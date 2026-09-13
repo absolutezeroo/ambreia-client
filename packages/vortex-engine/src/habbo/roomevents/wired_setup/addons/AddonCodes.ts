@@ -93,4 +93,28 @@ export class AddonCodes
 
     // AS3: AddonCodes.as::ACHIEVEMENT_ENABLER
     public static readonly ACHIEVEMENT_ENABLER: number = 2001;
+
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/roomevents/wired_setup/addons/AddonCodes.as::VARIABLE_FX_HEALTH_POINTS
+    public static readonly VARIABLE_FX_HEALTH_POINTS: number = 1200;
+
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/roomevents/wired_setup/addons/AddonCodes.as::VARIABLE_FX_PROGRESS_BAR
+    public static readonly VARIABLE_FX_PROGRESS_BAR: number = 1201;
+
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/roomevents/wired_setup/addons/AddonCodes.as::VARIABLE_FX_LEVELLING_PROGRESS
+    public static readonly VARIABLE_FX_LEVELLING_PROGRESS: number = 1202;
+
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/roomevents/wired_setup/addons/AddonCodes.as::VARIABLE_FX_STATUS_BAR
+    public static readonly VARIABLE_FX_STATUS_BAR: number = 1203;
+
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/roomevents/wired_setup/addons/AddonCodes.as::VARIABLE_FX_BOSS_BAR
+    public static readonly VARIABLE_FX_BOSS_BAR: number = 1204;
+
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/roomevents/wired_setup/addons/AddonCodes.as::VARIABLE_FX_NUMBER_DISPLAY
+    public static readonly VARIABLE_FX_NUMBER_DISPLAY: number = 1205;
+
+    // The add-on itself is not ported yet; the code is here because `AddonTypes` is what reports an
+    // unported one, and a code with no entry reads exactly like a bug in the dialog.
+    // TODO(AS3): port `VariablesWebApiAddon` — sources/AIR-1.0.31/src/com/sulake/habbo/roomevents/wired_setup/addons/VariablesWebApiAddon.as
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/roomevents/wired_setup/addons/AddonCodes.as::VARIABLES_WEB_API
+    public static readonly VARIABLES_WEB_API: number = 2002;
 }

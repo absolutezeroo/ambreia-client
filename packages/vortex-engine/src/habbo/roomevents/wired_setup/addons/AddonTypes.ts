@@ -29,6 +29,12 @@ import {CustomContract} from './chests/CustomContract';
 import {Projectile} from './Projectile';
 import {VariableTimeUtil} from './VariableTimeUtil';
 import {VariableLevelUp} from './VariableLevelUp';
+import {VariableFxBossBarAddon} from './variablefx/VariableFxBossBarAddon';
+import {VariableFxHealthPointsAddon} from './variablefx/VariableFxHealthPointsAddon';
+import {VariableFxLevellingProgressAddon} from './variablefx/VariableFxLevellingProgressAddon';
+import {VariableFxNumberDisplayAddon} from './variablefx/VariableFxNumberDisplayAddon';
+import {VariableFxProgressBarAddon} from './variablefx/VariableFxProgressBarAddon';
+import {VariableFxStatusBarAddon} from './variablefx/VariableFxStatusBarAddon';
 
 /**
  * AddonTypes — the wired addon registry (IWiredTypeHolder): instantiates every addon type and resolves
@@ -67,7 +73,13 @@ export class AddonTypes implements IWiredTypeHolder
         new CustomContract(),
         new VariableTimeUtil(),
         new Projectile(),
-        new VariableLevelUp()
+        new VariableLevelUp(),
+        new VariableFxHealthPointsAddon(),
+        new VariableFxProgressBarAddon(),
+        new VariableFxLevellingProgressAddon(),
+        new VariableFxStatusBarAddon(),
+        new VariableFxBossBarAddon(),
+        new VariableFxNumberDisplayAddon()
     ];
 
     // AS3: AddonTypes.as::getByCode()

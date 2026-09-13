@@ -139,10 +139,34 @@ Four things worth knowing about the families beyond the bars:
   badge alone — deliberately: a mapping the client does not understand should cost the bar, not the
   badge.
 
-**What is left:** the visualization wiring (`StackedAdditions` + `VariableFxStackAddition` into
-`AvatarVisualization`/`FurnitureVisualization`, ~1,200 l.) is what actually puts a bar on screen in
-a room, and the Wired editor addon (~3,400 l.) is what lets anyone configure one. Nothing in this
-feature has been exercised against a live server yet.
+**The visualization wiring is in** — `StackedAdditions` + `VariableFxStackAddition` +
+`VariableFxStackReconciler` into `AvatarVisualization`, with the per-room config table threaded
+through `RoomObjectVisualizationFactory` and `RoomManager`. That is what puts a bar on screen.
+
+**And so is the Wired editor**, the ~3,400 lines that let anyone configure one: 6 model files, 9
+presets, the add-on base and its six subclasses. The last of those is what the user actually sees
+first, because until the six codes existed `prepareForUpdate()` logged *"no ported element for code
+1202 in addon"* and the dialog never opened.
+
+The add-on base is one form over one state object; the six differ by a code and a category id, and
+two of them by a single extra int param. **The param layout is the contract and it is not what the
+field order suggests**: three values are written as LONGS, two slots each, so writing pushes 0..9
+plainly, `defaultMinValue` into 10-11, `defaultMaxValue` into 12-13, four flags into 14..17,
+`audienceVariableValue` into 18-19 and `segments` at 20 — and reading therefore skips 10, 12 and 18.
+Levelling adds a sub-renderer id at 21, the number display an icon alignment.
+
+**That count is what found two server-side breaks, both of which made a save fail silently.** The
+emulator declared 21 rules for all six, and `TryNormalizeIntParams` rejects a count it has no rule
+for and returns `false` from the whole update — so levelling progress and the number display, the
+two that send 22, could never be saved at all. `GetMaxVariableIds()` was also still the default 0,
+which let exactly one of the three variable ids through (`GetValidVariableIds` adds before it
+tests). Both fixed in `vortex-emulator`. The three ids are positional on the client's side and the
+shared pruning still drops the empty slots between them, which is noted where the limit is raised
+— a display using only its audience variable reads it back as its minimum override.
+
+The dialog's **header source-type selector is not wired**: `HeaderPreset` in this port takes no
+`SourceTypeSelectorParam`, so the furni-or-user switch AIR puts in the header has nowhere to go yet
+and the add-on's own `getHeaderSourceTypeSelectorParam()` has no caller.
 
 ### Raid protection, and a second asset source (2026-09-13)
 
