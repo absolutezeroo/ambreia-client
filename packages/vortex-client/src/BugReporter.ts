@@ -125,7 +125,13 @@ function buildDialog(): HTMLDialogElement
  */
 const STYLE = `
 #vortex-bug-report-button {
-    position: fixed; right: 12px; bottom: 12px; z-index: 2147483000;
+    /* Top right, not bottom right. The bottom edge is the client's own: the toolbar sits bottom
+       left, the chat input bottom centre, and a furni context menu ("Pick up / Use / Inspect")
+       opens wherever the furni is — which is how this button ended up sitting on top of one. It
+       also shared the corner with the window debugger's toggle, so the two overlapped each other
+       whenever that build had it. Top right is the one edge nothing in the room UI claims.
+       The debugger's toggle is placed just under it (see .hwd-toggle-btn). */
+    position: fixed; right: 12px; top: 12px; z-index: 2147483000;
     padding: 5px 12px; cursor: pointer;
     font: 12px/1.4 Arial, Helvetica, sans-serif; color: #FFF;
     background: #0E151C; border: 1px solid #8CA1AD;

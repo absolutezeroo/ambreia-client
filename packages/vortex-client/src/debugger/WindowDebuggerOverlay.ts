@@ -28,6 +28,59 @@ const log = Logger.getLogger('client.debugger.WindowDebuggerOverlay');
  */
 
 const HOTKEY_CODE = 'KeyD';
+
+/**
+ * Clipboard write that still works where `navigator.clipboard` is refused.
+ *
+ * Every toolbar action here ends in a clipboard write, and the whole point of them is handing a
+ * window tree to someone else. A Permissions Policy blocks the modern API with nothing but a console
+ * violation — the client is framed by vortex-web and Chrome does not inherit `clipboard-write` into
+ * a frame just because it is same-origin (that delegation is now in Client.svelte, but a client
+ * opened directly, or an older deployment of the site, still lands here).
+ *
+ * The fallback is the pre-API `execCommand('copy')` over an off-screen textarea. It is deprecated
+ * and it is synchronous, which is exactly why it survives the policy: it copies from a real
+ * selection inside a user gesture rather than asking for a capability.
+ */
+async function copyText(text: string): Promise<string>
+{
+    try
+    {
+        await navigator.clipboard.writeText(text);
+
+        return 'Copied!';
+    }
+    catch
+    {
+        const area = document.createElement('textarea');
+
+        area.value = text;
+        area.setAttribute('readonly', '');
+        area.style.position = 'fixed';
+        area.style.left = '-9999px';
+        area.style.top = '0';
+
+        document.body.appendChild(area);
+        area.select();
+
+        let ok: boolean;
+
+        try
+        {
+            ok = document.execCommand('copy');
+        }
+        catch
+        {
+            ok = false;
+        }
+
+        area.remove();
+
+        if(ok) return 'Copied!';
+
+        throw new Error('clipboard blocked');
+    }
+}
 const CASCADE_OFFSET = 24;
 const CONTEXT_LAYER_COUNT = 4;
 // A full-region dump of anything bigger than a small icon is unpasteable;
@@ -691,7 +744,7 @@ class WindowDebuggerPanel
         toolbar.appendChild(this.createActionButton(
             'Copy report',
             'Problems, overlaps, layout source, ancestor chain, full tree and captured warnings - everything a bug report needs, in one paste',
-            () => navigator.clipboard.writeText(buildDiagnosticReport(snapshot, this._canvas, selectedNode)).then(() => 'Copied!')));
+            () => copyText(buildDiagnosticReport(snapshot, this._canvas, selectedNode))));
 
         toolbar.appendChild(this.createActionButton(
             'Copy PNG',
@@ -708,7 +761,7 @@ class WindowDebuggerPanel
         toolbar.appendChild(this.createActionButton(
             'Layout source',
             'Which registered layout XML declares the selected node, scored across its whole ancestor chain',
-            () => navigator.clipboard.writeText(findLayoutSources((selectedNode ?? snapshot).window)).then(() => 'Copied!')));
+            () => copyText(findLayoutSources((selectedNode ?? snapshot).window))));
 
         toolbar.appendChild(this.createActionButton(
             'Copy pixels',
@@ -719,7 +772,7 @@ class WindowDebuggerPanel
 
                 if(!target) return Promise.resolve('No node selected');
 
-                return navigator.clipboard.writeText(dumpWindowPixels(target, this._canvas)).then(() => 'Copied!');
+                return copyText(dumpWindowPixels(target, this._canvas));
             }));
 
         if(overlaps === null)
@@ -1717,8 +1770,11 @@ function injectStyles(): void
 
     style.textContent = `
 .hwd-toggle-btn {
+    /* Under the bug-report button, same edge. Both used to sit bottom right, on top of each other
+       and on top of whatever furni context menu the player had open. The 44px offset clears that
+       button's height plus its 12px margin. */
     position: fixed;
-    bottom: 16px;
+    top: 44px;
     right: 16px;
     width: 40px;
     height: 40px;

@@ -176,7 +176,14 @@
             <HotelClosed reason={error} className="w-full max-w-[620px]" />
         </div>
     {:else if src}
-        <iframe bind:this={frame} {src} title="Vortex" class="h-full w-full border-0" allow="autoplay; fullscreen"></iframe>
+        <!-- `clipboard-write` is delegated because the client writes to the clipboard from inside
+             this frame and a Permissions Policy blocks it otherwise, with nothing but a console
+             violation to say so: the window debugger's copy buttons (diagnostic report, layout
+             sources, canvas pixels) and the bug reporter both go through
+             `navigator.clipboard.writeText`. Chrome does not inherit this one into a frame just
+             because the frame is same-origin — it has to be named here. Read is NOT delegated:
+             nothing in the client pastes, and `clipboard-read` prompts the user. -->
+        <iframe bind:this={frame} {src} title="Vortex" class="h-full w-full border-0" allow="autoplay; fullscreen; clipboard-write"></iframe>
     {:else}
         <div class="flex h-full items-center justify-center bg-page">
             <p class="font-condensed uppercase text-ink">...</p>
