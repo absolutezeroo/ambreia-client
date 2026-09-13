@@ -34,3 +34,5 @@ export * from './RoomAdSearchMessageComposer';
 export * from './RemoveOwnRoomRightsRoomMessageComposer';
 export * from './RoomAdEventTabAdClickedComposer';
 export * from './RoomAdEventTabViewedComposer';
+export * from './GetRaidProtectionSettingsMessageComposer';
+export * from './SaveRaidProtectionSettingsMessageComposer';

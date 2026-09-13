@@ -46,6 +46,9 @@ import type {IHabboCommunicationManager} from '../communication/IHabboCommunicat
 import {IID_HabboCommunicationManager} from "@iid/IIDHabboCommunicationManager";
 import {Logger} from '@core/utils/Logger';
 import {ToolbarHoverCtrl} from './toolbar/ToolbarHoverCtrl';
+import {IID_HabboConfigurationManager} from '@iid/IIDHabboConfigurationManager';
+import type {IHabboConfigurationManager} from '@habbo/configuration/IHabboConfigurationManager';
+import {RaidProtectionSettingsController} from './raidprotection/RaidProtectionSettingsController';
 
 // Composers
 import {
@@ -74,6 +77,13 @@ export class HabboNavigator extends Component implements IHabboNavigator
     private _newNavigator: IHabboNewNavigator | null = null;
     // AS3: .../src/com/sulake/habbo/navigator/HabboNavigator.as::_roomSessionManager
     private _roomSessionManager: IRoomSessionManager | null = null;
+
+    // AS3: .../src/com/sulake/habbo/navigator/HabboNavigator.as::get roomSessionManager()
+    get roomSessionManager(): IRoomSessionManager | null
+    {
+        return this._roomSessionManager;
+    }
+
     // AS3: .../src/com/sulake/habbo/navigator/HabboNavigator.as::_toolbar
     private _toolbar: IHabboToolbar | null = null;
 
@@ -82,8 +92,28 @@ export class HabboNavigator extends Component implements IHabboNavigator
     // Built on first hover, exactly as AS3 does — the room list it shows is not worth a window
     // for a session that never hovers the navigator button.
     private _toolbarHover: ToolbarHoverCtrl | null = null;
+    // AS3: .../src/com/sulake/habbo/navigator/HabboNavigator.as::_configuration
+    private _configuration: IHabboConfigurationManager | null = null;
+
+    // AS3: .../src/com/sulake/habbo/navigator/HabboNavigator.as::_raidProtectionSettingsController
+    //   Name derived: the AS3 field is `_SafeStr_5588`; named for the class it holds.
+    private _raidProtectionSettingsController: RaidProtectionSettingsController | null = null;
+
+    // AS3: .../src/com/sulake/habbo/navigator/HabboNavigator.as::get raidProtectionSettingsController()
+    get raidProtectionSettingsController(): RaidProtectionSettingsController | null
+    {
+        return this._raidProtectionSettingsController;
+    }
+
     // AS3: .../src/com/sulake/habbo/navigator/HabboNavigator.as::_windowManager
     private _windowManager: IHabboWindowManager | null = null;
+
+    // AS3: .../src/com/sulake/habbo/navigator/HabboNavigator.as::get windowManager()
+    get windowManager(): IHabboWindowManager | null
+    {
+        return this._windowManager;
+    }
+
     // AS3: .../src/com/sulake/habbo/navigator/HabboNavigator.as::_localization
     private _localization: IHabboLocalizationManager | null = null;
     // AS3: .../src/com/sulake/habbo/navigator/HabboNavigator.as::_tracking
@@ -177,8 +207,16 @@ export class HabboNavigator extends Component implements IHabboNavigator
                 true
             ),
             new ComponentDependency(
+                IID_HabboConfigurationManager,
+                (manager: IHabboConfigurationManager | null) =>
+                {
+                    this._configuration = manager;
+                },
+                true
+            ),
+            new ComponentDependency(
                 IID_RoomSessionManager,
-                (manager: IRoomSessionManager | null) => 
+                (manager: IRoomSessionManager | null) =>
                 {
                     this._roomSessionManager = manager;
                 },
@@ -989,8 +1027,11 @@ export class HabboNavigator extends Component implements IHabboNavigator
 
         if(parts.length < 2) return;
 
-        switch(parts[1]) 
+        switch(parts[1])
         {
+            case 'raidprotection':
+                this._raidProtectionSettingsController?.openFromLink(parts.length === 3 ? parts[2]! : null);
+                break;
             case 'goto':
                 if(parts.length >= 3) 
                 {
@@ -1072,15 +1113,18 @@ export class HabboNavigator extends Component implements IHabboNavigator
         }
 
         this._incomingMessages?.dispose();
+        this._raidProtectionSettingsController?.dispose();
+        this._raidProtectionSettingsController = null;
         this._data.dispose();
 
         log.debug('Navigator disposed');
         super.dispose();
     }
 
-    protected override initComponent(): void 
+    protected override initComponent(): void
     {
         this._incomingMessages = new IncomingMessages(this);
+        this._raidProtectionSettingsController = new RaidProtectionSettingsController(this, this._configuration);
 
         log.debug('Navigator initialized');
     }

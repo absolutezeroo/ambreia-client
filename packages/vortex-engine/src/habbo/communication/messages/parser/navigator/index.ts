@@ -24,3 +24,6 @@ export * from './NoOwnedRoomsAlertMessageEventParser';
 export * from './NoSuchFlatMessageEventParser';
 export * from './RoomFilterSettingsMessageEventParser';
 export * from './RoomSettingsErrorMessageEventParser';
+export * from './RaidProtectionCapabilityMessageParser';
+export * from './RaidProtectionSettingsMessageParser';
+export * from './RaidProtectionSaveResultMessageParser';

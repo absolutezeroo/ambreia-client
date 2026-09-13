@@ -126,6 +126,9 @@ import {
     NavigatorSettingsMessageEvent,
     OfficialRoomsMessageEvent,
     PopularRoomTagsResultMessageEvent,
+    RaidProtectionCapabilityMessageEvent,
+    RaidProtectionSaveResultMessageEvent,
+    RaidProtectionSettingsMessageEvent,
     RoomEventCancelMessageEvent,
     RoomEventMessageEvent,
     NoOwnedRoomsAlertMessageEvent,
@@ -1284,6 +1287,8 @@ import {
     RoomsWhereMyFriendsAreSearchMessageComposer,
     RoomsWithHighestScoreSearchMessageComposer,
     RoomTextSearchMessageComposer,
+    GetRaidProtectionSettingsMessageComposer,
+    SaveRaidProtectionSettingsMessageComposer,
     SetRoomSessionTagsMessageComposer,
     ToggleStaffPickMessageComposer,
     UpdateHomeRoomMessageComposer,
@@ -1873,6 +1878,24 @@ export class HabboMessages implements IMessageConfiguration
         this._events.set(1086, FlatAccessDeniedMessageEvent);
         this._events.set(3494, ConvertedRoomIdMessageEvent);
         this._events.set(84, CompetitionRoomsDataMessageEvent);
+
+        // === RAID PROTECTION ===
+        // These three exist only in AIR-1.0.31 — no WIN63 build has the feature at all, so there
+        // is no 20260701 header to recover and none of the three names is recoverable either
+        // (every class is obfuscated in the one tree that has them). AIR's own ids cannot simply
+        // be reused: it re-randomises the whole registry, and two of the three collide with
+        // messages this revision already uses. So the ids below are *assigned* in 20260701
+        // numbering, and must be assigned identically in the emulator's Headers.cs:
+        //
+        //   AIR  734 -> 3554  (734 is ChatReviewSessionOfferedToGuide here)
+        //   AIR 3553 -> 3553  (free on both sides, so AIR's own id is kept)
+        //   AIR 3620 -> 3555  (3620 is SecondsUntil here)
+        //
+        // 3554 and 3555 were picked as the first ids after 3553 that are unused as an event AND
+        // as a composer in the WIN63 registry, in this file, and in the emulator.
+        this._events.set(3554, RaidProtectionCapabilityMessageEvent);
+        this._events.set(3553, RaidProtectionSettingsMessageEvent);
+        this._events.set(3555, RaidProtectionSaveResultMessageEvent);
 
         // === NOTIFICATIONS ===
         this._events.set(509, ActivityPointsMessageEvent);
@@ -3114,6 +3137,11 @@ export class HabboMessages implements IMessageConfiguration
 
         // === NAVIGATOR ===
         this._composers.set(2603, GetGuestRoomMessageComposer);
+        // Raid protection — AIR-1.0.31 only; see the incoming block above for how the ids were
+        // assigned. Unlike the three events, both composer ids are free in this revision and in
+        // the emulator, so AIR's own numbers are kept verbatim.
+        this._composers.set(206, GetRaidProtectionSettingsMessageComposer);
+        this._composers.set(2687, SaveRaidProtectionSettingsMessageComposer);
         this._composers.set(354, CreateFlatMessageComposer);
         this._composers.set(3169, AddFavouriteRoomMessageComposer);
         this._composers.set(1654, DeleteFavouriteRoomMessageComposer);

@@ -15,6 +15,7 @@ import {TagRenderer} from '../TagRenderer';
 import {GuildInfoCtrl} from '../GuildInfoCtrl';
 import {SimpleAlertView} from '../SimpleAlertView';
 import {Util} from '../Util';
+import {RaidProtectionSettingsController} from '../raidprotection/RaidProtectionSettingsController';
 import {UserInfoRegionUtil} from '@habbo/utils/UserInfoRegionUtil';
 import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
 
@@ -36,6 +37,10 @@ export class RoomInfoViewCtrl
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/navigator/inroom/RoomInfoViewCtrl.as::_embedExpanded
     private _embedExpanded: boolean = false;
     private _visible: boolean = false;
+
+    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/navigator/inroom/RoomInfoViewCtrl.as::_raidProtectionSettingsController
+    //   Name derived: the AS3 field is `_SafeStr_5588`; named for the class it holds.
+    private _raidProtection: RaidProtectionSettingsController | null = null;
 
     constructor(navigator: IHabboTransitionalNavigator)
     {
@@ -121,12 +126,15 @@ export class RoomInfoViewCtrl
         const session = nav.roomSessionManager?.getSession(roomData.flatId) ?? null;
         this._find('floor_plan_editor_button').visible = session !== null && session.roomControllerLevel >= 1;
 
+        this._refreshRaidProtectionButton(roomData);
+
         const btnsCont = this._window.findChildByName('buttons_cont') as IWindowContainer | null;
 
         if(btnsCont !== null)
         {
             const btnNames = [
                 'room_settings_button',
+                'raid_protection_settings_button',
                 'room_filter_button',
                 'floor_plan_editor_button',
                 'staff_pick_button',
@@ -140,11 +148,65 @@ export class RoomInfoViewCtrl
         }
     }
 
+    /**
+     * Looked up rather than `_find()`-ed because the button is not in the WIN63 dump — raid
+     * protection postdates it. It reaches the client because `build-window-assets.mjs` takes
+     * `iro_room_details_framed_xml` from the AIR source instead (its `AIR_PREFERRED` set, which
+     * exists for this one button). Build the assets with `--no-air` and this becomes a no-op
+     * rather than a crash, and the window is still reachable through its
+     * `navigator/raidprotection/<flatId>` link.
+     */
+    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/navigator/inroom/RoomInfoViewCtrl.as::refreshRaidProtectionButton()
+    private _refreshRaidProtectionButton(roomData: GuestRoomData): void
+    {
+        const button = this._window?.findChildByName('raid_protection_settings_button') ?? null;
+
+        if(button === null) return;
+
+        button.visible = this._raidProtection !== null
+            && this._raidProtection.isFeatureEnabled
+            && this._raidProtection.canManage(roomData.flatId);
+    }
+
+    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/navigator/inroom/RoomInfoViewCtrl.as::onRaidProtectionStateChanged()
+    private _onRaidProtectionStateChanged = (): void =>
+    {
+        const roomData = this._navigator?.data.enteredGuestRoom ?? null;
+
+        if(this._window === null || roomData === null) return;
+
+        this.refreshButtons(roomData);
+    };
+
+    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/navigator/inroom/RoomInfoViewCtrl.as::onRaidProtectionSettingsClick()
+    private _onRaidProtectionSettingsClick = (): void =>
+    {
+        const roomData = this._navigator?.data.enteredGuestRoom ?? null;
+
+        if(roomData === null) return;
+
+        const ctx = (this._navigator?.windowManager as unknown as {
+            context?: {createLinkEvent(link: string): void};
+        })?.context;
+
+        ctx?.createLinkEvent(`navigator/raidprotection/${roomData.flatId}`);
+        this.close();
+    };
+
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/navigator/inroom/RoomInfoViewCtrl.as::dispose()
     dispose(): void
     {
         this._tagRenderer.dispose();
         this._guildInfoCtrl.dispose();
+
+        if(this._raidProtection)
+        {
+            this._raidProtection.off(
+                RaidProtectionSettingsController.STATE_CHANGED,
+                this._onRaidProtectionStateChanged
+            );
+            this._raidProtection = null;
+        }
 
         if(this._window !== null)
         {
@@ -357,6 +419,18 @@ export class RoomInfoViewCtrl
     {
         this._visible = true;
 
+        // Subscribed before the early return below, exactly as AS3 does: the controller may only
+        // have been built after this view's first window, and leaving/entering a room changes the
+        // answer without the window being rebuilt.
+        if(this._raidProtection === null)
+        {
+            this._raidProtection = this._navigator?.raidProtectionSettingsController ?? null;
+            this._raidProtection?.on(
+                RaidProtectionSettingsController.STATE_CHANGED,
+                this._onRaidProtectionStateChanged
+            );
+        }
+
         if(this._window !== null) return;
 
         if(!this._navigator) return;
@@ -372,6 +446,7 @@ export class RoomInfoViewCtrl
         this._addClick('make_favourite_region', this._onAddFavouriteClick);
         this._addClick('favourite_region', this._onRemoveFavouriteClick);
         this._addClick('room_settings_button', this._onRoomSettingsClick);
+        this._addClick('raid_protection_settings_button', this._onRaidProtectionSettingsClick);
         this._addClick('room_filter_button', this._onRoomFilterButtonClick);
         this._addClick('floor_plan_editor_button', this._onFloorPlanEditorButtonClick);
         this._addClick('room_muteall_button', this._onMuteAllClick);

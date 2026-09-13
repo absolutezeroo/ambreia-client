@@ -10,6 +10,7 @@ import type {IRoomSessionManager} from '../session/IRoomSessionManager';
 import type {ISessionDataManager} from '../session/ISessionDataManager';
 import type {IHabboWindowManager} from '../window/IHabboWindowManager';
 import type {IHabboHelp} from '../help/IHabboHelp';
+import type {RaidProtectionSettingsController} from './raidprotection/RaidProtectionSettingsController';
 import type {IMessageComposer} from '@core';
 import type {IHabboNavigator} from './IHabboNavigator';
 import type {NavigatorData} from './domain';
@@ -131,4 +132,11 @@ export interface IHabboTransitionalNavigator extends IHabboNavigator
 
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/navigator/IHabboTransitionalNavigator.as::getProperty()
     getProperty(key: string, params?: Record<string, string>): string;
+
+    /**
+     * Null when the old navigator has not been built yet, or when the client was compiled without
+     * the feature — every caller has to check.
+     */
+    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/navigator/_SafeCls_94.as::get raidProtectionSettingsController()
+    readonly raidProtectionSettingsController: RaidProtectionSettingsController | null;
 }

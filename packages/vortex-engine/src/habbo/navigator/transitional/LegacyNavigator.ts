@@ -19,6 +19,7 @@ import type {IHabboTransitionalNavigator} from '../IHabboTransitionalNavigator';
 import type {ITransitionalMainViewCtrl} from '../mainview/ITransitionalMainViewCtrl';
 import type {HabboNewNavigator} from '../HabboNewNavigator';
 import type {HabboNavigator} from '../HabboNavigator';
+import type {RaidProtectionSettingsController} from '../raidprotection/RaidProtectionSettingsController';
 import {EventEmitter} from 'eventemitter3';
 import type {NavigatorData} from '../domain';
 import {Tabs} from '../domain/Tabs';
@@ -211,6 +212,16 @@ export class LegacyNavigator implements IHabboTransitionalNavigator
     get data(): NavigatorData
     {
         return this._oldNavigator!.data;
+    }
+
+    /**
+     * The controller lives on the old navigator; everything that reaches for it — the room-info
+     * view, and the new navigator's `navigator/raidprotection/<flatId>` link — goes through here.
+     */
+    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/navigator/transitional/LegacyNavigator.as::get raidProtectionSettingsController()
+    get raidProtectionSettingsController(): RaidProtectionSettingsController | null
+    {
+        return this._oldNavigator?.raidProtectionSettingsController ?? null;
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/navigator/transitional/LegacyNavigator.as::get mainViewCtrl()

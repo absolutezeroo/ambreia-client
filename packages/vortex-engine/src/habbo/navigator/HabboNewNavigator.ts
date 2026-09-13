@@ -990,6 +990,11 @@ export class HabboNewNavigator extends Component implements IHabboNewNavigator
 
         switch(parts[1])
         {
+            case 'raidprotection':
+                this._legacyNavigatorWrapper
+                    ?.raidProtectionSettingsController
+                    ?.openFromLink(parts.length === 3 ? parts[2]! : null);
+                break;
             case 'goto':
                 if(parts.length > 2)
                 {

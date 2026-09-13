@@ -45,3 +45,7 @@ export * from './NoOwnedRoomsAlertMessageEvent';
 export * from './NoSuchFlatMessageEvent';
 export * from './RoomFilterSettingsMessageEvent';
 export * from './RoomSettingsErrorMessageEvent';
+export * from './RaidProtectionSettingsSnapshot';
+export * from './RaidProtectionCapabilityMessageEvent';
+export * from './RaidProtectionSettingsMessageEvent';
+export * from './RaidProtectionSaveResultMessageEvent';
