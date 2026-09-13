@@ -608,6 +608,35 @@ export class HabboFreeFlowChat extends Component implements IHabboFreeFlowChat
         this.selectAvatar(item.roomId, item.userId);
     }
 
+    /**
+	 * Both branches of AS3's `onTextLinkEvent()`, moved off the bubble — see the DEVIATION note on
+	 * `IHabboFreeFlowChat.chatLinkClicked()` for why the bubble reports instead of acting.
+	 *
+	 * `highlight/<text>` is not a client link: it shows the rest of the string as a hint at the
+	 * cursor, uppercased, which is how a chat bubble annotates a word. Anything else is a real
+	 * link and goes to the link trackers.
+	 */
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/freeflowchat/viewer/visualization/PooledChatBubble.as::onTextLinkEvent()
+    chatLinkClicked(url: string, at: {x: number; y: number}): void
+    {
+        if(url.length === 0) return;
+
+        const marker = 'highlight/';
+        const index = url.indexOf(marker);
+
+        if(index > -1)
+        {
+            const hint = url.substring(index + marker.length);
+
+            this._windowManager?.hideHint();
+            this._windowManager?.showHint(hint.toLocaleUpperCase(), {x: at.x, y: at.y, width: 0, height: 0});
+
+            return;
+        }
+
+        this.context.createLinkEvent(url);
+    }
+
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/freeflowchat/HabboFreeFlowChat.as::selectAvatar()
     selectAvatar(roomId: number, userId: number): void
     {

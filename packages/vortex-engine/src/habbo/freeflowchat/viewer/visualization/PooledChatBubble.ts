@@ -5,7 +5,8 @@ import type {ChatItem} from '@habbo/freeflowchat/data/ChatItem';
 import {RoomSessionChatEvent} from '@habbo/session/events/RoomSessionChatEvent';
 import {ChatBubbleWidth} from '../enum/ChatBubbleWidth';
 import type {IChatStyleInternal} from './style/IChatStyleInternal';
-import {buildChatTextRuns, layoutChatText, drawChatText} from './ChatTextLayout';
+import {buildChatTextRuns, layoutChatText, drawChatText, hitTestChatTextLayout} from './ChatTextLayout';
+import type {IChatTextLayout} from './ChatTextLayout';
 
 function clamp(value: number, min: number, max: number): number
 {
@@ -63,6 +64,11 @@ export class PooledChatBubble extends Container
     private readonly _emblem: Sprite = new Sprite();
     private readonly _faceSprite: Sprite = new Sprite();
     private readonly _textSprite: Sprite = new Sprite();
+
+    // Kept so a click can be resolved back to a link run. The bubble is a rasterized canvas, so
+    // without the layout the URLs `buildChatTextRuns()` already attaches have no reader at all.
+    // TS-only: Flash carried the links on the TextField itself and reported clicks as TextEvents.
+    private _textLayout: IChatTextLayout | null = null;
     private readonly _clipMask: Graphics = new Graphics();
 
     private _minHeight: number = -1;
@@ -291,6 +297,8 @@ export class PooledChatBubble extends Container
         const textCtx = textCanvas.getContext('2d')!;
 
         drawChatText(textCtx, layout, fontFace, fontSize);
+
+        this._textLayout = layout;
 
         this._textSprite.texture = Texture.from(textCanvas.transferToImageBitmap());
         this._textSprite.position.set(margins.x, margins.y);
@@ -564,6 +572,28 @@ export class PooledChatBubble extends Container
     private onMouseClick(event: FederatedPointerEvent): void
     {
         if(!this._style || this._style.isAnonymous || !this._chatFlow || !this._chatItem) return;
+
+        // A link takes the click before the bubble does — AS3 gets the same ordering for free,
+        // because Flash's TextField swallows a click on an anchor and dispatches `"link"` instead
+        // of letting it reach the bubble's own `onMouseClick`.
+        // AS3: .../src/com/sulake/habbo/freeflowchat/viewer/visualization/PooledChatBubble.as::onTextLinkEvent()
+        if(this._textLayout !== null)
+        {
+            const local = this.toLocal(event.global);
+            const url = hitTestChatTextLayout(
+                this._textLayout,
+                local.x - this._textSprite.position.x,
+                local.y - this._textSprite.position.y
+            );
+
+            if(url !== null)
+            {
+                this._chatFlow.chatLinkClicked(url, {x: event.global.x, y: event.global.y});
+                event.stopPropagation();
+
+                return;
+            }
+        }
 
         if(!this._chatFlow.clickHasToPropagate(event))
         {

@@ -344,3 +344,34 @@ export function buildChatTextRuns(
 
     return runs;
 }
+
+/**
+ * The URL of the link run at a point in the laid-out text, or null.
+ *
+ * Coordinates are local to the text block — the origin `drawChatText()` draws from, which is the
+ * text sprite's own position inside the bubble.
+ *
+ * Flash needed no equivalent: the bubble's TextField carried the links as `htmlText` anchors and
+ * dispatched a `TextEvent` with the href, so AS3 reads `event.text` and never hit-tests. This port
+ * rasterizes its runs to a canvas, so the hit test is what stands in for that event — the geometry
+ * is already here, it just had no reader.
+ */
+// DEVIATION: AS3 gets the clicked href from Flash's `"link"` TextEvent on a TextField. This port
+//   draws text itself and has no TextField, so the same information is recovered from the layout
+//   the draw already produced.
+// AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/freeflowchat/viewer/visualization/PooledChatBubble.as::onTextLinkEvent()
+export function hitTestChatTextLayout(layout: IChatTextLayout, x: number, y: number): string | null
+{
+    if(y < 0 || y >= layout.height || x < 0) return null;
+
+    const line = layout.lines[Math.floor(y / layout.lineHeight)];
+
+    if(!line) return null;
+
+    for(const placed of line)
+    {
+        if(x >= placed.x && x < placed.x + placed.width) return placed.run.url ?? null;
+    }
+
+    return null;
+}

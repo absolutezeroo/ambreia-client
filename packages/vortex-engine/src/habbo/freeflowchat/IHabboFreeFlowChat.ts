@@ -236,6 +236,19 @@ export interface IHabboFreeFlowChat
     selectAvatar(roomId: number, userId: number): void;
 
     /**
+	 * A link inside a chat bubble was clicked. `at` is where, in global coordinates, for the hint.
+	 *
+	 * DEVIATION: AS3 puts this in the bubble itself — `onTextLinkEvent()` reaches through
+	 *   `chatFlow.context.createLinkEvent()` and `chatFlow.windowManager.showHint()`. This
+	 *   interface deliberately exposes neither (see the note on `registerUpdateReceiver` below:
+	 *   the views work through the chatFlow reference rather than getting their own component
+	 *   access), and handing a bubble the context would hand it the whole client. So the bubble
+	 *   reports the click and the component, which already holds both, acts on it.
+	 */
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/freeflowchat/viewer/visualization/PooledChatBubble.as::onTextLinkEvent()
+    chatLinkClicked(url: string, at: {x: number; y: number}): void;
+
+    /**
 	 * Per-frame tick registration, inherited in AS3 from the component interface HabboFreeFlowChat
 	 * implements — ChatFlowViewer/ChatFlowStage register themselves through the chatFlow reference
 	 * they are constructed with rather than needing their own Component/context access.
