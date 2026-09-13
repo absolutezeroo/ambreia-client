@@ -52,6 +52,17 @@ RUN node install.mjs --skip-install --skip-checks
 # Coolify's Resource Limits — or the machine genuinely does not have the memory, and the build has
 # to happen somewhere with more.
 ENV NODE_OPTIONS=--max-old-space-size=4096
+
+# The in-client window debugger (🐞 / Ctrl+Shift+D), off unless asked for. It has to be a BUILD
+# argument, not a runtime variable: Vite inlines `import.meta.env.*` as literals and the minifier
+# drops the dead branch, so an unset flag means the debugger is not in the bundle at all rather
+# than merely hidden. Setting it in Coolify's runtime environment therefore does nothing.
+#
+# In Coolify this is a *Build Variable* (Configuration → Environment Variables → "Build Variable"),
+# which is what gets passed through to `docker build --build-arg`.
+ARG VITE_WINDOW_DEBUGGER=
+ENV VITE_WINDOW_DEBUGGER=$VITE_WINDOW_DEBUGGER
+
 RUN pnpm --filter vortex-client build
 
 # =================================================================================================

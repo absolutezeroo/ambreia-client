@@ -1436,9 +1436,16 @@ export class VortexApp
 
     private async initClientUi(vortex: typeof Vortex.instance): Promise<void>
     {
-        // Dev-only visual window debugger (Ctrl+Shift+D). Never bundled in
-        // production — import.meta.env.DEV is statically stripped by Vite.
-        if(import.meta.env.DEV && this._canvas)
+        // Visual window debugger (Ctrl+Shift+D, or the 🐞 button). On in dev always; in a
+        // production build only when `VITE_WINDOW_DEBUGGER=1` was set AT BUILD TIME.
+        //
+        // It cannot be a runtime switch. Vite substitutes `import.meta.env.*` as literals and the
+        // minifier drops the dead branch, so with neither flag set the debugger — and the whole
+        // module behind it, tree inspector and skin previewer included — is not in the bundle at
+        // all. That is the point: it is several hundred KB of tooling nobody browsing the hotel
+        // should download. Setting the variable in Coolify's *runtime* environment does nothing;
+        // it has to reach `vite build`, which is why the Dockerfile takes it as a build ARG.
+        if((import.meta.env.DEV || import.meta.env.VITE_WINDOW_DEBUGGER === '1') && this._canvas)
         {
             this._uninstallWindowDebugger = installWindowDebugger(this._canvas);
         }
