@@ -66,6 +66,18 @@ const AIR_PREFERRED = new Set(['iro_room_details_framed_xml']);
 // the type/style -> renderer+asset table, loaded through its own manager entry point.
 const ELEMENT_DESCRIPTION_ASSET = 'habbo_element_description_xml';
 
+// XML documents that are configuration rather than a window or a skin, but reach the client through
+// the same asset library and under the same *Com.as field name. Keyed by root element because that
+// is the only thing that distinguishes them once the file is open.
+const CONFIG_ROOT_TAGS = new Set([
+    // habbo_notifications_config_xml
+    'variables',
+    // variablefx_renderer_mapping - renderer id -> renderer class, read by VariableFxRendererRegistry
+    'variableFxRenderers',
+    // variablefx_icon_metadata - per-icon sheet offsets
+    'icons'
+]);
+
 const FIELD_RE = /public\s+static\s+(?:var|const)\s+(\w+)\s*:\s*Class\s*=\s*([\w$]+)\s*;/g;
 
 // A Flex embed's linkage name is "<name>_<type>$<hash>". The type is read generically rather
@@ -291,9 +303,23 @@ function readDeclarations(comDir, srcDir, obfuscatedNameMap)
         }
     }
 
-    for (const comFile of findComFiles(comDir))
+    // *Lib.as alongside *Com.as. The VariableFx renderer mapping and icon metadata are declared in
+    // HabboRoomObjectVisualizationLib, which a *Com.as-only scan walks straight past - the same
+    // thing that hid the 121 variablefx images from the image importer. Safe to widen because the
+    // root-tag filter downstream is what decides: the other XML these declare (avatar geometry,
+    // action offsets, the .nitro manifests) have roots this builder does not accept, so they are
+    // read and skipped exactly as before.
+    const manifestFiles = [
+        ...findComFiles(comDir),
+        ...fs.readdirSync(comDir).filter((name) => /Lib\.as$/.test(name)).map((name) => path.join(comDir, name))
+    ];
+
+    for (const comFile of manifestFiles)
     {
-        const component = path.basename(comFile).replace(/Com\.as$/, '');
+        // Strips either suffix: the component name is what qualifies a colliding field name, and
+        // "HabboRoomObjectVisualizationLib" would otherwise keep its Lib where every sibling drops
+        // its Com.
+        const component = path.basename(comFile).replace(/(Com|Lib)\.as$/, '');
         const content = fs.readFileSync(comFile, 'utf8');
         let match;
 
@@ -416,17 +442,19 @@ function collectAssets(tree, label)
 
         const tag = rootTag(xml);
 
-        if (tag !== 'layout' && tag !== 'skin' && tag !== 'variables')
+        if (!CONFIG_ROOT_TAGS.has(tag) && tag !== 'layout' && tag !== 'skin')
         {
             continue;
         }
 
-        // A <variables> document is a configuration, not a drawable: the one in the dump is
+        // A CONFIG_ROOT_TAGS document is a configuration, not a drawable: `<variables>` is
         // habbo_notifications_config_xml, the per-type notification style/timing table that
-        // SingularNotificationController reads through XMLVariableParser. It rides along with
-        // the layouts because that is the channel already registering XML into the asset
-        // library under its *Com.as field name, which is the name AS3 asks for. App.ts's
-        // layout pass finds no <window> in it and yields nothing, silently and by design.
+        // SingularNotificationController reads through XMLVariableParser, and the two VariableFx
+        // ones are the renderer id -> class table and the icon offsets, both fetched by name
+        // through AssetLibraryVariableFxAssetProvider.getXml(). They ride along with the layouts
+        // because that is the channel already registering XML into the asset library under its
+        // *Com.as field name, which is the name AS3 asks for. App.ts's layout pass finds no
+        // <window> in them and yields nothing, silently and by design.
         (tag === 'skin' ? skins : layouts).push({...declaration, raw, file, xml});
     }
 
