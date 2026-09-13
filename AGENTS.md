@@ -21,7 +21,7 @@ pnpm lint                    # ESLint over both packages
 | `sources/WIN63-202607011411-782849652/`      | PRIMARY   | `src/com/sulake/{habbo,room,core,iid}/` | ~3,369 |
 | `sources/win63_version/`                     | Secondary | `habbo/`, `room/`                       | ~4,465 |
 | `sources/PRODUCTION-201601012205-226667486/` | Tertiary  | `com/sulake/habbo/`                     | ~7,160 |
-| `sources/AIR-1.0.31/`                        | Features only — **never headers** | `scripts/com/sulake/{habbo,room,core,iid}/` | ~3,432 |
+| `sources/AIR-1.0.31/`                        | Features only — **never headers** | `src/com/sulake/{habbo,room,core,iid}/` | ~3,432 |
 
 `WIN63-202607011411-782849652` is a later, partly-obfuscated build and the day-to-day reference. Three corrections to what this paragraph used to claim, each of which cost real work:
 

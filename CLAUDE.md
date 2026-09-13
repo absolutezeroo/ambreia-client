@@ -49,7 +49,7 @@ Enforcement rules live in `.claude/rules/` and are auto-loaded into every sessio
 | `sources/WIN63-202607011411-782849652/`      | **PRIMARY** | `src/com/sulake/{habbo,room,core,iid}/` | 3,305 | 25%        |
 | `sources/win63_version/`                     | Secondary   | `habbo/`, `room/`, `core/`              | 4,694 | 18%        |
 | `sources/PRODUCTION-201601012205-226667486/` | Tertiary    | `src/com/sulake/habbo/`                 | 3,526 | 0%         |
-| `sources/AIR-1.0.31/`                        | Features only — **never headers** | `scripts/com/sulake/{habbo,room,core,iid}/` | 3,432 | 26% |
+| `sources/AIR-1.0.31/`                        | Features only — **never headers** | `src/com/sulake/{habbo,room,core,iid}/` | 3,432 | 26% |
 
 `WIN63-202607011411-782849652` is a later, partly-obfuscated client build and is the primary
 day-to-day reference.
@@ -74,9 +74,9 @@ New messages ported out of AIR therefore get a free header chosen in the 2026070
 assigned on **both** sides — the same way the room-effect message (2624) and the habbicons
 messages were done. Mixing numbering from two revisions on one wire is never valid.
 
-**The AIR dump's assets are in `scripts/binaryData/`, not in an `_assets/`.** It is laid out
-differently from the WIN63 trees: no `_assets/`, no `layouts/`, no `images/` — just `scripts/` plus
-`scripts/binaryData/`, holding **1,092 `.bin` blobs** named `<charId>_<class>`, where `<class>` is
+**The AIR dump's assets are in `src/binaryData/`, not in an `_assets/`.** It is laid out
+differently from the WIN63 trees: no `_assets/`, no `layouts/`, no `images/` — just `src/` plus
+`src/binaryData/`, holding **1,092 `.bin` blobs** named `<charId>_<class>`, where `<class>` is
 either the real linkage name (`3329_room_settings_xml$771e3819...`) or the obfuscated
 `<charId>__SafeCls_N`. `_SafeCls_N` is exactly the class the dump's own `*Com.as` assigns to the
 asset field, so the join described in "Assets" below works unchanged:
@@ -188,9 +188,12 @@ it. `src/layouts/` and `src/images/` hold the raw XML/PNG resources flat, named 
 (`<seq>_<name>_<type>$<hash>` or `<seq>__SafeCls_N`).
 
 **The builder reads a second source, `AIR-1.0.31`, as a supplement.** Same join, different tree
-shape — AIR keeps its `*Com.as` at `scripts/` and its embeds in `scripts/binaryData/`, where WIN63
-keeps the manifests in `src/binaryData/` and the embeds in `src/layouts/` + `src/_assets/`; both
-have a `binaryData/` and it means the opposite thing in each, which `resolveTree()` sorts out. The
+shape — AIR keeps its `*Com.as` at the package root and its embeds in `binaryData/` beside them,
+where WIN63 keeps the manifests in `src/binaryData/` and the embeds in `src/layouts/` +
+`src/_assets/`; both have a `binaryData/` and it means the opposite thing in each, which
+`resolveTree()` sorts out — **by where the `*Com.as` manifests are, never by directory name**,
+because this dump's root was once renamed `scripts/` → `src/` and a name-based check silently
+reported "added layouts: 0". The
 merge rule is deliberate and narrow: **AIR adds names WIN63 does not have, and never replaces one**
 — except the names in `AIR_PREFERRED`, each of which is a checked decision written down at the set.
 Today that is the whole of it: **1 layout added** (`raid_protection_settings_xml`) and **1
