@@ -237,6 +237,100 @@ export class VariableFxBitmapComposer
     }
 
     /**
+     * {@link drawThreeSlice} with the middle REPEATED rather than stretched.
+     *
+     * Same two caps, but the centre is tiled — which is what a striped or blocked bar needs, since
+     * stretching its pattern would turn a run of stripes into a few wide smears.
+     */
+    // AS3: .../rendering/VariableFxBitmapComposer.as::drawRepeatedThreeSlice()
+    drawRepeatedThreeSlice(
+        source: VariableFxDrawable,
+        leftWidth: number,
+        rightWidth: number,
+        width: number,
+        x: number,
+        y: number,
+        blendMode: string,
+        opacity: number,
+        clipRect: VariableFxClipRect | null = null
+    ): void
+    {
+        const left = Math.max(0, leftWidth | 0);
+        const right = Math.max(0, rightWidth | 0);
+        const total = Math.max(0, width | 0);
+        const middleSourceWidth = Math.max(0, source.width - left - right);
+        const middleTargetWidth = Math.max(0, total - left - right);
+
+        this.drawSourceRegion(
+            source, 0, 0, Math.min(left, total), source.height, x, y, blendMode, opacity, clipRect
+        );
+
+        if(middleSourceWidth > 0 && middleTargetWidth > 0)
+        {
+            this.drawTiledChunk(
+                source,
+                new VariableFxClipRect(left, 0, middleSourceWidth, source.height),
+                x + left, y, middleTargetWidth, source.height, blendMode, opacity, clipRect
+            );
+        }
+
+        const rightDrawn = Math.min(right, Math.max(0, total - left - middleTargetWidth));
+
+        if(rightDrawn > 0)
+        {
+            this.drawSourceRegion(
+                source, source.width - rightDrawn, 0, rightDrawn, source.height,
+                x + total - rightDrawn, y, blendMode, opacity, clipRect
+            );
+        }
+    }
+
+    /**
+     * Tiles one region of `source` across a target area.
+     *
+     * The tiling ORIGIN is the requested x/y, not the clipped area's corner — the first tile is
+     * snapped backwards to a whole multiple from there. That is what keeps the pattern in phase
+     * when only part of it is visible: tiling from the clip's corner instead would make the stripes
+     * jump every time the bar's fill width changed.
+     */
+    // AS3: .../rendering/VariableFxBitmapComposer.as::drawTiledChunk()
+    drawTiledChunk(
+        source: VariableFxDrawable,
+        sourceRect: VariableFxClipRect,
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        blendMode: string,
+        opacity: number,
+        clipRect: VariableFxClipRect | null = null
+    ): void
+    {
+        const tileWidth = Math.max(0, sourceRect.width);
+        const tileHeight = Math.max(0, sourceRect.height);
+        const originX = x | 0;
+        const originY = y | 0;
+        const bounds = this.getTargetBounds(originX, originY, Math.max(0, width | 0), Math.max(0, height | 0), clipRect);
+
+        if(tileWidth <= 0 || tileHeight <= 0 || bounds.left >= bounds.right || bounds.top >= bounds.bottom) return;
+
+        const firstX = originX + Math.floor((bounds.left - originX) / tileWidth) * tileWidth;
+        const firstY = originY + Math.floor((bounds.top - originY) / tileHeight) * tileHeight;
+        const clip = VariableFxBitmapComposer.boundsToClipRect(bounds);
+
+        for(let tileY = firstY; tileY < bounds.bottom; tileY += tileHeight)
+        {
+            for(let tileX = firstX; tileX < bounds.right; tileX += tileWidth)
+            {
+                this.drawSourceRegion(
+                    source, sourceRect.x, sourceRect.y, tileWidth, tileHeight,
+                    tileX, tileY, blendMode, opacity, clip
+                );
+            }
+        }
+    }
+
+    /**
      * The stretched middle of {@link drawThreeSlice}: the only place anything is SCALED, and the
      * one draw whose matrix is not a plain translation.
      */
