@@ -78,6 +78,8 @@ import {SliderSection} from './presets/sections/SliderSection';
 import {NamedNumberInputPreset} from './presets/combinations/NamedNumberInputPreset';
 import {NamedTextInputPreset} from './presets/combinations/NamedTextInputPreset';
 import {RewardRowPreset} from './presets/combinations/RewardRowPreset';
+import {VariableFxPreviewPreset} from '../addons/variablefx/presets/VariableFxPreviewPreset';
+import {VariableFxPreviewBlockPreset} from '../addons/variablefx/presets/VariableFxPreviewBlockPreset';
 import {RewardListPreset} from './presets/combinations/RewardListPreset';
 import {DropdownPreset} from './presets/DropdownPreset';
 import {NamedDropdownPreset} from './presets/combinations/NamedDropdownPreset';
@@ -265,6 +267,36 @@ export class PresetManager
     createPaddedContainerPreset(wrapped: WiredUIPreset, leftPadding: number, top: number, rightPadding: number, bottom: number, window: IWindowContainer | null = null, stretchMode: boolean = false): PaddedContainerPreset
     {
         return new PaddedContainerPreset(this._roomEvents, this, this.wiredStyle, wrapped, leftPadding, top, rightPadding, bottom, window, stretchMode);
+    }
+
+    /** A padded container wearing the style's OUTER border rather than a plain one. */
+    // AS3: PresetManager.as::createVariableFxPreviewPreset()
+    createVariableFxPreviewPreset(): VariableFxPreviewPreset
+    {
+        return new VariableFxPreviewPreset(this._roomEvents, this, this.wiredStyle);
+    }
+
+    // AS3: PresetManager.as::createVariableFxPreviewBlockPreset()
+    createVariableFxPreviewBlockPreset(
+        preview: VariableFxPreviewPreset,
+        onRandomize: () => void
+    ): VariableFxPreviewBlockPreset
+    {
+        return new VariableFxPreviewBlockPreset(this._roomEvents, this, this.wiredStyle, preview, onRandomize);
+    }
+
+    // AS3: PresetManager.as::createSurroundingBorderContainerPreset()
+    createSurroundingBorderContainerPreset(
+        wrapped: WiredUIPreset,
+        leftPadding: number,
+        top: number,
+        rightPadding: number,
+        bottom: number
+    ): PaddedContainerPreset
+    {
+        return this.createPaddedContainerPreset(
+            wrapped, leftPadding, top, rightPadding, bottom, this.wiredStyle.createSurroundingBorder()
+        );
     }
 
     // AS3: PresetManager.as::createContainerButtonPreset()

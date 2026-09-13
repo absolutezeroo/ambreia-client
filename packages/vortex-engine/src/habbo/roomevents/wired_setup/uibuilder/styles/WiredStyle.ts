@@ -384,10 +384,32 @@ export class WiredStyle
         return this.recreateElement('inner_border') as unknown as IWindowContainer;
     }
 
+    /**
+     * The style id an OUTER border uses, when the style has a distinct one.
+     *
+     * Zero in the base style and in every style that ships — a subclass overrides it to give the
+     * outermost frame a heavier look than the inner panels.
+     */
+    // AS3: WiredStyle.as::get surroundingBorderStyleId()
+    get surroundingBorderStyleId(): number
+    {
+        return 0;
+    }
+
     // AS3: WiredStyle.as::createBorder()
     createBorder(): IWindowContainer
     {
         return this.recreateElement('border') as unknown as IWindowContainer;
+    }
+
+    // AS3: WiredStyle.as::createSurroundingBorder()
+    createSurroundingBorder(): IWindowContainer
+    {
+        const border = this.createBorder();
+
+        if(this.surroundingBorderStyleId > 0) border.style = this.surroundingBorderStyleId;
+
+        return border;
     }
 
     // AS3: WiredStyle.as::createContainerButton()

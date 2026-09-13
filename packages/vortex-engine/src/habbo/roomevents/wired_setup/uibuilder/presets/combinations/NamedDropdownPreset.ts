@@ -45,6 +45,27 @@ export class NamedDropdownPreset extends WiredUIPreset
         this._container.addChild(this._listView.window);
     }
 
+    /**
+     * The label column's width.
+     *
+     * Settable so a stack of named dropdowns can be given ONE column width — the widest label's —
+     * and have every dropdown start at the same x. Nothing computes that here; the owner measures
+     * its rows and writes the answer back.
+     */
+    // AS3: NamedDropdownPreset.as::get nameWidth()
+    get nameWidth(): number
+    {
+        return this._text.window.width;
+    }
+
+    // AS3: NamedDropdownPreset.as::set nameWidth()
+    set nameWidth(value: number)
+    {
+        this._text.window.width = value;
+
+        this._listView.resize();
+    }
+
     // AS3: NamedDropdownPreset.as::get selectedId()
     get selectedId(): number
     {
