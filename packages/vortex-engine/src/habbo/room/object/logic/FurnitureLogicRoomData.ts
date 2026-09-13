@@ -7,7 +7,7 @@ import {VariableFxLogicConfigManager} from './VariableFxLogicConfigManager';
  * Class name derived: the AS3 class is obfuscated (`_SafeCls_2037`) and exists in no other tree.
  * Named from `RoomObjectFactory.getFurnitureLogicRoomData()`, which is readable and returns it.
  *
- * @see sources/AIR-1.0.31/scripts/com/sulake/habbo/room/object/logic/_SafeCls_2037.as
+ * @see sources/AIR-1.0.31/src/com/sulake/habbo/room/object/logic/_SafeCls_2037.as
  */
 export class FurnitureLogicRoomData
 {

@@ -13,7 +13,7 @@ import type {VariableFxLogicConfig} from './VariableFxLogicConfig';
  * Named from the accessor every holder exposes it under, `variableFxLogicManager`, which is
  * readable — `Config` added because that is all it holds.
  *
- * @see sources/AIR-1.0.31/scripts/com/sulake/habbo/room/object/logic/_SafeCls_2984.as
+ * @see sources/AIR-1.0.31/src/com/sulake/habbo/room/object/logic/_SafeCls_2984.as
  */
 export class VariableFxLogicConfigManager
 {

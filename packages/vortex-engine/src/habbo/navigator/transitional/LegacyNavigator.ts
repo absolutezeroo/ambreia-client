@@ -218,7 +218,7 @@ export class LegacyNavigator implements IHabboTransitionalNavigator
      * The controller lives on the old navigator; everything that reaches for it — the room-info
      * view, and the new navigator's `navigator/raidprotection/<flatId>` link — goes through here.
      */
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/navigator/transitional/LegacyNavigator.as::get raidProtectionSettingsController()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/navigator/transitional/LegacyNavigator.as::get raidProtectionSettingsController()
     get raidProtectionSettingsController(): RaidProtectionSettingsController | null
     {
         return this._oldNavigator?.raidProtectionSettingsController ?? null;

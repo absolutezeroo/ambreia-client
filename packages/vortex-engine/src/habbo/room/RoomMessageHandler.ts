@@ -2820,7 +2820,7 @@ export class RoomMessageHandler implements IRoomMessageHandler
         return value === '0' ? null : value;
     }
 
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/_SafeCls_2064.as::onVariableFxConfigs()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/_SafeCls_2064.as::onVariableFxConfigs()
     private onVariableFxConfigs(event: IMessageEvent): void
     {
         if(this._roomCreator === null) return;
@@ -2832,7 +2832,7 @@ export class RoomMessageHandler implements IRoomMessageHandler
         this._roomCreator.updateVariableFxConfigs(this._currentRoomId, parser.configs);
     }
 
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/_SafeCls_2064.as::onVariableFxConfigsRemoved()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/_SafeCls_2064.as::onVariableFxConfigsRemoved()
     private onVariableFxConfigsRemoved(event: IMessageEvent): void
     {
         if(this._roomCreator === null) return;
@@ -2844,7 +2844,7 @@ export class RoomMessageHandler implements IRoomMessageHandler
         this._roomCreator.removeVariableFxConfigs(this._currentRoomId, parser.configIds);
     }
 
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/_SafeCls_2064.as::onVariableFxStatus()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/_SafeCls_2064.as::onVariableFxStatus()
     private onVariableFxStatus(event: IMessageEvent): void
     {
         if(this._roomCreator === null) return;
@@ -2856,7 +2856,7 @@ export class RoomMessageHandler implements IRoomMessageHandler
         this._roomCreator.updateVariableFxStatuses(this._currentRoomId, parser.statuses);
     }
 
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/_SafeCls_2064.as::onVariableFxStatusRemoved()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/_SafeCls_2064.as::onVariableFxStatusRemoved()
     private onVariableFxStatusRemoved(event: IMessageEvent): void
     {
         if(this._roomCreator === null) return;

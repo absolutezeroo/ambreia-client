@@ -10,7 +10,7 @@ import type {RaidProtectionSettingsSnapshot} from '@habbo/communication/messages
  * This class exists only in `AIR-1.0.31`; no WIN63 or PRODUCTION build has the feature. Its own
  * name and all its members are readable there — only its two lowest sensitivity constants are not.
  *
- * @see sources/AIR-1.0.31/scripts/com/sulake/habbo/navigator/raidprotection/RaidProtectionSettingsData.as
+ * @see sources/AIR-1.0.31/src/com/sulake/habbo/navigator/raidprotection/RaidProtectionSettingsData.as
  */
 export class RaidProtectionSettingsData
 {

@@ -11,18 +11,18 @@ import {MessageComposer} from '@core/communication/messages/MessageComposer';
  * Class name derived — the AS3 class is obfuscated (`_SafePkg_3403._SafeCls_3936`) and exists in
  * no other tree. Named from its only call site, `RaidProtectionSettingsController::sendSave()`.
  *
- * @see sources/AIR-1.0.31/scripts/_SafePkg_3403/_SafeCls_3936.as
+ * @see sources/AIR-1.0.31/src/_SafePkg_3403/_SafeCls_3936.as
  */
 export class SaveRaidProtectionSettingsMessageComposer extends MessageComposer<
     [number, boolean, number, number, number, boolean, number, number, boolean]
 >
 {
-    // AS3: sources/AIR-1.0.31/scripts/_SafePkg_3403/_SafeCls_3936.as::_data
+    // AS3: sources/AIR-1.0.31/src/_SafePkg_3403/_SafeCls_3936.as::_data
     //   Name derived: the AS3 field is `_SafeStr_4778:Array`, the message array every composer in
     //   the tree pushes its arguments onto.
     private _data: [number, boolean, number, number, number, boolean, number, number, boolean];
 
-    // AS3: sources/AIR-1.0.31/scripts/_SafePkg_3403/_SafeCls_3936.as::_SafeCls_3936()
+    // AS3: sources/AIR-1.0.31/src/_SafePkg_3403/_SafeCls_3936.as::_SafeCls_3936()
     constructor(
         roomId: number,
         enabled: boolean,
@@ -50,7 +50,7 @@ export class SaveRaidProtectionSettingsMessageComposer extends MessageComposer<
         ];
     }
 
-    // AS3: sources/AIR-1.0.31/scripts/_SafePkg_3403/_SafeCls_3936.as::getMessageArray()
+    // AS3: sources/AIR-1.0.31/src/_SafePkg_3403/_SafeCls_3936.as::getMessageArray()
     getMessageArray(): [number, boolean, number, number, number, boolean, number, number, boolean]
     {
         return this._data;

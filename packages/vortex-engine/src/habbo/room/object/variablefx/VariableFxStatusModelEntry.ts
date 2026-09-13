@@ -7,7 +7,7 @@ import type {OrderedMap} from '@core/utils/OrderedMap';
  * Distinct from `VariableFxStatusUpdateData`, which is the wire form: this one carries
  * `createdAt`, `updateId` and `invisible`, none of which the server sends.
  *
- * @see sources/AIR-1.0.31/scripts/com/sulake/habbo/room/object/variablefx/VariableFxStatusModelEntry.as
+ * @see sources/AIR-1.0.31/src/com/sulake/habbo/room/object/variablefx/VariableFxStatusModelEntry.as
  */
 export class VariableFxStatusModelEntry
 {

@@ -7,7 +7,7 @@ import type {OrderedMap} from '@core/utils/OrderedMap';
  *
  * Carries no location or direction — `super(null, null)` — because it changes neither.
  *
- * @see sources/AIR-1.0.31/scripts/com/sulake/habbo/room/messages/RoomObjectVariableFxStatusUpdateMessage.as
+ * @see sources/AIR-1.0.31/src/com/sulake/habbo/room/messages/RoomObjectVariableFxStatusUpdateMessage.as
  */
 export class RoomObjectVariableFxStatusUpdateMessage extends RoomObjectUpdateMessage
 {

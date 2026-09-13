@@ -36,10 +36,10 @@ export interface IRoomManager
      * `unknown[]` for the same reason as on `IRoomObjectFactory`: AS3 types it `Array` so the room
      * layer stays independent of the habbo one.
      */
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/room/IRoomManager.as::updateVariableFxConfigs()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/room/IRoomManager.as::updateVariableFxConfigs()
     updateVariableFxConfigs(id: string, configs: unknown[]): void;
 
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/room/IRoomManager.as::removeVariableFxConfigs()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/room/IRoomManager.as::removeVariableFxConfigs()
     removeVariableFxConfigs(id: string, configIds: number[]): void;
 
     // AS3: .../src/com/sulake/room/IRoomManager.as::getRoom()

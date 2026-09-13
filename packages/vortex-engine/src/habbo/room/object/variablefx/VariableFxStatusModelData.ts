@@ -5,7 +5,7 @@ import type {VariableFxStatusModelEntry} from './VariableFxStatusModelEntry';
  * Every status one room object currently carries, grouped by config and then by variable, plus the
  * `updateId` the visualization compares against to decide whether it has to recomposite.
  *
- * @see sources/AIR-1.0.31/scripts/com/sulake/habbo/room/object/variablefx/VariableFxStatusModelData.as
+ * @see sources/AIR-1.0.31/src/com/sulake/habbo/room/object/variablefx/VariableFxStatusModelData.as
  */
 export class VariableFxStatusModelData
 {

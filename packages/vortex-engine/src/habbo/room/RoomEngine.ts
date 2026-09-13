@@ -1156,19 +1156,19 @@ export class RoomEngine extends Component implements IRoomEngine,
         return parseInt(parts[0], 10);
     }
 
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/_SafeCls_90.as::updateVariableFxConfigs()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/_SafeCls_90.as::updateVariableFxConfigs()
     updateVariableFxConfigs(roomId: number, configs: VariableFxConfigUpdateData[]): void
     {
         this._roomManager?.updateVariableFxConfigs(this.getRoomIdentifier(roomId), configs);
     }
 
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/_SafeCls_90.as::removeVariableFxConfigs()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/_SafeCls_90.as::removeVariableFxConfigs()
     removeVariableFxConfigs(roomId: number, configIds: number[]): void
     {
         this._roomManager?.removeVariableFxConfigs(this.getRoomIdentifier(roomId), configIds);
     }
 
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/_SafeCls_90.as::updateVariableFxStatuses()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/_SafeCls_90.as::updateVariableFxStatuses()
     updateVariableFxStatuses(roomId: number, statuses: VariableFxStatusUpdateData[]): void
     {
         for(const status of statuses)
@@ -1177,7 +1177,7 @@ export class RoomEngine extends Component implements IRoomEngine,
         }
     }
 
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/_SafeCls_90.as::removeVariableFxStatuses()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/_SafeCls_90.as::removeVariableFxStatuses()
     removeVariableFxStatuses(roomId: number, statuses: VariableFxStatusRemoveData[]): void
     {
         for(const status of statuses)
@@ -1191,7 +1191,7 @@ export class RoomEngine extends Component implements IRoomEngine,
      * error: the server sends a room's statuses as one packet, and an avatar named in it may have
      * walked out between the server building the packet and the client reading it.
      */
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/_SafeCls_90.as::updateVariableFxStatus()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/_SafeCls_90.as::updateVariableFxStatus()
     private updateVariableFxStatus(roomId: number, status: VariableFxStatusUpdateData): void
     {
         const category = status.isUserEntity
@@ -1213,7 +1213,7 @@ export class RoomEngine extends Component implements IRoomEngine,
         ));
     }
 
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/_SafeCls_90.as::removeVariableFxStatus()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/_SafeCls_90.as::removeVariableFxStatus()
     private removeVariableFxStatus(roomId: number, status: VariableFxStatusRemoveData): void
     {
         const category = status.isUserEntity

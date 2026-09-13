@@ -28,7 +28,7 @@ import type {IRoomEngine} from './IRoomEngine';
  * friends by inheritance, and the alternative here was redeclaring each on both. RoomEngine is the
  * only implementor and already declares both, so nothing had to change to satisfy it.
  */
-// AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/_SafeCls_89.as
+// AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/_SafeCls_89.as
 export interface IRoomCreator extends IRoomEngine
 {
     /**

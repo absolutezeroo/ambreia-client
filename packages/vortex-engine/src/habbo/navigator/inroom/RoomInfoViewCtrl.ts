@@ -38,7 +38,7 @@ export class RoomInfoViewCtrl
     private _embedExpanded: boolean = false;
     private _visible: boolean = false;
 
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/navigator/inroom/RoomInfoViewCtrl.as::_raidProtectionSettingsController
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/navigator/inroom/RoomInfoViewCtrl.as::_raidProtectionSettingsController
     //   Name derived: the AS3 field is `_SafeStr_5588`; named for the class it holds.
     private _raidProtection: RaidProtectionSettingsController | null = null;
 
@@ -156,7 +156,7 @@ export class RoomInfoViewCtrl
      * rather than a crash, and the window is still reachable through its
      * `navigator/raidprotection/<flatId>` link.
      */
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/navigator/inroom/RoomInfoViewCtrl.as::refreshRaidProtectionButton()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/navigator/inroom/RoomInfoViewCtrl.as::refreshRaidProtectionButton()
     private _refreshRaidProtectionButton(roomData: GuestRoomData): void
     {
         const button = this._window?.findChildByName('raid_protection_settings_button') ?? null;
@@ -168,7 +168,7 @@ export class RoomInfoViewCtrl
             && this._raidProtection.canManage(roomData.flatId);
     }
 
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/navigator/inroom/RoomInfoViewCtrl.as::onRaidProtectionStateChanged()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/navigator/inroom/RoomInfoViewCtrl.as::onRaidProtectionStateChanged()
     private _onRaidProtectionStateChanged = (): void =>
     {
         const roomData = this._navigator?.data.enteredGuestRoom ?? null;
@@ -178,7 +178,7 @@ export class RoomInfoViewCtrl
         this.refreshButtons(roomData);
     };
 
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/navigator/inroom/RoomInfoViewCtrl.as::onRaidProtectionSettingsClick()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/navigator/inroom/RoomInfoViewCtrl.as::onRaidProtectionSettingsClick()
     private _onRaidProtectionSettingsClick = (): void =>
     {
         const roomData = this._navigator?.data.enteredGuestRoom ?? null;

@@ -137,6 +137,6 @@ export interface IHabboTransitionalNavigator extends IHabboNavigator
      * Null when the old navigator has not been built yet, or when the client was compiled without
      * the feature — every caller has to check.
      */
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/navigator/_SafeCls_94.as::get raidProtectionSettingsController()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/navigator/_SafeCls_94.as::get raidProtectionSettingsController()
     readonly raidProtectionSettingsController: RaidProtectionSettingsController | null;
 }

@@ -747,19 +747,19 @@ export interface IRoomEngine extends IDisposable {
      * VariableFx *configurations* — the recipes. They belong to the room, not to any object, and
      * go straight to the room manager's per-room stores.
      */
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/_SafeCls_86.as::updateVariableFxConfigs()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/_SafeCls_86.as::updateVariableFxConfigs()
     updateVariableFxConfigs(roomId: number, configs: VariableFxConfigUpdateData[]): void;
 
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/_SafeCls_86.as::removeVariableFxConfigs()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/_SafeCls_86.as::removeVariableFxConfigs()
     removeVariableFxConfigs(roomId: number, configIds: number[]): void;
 
     /**
      * VariableFx *statuses* — the live values. Each one names an entity, so these are dispatched
      * one object at a time as a `RoomObjectUpdateMessage`, not stored on the room.
      */
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/_SafeCls_86.as::updateVariableFxStatuses()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/_SafeCls_86.as::updateVariableFxStatuses()
     updateVariableFxStatuses(roomId: number, statuses: VariableFxStatusUpdateData[]): void;
 
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/_SafeCls_86.as::removeVariableFxStatuses()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/_SafeCls_86.as::removeVariableFxStatuses()
     removeVariableFxStatuses(roomId: number, statuses: VariableFxStatusRemoveData[]): void;
 }

@@ -112,11 +112,11 @@ export class RoomObjectFactory implements IRoomObjectFactory
      * because a config is either a user effect or a furniture one, and each half is read by a
      * different set of object logics.
      */
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/RoomObjectFactory.as::_avatarLogicRoomData
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/RoomObjectFactory.as::_avatarLogicRoomData
     //   Name derived: the AS3 field is `_SafeStr_5897`; named for what it holds.
     private _avatarLogicRoomData: OrderedMap<string, AvatarLogicRoomData> = new OrderedMap();
 
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/RoomObjectFactory.as::_furnitureLogicRoomData
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/RoomObjectFactory.as::_furnitureLogicRoomData
     //   Name derived: the AS3 field is `_SafeStr_5916`.
     private _furnitureLogicRoomData: OrderedMap<string, FurnitureLogicRoomData> = new OrderedMap();
 
@@ -606,7 +606,7 @@ export class RoomObjectFactory implements IRoomObjectFactory
         return new RoomObjectManager();
     }
 
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/RoomObjectFactory.as::getAvatarLogicRoomData()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/RoomObjectFactory.as::getAvatarLogicRoomData()
     private getAvatarLogicRoomData(roomId: string): AvatarLogicRoomData
     {
         let data = this._avatarLogicRoomData.getValue(roomId);
@@ -620,7 +620,7 @@ export class RoomObjectFactory implements IRoomObjectFactory
         return data;
     }
 
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/RoomObjectFactory.as::getFurnitureLogicRoomData()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/RoomObjectFactory.as::getFurnitureLogicRoomData()
     private getFurnitureLogicRoomData(roomId: string): FurnitureLogicRoomData
     {
         let data = this._furnitureLogicRoomData.getValue(roomId);
@@ -634,7 +634,7 @@ export class RoomObjectFactory implements IRoomObjectFactory
         return data;
     }
 
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/RoomObjectFactory.as::updateVariableFxConfigs()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/RoomObjectFactory.as::updateVariableFxConfigs()
     updateVariableFxConfigs(roomId: string, configs: VariableFxConfigUpdateData[]): void
     {
         for(const config of configs)
@@ -654,7 +654,7 @@ export class RoomObjectFactory implements IRoomObjectFactory
         }
     }
 
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/RoomObjectFactory.as::removeVariableFxConfigs()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/RoomObjectFactory.as::removeVariableFxConfigs()
     removeVariableFxConfigs(roomId: string, configIds: number[]): void
     {
         // Both stores, unconditionally: the remove message carries ids and nothing else, so which
@@ -669,7 +669,7 @@ export class RoomObjectFactory implements IRoomObjectFactory
         }
     }
 
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/RoomObjectFactory.as::disposeRoomLogicData()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/RoomObjectFactory.as::disposeRoomLogicData()
     disposeRoomLogicData(roomId: string): void
     {
         this._avatarLogicRoomData.remove(roomId)?.dispose();

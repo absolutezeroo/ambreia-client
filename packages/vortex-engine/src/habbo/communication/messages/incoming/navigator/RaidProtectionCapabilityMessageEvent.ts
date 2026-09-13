@@ -6,7 +6,7 @@ import {RaidProtectionCapabilityMessageParser} from '../../parser/navigator/Raid
  * Class name derived — the AS3 class is obfuscated (`_SafePkg_3108._SafeCls_3219`) and exists in
  * no other tree. Named after its parser.
  *
- * @see sources/AIR-1.0.31/scripts/_SafePkg_3108/_SafeCls_3219.as
+ * @see sources/AIR-1.0.31/src/_SafePkg_3108/_SafeCls_3219.as
  */
 export class RaidProtectionCapabilityMessageEvent extends MessageEvent implements IMessageEvent
 {

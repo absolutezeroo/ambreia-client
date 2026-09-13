@@ -3,7 +3,7 @@ import {RoomObjectUpdateMessage} from '@room/messages/RoomObjectUpdateMessage';
 /**
  * Retracts one VariableFx value from the room object it was on.
  *
- * @see sources/AIR-1.0.31/scripts/com/sulake/habbo/room/messages/RoomObjectVariableFxStatusRemoveMessage.as
+ * @see sources/AIR-1.0.31/src/com/sulake/habbo/room/messages/RoomObjectVariableFxStatusRemoveMessage.as
  */
 export class RoomObjectVariableFxStatusRemoveMessage extends RoomObjectUpdateMessage
 {

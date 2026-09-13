@@ -7,7 +7,7 @@ import {OrderedMap} from '@core/utils/OrderedMap';
  * here exactly as the AS3 splits it. `entityId` and `isUserEntity` come from the packet as their
  * own fields, which is why this key is only two parts where the remove message's is four.
  *
- * @see sources/AIR-1.0.31/scripts/com/sulake/habbo/room/object/variablefx/VariableFxStatusUpdateData.as
+ * @see sources/AIR-1.0.31/src/com/sulake/habbo/room/object/variablefx/VariableFxStatusUpdateData.as
  */
 export class VariableFxStatusUpdateData
 {

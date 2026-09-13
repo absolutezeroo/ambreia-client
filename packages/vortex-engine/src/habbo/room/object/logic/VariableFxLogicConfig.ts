@@ -3,7 +3,7 @@
  * when* an effect is visible. Everything about how it looks (renderer, colour, width, style) stays
  * on the visualization side's own config.
  *
- * @see sources/AIR-1.0.31/scripts/com/sulake/habbo/room/object/logic/VariableFxLogicConfig.as
+ * @see sources/AIR-1.0.31/src/com/sulake/habbo/room/object/logic/VariableFxLogicConfig.as
  */
 export class VariableFxLogicConfig
 {

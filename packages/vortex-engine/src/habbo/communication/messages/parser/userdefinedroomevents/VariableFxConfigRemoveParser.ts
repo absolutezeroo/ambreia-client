@@ -7,7 +7,7 @@ import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDat
  * Class name derived: the AS3 parser is obfuscated (`_SafeCls_3360`) and exists in no other tree.
  * Its one member, `configIds`, is readable.
  *
- * @see sources/AIR-1.0.31/scripts/com/sulake/habbo/communication/messages/parser/userdefinedroomevents/_SafeCls_3360.as
+ * @see sources/AIR-1.0.31/src/com/sulake/habbo/communication/messages/parser/userdefinedroomevents/_SafeCls_3360.as
  */
 export class VariableFxConfigRemoveParser implements IMessageParser
 {

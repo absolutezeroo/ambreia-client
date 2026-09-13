@@ -56,7 +56,7 @@ const DEFAULT_AIR_SOURCE = path.resolve(repoRoot, 'sources', 'AIR-1.0.31');
 // that changes nothing - both sit at 0,0 and RoomInfoViewCtrl re-stacks the container through
 // Util.moveChildrenToColumn). Without it RoomInfoViewCtrl has no button to show and the raid
 // protection window is reachable only through its link. Re-check the delta with:
-//   diff sources/AIR-1.0.31/scripts/binaryData/3128__SafeCls_1100.bin \
+//   diff sources/AIR-1.0.31/src/binaryData/3128__SafeCls_1100.bin \
 //        packages/vortex-client/src/assets/window-layouts/iro_room_details_framed_xml.xml
 // If it has grown past that button, decide again rather than widening this set by reflex.
 const AIR_PREFERRED = new Set(['iro_room_details_framed_xml']);
@@ -104,37 +104,43 @@ function parseArgs()
  * The two dumps are laid out differently, and one of the differences is a trap: both have a
  * `binaryData/` directory and it means the opposite thing in each.
  *
- *   WIN63  src/binaryData/*Com.as          the component manifests
- *          src/layouts/, src/_assets/      the embedded files
+ *   WIN63  <root>/binaryData/*Com.as       the component manifests
+ *          <root>/layouts/, <root>/_assets/ the embedded files
  *
- *   AIR    scripts/*Com.as                 the component manifests, at the root
- *          scripts/binaryData/*.bin        the embedded files
+ *   AIR    <root>/*Com.as                  the component manifests, at the root
+ *          <root>/binaryData/*.bin         the embedded files
  *
- * Everything downstream is identical: the same `<fieldName>:Class = <ref>` declarations joined to
- * the same `<seq>_<identifier>` filenames through the same `@identifier` footers.
+ * DETECTED BY WHERE THE MANIFESTS ARE, never by the directory's name. An earlier version keyed on
+ * the root being called `src` or `scripts`, and renaming AIR's `scripts/` to `src/` — which makes
+ * it match the other dumps and is an entirely reasonable thing to do — silently turned the AIR
+ * source into zero assets: it matched the WIN63 branch, looked for manifests among the .bin blobs,
+ * found none, and reported success. Nothing downstream cares what the directory is called, so
+ * nothing here should either.
+ *
+ * Everything after this point is identical for both: the same `<fieldName>:Class = <ref>`
+ * declarations joined to the same `<seq>_<identifier>` filenames through the same `@identifier`
+ * footers.
  */
 function resolveTree(sourceRoot)
 {
-    const src = path.join(sourceRoot, 'src');
+    const hasComFiles = (dir) => fs.existsSync(dir)
+        && fs.readdirSync(dir).some((name) => /Com\.as$/.test(name));
 
-    if (fs.existsSync(path.join(src, 'binaryData')))
+    for (const root of [path.join(sourceRoot, 'src'), path.join(sourceRoot, 'scripts'), sourceRoot])
     {
-        return {
-            srcDir: src,
-            comDir: path.join(src, 'binaryData'),
-            assetDirs: [path.join(src, 'layouts'), path.join(src, '_assets')]
-        };
-    }
+        if (!fs.existsSync(root)) continue;
 
-    const scripts = path.join(sourceRoot, 'scripts');
+        const binaryData = path.join(root, 'binaryData');
 
-    if (fs.existsSync(path.join(scripts, 'binaryData')))
-    {
-        return {
-            srcDir: scripts,
-            comDir: scripts,
-            assetDirs: [path.join(scripts, 'binaryData')]
-        };
+        if (hasComFiles(binaryData))
+        {
+            return {srcDir: root, comDir: binaryData, assetDirs: [path.join(root, 'layouts'), path.join(root, '_assets')]};
+        }
+
+        if (hasComFiles(root))
+        {
+            return {srcDir: root, comDir: root, assetDirs: [binaryData]};
+        }
     }
 
     return null;

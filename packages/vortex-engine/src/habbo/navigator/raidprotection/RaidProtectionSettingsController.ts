@@ -40,7 +40,7 @@ const log = Logger.getLogger('habbo.navigator.raidprotection.RaidProtectionSetti
  * `_confirmDraft`, `_confirmBaseline`, `_confirmDialog`, `_view`, `_messageEvents`) are derived
  * from what each field holds.
  *
- * @see sources/AIR-1.0.31/scripts/com/sulake/habbo/navigator/raidprotection/RaidProtectionSettingsController.as
+ * @see sources/AIR-1.0.31/src/com/sulake/habbo/navigator/raidprotection/RaidProtectionSettingsController.as
  */
 export class RaidProtectionSettingsController extends EventEmitter implements IDisposable
 {

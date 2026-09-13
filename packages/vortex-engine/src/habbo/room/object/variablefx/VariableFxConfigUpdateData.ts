@@ -11,7 +11,7 @@ import {OrderedMap} from '@core/utils/OrderedMap';
  * declaration. Getting that wrong is easy and silent: the first pass here called two of them
  * unread, and both are read.
  *
- * @see sources/AIR-1.0.31/scripts/com/sulake/habbo/room/object/variablefx/VariableFxConfigUpdateData.as
+ * @see sources/AIR-1.0.31/src/com/sulake/habbo/room/object/variablefx/VariableFxConfigUpdateData.as
  */
 export class VariableFxConfigUpdateData
 {

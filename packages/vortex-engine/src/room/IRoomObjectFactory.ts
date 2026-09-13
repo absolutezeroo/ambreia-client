@@ -38,16 +38,16 @@ export interface IRoomObjectFactory
      * does live in habbo — narrows it. Importing the DTO here would invert that, for a type the
      * interface never uses.
      */
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/room/IRoomObjectFactory.as::updateVariableFxConfigs()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/room/IRoomObjectFactory.as::updateVariableFxConfigs()
     updateVariableFxConfigs(roomId: string, configs: unknown[]): void;
 
     /**
      * Removes by id from BOTH stores: the message carries only config ids, and nothing in it says
      * which half the config belonged to.
      */
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/room/IRoomObjectFactory.as::removeVariableFxConfigs()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/room/IRoomObjectFactory.as::removeVariableFxConfigs()
     removeVariableFxConfigs(roomId: string, configIds: number[]): void;
 
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/room/IRoomObjectFactory.as::disposeRoomLogicData()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/room/IRoomObjectFactory.as::disposeRoomLogicData()
     disposeRoomLogicData(roomId: string): void;
 }

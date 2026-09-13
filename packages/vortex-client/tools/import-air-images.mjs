@@ -113,11 +113,15 @@ function main()
         process.exit(0);
     }
 
-    const scripts = path.join(args.source, 'scripts');
+    // Located by where the manifests are, not by the directory's name - the dump's root has been
+    // called both `scripts/` and `src/`, and hard-coding either turns a rename into a silent
+    // "imported 0 images".
+    const scripts = [path.join(args.source, 'src'), path.join(args.source, 'scripts'), args.source]
+        .find((dir) => fs.existsSync(dir) && fs.readdirSync(dir).some((name) => /Com\.as$/.test(name)));
 
-    if (!fs.existsSync(scripts))
+    if (!scripts)
     {
-        console.error(`No scripts/ under ${args.source}`);
+        console.error(`No *Com.as manifests under ${args.source} (looked in src/, scripts/ and the root)`);
         process.exit(1);
     }
 

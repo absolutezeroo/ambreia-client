@@ -16,7 +16,7 @@ import {VariableFxStatusUpdateData} from '@habbo/room/object/variablefx/Variable
  *
  * Class name derived: the AS3 parser is obfuscated (`_SafeCls_2687`) and exists in no other tree.
  *
- * @see sources/AIR-1.0.31/scripts/com/sulake/habbo/communication/messages/parser/userdefinedroomevents/_SafeCls_2687.as
+ * @see sources/AIR-1.0.31/src/com/sulake/habbo/communication/messages/parser/userdefinedroomevents/_SafeCls_2687.as
  */
 export class VariableFxStatusUpdateParser implements IMessageParser
 {

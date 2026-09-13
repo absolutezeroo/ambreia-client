@@ -416,22 +416,22 @@ export class RoomManager extends Component implements IRoomManager, IRoomInstanc
         return false;
     }
 
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/room/RoomManager.as::updateVariableFxConfigs()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/room/RoomManager.as::updateVariableFxConfigs()
     updateVariableFxConfigs(id: string, configs: unknown[]): void
     {
         // AS3 also calls `_visualizationFactory.updateVariableFxConfigs()` here. That half is the
         // visualization config store, which this port has not ported yet — it belongs with the
         // renderers, not with the logic. The logic half below is complete.
-        // TODO(AS3): sources/AIR-1.0.31/scripts/com/sulake/room/RoomManager.as::updateVariableFxConfigs()
+        // TODO(AS3): sources/AIR-1.0.31/src/com/sulake/room/RoomManager.as::updateVariableFxConfigs()
         //   — add the `_visualizationFactory.updateVariableFxConfigs(id, configs)` call once
         //   RoomObjectVisualizationFactory has its VariableFx config store.
         this._objectFactory?.updateVariableFxConfigs(id, configs);
     }
 
-    // AS3: sources/AIR-1.0.31/scripts/com/sulake/room/RoomManager.as::removeVariableFxConfigs()
+    // AS3: sources/AIR-1.0.31/src/com/sulake/room/RoomManager.as::removeVariableFxConfigs()
     removeVariableFxConfigs(id: string, configIds: number[]): void
     {
-        // TODO(AS3): sources/AIR-1.0.31/scripts/com/sulake/room/RoomManager.as::removeVariableFxConfigs()
+        // TODO(AS3): sources/AIR-1.0.31/src/com/sulake/room/RoomManager.as::removeVariableFxConfigs()
         //   — same missing half as updateVariableFxConfigs() above.
         this._objectFactory?.removeVariableFxConfigs(id, configIds);
     }

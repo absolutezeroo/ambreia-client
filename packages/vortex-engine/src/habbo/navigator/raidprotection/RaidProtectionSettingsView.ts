@@ -29,7 +29,7 @@ const log = Logger.getLogger('habbo.navigator.raidprotection.RaidProtectionSetti
  * Only `AIR-1.0.31` has this class. Its name and all its methods are readable there; the private
  * fields `_settings` and `_saveOutstanding` are derived from what they hold.
  *
- * @see sources/AIR-1.0.31/scripts/com/sulake/habbo/navigator/raidprotection/RaidProtectionSettingsView.as
+ * @see sources/AIR-1.0.31/src/com/sulake/habbo/navigator/raidprotection/RaidProtectionSettingsView.as
  */
 export class RaidProtectionSettingsView implements IDisposable
 {

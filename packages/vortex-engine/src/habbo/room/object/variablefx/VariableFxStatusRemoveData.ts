@@ -6,7 +6,7 @@
  * as everything *between* the first separator and the second-to-last — it may itself contain a
  * `|`, which is why the AS3 scans from both ends instead of splitting, and why this port does too.
  *
- * @see sources/AIR-1.0.31/scripts/com/sulake/habbo/room/object/variablefx/VariableFxStatusRemoveData.as
+ * @see sources/AIR-1.0.31/src/com/sulake/habbo/room/object/variablefx/VariableFxStatusRemoveData.as
  */
 export class VariableFxStatusRemoveData
 {

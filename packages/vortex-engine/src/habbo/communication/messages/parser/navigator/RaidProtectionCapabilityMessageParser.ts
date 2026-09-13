@@ -8,26 +8,26 @@ import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDat
  * no other tree, so there is nothing to recover it from. Its two members are readable and are
  * used verbatim below.
  *
- * @see sources/AIR-1.0.31/scripts/_SafePkg_4207/_SafeCls_4332.as
+ * @see sources/AIR-1.0.31/src/_SafePkg_4207/_SafeCls_4332.as
  */
 export class RaidProtectionCapabilityMessageParser implements IMessageParser
 {
     private _roomId: number = 0;
     private _canManage: boolean = false;
 
-    // AS3: sources/AIR-1.0.31/scripts/_SafePkg_4207/_SafeCls_4332.as::get roomId()
+    // AS3: sources/AIR-1.0.31/src/_SafePkg_4207/_SafeCls_4332.as::get roomId()
     get roomId(): number
     {
         return this._roomId;
     }
 
-    // AS3: sources/AIR-1.0.31/scripts/_SafePkg_4207/_SafeCls_4332.as::get canManage()
+    // AS3: sources/AIR-1.0.31/src/_SafePkg_4207/_SafeCls_4332.as::get canManage()
     get canManage(): boolean
     {
         return this._canManage;
     }
 
-    // AS3: sources/AIR-1.0.31/scripts/_SafePkg_4207/_SafeCls_4332.as::flush()
+    // AS3: sources/AIR-1.0.31/src/_SafePkg_4207/_SafeCls_4332.as::flush()
     flush(): boolean
     {
         this._roomId = 0;
@@ -35,7 +35,7 @@ export class RaidProtectionCapabilityMessageParser implements IMessageParser
         return true;
     }
 
-    // AS3: sources/AIR-1.0.31/scripts/_SafePkg_4207/_SafeCls_4332.as::parse()
+    // AS3: sources/AIR-1.0.31/src/_SafePkg_4207/_SafeCls_4332.as::parse()
     parse(wrapper: IMessageDataWrapper): boolean
     {
         this._roomId = wrapper.readInt();

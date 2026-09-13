@@ -6,7 +6,7 @@ import {VariableFxStatusRemoveParser} from '../../parser/userdefinedroomevents/V
  * Class name derived — the AS3 class is obfuscated (`_SafeCls_2666`) and exists in no other tree.
  * Named after its parser.
  *
- * @see sources/AIR-1.0.31/scripts/com/sulake/habbo/communication/messages/incoming/userdefinedroomevents/_SafeCls_2666.as
+ * @see sources/AIR-1.0.31/src/com/sulake/habbo/communication/messages/incoming/userdefinedroomevents/_SafeCls_2666.as
  */
 export class VariableFxStatusRemoveMessageEvent extends MessageEvent implements IMessageEvent
 {
