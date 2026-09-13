@@ -98,6 +98,9 @@ import {VariablePlaceholderModeSection} from './presets/sections/VariablePlaceho
 import type {ISliderConverter} from '../common/slider_converter/ISliderConverter';
 import type {IWiredTypeHolder} from '../IWiredTypeHolder';
 import type {ListScrollParams} from './params/ListScrollParams';
+import {VariableFxVisibilitySettingsPreset} from '../addons/variablefx/presets/VariableFxVisibilitySettingsPreset';
+import {VariableFxAudienceVariablePopup} from '../addons/variablefx/presets/VariableFxAudienceVariablePopup';
+import type {VariableFxAudienceSelection} from '../addons/variablefx/presets/VariableFxAudienceVariablePopup';
 import type {CheckboxOptionParam} from './params/CheckboxOptionParam';
 import type {RadioButtonParam} from './params/RadioButtonParam';
 import type {TextInputParam} from './params/TextInputParam';
@@ -275,6 +278,22 @@ export class PresetManager
     }
 
     /** A padded container wearing the style's OUTER border rather than a plain one. */
+    // AS3: PresetManager.as::createVariableFxVisibilitySettingsPreset()
+    createVariableFxVisibilitySettingsPreset(
+        listener: IVariableFxStateListener
+    ): VariableFxVisibilitySettingsPreset
+    {
+        return new VariableFxVisibilitySettingsPreset(this._roomEvents, this, this.wiredStyle, listener);
+    }
+
+    // AS3: PresetManager.as::createVariableFxAudienceVariablePopup()
+    createVariableFxAudienceVariablePopup(
+        onSelected: VariableFxAudienceSelection
+    ): VariableFxAudienceVariablePopup
+    {
+        return new VariableFxAudienceVariablePopup(this._roomEvents, this, this.wiredStyle, onSelected);
+    }
+
     // AS3: PresetManager.as::createVariableFxValueRangePreset()
     createVariableFxValueRangePreset(listener: IVariableFxStateListener): VariableFxValueRangePreset
     {
