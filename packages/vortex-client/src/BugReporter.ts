@@ -124,20 +124,36 @@ function buildDialog(): HTMLDialogElement
  * the hotel, which is also what makes a player trust it enough to use it.
  */
 const STYLE = `
+/* Fourth in the row the site starts at top left: [back to web] [fullscreen] [report] [debugger].
+   Those first two live in the SITE document (vortex-web's Client.svelte, "client__buttons",
+   top 12px / left 12px); these two are inside the client's own iframe and cannot join that flex
+   row, so they are placed after it by hand. The bottom edge is not an option: toolbar bottom
+   left, chat input bottom centre, and a furni context menu opens wherever the furni is, which is
+   what this button was sitting on top of.
+
+   The look is that row's, restated in plain CSS because there is no Tailwind in this bundle:
+   gold pill #ffb900 on a #ffea00 border, square left edge and 5px right, icon only with the
+   label opening on hover over 150ms - the same trick "client__close__expand" uses so a control
+   can be an icon without being a mystery. */
 #vortex-bug-report-button {
-    /* Top right, not bottom right. The bottom edge is the client's own: the toolbar sits bottom
-       left, the chat input bottom centre, and a furni context menu ("Pick up / Use / Inspect")
-       opens wherever the furni is — which is how this button ended up sitting on top of one. It
-       also shared the corner with the window debugger's toggle, so the two overlapped each other
-       whenever that build had it. Top right is the one edge nothing in the room UI claims.
-       The debugger's toggle is placed just under it (see .hwd-toggle-btn). */
-    position: fixed; right: 12px; top: 12px; z-index: 2147483000;
-    padding: 5px 12px; cursor: pointer;
-    font: 12px/1.4 Arial, Helvetica, sans-serif; color: #FFF;
-    background: #0E151C; border: 1px solid #8CA1AD;
-    box-shadow: 0 2px 6px rgb(0 0 0 / 50%);
+    position: fixed; top: 12px; left: 124px; z-index: 2147483000;
+    display: flex; align-items: center; cursor: pointer;
+    padding: 6px 12px; border: 2px solid #ffea00; border-radius: 0 5px 5px 0;
+    background: #ffb900; color: #000;
+    font: 700 12px/1.2 Ubuntu, Arial, Helvetica, sans-serif; text-transform: uppercase;
+    box-shadow: -1px 4px 0 rgb(0 0 0 / 30%);
 }
-#vortex-bug-report-button:hover { border-color: #BACAD3; color: #BACAD3; }
+#vortex-bug-report-button:hover { border-color: #fffd70; background: #ffd400; }
+#vortex-bug-report-button:active {
+    transform: translateY(2px); border-color: #ffce37; background: #f89400;
+    box-shadow: -1px 2px 0 rgb(0 0 0 / 30%);
+}
+#vortex-bug-report-button .vbr-label {
+    display: block; width: 0; overflow: hidden; white-space: nowrap;
+    transition: width 150ms ease-out;
+}
+#vortex-bug-report-button:hover .vbr-label { width: 58px; }
+#vortex-bug-report-button .vbr-label > span { display: block; padding-left: 6px; }
 
 #vortex-bug-report {
     padding: 0; max-width: 440px; width: calc(100% - 32px);
@@ -276,7 +292,10 @@ export function installBugReporter(): void
     const button = document.createElement('button');
     button.id = 'vortex-bug-report-button';
     button.type = 'button';
-    button.textContent = 'Report a problem';
+    // Icon plus a label that is zero-width until hover, mirroring the site's "Web" button.
+    button.innerHTML = '<span aria-hidden="true">🐛</span>'
+        + '<span class="vbr-label"><span>Report</span></span>';
+    button.title = 'Report a problem';
     button.addEventListener('click', () => dialog.showModal());
     document.body.appendChild(button);
 

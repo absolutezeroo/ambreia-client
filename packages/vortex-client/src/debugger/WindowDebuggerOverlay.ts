@@ -1770,26 +1770,31 @@ function injectStyles(): void
 
     style.textContent = `
 .hwd-toggle-btn {
-    /* Under the bug-report button, same edge. Both used to sit bottom right, on top of each other
-       and on top of whatever furni context menu the player had open. The 44px offset clears that
-       button's height plus its 12px margin. */
+    /* Last in the row the site starts at top left: [back to web] [fullscreen] [report] [debugger].
+       The first two are the site's own (vortex-web Client.svelte), the third is the bug reporter
+       at left 124px; this one follows it. Same gold pill so the four read as one strip rather than
+       as three different products, restated in plain CSS because this bundle has no Tailwind. */
     position: fixed;
-    top: 44px;
-    right: 16px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: #2a2a2a;
-    border: 1px solid #555;
-    color: #fff;
-    font-size: 18px;
+    top: 12px;
+    left: 186px;
+    padding: 6px 12px;
+    border-radius: 0 5px 5px 0;
+    background: #ffb900;
+    border: 2px solid #ffea00;
+    color: #000;
+    box-shadow: -1px 4px 0 rgb(0 0 0 / 30%);
+    font-size: 16px;
     line-height: 1;
     cursor: pointer;
     z-index: 999997;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
 }
-.hwd-toggle-btn:hover { background: #3a3a3a; border-color: #4a9eff; }
-.hwd-toggle-btn.hwd-toggle-active { background: #35506e; border-color: #4a9eff; }
+.hwd-toggle-btn:hover { background: #ffd400; border-color: #fffd70; }
+.hwd-toggle-btn:active {
+    transform: translateY(2px); background: #f89400; border-color: #ffce37;
+    box-shadow: -1px 2px 0 rgb(0 0 0 / 30%);
+}
+/* Open: the pressed shade held, so the strip shows which control is active without a second hue. */
+.hwd-toggle-btn.hwd-toggle-active { background: #f89400; border-color: #ffce37; }
 .hwd-root {
     position: fixed;
     top: 12px;
