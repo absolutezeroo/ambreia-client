@@ -109,12 +109,40 @@ stub returning null, so the `metallic` extra is read and discarded — that is t
 `resolveDynamicLevellingRgb()` calls `.toLowerCase()` on a possibly-null `readExtra()`, a #1009 in
 AS3; guarded here, because the faithful alternative takes the whole room's render down.
 
-**What is left:** three renderer families — health points (683 l.), level (2,066 l.) and number
-(716 l.) — then `VariableFxRendererRegistry.createDefault()`, which is deliberately absent until all
-14 factories exist. After that the visualization wiring (`StackedAdditions` + `VariableFxStackAddition`
-into `AvatarVisualization`/`FurnitureVisualization`, ~1,200 l.) is what actually puts a bar on
-screen in a room, and the Wired editor addon (~3,400 l.) is what lets anyone configure one. Nothing
-in this feature has been exercised against a live server yet.
+**All four renderer families are in, and the registry is closed.** 12 bar files, 3 health-point,
+5 number, 9 level — 29 renderer files against 29 in the AS3 — plus
+`VariableFxRendererRegistry.createDefault()`, which was deliberately held back until every factory
+existed. It registers the 14 classes by name, then the 17-entry `(category, style)` fallback table,
+then binds the server's numeric ids on top; that order is load-bearing, because both later steps
+look factories up by name.
+
+**The first end-to-end exercise of the feature** ran against the SHIPPED
+`variablefx_renderer_mapping.xml`: all 15 cases construct, update and draw, and all 15 resolve by
+server id rather than falling through to the style table. Before that every renderer had only ever
+been driven directly by a harness.
+
+Four things worth knowing about the families beyond the bars:
+
+- The **heart stack** is the first renderer whose FRAME RESIZES, and its
+  `AnimatedHeartOpacities` moves an array rather than a value — each heart gets its own fade window,
+  staggered, so the stack fills left to right and empties right to left. The total is sub-linear by
+  construction: one heart is exactly `SINGLE_HEART_ANIMATION_MS` and any number asymptotes to
+  `MAX_ANIMATION_DURATION_MS`, so losing twenty at once is a sweep, not a twenty-times-longer one.
+- The **number displays** are the same renderer with opposite trades — one tints a grey sheet per
+  colour, one picks a source Y in a sheet the artist already coloured. The second buys exact control
+  over five palettes and silently falls back to `GREEN` for anything else.
+- The **level family** animates a level and its progress as ONE scalar, the "path" = level +
+  progress, so a level-up is continuous motion rather than a bar jumping to 0 while a badge flips.
+  A maxed level folds into the same number.
+- `LevelWithProgressRenderer` is the only renderer that BUILDS ANOTHER RENDERER, through the
+  registry, from a `sub_renderer` id. All four ways that can fail leave the bar null and render the
+  badge alone — deliberately: a mapping the client does not understand should cost the bar, not the
+  badge.
+
+**What is left:** the visualization wiring (`StackedAdditions` + `VariableFxStackAddition` into
+`AvatarVisualization`/`FurnitureVisualization`, ~1,200 l.) is what actually puts a bar on screen in
+a room, and the Wired editor addon (~3,400 l.) is what lets anyone configure one. Nothing in this
+feature has been exercised against a live server yet.
 
 ### Raid protection, and a second asset source (2026-09-13)
 
