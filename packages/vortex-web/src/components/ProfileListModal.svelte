@@ -21,6 +21,7 @@
     // else. So a badge is found by its label or its explanation, a friend by their name or their
     // motto, a room or a group by either.
     import {link} from 'svelte-spa-router';
+    import Modal from './Modal.svelte';
     import Sprite from './Sprite.svelte';
     import Avatar from './Avatar.svelte';
     import EmptyResults from './EmptyResults.svelte';
@@ -127,8 +128,6 @@
     }
 </script>
 
-<svelte:window onkeydown={(event) => event.key === 'Escape' && onClose()} />
-
 <!-- The row's insides, so the linked and unlinked forms are one piece of markup rather than two
      that drift. -->
 {#snippet body(row: IRow)}
@@ -161,62 +160,44 @@
     </span>
 {/snippet}
 
-<div class="fixed inset-0 z-[1040] overflow-y-auto"
-     onclick={(event) => event.target === event.currentTarget && onClose()}
-     role="presentation">
-    <div class="fixed inset-0 bg-page opacity-90"></div>
-
-    <div class="relative mx-auto my-[5vh] w-full max-w-[500px] px-3">
-        <div class="relative rounded-[10px] border-[3px] border-card-line bg-card shadow-card">
-            <button type="button" onclick={onClose} class="absolute top-[11px] right-3 block" aria-label={t('FORM_CANCEL_LABEL')}>
-                <Sprite name="close" />
-            </button>
-
-            <!-- `.modal__title`: the darker band across the top, 42px line, case left alone. -->
-            <h3 class="m-0 rounded-lg bg-panel-head text-center leading-[42px] normal-case [text-shadow:0_1px_#000]">
-                {title}
-            </h3>
-
-            <div class="px-3 pt-6 pb-3">
-                <!-- `habbo-search`: magnifier left 12, clear right 12, 34px reserved either side. -->
-                <div class="relative mb-3">
-                    <span class="pointer-events-none absolute top-[0.5em] left-3 block"><Sprite name="searchGlass" /></span>
-                    <input bind:value={query} placeholder={t('SEARCH_PLACEHOLDER')}
-                           class="w-full rounded-[5px] border-[3px] border-field-line bg-field px-[34px] py-[5px] text-field-ink shadow-field focus:border-field-line-focus focus:bg-white focus:outline-none" />
-                    {#if query}
-                        <button type="button" onclick={() => (query = '')} class="absolute top-[0.5em] right-3 block" aria-label={t('FORM_CANCEL_LABEL')}>
-                            <Sprite name="searchClear" />
-                        </button>
-                    {/if}
-                </div>
-
-                {#if !shown.length}
-                    <EmptyResults />
-                {:else}
-                    <!-- `.item-list--stacked .item:not(:last-child)` is TWO lines, not one: a #2685bc
-                         border and a #0b6395 line a pixel below it, which is what gives the divider
-                         its engraved edge. A single border reads flat — the same detail as the
-                         purse's rule.
-
-                         The list scrolls inside the modal, which is what habbo.com's own
-                         `infinite-scroll-container="'.modal'"` is attached to. -->
-                    <ul class="max-h-[60vh] overflow-y-auto">
-                        {#each shown as row (row.key)}
-                            <li class="relative border-b border-card-line last:border-0 after:absolute after:-bottom-[2px] after:left-0 after:h-px after:w-full after:bg-[#0b6395] after:content-[''] last:after:hidden">
-                                {#if row.href}
-                                    <a href={row.href} use:link class="flex items-center p-3 hover:border-b-0 hover:bg-[#0074a6] active:bg-[#2685bc]">
-                                        {@render body(row)}
-                                    </a>
-                                {:else}
-                                    <div class="flex items-center p-3">
-                                        {@render body(row)}
-                                    </div>
-                                {/if}
-                            </li>
-                        {/each}
-                    </ul>
-                {/if}
-            </div>
+<Modal {title} {onClose}>
+    <div class="px-3 pt-6 pb-3">
+        <!-- `habbo-search`: magnifier left 12, clear right 12, 34px reserved either side. -->
+        <div class="relative mb-3">
+            <span class="pointer-events-none absolute top-[0.5em] left-3 block"><Sprite name="searchGlass" /></span>
+            <input bind:value={query} placeholder={t('SEARCH_PLACEHOLDER')}
+                   class="w-full rounded-[5px] border-[3px] border-field-line bg-field px-[34px] py-[5px] text-field-ink shadow-field focus:border-field-line-focus focus:bg-white focus:outline-none" />
+            {#if query}
+                <button type="button" onclick={() => (query = '')} class="absolute top-[0.5em] right-3 block" aria-label={t('FORM_CANCEL_LABEL')}>
+                    <Sprite name="searchClear" />
+                </button>
+            {/if}
         </div>
+
+        {#if !shown.length}
+            <EmptyResults />
+        {:else}
+            <!-- `.item-list--stacked .item:not(:last-child)` is TWO lines, not one: a #2685bc border
+                 and a #0b6395 line a pixel below it, which is what gives the divider its engraved
+                 edge. A single border reads flat — the same detail as the purse's rule.
+
+                 The list scrolls inside the modal, which is what habbo.com's own
+                 `infinite-scroll-container="'.modal'"` is attached to. -->
+            <ul class="max-h-[60vh] overflow-y-auto">
+                {#each shown as row (row.key)}
+                    <li class="relative border-b border-card-line last:border-0 after:absolute after:-bottom-[2px] after:left-0 after:h-px after:w-full after:bg-[#0b6395] after:content-[''] last:after:hidden">
+                        {#if row.href}
+                            <a href={row.href} use:link class="flex items-center p-3 hover:border-b-0 hover:bg-[#0074a6] active:bg-[#2685bc]">
+                                {@render body(row)}
+                            </a>
+                        {:else}
+                            <div class="flex items-center p-3">
+                                {@render body(row)}
+                            </div>
+                        {/if}
+                    </li>
+                {/each}
+            </ul>
+        {/if}
     </div>
-</div>
+</Modal>

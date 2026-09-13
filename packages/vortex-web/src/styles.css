@@ -74,6 +74,16 @@
     --color-btn-active: #084d74;
     --color-btn-line-active: #1e7b9e;
 
+    /* The crimson button — the one that takes something away: `.two-factor-auth__disable-button`
+       and `.account-security__disable`, which share this ramp exactly. It is NOT --error, the
+       darker #b00049 of the validation popover. */
+    --color-danger: #c0174e;
+    --color-danger-line: #f37387;
+    --color-danger-hover: #f9586d;
+    --color-danger-line-hover: #ff9598;
+    --color-danger-active: #820022;
+    --color-danger-line-active: #b73e56;
+
     /* Forms. Inputs are LIGHT on the dark page, with an inset highlight along the top edge. */
     --color-field: #ccd8df;
     --color-field-line: #275d8e;

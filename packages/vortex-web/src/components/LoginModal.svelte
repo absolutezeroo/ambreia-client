@@ -15,34 +15,19 @@
     // The dialog is the DEFAULT size — `.modal-dialog { margin: 30px auto; max-width: 500px }`. The
     // login modal never asks for `.modal-sm` (400px), and 400 is visibly too narrow for the social
     // block above the fields.
-    import Sprite from './Sprite.svelte';
+    import Modal from './Modal.svelte';
     import LoginForm from './LoginForm.svelte';
     import {t} from '../lib/i18n.js';
 
     let {onClose} = $props();
 </script>
 
-<svelte:window onkeydown={(event) => event.key === 'Escape' && onClose()} />
-
-<div class="fixed inset-0 z-[1040] overflow-y-auto"
-     onclick={(event) => event.target === event.currentTarget && onClose()}
-     role="presentation">
-    <!-- `.modal-backdrop`: the page navy at 90%, fixed, behind the dialog. -->
-    <div class="fixed inset-0 bg-page opacity-90"></div>
-
-    <div class="relative mx-auto my-[10vh] w-full max-w-[400px] px-3">
-        <div class="relative rounded-[10px] border-[3px] border-card-line bg-card shadow-card">
-            <button type="button" onclick={onClose} class="absolute top-[11px] right-3 block" aria-label={t('FORM_CANCEL_LABEL')}>
-                <Sprite name="close" />
-            </button>
-
-            <h3 class="m-0 rounded-lg bg-panel-head text-center leading-[42px] normal-case [text-shadow:0_1px_#000]">
-                {t('LOGIN')}
-            </h3>
-
-            <div class="mx-auto mt-6 mb-12 w-full max-w-[280px] px-3">
-                <LoginForm modal onDone={onClose} />
-            </div>
-        </div>
+<!-- The DEFAULT size, as the comment above says and as `loginModal.open()` confirms — it passes no
+     `size`, so neither `.modal-sm` nor `.modal-lg` applies. This had been shipping 400. -->
+<Modal title={t('LOGIN')} {onClose}>
+    <!-- `.modal__content`: a 280px column, 24px down from the title band and 110px clear of the
+         dialog's bottom edge. -->
+    <div class="mx-auto mt-6 mb-12 w-full max-w-[280px] px-3">
+        <LoginForm modal onDone={onClose} />
     </div>
-</div>
+</Modal>

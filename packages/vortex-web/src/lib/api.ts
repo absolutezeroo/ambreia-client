@@ -82,7 +82,10 @@ const ERRORS: Record<string, string> = {
     'pocket.auth.missing_credentials': 'Il manque ton nom ou ton mot de passe.',
     'pocket.auth.invalid_login': 'Nom ou mot de passe incorrect.',
     'pocket.auth.mfa_required': 'Entre le code de ton application d\'authentification.',
-    'pocket.auth.invalid_code': 'Ce code n\'est pas valide.',
+    'pocket.auth.invalid_code': t('TWO_FACTOR_AUTHENTICATION_INCORRECT_CODE'),
+    // Refused because the account already has a factor. habbo.com never answers this — its own
+    // enrolment replaces rather than refuses — so the sentence is ours.
+    'pocket.auth.mfa_already_enabled': 'Ce compte a deja une authentification a deux facteurs.',
     'pocket.auth.password_too_short': t('ERROR_PASSWORD_MIN_LENGTH'),
     'pocket.auth.wrong_password': t('ERROR_INCORRECT_PASSWORD'),
     'pocket.auth.no_avatars': 'Ce compte n\'a pas encore d\'avatar.',

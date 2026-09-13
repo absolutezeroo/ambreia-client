@@ -1,31 +1,37 @@
 <script lang="ts">
-    // `/settings/2fa` — `settings/two-factor-auth/two-factor-auth-edit.html` plus the enrolment
-    // modal's own template (`register-authenticator.html`): the description, a
-    // `habbo-message-container` carrying the on/off state, and — when enrolling — the steps, the
-    // secret and the code field.
+    // `/settings/2fa` — `settings/two-factor-auth/two-factor-auth.html`, which is one element
+    // (`<habbo-two-factor-auth-edit>`), so this page is `two-factor-auth-edit.html` and nothing
+    // else:
     //
-    // Real since 2026-09-12. `IAccountMfaService` has had the whole feature since the dashboard
-    // needed it (begin / confirm / verify / disable, with `TotpSecret` on the account) and sign-in
-    // has always answered `pocket.auth.mfa_required` against it — nothing had ever exposed the
-    // enrolment half to the website, so this page could only show a grey button.
+    //   <h3 translate="TWO_FACTOR_AUTHENTICATION_TITLE">  <p translate="…_DESCRIPTION">
+    //   <habbo-message-container type="2fa-off">          when there is no second factor
+    //     <h3 …_OFF>  <p …_METHODS>
+    //     <div class="two-factor-auth__status"><button class="two-factor-auth__edit">  APP
+    //     <div class="two-factor-auth__status"><button class="two-factor-auth__edit">  E-MAIL
+    //   <habbo-message-container type="2fa-on">           when there is
+    //     <h3 …_ON>  <p …_ENABLED_DESCRIPTION>
+    //     <div class="account-security__status"><button class="two-factor-auth__disable-button">
+    //     <p …_TRUSTED_LOCATIONS>  <habbo-trusted-locations-reset>
     //
-    // The first component in this package on `lang="ts"`: it is the one that pays for it, since
-    // every call here reads a generated shape.
+    // Every button here OPENS A MODAL — `openRegisterAuthenticator()`, `openRegisterEmail()`,
+    // `openDisable()`. The page itself never grows a form, never shows a secret and never asks for
+    // a code; the QR, the six code boxes and the confirmation all live in the two dialogs beside
+    // this file. This port had the whole flow folded into the page, which is why it looked nothing
+    // like habbo.com's.
+    //
+    // Real since 2026-09-12. `IAccountMfaService` has had the feature since the dashboard needed it
+    // (begin / confirm / verify / disable, with `TotpSecret` on the account) and sign-in has always
+    // answered `pocket.auth.mfa_required` against it.
     import SettingsShell from './SettingsShell.svelte';
     import MessageBox from '../../components/MessageBox.svelte';
     import Button from '../../components/Button.svelte';
-    import Field from '../../components/Field.svelte';
-    import FormError from '../../components/FormError.svelte';
+    import TwoFactorRegisterModal from '../../components/TwoFactorRegisterModal.svelte';
+    import TwoFactorDisableModal from '../../components/TwoFactorDisableModal.svelte';
     import * as api from '../../lib/api.js';
-    import type {ITwoFactorEnrolment} from '../../lib/api.js';
     import {t} from '../../lib/i18n.js';
 
     let enabled = $state<boolean | null>(null);
-    let enrolment = $state<ITwoFactorEnrolment | null>(null);
-    let disabling = $state(false);
-    let code = $state('');
-    let error = $state('');
-    let busy = $state(false);
+    let dialog = $state<'register' | 'disable' | null>(null);
 
     $effect(() =>
     {
@@ -38,62 +44,11 @@
         return () => (cancelled = true);
     });
 
-    function reset(): void
+    /** Both dialogs close by saying what they changed, the way `on-success="$close()"` does. */
+    function done(now: boolean): void
     {
-        enrolment = null;
-        disabling = false;
-        code = '';
-        error = '';
-    }
-
-    async function run(action: () => Promise<unknown>): Promise<boolean>
-    {
-        busy = true;
-        error = '';
-
-        try
-        {
-            await action();
-
-            return true;
-        }
-        catch(failure)
-        {
-            error = (failure as Error)?.message ?? '';
-
-            return false;
-        }
-        finally
-        {
-            busy = false;
-        }
-    }
-
-    async function start(): Promise<void>
-    {
-        reset();
-
-        await run(async () => (enrolment = await api.startTwoFactor()));
-    }
-
-    async function confirm(): Promise<void>
-    {
-        if(!enrolment) return;
-
-        if(await run(() => api.enableTwoFactor(enrolment!.secret, code.trim())))
-        {
-            enabled = true;
-            reset();
-        }
-    }
-
-    async function remove(): Promise<void>
-    {
-        if(await run(() => api.disableTwoFactor(code.trim())))
-        {
-            enabled = false;
-            reset();
-        }
+        enabled = now;
+        dialog = null;
     }
 </script>
 
@@ -104,97 +59,54 @@
     {#if enabled === null}
         <!-- The status has not answered yet, or the visitor is signed out. Nothing is claimed
              either way: a box saying "disabled" before the answer arrives is a lie half the time. -->
-    {:else if enabled && !disabling}
-        <!-- `two-factor-auth-edit.html` pairs `_ON` with `_ENABLED_DESCRIPTION`, and this had
-             `_DISABLED_DESCRIPTION` under it — so the box headed "L'AUTHENTIFICATION À DEUX FACTEURS
-             EST ACTIVÉE" went on to say it was disabled for this account. The button was
-             `_EDIT_OR_ENABLE` ("MODIFIER OU ACTIVER") on a control whose only job is to turn it off;
-             habbo.com's is `_DISABLE`. Two keys, and between them the box claimed the opposite of
-             the state it was reporting. -->
+    {:else if enabled}
+        <!-- `two-factor-auth-edit.html` pairs `_ON` with `_ENABLED_DESCRIPTION`.
+
+             habbo.com has a THIRD state between these two — `twoFactorAuthStatus.disabled`, a
+             factor that is registered but switched off, which shows `_DISABLED` / `_ENABLE` and
+             offers to turn it back on. There is no such state here: `DisableAsync` clears
+             `TotpSecret`, so an account either has a factor or has none. -->
         <MessageBox type="2fa-on">
             <h3 class="mt-0">{t('TWO_FACTOR_AUTHENTICATION_ON')}</h3>
             <p>{t('TWO_FACTOR_AUTHENTICATION_ENABLED_DESCRIPTION')}</p>
 
-            <Button className="mt-3" onclick={() => (disabling = true)}>
-                {t('TWO_FACTOR_AUTHENTICATION_DISABLE')}
-            </Button>
-        </MessageBox>
-    {:else if disabling}
-        <MessageBox type="2fa-on">
-            <h3 class="mt-0">{t('TWO_FACTOR_AUTHENTICATION_DISABLE_TITLE')}</h3>
-            <p>{t('TWO_FACTOR_AUTHENTICATION_DISABLE_DESCRIPTION')}</p>
-
-            <Field label={t('TWO_FACTOR_AUTHENTICATION_ENTER_EX_AUTH_CODE')}
-                   bind:value={code} autocomplete="one-time-code" maxlength={6} />
-
-            {#if error}
-                <FormError inline>{error}</FormError>
-            {/if}
-
-            <div class="mt-3 flex gap-3">
-                <Button onclick={remove} disabled={busy || !code.trim()}>
+            <!-- `.account-security__status` + `.two-factor-auth__disable-button`: the site's one
+                 crimson button, full width, and all it does is open the dialog. -->
+            <div class="xs:flex">
+                <Button variant="red" className="mt-3 min-w-full" onclick={() => (dialog = 'disable')}>
                     {t('TWO_FACTOR_AUTHENTICATION_DISABLE')}
                 </Button>
-                <Button onclick={reset}>
-                    {t('TWO_FACTOR_AUTHENTICATION_CANCEL_BUTTON')}
-                </Button>
             </div>
-        </MessageBox>
-    {:else if enrolment}
-        <MessageBox type="2fa-off">
-            <h3 class="mt-0">{t('TWO_FACTOR_AUTHENTICATION_REGISTER')}</h3>
-            <p>{t('TWO_FACTOR_AUTHENTICATION_APP_DESCRIPTION')}</p>
 
-            <!-- habbo.com's STEP2 and STEP3 describe a second code sent by e-mail. This hotel's
-                 enrolment is the authenticator alone — AccountMfaService stores one TOTP secret and
-                 sends nothing — so quoting those two steps would be instructions for a message that
-                 never arrives. -->
-            <p class="mt-3">{t('TWO_FACTOR_AUTHENTICATION_APP_STEP1')}</p>
-            <p>{t('TWO_FACTOR_AUTHENTICATION_APP_STEP4')}</p>
-
-            <!-- habbo.com shows a QR its server renders. There is none here yet, so the secret is
-                 shown for manual entry and the otpauth link is live: on a phone it opens the
-                 authenticator directly, which is the same gesture as scanning. -->
-            <p class="mt-3 font-mono text-lg tracking-widest break-all select-all">{enrolment.secret}</p>
-            <p><a href={enrolment.uri}>{t('TWO_FACTOR_AUTHENTICATION_AUTHENTICATOR_APP')}</a></p>
-
-            <Field label={t('TWO_FACTOR_AUTHENTICATION_ENTER_AUTH_CODE')}
-                   bind:value={code} autocomplete="one-time-code" maxlength={6} />
-
-            {#if error}
-                <FormError inline>{error}</FormError>
-            {/if}
-
-            <div class="mt-3 flex gap-3">
-                <Button onclick={confirm} disabled={busy || !code.trim()}>
-                    {t('TWO_FACTOR_AUTHENTICATION_REGISTER_BUTTON')}
-                </Button>
-                <Button onclick={reset}>
-                    {t('TWO_FACTOR_AUTHENTICATION_CANCEL_BUTTON')}
-                </Button>
-            </div>
+            <!-- `_TRUSTED_LOCATIONS` and `<habbo-trusted-locations-reset>` belong here on
+                 habbo.com. Both are left out: the emulator keeps no trusted-login record, so the
+                 button would reset nothing and the paragraph would explain a control that is not
+                 there. -->
         </MessageBox>
     {:else}
         <MessageBox type="2fa-off">
             <h3 class="mt-0">{t('TWO_FACTOR_AUTHENTICATION_OFF')}</h3>
             <p>{t('TWO_FACTOR_AUTHENTICATION_METHODS')}</p>
 
-            {#if error}
-                <FormError inline>{error}</FormError>
-            {/if}
-
-            <div class="mt-3 flex">
-                <Button className="min-w-[75%]" onclick={start} disabled={busy}>
+            <!-- `.two-factor-auth__edit { min-width: 75% }`, and 50% from 767px. -->
+            <div class="xs:flex">
+                <Button className="mt-3 min-w-[75%] md:min-w-[50%]" onclick={() => (dialog = 'register')}>
                     {t('TWO_FACTOR_AUTHENTICATION_AUTHENTICATOR_APP')}
                 </Button>
             </div>
-            <!-- Still disabled, and this one honestly: AccountMfaService is TOTP only — there is no
-                 e-mail second factor to enrol into. -->
-            <div class="mt-3 flex">
-                <Button disabled className="min-w-[75%]">
+            <!-- Disabled, and honestly: `AccountMfaService` is TOTP only — there is no e-mail
+                 second factor to enrol into, and no `openRegisterEmail()` to reach. -->
+            <div class="xs:flex">
+                <Button disabled className="mt-3 min-w-[75%] md:min-w-[50%]">
                     {t('TWO_FACTOR_AUTHENTICATION_EMAIL')}
                 </Button>
             </div>
         </MessageBox>
     {/if}
 </SettingsShell>
+
+{#if dialog === 'register'}
+    <TwoFactorRegisterModal onClose={() => (dialog = null)} onDone={() => done(true)} />
+{:else if dialog === 'disable'}
+    <TwoFactorDisableModal onClose={() => (dialog = null)} onDone={() => done(false)} />
+{/if}

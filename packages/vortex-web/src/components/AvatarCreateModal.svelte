@@ -12,7 +12,7 @@
     // A name is 3 to 15 characters against habbo.com's own pattern, checked for availability as you
     // type. There is no look picker: a new avatar gets the default look and the client's own editor
     // changes it afterwards.
-    import Sprite from './Sprite.svelte';
+    import Modal from './Modal.svelte';
     import Button from './Button.svelte';
     import Field from './Field.svelte';
     import * as api from '../lib/api.js';
@@ -132,63 +132,45 @@
     }
 </script>
 
-<svelte:window onkeydown={(event) => event.key === 'Escape' && onClose()} />
+<Modal title={t('AVATAR_CREATE_TITLE')} {onClose}>
+    <form class="mx-auto mt-6 mb-12 w-full max-w-[280px] px-3" onsubmit={create}>
+        <img src={BAGHEAD} alt="" class="mx-auto mb-6 block h-[116px] w-[94px]" />
 
-<div class="fixed inset-0 z-[1040] overflow-y-auto"
-     onclick={(event) => event.target === event.currentTarget && onClose()}
-     role="presentation">
-    <div class="fixed inset-0 bg-page opacity-90"></div>
+        {#if error}
+            <p class="mb-3 rounded-[3px] bg-error px-3 py-3 text-white drop-shadow-[0_4px_0_rgba(0,0,0,0.3)]">{error}</p>
+        {/if}
 
-    <div class="relative mx-auto my-[10vh] w-full max-w-[500px] px-3">
-        <div class="relative rounded-[10px] border-[3px] border-card-line bg-card shadow-card">
-            <button type="button" onclick={onClose} class="absolute top-[11px] right-3 block" aria-label={t('FORM_CANCEL_LABEL')}>
-                <Sprite name="close" />
-            </button>
+        <Field name="avatar-name" label={t('AVATAR_CREATE_LABEL')} bind:value={name} maxlength={15} />
 
-            <h3 class="m-0 rounded-lg bg-panel-head text-center leading-[42px] normal-case [text-shadow:0_1px_#000]">
-                {t('AVATAR_CREATE_TITLE')}
-            </h3>
-
-            <form class="mx-auto mt-6 mb-12 w-full max-w-[280px] px-3" onsubmit={create}>
-                <img src={BAGHEAD} alt="" class="mx-auto mb-6 block h-[116px] w-[94px]" />
-
-                {#if error}
-                    <p class="mb-3 rounded-[3px] bg-error px-3 py-3 text-white drop-shadow-[0_4px_0_rgba(0,0,0,0.3)]">{error}</p>
-                {/if}
-
-                <Field name="avatar-name" label={t('AVATAR_CREATE_LABEL')} bind:value={name} maxlength={15} />
-
-                <!-- `avatar-create-form.html` lists FOUR `ng-message`s for this one field, and each
-                     says what is actually wrong: too short (with the minimum), too long (with the
-                     maximum), the wrong characters, or taken. This showed the character rule for all
-                     of them, so a two-letter name was answered with a sentence about punctuation. -->
-                <div class="min-h-[22px] text-sm">
-                    {#if name.trim() && !valid}
-                        <span class="text-error">{t(nameError(name), {min: MIN_NAME, max: MAX_NAME})}</span>
-                    {:else if checking}
-                        <span>...</span>
-                    {:else if available === true}
-                        <span class="text-play-line">{name}</span>
-                    {:else if available === false}
-                        <!-- habbo.com's own ng-message for this field is ERROR_FIELD_NAME_TAKEN. -->
-                        <span class="text-error">{t('ERROR_FIELD_NAME_TAKEN')}</span>
-                    {/if}
-                </div>
-
-                <!-- habbo.com's own help text, which carries its own <br><br>. -->
-                <p class="mt-3 text-sm">{@html t('AVATAR_CREATE_HELP')}</p>
-
-                <div class="mt-6 flex items-center justify-between">
-                    <!-- `.form__cancel` is an <a> on habbo.com, so it picks up BOTH site-wide anchor
-                         rules: `color: #fff` and `a:hover { border-bottom: 1px solid }`. A <button>
-                         inherits the body's light blue and no underline, so it has to ask for both —
-                         which is why this read blue where habbo's reads white. -->
-                    <button type="button" onclick={onClose} class="text-white hover:border-b hover:border-solid">{t('FORM_CANCEL_LABEL')}</button>
-                    <Button type="submit" disabled={busy || !valid || available === false}>
-                        {busy ? '...' : t('FORM_BUTTON_CREATE')}
-                    </Button>
-                </div>
-            </form>
+        <!-- `avatar-create-form.html` lists FOUR `ng-message`s for this one field, and each says
+             what is actually wrong: too short (with the minimum), too long (with the maximum), the
+             wrong characters, or taken. This showed the character rule for all of them, so a
+             two-letter name was answered with a sentence about punctuation. -->
+        <div class="min-h-[22px] text-sm">
+            {#if name.trim() && !valid}
+                <span class="text-error">{t(nameError(name), {min: MIN_NAME, max: MAX_NAME})}</span>
+            {:else if checking}
+                <span>...</span>
+            {:else if available === true}
+                <span class="text-play-line">{name}</span>
+            {:else if available === false}
+                <!-- habbo.com's own ng-message for this field is ERROR_FIELD_NAME_TAKEN. -->
+                <span class="text-error">{t('ERROR_FIELD_NAME_TAKEN')}</span>
+            {/if}
         </div>
-    </div>
-</div>
+
+        <!-- habbo.com's own help text, which carries its own <br><br>. -->
+        <p class="mt-3 text-sm">{@html t('AVATAR_CREATE_HELP')}</p>
+
+        <div class="mt-6 flex items-center justify-between">
+            <!-- `.form__cancel` is an <a> on habbo.com, so it picks up BOTH site-wide anchor rules:
+                 `color: #fff` and `a:hover { border-bottom: 1px solid }`. A <button> inherits the
+                 body's light blue and no underline, so it has to ask for both — which is why this
+                 read blue where habbo's reads white. -->
+            <button type="button" onclick={onClose} class="text-white hover:border-b hover:border-solid">{t('FORM_CANCEL_LABEL')}</button>
+            <Button type="submit" disabled={busy || !valid || available === false}>
+                {busy ? '...' : t('FORM_BUTTON_CREATE')}
+            </Button>
+        </div>
+    </form>
+</Modal>
