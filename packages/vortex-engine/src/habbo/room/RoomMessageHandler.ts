@@ -9,6 +9,18 @@
 import type {IConnection} from '@core/communication/connection/IConnection';
 import type {IMessageEvent} from '@core/communication/messages/IMessageEvent';
 import type {IRoomCreator} from './IRoomCreator';
+import {
+    VariableFxConfigUpdateMessageEvent,
+    VariableFxConfigRemoveMessageEvent,
+    VariableFxStatusUpdateMessageEvent,
+    VariableFxStatusRemoveMessageEvent
+} from '@habbo/communication/messages/incoming/userdefinedroomevents';
+import type {
+    VariableFxConfigUpdateParser,
+    VariableFxConfigRemoveParser,
+    VariableFxStatusUpdateParser,
+    VariableFxStatusRemoveParser
+} from '@habbo/communication/messages/parser/userdefinedroomevents';
 import {Vector3d} from '@room/utils/Vector3d';
 import type {IVector3d} from '@room/utils/IVector3d';
 import {FurniStackingHeightMap} from './utils/FurniStackingHeightMap';
@@ -342,6 +354,12 @@ export class RoomMessageHandler implements IRoomMessageHandler
             connection.addMessageEvent(new CarryObjectMessageEvent(this.onCarryObject.bind(this)));
             connection.addMessageEvent(new UseObjectMessageEvent(this.onUseObject.bind(this)));
             connection.addMessageEvent(new UserChangeMessageEvent(this.onUserChange.bind(this)));
+
+            // VariableFx — configs first, then the live values that reference them.
+            connection.addMessageEvent(new VariableFxConfigUpdateMessageEvent(this.onVariableFxConfigs.bind(this)));
+            connection.addMessageEvent(new VariableFxConfigRemoveMessageEvent(this.onVariableFxConfigsRemoved.bind(this)));
+            connection.addMessageEvent(new VariableFxStatusUpdateMessageEvent(this.onVariableFxStatus.bind(this)));
+            connection.addMessageEvent(new VariableFxStatusRemoveMessageEvent(this.onVariableFxStatusRemoved.bind(this)));
         }
     }
 
@@ -2797,8 +2815,56 @@ export class RoomMessageHandler implements IRoomMessageHandler
     }
 
     // look, so it's treated the same as "not sent" here.
-    private normalizeRoomPropertyValue(value: string | null): string | null 
+    private normalizeRoomPropertyValue(value: string | null): string | null
     {
         return value === '0' ? null : value;
+    }
+
+    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/_SafeCls_2064.as::onVariableFxConfigs()
+    private onVariableFxConfigs(event: IMessageEvent): void
+    {
+        if(this._roomCreator === null) return;
+
+        const parser = event.parser as VariableFxConfigUpdateParser | null;
+
+        if(parser === null) return;
+
+        this._roomCreator.updateVariableFxConfigs(this._currentRoomId, parser.configs);
+    }
+
+    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/_SafeCls_2064.as::onVariableFxConfigsRemoved()
+    private onVariableFxConfigsRemoved(event: IMessageEvent): void
+    {
+        if(this._roomCreator === null) return;
+
+        const parser = event.parser as VariableFxConfigRemoveParser | null;
+
+        if(parser === null) return;
+
+        this._roomCreator.removeVariableFxConfigs(this._currentRoomId, parser.configIds);
+    }
+
+    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/_SafeCls_2064.as::onVariableFxStatus()
+    private onVariableFxStatus(event: IMessageEvent): void
+    {
+        if(this._roomCreator === null) return;
+
+        const parser = event.parser as VariableFxStatusUpdateParser | null;
+
+        if(parser === null) return;
+
+        this._roomCreator.updateVariableFxStatuses(this._currentRoomId, parser.statuses);
+    }
+
+    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/_SafeCls_2064.as::onVariableFxStatusRemoved()
+    private onVariableFxStatusRemoved(event: IMessageEvent): void
+    {
+        if(this._roomCreator === null) return;
+
+        const parser = event.parser as VariableFxStatusRemoveParser | null;
+
+        if(parser === null) return;
+
+        this._roomCreator.removeVariableFxStatuses(this._currentRoomId, parser.statuses);
     }
 }

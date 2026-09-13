@@ -13,6 +13,11 @@ import type {IRoomObjectFactory} from '@room/IRoomObjectFactory';
 import type {IRoomObjectEventHandler} from '@room/object/logic/IRoomObjectEventHandler';
 import type {IRoomObjectManager} from '@room/IRoomObjectManager';
 import {RoomObjectManager} from '@room/RoomObjectManager';
+import {OrderedMap} from '@core/utils/OrderedMap';
+import type {VariableFxConfigUpdateData} from './object/variablefx/VariableFxConfigUpdateData';
+import {VariableFxLogicConfig} from './object/logic/VariableFxLogicConfig';
+import {AvatarLogicRoomData} from './object/logic/AvatarLogicRoomData';
+import {FurnitureLogicRoomData} from './object/logic/FurnitureLogicRoomData';
 import {RoomObjectLogicEnum} from './object/RoomObjectLogicEnum';
 import {FurnitureLogic} from './object/logic/furniture/FurnitureLogic';
 import {FurnitureMultiStateLogic} from './object/logic/furniture/FurnitureMultiStateLogic';
@@ -101,6 +106,19 @@ export class RoomObjectFactory implements IRoomObjectFactory
     private _trackedEventTypes: Map<string, boolean>;
     // AS3: .../src/com/sulake/habbo/room/RoomObjectFactory.as::_objectEventListeners
     private _objectEventListeners: Array<(event: unknown) => void>;
+
+    /**
+     * Per-room VariableFx config stores, keyed by room *identifier*. Two maps rather than one
+     * because a config is either a user effect or a furniture one, and each half is read by a
+     * different set of object logics.
+     */
+    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/RoomObjectFactory.as::_avatarLogicRoomData
+    //   Name derived: the AS3 field is `_SafeStr_5897`; named for what it holds.
+    private _avatarLogicRoomData: OrderedMap<string, AvatarLogicRoomData> = new OrderedMap();
+
+    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/RoomObjectFactory.as::_furnitureLogicRoomData
+    //   Name derived: the AS3 field is `_SafeStr_5916`.
+    private _furnitureLogicRoomData: OrderedMap<string, FurnitureLogicRoomData> = new OrderedMap();
 
     constructor()
     {
@@ -586,6 +604,76 @@ export class RoomObjectFactory implements IRoomObjectFactory
     createRoomObjectManager(): IRoomObjectManager
     {
         return new RoomObjectManager();
+    }
+
+    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/RoomObjectFactory.as::getAvatarLogicRoomData()
+    private getAvatarLogicRoomData(roomId: string): AvatarLogicRoomData
+    {
+        let data = this._avatarLogicRoomData.getValue(roomId);
+
+        if(data === null)
+        {
+            data = new AvatarLogicRoomData();
+            this._avatarLogicRoomData.add(roomId, data);
+        }
+
+        return data;
+    }
+
+    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/RoomObjectFactory.as::getFurnitureLogicRoomData()
+    private getFurnitureLogicRoomData(roomId: string): FurnitureLogicRoomData
+    {
+        let data = this._furnitureLogicRoomData.getValue(roomId);
+
+        if(data === null)
+        {
+            data = new FurnitureLogicRoomData();
+            this._furnitureLogicRoomData.add(roomId, data);
+        }
+
+        return data;
+    }
+
+    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/RoomObjectFactory.as::updateVariableFxConfigs()
+    updateVariableFxConfigs(roomId: string, configs: VariableFxConfigUpdateData[]): void
+    {
+        for(const config of configs)
+        {
+            const store = config.isUserFx
+                ? this.getAvatarLogicRoomData(roomId)
+                : this.getFurnitureLogicRoomData(roomId);
+
+            store.variableFxLogicManager?.upsertConfig(new VariableFxLogicConfig(
+                config.configId,
+                config.isUserFx,
+                config.showMode,
+                config.visibilityMask,
+                config.showOnMouseHover,
+                config.showDuration
+            ));
+        }
+    }
+
+    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/RoomObjectFactory.as::removeVariableFxConfigs()
+    removeVariableFxConfigs(roomId: string, configIds: number[]): void
+    {
+        // Both stores, unconditionally: the remove message carries ids and nothing else, so which
+        // half a config lived in is not knowable here. Removing from the wrong one is a no-op.
+        const avatars = this.getAvatarLogicRoomData(roomId);
+        const furniture = this.getFurnitureLogicRoomData(roomId);
+
+        for(const configId of configIds)
+        {
+            avatars.variableFxLogicManager?.removeConfig(configId);
+            furniture.variableFxLogicManager?.removeConfig(configId);
+        }
+    }
+
+    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/RoomObjectFactory.as::disposeRoomLogicData()
+    disposeRoomLogicData(roomId: string): void
+    {
+        this._avatarLogicRoomData.remove(roomId)?.dispose();
+        this._furnitureLogicRoomData.remove(roomId)?.dispose();
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/RoomObjectFactory.as::addTrackedEventType()

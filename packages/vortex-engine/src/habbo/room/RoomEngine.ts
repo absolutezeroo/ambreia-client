@@ -46,6 +46,11 @@ import {IID_HabboGameManager} from '@iid/IIDHabboGameManager';
 import type {IHabboGameManager} from '@habbo/game/IHabboGameManager';
 import type {IRoomSession} from '@habbo/session/IRoomSession';
 import {RoomObjectCategoryEnum} from './object/RoomObjectCategoryEnum';
+import type {VariableFxConfigUpdateData} from './object/variablefx/VariableFxConfigUpdateData';
+import type {VariableFxStatusUpdateData} from './object/variablefx/VariableFxStatusUpdateData';
+import type {VariableFxStatusRemoveData} from './object/variablefx/VariableFxStatusRemoveData';
+import {RoomObjectVariableFxStatusUpdateMessage} from './messages/RoomObjectVariableFxStatusUpdateMessage';
+import {RoomObjectVariableFxStatusRemoveMessage} from './messages/RoomObjectVariableFxStatusRemoveMessage';
 import {RoomObjectOperationEnum} from './object/RoomObjectOperationEnum';
 import {RoomObjectAvatarSelectedMessage} from './messages/RoomObjectAvatarSelectedMessage';
 import {RoomObjectSelectedMessage} from './messages/RoomObjectSelectedMessage';
@@ -1149,6 +1154,79 @@ export class RoomEngine extends Component implements IRoomEngine,
         if(parts.length <= 1) return -1;
 
         return parseInt(parts[0], 10);
+    }
+
+    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/_SafeCls_90.as::updateVariableFxConfigs()
+    updateVariableFxConfigs(roomId: number, configs: VariableFxConfigUpdateData[]): void
+    {
+        this._roomManager?.updateVariableFxConfigs(this.getRoomIdentifier(roomId), configs);
+    }
+
+    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/_SafeCls_90.as::removeVariableFxConfigs()
+    removeVariableFxConfigs(roomId: number, configIds: number[]): void
+    {
+        this._roomManager?.removeVariableFxConfigs(this.getRoomIdentifier(roomId), configIds);
+    }
+
+    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/_SafeCls_90.as::updateVariableFxStatuses()
+    updateVariableFxStatuses(roomId: number, statuses: VariableFxStatusUpdateData[]): void
+    {
+        for(const status of statuses)
+        {
+            this.updateVariableFxStatus(roomId, status);
+        }
+    }
+
+    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/_SafeCls_90.as::removeVariableFxStatuses()
+    removeVariableFxStatuses(roomId: number, statuses: VariableFxStatusRemoveData[]): void
+    {
+        for(const status of statuses)
+        {
+            this.removeVariableFxStatus(roomId, status);
+        }
+    }
+
+    /**
+     * Silently drops a status whose entity is not in the room. That is the normal case, not an
+     * error: the server sends a room's statuses as one packet, and an avatar named in it may have
+     * walked out between the server building the packet and the client reading it.
+     */
+    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/_SafeCls_90.as::updateVariableFxStatus()
+    private updateVariableFxStatus(roomId: number, status: VariableFxStatusUpdateData): void
+    {
+        const category = status.isUserEntity
+            ? RoomObjectCategoryEnum.OBJECT_CATEGORY_USER
+            : RoomObjectCategoryEnum.OBJECT_CATEGORY_FURNITURE;
+
+        const object = this.getRoomObject(roomId, status.entityId, category) as IRoomObjectController | null;
+
+        if(!object || !object.getEventHandler()) return;
+
+        object.getEventHandler()?.processUpdateMessage(new RoomObjectVariableFxStatusUpdateMessage(
+            status.configId,
+            status.variableId,
+            status.value,
+            status.overrideMinValue,
+            status.overrideMaxValue,
+            status.extra,
+            status.isInitialize
+        ));
+    }
+
+    // AS3: sources/AIR-1.0.31/scripts/com/sulake/habbo/room/_SafeCls_90.as::removeVariableFxStatus()
+    private removeVariableFxStatus(roomId: number, status: VariableFxStatusRemoveData): void
+    {
+        const category = status.isUserEntity
+            ? RoomObjectCategoryEnum.OBJECT_CATEGORY_USER
+            : RoomObjectCategoryEnum.OBJECT_CATEGORY_FURNITURE;
+
+        const object = this.getRoomObject(roomId, status.entityId, category) as IRoomObjectController | null;
+
+        if(!object || !object.getEventHandler()) return;
+
+        object.getEventHandler()?.processUpdateMessage(
+            new RoomObjectVariableFxStatusRemoveMessage(status.configId, status.variableId)
+        );
     }
 
     /**
