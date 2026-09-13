@@ -8,6 +8,7 @@ import {isRoomViewerMode} from '@habbo/configuration/enum/HabboComponentFlags';
 import {IncomingMessages} from './IncomingMessages';
 import type {HabboCommunicationEventType} from '../enum/HabboCommunicationEvent';
 import {HabboCommunicationEvent} from '../enum/HabboCommunicationEvent';
+import {HabboCommunicationManagerEvent} from '../enum/HabboCommunicationManagerEvent';
 import type {IHabboCommunicationManager} from '../IHabboCommunicationManager';
 import {
     SSOTicketMessageComposer,
@@ -345,9 +346,9 @@ export class HabboCommunicationDemo extends Component implements IHabboCommunica
                     timeoutId = null;
                 }
 
-                events.off('loginStep', onLoginStep);
-                events.off('disconnected', onDisconnected);
-                events.off('connectionError', onConnectionError);
+                events.off(HabboCommunicationManagerEvent.LOGIN_STEP, onLoginStep);
+                events.off(HabboCommunicationManagerEvent.DISCONNECTED, onDisconnected);
+                events.off(HabboCommunicationManagerEvent.CONNECTION_ERROR, onConnectionError);
             };
 
             const resolveAuthenticated = (): void =>
@@ -392,9 +393,9 @@ export class HabboCommunicationDemo extends Component implements IHabboCommunica
                 rejectAuthentication(error);
             };
 
-            events.on('loginStep', onLoginStep);
-            events.on('disconnected', onDisconnected);
-            events.on('connectionError', onConnectionError);
+            events.on(HabboCommunicationManagerEvent.LOGIN_STEP, onLoginStep);
+            events.on(HabboCommunicationManagerEvent.DISCONNECTED, onDisconnected);
+            events.on(HabboCommunicationManagerEvent.CONNECTION_ERROR, onConnectionError);
 
             timeoutId = setTimeout(() =>
             {
@@ -456,7 +457,7 @@ export class HabboCommunicationDemo extends Component implements IHabboCommunica
         // Emit on the communication manager events (AS3 equivalent: context.events)
         if(this._communication?.events)
         {
-            this._communication.events.emit('disconnected', reason, reasonText);
+            this._communication.events.emit(HabboCommunicationManagerEvent.DISCONNECTED, reason, reasonText);
         }
 
         // AS3 branches on the login flow being alive: with one it hands over to
@@ -498,18 +499,28 @@ export class HabboCommunicationDemo extends Component implements IHabboCommunica
             return;
         }
 
+        // The callback disposes the dialog and nothing else, exactly as AS3 does. It used to
+        // `window.location.reload()` on a disconnect, under a DEVIATION claiming the reload "lands
+        // on the same login screen the client boots from". It does not: the SSO ticket rides on
+        // `?sso=` in the URL (index.html reads it into VortexConfig) and a reload keeps the URL, so
+        // it re-bootstraps the whole engine against the ticket that was just disconnected —
+        // App.ts::init() only redirects to the site when the ticket is *absent*. So the invented
+        // reload never reached a login screen, and it is the only thing this client does on this
+        // path that Habbo does not.
+        // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/communication/demo/_SafeCls_98.as::alert()
         this._windowManager.alert(titleKey, messageKey, 0, (dialog) =>
         {
             dialog.dispose();
 
-            // DEVIATION: AS3 closes the dialog and leaves the player on a dead client, because the
-            //   branch that has a login flow already returned them to the login screen. This port
-            //   has no live LoginFlow to return to, so the reload stands in for it: it lands on the
-            //   same login screen the client boots from, with no half-torn-down engine behind it.
+            // AS3's other branch, ported to where login actually lives. With a LoginFlow alive AS3
+            // never shows this dialog at all: `disconnected()` goes to `onBufferedDisconnected()`
+            // → `showDisconnected()`, and the player is back on the login screen. Here the site is
+            // the login screen, so the engine only says the session is over — the client turns that
+            // into whatever "back to login" means for its embedder.
             // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/communication/demo/_SafeCls_98.as::onBufferedDisconnected()
             if(this._isDisconnected)
             {
-                window.location.reload();
+                this._communication?.events.emit(HabboCommunicationManagerEvent.DISCONNECT_ACKNOWLEDGED);
             }
         });
     }
@@ -582,7 +593,7 @@ export class HabboCommunicationDemo extends Component implements IHabboCommunica
     {
         if(!this._communication?.events) return;
 
-        this._communication.events.emit('loginStep', step);
+        this._communication.events.emit(HabboCommunicationManagerEvent.LOGIN_STEP, step);
     }
 
     /**

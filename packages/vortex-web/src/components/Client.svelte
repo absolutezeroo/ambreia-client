@@ -21,6 +21,7 @@
     import {selectedId} from '../lib/session.js';
     import {CLIENT_URL} from '../lib/config.js';
     import {t} from '../lib/i18n.js';
+    import {ClientChannel} from '../lib/clientChannel.js';
 
     // `link` is habbo.com's own `/hotel?link=…` handover — `navigator/goto/42` from an appart's
     // "Entrer dans l'appart", `habboUI/open/hccenter` from the purse.
@@ -114,7 +115,39 @@
 
         // Targeted at our own origin: a wildcard would hand the link to whatever the iframe had
         // navigated to. If the client is still booting it queues this until the session is up.
-        client.postMessage({type: 'vortex:link', link}, window.location.origin);
+        client.postMessage({type: ClientChannel.LINK, link}, window.location.origin);
+    });
+
+    // The way back out, and the only one there is. The client is mounted once and never reloads
+    // itself, so when its session dies nothing on the page knows — the player sat in front of a dead
+    // frame. The client now says so (vortex-client App.ts::_onDisconnectAcknowledged), and dropping
+    // `src` unmounts the iframe outright: `{:else if src}` in the markup below means the dead client
+    // stops existing rather than lingering at about:blank.
+    //
+    // Clearing `src` also re-arms the ticket effect above, so the next time the hotel is opened it
+    // fetches a NEW ticket instead of reusing the one the server just disconnected.
+    //
+    // Accepted only from our own origin and only from this iframe: any page that can get a handle on
+    // this window could otherwise close the hotel out from under the player.
+    $effect(() =>
+    {
+        const onMessage = (event: MessageEvent): void =>
+        {
+            if(event.origin !== window.location.origin) return;
+            if(!frame || event.source !== frame.contentWindow) return;
+
+            const data = event.data as {type?: unknown} | null;
+
+            if(!data || data.type !== ClientChannel.DISCONNECTED) return;
+
+            src = '';
+            delivered = '';
+            onClose();
+        };
+
+        window.addEventListener('message', onMessage);
+
+        return () => window.removeEventListener('message', onMessage);
     });
 
     function toggleFullscreen()

@@ -1,6 +1,8 @@
 import type {IVortexConfig, IVortexWindowAssets} from 'vortex-engine';
 import {Vortex} from 'vortex-engine';
 import {FRAME_CHANNEL_UI, FrameTimings} from '@core/utils/FrameTimings';
+import {SiteChannel} from './SiteChannel';
+import {HabboCommunicationManagerEvent} from '@habbo/communication/enum/HabboCommunicationManagerEvent';
 import {AssetTypeDeclaration} from '@core/assets/AssetTypeDeclaration';
 import {UnknownAsset} from '@core/assets/UnknownAsset';
 import {SoundAsset} from '@core/assets/SoundAsset';
@@ -1323,7 +1325,37 @@ export class VortexApp
             reset: () => (this._authenticated = false),
             setDisconnected: () => (this._authenticated = false)
         });
+
+        // `off` first so this stays idempotent: `_onDisconnectAcknowledged` is a stable field, and a
+        // second install would otherwise leave two listeners and post the handover twice.
+        vortex.habboCommunication.events.off(
+            HabboCommunicationManagerEvent.DISCONNECT_ACKNOWLEDGED, this._onDisconnectAcknowledged);
+        vortex.habboCommunication.events.on(
+            HabboCommunicationManagerEvent.DISCONNECT_ACKNOWLEDGED, this._onDisconnectAcknowledged);
     }
+
+    /**
+     * Hand the player back to the site, which is this client's login screen.
+     *
+     * The engine raises `disconnectAcknowledged` when the player closes the disconnect dialog —
+     * AS3's `showDisconnected()` moment. It used to be a `window.location.reload()` inside the
+     * engine, which never reached a login screen at all: the SSO ticket rides on `?sso=` in the URL
+     * and a reload keeps the URL, so it re-bootstrapped the whole engine against the ticket that had
+     * just been disconnected.
+     *
+     * The site parks this client in an iframe and never reloads it (components/Client.svelte), so
+     * only the site can end the session: it drops the frame and fetches a fresh ticket the next time
+     * the hotel is opened. Same-origin because the site proxies this client at `/client`; the origin
+     * is named rather than `*` so the message is not readable by whatever else may frame this page.
+     */
+    // TS-only: AS3 calls `LoginFlow.showDisconnected()` here. This port has no LoginFlow — login
+    //   lives in `vortex-web` — so the handover is a message to the embedder instead.
+    private readonly _onDisconnectAcknowledged = (): void =>
+    {
+        if(window.parent === window) return;
+
+        window.parent.postMessage({type: SiteChannel.DISCONNECTED}, window.location.origin);
+    };
 
     /**
      * The second channel for `/hotel?link=…`, and the reason it has to exist.
@@ -1358,7 +1390,7 @@ export class VortexApp
 
             const data = event.data as {type?: unknown; link?: unknown} | null;
 
-            if(!data || data.type !== 'vortex:link') return;
+            if(!data || data.type !== SiteChannel.LINK) return;
             if(typeof data.link !== 'string' || data.link.length === 0) return;
 
             // Before the handshake completes a link reaches a tracker that sends a composer nobody

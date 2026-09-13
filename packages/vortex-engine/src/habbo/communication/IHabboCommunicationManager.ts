@@ -4,6 +4,7 @@ import type {IMessageEvent} from '@core/communication/messages/IMessageEvent';
 import type {IEncryption} from '@core/communication/encryption/IEncryption';
 import type {IKeyExchange} from '@core/communication/handshake/IKeyExchange';
 import type {HabboCommunicationEventType} from './enum';
+import type {HabboCommunicationManagerEvent} from './enum';
 import type {IHabboWebApiListener} from './IHabboWebApiListener';
 import type {IHabboWebApiSession} from './IHabboWebApiSession';
 
@@ -12,11 +13,16 @@ import type {IHabboWebApiSession} from './IHabboWebApiSession';
  */
 export interface IHabboCommunicationManagerEvents
 {
-    'loginStep': (step: HabboCommunicationEventType) => void;
-    'authenticated': () => void;
-    'connectionError': (error: Error) => void;
-    'disconnected': (reason: number, reasonText: string) => void;
-    'error': (code: number, message: string) => void;
+    [HabboCommunicationManagerEvent.LOGIN_STEP]: (step: HabboCommunicationEventType) => void;
+    [HabboCommunicationManagerEvent.AUTHENTICATED]: () => void;
+    [HabboCommunicationManagerEvent.CONNECTION_ERROR]: (error: Error) => void;
+    [HabboCommunicationManagerEvent.DISCONNECTED]: (reason: number, reasonText: string) => void;
+    /**
+	 * No reason is carried: the dialog the player just dismissed is where AS3 shows it. See the
+	 * constant for why this moment exists at all in a port with no `LoginFlow`.
+	 */
+    [HabboCommunicationManagerEvent.DISCONNECT_ACKNOWLEDGED]: () => void;
+    [HabboCommunicationManagerEvent.ERROR]: (code: number, message: string) => void;
 }
 
 /**

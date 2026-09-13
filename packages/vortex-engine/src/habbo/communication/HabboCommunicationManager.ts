@@ -5,6 +5,7 @@ import {Logger} from '@core/utils/Logger';
 import {HabboMessages} from './HabboMessages';
 import type { HabboCommunicationEventType} from './enum/HabboCommunicationEvent';
 import {HabboCommunicationEvent} from './enum/HabboCommunicationEvent';
+import {HabboCommunicationManagerEvent} from './enum/HabboCommunicationManagerEvent';
 import type {IHabboCommunicationManager} from './IHabboCommunicationManager';
 import type {ICoreCommunicationManager} from '@core/communication/ICoreCommunicationManager';
 import type {IConnection} from '@core/communication/connection/IConnection';
@@ -373,7 +374,7 @@ export class HabboCommunicationManager extends Component implements IHabboCommun
         session.addListener(listener);
 
         this._webApiSession = session;
-        this.events.emit('HABBO_POCKET_SESSION_CREATED');
+        this.events.emit(HabboCommunicationEvent.POCKET_SESSION_CREATED);
 
         return session;
     }
@@ -455,7 +456,7 @@ export class HabboCommunicationManager extends Component implements IHabboCommun
 			this._portIndex >= (this._config?.ports.length ?? 0) - 1)
         {
             this._connectionActions?.setError(error.message);
-            this.events.emit('connectionError', error);
+            this.events.emit(HabboCommunicationManagerEvent.CONNECTION_ERROR, error);
         }
         this.tryNextPort();
     }
@@ -494,7 +495,7 @@ export class HabboCommunicationManager extends Component implements IHabboCommun
         this.createConnection();
 
         // Forward loginStep events
-        this.events.on('loginStep', (step: HabboCommunicationEventType) =>
+        this.events.on(HabboCommunicationManagerEvent.LOGIN_STEP, (step: HabboCommunicationEventType) =>
         {
             this._connectionActions?.setLoginStep(step);
 
@@ -502,7 +503,7 @@ export class HabboCommunicationManager extends Component implements IHabboCommun
             {
                 this._connection?.isAuthenticated();
                 this._connectionActions?.setAuthenticated();
-                this.events.emit('authenticated');
+                this.events.emit(HabboCommunicationManagerEvent.AUTHENTICATED);
             }
         });
     }
