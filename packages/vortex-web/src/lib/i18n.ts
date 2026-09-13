@@ -14,6 +14,53 @@ import fr from './fr.json';
 /** What an interpolated key is given: `t('PROFILE_JOINED', {date: '12 mai 2025'})`. */
 export type ITranslationValues = Record<string, string | number>;
 
+/**
+ * The translations themselves are TRUSTED: `fr.json` is compiled into the bundle, nobody can write
+ * to it at runtime, and several of its strings carry markup on purpose — `REGISTRATION_SAFETY`
+ * holds the link to the safety page inside the sentence, `NOT_FOUND_PAGE_TEXT` holds the link home.
+ * The handful of `{@html}` sites in the port render exactly those, with no values, and that is safe
+ * by construction.
+ *
+ * The INTERPOLATED VALUES are a different thing. They are names, counts and dates the caller
+ * supplies, and one of them reaching an `{@html}` sink unescaped would be markup injection through
+ * the front door. It has not happened — every value passed anywhere in the port today is a number
+ * or a key of our own — but `notifier.success(key, values)` renders through `{@html}` and openly
+ * takes values, so the door is standing open.
+ *
+ * `tHtml` is that door, closed: same interpolation, values escaped. `t` is unchanged, because its
+ * output goes through Svelte's own escaping and escaping twice would print `&amp;` at the visitor.
+ */
+function escapeHtml(value: string): string
+{
+    return value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+/**
+ * For a translation whose result is rendered with `{@html}`. The template's own markup survives;
+ * anything the CALLER interpolates into it does not.
+ */
+export function tHtml(key: string, values?: ITranslationValues): string
+{
+    if(!values)
+    {
+        return t(key);
+    }
+
+    const safe: ITranslationValues = {};
+
+    for(const [name, value] of Object.entries(values))
+    {
+        safe[name] = escapeHtml(String(value));
+    }
+
+    return t(key, safe);
+}
+
 export function t(key: string, values?: ITranslationValues): string
 {
     // A key-presence test rather than a comparison against the value: the styleguide forbids

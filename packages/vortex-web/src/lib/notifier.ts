@@ -22,7 +22,15 @@
 // a form where habbo.com floats a card over the top of the screen. None of the keys below appear in
 // any of habbo.com's 210 templates, which is how you can tell: they are toast text and nothing else.
 import {writable} from 'svelte/store';
-import {t} from './i18n.js';
+// `tHtml` and not `t` for every MESSAGE below: a toast with `html: true` is rendered with `{@html}`
+// — habbo.com relies on that, `EMAIL_CHANGE_SUCCESS` carries a `<b>` — so anything a caller
+// interpolates into one would be markup on the page. The translations themselves are trusted (they
+// are compiled into the bundle); the VALUES are the caller's, and this is the only sink in the port
+// that takes both.
+//
+// The TITLE stays on plain `t`: it is rendered as `{toast.title}`, which Svelte escapes, and
+// escaping it here as well would print `&amp;` at the visitor.
+import {t, tHtml} from './i18n.js';
 import type {ITranslationValues} from './i18n.js';
 
 /** `showDuration` / `hideDuration`, the fade either way. */
@@ -81,7 +89,7 @@ export function success(key: string, values?: ITranslationValues): void
     show({
         type:'success',
         title: '',
-        message: t(key, values),
+        message: tHtml(key, values),
         html: true,
         sticky: false,
         timeOut: TIME_OUT,
@@ -95,7 +103,7 @@ export function error(key: string, values?: ITranslationValues): void
     show({
         type:'error',
         title: '',
-        message: t(key, values),
+        message: tHtml(key, values),
         html: true,
         sticky: false,
         timeOut: TIME_OUT,
@@ -114,7 +122,7 @@ export function errorSticky(titleKey: string, messageKey: string, messageValues?
     show({
         type:'error',
         title: t(titleKey),
-        message: t(messageKey, messageValues),
+        message: tHtml(messageKey, messageValues),
         html: true,
         sticky: true,
         timeOut: 0,
