@@ -27,6 +27,18 @@ import type {
 import {EventLogMessageComposer} from '@habbo/communication/messages/outgoing/tracking/EventLogMessageComposer';
 import type {IHabboTracking} from './IHabboTracking';
 import {HabboLoginTrackingStep} from './HabboLoginTrackingStep';
+import {HabboErrorVariableEnum} from './HabboErrorVariableEnum';
+import {ErrorReportStorage} from '@core/utils/ErrorReportStorage';
+import {ComponentEvents} from '@core/runtime';
+import {IID_HabboWindowManager} from '@iid/IIDHabboWindowManager';
+import {IID_HabboNavigator} from '@iid/IIDHabboNavigator';
+import {IID_HabboInventory} from '@iid/IIDHabboInventory';
+import {IID_HabboFriendList} from '@iid/IIDHabboFriendList';
+import {HabboWindowTrackingEvent} from '@habbo/window/enum/HabboWindowTrackingEvent';
+import {HabboNavigatorTrackingEvent} from '@habbo/navigator/events/HabboNavigatorTrackingEvent';
+import {HabboRoomSettingsTrackingEvent} from '@habbo/navigator/events/HabboRoomSettingsTrackingEvent';
+import {HabboInventoryTrackingEvent} from '@habbo/inventory/events/HabboInventoryTrackingEvent';
+import {HabboFriendListTrackingEvent} from '@habbo/friendlist/events/HabboFriendListTrackingEvent';
 import {LatencyTracker} from './LatencyTracker';
 import {FramerateTracker} from './FramerateTracker';
 import {LagWarningLogger} from './LagWarningLogger';
@@ -109,6 +121,57 @@ export class HabboTracking extends Component implements IHabboTracking, IUpdateR
                 },
                 true
             ),
+            // Four of the six UI buses AS3 listens to, in its own order — the two it skips are
+            // TODO'd below because nothing in this port emits on them yet. Every bus here already
+            // emits; only the listener was missing, so `_errorContextFlags` was written by nobody
+            // and read by nobody. All non-hard: tracking must never be what locks a component, and
+            // an absent subsystem simply contributes no flag.
+            // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::get dependencies()
+            new ComponentDependency(IID_HabboWindowManager, null, false, [
+                {type: HabboWindowTrackingEvent.HABBO_WINDOW_TRACKING_EVENT_INPUT, callback: this.onWindowTrackingEvent},
+                {type: HabboWindowTrackingEvent.HABBO_WINDOW_TRACKING_EVENT_RENDER, callback: this.onWindowTrackingEvent},
+                {type: HabboWindowTrackingEvent.HABBO_WINDOW_TRACKING_EVENT_SLEEP, callback: this.onWindowTrackingEvent},
+            ]),
+            new ComponentDependency(IID_HabboNavigator, null, false, [
+                {type: HabboNavigatorTrackingEvent.CLOSED, callback: this.onNavigatorTrackingEvent},
+                {type: HabboNavigatorTrackingEvent.EVENTS, callback: this.onNavigatorTrackingEvent},
+                {type: HabboNavigatorTrackingEvent.ROOMS, callback: this.onNavigatorTrackingEvent},
+                {type: HabboNavigatorTrackingEvent.ME, callback: this.onNavigatorTrackingEvent},
+                {type: HabboNavigatorTrackingEvent.OFFICIAL, callback: this.onNavigatorTrackingEvent},
+                {type: HabboNavigatorTrackingEvent.SEARCH, callback: this.onNavigatorTrackingEvent},
+                {type: HabboRoomSettingsTrackingEvent.CLOSED, callback: this.onRoomSettingsTrackingEvent},
+                {type: HabboRoomSettingsTrackingEvent.DEFAULT, callback: this.onRoomSettingsTrackingEvent},
+                {type: HabboRoomSettingsTrackingEvent.ADVANCED, callback: this.onRoomSettingsTrackingEvent},
+            ]),
+            // TODO(AS3): .../src/com/sulake/habbo/tracking/HabboTracking.as::get dependencies() also
+            //   takes IIDHabboCatalog with HABBO_CATALOG_TRACKING_EVENT_OPEN/_CLOSE onto flag 9,
+            //   plus CATALOG_PAGE_OPENED onto legacyTrackGoogle(). Not subscribed for the same
+            //   reason as help below: the whole bus is silent here — `HabboCatalogTrackingEvent` is
+            //   declared and nothing emits either member. Partial buses ARE subscribed (navigator,
+            //   room settings and inventory each emit most of their members and will emit the rest
+            //   as those tabs are wired); a bus with no speaker at all is not.
+            //   `scripts/check-tracking-buses.mjs` tells the two apart.
+            new ComponentDependency(IID_HabboInventory, null, false, [
+                {type: HabboInventoryTrackingEvent.CLOSED, callback: this.onInventoryTrackingEvent},
+                {type: HabboInventoryTrackingEvent.FURNI, callback: this.onInventoryTrackingEvent},
+                {type: HabboInventoryTrackingEvent.POSTERS, callback: this.onInventoryTrackingEvent},
+                {type: HabboInventoryTrackingEvent.BADGES, callback: this.onInventoryTrackingEvent},
+                {type: HabboInventoryTrackingEvent.ACHIEVEMENTS, callback: this.onInventoryTrackingEvent},
+                {type: HabboInventoryTrackingEvent.TRADING, callback: this.onInventoryTrackingEvent},
+            ]),
+            new ComponentDependency(IID_HabboFriendList, null, false, [
+                {type: HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_CLOSED, callback: this.onFriendListTrackingEvent},
+                {type: HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_FRIENDS, callback: this.onFriendListTrackingEvent},
+                {type: HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_SEARCH, callback: this.onFriendListTrackingEvent},
+                {type: HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_REQUEST, callback: this.onFriendListTrackingEvent},
+                {type: HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_MINIMIZED, callback: this.onFriendListTrackingEvent},
+            ]),
+            // TODO(AS3): .../src/com/sulake/habbo/tracking/HabboTracking.as::get dependencies() also
+            //   takes IIDHabboHelp with HABBO_HELP_TRACKING_EVENT_CLOSED/_DEFAULT onto flag 10.
+            //   Not subscribed: nothing in this port emits either — `HabboHelpTrackingEvent` is
+            //   declared and re-exported and never sent, so the listener would be a listener for a
+            //   bus with no speaker, which is the exact defect this whole change removes. Subscribe
+            //   it when HabboHelp emits; `scripts/check-tracking-buses.mjs` is the check.
         ];
     }
 
@@ -363,6 +426,11 @@ export class HabboTracking extends Component implements IHabboTracking, IUpdateR
             this._errorContextFlags.push(0);
         }
 
+        // The other half of the error context: AS3 folds the flags into every error report through
+        // `storeErrorDetails()`. Without this the array was written by nobody and read by nobody.
+        // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::onError()
+        this.context.events.on(ComponentEvents.ERROR, this.onError);
+
         // Register for frame updates
         this.registerUpdateReceiver(this, 1);
 
@@ -405,6 +473,142 @@ export class HabboTracking extends Component implements IHabboTracking, IUpdateR
     /**
 	 * Set an error context flag at the given index
 	 */
+    /**
+	 * The six bus handlers, each a thin switch onto `setErrorContextFlag()` exactly as AS3 writes
+	 * them. The value is not a boolean: it encodes WHICH view of that subsystem is open (navigator
+	 * 0=closed, 1=events, 2=rooms, 3=me, 4=official, 5=search), which is why the AS3 flag array is
+	 * numbers and not a bitmask.
+	 */
+    // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::onWindowTrackingEvent()
+    private onWindowTrackingEvent = (...args: unknown[]): void =>
+    {
+        switch(this.eventType(args))
+        {
+            case HabboWindowTrackingEvent.HABBO_WINDOW_TRACKING_EVENT_SLEEP: this.setErrorContextFlag(0, 3); break;
+            case HabboWindowTrackingEvent.HABBO_WINDOW_TRACKING_EVENT_RENDER: this.setErrorContextFlag(1, 3); break;
+            case HabboWindowTrackingEvent.HABBO_WINDOW_TRACKING_EVENT_INPUT: this.setErrorContextFlag(2, 3); break;
+        }
+    };
+
+    // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::onNavigatorTrackingEvent()
+    private onNavigatorTrackingEvent = (...args: unknown[]): void =>
+    {
+        switch(this.eventType(args))
+        {
+            case HabboNavigatorTrackingEvent.CLOSED: this.setErrorContextFlag(0, 4); break;
+            case HabboNavigatorTrackingEvent.EVENTS: this.setErrorContextFlag(1, 4); break;
+            case HabboNavigatorTrackingEvent.ROOMS: this.setErrorContextFlag(2, 4); break;
+            case HabboNavigatorTrackingEvent.ME: this.setErrorContextFlag(3, 4); break;
+            case HabboNavigatorTrackingEvent.OFFICIAL: this.setErrorContextFlag(4, 4); break;
+            case HabboNavigatorTrackingEvent.SEARCH: this.setErrorContextFlag(5, 4); break;
+        }
+    };
+
+    // TODO(AS3): .../src/com/sulake/habbo/tracking/HabboTracking.as::onNavigatorTrackingEvent() also
+    //   maps the eleven SEARCHTYPE_* events onto `legacyTrackGoogle("navigator", <name>)`. Not wired
+    //   here because nothing in this port emits a SEARCHTYPE_* event yet — the constants exist in
+    //   HabboNavigatorTrackingEvent and have no `emit` site, so subscribing would be a listener for
+    //   a bus with no speaker. Wire them with the emitters, not before.
+
+    // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::onRoomSettingsTrackingEvent()
+    private onRoomSettingsTrackingEvent = (...args: unknown[]): void =>
+    {
+        switch(this.eventType(args))
+        {
+            case HabboRoomSettingsTrackingEvent.CLOSED: this.setErrorContextFlag(0, 7); break;
+            case HabboRoomSettingsTrackingEvent.DEFAULT: this.setErrorContextFlag(1, 7); break;
+            case HabboRoomSettingsTrackingEvent.ADVANCED: this.setErrorContextFlag(2, 7); break;
+        }
+    };
+
+    // TODO(AS3): .../src/com/sulake/habbo/tracking/HabboTracking.as::onCatalogTrackingEvent() maps
+    //   OPEN/CLOSE onto flag 9. Not written: see the catalog TODO in `get dependencies()` — the bus
+    //   has no emitter, and a handler for a subscription that does not exist is worse than no
+    //   handler, because it reads as covered.
+
+    // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::onInventoryTrackingEvent()
+    private onInventoryTrackingEvent = (...args: unknown[]): void =>
+    {
+        switch(this.eventType(args))
+        {
+            case HabboInventoryTrackingEvent.CLOSED: this.setErrorContextFlag(0, 5); break;
+            case HabboInventoryTrackingEvent.FURNI: this.setErrorContextFlag(1, 5); break;
+            case HabboInventoryTrackingEvent.POSTERS: this.setErrorContextFlag(2, 5); break;
+            case HabboInventoryTrackingEvent.BADGES: this.setErrorContextFlag(3, 5); break;
+            case HabboInventoryTrackingEvent.ACHIEVEMENTS: this.setErrorContextFlag(4, 5); break;
+            case HabboInventoryTrackingEvent.TRADING: this.setErrorContextFlag(5, 5); break;
+        }
+    };
+
+    // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::onFriendlistTrackingEvent()
+    private onFriendListTrackingEvent = (...args: unknown[]): void =>
+    {
+        switch(this.eventType(args))
+        {
+            case HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_CLOSED: this.setErrorContextFlag(0, 6); break;
+            case HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_FRIENDS: this.setErrorContextFlag(1, 6); break;
+            case HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_SEARCH: this.setErrorContextFlag(2, 6); break;
+            case HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_REQUEST: this.setErrorContextFlag(3, 6); break;
+            case HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_MINIMIZED: this.setErrorContextFlag(4, 6); break;
+        }
+    };
+
+    // TODO(AS3): .../src/com/sulake/habbo/tracking/HabboTracking.as::onHelpTrackingEvent() maps
+    //   CLOSED/DEFAULT onto flag 10. Not written, for the same reason as the catalog one above.
+
+    /**
+	 * AS3 reads `event.type` off the Flash Event it is handed. This port's dependency subscriptions
+	 * forward whatever the emitter passed, and the emitters are not uniform — some emit the type
+	 * string alone, some an object carrying it — so both shapes are accepted rather than assuming
+	 * one and silently matching no case.
+	 */
+    // TS-only: Flash's Event carries `type`; an EventEmitter payload does not have to.
+    private eventType(args: unknown[]): string
+    {
+        const first = args[0];
+
+        if(typeof first === 'string') return first;
+        if(first && typeof first === 'object' && typeof (first as {type?: unknown}).type === 'string')
+        {
+            return (first as {type: string}).type;
+        }
+
+        return '';
+    }
+
+    /**
+	 * AS3 also sets `_SafeStr_9384` on a critical error and calls
+	 * `logError(context.root.getLastErrorMessage())`. Neither has a counterpart here: the flag is
+	 * read nowhere in the AS3 either, and this port has no `getLastErrorMessage()` — its error text
+	 * arrives on the event itself, which is what is logged instead.
+	 */
+    // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::onError()
+    private onError = (event: {message?: string; fatal?: boolean}): void =>
+    {
+        this.storeErrorDetails(event);
+        this.logError(event?.message ?? '');
+    };
+
+    /**
+	 * `error_ctx` is the flag array concatenated in index order — "00010000200" and so on — which is
+	 * how a crash report says which screens were open when it happened. That is the entire reason
+	 * the six bus subscriptions above exist.
+	 */
+    // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::storeErrorDetails()
+    private storeErrorDetails(event: {fatal?: boolean}): void
+    {
+        ErrorReportStorage.setParameter(
+            HabboErrorVariableEnum.ERROR_VARIABLE_IS_FATAL, String(event?.fatal === true));
+        ErrorReportStorage.setParameter(
+            HabboErrorVariableEnum.ERROR_VARIABLE_CLIENT_CRASH_TIME, String(Date.now()));
+        ErrorReportStorage.setParameter(
+            HabboErrorVariableEnum.ERROR_VARIABLE_CONTEXT, this._errorContextFlags.join(''));
+
+        // AS3 follows this with `flash_version` and `avg_update` off its FramerateTracker
+        // equivalent. `flash_version` has no counterpart; `avg_update` is left to the tracker that
+        // owns it rather than reached into from here.
+    }
+
     // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::setErrorContextFlag()
     private setErrorContextFlag(value: number, index: number): void
     {
