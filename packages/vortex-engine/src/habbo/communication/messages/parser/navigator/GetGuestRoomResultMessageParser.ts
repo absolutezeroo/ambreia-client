@@ -1,17 +1,24 @@
 import type {IMessageParser} from '@core/communication/messages/IMessageParser';
 import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
-import {GuestRoomData, RoomChatSettings, RoomModerationSettings} from '../../incoming/navigator';
+import {GuestRoomData, RoomModerationSettings} from '../../incoming/navigator';
+import {RoomChatSettings} from '../roomsettings/RoomChatSettings';
 
 /**
  * Parser for get guest room result message
  *
- * @see source_as_win63/habbo/communication/messages/parser/navigator/GetGuestRoomResultEventParser.as
+ * The traces point at the PRIMARY tree, where this class is `_SafeCls_2063` and every member name
+ * is readable. `win63_version`'s `GetGuestRoomResultEventParser.as` is an OLDER build of the same
+ * parser, and the difference is not cosmetic: it reads five chat integers off the wire where this
+ * revision reads one. Porting that older body is what made this message die on "End of buffer" —
+ * see `parse()`.
+ *
+ * @see sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2064/_SafeCls_2063.as
  */
 export class GetGuestRoomResultMessageParser implements IMessageParser
 {
     private _enterRoom: boolean = false;
 
-    // AS3: sources/win63_version/habbo/communication/messages/parser/navigator/GetGuestRoomResultEventParser.as::get enterRoom()
+    // AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2064/_SafeCls_2063.as::get enterRoom()
     get enterRoom(): boolean
     {
         return this._enterRoom;
@@ -19,7 +26,7 @@ export class GetGuestRoomResultMessageParser implements IMessageParser
 
     private _roomForward: boolean = false;
 
-    // AS3: sources/win63_version/habbo/communication/messages/parser/navigator/GetGuestRoomResultEventParser.as::get roomForward()
+    // AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2064/_SafeCls_2063.as::get roomForward()
     get roomForward(): boolean
     {
         return this._roomForward;
@@ -27,7 +34,7 @@ export class GetGuestRoomResultMessageParser implements IMessageParser
 
     private _staffPick: boolean = false;
 
-    // AS3: sources/win63_version/habbo/communication/messages/parser/navigator/GetGuestRoomResultEventParser.as::get staffPick()
+    // AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2064/_SafeCls_2063.as::get staffPick()
     get staffPick(): boolean
     {
         return this._staffPick;
@@ -35,7 +42,7 @@ export class GetGuestRoomResultMessageParser implements IMessageParser
 
     private _isGroupMember: boolean = false;
 
-    // AS3: sources/win63_version/habbo/communication/messages/parser/navigator/GetGuestRoomResultEventParser.as::get isGroupMember()
+    // AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2064/_SafeCls_2063.as::get isGroupMember()
     get isGroupMember(): boolean
     {
         return this._isGroupMember;
@@ -43,7 +50,7 @@ export class GetGuestRoomResultMessageParser implements IMessageParser
 
     private _openingConnection: boolean = false;
 
-    // AS3: sources/win63_version/habbo/communication/messages/parser/navigator/GetGuestRoomResultEventParser.as::get openingConnection()
+    // AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2064/_SafeCls_2063.as::get openingConnection()
     get openingConnection(): boolean
     {
         return this._openingConnection;
@@ -51,7 +58,7 @@ export class GetGuestRoomResultMessageParser implements IMessageParser
 
     private _data: GuestRoomData | null = null;
 
-    // AS3: sources/win63_version/habbo/communication/messages/parser/navigator/GetGuestRoomResultEventParser.as::get data()
+    // AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2064/_SafeCls_2063.as::get data()
     get data(): GuestRoomData | null
     {
         return this._data;
@@ -59,7 +66,7 @@ export class GetGuestRoomResultMessageParser implements IMessageParser
 
     private _roomModerationSettings: RoomModerationSettings | null = null;
 
-    // AS3: sources/win63_version/habbo/communication/messages/parser/navigator/GetGuestRoomResultEventParser.as::get roomModerationSettings()
+    // AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2064/_SafeCls_2063.as::get roomModerationSettings()
     get roomModerationSettings(): RoomModerationSettings | null
     {
         return this._roomModerationSettings;
@@ -67,13 +74,13 @@ export class GetGuestRoomResultMessageParser implements IMessageParser
 
     private _chatSettings: RoomChatSettings | null = null;
 
-    // AS3: sources/win63_version/habbo/communication/messages/parser/navigator/GetGuestRoomResultEventParser.as::get chatSettings()
+    // AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2064/_SafeCls_2063.as::get chatSettings()
     get chatSettings(): RoomChatSettings | null
     {
         return this._chatSettings;
     }
 
-    // AS3: sources/win63_version/habbo/communication/messages/parser/navigator/GetGuestRoomResultEventParser.as::flush()
+    // AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2064/_SafeCls_2063.as::flush()
     flush(): boolean
     {
         this._enterRoom = false;
@@ -88,7 +95,7 @@ export class GetGuestRoomResultMessageParser implements IMessageParser
         return true;
     }
 
-    // AS3: sources/win63_version/habbo/communication/messages/parser/navigator/GetGuestRoomResultEventParser.as::parse()
+    // AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2064/_SafeCls_2063.as::parse()
     parse(wrapper: IMessageDataWrapper): boolean
     {
         this._enterRoom = wrapper.readBoolean();
@@ -106,7 +113,12 @@ export class GetGuestRoomResultMessageParser implements IMessageParser
         this._data.allInRoomMuted = allInRoomMuted;
         this._data.canMute = wrapper.readBoolean();
 
-        this._chatSettings = new RoomChatSettings(wrapper);
+        // ONE integer, not five. `_SafeCls_1709.fromFloodSensitivity()` fills chat mode, bubble
+        // width and scroll speed from AS3's own defaults because this revision no longer sends them
+        // with the room — they are account preferences now and travel in their own packet. The port
+        // had `win63_version`'s older body here, reading all five straight off the wire, so it ate
+        // `openingConnection` and then ran 16 bytes past the end of every 3042.
+        this._chatSettings = RoomChatSettings.fromFloodSensitivity(wrapper.readInt());
 
         this._openingConnection = wrapper.readBoolean();
 

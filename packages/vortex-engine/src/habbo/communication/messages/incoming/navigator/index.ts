@@ -38,7 +38,6 @@ export * from './CategoriesWithVisitorCountData';
 export * from './PromotedRoomCategoryData';
 export * from './PromotedRoomsData';
 export * from './RoomModerationSettings';
-export * from './RoomChatSettings';
 export * from './CompetitionRoomsData';
 export * from './RoomMuteAllMessageEvent';
 export * from './NoOwnedRoomsAlertMessageEvent';
