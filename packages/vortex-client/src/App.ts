@@ -888,6 +888,12 @@ export class VortexApp
     private _xmlBundle: AssetBundle | null = null;
     private _uninstallWindowDebugger: (() => void) | null = null;
 
+    /** True between `setAuthenticated` and the next disconnect: when a link may actually be fired. */
+    private _authenticated: boolean = false;
+
+    /** The `message` listener installed by `installLinkChannel`, kept so `dispose()` can remove it. */
+    private _linkChannel: ((event: MessageEvent) => void) | null = null;
+
     /** Whether the mouse button is currently down. */
     private _mouseDown: boolean = false;
 
@@ -935,6 +941,11 @@ export class VortexApp
         // query parameter layered on top — `__log.set('habbo.room', 'debug')` at runtime, no
         // rebuild. See docs/STYLEGUIDE.md → Logging.
         Logger.configureFromEnvironment(import.meta.env.DEV);
+
+        // Before the bundles, not after: a link posted while they download has to land somewhere,
+        // and the listener queues it. Installed later it would simply not be there — the site can
+        // post the moment the iframe exists, which is several seconds before the engine does.
+        this.installLinkChannel();
 
         // 1. Load bundles, then bootstrap engine with AS3 embedded configuration assets
         const CORE_RATIO = 0.6;
@@ -1296,12 +1307,69 @@ export class VortexApp
         vortex.habboCommunication.setConnectionActions({
             setConnecting: () => undefined,
             setConnected: () => undefined,
-            setAuthenticated: () => this.fireStartLink(vortex),
+            setAuthenticated: () =>
+            {
+                this._authenticated = true;
+                this.fireStartLink(vortex);
+            },
             setError: () => undefined,
             setLoginStep: () => undefined,
-            reset: () => undefined,
-            setDisconnected: () => undefined
+            reset: () => (this._authenticated = false),
+            setDisconnected: () => (this._authenticated = false)
         });
+    }
+
+    /**
+     * The second channel for `/hotel?link=…`, and the reason it has to exist.
+     *
+     * The site MOUNTS THIS CLIENT ONCE and never reloads it — closing the hotel parks the iframe
+     * off-screen with its socket, its room and its session intact, which is what makes coming back
+     * instant (components/Client.svelte). The consequence is that the query string is written
+     * exactly once: `?link=habboUI/open/hccenter` from the purse reached the client the first time
+     * the hotel was opened in a session and never again, so every later click did nothing at all.
+     *
+     * A message is the only way in after that, and same-origin is what makes it cheap: the site
+     * proxies this client at `/client`, so the embedder and the embedded share an origin.
+     *
+     * WHAT IT WILL AND WILL NOT ACCEPT. `createLinkEvent` drives the client's own UI — open the
+     * catalog, walk into a room, file a report — so a listener that fired on anything would hand
+     * that to any page able to get a handle on this window, and this client is served publicly
+     * enough to be framed by one. Hence: the origin must be ours, the sender must be the parent
+     * frame, and the payload must be the exact shape below. Anything else is dropped in silence,
+     * because answering tells a prober it found something.
+     */
+    // TS-only: the website needs a way to re-deliver habbo.com's own `/hotel?link=…` handover to an
+    //   already-running client; AS3 has no counterpart because the Flash client took it in FlashVars
+    //   and was reloaded for each visit.
+    private installLinkChannel(): void
+    {
+        if(this._linkChannel) return;
+
+        this._linkChannel = (event: MessageEvent): void =>
+        {
+            if(event.origin !== window.location.origin) return;
+            if(event.source !== window.parent) return;
+
+            const data = event.data as {type?: unknown; link?: unknown} | null;
+
+            if(!data || data.type !== 'vortex:link') return;
+            if(typeof data.link !== 'string' || data.link.length === 0) return;
+
+            // Before the handshake completes a link reaches a tracker that sends a composer nobody
+            // reads, so it waits where `fireStartLink` will find it instead of being dropped. That
+            // covers the whole boot, engine included: this listener is installed before the engine
+            // exists, which is why the instance is read here and not captured.
+            if(!this._authenticated || !Vortex.hasInstance)
+            {
+                if(window.VortexConfig) window.VortexConfig.startLink = data.link;
+
+                return;
+            }
+
+            Vortex.instance.context.createLinkEvent(data.link);
+        };
+
+        window.addEventListener('message', this._linkChannel);
     }
 
     /**
@@ -1524,6 +1592,12 @@ export class VortexApp
         // Remove event listeners
         window.removeEventListener('resize', this._onResize);
         document.removeEventListener('visibilitychange', this._onVisibilityChange);
+
+        if(this._linkChannel)
+        {
+            window.removeEventListener('message', this._linkChannel);
+            this._linkChannel = null;
+        }
 
         if(this._canvas) 
         {

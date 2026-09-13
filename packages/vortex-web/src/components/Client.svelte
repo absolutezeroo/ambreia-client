@@ -23,12 +23,13 @@
     import {t} from '../lib/i18n.js';
 
     // `link` is habbo.com's own `/hotel?link=…` handover — `navigator/goto/42` from an appart's
-    // "Entrer dans l'appart", `habboUI/open/hccenter` from the purse. It rides on the iframe's URL,
-    // which is the ONLY moment it can be delivered: the client is mounted once and never reloaded
-    // (see 1. above), so a link that arrives after that would need a second channel. Clicking the
-    // same button twice in one session therefore opens the appart the first time and does nothing
-    // the second — the ceiling of parking the iframe rather than reloading it, and the price of the
-    // instant return that parking buys.
+    // "Entrer dans l'appart", `habboUI/open/hccenter` from the purse.
+    //
+    // It rides on the iframe's URL the FIRST time, which is the only moment the URL is written: the
+    // client is mounted once and never reloaded (see 1. above), so every later click used to do
+    // nothing at all — the ceiling of parking the iframe rather than reloading it. The second
+    // channel is `postMessage`, same-origin because the site proxies the client at `/client`, and
+    // the client only accepts it from its own parent (vortex-client's App.ts::installLinkChannel).
     let {visible = false, link = '', onClose}:
     {
         visible?: boolean;
@@ -44,6 +45,12 @@
     // way. Typed as the element so `requestFullscreen` is its own method rather than a property
     // nobody can check — and `?.` because the ref is undefined until the iframe mounts.
     let frame = $state<HTMLIFrameElement | undefined>();
+
+    // The link the running client already has. Plain `let`, not `$state`: the delivery effect writes
+    // it and must not re-run on its own write. It is cleared when the route drops the parameter,
+    // which is what lets the SAME link work twice — leave the hotel, click the purse again, and the
+    // second click is a new delivery rather than a repeat of the one already made.
+    let delivered = '';
 
     // The ticket is fetched ONCE, on the first time the client is shown, and never again: it is
     // single use — the emulator burns it on the handshake — so asking for a second one on the next
@@ -67,6 +74,9 @@
                 {
                     const target = link ? `&link=${encodeURIComponent(link)}` : '';
 
+                    // The URL delivers this one, so the channel below must not deliver it again:
+                    // `navigator/goto/42` fired twice enters the appart twice.
+                    delivered = link;
                     src = `${CLIENT_URL}/?sso=${encodeURIComponent(result.ssoToken)}${target}`;
                 }
             }
@@ -80,6 +90,31 @@
         })();
 
         return () => (cancelled = true);
+    });
+
+    // The second channel. Runs on every change of `link`, does nothing until the iframe exists.
+    $effect(() =>
+    {
+        if(!link)
+        {
+            delivered = '';
+
+            return;
+        }
+
+        if(link === delivered) return;
+
+        // `frame` is read before the bail so the effect re-runs when the iframe mounts: a link that
+        // arrives while the client is still being created is delivered then, not dropped.
+        const client = frame?.contentWindow;
+
+        if(!client) return;
+
+        delivered = link;
+
+        // Targeted at our own origin: a wildcard would hand the link to whatever the iframe had
+        // navigated to. If the client is still booting it queues this until the session is up.
+        client.postMessage({type: 'vortex:link', link}, window.location.origin);
     });
 
     function toggleFullscreen()
