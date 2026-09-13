@@ -397,6 +397,32 @@ export class TextFieldController extends TextController implements ITextFieldWin
     }
 
     /**
+     * A text field's hit area is its BOX, never the pixels of its glyphs.
+     *
+     * The base implementation alpha-tests the window's own draw buffer, and in Flash that buffer
+     * was opaque wherever the field was: the AS3 class builds its own `GraphicContext` and
+     * overrides `set background`, so the TextField's background fill lives in the very bitmap the
+     * test samples. This port has no Flash TextField — `TextSkinRenderer` paints glyphs and
+     * nothing else — so the same test samples a fully transparent buffer whenever the field is
+     * empty, and the default threshold for this window type is 10, not 0
+     * (`registerTextRenderersMissingFromElementDescription` registers `new DefaultAttStruct()`,
+     * whose threshold defaults to 10, and the element description declares no entry of its own).
+     *
+     * An empty field was therefore unreachable by the mouse: `passMouseEvent` rejected the point,
+     * so no WME_DOWN arrived, `focus()` never ran, the DOM bridge never took focus and nothing
+     * could be typed. Every empty input in the client was dead this way, and a field that did hold
+     * text was clickable only on the letters themselves.
+     */
+    // DEVIATION: AS3 leaves this to WindowController, whose alpha test reads a bitmap that carried
+    //   the field's background; this port's buffer holds glyph coverage only, so the literal port
+    //   of that test answers the opposite question. Bounds are what Flash's TextField hit area was.
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/core/window/components/TextFieldController.as::getGraphicContext()
+    public override validateLocalPointIntersection(point: { x: number; y: number }, _drawBuffer: unknown): boolean
+    {
+        return this.isInWindowBounds(point);
+    }
+
+    /**
 	 * Focuses the text field.
 	 *
 	 * In AS3, calls super.focus() then sets Flash stage focus to the TextField.

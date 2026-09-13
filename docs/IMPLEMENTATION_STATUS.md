@@ -4705,6 +4705,40 @@ other window's clip moved. This is the one-pass equivalent of AS3's per-`BitmapD
 
 ## Recent Work Recorded
 
+- 🆕 **An empty text field could not be clicked — 2026-09-14.** Every wired dialog's input was
+  dead, whatever the box: no caret, nothing typed. The window debugger cleared each of the usual
+  suspects in turn — `state=0` so nothing was disabled, `param=2177` so the input-event-processor
+  bit was present, `visible=true`, and the debugger's own pick resolved the field under the cursor —
+  which is what finally pointed at the step *after* hit-testing.
+
+  `MouseEventProcessor.passMouseEvent()` validates every point against the window's **pixels**
+  (`testLocalPointHitAgainstAlpha`). Three facts combine badly for a text field here: the mouse
+  threshold is **10**, not 0 (the element description declares no `textfield` entry, so
+  `registerTextRenderersMissingFromElementDescription()` supplies `new DefaultAttStruct()`, whose
+  threshold defaults to 10, and the wired layouts set no `treshold`); `TextFieldController`'s
+  constructor forces `param & ~0x10`, so the test reads the field's **own** draw buffer; and that
+  buffer holds glyph coverage and nothing else, because `TextSkinRenderer` paints the text while
+  the box around it is a separate window (`border "input_template"` in the wired templates).
+
+  An empty field is therefore a fully transparent buffer — alpha 0, under the threshold — so
+  `passMouseEvent` returns null, no `WME_DOWN` reaches the field, `focus()` never runs, the DOM
+  bridge never takes focus, and there is no caret and no typing. A field holding text was clickable
+  only on the letters.
+
+  The AS3 runs the same test and is right to: its buffer carried the field's background fill, which
+  is what `set background` and the class's own `GraphicContext` exist for
+  (`TextFieldController.as:234`, `:256`). There is no Flash TextField here, so the identical
+  instruction reads the opposite answer — rule 30's first shape, "the line is identical; the data it
+  reads is not". `TextFieldController` now overrides `validateLocalPointIntersection` to return
+  `isInWindowBounds(point)`: a text field's hit area is its box, never its glyphs.
+
+  The toolbar's chat input escaped this by painting an opaque background into its own buffer, which
+  is why one field in the client worked and the wired ones did not — the asymmetry that made this
+  look like a wired bug for most of the investigation. Two earlier explanations were wrong and are
+  recorded here so they are not re-tried: the widgets are **not** disabled (`MouseEventProcessor`
+  never tests `WindowState.DISABLED` at all), and the clones do **not** lose their param flags
+  (`clone()` copies `_param`, and the report shows 2177 on a live field).
+
 - 🆕 **Emitters wired, listeners never registered — 2026-09-13.** One reported symptom ("the raid
   protection button does nothing") turned out to be an instance of the port's dominant defect, and
   pulling on it produced six more. In every case the *data* and the *emitter* were ported and only
