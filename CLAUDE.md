@@ -49,9 +49,50 @@ Enforcement rules live in `.claude/rules/` and are auto-loaded into every sessio
 | `sources/WIN63-202607011411-782849652/`      | **PRIMARY** | `src/com/sulake/{habbo,room,core,iid}/` | 3,305 | 25%        |
 | `sources/win63_version/`                     | Secondary   | `habbo/`, `room/`, `core/`              | 4,694 | 18%        |
 | `sources/PRODUCTION-201601012205-226667486/` | Tertiary    | `src/com/sulake/habbo/`                 | 3,526 | 0%         |
+| `sources/AIR-1.0.31/`                        | Features only — **never headers** | `scripts/com/sulake/{habbo,room,core,iid}/` | 3,432 | 26% |
 
 `WIN63-202607011411-782849652` is a later, partly-obfuscated client build and is the primary
 day-to-day reference.
+
+### `AIR-1.0.31` is newer than the primary, and is still not a header source
+
+It is a strict superset in readable-class terms (nothing was removed; 84 new readable classes,
+76 of them one feature) and it carries three things no other tree has: **VariableFx** (wired
+variables rendered over avatars/furni — health bars, level badges, progress bars, counters:
+`habbo/room/object/variablefx/`, `.../visualization/variablefx/`, `.../visualization/stacked/`,
+`habbo/roomevents/wired_setup/addons/variablefx/`), **raid protection**
+(`habbo/navigator/raidprotection/`), and the wired **`VariablesWebApiAddon`**.
+
+Read it for *behaviour* of those features. Never take a packet id from it. Habbo re-randomises
+the whole registry every build: against the primary, **only 16 of 586 composers keep their
+header** — 421 composers and 523 events move, and 78 composers / 85 events change shape at the
+same number (`.claude/skills/compare-as3-revisions/` produces the remap tables). The emulator is
+pinned to `Revision20260701`, which *is* the primary's numbering, so a header lifted from AIR is
+wrong on this wire even when the message is right.
+
+New messages ported out of AIR therefore get a free header chosen in the 20260701 numbering and
+assigned on **both** sides — the same way the room-effect message (2624) and the habbicons
+messages were done. Mixing numbering from two revisions on one wire is never valid.
+
+**The AIR dump's assets are in `scripts/binaryData/`, not in an `_assets/`.** It is laid out
+differently from the WIN63 trees: no `_assets/`, no `layouts/`, no `images/` — just `scripts/` plus
+`scripts/binaryData/`, holding **1,092 `.bin` blobs** named `<charId>_<class>`, where `<class>` is
+either the real linkage name (`3329_room_settings_xml$771e3819...`) or the obfuscated
+`<charId>__SafeCls_N`. `_SafeCls_N` is exactly the class the dump's own `*Com.as` assigns to the
+asset field, so the join described in "Assets" below works unchanged:
+`HabboNavigatorCom.as` says `raid_protection_settings_xml:Class = _SafeCls_1412`, and the layout is
+`binaryData/3129__SafeCls_1412.bin`. **Do not reconstruct an AIR layout by hand** — look there
+first; it went unnoticed once and cost an invented window.
+
+The blobs are XML/TXT/PBJ only. **Images are not in the dump**, and nothing here covers them: they
+have to be cut out of the client the launcher downloaded, with JPEXS
+(`C:\Program Files (x86)\FFDec\ffdec-cli.exe`), which is also how `binaryData/` itself was produced
+and how to re-cut it for a newer build:
+
+```bash
+ffdec-cli -export binaryData,symbolClass,image <outdir> \
+  "%APPDATA%/Habbo Launcher/downloads/air/<build>/HabboAir.swf"
+```
 
 **Class names are obfuscated; member names are not.** In an obfuscated file the class is
 `_SafeCls_N` and some *types* it references are too, but its methods, getters and constants keep
@@ -134,6 +175,21 @@ Window layouts and skins ship **as XML**, verbatim from the dump, built by
 `<layout name="...">` — a Flash-authoring label AS3 never reads — so nothing should be named from
 it. `src/layouts/` and `src/images/` hold the raw XML/PNG resources flat, named by embed
 (`<seq>_<name>_<type>$<hash>` or `<seq>__SafeCls_N`).
+
+**The builder reads a second source, `AIR-1.0.31`, as a supplement.** Same join, different tree
+shape — AIR keeps its `*Com.as` at `scripts/` and its embeds in `scripts/binaryData/`, where WIN63
+keeps the manifests in `src/binaryData/` and the embeds in `src/layouts/` + `src/_assets/`; both
+have a `binaryData/` and it means the opposite thing in each, which `resolveTree()` sorts out. The
+merge rule is deliberate and narrow: **AIR adds names WIN63 does not have, and never replaces one**
+— except the names in `AIR_PREFERRED`, each of which is a checked decision written down at the set.
+Today that is the whole of it: **1 layout added** (`raid_protection_settings_xml`) and **1
+overridden** (`iro_room_details_framed_xml`, for its one extra button). `--no-air` builds without
+it.
+
+Beware of measuring the gap between the two trees by filename: AIR's blobs carry the embed's
+*linkage* name (`border_12_xml$…`) and the shipped assets carry the `*Com.as` *field* name
+(`habbo_skin_border_12_xml`), so a flat comparison invents hundreds of AIR-only assets that are the
+same file under the other name. The builder's own report is the measurement.
 
 **An asset's real name is its `*Com.as` field name**, the exact string passed to
 `assets.getAssetByName()` — e.g. `HabboWindowManagerCom.as` declares

@@ -21,12 +21,15 @@ pnpm lint                    # ESLint over both packages
 | `sources/WIN63-202607011411-782849652/`      | PRIMARY   | `src/com/sulake/{habbo,room,core,iid}/` | ~3,369 |
 | `sources/win63_version/`                     | Secondary | `habbo/`, `room/`                       | ~4,465 |
 | `sources/PRODUCTION-201601012205-226667486/` | Tertiary  | `com/sulake/habbo/`                     | ~7,160 |
+| `sources/AIR-1.0.31/`                        | Features only — **never headers** | `scripts/com/sulake/{habbo,room,core,iid}/` | ~3,432 |
 
 `WIN63-202607011411-782849652` is a later, partly-obfuscated build and the day-to-day reference. Three corrections to what this paragraph used to claim, each of which cost real work:
 
 - **The two trees do not line up 1:1.** `win63_version` is obfuscated too, with a *different* scheme, so the same class has a different meaningless name in each (in `habbo/room`, 9 of 20 filenames match). RoomEngine is `_SafeCls_90.as` in the primary tree, `class_34.as` in `win63_version`, and `RoomEngine.as` only in `PRODUCTION-201601012205-226667486` — the one tree with no obfuscation, and a 2016 build, so use it to *identify* a class or recover a member name, never as a behaviour reference.
 - **`src/unknowns/` is part of the client, not an unrelated module.** 556 files under `src/com/sulake/` import from it; it holds real parser DTOs and composers. The flat `_SafeCls_N.as` files under `src/` are the embedded-asset classes and carry the name mapping in a footer comment. Skipping either means failing to find definitions that exist.
 - **Never read a method body from `win63_version`.** It is a worse decompile, not just a differently obfuscated one: two of its bodies were caught in one day emitting code that would have shipped — a permanently hidden container (`visible = 0 > 0`) and a browser hang (`while(0 < _loc2_)` with the counter never tested). Cite it for a readable message *filename*, and point every `AS3:` trace at the primary path.
+
+- **`AIR-1.0.31` is newer than the primary and is still not a header source.** Read it for the behaviour of the three features only it has (VariableFx, raid protection, `VariablesWebApiAddon`); take no packet id from it. Habbo re-randomises the whole registry every build — only 16 of 586 composers keep their header between the two, and the emulator is pinned to the primary's numbering. A message ported out of AIR gets a free header in the 20260701 numbering, assigned on both sides.
 
 See `CLAUDE.md` → "AS3 sources" for the full version, including how to identify an obfuscated class and what to do when a name exists in no tree.
 

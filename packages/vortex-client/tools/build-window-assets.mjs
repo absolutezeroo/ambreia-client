@@ -42,6 +42,25 @@ const DEFAULT_SOURCE = path.resolve(repoRoot, 'sources', 'WIN63-202607011411-782
 const DEFAULT_LAYOUTS_OUT = path.resolve(__dirname, '../src/assets/window-layouts');
 const DEFAULT_SKINS_OUT = path.resolve(__dirname, '../src/assets/window-skins');
 
+// SECOND SOURCE. AIR-1.0.31 is a later client than the primary dump and carries assets for
+// features WIN63 does not have at all - raid protection is the first. It is a supplement, never a
+// replacement: an asset present in both keeps the PRIMARY copy, because the port is written
+// against WIN63's behaviour and silently swapping ~200 shared assets to a newer build is not a
+// thing to do as a side effect of adding one window.
+const DEFAULT_AIR_SOURCE = path.resolve(repoRoot, 'sources', 'AIR-1.0.31');
+
+// The exceptions to that rule, each one a deliberate, checked decision.
+//
+// `iro_room_details_framed_xml`: the AIR copy differs from WIN63's by exactly one line, the
+// `raid_protection_settings_button` in `buttons_cont` (plus a staff_pick/floor_plan sibling swap
+// that changes nothing - both sit at 0,0 and RoomInfoViewCtrl re-stacks the container through
+// Util.moveChildrenToColumn). Without it RoomInfoViewCtrl has no button to show and the raid
+// protection window is reachable only through its link. Re-check the delta with:
+//   diff sources/AIR-1.0.31/scripts/binaryData/3128__SafeCls_1100.bin \
+//        packages/vortex-client/src/assets/window-layouts/iro_room_details_framed_xml.xml
+// If it has grown past that button, decide again rather than widening this set by reflex.
+const AIR_PREFERRED = new Set(['iro_room_details_framed_xml']);
+
 // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/HabboWindowManagerComponent.as::init()
 // The element description shares the <skin> root element but is not a drawable skin - it is
 // the type/style -> renderer+asset table, loaded through its own manager entry point.
@@ -60,6 +79,7 @@ function parseArgs()
     const args =
     {
         source: DEFAULT_SOURCE,
+        airSource: DEFAULT_AIR_SOURCE,
         layoutsOut: DEFAULT_LAYOUTS_OUT,
         skinsOut: DEFAULT_SKINS_OUT,
         dryRun: false
@@ -68,12 +88,56 @@ function parseArgs()
     for (let i = 0; i < argv.length; i += 1)
     {
         if (argv[i] === '--source') { args.source = path.resolve(argv[i + 1]); i += 1; }
+        else if (argv[i] === '--air-source') { args.airSource = path.resolve(argv[i + 1]); i += 1; }
+        else if (argv[i] === '--no-air') { args.airSource = null; }
         else if (argv[i] === '--layouts-out') { args.layoutsOut = path.resolve(argv[i + 1]); i += 1; }
         else if (argv[i] === '--skins-out') { args.skinsOut = path.resolve(argv[i + 1]); i += 1; }
         else if (argv[i] === '--dry-run') { args.dryRun = true; }
     }
 
     return args;
+}
+
+/**
+ * Locates the three things a source tree is read for, whatever shape it has.
+ *
+ * The two dumps are laid out differently, and one of the differences is a trap: both have a
+ * `binaryData/` directory and it means the opposite thing in each.
+ *
+ *   WIN63  src/binaryData/*Com.as          the component manifests
+ *          src/layouts/, src/_assets/      the embedded files
+ *
+ *   AIR    scripts/*Com.as                 the component manifests, at the root
+ *          scripts/binaryData/*.bin        the embedded files
+ *
+ * Everything downstream is identical: the same `<fieldName>:Class = <ref>` declarations joined to
+ * the same `<seq>_<identifier>` filenames through the same `@identifier` footers.
+ */
+function resolveTree(sourceRoot)
+{
+    const src = path.join(sourceRoot, 'src');
+
+    if (fs.existsSync(path.join(src, 'binaryData')))
+    {
+        return {
+            srcDir: src,
+            comDir: path.join(src, 'binaryData'),
+            assetDirs: [path.join(src, 'layouts'), path.join(src, '_assets')]
+        };
+    }
+
+    const scripts = path.join(sourceRoot, 'scripts');
+
+    if (fs.existsSync(path.join(scripts, 'binaryData')))
+    {
+        return {
+            srcDir: scripts,
+            comDir: scripts,
+            assetDirs: [path.join(scripts, 'binaryData')]
+        };
+    }
+
+    return null;
 }
 
 /**
@@ -192,7 +256,7 @@ const DIRECT_EMBED_SOURCES = [
 ];
 
 /** Reads every `<fieldName>:Class = <ref>` declaration across the component manifests. */
-function readDeclarations(binaryDataDir, srcDir, obfuscatedNameMap)
+function readDeclarations(comDir, srcDir, obfuscatedNameMap)
 {
     const declarations = [];
 
@@ -221,7 +285,7 @@ function readDeclarations(binaryDataDir, srcDir, obfuscatedNameMap)
         }
     }
 
-    for (const comFile of findComFiles(binaryDataDir))
+    for (const comFile of findComFiles(comDir))
     {
         const component = path.basename(comFile).replace(/Com\.as$/, '');
         const content = fs.readFileSync(comFile, 'utf8');
@@ -297,25 +361,14 @@ function writeAssets(assets, outDir, dryRun)
     }
 }
 
-function main()
+/** Reads one source tree into its named layouts and skins. */
+function collectAssets(tree, label)
 {
-    const args = parseArgs();
-    const srcDir = path.join(args.source, 'src');
-    const binaryDataDir = path.join(srcDir, 'binaryData');
-
-    if (!fs.existsSync(binaryDataDir))
-    {
-        console.error(`No binaryData manifests under ${binaryDataDir}`);
-        process.exit(1);
-    }
-
+    const {srcDir, comDir, assetDirs} = tree;
     const obfuscatedNameMap = buildObfuscatedNameMap(findAsFiles(srcDir));
-    const filesByLinkage = indexFilesByLinkage(
-        [path.join(srcDir, 'layouts'), path.join(srcDir, '_assets')],
-        obfuscatedNameMap
-    );
+    const filesByLinkage = indexFilesByLinkage(assetDirs, obfuscatedNameMap);
 
-    const declarations = readDeclarations(binaryDataDir, srcDir, obfuscatedNameMap);
+    const declarations = readDeclarations(comDir, srcDir, obfuscatedNameMap);
     const xmlCache = new Map();
     const layouts = [];
     const skins = [];
@@ -339,7 +392,7 @@ function main()
         if (!file)
         {
             unresolved += 1;
-            console.warn(`  unresolved: ${declaration.component}Com.as::${declaration.fieldName} (${declaration.ref})`);
+            console.warn(`  unresolved [${label}]: ${declaration.component}Com.as::${declaration.fieldName} (${declaration.ref})`);
             continue;
         }
 
@@ -371,22 +424,108 @@ function main()
         (tag === 'skin' ? skins : layouts).push({...declaration, raw, file, xml});
     }
 
-    const namedLayouts = assignNames(layouts);
-    const namedSkins = assignNames(skins);
+    return {
+        layouts: assignNames(layouts),
+        skins: assignNames(skins),
+        stats: {declarations: declarations.length, otherMedia, unresolved}
+    };
+}
 
-    writeAssets(namedLayouts.named, args.layoutsOut, args.dryRun);
-    writeAssets(namedSkins.named, args.skinsOut, args.dryRun);
+/**
+ * Folds a supplementary source into the primary's named assets.
+ *
+ * Adds what the primary does not have; keeps the primary's copy of everything else, except the
+ * names in AIR_PREFERRED. Merging happens AFTER assignNames() on purpose: the primary's own
+ * collision qualification then stays byte-identical to a single-source run, where merging the raw
+ * declarations first would let a same-name asset from the other tree qualify both by component.
+ */
+function mergeSource(primary, extra, preferred)
+{
+    const byName = new Map(primary.map((asset) => [asset.name, asset]));
+    const added = [];
+    const overridden = [];
 
-    const hasElementDescription = namedSkins.named.some((skin) => skin.name === ELEMENT_DESCRIPTION_ASSET);
+    for (const asset of extra)
+    {
+        if (!byName.has(asset.name))
+        {
+            byName.set(asset.name, asset);
+            added.push(asset.name);
+        }
+        else if (preferred.has(asset.name))
+        {
+            byName.set(asset.name, asset);
+            overridden.push(asset.name);
+        }
+    }
 
-    console.log(`Declarations:         ${declarations.length}`);
-    console.log(`Non-XML (other pipe): ${otherMedia}`);
-    console.log(`Unresolved XML refs:  ${unresolved}`);
-    console.log(`Layouts written:      ${namedLayouts.named.length} -> ${path.relative(repoRoot, args.layoutsOut)}`);
-    console.log(`Skins written:        ${namedSkins.named.length} -> ${path.relative(repoRoot, args.skinsOut)}`);
+    return {merged: [...byName.values()], added, overridden};
+}
+
+function main()
+{
+    const args = parseArgs();
+    const tree = resolveTree(args.source);
+
+    if (!tree)
+    {
+        console.error(`No src/binaryData or scripts/binaryData under ${args.source}`);
+        process.exit(1);
+    }
+
+    const primary = collectAssets(tree, 'primary');
+    let layouts = primary.layouts.named;
+    let skins = primary.skins.named;
+    const collisions = [...primary.layouts.collisions, ...primary.skins.collisions];
+    let airReport = null;
+
+    const airTree = args.airSource ? resolveTree(args.airSource) : null;
+
+    if (args.airSource && !airTree)
+    {
+        console.warn(`AIR source has no readable tree, skipping: ${args.airSource}`);
+    }
+    else if (airTree)
+    {
+        const air = collectAssets(airTree, 'air');
+        const mergedLayouts = mergeSource(layouts, air.layouts.named, AIR_PREFERRED);
+        const mergedSkins = mergeSource(skins, air.skins.named, AIR_PREFERRED);
+
+        layouts = mergedLayouts.merged;
+        skins = mergedSkins.merged;
+        airReport = {
+            addedLayouts: mergedLayouts.added,
+            addedSkins: mergedSkins.added,
+            overridden: [...mergedLayouts.overridden, ...mergedSkins.overridden]
+        };
+    }
+
+    writeAssets(layouts, args.layoutsOut, args.dryRun);
+    writeAssets(skins, args.skinsOut, args.dryRun);
+
+    const hasElementDescription = skins.some((skin) => skin.name === ELEMENT_DESCRIPTION_ASSET);
+
+    console.log(`Declarations:         ${primary.stats.declarations}`);
+    console.log(`Non-XML (other pipe): ${primary.stats.otherMedia}`);
+    console.log(`Unresolved XML refs:  ${primary.stats.unresolved}`);
+    console.log(`Layouts written:      ${layouts.length} -> ${path.relative(repoRoot, args.layoutsOut)}`);
+    console.log(`Skins written:        ${skins.length} -> ${path.relative(repoRoot, args.skinsOut)}`);
     console.log(`Element description:  ${hasElementDescription ? ELEMENT_DESCRIPTION_ASSET : 'MISSING'}`);
 
-    for (const collision of [...namedLayouts.collisions, ...namedSkins.collisions])
+    if (airReport)
+    {
+        console.log(`\nFrom ${path.relative(repoRoot, args.airSource)}:`);
+        console.log(`  added layouts:      ${airReport.addedLayouts.length}`);
+        console.log(`  added skins:        ${airReport.addedSkins.length}`);
+        console.log(`  overridden:         ${airReport.overridden.length ? airReport.overridden.join(', ') : 'none'}`);
+
+        for (const name of [...airReport.addedLayouts, ...airReport.addedSkins].sort())
+        {
+            console.log(`    + ${name}`);
+        }
+    }
+
+    for (const collision of collisions)
     {
         console.log(`Collision: "${collision.fieldName}" -> different embeds in ${collision.components.join(', ')}; qualified by component.`);
     }
