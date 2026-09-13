@@ -24,11 +24,21 @@ export class BitmapViewPreset extends WiredUIPreset
     private _height: number = 0;
 
     // AS3: BitmapViewPreset.as::BitmapViewPreset()
-    constructor(roomEvents: HabboUserDefinedRoomEvents, presetManager: PresetManager, wiredStyle: WiredStyle)
+    constructor(
+        roomEvents: HabboUserDefinedRoomEvents,
+        presetManager: PresetManager,
+        wiredStyle: WiredStyle,
+        ownGraphicContext: boolean = false
+    )
     {
         super(roomEvents, presetManager, wiredStyle);
 
         this._window = presetManager.createLayout('bitmap_wrapper_view') as unknown as IBitmapWrapperWindow;
+
+        // A surface redrawn every frame must not share its parent's graphic context, or the parent
+        // is invalidated with it — which for the Variable FX preview is the whole wired dialog, 60
+        // times a second.
+        if(ownGraphicContext) (this._window as unknown as IWindow).setParamFlag(16, false);
     }
 
     // AS3: BitmapViewPreset.as::get bitmapWindow()

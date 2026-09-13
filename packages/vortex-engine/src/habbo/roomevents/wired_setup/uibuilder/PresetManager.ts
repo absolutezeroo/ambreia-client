@@ -346,9 +346,9 @@ export class PresetManager
     }
 
     // AS3: PresetManager.as::createBitmapViewPreset()
-    createBitmapViewPreset(): BitmapViewPreset
+    createBitmapViewPreset(ownGraphicContext: boolean = false): BitmapViewPreset
     {
-        return new BitmapViewPreset(this._roomEvents, this, this.wiredStyle);
+        return new BitmapViewPreset(this._roomEvents, this, this.wiredStyle, ownGraphicContext);
     }
 
     // AS3: PresetManager.as::createAvatarImagePreset()

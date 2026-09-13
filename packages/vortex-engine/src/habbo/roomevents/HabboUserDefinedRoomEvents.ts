@@ -59,6 +59,9 @@ import {WiredEnvironment} from './WiredEnvironment';
 import {NewVariablePickerHelper} from './wired_setup/uibuilder/presets/newvariablepicker/NewVariablePickerHelper';
 import {IncomingMessages} from './IncomingMessages';
 import {WiredClickUserMessageComposer} from '@habbo/communication/messages/outgoing/userdefinedroomevents/WiredClickUserMessageComposer';
+import {AssetLibraryVariableFxAssetProvider} from '@habbo/room/object/visualization/variablefx/AssetLibraryVariableFxAssetProvider';
+import {VariableFxRendererRegistry} from '@habbo/room/object/visualization/variablefx/VariableFxRendererRegistry';
+import type {IVariableFxAssetProvider} from '@habbo/room/object/visualization/variablefx/IVariableFxAssetProvider';
 
 const log = Logger.getLogger('habbo.roomevents.HabboUserDefinedRoomEvents');
 
@@ -382,6 +385,51 @@ export class HabboUserDefinedRoomEvents extends Component implements IHabboUserD
     get roomEngine(): IRoomEngine | null
     {
         return this._roomEngine;
+    }
+
+    /**
+     * The Variable FX services the wired editor's preview renders with.
+     *
+     * Deliberately its OWN provider and registry, not the room's: AS3 builds a second pair here
+     * too. A preview is not in a room, has no room configs, and must keep working while no room is
+     * loaded at all — sharing the visualization factory's pair would tie the editor's lifetime to a
+     * room instance's.
+     *
+     * DEVIATION: AS3 builds them in `setRoomObjectVisualizationFactory()`, off the factory's asset
+     *   library, because its factory is a Component. This port's factory is a plain class with no
+     *   IID, so there is nothing to depend on — built lazily off this component's own asset
+     *   library instead, which is the same library by the time either is asked for.
+     * AS3: HabboUserDefinedRoomEvents.as::setRoomObjectVisualizationFactory()
+     */
+    private _variableFxAssetProvider: IVariableFxAssetProvider | null = null;
+
+    // AS3: HabboUserDefinedRoomEvents.as::_variableFxRendererRegistry
+    private _variableFxRendererRegistry: VariableFxRendererRegistry | null = null;
+
+    // AS3: HabboUserDefinedRoomEvents.as::get variableFxAssetProvider()
+    get variableFxAssetProvider(): IVariableFxAssetProvider | null
+    {
+        const assets = this.assets;
+
+        if(this._variableFxAssetProvider === null && assets !== null)
+        {
+            this._variableFxAssetProvider = new AssetLibraryVariableFxAssetProvider(assets);
+        }
+
+        return this._variableFxAssetProvider;
+    }
+
+    // AS3: HabboUserDefinedRoomEvents.as::get variableFxRendererRegistry()
+    get variableFxRendererRegistry(): VariableFxRendererRegistry | null
+    {
+        const provider = this.variableFxAssetProvider;
+
+        if(this._variableFxRendererRegistry === null && provider !== null)
+        {
+            this._variableFxRendererRegistry = VariableFxRendererRegistry.createDefault(provider);
+        }
+
+        return this._variableFxRendererRegistry;
     }
 
     // AS3: HabboUserDefinedRoomEvents.as::get wiredCtrl()
