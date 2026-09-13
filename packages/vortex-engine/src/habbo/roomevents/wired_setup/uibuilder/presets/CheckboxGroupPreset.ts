@@ -109,6 +109,13 @@ export class CheckboxGroupPreset extends WiredUIPreset
         return this._options.getValue(id)!;
     }
 
+    /** One checkbox by its id — the row presets reach their single option through this. */
+    // AS3: CheckboxGroupPreset.as::get()
+    get(id: number): CheckboxOptionPreset | null
+    {
+        return this._options.getValue(id);
+    }
+
     // AS3: CheckboxGroupPreset.as::get numCheckboxes()
     get numCheckboxes(): number
     {

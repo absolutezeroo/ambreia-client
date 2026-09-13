@@ -88,6 +88,11 @@ import {VariableNameSection} from './presets/sections/VariableNameSection';
 import {ChooseVariableSection} from './presets/sections/ChooseVariableSection';
 import {ValueOrVariableSection} from './presets/sections/ValueOrVariableSection';
 import {PlaceholderNameSection} from './presets/sections/PlaceholderNameSection';
+import {VariableFxValueRangePreset} from '../addons/variablefx/presets/VariableFxValueRangePreset';
+import {VariableFxAdvancedRangePreset} from '../addons/variablefx/presets/VariableFxAdvancedRangePreset';
+import {VariableFxVariableOverrideRowPreset} from '../addons/variablefx/presets/VariableFxVariableOverrideRowPreset';
+import {VariableFxVisualizationSettingsPreset} from '../addons/variablefx/presets/VariableFxVisualizationSettingsPreset';
+import type {IVariableFxStateListener} from '../addons/variablefx/presets/IVariableFxStateListener';
 import {PlaceholderTypeSection} from './presets/sections/PlaceholderTypeSection';
 import {VariablePlaceholderModeSection} from './presets/sections/VariablePlaceholderModeSection';
 import type {ISliderConverter} from '../common/slider_converter/ISliderConverter';
@@ -270,6 +275,35 @@ export class PresetManager
     }
 
     /** A padded container wearing the style's OUTER border rather than a plain one. */
+    // AS3: PresetManager.as::createVariableFxValueRangePreset()
+    createVariableFxValueRangePreset(listener: IVariableFxStateListener): VariableFxValueRangePreset
+    {
+        return new VariableFxValueRangePreset(this._roomEvents, this, this.wiredStyle, listener);
+    }
+
+    // AS3: PresetManager.as::createVariableFxAdvancedRangePreset()
+    createVariableFxAdvancedRangePreset(listener: IVariableFxStateListener): VariableFxAdvancedRangePreset
+    {
+        return new VariableFxAdvancedRangePreset(this._roomEvents, this, this.wiredStyle, listener);
+    }
+
+    // AS3: PresetManager.as::createVariableFxVariableOverrideRowPreset()
+    createVariableFxVariableOverrideRowPreset(
+        kind: number,
+        onChange: () => void
+    ): VariableFxVariableOverrideRowPreset
+    {
+        return new VariableFxVariableOverrideRowPreset(this._roomEvents, this, this.wiredStyle, kind, onChange);
+    }
+
+    // AS3: PresetManager.as::createVariableFxVisualizationSettingsPreset()
+    createVariableFxVisualizationSettingsPreset(
+        listener: IVariableFxStateListener
+    ): VariableFxVisualizationSettingsPreset
+    {
+        return new VariableFxVisualizationSettingsPreset(this._roomEvents, this, this.wiredStyle, listener);
+    }
+
     // AS3: PresetManager.as::createVariableFxPreviewPreset()
     createVariableFxPreviewPreset(): VariableFxPreviewPreset
     {

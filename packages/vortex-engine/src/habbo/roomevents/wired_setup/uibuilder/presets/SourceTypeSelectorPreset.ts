@@ -45,6 +45,13 @@ export class SourceTypeSelectorPreset extends WiredUIPreset
     }
 
     // AS3: SourceTypeSelectorPreset.as::select()
+    /** Replaces the offered source types AND the selection — the options depend on the effect. */
+    // AS3: SourceTypeSelectorPreset.as::reinit()
+    reinit(ids: number[], selected: number): void
+    {
+        this._picker.initialize(ids, selected);
+    }
+
     select(id: number): void
     {
         this._picker.select(id);
