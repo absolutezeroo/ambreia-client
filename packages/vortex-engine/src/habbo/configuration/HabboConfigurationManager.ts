@@ -5,6 +5,7 @@ import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocaliza
 import {IID_HabboLocalizationManager} from '@iid/IIDHabboLocalizationManager';
 import {HabboProperty} from './enum/HabboProperty';
 import {HabboConfigurationFlags} from './enum/HabboConfigurationFlags';
+import {HabboConfigurationEvent} from './enum/HabboConfigurationEvent';
 
 const log = Logger.getLogger('habbo.configuration.HabboConfigurationManager');
 
@@ -676,9 +677,13 @@ export class HabboConfigurationManager extends Component implements IHabboConfig
         this.setProperty('game.center.error.url', '${url.prefix}/log/gameerror');
     }
 
-    private configurationsLoaded(): void 
+    private configurationsLoaded(): void
     {
-        this.events.emit('configurationLoaded');
+        // The emitted name used to be the literal 'configurationLoaded', while the enum beside it
+        // has always said 'HCE_CONFIGURATION_LOADED' — which is what AS3 dispatches and what any
+        // ported listener would subscribe to. Nothing listened either way, so the drift was
+        // invisible until the first subscriber arrived (RaidProtectionSettingsController).
+        this.events.emit(HabboConfigurationEvent.CONFIGURATION_LOADED);
         this.configurationsComplete();
     }
 

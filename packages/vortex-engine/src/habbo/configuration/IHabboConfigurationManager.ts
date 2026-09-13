@@ -9,9 +9,12 @@ import type {ICoreConfiguration} from '@core/runtime/ICoreConfiguration';
 export interface IHabboConfigurationManagerEvents
 {
     /**
-	 * Configuration loaded successfully
+	 * Configuration loaded successfully. The key is `HabboConfigurationEvent.CONFIGURATION_LOADED`,
+	 * which is the name AS3 dispatches — it used to be spelt 'configurationLoaded' here and in the
+	 * manager, agreeing with each other but with nothing else.
 	 */
-    'configurationLoaded': () => void;
+    // eslint-disable-next-line @typescript-eslint/naming-convention -- an event name, not a method
+    'HCE_CONFIGURATION_LOADED': () => void;
 
     /**
 	 * Configuration load error
