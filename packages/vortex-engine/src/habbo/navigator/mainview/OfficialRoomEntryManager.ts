@@ -12,6 +12,22 @@ import {Util} from '../Util';
  */
 export class OfficialRoomEntryManager implements IDisposable
 {
+    // Twenty of this class's twenty-seven AS3 methods are absent — every one of them the entry's
+    // interactive and detail layer: `handleClick`, `onCellMouseClick/Over/Out`, `refreshCell`,
+    // `refreshCustomImage`, `refreshDetails`, `refreshFolderEntry`, `getEntry`. This note is here so
+    // the next hollow-port sweep stops re-deriving that, and stops reading it as a broken feature.
+    //
+    // Nothing calls `createEntry()` or `refreshEntry()` in this port. `LegacyNavigator` constructs
+    // the class and `OfficialTabPageDecorator` uses exactly one member, `refreshAdFooter()`. The
+    // live path for entering a room from a navigator result is the new navigator's
+    // `RoomEntryElementFactory`, which wires `go_to_room_region` to `onGoButtonClicked` — that is
+    // what AS3's `handleClick` corresponds to here, and it works.
+    //
+    // So these are not a gap in a reachable feature; they are the unported half of a superseded
+    // legacy path. Port them if and when the legacy official tab is driven again, not before:
+    // twenty methods written against a caller that does not exist is twenty methods nobody can
+    // check.
+
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/navigator/mainview/OfficialRoomEntryManager.as::HOTTEST_GROUPS_TAG
     private static readonly HOTTEST_GROUPS_TAG: string = 'hottest_groups';
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/navigator/mainview/OfficialRoomEntryManager.as::IMAGE_WIDTH_WIDE

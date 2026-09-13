@@ -4697,6 +4697,72 @@ other window's clip moved. This is the one-pass equivalent of AS3's per-`BitmapD
 
 ## Recent Work Recorded
 
+- 🆕 **Emitters wired, listeners never registered — 2026-09-13.** One reported symptom ("the raid
+  protection button does nothing") turned out to be an instance of the port's dominant defect, and
+  pulling on it produced six more. In every case the *data* and the *emitter* were ported and only
+  the subscribing edge was missing, which is why nothing threw, nothing logged, and coverage read
+  100%: a registration is not a member.
+
+  - **The navigator never registered as a link event tracker.** `linkPattern` and `linkReceived`
+    were ported in both navigators — and so was `removeLinkEventTracker`, which made the pair look
+    symmetric. `addLinkEventTracker` was nowhere. `createLinkEvent()` iterates registered trackers
+    and logs nothing when none match, so every `navigator/...` link went to nobody. That is four
+    dead links, not one: the raid-protection button, `navigator/goto/random_friending_room`,
+    the NUX `predefined_noob_lobby` offer, and `FurnitureRoomLinkHandler`'s room-teleport furni.
+    Registered as AS3 registers — unconditional for the new navigator, perk-gated for the legacy one,
+    because two trackers on one prefix deliver every link twice. `onPerksUpdated()` came with it
+    rather than as a TODO: AS3's is 13 readable lines and the port already had every piece.
+  - **`BottomBarLeft` declared `"toolbar/"` and never registered for it**, so `toolbar/memenu` —
+    which opens the me-menu — reached nobody. Narrower than the navigator and worth saying: nothing
+    inside the client emits a `toolbar/...` link today, so this completes the site's entry point
+    rather than fixing a visible button. `ToolbarView` carries the same pattern and is deliberately
+    left alone — nothing constructs it, in this port **or** in the primary tree.
+  - **`error_ctx` was written by nobody and read by nobody.** `HabboTracking` is 263 code lines
+    against its AS3's 838, and 21 of the missing methods are `on*Event` handlers. That is not a
+    hollow port: the push API that replaced AS3's buses is genuinely adopted (`trackGoogle` 138 call
+    sites, `trackEventLog` 55). What was unfinished is one piece of it — `setErrorContextFlag()` had
+    0 callers and `_errorContextFlags` was never read, so the field a crash report carries to say
+    which screens were open was permanently absent. Four bus subscriptions and the missing reader.
+    Catalog and help are **not** subscribed and that is the point: nothing emits on either bus, and a
+    listener with no speaker is the defect being removed.
+  - **Links in chat bubbles were drawn but not clickable.** `buildChatTextRuns()` already attached a
+    `url` to every link run — the comment on `IChatTextRun.url` reads "the URL a click should
+    navigate to" — and nothing read it. Flash needed no reader: its TextField dispatched a `"link"`
+    TextEvent. This port rasterizes text, so the click is resolved by geometry over the layout the
+    draw already produced. Only useful *because* the link trackers were registered the same day.
+  - **The disconnect dialog reloaded the page**, under a `DEVIATION:` whose own justification was
+    false — it claimed the reload lands on the login screen, but the SSO ticket rides on `?sso=` and
+    a reload keeps the URL, so it re-bootstrapped the engine against the ticket that had just been
+    disconnected. AS3's callback disposes the dialog and nothing else. The handover now goes to the
+    site through the existing postMessage channel, which is where login actually lives.
+  - **Server side: the landing view's dynamic slots were empty by design of a stub.**
+    `GetCurrentTimingCodeMessageHandler` answered `Code = ""` unconditionally, which is the client's
+    "nothing scheduled" case, so every `widgetcontainer` slot rendered nothing. (vortex-emulator
+    `1cfa64186`.)
+
+  **Two new probes, and the negative control that saved one of them.**
+  `scripts/wiring-coverage.mjs` measures edges — registrations AS3 makes and the port does not — by
+  pairing AS3 to TS through the `AS3:` trace comments. `scripts/hollow-coverage.mjs` measures body
+  size on the same pairs. Both are local-only, like every other probe here.
+
+  The first version of the wiring probe reported a confident **0**. Removing a registration by hand
+  did not make it reappear: an escaped backslash had been eaten, `split(/[\/]/)` did not split
+  Windows paths, and the probe was silently measuring a fifth of the tree. Coverage went 342 → 1746
+  paired classes once fixed. **A probe that reports 0 is worthless until something proves it can
+  still fail.**
+
+  What they measure today: **1746 paired classes, one real wiring gap** (the navigator), and 22
+  hollow candidates of which one was real (chat links) and one a rename. The rest split into
+  accessor compression — AS3 spends 35 getters + 35 setters + 35 private vars where TS spends 35
+  `readonly` fields — classes nothing constructs, and substitutions that are correct: `Canvas` and
+  `ShapeSkinRenderer` are AS3 software rasterisers replaced by Canvas2D, `ThumbListManager`'s eleven
+  absent members are incremental `BitmapData` patching that an immutable `ImageBitmap` cannot do.
+  Each of those now carries a note in its own file so the next sweep stops re-deriving it.
+
+  **`RoomSettingsData.setController` was `setFlatController` with no `AS3:` trace at all** — nothing
+  tied it to the member it ports, which is exactly why a size sweep could not see it.
+  `check-as3-trace.mjs` only scans staged files; a full pass would be worth a session.
+
 - 🆕 **The two stub visualizations, ported — 2026-09-10.** These were the only remaining items on
   this file's own "what is actually left" list that were a missing *file* rather than an
   architecture task or live exercise.

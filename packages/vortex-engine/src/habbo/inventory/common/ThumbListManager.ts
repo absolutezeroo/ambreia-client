@@ -17,6 +17,21 @@ const log = Logger.getLogger('habbo.inventory.common.ThumbListManager');
  */
 export class ThumbListManager
 {
+    // Eleven of AS3's eighteen members are absent, and they are all one thing: incremental mutation
+    // of the strip — `addItemAsFirst`, `removeItemInIndex/Location/Image`, `replaceItemImage`,
+    // `updateListItem`, and the `resolveGridLocation*` arithmetic those need. This note is here so
+    // the next hollow-port sweep stops re-deriving it.
+    //
+    // They cannot be ported as written, and the reason is the one in the class comment above: AS3
+    // patches a mutable `BitmapData` in place with copyPixels, and an `ImageBitmap` is immutable.
+    // The port re-composites the whole strip through `updateImageFromList()` instead, which reaches
+    // the same end state by the only route the platform offers.
+    //
+    // Nothing in this port calls this class at all today, so the choice is also untested in anger.
+    // When a caller arrives, the thing to check is cost: re-compositing a long strip per change is
+    // the price of immutability, and if it bites, the answer is an OffscreenCanvas kept between
+    // updates — not the eleven methods, which have no target to patch.
+
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/common/ThumbListManager.as::_provider
     // Derived name: obfuscated in the primary tree.
     private _provider: IThumbListDataProvider | null;
