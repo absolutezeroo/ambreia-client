@@ -26,6 +26,7 @@
     import * as api from '../lib/api.js';
     import type {IPlayerPurse} from '../lib/api.js';
     import type {ISpriteName} from '../lib/sprite.js';
+    import {balance, balanceExact, isAbbreviated} from '../lib/balance.js';
     import {selectedId, signedIn} from '../lib/session.js';
     import {t} from '../lib/i18n.js';
 
@@ -58,24 +59,40 @@
     //
     // Typed against the sheet's own names so a renamed icon is a compile error here rather than a
     // 0x0 span in the panel.
-    const COLUMNS = $derived<{icon: ISpriteName; label: string}[][]>(purse === null ? [] : [
+    const COLUMNS = $derived<{icon: ISpriteName; label: string; exact: string}[][]>(purse === null ? [] : [
         [
-            {icon: 'credits', label: t('SHOP_PURSE_CREDITS', {creditBalance: purse.credits})},
-            {icon: 'diamonds', label: t('SHOP_PURSE_DIAMONDS', {diamondBalance: purse.diamonds})},
-            {icon: 'silver', label: t('SHOP_PURSE_SILVER', {silverBalance: purse.duckets})},
+            {
+                icon: 'credits',
+                label: t('SHOP_PURSE_CREDITS', {creditBalance: balance(purse.credits)}),
+                exact: isAbbreviated(purse.credits) ? balanceExact(purse.credits) : '',
+            },
+            {
+                icon: 'diamonds',
+                label: t('SHOP_PURSE_DIAMONDS', {diamondBalance: balance(purse.diamonds)}),
+                exact: isAbbreviated(purse.diamonds) ? balanceExact(purse.diamonds) : '',
+            },
+            {
+                icon: 'silver',
+                label: t('SHOP_PURSE_SILVER', {silverBalance: balance(purse.duckets)}),
+                exact: isAbbreviated(purse.duckets) ? balanceExact(purse.duckets) : '',
+            },
         ],
         [
+            // The two memberships stay EXACT and unabbreviated: they are a countdown in days, and
+            // "1,2 k jours" answers a question nobody asked while hiding the one they did.
             {
                 icon: 'habboClub',
                 label: purse.habboClubDays
                     ? t('SHOP_PURSE_HC_DAYS', {habboClubDays: purse.habboClubDays})
                     : t('SHOP_PURSE_NO_HC'),
+                exact: '',
             },
             {
                 icon: 'buildersClub',
                 label: purse.buildersClubDays
                     ? t('SHOP_PURSE_BC_DAYS', {buildersClubDays: purse.buildersClubDays})
                     : t('SHOP_PURSE_NO_BC'),
+                exact: '',
             },
         ],
     ]);
@@ -94,7 +111,13 @@
                 {#each COLUMNS as column, index (index)}
                     <div class="w-1/2 px-3">
                         {#each column as item (item.icon)}
-                            <p class="relative whitespace-nowrap py-1.5 pl-[26px] leading-[22px]">
+                            <!-- `title` carries the full number whenever the balance was
+                                 abbreviated, so the exact figure is one hover away and nothing is
+                                 lost — see lib/balance.ts. The dotted underline is the browser's
+                                 own convention for "there is more here"; without it an abbreviated
+                                 balance looks like the whole answer. -->
+                            <p class="relative whitespace-nowrap py-1.5 pl-[26px] leading-[22px] {item.exact ? 'decoration-dotted underline-offset-4 hover:underline' : ''}"
+                               title={item.exact || null}>
                                 <Sprite name={item.icon} className="absolute left-0 top-1/2 -translate-y-1/2" />
                                 {item.label}
                             </p>
