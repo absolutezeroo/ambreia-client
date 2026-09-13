@@ -20,6 +20,8 @@
     import FormError from '../../components/FormError.svelte';
     import EmptyResults from '../../components/EmptyResults.svelte';
     import AvatarCreateModal from '../../components/AvatarCreateModal.svelte';
+    import SafetyChallengeModal from '../../components/SafetyChallengeModal.svelte';
+    import * as api from '../../lib/api.js';
     import {avatars, selectedId, choose} from '../../lib/session.js';
     import {t} from '../../lib/i18n.js';
 
@@ -30,6 +32,38 @@
     let creating = $state(false);
     let query = $state('');
     let error = $state('');
+
+    // `avatar-create.html`'s own `open()`, and the ONE place habbo.com puts this gate:
+    //
+    //   o.open = function () { Session.isTrusted() ? create() : safetyLockModal.open().then(create) }
+    //
+    // A new avatar is the risky action a thief reaches for first — it is a new identity on the
+    // hotel wearing the owner's account — so an untrusted session answers the security questions
+    // before the dialog opens, and the creation follows the answer. The server refuses it too
+    // (`safetylock.required` on POST /api/user/avatars); this is the half that explains why.
+    let challenging = $state(false);
+
+    async function openCreate()
+    {
+        try
+        {
+            const status = await api.getSafetyQuestions();
+
+            if(status.configured && !status.trusted)
+            {
+                challenging = true;
+
+                return;
+            }
+        }
+        catch
+        {
+            // Signed out, or the route is unreachable. The server is the one that actually refuses,
+            // so opening the dialog here is never the thing that lets a creation through.
+        }
+
+        creating = true;
+    }
 
     // `byNameDescriptionOrMotto`, habbo.com's own filter on this list. Its ordering is
     // `['-lastWebAccess', 'name']`; `AvatarInfo` carries no last-access, so this falls back to the
@@ -74,7 +108,7 @@
         </p>
 
         <span class="w-full pt-3 text-center md:ml-auto md:w-auto md:pt-0">
-            <Button disabled={$avatars.length >= MAX_AVATARS} onclick={() => (creating = true)} className="whitespace-nowrap">
+            <Button disabled={$avatars.length >= MAX_AVATARS} onclick={openCreate} className="whitespace-nowrap">
                 {t('AVATAR_CREATE_BUTTON')}
             </Button>
         </span>
@@ -125,3 +159,9 @@
         <AvatarCreateModal onClose={() => (creating = false)} />
     {/if}
 </SettingsShell>
+
+<!-- `.then(create)`: answering opens the dialog the visitor asked for in the first place. -->
+{#if challenging}
+    <SafetyChallengeModal onClose={() => (challenging = false)}
+                          onDone={() => { challenging = false; creating = true; }} />
+{/if}

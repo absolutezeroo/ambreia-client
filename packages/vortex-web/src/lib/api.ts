@@ -42,6 +42,8 @@ export type IEmptyResponse = Schemas['EmptyResponse'];
 export type IPlayerPreferences = Schemas['PlayerPreferencesResponse'];
 export type IAccountEmail = Schemas['AccountEmailResponse'];
 export type ISafetyLock = Schemas['SafetyLockResponse'];
+export type ISafetyQuestions = Schemas['SafetyQuestionsResponse'];
+export type ITrustedLocationsReset = Schemas['TrustedLocationsResetResponse'];
 export type ITwoFactorStatus = Schemas['TwoFactorStatusResponse'];
 export type ITwoFactorEnrolment = Schemas['TwoFactorEnrolmentResponse'];
 export type IShopProduct = Schemas['ShopProduct'];
@@ -86,6 +88,12 @@ const ERRORS: Record<string, string> = {
     // Refused because the account already has a factor. habbo.com never answers this — its own
     // enrolment replaces rather than refuses — so the sentence is ours.
     'pocket.auth.mfa_already_enabled': 'Ce compte a deja une authentification a deux facteurs.',
+    // habbo.com's own key for a refused challenge, and its own sentence.
+    'safetylock.invalid_answer': t('ERROR_SAFETY_LOCK_ANSWER'),
+    'safetylock.not_configured': 'Ce compte n\'a pas de questions de securite.',
+    // Never rendered: `needsSafetyUnlock` catches this one and opens the dialog instead, the way
+    // `needsMfa` catches the second factor. The wording is here for the path that forgets to.
+    'safetylock.required': 'Reponds a tes questions de securite pour continuer.',
     'pocket.auth.password_too_short': t('ERROR_PASSWORD_MIN_LENGTH'),
     'pocket.auth.wrong_password': t('ERROR_INCORRECT_PASSWORD'),
     'pocket.auth.no_avatars': 'Ce compte n\'a pas encore d\'avatar.',
@@ -500,6 +508,61 @@ export function enableTwoFactor(secret: string, code: string): Promise<IEmptyRes
 export function disableTwoFactor(code: string): Promise<IEmptyResponse>
 {
     return request('/api/user/twofactor/disable', {method: 'POST', body: {code}});
+}
+
+// The account's security questions — habbo.com's "Protection du compte". Four calls, and they split
+// on what each demands: setting and clearing the questions change the recovery path and take the
+// PASSWORD, answering the challenge takes the ANSWERS and nothing else.
+//
+// Only the question NUMBERS travel. Their wording is `IDENTITY_SAFETYQUESTION_<n>` in fr.json, so
+// the pair an account chose reads in whatever language the visitor has — see lib/safety.ts.
+export function getSafetyQuestions(): Promise<ISafetyQuestions>
+{
+    return request('/api/user/safetyquestions');
+}
+
+export function saveSafetyQuestions(
+    question1: number,
+    answer1: string,
+    question2: number,
+    answer2: string,
+    currentPassword: string,
+    code?: string
+): Promise<IEmptyResponse>
+{
+    return request('/api/user/safetyquestions', {
+        method: 'POST',
+        body: {question1, answer1, question2, answer2, currentPassword, code},
+    });
+}
+
+export function disableSafetyQuestions(currentPassword: string, code?: string): Promise<IEmptyResponse>
+{
+    return request('/api/user/safetyquestions/disable', {method: 'POST', body: {currentPassword, code}});
+}
+
+/** `trust` is habbo.com's radio pair: false unlocks this session only, true remembers the device. */
+export function unlockSafetyQuestions(
+    answer1: string,
+    answer2: string,
+    trust: boolean
+): Promise<IEmptyResponse>
+{
+    return request('/api/user/safetyquestions/unlock', {method: 'POST', body: {answer1, answer2, trust}});
+}
+
+export function resetTrustedLocations(): Promise<ITrustedLocationsReset>
+{
+    return request('/api/user/trustedlocations/reset', {method: 'POST'});
+}
+
+/**
+ * Whether a refusal is the server asking for the security questions rather than saying no. Same
+ * shape as `needsMfa`: a challenge is a step, not a failure.
+ */
+export function needsSafetyUnlock(error: unknown): boolean
+{
+    return (error as ApiError | null)?.code === 'safetylock.required';
 }
 
 export function saveLook(

@@ -1,28 +1,23 @@
 <script lang="ts">
-    // `settings/account-security/safety-lock-disable-modal/…`. Both of habbo.com's account-security
-    // actions are MODALS — the page itself never grows a form:
+    // `settings/account-security/safety-lock-disable-modal/…` — turning the protection OFF:
     //
-    //   <button class="modal__close">  <h3 class="modal__title" translate="ACCOUNT_SECURITY_DISABLE">
-    //   <div class="modal__content">
-    //     <form class="form">
-    //       <p translate="ACCOUNT_SECURITY_DISABLE_CONFIRMATION">
-    //       <habbo-password-current>   the CURRENT_PASSWORD_LABEL fieldset with the eye
-    //       <habbo-captcha>
-    //       <div class="form__footer">
-    //         <a class="form__cancel" translate="FORM_CANCEL_LABEL">
-    //         <button class="form__submit" translate="OK_BUTTON">
+    //   <h3 class="modal__title" translate="ACCOUNT_SECURITY_DISABLE">
+    //   <div class="modal__content"><form class="form">
+    //     <p translate="ACCOUNT_SECURITY_DISABLE_CONFIRMATION">
+    //     <habbo-password-current>     the CURRENT_PASSWORD_LABEL fieldset with the eye
+    //     <habbo-captcha>
+    //     <div class="form__footer">
+    //       <a class="form__cancel" translate="FORM_CANCEL_LABEL">
+    //       <button class="form__submit" translate="OK_BUTTON">
     //
-    // One component for both directions, and the reason is worth stating: habbo.com's TWO modals
-    // are `safety-questions-modal` (turning it on) and `safety-lock-disable-modal` (turning it off),
-    // and they differ only because the first one asks for two security questions. This hotel's lock
-    // is gated on the password in both directions — see `IAccountSafetyLockService` — so the two
-    // collapse into the shell habbo.com uses for the second, which asks for the current password and
-    // nothing else. Its title and its first paragraph still come from whichever direction is being
-    // taken.
+    // It asks for the password and NOT for the questions, which is the right way round: a player who
+    // has forgotten their answers must still be able to switch the thing off, and a thief who has
+    // the password already owns the account. The answers guard the challenge; the password guards
+    // the recovery path itself.
     //
     // The captcha is deliberately absent: this hotel configures no provider, and the endpoint is
-    // rate-limited. The MFA field is an ADDITION — `SetAsync` verifies the second factor as well as
-    // the password, and it appears only when the server asks for it.
+    // rate-limited on sign-in's own policy. The MFA field is an ADDITION — `ClearAsync` verifies the
+    // second factor as well, and it appears only when the server asks for it.
     import Modal from './Modal.svelte';
     import Fieldset from './Fieldset.svelte';
     import PasswordField from './PasswordField.svelte';
@@ -32,13 +27,7 @@
     import * as notifier from '../lib/notifier.js';
     import {t} from '../lib/i18n.js';
 
-    let {locked, onClose, onDone}:
-    {
-        /** The state the account is in NOW, so this dialog is the one that turns it around. */
-        locked: boolean;
-        onClose: () => void;
-        onDone: (now: boolean) => void;
-    } = $props();
+    let {onClose, onDone}: {onClose: () => void; onDone: () => void} = $props();
 
     let password = $state('');
     let code = $state('');
@@ -46,7 +35,7 @@
     let error = $state('');
     let busy = $state(false);
 
-    async function apply(event: SubmitEvent): Promise<void>
+    async function disable(event: SubmitEvent): Promise<void>
     {
         event.preventDefault();
 
@@ -60,18 +49,13 @@
 
         try
         {
-            const status = await api.setSafetyLock(!locked, password, code.trim() || undefined);
+            await api.disableSafetyQuestions(password, code.trim() || undefined);
 
-            onDone(status.locked);
-
-            // habbo.com's own pair, one key per direction: "Le verrouillage de sécurité de ton
-            // compte est maintenant activé / désactivé".
-            notifier.success(status.locked ? 'ACCOUNT_SECURITY_SAVED_OK' : 'ACCOUNT_SECURITY_DISABLED_OK');
+            onDone();
+            notifier.success('ACCOUNT_SECURITY_DISABLED_OK');
         }
         catch(failure)
         {
-            // Not a refusal: the server is asking for the second factor, so the field appears and
-            // the visitor posts again.
             if(api.needsMfa(failure))
             {
                 needsCode = true;
@@ -89,16 +73,10 @@
     }
 </script>
 
-<!-- Turning it off is `ACCOUNT_SECURITY_DISABLE`; turning it on is the page's own title, which is
-     what `safety-questions-modal` carries. -->
-<Modal title={locked ? t('ACCOUNT_SECURITY_DISABLE') : t('ACCOUNT_SECURITY_TITLE')} {onClose}>
+<Modal title={t('ACCOUNT_SECURITY_DISABLE')} {onClose}>
     <!-- `.modal__content`: the 280px column, 24px down from the band and 110px clear of the bottom. -->
-    <form class="mx-auto mt-6 mb-12 w-full max-w-[280px] px-3" onsubmit={apply}>
-        <p class="mt-0">
-            {locked
-                ? t('ACCOUNT_SECURITY_DISABLE_CONFIRMATION')
-                : t('ACCOUNT_SECURITY_PASSWORD_DESCRIPTION')}
-        </p>
+    <form class="mx-auto mt-6 mb-12 w-full max-w-[280px] px-3" onsubmit={disable}>
+        <p class="mt-0">{t('ACCOUNT_SECURITY_DISABLE_CONFIRMATION')}</p>
 
         <Fieldset>
             <PasswordField name="safety-password" label={t('CURRENT_PASSWORD_LABEL')} bind:value={password} />

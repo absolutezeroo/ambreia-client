@@ -20,91 +20,159 @@
     //              <button class="account-security__enable">   …_ENABLE_BUTTON (blue)
     //   identity_verification_required → type="exclamation", a heading and a link to /settings/email
     //
-    // Both buttons OPEN A MODAL (`openEditModal()` / `openDisableModal()`). This page had the form
-    // folded into the message box, the same defect the 2FA page had.
+    // Every button opens a MODAL — `openEditModal()` / `openDisableModal()` — and this page had the
+    // form folded into the message box, the same defect the 2FA page had.
     //
-    // Real since 2026-09-12, and it is the account SAFETY LOCK: while it is on, the account cannot
-    // spend — no catalog purchase, no marketplace — and the server enforces that on every spending
-    // handler, not just the client. The client already hides both screens when the user object says
-    // locked (`PurchaseCatalogWidget`, `MarketPlaceCatalogWidget`).
+    // "Enabled" here means the account HAS security questions, which is what arms the lock. The
+    // lock itself is a separate flag the server throws when a sign-in arrives from a place the
+    // account has never answered from; `status.locked` is it, and the challenge box below is what
+    // lifts it.
     //
-    // THREE things habbo.com has here are absent, and each is absent for the same reason — the
-    // feature behind it does not exist on this hotel, so the control would do nothing:
-    //
-    //  - The two SECURITY QUESTIONS. habbo.com's lock is a pair of questions asked when you sign in
-    //    from a new device; `IAccountSafetyLockService` gates on the password and the second factor
-    //    instead. Storing two answers that nothing ever asks for would be a form, not a defence —
-    //    which is why `ACCOUNT_SECURITY_EDIT_BUTTON` ("Editer les questions de sécurité") has no
-    //    counterpart below.
-    //  - TRUSTED LOCATIONS, for the same reason one step on: there is no sign-in challenge, so
-    //    there is nothing to remember a device for and nothing for the reset button to clear.
-    //  - `identity_verification_required`, which is the state of an account whose e-mail is not
-    //    verified. `AccountEmailResponse.Verified` is hardcoded false here because no verification
-    //    mail exists, so every account would sit in that state permanently.
-    //
-    // `ACCOUNT_SECURITY_DESCRIPTION` goes with them: it is three sentences about the security
-    // questions and the login challenge, so quoting it would promise all three.
+    // Only `identity_verification_required` is left out, and by capability: it is the state of an
+    // account whose e-mail is not verified, and `AccountEmailResponse.Verified` is hardcoded false
+    // here because nothing can send a verification mail — so every account would sit in it forever.
     import SettingsShell from './SettingsShell.svelte';
     import MessageBox from '../../components/MessageBox.svelte';
     import Button from '../../components/Button.svelte';
+    import SafetyQuestionsModal from '../../components/SafetyQuestionsModal.svelte';
     import SafetyLockModal from '../../components/SafetyLockModal.svelte';
+    import SafetyChallengeModal from '../../components/SafetyChallengeModal.svelte';
     import * as api from '../../lib/api.js';
+    import type {ISafetyQuestions} from '../../lib/api.js';
+    import * as notifier from '../../lib/notifier.js';
     import {t} from '../../lib/i18n.js';
 
-    let locked = $state<boolean | null>(null);
-    let asking = $state(false);
+    let status = $state<ISafetyQuestions | null>(null);
+    let dialog = $state<'edit' | 'disable' | 'challenge' | null>(null);
+    let resetting = $state(false);
+
+    async function refresh(): Promise<void>
+    {
+        try
+        {
+            status = await api.getSafetyQuestions();
+        }
+        catch
+        {
+            status = null;
+        }
+    }
 
     $effect(() =>
     {
-        let cancelled = false;
-
-        void api.getSafetyLock()
-            .then((status) => !cancelled && (locked = status.locked))
-            .catch(() => {});
-
-        return () => (cancelled = true);
+        void refresh();
     });
+
+    function done(): void
+    {
+        dialog = null;
+        void refresh();
+    }
+
+    async function resetLocations(): Promise<void>
+    {
+        if(resetting || !window.confirm(t('ACCOUNT_SECURITY_RESET_LOCATIONS_CONFIRMATION')))
+        {
+            return;
+        }
+
+        resetting = true;
+
+        try
+        {
+            await api.resetTrustedLocations();
+            notifier.success('ACCOUNT_SECURITY_TRUSTED_LOGINS_RESET_OK');
+        }
+        catch(failure)
+        {
+            // An untrusted session is refused here on purpose — forgetting every place is how a
+            // thief would make sure the owner is challenged next time — so it opens the challenge
+            // rather than reporting a failure.
+            if(api.needsSafetyUnlock(failure))
+            {
+                dialog = 'challenge';
+            }
+            else
+            {
+                notifier.error('ERROR_SERVER');
+            }
+        }
+        finally
+        {
+            resetting = false;
+        }
+    }
 </script>
 
 <SettingsShell>
-    <!-- `<h2>`, not `<h1>`: this page's own heading is 32px, where /settings/password leads with an
-         `<h2>` too. The tabs above already carry the site's `<h1>`. -->
+    <!-- `<h2>`, not `<h1>`: the tabs above already carry the page's `<h1>`. -->
     <h2 class="mt-0">{t('ACCOUNT_SECURITY_TITLE')}</h2>
-    <p>
-        Le verrouillage de sécurité empêche toute dépense sur ton compte — catalogue et place de
-        marché — jusqu'à ce que tu le retires avec ton mot de passe.
-    </p>
+    <!-- habbo.com's own description, and it carries its own <b> and <br>. It is usable verbatim
+         now that the questions and the trusted locations behind it are both real. -->
+    <p>{@html t('ACCOUNT_SECURITY_DESCRIPTION')}</p>
 
-    {#if locked !== null}
-        <MessageBox type={locked ? 'check' : 'exclamation'}>
-            <h3 class="mt-0">
-                {locked
-                    ? t('ACCOUNT_SECURITY_STATUS_ENABLED_TITLE')
-                    : t('ACCOUNT_SECURITY_STATUS_DISABLED_TITLE')}
-            </h3>
+    {#if status !== null}
+        {#if status.configured}
+            <MessageBox type="check">
+                <h3 class="mt-0">{t('ACCOUNT_SECURITY_STATUS_ENABLED_TITLE')}</h3>
 
-            {#if locked}
-                <!-- `.account-security__status` is a flex row, and it holds two buttons on
-                     habbo.com. Only the crimson one has a counterpart here — the blue "Editer les
-                     questions de sécurité" beside it edits questions this hotel does not keep. -->
-                <div class="flex">
-                    <Button variant="red" className="mt-3" onclick={() => (asking = true)}>
+                <!-- `.account-security__status` is a flex row: the blue edit button with its 12px
+                     right margin, then the crimson one. -->
+                <div class="mt-3 xs:flex">
+                    <Button className="mr-3" onclick={() => (dialog = 'edit')}>
+                        {t('ACCOUNT_SECURITY_EDIT_BUTTON')}
+                    </Button>
+                    <Button variant="red" onclick={() => (dialog = 'disable')}>
                         {t('ACCOUNT_SECURITY_DISABLE')}
                     </Button>
                 </div>
-            {:else}
-                <!-- `.account-security__enable` is BLUE, not green — the same ramp as
-                     `.account-security__edit` and `.account-security__reset`. -->
-                <Button className="mt-3" onclick={() => (asking = true)}>
+            </MessageBox>
+
+            {#if status.locked}
+                <!-- Not on habbo.com's page, because its lock is lifted wherever you happen to hit
+                     it: the dialog is opened by the ACTION that was refused. A player who is locked
+                     and browsing settings would otherwise have to go and fail at something before
+                     being offered the way out, so the offer is repeated here. -->
+                <MessageBox type="exclamation">
+                    <h3 class="mt-0">{t('SAFETY_LOCK_TITLE')}</h3>
+                    <p>{t('SAFETY_LOCK_ANSWER')}</p>
+
+                    <Button className="mt-3" onclick={() => (dialog = 'challenge')}>
+                        {t('FORM_BUTTON_UNLOCK')}
+                    </Button>
+                </MessageBox>
+            {/if}
+
+            <!-- `.account-security__trusted-locations { margin-top: 24px }`, shown only while the
+                 protection is on — there is nothing to remember a place for otherwise. -->
+            <section class="mt-6">
+                <h2>{t('ACCOUNT_SECURITY_TRUSTED_LOCATIONS_TITLE')}</h2>
+                <p>{@html t('ACCOUNT_SECURITY_TRUSTED_LOCATIONS_DESCRIPTION')}</p>
+
+                <Button className="mt-3" disabled={resetting} onclick={resetLocations}>
+                    {t('ACCOUNT_SECURITY_RESET_TRUSTED_LOGINS_BUTTON')}
+                </Button>
+            </section>
+        {:else}
+            <MessageBox type="exclamation">
+                <h3 class="mt-0">{t('ACCOUNT_SECURITY_STATUS_DISABLED_TITLE')}</h3>
+
+                <!-- `.account-security__enable` is BLUE, not green — the same ramp as `__edit` and
+                     `__reset`. Only `__disable` is crimson. -->
+                <Button className="mt-3" onclick={() => (dialog = 'edit')}>
                     {t('ACCOUNT_SECURITY_ENABLE_BUTTON')}
                 </Button>
-            {/if}
-        </MessageBox>
+            </MessageBox>
+        {/if}
     {/if}
 </SettingsShell>
 
-{#if asking && locked !== null}
-    <SafetyLockModal {locked}
-                     onClose={() => (asking = false)}
-                     onDone={(now) => { locked = now; asking = false; }} />
+{#if dialog === 'edit'}
+    <SafetyQuestionsModal question1={status?.question1 || 1}
+                          question2={status?.question2 || 2}
+                          onClose={() => (dialog = null)} onDone={done} />
+{:else if dialog === 'disable'}
+    <SafetyLockModal onClose={() => (dialog = null)} onDone={done} />
+{:else if dialog === 'challenge'}
+    <SafetyChallengeModal onClose={() => (dialog = null)} onDone={done} />
 {/if}
