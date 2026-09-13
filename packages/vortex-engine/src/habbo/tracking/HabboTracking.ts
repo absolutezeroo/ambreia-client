@@ -121,6 +121,12 @@ export class HabboTracking extends Component implements IHabboTracking, IUpdateR
                 },
                 true
             ),
+            // Every callback below is WRAPPED in a lambda, and must stay wrapped: `get
+            // dependencies()` is read from inside Component's constructor — during `super()` —
+            // and TypeScript runs a derived class's field initialisers AFTER super() returns.
+            // Passing `this.onWindowTrackingEvent` directly hands `undefined` to
+            // `events.on()`, which throws "The listener must be a function" and takes the whole
+            // DI unlock chain with it. The lambda defers the lookup to call time.
             // Four of the six UI buses AS3 listens to, in its own order — the two it skips are
             // TODO'd below because nothing in this port emits on them yet. Every bus here already
             // emits; only the listener was missing, so `_errorContextFlags` was written by nobody
@@ -128,20 +134,20 @@ export class HabboTracking extends Component implements IHabboTracking, IUpdateR
             // an absent subsystem simply contributes no flag.
             // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::get dependencies()
             new ComponentDependency(IID_HabboWindowManager, null, false, [
-                {type: HabboWindowTrackingEvent.HABBO_WINDOW_TRACKING_EVENT_INPUT, callback: this.onWindowTrackingEvent},
-                {type: HabboWindowTrackingEvent.HABBO_WINDOW_TRACKING_EVENT_RENDER, callback: this.onWindowTrackingEvent},
-                {type: HabboWindowTrackingEvent.HABBO_WINDOW_TRACKING_EVENT_SLEEP, callback: this.onWindowTrackingEvent},
+                {type: HabboWindowTrackingEvent.HABBO_WINDOW_TRACKING_EVENT_INPUT, callback: (...a: unknown[]) => this.onWindowTrackingEvent(...a)},
+                {type: HabboWindowTrackingEvent.HABBO_WINDOW_TRACKING_EVENT_RENDER, callback: (...a: unknown[]) => this.onWindowTrackingEvent(...a)},
+                {type: HabboWindowTrackingEvent.HABBO_WINDOW_TRACKING_EVENT_SLEEP, callback: (...a: unknown[]) => this.onWindowTrackingEvent(...a)},
             ]),
             new ComponentDependency(IID_HabboNavigator, null, false, [
-                {type: HabboNavigatorTrackingEvent.CLOSED, callback: this.onNavigatorTrackingEvent},
-                {type: HabboNavigatorTrackingEvent.EVENTS, callback: this.onNavigatorTrackingEvent},
-                {type: HabboNavigatorTrackingEvent.ROOMS, callback: this.onNavigatorTrackingEvent},
-                {type: HabboNavigatorTrackingEvent.ME, callback: this.onNavigatorTrackingEvent},
-                {type: HabboNavigatorTrackingEvent.OFFICIAL, callback: this.onNavigatorTrackingEvent},
-                {type: HabboNavigatorTrackingEvent.SEARCH, callback: this.onNavigatorTrackingEvent},
-                {type: HabboRoomSettingsTrackingEvent.CLOSED, callback: this.onRoomSettingsTrackingEvent},
-                {type: HabboRoomSettingsTrackingEvent.DEFAULT, callback: this.onRoomSettingsTrackingEvent},
-                {type: HabboRoomSettingsTrackingEvent.ADVANCED, callback: this.onRoomSettingsTrackingEvent},
+                {type: HabboNavigatorTrackingEvent.CLOSED, callback: (...a: unknown[]) => this.onNavigatorTrackingEvent(...a)},
+                {type: HabboNavigatorTrackingEvent.EVENTS, callback: (...a: unknown[]) => this.onNavigatorTrackingEvent(...a)},
+                {type: HabboNavigatorTrackingEvent.ROOMS, callback: (...a: unknown[]) => this.onNavigatorTrackingEvent(...a)},
+                {type: HabboNavigatorTrackingEvent.ME, callback: (...a: unknown[]) => this.onNavigatorTrackingEvent(...a)},
+                {type: HabboNavigatorTrackingEvent.OFFICIAL, callback: (...a: unknown[]) => this.onNavigatorTrackingEvent(...a)},
+                {type: HabboNavigatorTrackingEvent.SEARCH, callback: (...a: unknown[]) => this.onNavigatorTrackingEvent(...a)},
+                {type: HabboRoomSettingsTrackingEvent.CLOSED, callback: (...a: unknown[]) => this.onRoomSettingsTrackingEvent(...a)},
+                {type: HabboRoomSettingsTrackingEvent.DEFAULT, callback: (...a: unknown[]) => this.onRoomSettingsTrackingEvent(...a)},
+                {type: HabboRoomSettingsTrackingEvent.ADVANCED, callback: (...a: unknown[]) => this.onRoomSettingsTrackingEvent(...a)},
             ]),
             // TODO(AS3): .../src/com/sulake/habbo/tracking/HabboTracking.as::get dependencies() also
             //   takes IIDHabboCatalog with HABBO_CATALOG_TRACKING_EVENT_OPEN/_CLOSE onto flag 9,
@@ -152,19 +158,19 @@ export class HabboTracking extends Component implements IHabboTracking, IUpdateR
             //   as those tabs are wired); a bus with no speaker at all is not.
             //   `scripts/check-tracking-buses.mjs` tells the two apart.
             new ComponentDependency(IID_HabboInventory, null, false, [
-                {type: HabboInventoryTrackingEvent.CLOSED, callback: this.onInventoryTrackingEvent},
-                {type: HabboInventoryTrackingEvent.FURNI, callback: this.onInventoryTrackingEvent},
-                {type: HabboInventoryTrackingEvent.POSTERS, callback: this.onInventoryTrackingEvent},
-                {type: HabboInventoryTrackingEvent.BADGES, callback: this.onInventoryTrackingEvent},
-                {type: HabboInventoryTrackingEvent.ACHIEVEMENTS, callback: this.onInventoryTrackingEvent},
-                {type: HabboInventoryTrackingEvent.TRADING, callback: this.onInventoryTrackingEvent},
+                {type: HabboInventoryTrackingEvent.CLOSED, callback: (...a: unknown[]) => this.onInventoryTrackingEvent(...a)},
+                {type: HabboInventoryTrackingEvent.FURNI, callback: (...a: unknown[]) => this.onInventoryTrackingEvent(...a)},
+                {type: HabboInventoryTrackingEvent.POSTERS, callback: (...a: unknown[]) => this.onInventoryTrackingEvent(...a)},
+                {type: HabboInventoryTrackingEvent.BADGES, callback: (...a: unknown[]) => this.onInventoryTrackingEvent(...a)},
+                {type: HabboInventoryTrackingEvent.ACHIEVEMENTS, callback: (...a: unknown[]) => this.onInventoryTrackingEvent(...a)},
+                {type: HabboInventoryTrackingEvent.TRADING, callback: (...a: unknown[]) => this.onInventoryTrackingEvent(...a)},
             ]),
             new ComponentDependency(IID_HabboFriendList, null, false, [
-                {type: HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_CLOSED, callback: this.onFriendListTrackingEvent},
-                {type: HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_FRIENDS, callback: this.onFriendListTrackingEvent},
-                {type: HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_SEARCH, callback: this.onFriendListTrackingEvent},
-                {type: HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_REQUEST, callback: this.onFriendListTrackingEvent},
-                {type: HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_MINIMIZED, callback: this.onFriendListTrackingEvent},
+                {type: HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_CLOSED, callback: (...a: unknown[]) => this.onFriendListTrackingEvent(...a)},
+                {type: HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_FRIENDS, callback: (...a: unknown[]) => this.onFriendListTrackingEvent(...a)},
+                {type: HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_SEARCH, callback: (...a: unknown[]) => this.onFriendListTrackingEvent(...a)},
+                {type: HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_REQUEST, callback: (...a: unknown[]) => this.onFriendListTrackingEvent(...a)},
+                {type: HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_MINIMIZED, callback: (...a: unknown[]) => this.onFriendListTrackingEvent(...a)},
             ]),
             // TODO(AS3): .../src/com/sulake/habbo/tracking/HabboTracking.as::get dependencies() also
             //   takes IIDHabboHelp with HABBO_HELP_TRACKING_EVENT_CLOSED/_DEFAULT onto flag 10.
