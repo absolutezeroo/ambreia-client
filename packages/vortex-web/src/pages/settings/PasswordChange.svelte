@@ -118,7 +118,9 @@
         <Fieldset>
             <p class="text-sm">Changer ton mot de passe déconnecte toutes tes sessions, y compris celle-ci.</p>
             <Button type="submit" disabled={busy || mismatch || problem !== null || !next} className="mt-3">
-                {busy ? '...' : t('PASSWORD_CHANGE_TITLE')}
+                <!-- `password-change-form.html`'s button is `FORM_BUTTON_CHANGE` — "Changer". The
+                     page title above it already says what is being changed. -->
+                {busy ? '...' : t('FORM_BUTTON_CHANGE')}
             </Button>
         </Fieldset>
     </form>

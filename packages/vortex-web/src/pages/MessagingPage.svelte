@@ -18,7 +18,9 @@
 <Tabs tabs={HOME_TABS} />
 
 <main class="mx-auto max-w-[1200px] px-3 py-6">
-    <h1>{t('HOME_MESSAGING_TAB')}</h1>
+    <!-- `messaging.html`'s own heading. `HOME_MESSAGING_TAB` is the TAB's word ("Messages privés")
+         and reads as a label above a page that already has a tab saying it. -->
+    <h1>{t('MESSAGING_TITLE')}</h1>
 
     {#if !DISCUSSIONS.length}
         <EmptyResults key="DISCUSSIONS_EMPTY" className="py-12" />

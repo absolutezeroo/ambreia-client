@@ -206,10 +206,10 @@
                 </label>
             </fieldset>
 
-            <p class="px-3">
-                Bienvenue sur Habbo! Amuse toi bien
-                <a href="/playing-habbo/safety" use:link>et fais attention à toi</a> !
-            </p>
+            <!-- `.registration-form__safety`, and habbo.com's own key carries its own <a> to the
+                 safety page — which is why this had been hand-written around a link instead. The
+                 hotel's name comes from fr.json with the rest of it. -->
+            <p class="px-3">{@html t('REGISTRATION_SAFETY')}</p>
 
             <div class="mt-6 px-3">
                 <Button type="submit" disabled={busy || mismatch || problem !== null || emailError !== null || !password || !terms || !email} className="w-full">

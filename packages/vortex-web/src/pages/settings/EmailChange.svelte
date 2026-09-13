@@ -125,7 +125,8 @@
 
         <Fieldset>
             <Button type="submit" disabled={busy || !current || !email.trim() || emailError !== null}>
-                {t('EMAIL_CHANGE_TITLE')}
+                <!-- `email-change-form.html`'s own button: "Changer", not the page's title. -->
+                {t('FORM_BUTTON_CHANGE')}
             </Button>
         </Fieldset>
     </form>

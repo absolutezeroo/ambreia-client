@@ -29,17 +29,20 @@
     // same button twice in one session therefore opens the appart the first time and does nothing
     // the second — the ceiling of parking the iframe rather than reloading it, and the price of the
     // instant return that parking buys.
-    let {visible = false, link = '', onClose} = $props();
+    let {visible = false, link = '', onClose}:
+    {
+        visible?: boolean;
+        link?: string;
+        onClose: () => void;
+    } = $props();
 
     let src = $state('');
     let error = $state('');
     let fullscreen = $state(false);
-    // `$state` because `bind:this` assigns it and Svelte 5 warns about a plain `let` being written
-    // that way. Nothing reactive reads it — the only read is `requestFullscreen()` in a click
-    // handler, which is why this never misbehaved — but the checker is worth keeping at zero.
-    // The iframe itself, bound below. Typed so `requestFullscreen` is the element's own method and
-    // not a property nobody can check — it is called through `?.` precisely because the ref is
-    // undefined until the element mounts.
+
+    // `$state` because `bind:this` assigns it and Svelte 5 warns about a plain `let` written that
+    // way. Typed as the element so `requestFullscreen` is its own method rather than a property
+    // nobody can check — and `?.` because the ref is undefined until the iframe mounts.
     let frame = $state<HTMLIFrameElement | undefined>();
 
     // The ticket is fetched ONCE, on the first time the client is shown, and never again: it is
