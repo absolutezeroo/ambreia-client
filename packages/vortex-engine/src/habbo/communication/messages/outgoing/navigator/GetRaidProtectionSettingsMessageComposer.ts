@@ -12,6 +12,9 @@ import {MessageComposer} from '@core/communication/messages/MessageComposer';
  */
 export class GetRaidProtectionSettingsMessageComposer extends MessageComposer<[number]>
 {
+    // AS3: sources/AIR-1.0.31/scripts/_SafePkg_3403/_SafeCls_3402.as::_data
+    //   Name derived: the AS3 field is `_SafeStr_4778:Array`, the message array every composer in
+    //   the tree pushes its arguments onto.
     private _data: [number];
 
     // AS3: sources/AIR-1.0.31/scripts/_SafePkg_3403/_SafeCls_3402.as::_SafeCls_3402()

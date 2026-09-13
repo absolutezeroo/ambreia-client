@@ -69,6 +69,55 @@ single missing member — so 45 commands landed and the number went 304 → 309.
 things is worth less than five covering five, and any reading of this file that treats the total as
 a score will get that backwards.
 
+### Raid protection, and a second asset source (2026-09-13)
+
+A new dump landed, `sources/AIR-1.0.31/` — a later client than the primary, script-only at first
+glance. `compare-as3-revisions` against the primary says what it is: **nothing removed**, 84 new
+readable classes, 76 of them one feature (VariableFx), and the rest raid protection plus the wired
+`VariablesWebApiAddon`. It is *not* a header source: only **16 of 586 composers keep their number**
+across the two builds, 421 composers and 523 events move, and 78 / 85 change shape at the same
+number. The emulator is pinned to the primary's numbering, so an id lifted from AIR is wrong on
+this wire even when the message is right. CLAUDE.md now says so at the table row.
+
+Raid protection is the first feature ported out of it: 2 composers, 3 events, 3 parsers, a wire
+DTO, `RaidProtectionSettingsData`/`Controller`/`View`, and six wiring points (`HabboNavigator`
+dependency + construction + getter + link case + dispose, `HabboNewNavigator`'s link case,
+`LegacyNavigator`'s delegating getter, `IHabboTransitionalNavigator`, and `RoomInfoViewCtrl`'s
+button + `RPSE_STATE_CHANGED` subscription + click). All **69 members** of the three AS3 classes are
+ported — 24 / 13 / 32, checked one by one, no `TODO(AS3)`.
+
+Headers had to be *assigned*, which is new here and worth the precedent: composers keep AIR's own
+206 and 2687 because both are free in this revision and in the emulator; the events could not,
+since two of three collide (AIR's 734 is `ChatReviewSessionOfferedToGuide`, its 3620 is
+`SecondsUntil`). They are 3553 (AIR's own), 3554 and 3555 — the first ids after it unused as an
+event *and* as a composer in the WIN63 registry, in `HabboMessages.ts`, and in the emulator. The
+rule and the table are written into `HabboMessages.ts` itself.
+
+**Three things this cost, each a measurement that contradicted a confident guess:**
+
+- The AIR dump's assets are in `scripts/binaryData/`, and that was missed — a full window layout
+  was *authored from scratch* before anyone looked. The real one is 430×488 with cards, an
+  `itemlist` that resizes, a warning banner and a green Save; the invention was none of those.
+  Look in the dump before drawing anything.
+- The gap between the two trees measured by filename read 302, then 225. The real number is **1**.
+  AIR's blobs carry the embed's *linkage* name (`border_12_xml$…`), the shipped assets carry the
+  `*Com.as` *field* name (`habbo_skin_border_12_xml`) — exactly the collapse CLAUDE.md warns about,
+  done in the other direction. Only the builder's own join can answer this.
+- `HabboConfigurationManager` emitted `'configurationLoaded'` while its enum said
+  `'HCE_CONFIGURATION_LOADED'`. Nothing listened to either, so the drift was invisible until the
+  first subscriber — which would have been born dead.
+
+`build-window-assets.mjs` now reads AIR as a **supplement**: it adds names the primary lacks and
+never replaces one, except `AIR_PREFERRED`, which holds `iro_room_details_framed_xml` alone and for
+one reason — the AIR copy differs by exactly one line, the `raid_protection_settings_button`.
+Shipped layouts 788 → **789**. `--no-air` builds without any of it.
+
+**Not done, and the feature cannot run without it:** the emulator has no raid protection at all —
+5 headers, a handler that reads/persists/echoes, and the detection itself. The ~35
+`raid.protection.*` texts are unwritten (they are in no embed; they belong on the gamedata host).
+`raid.protection.enabled` is set there. And **none of this has been exercised**: it typechecks and
+lints, the window has never been opened.
+
 ### Doors and windows were cut by guesswork, and the thickness settings did nothing (2026-09-05)
 
 Four faults in the room's plane renderer, found one behind the other. They are listed in the order

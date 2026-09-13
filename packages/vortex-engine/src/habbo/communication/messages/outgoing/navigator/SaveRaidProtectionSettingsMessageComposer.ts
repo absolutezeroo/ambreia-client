@@ -17,6 +17,9 @@ export class SaveRaidProtectionSettingsMessageComposer extends MessageComposer<
     [number, boolean, number, number, number, boolean, number, number, boolean]
 >
 {
+    // AS3: sources/AIR-1.0.31/scripts/_SafePkg_3403/_SafeCls_3936.as::_data
+    //   Name derived: the AS3 field is `_SafeStr_4778:Array`, the message array every composer in
+    //   the tree pushes its arguments onto.
     private _data: [number, boolean, number, number, number, boolean, number, number, boolean];
 
     // AS3: sources/AIR-1.0.31/scripts/_SafePkg_3403/_SafeCls_3936.as::_SafeCls_3936()
