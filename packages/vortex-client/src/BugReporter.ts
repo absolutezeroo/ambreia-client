@@ -199,7 +199,10 @@ function setStatus(element: HTMLElement, text: string, isError: boolean): void
     element.classList.toggle('vortex-bug-report__status--error', isError);
 }
 
-async function send(message: string): Promise<boolean>
+/** The server's MAX_CONTEXT, which every short field is measured against. */
+const MAX_CONTEXT = 500;
+
+async function send(message: string): Promise<number>
 {
     const response = await fetch(REPORT_ENDPOINT, {
         method: 'POST',
@@ -209,17 +212,40 @@ async function send(message: string): Promise<boolean>
         // authenticated on purpose: an anonymous report cannot be correlated with anything.
         body: JSON.stringify({
             message: message.slice(0, MAX_MESSAGE),
-            page: location.pathname + location.search,
+
+            // Sliced like the other two short fields. It was the one field sent whole, and the
+            // client is served under a base path with an `?sso=` ticket on it — a URL long enough
+            // to trip SubmitReportRequest.IsValid, which answers 400 and says nothing about why.
+            page: (location.pathname + location.search).slice(0, MAX_CONTEXT),
 
             // The browser, not a version number: there is no build stamp in this client, and for a
             // rendering bug "which browser" answers more than "which commit" would. Sliced to the
             // server's context ceiling so a long user-agent cannot turn into a 400.
-            clientVersion: `${import.meta.env.MODE} · ${navigator.userAgent}`.slice(0, 500),
+            clientVersion: `${import.meta.env.MODE} · ${navigator.userAgent}`.slice(0, MAX_CONTEXT),
             console: consoleLines.join('\n').slice(-MAX_CONSOLE),
         }),
     });
 
-    return response.ok;
+    return response.status;
+}
+
+/**
+ * The status line for a failed POST.
+ *
+ * It used to be the single sentence "Could not send — are you signed in?" for every status the
+ * route can answer, so a rate-limited retry loop, an over-long field and a route that is not
+ * mounted all accused the player of being signed out — and a player who *is* signed in has nowhere
+ * to go from there. Each branch below is a status this endpoint actually returns.
+ */
+function failureText(status: number): string
+{
+    if(status === 401) return 'Could not send — you are signed out. Sign in and try again.';
+
+    if(status === 429) return 'Too many reports just now. Try again in a few minutes.';
+
+    if(status === 400) return 'Could not send — the report was rejected as malformed.';
+
+    return `Could not send (error ${status}). Please try again.`;
 }
 
 /**
@@ -269,11 +295,11 @@ export function installBugReporter(): void
         setStatus(status, 'Sending…', false);
 
         send(message)
-            .then((ok) =>
+            .then((code) =>
             {
-                if(!ok)
+                if(code < 200 || code >= 300)
                 {
-                    setStatus(status, 'Could not send — are you signed in?', true);
+                    setStatus(status, failureText(code), true);
 
                     return;
                 }
