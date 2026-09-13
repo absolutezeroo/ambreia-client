@@ -12,6 +12,9 @@ import type {IDropMenuWindow} from '@core/window/components/IDropMenuWindow';
 import type {IInteractiveWindow} from '@core/window/components/IInteractiveWindow';
 
 import type {HabboUserDefinedRoomEvents} from '@habbo/roomevents/HabboUserDefinedRoomEvents';
+import {Logger} from '@core/utils/Logger';
+
+const log = Logger.getLogger('habbo.roomevents.wired_setup.uibuilder.styles.WiredStyle');
 
 /**
  * WiredStyle — the base skin of the wired UI builder. Subclasses (volter/illumina/ubuntu variants)
@@ -418,11 +421,18 @@ export class WiredStyle
         return this.recreateElement('container_button') as unknown as IIconButtonWindow;
     }
 
+    // The AS3 dereferences the lookup with no check, and so does this — a style that cannot build
+    // its own widget has nothing to return. What is added is the sentence saying WHICH element is
+    // missing from WHICH skin: the styles do not all carry the same children (illumina shipped
+    // without `border` until the AIR copy replaced it), so the bare null dereference names neither.
     // AS3: WiredStyle.as::recreateElement()
     private recreateElement(name: string): IWindow
     {
         const template = this.styleTemplate!;
         const original = template.findChildByName(name)!;
+
+        if(original === null) log.warn(`${this.constructor.name} has no template element "${name}"`);
+
         const clone = original.clone();
 
         clone.visible = true;

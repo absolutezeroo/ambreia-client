@@ -59,7 +59,19 @@ const DEFAULT_AIR_SOURCE = path.resolve(repoRoot, 'sources', 'AIR-1.0.31');
 //   diff sources/AIR-1.0.31/src/binaryData/3128__SafeCls_1100.bin \
 //        packages/vortex-client/src/assets/window-layouts/iro_room_details_framed_xml.xml
 // If it has grown past that button, decide again rather than widening this set by reflex.
-const AIR_PREFERRED = new Set(['iro_room_details_framed_xml']);
+//
+// `wired_style_illumina_xml`: the template WiredStyle clones its widgets out of, and the WIN63 copy
+// has no `border` child. `createBorder()` looks that child up by name and clones it, so on this
+// skin it dereferenced null and took the whole wired dialog down the moment a preset asked for a
+// border - which is what every Variable FX add-on does. The delta is additive: a hidden
+// `warning_display` container (carrying `error_text`), the `border` itself, and `visible="false"`
+// on `mini_button_view`, which changes nothing because `recreateElement()` sets `visible = true` on
+// every clone. Illumina is the only one of the six styles that needed it - the other five carry
+// `border` in both trees, under linkage names that are identical hash and all.
+// Re-check the delta with:
+//   diff <(sed 's/></>\n</g' sources/AIR-1.0.31/src/binaryData/1175__SafeCls_1777.bin) \
+//        <(sed 's/></>\n</g' packages/vortex-client/src/assets/window-layouts/wired_style_illumina_xml.xml)
+const AIR_PREFERRED = new Set(['iro_room_details_framed_xml', 'wired_style_illumina_xml']);
 
 // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/HabboWindowManagerComponent.as::init()
 // The element description shares the <skin> root element but is not a drawable skin - it is
