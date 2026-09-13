@@ -69,6 +69,53 @@ single missing member — so 45 commands landed and the number went 304 → 309.
 things is worth less than five covering five, and any reading of this file that treats the total as
 a score will get that backwards.
 
+### Variable FX: the bar family draws (2026-09-13)
+
+The second feature out of the AIR dump, and the large one — ~14,500 lines of AS3 for wired-variable
+effects: bars, hearts, levels and numbers that hang off avatars and furniture and track a room
+variable. 43 files and ~7,250 lines are in so far: the whole message layer (4 parsers, 4 events, 5
+DTOs, headers 3388/3390/3391/3889), the engine plumbing through `RoomObjectFactory` /
+`RoomEngine` / `RoomMessageHandler` / `MovingObjectLogic`, the renderer framework, and **the bar
+family complete at 12 of 12 AS3 files**.
+
+**The translation contract is Flash-to-Canvas and it is the whole risk.** `BitmapData` →
+`OffscreenCanvas`; `ColorTransform` → `globalAlpha` when it is alpha-only and a three-pass
+multiply + `destination-in` when it tints; `copyChannel(RED → ALPHA)` → an explicit pixel pass,
+because Canvas has no channel copy. None of that is checkable by reading it, so every renderer is
+rendered in headless Edge before it is committed and the image is looked at. Twice that caught the
+*harness* rather than the renderer (a missing metallic asset the renderer correctly refused to
+draw; `convertToBlob()` on a plain `<canvas>`), and twice the verification caught a wrong claim in
+the doc comment rather than in the code — the `AnimatedScalar` speed cap bounds *cruising* speed,
+not per-step displacement, and `needsUpdate`'s quantisation is an early `return true` that can only
+ADD a redraw reason, never filter one.
+
+Where a claim is checkable by pixels, it is asserted rather than eyeballed: the striped bar's scroll
+wraps exactly at 700 ms (phase 0 and phase 700 are pixel-identical) and really moves at 350 ms; the
+arrow bar's `segments` override gives 141 px at 15 and 906 px at 999 — the cap at 100 — and falls
+back to the size default on junk; the thermometer renders RED and CYAN pixel-identically, which is
+the proof that it genuinely ignores the config colour.
+
+**Nine bars, and no two of them draw the same way.** Classic and mini nine-slice a tinted fill;
+health and boss vary the slices; block tiles; the striped bar scrolls a baked stripe layer and is
+the family's only self-animating renderer (`isContinuous` is true only while there IS fill); the
+arrow bar stamps one 11px chunk every 9px, the 2px of overhang being the arrowhead; the thermometer
+tiles a single source PIXEL and never resolves a colour at all; and the heart memoises whole frames
+by (colour, filled width) and is the one place the red-channel mask is used — the mask art is opaque
+everywhere, so reading its alpha would mask nothing and the 1px leading-edge line would run past the
+heart's outline.
+
+**Two AS3 quirks ported deliberately, both noted at the declaration.** `parseExtraBoolean()` is a
+stub returning null, so the `metallic` extra is read and discarded — that is the shipped behaviour.
+`resolveDynamicLevellingRgb()` calls `.toLowerCase()` on a possibly-null `readExtra()`, a #1009 in
+AS3; guarded here, because the faithful alternative takes the whole room's render down.
+
+**What is left:** three renderer families — health points (683 l.), level (2,066 l.) and number
+(716 l.) — then `VariableFxRendererRegistry.createDefault()`, which is deliberately absent until all
+14 factories exist. After that the visualization wiring (`StackedAdditions` + `VariableFxStackAddition`
+into `AvatarVisualization`/`FurnitureVisualization`, ~1,200 l.) is what actually puts a bar on
+screen in a room, and the Wired editor addon (~3,400 l.) is what lets anyone configure one. Nothing
+in this feature has been exercised against a live server yet.
+
 ### Raid protection, and a second asset source (2026-09-13)
 
 A new dump landed, `sources/AIR-1.0.31/` — a later client than the primary, script-only at first
