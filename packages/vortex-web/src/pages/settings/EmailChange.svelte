@@ -18,6 +18,7 @@
     import Button from '../../components/Button.svelte';
     import FormError from '../../components/FormError.svelte';
     import * as api from '../../lib/api.js';
+    import * as notifier from '../../lib/notifier.js';
     import {t} from '../../lib/i18n.js';
 
     let current = $state('');
@@ -26,7 +27,6 @@
     let needsCode = $state(false);
     let currentEmail = $state('');
     let error = $state('');
-    let saved = $state(false);
     let busy = $state(false);
 
     $effect(() =>
@@ -45,7 +45,6 @@
         event.preventDefault();
         busy = true;
         error = '';
-        saved = false;
 
         try
         {
@@ -56,7 +55,14 @@
             email = '';
             code = '';
             needsCode = false;
-            saved = true;
+
+            // habbo.com says `EMAIL_CHANGE_SUCCESS` here, and that key is NOT usable on this hotel:
+            // it promises "un message de vérification a été envoyé à ta nouvelle adresse … ton
+            // adresse ne sera pas changée jusqu'à ce que tu cliques sur le lien". There is no
+            // verification mail behind this endpoint — the address is changed on the spot, which is
+            // the same reason `AccountEmailResponse.Verified` is hardcoded false. So the toast is
+            // habbo.com's mechanism with the honest key.
+            notifier.success('SETTINGS_SAVED_OK');
         }
         catch(failure)
         {
@@ -104,8 +110,6 @@
 
         {#if error}
             <FormError inline>{error}</FormError>
-        {:else if saved}
-            <p>{t('SETTINGS_SAVED_OK')}</p>
         {/if}
 
         <Fieldset>

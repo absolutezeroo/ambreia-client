@@ -16,6 +16,7 @@
     import FormError from '../../components/FormError.svelte';
     import Button from '../../components/Button.svelte';
     import * as api from '../../lib/api.js';
+    import * as notifier from '../../lib/notifier.js';
     import {avatars, selectedId} from '../../lib/session.js';
     import {t} from '../../lib/i18n.js';
 
@@ -51,6 +52,13 @@
 
             avatars.set([]);
             selectedId.set('');
+
+            // `PasswordChangeFormController.update()`'s own `notifier.success(...)`, and the toast
+            // is what makes the redirect below legible: habbo.com clears the form and stays put,
+            // this endpoint revokes the session, so the page is gone a tick later. The container is
+            // mounted outside the router (App.svelte), so the message survives the navigation —
+            // where a line inside the form would leave with it and nothing would be said at all.
+            notifier.success('PASSWORD_CHANGE_SUCCESS');
             push('/');
         }
         catch(failure)

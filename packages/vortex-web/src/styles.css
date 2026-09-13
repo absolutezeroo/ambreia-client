@@ -107,6 +107,17 @@
     --shadow-btn: 0 3px 0 1px rgba(0, 0, 0, 0.3);
     --shadow-btn-active: 0 1px 0 1px rgba(0, 0, 0, 0.3);
     --shadow-field: inset 0 2px 0 0 #9ebecc;
+    /* `.toast:hover` — the card lifts a little under the pointer. Its resting shadow is
+       --shadow-card, the same one `.modal-content` carries. */
+    --shadow-toast-hover: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* `.toast-progress` is animated by toastr itself, which sets `width: <remaining>%` on an interval.
+   One keyframe pair says the same thing and can be paused from CSS while the pointer is over the
+   card — see components/Toast.svelte, which stops the JS clock at the same moment. */
+@keyframes toast-progress {
+    from { width: 100%; }
+    to { width: 0; }
 }
 
 @layer base {

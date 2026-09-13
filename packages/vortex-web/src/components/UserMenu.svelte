@@ -6,6 +6,7 @@
     import Sprite from './Sprite.svelte';
     import Avatar from './Avatar.svelte';
     import {me, signOut} from '../lib/session.js';
+    import * as notifier from '../lib/notifier.js';
     import {t} from '../lib/i18n.js';
 
     let open = $state(false);
@@ -27,7 +28,25 @@
     async function handleSignOut()
     {
         open = false;
-        await signOut();
+
+        // `UserMenuController.logout()` is one line and a catch:
+        //   security.logout().catch(function () {
+        //       notifier.errorSticky("ERROR_LOGOUT_TITLE", "ERROR_LOGOUT_TEXT") })
+        //
+        // A failed sign-out is the one message on the site that must not clear itself, which is why
+        // habbo.com reaches for the sticky variant here: `signOut()` empties the stores either way,
+        // so the header says "signed out" while the server's cookie may still be alive — and
+        // ERROR_LOGOUT_TEXT is what tells the visitor to clear it themselves. A toast that faded
+        // after twenty seconds would leave them looking signed out and not being.
+        try
+        {
+            await signOut();
+        }
+        catch
+        {
+            notifier.errorSticky('ERROR_LOGOUT_TITLE', 'ERROR_LOGOUT_TEXT');
+        }
+
         push('/');
     }
 </script>

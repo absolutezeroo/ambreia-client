@@ -14,6 +14,7 @@
     import Navigation from './components/Navigation.svelte';
     import Footer from './components/Footer.svelte';
     import Client from './components/Client.svelte';
+    import Toasts from './components/Toasts.svelte';
     import {routes} from './lib/routes.js';
     import {refresh, signedIn} from './lib/session.js';
 
@@ -101,3 +102,8 @@
     {/if}
     {/if}
 {/if}
+
+<!-- toastr appends `#toast-container` to the BODY, so it is outside every branch above — including
+     /hotel, where the site's own chrome is not rendered. A toast raised by the client handover, or
+     by a call still in flight when the visitor navigated, still has somewhere to land. -->
+<Toasts />

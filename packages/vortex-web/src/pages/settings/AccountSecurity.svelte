@@ -25,6 +25,7 @@
     import Field from '../../components/Field.svelte';
     import FormError from '../../components/FormError.svelte';
     import * as api from '../../lib/api.js';
+    import * as notifier from '../../lib/notifier.js';
     import {t} from '../../lib/i18n.js';
 
     let locked = $state<boolean | null>(null);
@@ -33,7 +34,6 @@
     let code = $state('');
     let needsCode = $state(false);
     let error = $state('');
-    let saved = $state(false);
     let busy = $state(false);
 
     $effect(() =>
@@ -61,15 +61,19 @@
         event.preventDefault();
         busy = true;
         error = '';
-        saved = false;
 
         try
         {
             const status = await api.setSafetyLock(!locked, password, code.trim() || undefined);
 
             locked = status.locked;
-            saved = true;
             reset();
+
+            // habbo.com has a key per direction and they are written for this exact feature: "Le
+            // verrouillage de sécurité de ton compte est maintenant activé / désactivé". Both are
+            // said through the notifier — `enableSafetyLock` and `disableSafetyLock` each end in
+            // `notifier.success(...)`, and neither page grows a line under the form.
+            notifier.success(locked ? 'ACCOUNT_SECURITY_SAVED_OK' : 'ACCOUNT_SECURITY_DISABLED_OK');
         }
         catch(failure)
         {
@@ -103,10 +107,6 @@
                     ? t('ACCOUNT_SECURITY_STATUS_ENABLED_TITLE')
                     : t('ACCOUNT_SECURITY_STATUS_DISABLED_TITLE')}
             </h3>
-
-            {#if saved}
-                <p>{t('ACCOUNT_SECURITY_SAVED_OK')}</p>
-            {/if}
 
             {#if !asking}
                 <Button className="mt-3" onclick={() => { reset(); asking = true; }}>

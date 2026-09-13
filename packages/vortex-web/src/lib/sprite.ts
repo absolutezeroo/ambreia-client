@@ -58,9 +58,12 @@ export const SPRITE = {
     roomThumbnail: [110, 1084, 110, 110],
 
     // The status marks a `habbo-message-container` puts in its white 50px disc: the exclamation
-    // (a bare bar+dot, hence 10x45), the tick, and the two 2FA padlocks.
+    // (a bare bar+dot, hence 10x45), the tick, the cross, and the two 2FA padlocks. The tick and
+    // the cross are also what a toast puts in ITS disc — `.toast.toast-success::after` and
+    // `.toast.toast-error::after` point at these same two cuts.
     statusExclamation: [1200, 594, 10, 45],
     statusCheck: [1191, 1016, 22, 27],
+    statusCross: [990, 786, 25, 27],
     status2faOff: [532, 1016, 52, 56],
     status2faOn: [586, 1016, 52, 56],
 

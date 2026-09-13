@@ -29,11 +29,11 @@
     import Button from '../../components/Button.svelte';
     import FormError from '../../components/FormError.svelte';
     import * as api from '../../lib/api.js';
+    import * as notifier from '../../lib/notifier.js';
     import {t} from '../../lib/i18n.js';
 
     let profileVisible = $state(false);
     let saving = $state(false);
-    let saved = $state(false);
     let error = $state('');
 
     $effect(() =>
@@ -51,7 +51,6 @@
     {
         event.preventDefault();
         saving = true;
-        saved = false;
         error = '';
 
         try
@@ -59,7 +58,11 @@
             const preferences = await api.savePreferences(profileVisible);
 
             profileVisible = preferences.profileVisible;
-            saved = true;
+
+            // `PrivacySettingsController.save()` ends on `notifier.success("SETTINGS_SAVED_OK")` —
+            // and says it even when the form is untouched (`$pristine` returns early, straight to
+            // the same toast), which is why the page has nowhere to put a line of its own.
+            notifier.success('SETTINGS_SAVED_OK');
         }
         catch(failure)
         {
@@ -168,8 +171,6 @@
         <div class="mt-6 text-center">
             {#if error}
                 <FormError inline>{error}</FormError>
-            {:else if saved}
-                <p class="mb-3">{t('SETTINGS_SAVED_OK')}</p>
             {/if}
 
             <Button type="submit" disabled={saving}>{t('FORM_BUTTON_SAVE')}</Button>

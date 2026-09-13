@@ -22,10 +22,10 @@
     import QRCode from 'qrcode';
     import Modal from './Modal.svelte';
     import TwoFactorCode from './TwoFactorCode.svelte';
-    import FormError from './FormError.svelte';
     import * as api from '../lib/api.js';
     import type {ITwoFactorEnrolment} from '../lib/api.js';
     import {ApiError} from '../lib/api.js';
+    import * as notifier from '../lib/notifier.js';
     import {t} from '../lib/i18n.js';
 
     let {onClose, onDone}: {onClose: () => void; onDone: () => void} = $props();
@@ -33,7 +33,6 @@
     let enrolment = $state<ITwoFactorEnrolment | null>(null);
     let qr = $state('');
     let code = $state('');
-    let error = $state('');
     let busy = $state(false);
 
     $effect(() =>
@@ -53,7 +52,9 @@
                 // on the hotel's side.
                 qr = await QRCode.toDataURL(answer.uri, {margin: 1, width: 150});
             })
-            .catch(() => !cancelled && (error = t('TWO_FACTOR_AUTH_REGISTRATION_ERROR')));
+            // `startRegistration()`'s own catch, and the same key:
+            //   .catch(function (e) { … notifier.error("TWO_FACTOR_AUTH_REGISTRATION_ERROR") })
+            .catch(() => !cancelled && notifier.error('TWO_FACTOR_AUTH_REGISTRATION_ERROR'));
 
         return () => (cancelled = true);
     });
@@ -68,21 +69,23 @@
         }
 
         busy = true;
-        error = '';
 
         try
         {
             await api.enableTwoFactor(enrolment.secret, code);
+
+            // `completeRegistration()` closes the dialog and says so through the notifier — the
+            // page behind it never grows a confirmation of its own.
             onDone();
+            notifier.success('TWO_FACTOR_AUTH_REGISTERED_OK');
         }
         catch(failure)
         {
-            // habbo.com's own split: a rejected code says so, anything else is "registration
-            // failed". It shows both through a toast; this port has no toast, so the message stays
-            // in the dialog that caused it.
-            error = failure instanceof ApiError && failure.code === 'pocket.auth.invalid_code'
-                ? t('TWO_FACTOR_AUTHENTICATION_INCORRECT_CODE')
-                : t('TWO_FACTOR_AUTH_REGISTRATION_ERROR');
+            // habbo.com's own split, `isInvalidAuthCode() ? … : …`: a rejected code says so,
+            // anything else is "registration failed".
+            notifier.error(failure instanceof ApiError && failure.code === 'pocket.auth.invalid_code'
+                ? 'TWO_FACTOR_AUTHENTICATION_INCORRECT_CODE'
+                : 'TWO_FACTOR_AUTH_REGISTRATION_ERROR');
         }
         finally
         {
@@ -130,10 +133,6 @@
                 <div class="flex justify-center">
                     <TwoFactorCode bind:value={code} />
                 </div>
-
-                {#if error}
-                    <FormError inline>{error}</FormError>
-                {/if}
 
                 <div class="relative mt-6 after:table after:clear-both after:content-['']">
                     <!-- `.two-factor-auth__auth-button`: the green ramp at `width:25%`, floated

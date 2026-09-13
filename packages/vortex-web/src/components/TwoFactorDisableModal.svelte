@@ -18,15 +18,14 @@
     // habbo.com's own `ng-if` would hide every e-mail element anyway.
     import Modal from './Modal.svelte';
     import TwoFactorCode from './TwoFactorCode.svelte';
-    import FormError from './FormError.svelte';
     import * as api from '../lib/api.js';
     import {ApiError} from '../lib/api.js';
+    import * as notifier from '../lib/notifier.js';
     import {t} from '../lib/i18n.js';
 
     let {onClose, onDone}: {onClose: () => void; onDone: () => void} = $props();
 
     let code = $state('');
-    let error = $state('');
     let busy = $state(false);
 
     async function disable(event: Event): Promise<void>
@@ -39,18 +38,22 @@
         }
 
         busy = true;
-        error = '';
 
         try
         {
             await api.disableTwoFactor(code);
+
+            // `disableTwoFactorAuth()`'s own pair: close, then say it through the notifier. The
+            // success key is `TWO_FACTOR_AUTHENTICATION_DISABLED`, the same string the ON/OFF box
+            // uses as a heading — habbo.com reuses it here rather than wording a second one.
             onDone();
+            notifier.success('TWO_FACTOR_AUTHENTICATION_DISABLED');
         }
         catch(failure)
         {
-            error = failure instanceof ApiError && failure.code === 'pocket.auth.invalid_code'
-                ? t('TWO_FACTOR_AUTHENTICATION_INCORRECT_CODE')
-                : t('TWO_FACTOR_AUTH_REGISTRATION_ERROR');
+            notifier.error(failure instanceof ApiError && failure.code === 'pocket.auth.invalid_code'
+                ? 'TWO_FACTOR_AUTHENTICATION_INCORRECT_CODE'
+                : 'TWO_FACTOR_AUTH_REGISTRATION_ERROR');
         }
         finally
         {
@@ -73,10 +76,6 @@
                 <div class="flex justify-center">
                     <TwoFactorCode bind:value={code} />
                 </div>
-
-                {#if error}
-                    <FormError inline>{error}</FormError>
-                {/if}
 
                 <div class="relative mt-6 after:table after:clear-both after:content-['']">
                     <button type="submit" disabled={busy || code.length !== 6}
