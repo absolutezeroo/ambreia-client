@@ -94,6 +94,17 @@ ffdec-cli -export binaryData,symbolClass,image <outdir> \
   "%APPDATA%/Habbo Launcher/downloads/air/<build>/HabboAir.swf"
 ```
 
+`packages/vortex-client/tools/import-air-images.mjs` takes that image export and ships what AIR
+adds under its real asset names — `AIR_IMAGE_EXPORT=<dir> node …/import-air-images.mjs`, or
+`--images <dir>`; with neither it says so and does nothing, which is what a normal
+`node install.mjs` does. It reads AIR's `*Com.as` **and `*Lib.as`** (the VariableFx artwork is
+declared in `HabboRoomObjectVisualizationLib.as`, which no `*Com.as`-only scan sees), joins on the
+whole linkage name, and adds only names the shipped set lacks: **142 today, 121 of them
+`variablefx_*`**. Two things bite here — an image field name often carries a redundant `_png`
+(`user_typing_png` **is** the shipped `user_typing.png`, and not stripping it invents 474 new
+images), and `src/assets/images/` is gitignored, so a new image reaches anyone else only through
+`vortex-client-assets.zip` (`node install.mjs --pack`).
+
 **Class names are obfuscated; member names are not.** In an obfuscated file the class is
 `_SafeCls_N` and some *types* it references are too, but its methods, getters and constants keep
 their real names. `habbo/room/_SafeCls_90.as` declares

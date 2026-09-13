@@ -329,7 +329,14 @@ const IMPORTERS = [
     {script: 'import-crypted-sounds.mjs', flag: '--source', extra: ['--write'], what: 'sound effects'},
     {script: 'import-avatar-configurations.mjs', flag: '--source', extra: ['--write'], what: 'avatar configurations'},
     {script: 'import-chatstyles.mjs', flag: '--crypted-root', extra: ['--write'], what: 'chat styles'},
-    {script: 'import-localizations.mjs', flag: '--source', extra: ['--write'], what: 'localization texts'}
+    {script: 'import-localizations.mjs', flag: '--source', extra: ['--write'], what: 'localization texts'},
+    // The odd one out: its input is not the dump but an `ffdec-cli -export image` of the AIR
+    // client's SWF, because the AIR dump carries no images at all. It therefore takes no dump
+    // path, and skips itself with a message when AIR_IMAGE_EXPORT is unset - which is the normal
+    // case for anyone who is not re-cutting the AIR assets. Without it, a regenerate-from-dump
+    // silently drops the 142 images AIR adds, the 121 variablefx_* among them, and the FX
+    // renderers draw nothing while failing at nothing.
+    {script: 'import-air-images.mjs', flag: null, extra: [], what: 'AIR images', optional: true}
 ];
 
 function buildAssets(source)
@@ -367,9 +374,18 @@ function generateAssets(dump)
             continue;
         }
 
-        const output = run('node', [script, importer.flag, dump, ...importer.extra], {label: importer.script});
+        const args = importer.flag === null
+            ? [script, ...importer.extra]
+            : [script, importer.flag, dump, ...importer.extra];
 
-        if(output === null) continue;
+        const output = run('node', args, {label: importer.script});
+
+        if(output === null)
+        {
+            if(importer.optional) ok(`${importer.what.padEnd(24)} skipped`);
+
+            continue;
+        }
 
         ok(`${importer.what.padEnd(24)} ${lastCountLine(output)}`);
     }

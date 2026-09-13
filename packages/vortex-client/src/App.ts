@@ -477,6 +477,12 @@ async function readImageAssets(imageBundle: AssetBundle, layoutNames: ReadonlySe
             // `AvatarVisualization.getAvatarRendererAsset()` asks the library for the result. Thirty
             // images between them.
             || name.startsWith('user_') || name.startsWith('number_')
+            // variablefx_*: the 121 pieces the room-object FX renderers composite - bar
+            // backgrounds, fills, darkenings, splitters, heart masks, level badges, digit sheets.
+            // Every one is fetched at runtime through AssetLibraryVariableFxAssetProvider, keyed
+            // by a name the renderer builds from the config the server sent, so no layout names
+            // any of them and nothing but a prefix can cover them.
+            || name.startsWith('variablefx_')
             || LIBRARY_IMAGE_NAMES.has(name))
         {
             decodes.push(imageBundle.getImageBitmap(key).then((bitmap) =>
