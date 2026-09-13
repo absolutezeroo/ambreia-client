@@ -212,10 +212,18 @@ one reason — the AIR copy differs by exactly one line, the `raid_protection_se
 Shipped layouts 788 → **789**. `--no-air` builds without any of it.
 
 **Not done, and the feature cannot run without it:** the emulator has no raid protection at all —
-5 headers, a handler that reads/persists/echoes, and the detection itself. The ~35
-`raid.protection.*` texts are unwritten (they are in no embed; they belong on the gamedata host).
-`raid.protection.enabled` is set there. And **none of this has been exercised**: it typechecks and
-lints, the window has never been opened.
+5 headers, a handler that reads/persists/echoes, and the detection itself. And **none of this has
+been exercised**: it typechecks and lints, the window has never been opened.
+
+The texts are no longer owed. They were never missing upstream — habbo.com's live texts file has
+all 47 `raid.protection.*` and 4 `notification.raid.*`, and the reason this hotel's copy lacked
+them is that `sources/external_flash_texts.txt` is an older dump. `locale-overrides/
+upstream-missing.en.txt` carries the whole delta the client can actually reach — 312 keys, of
+which 209 are `wiredfurni.params.*` (the Variable FX editor's own labels) and 51 raid — and
+`--merge-into` puts them on the host. The 40,253-key gap it does *not* close is the four
+provenance rules the builder drops on purpose: 20,220 badge strings, 8,634 quests, 8,564 landing
+campaigns and 2,498 promo offers, every one of them keyed by something this server hands out and
+seeds none of.
 
 ### Doors and windows were cut by guesswork, and the thickness settings did nothing (2026-09-05)
 
