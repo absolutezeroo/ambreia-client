@@ -21,6 +21,8 @@
 import {Texture} from 'pixi.js';
 import type {IRoomObjectSprite} from '@room/object/visualization/IRoomObjectSprite';
 import type {IAvatarAddition} from './IAvatarAddition';
+import type {IStackedAvatarAddition} from './IStackedAvatarAddition';
+import type {StackedAdditionSource} from '../../stacked/IStackedAddition';
 import type {AvatarVisualization} from '../AvatarVisualization';
 import {HabbiconAssetManager} from '@habbo/habbicons/assets/HabbiconAssetManager';
 import type {
@@ -28,8 +30,21 @@ import type {
     IHabbiconRuntimeAsset
 } from '@habbo/habbicons/assets/HabbiconDefinition';
 
-export class HabbiconBubble implements IAvatarAddition
+export class HabbiconBubble implements IAvatarAddition, IStackedAvatarAddition
 {
+    /**
+     * The picture, kept alongside the texture so the addition stack can composite it.
+     *
+     * `setBitmap()` hands its canvas to `transferToImageBitmap()`, which DETACHES the canvas — so
+     * the ImageBitmap is the only drawable copy left, and the stack needs one. See the deviation
+     * note on `IStackedAddition.stackSourceBitmap` for why the stack cannot read the texture back.
+     */
+    // AS3: .../additions/HabbiconBubble.as::_bitmap
+    private _stackSource: ImageBitmap | null = null;
+
+    // AS3: .../additions/HabbiconBubble.as::_isPartOfStack (name derived)
+    private _isPartOfStack: boolean = false;
+
     // AS3: .../additions/HabbiconBubble.as::DEFAULT_VISIBLE_DURATION_MS
     private static readonly DEFAULT_VISIBLE_DURATION_MS: number = 3000;
     // AS3: .../additions/HabbiconBubble.as::INTRO_DURATION_MS
@@ -209,6 +224,54 @@ export class HabbiconBubble implements IAvatarAddition
     get disposed(): boolean
     {
         return this._avatar === null;
+    }
+
+    // AS3: .../additions/HabbiconBubble.as::get isPartOfStack()
+    get isPartOfStack(): boolean
+    {
+        return this._isPartOfStack;
+    }
+
+    // AS3: .../additions/HabbiconBubble.as::set isPartOfStack()
+    set isPartOfStack(value: boolean)
+    {
+        this._isPartOfStack = value;
+    }
+
+    /** Always true: a bubble is never a passenger, it always pushes what is above it. */
+    // AS3: .../additions/HabbiconBubble.as::get contributesToStackLayout()
+    get contributesToStackLayout(): boolean
+    {
+        return true;
+    }
+
+    // AS3: .../additions/HabbiconBubble.as::get invisible()
+    get invisible(): boolean
+    {
+        return false;
+    }
+
+    /**
+     * Always false, unlike a Variable FX effect. A bubble's end of life is the visualization
+     * removing it, not the bubble reporting itself spent.
+     */
+    // AS3: .../additions/HabbiconBubble.as::get isFinished()
+    get isFinished(): boolean
+    {
+        return false;
+    }
+
+    /** Always true: the bubble is animated for its whole life. */
+    // AS3: .../additions/HabbiconBubble.as::get requiresAnimationTick()
+    get requiresAnimationTick(): boolean
+    {
+        return true;
+    }
+
+    // AS3: .../additions/HabbiconBubble.as::_bitmap
+    get stackSourceBitmap(): StackedAdditionSource | null
+    {
+        return this._stackSource;
     }
 
     // AS3: .../additions/HabbiconBubble.as::set relativeDepth()
@@ -489,7 +552,12 @@ export class HabbiconBubble implements IAvatarAddition
         const height = canvas.height;
         const previous = this._texture;
 
-        this._texture = Texture.from(canvas.transferToImageBitmap());
+        // Kept, not discarded: the canvas is detached by this call, so this ImageBitmap is the only
+        // drawable copy left and the addition stack composites from it.
+        const bitmap = canvas.transferToImageBitmap();
+
+        this._stackSource = bitmap;
+        this._texture = Texture.from(bitmap);
         this._textureWidth = width;
         this._textureHeight = height;
         this._textureIsShared = shared;
@@ -910,6 +978,7 @@ export class HabbiconBubble implements IAvatarAddition
         if(this._texture !== null && !this._textureIsShared) this._texture.destroy(true);
 
         this._texture = null;
+        this._stackSource = null;
         this._composeCanvas = null;
         this._textureIsShared = false;
         this._textureHasBackground = false;

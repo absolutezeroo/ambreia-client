@@ -1,6 +1,18 @@
 import type {IRoomObjectSprite} from '@room/object/visualization/IRoomObjectSprite';
 
 /**
+ * What a stack member can hand over as its picture.
+ *
+ * Both are drawable by `CanvasRenderingContext2D.drawImage()` and both carry `width`/`height`,
+ * which is everything the stack needs. Two shapes rather than one because the members compose
+ * differently: a Variable FX effect keeps its `OffscreenCanvas` and redraws into it, while
+ * `HabbiconBubble` hands its canvas to `transferToImageBitmap()` — which detaches the canvas — and
+ * keeps the `ImageBitmap`. Narrowing this to `OffscreenCanvas` would mean changing that, for no
+ * gain.
+ */
+export type StackedAdditionSource = OffscreenCanvas | ImageBitmap;
+
+/**
  * An addition that is composited INTO a shared stack rather than drawn on a sprite of its own.
  *
  * The stack owns one sprite for all of its members and stacks them vertically, so a member has to
@@ -51,7 +63,7 @@ export interface IStackedAddition
      *   hands the stack the canvas it just drew, which is what AS3's `sprite.asset` effectively was.
      * AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/object/visualization/stacked/StackedAdditionStack.as::drawEntry()
      */
-    readonly stackSourceBitmap: OffscreenCanvas | null;
+    readonly stackSourceBitmap: StackedAdditionSource | null;
 
     // AS3: .../visualization/stacked/IStackedAddition.as::update()
     update(sprite: IRoomObjectSprite | null, scale: number): void;
