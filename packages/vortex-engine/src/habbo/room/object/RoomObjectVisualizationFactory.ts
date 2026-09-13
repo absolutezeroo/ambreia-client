@@ -38,6 +38,14 @@ import {FurnitureQueueTileVisualization} from './visualization/furniture/Furnitu
 import {FurniturePartyBeamerVisualization} from './visualization/furniture/FurniturePartyBeamerVisualization';
 import {FurnitureCuboidVisualization} from './visualization/furniture/FurnitureCuboidVisualization';
 import {FurnitureGiftWrappedVisualization} from './visualization/furniture/FurnitureGiftWrappedVisualization';
+import {VariableFxVisualizationRoomData} from './visualization/VariableFxVisualizationRoomData';
+import {VariableFxConfigData} from './visualization/variablefx/VariableFxConfigData';
+import {VariableFxCatalog} from './visualization/variablefx/VariableFxCatalog';
+import {VariableFxPreviewStyles} from './visualization/variablefx/VariableFxPreviewStyles';
+import {VariableFxRendererRegistry} from './visualization/variablefx/VariableFxRendererRegistry';
+import {AssetLibraryVariableFxAssetProvider} from './visualization/variablefx/AssetLibraryVariableFxAssetProvider';
+import type {IVariableFxAssetProvider} from './visualization/variablefx/IVariableFxAssetProvider';
+import type {VariableFxConfigUpdateData} from './variablefx/VariableFxConfigUpdateData';
 import {FurnitureCounterClockVisualization} from './visualization/furniture/FurnitureCounterClockVisualization';
 import {FurnitureScoreBoardVisualization} from './visualization/furniture/FurnitureScoreBoardVisualization';
 import {FurnitureFireworksVisualization} from './visualization/furniture/FurnitureFireworksVisualization';
@@ -130,6 +138,32 @@ export class RoomObjectVisualizationFactory implements IRoomObjectVisualizationF
     private _assets: IAssetLibrary | null = null;
 
     /**
+     * The Variable FX services, per room and per kind.
+     *
+     * Two maps, not one: an avatar config and a furniture config can carry the SAME id, and the
+     * config update's `isUserFx` flag is what says which store a config belongs in.
+     */
+    // AS3: .../src/com/sulake/habbo/room/object/RoomObjectVisualizationFactory.as::_avatarVisualizationRoomData (name derived)
+    private _avatarVariableFxRoomData: Map<string, VariableFxVisualizationRoomData> = new Map();
+
+    // AS3: .../src/com/sulake/habbo/room/object/RoomObjectVisualizationFactory.as::_furnitureVisualizationRoomData (name derived)
+    private _furnitureVariableFxRoomData: Map<string, VariableFxVisualizationRoomData> = new Map();
+
+    /**
+     * The asset provider and registry every room's data shares.
+     *
+     * Both are built LAZILY, on the first config update, rather than in the constructor: the
+     * registry's `createDefault()` parses the shipped renderer mapping out of the asset library,
+     * and the library is injected after construction. AS3 builds them in `initialize()` for the
+     * same reason.
+     */
+    // AS3: .../src/com/sulake/habbo/room/object/RoomObjectVisualizationFactory.as::_variableFxAssetProvider (name derived)
+    private _variableFxAssetProvider: IVariableFxAssetProvider | null = null;
+
+    // AS3: .../src/com/sulake/habbo/room/object/RoomObjectVisualizationFactory.as::_variableFxRendererRegistry
+    private _variableFxRendererRegistry: VariableFxRendererRegistry | null = null;
+
+    /**
 	 * Asset library reference for pet visualization data injection.
 	 *
 	 * AS3: sources/win63_version/habbo/room/object/RoomObjectVisualizationFactory.as::assets
@@ -190,7 +224,23 @@ export class RoomObjectVisualizationFactory implements IRoomObjectVisualizationF
 	 * @see AS3 RoomObjectVisualizationFactory.createRoomObjectVisualization()
 	 */
     // AS3: .../src/com/sulake/habbo/room/object/RoomObjectVisualizationFactory.as::createRoomObjectVisualization()
-    createRoomObjectVisualization(type: string): IRoomObjectVisualization | null
+    createRoomObjectVisualization(type: string, roomId: string | null = null): IRoomObjectVisualization | null
+    {
+        const visualization = this.createVisualizationInstance(type);
+
+        // The room's Variable FX services, handed over at construction. AS3 does the same here,
+        // by `is`-testing the instance; `roomId` is optional so the callers that have no room to
+        // name — the thumbnail and preview renderers — are unaffected.
+        if(roomId !== null && visualization instanceof AvatarVisualization)
+        {
+            visualization.variableFxRoomData = this.getAvatarVariableFxRoomData(roomId);
+        }
+
+        return visualization;
+    }
+
+    // AS3: .../src/com/sulake/habbo/room/object/RoomObjectVisualizationFactory.as::createRoomObjectVisualization()
+    private createVisualizationInstance(type: string): IRoomObjectVisualization | null
     {
         switch(type)
         {
@@ -462,6 +512,133 @@ export class RoomObjectVisualizationFactory implements IRoomObjectVisualizationF
         return vizData;
     }
 
+    /**
+     * Turns a room's numeric config updates into renderable configs.
+     *
+     * Every field on the wire is an id; this is where they become the names the renderers are
+     * written against. The STYLE is the one that needs a second table — `(categoryId, styleId)`
+     * names a preview style, and it is the style that carries the extras a renderer needs but the
+     * server never sends: the icon for a status bar, the `design` for a number display, the
+     * `sub_renderer` for a level badge.
+     *
+     * A style this build does not have leaves the config with an empty style name rather than
+     * dropping it, so a renderer resolved by id still draws.
+     */
+    // AS3: .../src/com/sulake/habbo/room/object/RoomObjectVisualizationFactory.as::updateVariableFxConfigs()
+    updateVariableFxConfigs(roomId: string, configs: VariableFxConfigUpdateData[]): void
+    {
+        for(const config of configs)
+        {
+            const store = config.isUserFx
+                ? this.getAvatarVariableFxRoomData(roomId).variableFxVisualizationManager
+                : this.getFurnitureVariableFxRoomData(roomId).variableFxVisualizationManager;
+
+            if(store === null) continue;
+
+            const style = VariableFxPreviewStyles.getByCategoryAndStyleId(config.categoryId, config.styleId);
+            const category = VariableFxCatalog.resolveCategoryById(config.categoryId);
+
+            store.upsertConfig(config.configId, new VariableFxConfigData(
+                category ?? '',
+                style === null ? '' : style.serverStyle,
+                VariableFxCatalog.resolveRendererById(config.rendererId) ?? '',
+                VariableFxCatalog.resolveWidthById(config.widthId),
+                VariableFxCatalog.resolveColorById(config.colorId),
+                config.defaultMinValue,
+                config.defaultMaxValue,
+                config.extra,
+                config.categoryId,
+                config.styleId,
+                config.rendererId
+            ));
+        }
+    }
+
+    /** Removed from BOTH stores: the id alone does not say which kind it was. */
+    // AS3: .../src/com/sulake/habbo/room/object/RoomObjectVisualizationFactory.as::removeVariableFxConfigs()
+    removeVariableFxConfigs(roomId: string, configIds: number[]): void
+    {
+        const avatar = this.getAvatarVariableFxRoomData(roomId);
+        const furniture = this.getFurnitureVariableFxRoomData(roomId);
+
+        for(const configId of configIds)
+        {
+            avatar.variableFxVisualizationManager?.removeConfig(configId);
+            furniture.variableFxVisualizationManager?.removeConfig(configId);
+        }
+    }
+
+    // AS3: .../src/com/sulake/habbo/room/object/RoomObjectVisualizationFactory.as::getAvatarVisualizationRoomData()
+    getAvatarVariableFxRoomData(roomId: string): VariableFxVisualizationRoomData
+    {
+        return RoomObjectVisualizationFactory.getOrCreateRoomData(
+            this._avatarVariableFxRoomData, roomId, this.variableFxAssetProvider, this.variableFxRendererRegistry
+        );
+    }
+
+    // AS3: .../src/com/sulake/habbo/room/object/RoomObjectVisualizationFactory.as::getFurnitureVisualizationRoomData()
+    getFurnitureVariableFxRoomData(roomId: string): VariableFxVisualizationRoomData
+    {
+        return RoomObjectVisualizationFactory.getOrCreateRoomData(
+            this._furnitureVariableFxRoomData, roomId, this.variableFxAssetProvider, this.variableFxRendererRegistry
+        );
+    }
+
+    // AS3: .../src/com/sulake/habbo/room/object/RoomObjectVisualizationFactory.as::disposeRoomVisualizationData()
+    disposeRoomVisualizationData(roomId: string): void
+    {
+        this._avatarVariableFxRoomData.get(roomId)?.dispose();
+        this._avatarVariableFxRoomData.delete(roomId);
+
+        this._furnitureVariableFxRoomData.get(roomId)?.dispose();
+        this._furnitureVariableFxRoomData.delete(roomId);
+    }
+
+    /** Built on first use — see the field comment for why not in the constructor. */
+    // AS3: .../src/com/sulake/habbo/room/object/RoomObjectVisualizationFactory.as::initialize()
+    private get variableFxAssetProvider(): IVariableFxAssetProvider | null
+    {
+        if(this._variableFxAssetProvider === null && this._assets !== null)
+        {
+            this._variableFxAssetProvider = new AssetLibraryVariableFxAssetProvider(this._assets);
+        }
+
+        return this._variableFxAssetProvider;
+    }
+
+    // AS3: .../src/com/sulake/habbo/room/object/RoomObjectVisualizationFactory.as::initialize()
+    private get variableFxRendererRegistry(): VariableFxRendererRegistry | null
+    {
+        const provider = this.variableFxAssetProvider;
+
+        if(this._variableFxRendererRegistry === null && provider !== null)
+        {
+            this._variableFxRendererRegistry = VariableFxRendererRegistry.createDefault(provider);
+        }
+
+        return this._variableFxRendererRegistry;
+    }
+
+    // AS3: .../src/com/sulake/habbo/room/object/RoomObjectVisualizationFactory.as::getAvatarVisualizationRoomData()
+    private static getOrCreateRoomData(
+        store: Map<string, VariableFxVisualizationRoomData>,
+        roomId: string,
+        assetProvider: IVariableFxAssetProvider | null,
+        rendererRegistry: VariableFxRendererRegistry | null
+    ): VariableFxVisualizationRoomData
+    {
+        let data = store.get(roomId);
+
+        if(data === undefined)
+        {
+            data = new VariableFxVisualizationRoomData(assetProvider, rendererRegistry);
+
+            store.set(roomId, data);
+        }
+
+        return data;
+    }
+
     // AS3: .../src/com/sulake/habbo/room/object/RoomObjectVisualizationFactory.as::dispose()
     dispose(): void
     {
@@ -473,6 +650,15 @@ export class RoomObjectVisualizationFactory implements IRoomObjectVisualizationF
         }
 
         this._visualizationDataCache.clear();
+
+        for(const data of this._avatarVariableFxRoomData.values()) data.dispose();
+        for(const data of this._furnitureVariableFxRoomData.values()) data.dispose();
+
+        this._avatarVariableFxRoomData.clear();
+        this._furnitureVariableFxRoomData.clear();
+
+        this._variableFxAssetProvider = null;
+        this._variableFxRendererRegistry = null;
         this._disposed = true;
     }
 }

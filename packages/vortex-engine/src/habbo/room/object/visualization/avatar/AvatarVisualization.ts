@@ -44,6 +44,10 @@ import {GuideStatusBubble} from './additions/GuideStatusBubble';
 import {GameClickTarget} from './additions/GameClickTarget';
 import {NumberBubble} from './additions/NumberBubble';
 import {HabbiconBubble} from './additions/HabbiconBubble';
+import {StackedAdditions} from './additions/StackedAdditions';
+import {VariableFxStackReconciler} from '../variablefx/VariableFxStackReconciler';
+import {VariableFxStatusModelData} from '../../variablefx/VariableFxStatusModelData';
+import type {IVariableFxVisualizationRoomData} from '../IVariableFxVisualizationRoomData';
 import {ExpressionAdditionFactory} from './additions/ExpressionAdditionFactory';
 
 export class AvatarVisualization extends RoomObjectSpriteVisualization implements IAvatarImageListener, IAvatarEffectListener 
@@ -129,6 +133,29 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/avatar/AvatarVisualization.as::ADDITION_ID_HABBICON_BUBBLE
     private static readonly ADDITION_ID_HABBICON_BUBBLE: number = 8;
+
+    /** The stack itself — one addition carrying the habbicon and every Variable FX effect. */
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/object/visualization/avatar/AvatarVisualization.as::ADDITION_ID_STACKED_ADDITIONS
+    private static readonly ADDITION_ID_STACKED_ADDITIONS: number = 9;
+
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/object/visualization/avatar/AvatarVisualization.as::_variableFxReconciler (name derived)
+    private _variableFxReconciler: VariableFxStackReconciler = new VariableFxStackReconciler();
+
+    /**
+     * The room's Variable FX services, injected by the visualization factory.
+     *
+     * TS-only: AS3 reaches them through `_visualizationData`, which this port's avatar
+     *   visualization does not carry a Variable FX-aware version of. Injected instead, by the same
+     *   route `assets` and `avatarRenderManager` already take.
+     */
+    private _variableFxRoomData: IVariableFxVisualizationRoomData | null = null;
+
+    /** Set by the factory when the visualization is created for a room. */
+    // TS-only: see `_variableFxRoomData`.
+    set variableFxRoomData(value: IVariableFxVisualizationRoomData | null)
+    {
+        this._variableFxRoomData = value;
+    }
 
     /**
      * How far the avatar is turned by a spinning Habbicon, in degrees, applied to both the body and
@@ -629,9 +656,63 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
      * @returns The addition, or null if not found
      */
     // AS3: .../src/com/sulake/habbo/room/object/visualization/avatar/AvatarVisualization.as::getAddition()
-    getAddition(id: number): IAvatarAddition | null 
+    getAddition(id: number): IAvatarAddition | null
     {
         return (this._additions) ? (this._additions.get(id) ?? null) : null;
+    }
+
+    /**
+     * The stack, created on demand.
+     *
+     * `createIfMissing` is what keeps an avatar with nothing to show from paying for a stack at
+     * all — which is every avatar in a room with no wired effects and no habbicon, i.e. almost all
+     * of them.
+     */
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/object/visualization/avatar/AvatarVisualization.as::getStackedAdditions()
+    private getStackedAdditions(createIfMissing: boolean): StackedAdditions | null
+    {
+        const existing = this.getAddition(AvatarVisualization.ADDITION_ID_STACKED_ADDITIONS);
+
+        if(existing instanceof StackedAdditions) return existing;
+
+        if(!createIfMissing) return null;
+
+        const created = this.addAddition(
+            new StackedAdditions(AvatarVisualization.ADDITION_ID_STACKED_ADDITIONS, this)
+        );
+
+        return created instanceof StackedAdditions ? created : null;
+    }
+
+    /**
+     * Brings the stack in line with the room's Variable FX status model.
+     *
+     * The stack is created only when there is something to put in it — an empty model on an avatar
+     * that has none must not conjure one, which is what the first condition is for.
+     */
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/object/visualization/avatar/AvatarVisualization.as::reconcileVariableFxStatuses()
+    private reconcileVariableFxStatuses(model: unknown): boolean
+    {
+        const statuses = model instanceof VariableFxStatusModelData ? model : null;
+        const roomData = this._variableFxRoomData;
+        const hasStatuses = statuses !== null
+            && (statuses.statusesByConfig?.length ?? 0) > 0
+            && roomData !== null
+            && roomData.variableFxVisualizationManager !== null;
+
+        const stackedAdditions = this.getStackedAdditions(hasStatuses);
+
+        if(stackedAdditions === null) return false;
+
+        return this._variableFxReconciler.reconcile(
+            statuses,
+            roomData === null ? null : roomData.variableFxVisualizationManager,
+            roomData === null ? null : roomData.variableFxAssetProvider,
+            roomData === null ? null : roomData.variableFxRendererRegistry,
+            stackedAdditions.stack,
+            StackedAdditions.LAYER_VARIABLE_FX,
+            performance.now()
+        );
     }
 
     /**
@@ -992,9 +1073,13 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
             numValue = model.getNumber(RoomObjectVariableEnum.AVATAR_HABBICON) | 0;
 
             const habbiconTriggerSequence = model.getNumber(RoomObjectVariableEnum.AVATAR_HABBICON_TRIGGER_SEQUENCE) | 0;
-            const habbiconAddition = this.getAddition(AvatarVisualization.ADDITION_ID_HABBICON_BUBBLE) as HabbiconBubble | null;
 
-            if(numValue > 0)
+            // The bubble now lives INSIDE the stack rather than holding a sprite of its own, so it
+            // is reached through the stack's owner and not through `getAddition()`.
+            const stackedAdditions = this.getStackedAdditions(numValue > 0);
+            const habbiconAddition = stackedAdditions === null ? null : stackedAdditions.habbicon;
+
+            if(numValue > 0 && stackedAdditions !== null)
             {
                 // The trigger sequence is in the test, not just the id: triggering the *same*
                 // Habbicon twice must replay it, and without this the second trigger would find a
@@ -1003,21 +1088,24 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
                     || habbiconAddition.habbiconId !== numValue
                     || habbiconAddition.triggerSequence !== habbiconTriggerSequence)
                 {
-                    this.removeAddition(AvatarVisualization.ADDITION_ID_HABBICON_BUBBLE);
-                    this.addAddition(new HabbiconBubble(
+                    stackedAdditions.setHabbicon(new HabbiconBubble(
                         AvatarVisualization.ADDITION_ID_HABBICON_BUBBLE, numValue, habbiconTriggerSequence, this
                     ));
                 }
 
                 changed = true;
             }
-            else
+            else if(habbiconAddition && stackedAdditions !== null)
             {
-                if(habbiconAddition)
-                {
-                    this.removeAddition(AvatarVisualization.ADDITION_ID_HABBICON_BUBBLE);
-                }
+                stackedAdditions.clearHabbicon();
+
+                // The stack only exists to carry things; with nothing left in it, it goes too.
+                if(stackedAdditions.isEmpty) this.removeAddition(AvatarVisualization.ADDITION_ID_STACKED_ADDITIONS);
+
+                changed = true;
             }
+
+            if(this.reconcileVariableFxStatuses(model.getObject(RoomObjectVariableEnum.VARIABLE_FX_STATUSES))) changed = true;
 
             // Habbicon spin. It turns the avatar, not the bubble, so it only has to be noticed
             // here; the angles are recomputed further down from the value stored now.

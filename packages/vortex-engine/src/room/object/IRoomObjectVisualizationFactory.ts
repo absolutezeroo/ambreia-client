@@ -21,7 +21,7 @@ export interface IRoomObjectVisualizationFactory
 	 * @returns A new visualization instance, or null if the type is unknown
 	 */
     // AS3: .../src/com/sulake/room/object/IRoomObjectVisualizationFactory.as::createRoomObjectVisualization()
-    createRoomObjectVisualization(type: string): IRoomObjectVisualization | null;
+    createRoomObjectVisualization(type: string, roomId?: string | null): IRoomObjectVisualization | null;
 
     /**
 	 * Create a graphic asset collection.
@@ -41,6 +41,18 @@ export interface IRoomObjectVisualizationFactory
 	 */
     // AS3: .../src/com/sulake/room/object/IRoomObjectVisualizationFactory.as::getRoomObjectVisualizationData()
     getRoomObjectVisualizationData(id: string, type: string, data: unknown): IRoomObjectVisualizationData | null;
+
+    /**
+	 * The visualization half of a Variable FX config update — the renderable configs.
+	 *
+	 * `unknown[]` for the same reason `IRoomObjectFactory`'s pair is: this is the generic room
+	 * layer and `VariableFxConfigUpdateData` is a Habbo type. AS3 keeps the same layering.
+	 */
+    // AS3: sources/AIR-1.0.31/src/com/sulake/room/object/IRoomObjectVisualizationFactory.as::updateVariableFxConfigs()
+    updateVariableFxConfigs(roomId: string, configs: unknown[]): void;
+
+    // AS3: sources/AIR-1.0.31/src/com/sulake/room/object/IRoomObjectVisualizationFactory.as::removeVariableFxConfigs()
+    removeVariableFxConfigs(roomId: string, configIds: number[]): void;
 
     dispose(): void;
 }

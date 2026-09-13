@@ -419,21 +419,18 @@ export class RoomManager extends Component implements IRoomManager, IRoomInstanc
     // AS3: sources/AIR-1.0.31/src/com/sulake/room/RoomManager.as::updateVariableFxConfigs()
     updateVariableFxConfigs(id: string, configs: unknown[]): void
     {
-        // AS3 also calls `_visualizationFactory.updateVariableFxConfigs()` here. That half is the
-        // visualization config store, which this port has not ported yet — it belongs with the
-        // renderers, not with the logic. The logic half below is complete.
-        // TODO(AS3): sources/AIR-1.0.31/src/com/sulake/room/RoomManager.as::updateVariableFxConfigs()
-        //   — add the `_visualizationFactory.updateVariableFxConfigs(id, configs)` call once
-        //   RoomObjectVisualizationFactory has its VariableFx config store.
+        // Both halves, and they are different things: the OBJECT factory stores the logic config
+        // (show mode, visibility mask, duration) and the VISUALIZATION factory stores the
+        // renderable one (category, style, renderer, colour, width).
         this._objectFactory?.updateVariableFxConfigs(id, configs);
+        this._visualizationFactory?.updateVariableFxConfigs(id, configs);
     }
 
     // AS3: sources/AIR-1.0.31/src/com/sulake/room/RoomManager.as::removeVariableFxConfigs()
     removeVariableFxConfigs(id: string, configIds: number[]): void
     {
-        // TODO(AS3): sources/AIR-1.0.31/src/com/sulake/room/RoomManager.as::removeVariableFxConfigs()
-        //   — same missing half as updateVariableFxConfigs() above.
         this._objectFactory?.removeVariableFxConfigs(id, configIds);
+        this._visualizationFactory?.removeVariableFxConfigs(id, configIds);
     }
 
     /**
@@ -558,7 +555,9 @@ export class RoomManager extends Component implements IRoomManager, IRoomInstanc
         // Create visualization
         if(this._visualizationFactory && visualizationType)
         {
-            const visualization = this._visualizationFactory.createRoomObjectVisualization(visualizationType);
+            // The room id is passed so the factory can hand the visualization that room's
+            // Variable FX services — see RoomObjectVisualizationFactory.createRoomObjectVisualization().
+            const visualization = this._visualizationFactory.createRoomObjectVisualization(visualizationType, roomId);
 
             if(visualization)
             {
@@ -887,7 +886,9 @@ export class RoomManager extends Component implements IRoomManager, IRoomInstanc
                     // Create new visualization
                     if(visualizationType)
                     {
-                        const visualization = this._visualizationFactory.createRoomObjectVisualization(visualizationType);
+                        // Same room id as the loop's key — a visualization rebuilt on a content
+                        // reload must get its room's Variable FX services back too.
+                        const visualization = this._visualizationFactory.createRoomObjectVisualization(visualizationType, roomId);
 
                         if(visualization)
                         {
