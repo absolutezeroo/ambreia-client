@@ -7,6 +7,7 @@ import type {
 } from '@habbo/communication/messages/incoming/newnavigator/NavigatorSearchResultSet';
 import {ResultsModeEnum} from '../../ResultsModeEnum';
 import type {CategoryElementFactory} from './CategoryElementFactory';
+import {PerkType} from '../../../../communication/enum/PerkType';
 
 /**
  * Manages the block results list in the navigator.
@@ -265,7 +266,7 @@ export class BlockResultsView
 
         if(isExpanded)
         {
-            const viewMode = !this._navigator.isPerkAllowed('NAVIGATOR_ROOM_THUMBNAIL_CAMERA')
+            const viewMode = !this._navigator.isPerkAllowed(PerkType.NAVIGATOR_ROOM_THUMBNAIL_CAMERA)
 				&& this._navigator.currentResults?.searchCodeOriginal !== 'official_view'
                 ? 0
                 : block.viewMode;

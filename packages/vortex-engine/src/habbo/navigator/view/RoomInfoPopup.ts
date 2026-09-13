@@ -13,6 +13,7 @@ import {FriendlyTime} from '@habbo/utils/FriendlyTime';
 import type {IBadgeImageWidget} from '@habbo/window/widgets/IBadgeImageWidget';
 import type {HabboNewNavigator} from '../HabboNewNavigator';
 import type {LegacyNavigator} from '../transitional/LegacyNavigator';
+import {PerkType} from '../../communication/enum/PerkType';
 
 /**
  * Room info popup bubble shown when hovering over room entries.
@@ -543,7 +544,7 @@ export class RoomInfoPopup
         {
             roomThumbnail.assetUri = 'newnavigator_default_room';
 
-            if(this._navigator.isPerkAllowed('NAVIGATOR_ROOM_THUMBNAIL_CAMERA'))
+            if(this._navigator.isPerkAllowed(PerkType.NAVIGATOR_ROOM_THUMBNAIL_CAMERA))
             {
                 if(this._roomData.officialRoomPicRef != null)
                 {

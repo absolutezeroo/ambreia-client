@@ -18,6 +18,7 @@ import {PhotoCompetitionMessageComposer} from '@habbo/communication/messages/out
 import type {RenderRoomMessageComposer} from '@habbo/communication/messages/outgoing/camera/RenderRoomMessageComposer';
 import type {InitCameraMessageParser} from '@habbo/communication/messages/parser/camera/InitCameraMessageParser';
 import type {CameraStorageUrlMessageParser} from '@habbo/communication/messages/parser/camera/CameraStorageUrlMessageParser';
+import {PerkType} from '../../communication/enum/PerkType';
 
 /**
  * Wires the camera widget to the toolbar, the `camera/` link pattern and the five camera messages.
@@ -160,7 +161,7 @@ export class CameraWidgetHandler implements IRoomWidgetHandler, ILinkEventTracke
     // AS3: .../ui/handler/CameraWidgetHandler.as::sendInitCameraMessage()
     sendInitCameraMessage(): void
     {
-        if(this._container?.sessionDataManager?.isPerkAllowed('CAMERA'))
+        if(this._container?.sessionDataManager?.isPerkAllowed(PerkType.CAMERA))
         {
             this._container.connection?.send(new RequestCameraConfigurationMessageComposer());
         }
@@ -288,7 +289,7 @@ export class CameraWidgetHandler implements IRoomWidgetHandler, ILinkEventTracke
     {
         if(this._container === null
             || this._container.toolbar === null
-            || !this._container.sessionDataManager?.isPerkAllowed('CAMERA'))
+            || !this._container.sessionDataManager?.isPerkAllowed(PerkType.CAMERA))
         {
             return;
         }

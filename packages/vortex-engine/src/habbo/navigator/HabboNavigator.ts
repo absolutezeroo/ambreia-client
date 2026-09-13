@@ -16,6 +16,8 @@ import type {IWindowContainer} from '@core/window/IWindowContainer';
 import type {IBitmapWrapperWindow} from '@core/window/components/IBitmapWrapperWindow';
 import type {IHabboCatalog} from '@habbo/catalog/IHabboCatalog';
 import type {IHabboNavigator} from './IHabboNavigator';
+import type {ILinkEventTracker} from '@core/runtime/events/ILinkEventTracker';
+import {PerksUpdatedEvent} from '../session/events/PerksUpdatedEvent';
 import type {IHabboNewNavigator} from './IHabboNewNavigator';
 import type {RoomInfoViewCtrl} from './inroom/RoomInfoViewCtrl';
 import type {ITransitionalMainViewCtrl} from './mainview/ITransitionalMainViewCtrl';
@@ -57,13 +59,14 @@ import {
     RemoveOwnRoomRightsRoomMessageComposer,
 } from '../communication/messages/outgoing/navigator';
 import type {IMessageComposer} from "@core";
+import {PerkType} from '../communication/enum/PerkType';
 
 const log = Logger.getLogger('habbo.navigator.HabboNavigator');
 
 /**
  * Habbo Navigator component
  */
-export class HabboNavigator extends Component implements IHabboNavigator 
+export class HabboNavigator extends Component implements IHabboNavigator, ILinkEventTracker 
 {
     // AS3: .../src/com/sulake/habbo/navigator/HabboNavigator.as::_incomingMessages
     private _incomingMessages: IncomingMessages | null = null;
@@ -269,7 +272,13 @@ export class HabboNavigator extends Component implements IHabboNavigator
                 {
                     this._sessionData = manager;
                 },
-                true
+                true,
+                [
+                    {
+                        type: PerksUpdatedEvent.PERKS_UPDATED,
+                        callback: (...args: unknown[]) => this.onPerksUpdated(args[0] as PerksUpdatedEvent)
+                    }
+                ]
             ),
             new ComponentDependency(
                 IID_HabboTracking,
@@ -1018,6 +1027,40 @@ export class HabboNavigator extends Component implements IHabboNavigator
      * @param link - The link URL to handle
      * @see sources/win63_version/habbo/navigator/HabboNavigator.as linkReceived()
      */
+    /**
+     * Which navigator owns the `navigator/` link prefix follows the phase-two perk, and the perk can
+     * change mid-session. Without this the tracker registered in `initComponent()` would be stuck at
+     * whatever the perk said at boot: a player granted phase two would keep two trackers on the
+     * prefix and every link would fire twice, one revoked would keep none and every link would be
+     * dropped.
+     */
+    // AS3: .../src/com/sulake/habbo/navigator/HabboNavigator.as::onPerksUpdated()
+    private onPerksUpdated(_event: PerksUpdatedEvent): void
+    {
+        if(this.isPerkAllowed(PerkType.NAVIGATOR_PHASE_TWO_2014))
+        {
+            this.context.removeLinkEventTracker(this);
+
+            return;
+        }
+
+        const mainView = this.mainViewCtrl;
+
+        if(mainView !== null
+            && mainView.isPhaseOneNavigator !== this.isPerkAllowed(PerkType.NAVIGATOR_PHASE_ONE_2014))
+        {
+            mainView.close();
+        }
+
+        this.context.addLinkEventTracker(this);
+    }
+
+    // AS3: .../src/com/sulake/habbo/navigator/HabboNavigator.as::get linkPattern()
+    get linkPattern(): string
+    {
+        return 'navigator/';
+    }
+
     // AS3: .../src/com/sulake/habbo/navigator/HabboNavigator.as::linkReceived()
     linkReceived(link: string): void 
     {
@@ -1125,6 +1168,19 @@ export class HabboNavigator extends Component implements IHabboNavigator
     {
         this._incomingMessages = new IncomingMessages(this);
         this._raidProtectionSettingsController = new RaidProtectionSettingsController(this, this._configuration);
+
+        // Without this `linkReceived()` below is unreachable and every `navigator/...` link is
+        // dropped in silence — `createLinkEvent()` only reaches trackers that registered. That is
+        // what made the raid-protection button in the room-info window do nothing: it fires
+        // `navigator/raidprotection/<flatId>` and nobody was listening.
+        //
+        // Gated exactly as AS3 gates it: with the phase-two navigator perk the NEW navigator owns
+        // the `navigator/` prefix instead, and two trackers on one prefix deliver every link twice.
+        // `onPerksUpdated()` below keeps the pair in step when the perk changes mid-session.
+        if(!this.isPerkAllowed(PerkType.NAVIGATOR_PHASE_TWO_2014))
+        {
+            this.context.addLinkEventTracker(this);
+        }
 
         log.debug('Navigator initialized');
     }

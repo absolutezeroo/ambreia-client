@@ -18,6 +18,7 @@ import {Util} from '../Util';
 import {RaidProtectionSettingsController} from '../raidprotection/RaidProtectionSettingsController';
 import {UserInfoRegionUtil} from '@habbo/utils/UserInfoRegionUtil';
 import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
+import {PerkType} from '../../communication/enum/PerkType';
 
 /**
  * Room info view controller for displaying room details in-room.
@@ -542,7 +543,7 @@ export class RoomInfoViewCtrl
             }
         }
 
-        if(this._navigator.sessionData?.isPerkAllowed('NAVIGATOR_ROOM_THUMBNAIL_CAMERA'))
+        if(this._navigator.sessionData?.isPerkAllowed(PerkType.NAVIGATOR_ROOM_THUMBNAIL_CAMERA))
         {
             const addThumbRegion = win.findChildByName('add_thumbnail_region');
 

@@ -50,6 +50,7 @@ import {RoomCullingMode} from '@habbo/room/renderer/RoomCullingMode';
 import {FriendBarResizeEvent} from '@habbo/friendbar/events/FriendBarResizeEvent';
 import {HideRoomWidgetEvent} from '@habbo/ui/widget/events/HideRoomWidgetEvent';
 import {SessionDataToWidgetEvent} from '@habbo/session/events/SessionDataToWidgetEvent';
+import {PerkType} from '../../communication/enum/PerkType';
 
 const log = Logger.getLogger('habbo.ui.handler.ChatInputWidgetHandler');
 
@@ -775,7 +776,7 @@ export class ChatInputWidgetHandler implements IRoomWidgetHandler
 
             case ':cam':
             case ':camera':
-                if(sessionData?.isPerkAllowed('CAMERA'))
+                if(sessionData?.isPerkAllowed(PerkType.CAMERA))
                 {
                     const event = new HabboToolbarEvent(HabboToolbarEvent.CAMERA_TOGGLE);
 

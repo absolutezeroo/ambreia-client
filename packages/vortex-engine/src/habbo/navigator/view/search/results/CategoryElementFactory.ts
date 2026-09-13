@@ -8,6 +8,7 @@ import type {BlockResultsView} from './BlockResultsView';
 import type {RoomEntryElementFactory} from './RoomEntryElementFactory';
 import {NavigatorSearchAction} from '@habbo/communication/messages/incoming/newnavigator/NavigatorSearchResultBlock';
 import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
+import {PerkType} from '../../../../communication/enum/PerkType';
 
 /**
  * Factory for creating category elements in navigator search results.
@@ -165,7 +166,7 @@ export class CategoryElementFactory
 
         if(headerControls)
         {
-            if(this._navigator.isPerkAllowed('NAVIGATOR_ROOM_THUMBNAIL_CAMERA'))
+            if(this._navigator.isPerkAllowed(PerkType.NAVIGATOR_ROOM_THUMBNAIL_CAMERA))
             {
                 const toggleTiles = headerControls.getListItemByName?.('category_toggle_tiles');
                 const toggleRows = headerControls.getListItemByName?.('category_toggle_rows');

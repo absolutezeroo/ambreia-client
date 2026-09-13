@@ -68,6 +68,7 @@ import type {GuideHelpManager} from '../GuideHelpManager';
 import type {HabboHelp} from '../HabboHelp';
 import {GuideSessionData} from '../GuideSessionData';
 import {AnimationData} from './AnimationData';
+import {PerkType} from '../../communication/enum/PerkType';
 
 const log = Logger.getLogger('habbo.help.guidehelp.GuideSessionController');
 
@@ -288,7 +289,7 @@ export class GuideSessionController implements IDisposable, IIlluminaInputHandle
 
         const parser = (event as PerkAllowancesMessageEvent).getParser?.() ?? null;
 
-        if(parser === null || parser.isPerkAllowed('USE_GUIDE_TOOL')) return;
+        if(parser === null || parser.isPerkAllowed(PerkType.USE_GUIDE_TOOL)) return;
 
         if(this._onDuty)
         {
@@ -698,7 +699,7 @@ export class GuideSessionController implements IDisposable, IIlluminaInputHandle
         this.setCheckBoxValue('handle_helper_tickets', this._handleHelperTickets);
         this.setCheckBoxValue('handle_guide_tickets', this._handleTourRequests);
 
-        if(!this._habboHelp?.sessionDataManager?.isPerkAllowed('JUDGE_CHAT_REVIEWS'))
+        if(!this._habboHelp?.sessionDataManager?.isPerkAllowed(PerkType.JUDGE_CHAT_REVIEWS))
         {
             const list = this._window.findChildByName('list') as unknown as IItemListWindow | null;
             const container = list?.getListItemByName('handle_selection_container') as IWindowContainer | null;
@@ -1782,7 +1783,7 @@ export class GuideSessionController implements IDisposable, IIlluminaInputHandle
         this.resetSessionData();
         this.closeWindow();
 
-        if(this._onDuty && !this._habboHelp?.sessionDataManager?.isPerkAllowed('USE_GUIDE_TOOL')) this.setOnDuty(false);
+        if(this._onDuty && !this._habboHelp?.sessionDataManager?.isPerkAllowed(PerkType.USE_GUIDE_TOOL)) this.setOnDuty(false);
 
         if(returnToGuideTool && this._onDuty) this.setStateGuideTool();
     }

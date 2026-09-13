@@ -194,6 +194,7 @@ import {PerkManager} from './PerkManager';
 import {IgnoredUsersManager} from './IgnoredUsersManager';
 import {BlockedUsersManager} from './BlockedUsersManager';
 import {HabboGroupInfoManager} from './HabboGroupInfoManager';
+import {PerkType} from '../communication/enum/PerkType';
 
 const log = Logger.getLogger('habbo.session.SessionDataManager');
 
@@ -735,7 +736,7 @@ export class SessionDataManager extends Component implements ISessionDataManager
     {
         const citizenshipEnabled = this._configurationManager?.getBoolean('talent.track.citizenship.enabled') ?? false;
 
-        return citizenshipEnabled && !this.isPerkAllowed('CITIZEN') ? 'citizenship' : 'helper';
+        return citizenshipEnabled && !this.isPerkAllowed(PerkType.CITIZEN) ? 'citizenship' : 'helper';
     }
 
     protected override get dependencies(): Array<ComponentDependency<any>>

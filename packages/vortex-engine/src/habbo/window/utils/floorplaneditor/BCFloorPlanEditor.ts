@@ -58,6 +58,7 @@ import {FloorPlanCache} from './FloorPlanCache';
 import {FloorPlanPreviewer} from './FloorPlanPreviewer';
 import {HeightMapEditor} from './HeightMapEditor';
 import {ImportExportDialog} from './ImportExportDialog';
+import {PerkType} from '../../../communication/enum/PerkType';
 
 const log = Logger.getLogger('habbo.window.utils.floorplaneditor.BCFloorPlanEditor');
 
@@ -704,7 +705,7 @@ export class BCFloorPlanEditor implements IUpdateReceiver, IDisposable
     {
         const parser = event.parser as PerkAllowancesMessageEventParser | null;
 
-        this._largeFloorPlansAllowed = parser?.isPerkAllowed('BUILDER_AT_WORK') ?? false;
+        this._largeFloorPlansAllowed = parser?.isPerkAllowed(PerkType.BUILDER_AT_WORK) ?? false;
     };
 
     // AS3: BCFloorPlanEditor.as::updatePreviewBitmap()

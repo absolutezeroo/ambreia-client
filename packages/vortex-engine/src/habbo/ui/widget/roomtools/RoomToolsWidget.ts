@@ -22,6 +22,7 @@ import {WiredAchievementsUpdatedEvent} from '@habbo/roomevents/events/WiredAchie
 import {RoomToolsInfoCtrl} from './RoomToolsInfoCtrl';
 import {RoomToolsToolbarCtrl} from './RoomToolsToolbarCtrl';
 import {RoomVisitHistory} from './RoomVisitHistory';
+import {PerkType} from '../../../communication/enum/PerkType';
 
 export class RoomToolsWidget extends RoomWidgetBase
 {
@@ -54,7 +55,7 @@ export class RoomToolsWidget extends RoomWidgetBase
         const cameraLaunchPosition = roomUI.getProperty('camera.launch.ui.position');
 
         this._toolbarCtrl.setCameraButton(
-            (this.handler.sessionDataManager?.isPerkAllowed('CAMERA') ?? false)
+            (this.handler.sessionDataManager?.isPerkAllowed(PerkType.CAMERA) ?? false)
 			&& (StringUtil.isBlank(cameraLaunchPosition) || cameraLaunchPosition === 'room-menu')
         );
         this._toolbarCtrl.setLikeButton(this.handler.canRate);

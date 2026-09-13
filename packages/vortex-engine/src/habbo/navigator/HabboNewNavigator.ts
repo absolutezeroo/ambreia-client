@@ -10,6 +10,7 @@ import {IID_SessionDataManager} from '@iid/IIDSessionDataManager';
 import type {IWindow} from '@core/window/IWindow';
 import type {IHabboNewNavigator} from './IHabboNewNavigator';
 import type {IHabboNavigator} from './IHabboNavigator';
+import type {ILinkEventTracker} from '@core/runtime/events/ILinkEventTracker';
 import type {IHabboHelp} from '../help/IHabboHelp';
 import type {IHabboToolbar} from '../toolbar/IHabboToolbar';
 import {HabboToolbarEvent} from '../toolbar/events/HabboToolbarEvent';
@@ -61,6 +62,7 @@ import {GetHabboGroupDetailsMessageComposer} from '../communication/messages/out
 import type {IMessageComposer} from '@core';
 import {IID_HabboCommunicationManager} from "@iid/IIDHabboCommunicationManager";
 import {IID_HabboNavigator} from "@iid/IIDHabboNavigator";
+import {PerkType} from '../communication/enum/PerkType';
 
 const log = Logger.getLogger('habbo.navigator.HabboNewNavigator');
 
@@ -71,7 +73,7 @@ const log = Logger.getLogger('habbo.navigator.HabboNewNavigator');
  * for shared data and functionality through delegation.
  *
  */
-export class HabboNewNavigator extends Component implements IHabboNewNavigator
+export class HabboNewNavigator extends Component implements IHabboNewNavigator, ILinkEventTracker
 {
     // AS3: .../src/com/sulake/habbo/navigator/HabboNewNavigator.as::_incomingMessages
     private _incomingMessages: NewIncomingMessages | null = null;
@@ -1129,6 +1131,13 @@ export class HabboNewNavigator extends Component implements IHabboNewNavigator
     protected override initComponent(): void
     {
         this._incomingMessages = new NewIncomingMessages(this);
+
+        // AS3 registers here, unconditionally and before anything else is built. `onPerksUpdated()`
+        // below already removes the tracker when the phase-two perk goes away — it was the only
+        // half of the pair this port had, so `linkReceived()` could never run and every
+        // `navigator/...` link went nowhere.
+        this.context.addLinkEventTracker(this);
+
         this._view = new NavigatorView(this);
 
         // Create the LegacyNavigator wrapper bridging new and old navigators
@@ -1152,7 +1161,7 @@ export class HabboNewNavigator extends Component implements IHabboNewNavigator
     // AS3: .../src/com/sulake/habbo/navigator/HabboNewNavigator.as::onPerksUpdated()
     private onPerksUpdated(_event: PerksUpdatedEvent): void
     {
-        const hasPhaseTwoNavigator = this._sessionData?.isPerkAllowed('NAVIGATOR_PHASE_TWO_2014') ?? false;
+        const hasPhaseTwoNavigator = this._sessionData?.isPerkAllowed(PerkType.NAVIGATOR_PHASE_TWO_2014) ?? false;
 
         if(!hasPhaseTwoNavigator)
         {
