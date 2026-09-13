@@ -13,3 +13,7 @@ export * from './WiredValidationErrorEvent';
 export * from './WiredValidationErrorParameter';
 export * from './WiredSaveSuccessEvent';
 export * from './OpenEvent';
+export * from './VariableFxConfigUpdateMessageEvent';
+export * from './VariableFxConfigRemoveMessageEvent';
+export * from './VariableFxStatusUpdateMessageEvent';
+export * from './VariableFxStatusRemoveMessageEvent';

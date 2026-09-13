@@ -12,3 +12,7 @@ export * from './WiredFurniSelectorMessageParser';
 export * from './WiredValidationErrorParser';
 export * from './WiredSaveSuccessMessageParser';
 export * from './OpenMessageParser';
+export * from './VariableFxConfigUpdateParser';
+export * from './VariableFxConfigRemoveParser';
+export * from './VariableFxStatusUpdateParser';
+export * from './VariableFxStatusRemoveParser';

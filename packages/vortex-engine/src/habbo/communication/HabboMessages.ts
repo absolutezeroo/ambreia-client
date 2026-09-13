@@ -483,7 +483,11 @@ import {
     WiredPermissionsEvent,
     WiredRewardResultMessageEvent,
     WiredSaveSuccessEvent,
-    WiredValidationErrorEvent
+    WiredValidationErrorEvent,
+    VariableFxConfigUpdateMessageEvent,
+    VariableFxConfigRemoveMessageEvent,
+    VariableFxStatusUpdateMessageEvent,
+    VariableFxStatusRemoveMessageEvent
 } from './messages/incoming/userdefinedroomevents';
 // Outgoing Composers - User Defined Room Events (Wired)
 import {
@@ -2299,6 +2303,25 @@ export class HabboMessages implements IMessageConfiguration
         this._events.set(2635, OpenEvent);
         this._events.set(3201, WiredValidationErrorEvent);
         this._events.set(1192, WiredSaveSuccessEvent);
+
+        // === VARIABLE FX ===
+        // AIR-1.0.31 only — the wired-variable effects drawn over avatars and furni. Same
+        // situation as raid protection above: AIR re-randomises the registry, so its ids are kept
+        // only where they are free in this revision, and assigned otherwise.
+        //
+        //   AIR  267 -> 3390  (267 is taken as an event here)
+        //   AIR 1200 -> 3391  (1200 is taken as an event here)
+        //   AIR 3388 -> 3388  (free on both sides, so AIR's own id is kept)
+        //   AIR 3889 -> 3889  (likewise)
+        //
+        // 3390 and 3391 are the first ids after 3388 unused as an event AND as a composer in the
+        // WIN63 registry, in this file, and in the emulator. The emulator has none of these four
+        // yet; they must be assigned there identically.
+        this._events.set(3390, VariableFxConfigUpdateMessageEvent);
+        this._events.set(3391, VariableFxConfigRemoveMessageEvent);
+        this._events.set(3889, VariableFxStatusUpdateMessageEvent);
+        this._events.set(3388, VariableFxStatusRemoveMessageEvent);
+
         this._events.set(3287, AllVariablesHashMessageEvent);
         this._events.set(2733, AllVariablesDiffMessageEvent);
         // Overview tab: variable-holders push (WIN63 registry _SafeCls_2046.as: 3506 -> _SafeCls_2537).
