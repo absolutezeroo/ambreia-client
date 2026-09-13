@@ -175,7 +175,7 @@ export class RoomSettingsCtrl
 
         for(const ctrl of controllers)
         {
-            this._originalData!.setController(ctrl.userId, ctrl);
+            this._originalData!.setFlatController(ctrl.userId, ctrl);
         }
 
         this._checkFlatControllerRefresh();
@@ -186,7 +186,7 @@ export class RoomSettingsCtrl
     {
         if(!this._isAcceptFlatControllerUpdate(flatId)) return;
 
-        this._originalData!.setController(ctrl.userId, ctrl);
+        this._originalData!.setFlatController(ctrl.userId, ctrl);
         this._checkFlatControllerRefresh();
     }
 

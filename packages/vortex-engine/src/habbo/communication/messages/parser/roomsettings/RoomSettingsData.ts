@@ -119,7 +119,12 @@ export class RoomSettingsData
         }
     }
 
-    setController(userId: number, controller: RoomSettingsController): void
+    /**
+     * AS3 also records the id it just changed (`_SafeStr_8812`). That field is written here and
+     * read nowhere in any tree, so it is not carried.
+     */
+    // AS3: .../src/unknowns/_SafePkg_1710/_SafeCls_1961.as::setFlatController()
+    setFlatController(userId: number, controller: RoomSettingsController): void
     {
         this.controllersById.set(userId, controller);
         this._controllerListDirty = true;
