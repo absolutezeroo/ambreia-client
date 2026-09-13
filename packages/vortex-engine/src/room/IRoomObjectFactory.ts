@@ -23,8 +23,13 @@ export interface IRoomObjectFactory
     // AS3: .../src/com/sulake/room/IRoomObjectFactory.as::removeObjectEventListener()
     removeObjectEventListener(callback: (event: unknown) => void): void;
 
-    // AS3: .../src/com/sulake/room/IRoomObjectFactory.as::createRoomObjectLogic()
-    createRoomObjectLogic(type: string): IRoomObjectEventHandler | null;
+    /**
+     * `roomId` is AIR's addition (WIN63 takes the type alone) and is what lets the factory hand a
+     * freshly built logic its room's VariableFx config store. Optional, as in AS3: a caller with no
+     * room in hand still gets a working logic, just one whose effects never resolve a config.
+     */
+    // AS3: sources/AIR-1.0.31/src/com/sulake/room/IRoomObjectFactory.as::createRoomObjectLogic()
+    createRoomObjectLogic(type: string, roomId?: string | null): IRoomObjectEventHandler | null;
 
     // AS3: .../src/com/sulake/room/IRoomObjectFactory.as::createRoomObjectManager()
     createRoomObjectManager(): IRoomObjectManager;

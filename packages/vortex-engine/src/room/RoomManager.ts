@@ -588,7 +588,7 @@ export class RoomManager extends Component implements IRoomManager, IRoomInstanc
         // Create and assign logic
         if(this._objectFactory && logicType)
         {
-            const logic = this._objectFactory.createRoomObjectLogic(logicType);
+            const logic = this._objectFactory.createRoomObjectLogic(logicType, roomId);
 
             if(logic)
             {
@@ -853,7 +853,9 @@ export class RoomManager extends Component implements IRoomManager, IRoomInstanc
         const logicType = this._contentLoader.getLogicType(contentType);
         const visualizationConfig = this._contentLoader.getVisualizationXML(contentType);
 
-        for(const room of this._rooms.values())
+        // entries(), not values(): the key is the room identifier, and rebuilding a logic here has
+        // to hand it the same VariableFx store the object had before its content was reloaded.
+        for(const [roomId, room] of this._rooms.entries())
         {
             const roomInstance = room as RoomInstance;
             const managerIds = roomInstance.getObjectManagerIds();
@@ -913,7 +915,7 @@ export class RoomManager extends Component implements IRoomManager, IRoomInstanc
                     // Create new logic handler
                     if(logicType)
                     {
-                        const logic = this._objectFactory.createRoomObjectLogic(logicType);
+                        const logic = this._objectFactory.createRoomObjectLogic(logicType, roomId);
 
                         if(logic)
                         {

@@ -174,7 +174,7 @@ export class RoomObjectFactory implements IRoomObjectFactory
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/RoomObjectFactory.as::createRoomObjectLogic()
     // The case order mirrors the AS3 switch. AS3 has no default branch: an unknown type leaves the
     // class null and the method returns null, so the object simply gets no event handler.
-    createRoomObjectLogic(type: string): IRoomObjectEventHandler | null
+    createRoomObjectLogic(type: string, roomId: string | null = null): IRoomObjectEventHandler | null
     {
         let LogicClass: LogicConstructor | null = null;
 
@@ -580,6 +580,22 @@ export class RoomObjectFactory implements IRoomObjectFactory
 
         if(logic !== null)
         {
+            // The logic's link to its room's VariableFx config store. Without it every effect on
+            // this object resolves no config and publishes nothing — the whole feature goes quiet
+            // without failing. Avatars and pets share the avatar store; everything else that is a
+            // FurnitureLogic takes the furniture one.
+            if(roomId)
+            {
+                if(logic instanceof AvatarLogic || logic instanceof PetLogic)
+                {
+                    logic.roomData = this.getAvatarLogicRoomData(roomId);
+                }
+                else if(logic instanceof FurnitureLogic)
+                {
+                    logic.roomData = this.getFurnitureLogicRoomData(roomId);
+                }
+            }
+
             logic.eventDispatcher = this._events;
 
             if(!this._registeredTypes.has(type))

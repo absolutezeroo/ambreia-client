@@ -40,6 +40,9 @@ import {RoomObjectAvatarFlatControlUpdateMessage} from '../../messages/RoomObjec
 import {RoomObjectAvatarGuideStatusUpdateMessage} from '../../messages/RoomObjectAvatarGuideStatusUpdateMessage';
 import {RoomObjectAvatarOwnMessage} from '../../messages/RoomObjectAvatarOwnMessage';
 
+import type {AvatarLogicRoomData} from './AvatarLogicRoomData';
+import type {VariableFxLogicConfigManager} from './VariableFxLogicConfigManager';
+
 export class AvatarLogic extends MovingObjectLogic
 {
     // Constants
@@ -138,6 +141,20 @@ export class AvatarLogic extends MovingObjectLogic
         ];
 
         return this.getAllEventTypes(super.getEventTypes(), types);
+    }
+
+    /**
+     * The room half this logic reads its VariableFx configs from. Injected by
+     * `RoomObjectFactory.createRoomObjectLogic()` at construction; null when the logic was built
+     * without a room, in which case no effect on this object ever resolves a config.
+     */
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/object/logic/AvatarLogic.as::roomData
+    roomData: AvatarLogicRoomData | null = null;
+
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/object/logic/AvatarLogic.as::get variableFxLogicManager()
+    protected override get variableFxLogicManager(): VariableFxLogicConfigManager | null
+    {
+        return this.roomData?.variableFxLogicManager ?? null;
     }
 
     override dispose(): void

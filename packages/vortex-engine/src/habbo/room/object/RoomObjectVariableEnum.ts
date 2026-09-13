@@ -84,6 +84,16 @@ export const RoomObjectVariableEnum = {
     FURNITURE_CENTER_Y: 'furniture_center_y',
     FURNITURE_CENTER_Z: 'furniture_center_z',
     FURNITURE_LIFT_AMOUNT: 'furniture_lift_amount',
+
+    /**
+     * The whole VariableFx model for one object — a `VariableFxStatusModelData`, set by the
+     * object's logic and read by its visualization. The only channel between the two halves of the
+     * feature, which is why it is an object rather than the usual number or string.
+     */
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/object/logic/MovingObjectLogic.as::publishVariableFxStatuses()
+    //   The key is a literal in AS3, as every model key is; the enum is this port's index of them.
+    VARIABLE_FX_STATUSES: 'variable_fx_statuses',
+
     FURNITURE_ALLOWED_DIRECTIONS: 'furniture_allowed_directions',
     FURNITURE_DATA: 'furniture_data',
     FURNITURE_DATA_FORMAT: 'furniture_data_format',
