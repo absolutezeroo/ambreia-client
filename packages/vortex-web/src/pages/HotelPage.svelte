@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `/hotel` — and this page deliberately renders almost nothing.
     //
     // The client itself lives in App.svelte (components/Client.svelte), mounted once and parked at

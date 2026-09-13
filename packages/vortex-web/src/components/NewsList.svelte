@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // The news feed. habbo.fr renders it in TWO shapes and they are not interchangeable:
     //
     //   the home (`lead` + `columns={2}`)  a full-width 300px lead plate with the story laid over
@@ -18,23 +18,32 @@
     import {link} from 'svelte-spa-router';
     import EmptyResults from './EmptyResults.svelte';
     import {IMAGES} from '../lib/config.js';
+    import type {IArticleSummary} from '../lib/api.js';
 
-    let {articles = [], categories = [], lead = false, columns = 1} = $props();
+    let {articles = [], categories = [], lead = false, columns = 1}:
+    {
+        articles?: IArticleSummary[];
+        categories?: {id: string; label: string}[];
+        lead?: boolean;
+        columns?: number;
+    } = $props();
 
     const first = $derived(lead ? articles[0] ?? null : null);
     const rest = $derived(lead ? articles.slice(1) : articles);
 
-    function href(article)
+    function href(article: IArticleSummary): string
     {
         return `/article/${article.id}/${article.id}`;
     }
 
-    function label(id)
+    // An unknown category id shows as ITSELF rather than vanishing: the feed and the category list
+    // are two calls, and one arriving first is not a reason to render a headline with no section.
+    function label(id: string): string
     {
         return categories.find((category) => category.id === id)?.label ?? id;
     }
 
-    function when(date)
+    function when(date: string): string
     {
         return new Date(date).toLocaleDateString('fr-FR', {day: 'numeric', month: 'long', year: 'numeric'});
     }

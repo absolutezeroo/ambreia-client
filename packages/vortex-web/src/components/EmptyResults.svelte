@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `common/empty-results/empty-results.html` — habbo.com's "nothing here", and it is not a line
     // of centred text:
     //
@@ -13,7 +13,7 @@
     import {t} from '../lib/i18n.js';
 
     // The template's own default: `EmptyResultsController.translationKey || 'EMPTY_RESULTS_TEXT'`.
-    let {key = 'EMPTY_RESULTS_TEXT', className = ''} = $props();
+    let {key = 'EMPTY_RESULTS_TEXT', className = ''}: {key?: string; className?: string} = $props();
 
     const FRANK = new URL('../assets/teaser_frank_unsure.png', import.meta.url).href;
 </script>

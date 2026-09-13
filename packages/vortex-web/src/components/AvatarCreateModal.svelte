@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `settings/avatar-selection/avatar-create/avatar-create-modal.html` + `…/avatar-create-form.html`.
     // Avatar creation is a MODAL on habbo.com, not a form folded into the page:
     //
@@ -19,18 +19,19 @@
     import {avatars, selectedId} from '../lib/session.js';
     import {t} from '../lib/i18n.js';
 
-    let {onClose} = $props();
+    let {onClose}: {onClose: () => void} = $props();
 
     const BAGHEAD = new URL('../assets/teaser_baghead.png', import.meta.url).href;
     const NAME_PATTERN = /^[a-zA-Z0-9_\-=?!@:.,$]+$/;
     const DEFAULT_FIGURE = 'hr-802-31.hd-180-2.ch-215-66.lg-270-82.sh-305-62';
 
     let name = $state('');
-    let available = $state(null);
+    /** null while nothing has been asked, then what the server answered. */
+    let available = $state<boolean | null>(null);
     let checking = $state(false);
     let busy = $state(false);
     let error = $state('');
-    let timer;
+    let timer: ReturnType<typeof setTimeout>;
 
     // habbo.com's own `ng-minlength="3" ng-maxlength="15"`, named so the messages can quote them:
     // `ERROR_FIELD_MINLENGTH` is "au moins {{min}} caractères".
@@ -42,7 +43,7 @@
         && NAME_PATTERN.test(name.trim()));
 
     /** Which of habbo.com's four messages this name earns, in its own order. */
-    function nameError(value)
+    function nameError(value: string): string
     {
         const trimmed = value.trim();
 
@@ -89,7 +90,7 @@
         return () => clearTimeout(timer);
     });
 
-    async function create(event)
+    async function create(event: SubmitEvent): Promise<void>
     {
         event.preventDefault();
 
@@ -123,7 +124,7 @@
         }
         catch(failure)
         {
-            error = failure.message;
+            error = (failure as Error)?.message ?? '';
         }
         finally
         {

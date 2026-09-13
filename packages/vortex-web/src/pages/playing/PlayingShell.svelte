@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `playing-habbo/playing-habbo.html` — the shell: header, the five tabs, and a `ui-view`.
     //
     // Each tab is its own template (`what-is-habbo.html`, `how-to-play.html`, `habbo-way.html`,

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `/settings/avatars` — `settings/avatar-selection/avatar-selection.html`:
     //
     //   <h2>Sélection d'avatar</h2>
@@ -22,6 +22,7 @@
     import AvatarCreateModal from '../../components/AvatarCreateModal.svelte';
     import SafetyChallengeModal from '../../components/SafetyChallengeModal.svelte';
     import * as api from '../../lib/api.js';
+    import type {IAvatarInfo} from '../../lib/api.js';
     import {avatars, selectedId, choose} from '../../lib/session.js';
     import {t} from '../../lib/i18n.js';
 
@@ -68,12 +69,15 @@
     // `byNameDescriptionOrMotto`, habbo.com's own filter on this list. Its ordering is
     // `['-lastWebAccess', 'name']`; `AvatarInfo` carries no last-access, so this falls back to the
     // name alone — and the row's "Dernière connexion" line has no time for the same reason.
-    const shown = $derived($avatars
+    // `[...].sort()` and not `.toSorted()`: the lib target this project compiles against does not
+    // carry it, and sorting the store's own array in place would mutate what every other reader
+    // sees.
+    const shown = $derived([...$avatars]
         .filter((avatar) => !query
             || `${avatar.name} ${avatar.motto ?? ''}`.toLowerCase().includes(query.toLowerCase()))
-        .toSorted((a, b) => a.name.localeCompare(b.name)));
+        .sort((a, b) => a.name.localeCompare(b.name)));
 
-    async function select(avatar)
+    async function select(avatar: IAvatarInfo): Promise<void>
     {
         error = '';
 
@@ -83,7 +87,7 @@
         }
         catch(failure)
         {
-            error = failure.message;
+            error = (failure as Error)?.message ?? '';
         }
     }
 </script>

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // habbo.com's `.user-menu`: a 190px block holding the name pill, the round avatar well that
     // overlaps the header, and a dropdown that opens BEHIND the header (the list's first item is
     // padded 70px down so it clears it) against a black 90% panel.
@@ -7,6 +7,7 @@
     import Avatar from './Avatar.svelte';
     import {me, signOut} from '../lib/session.js';
     import * as notifier from '../lib/notifier.js';
+    import type {ISpriteName} from '../lib/sprite.js';
     import {t} from '../lib/i18n.js';
 
     let open = $state(false);
@@ -18,7 +19,7 @@
     // (`.navigation__item--hotel`), which leaves a phone with no way into the hotel at all. So this
     // menu carries one. The label is still habbo.com's own word for the action
     // (`NAVIGATION_NATIVE_HOTEL`), and the icon the same sprite cut its green button uses.
-    const ITEMS = [
+    const ITEMS: {href: string; icon: ISpriteName; label: string; added?: boolean}[] = [
         {href: '/hotel', icon: 'habbo', label: t('NAVIGATION_NATIVE_HOTEL'), added: true},
         {href: '/profile', icon: 'profile', label: t('NAVIGATION_PROFILE')},
         {href: '/settings', icon: 'settings', label: t('NAVIGATION_SETTINGS')},
@@ -51,9 +52,15 @@
     }
 </script>
 
+<!-- `event.target` is an EventTarget, not an Element: a click delivered to the document itself, or
+     to a text node, has no `closest` and this threw. It never surfaced because the menu is usually
+     closed, so the branch is only reached while it is open — but a `TypeError` in a window listener
+     takes the whole handler down, and this one is the only thing that closes the menu. -->
 <svelte:window onclick={(event) =>
 {
-    if(open && !event.target.closest('[data-user-menu]'))
+    const target = event.target instanceof Element ? event.target : null;
+
+    if(open && !target?.closest('[data-user-menu]'))
     {
         open = false;
     }

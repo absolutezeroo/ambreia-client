@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `community/fansites/fansites.html`:
     //
     //   <section class="wrapper wrapper--content">

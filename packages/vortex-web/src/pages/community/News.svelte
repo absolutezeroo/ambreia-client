@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `/community` — `community/community.html` + `community/category/category.html`: the news tab,
     // laid out as the standard `main--fixed` + 304px safety aside.
     //
@@ -11,11 +11,12 @@
     import ContentAside from '../../components/ContentAside.svelte';
     import NewsList from '../../components/NewsList.svelte';
     import * as api from '../../lib/api.js';
+    import type {IArticleFeed} from '../../lib/api.js';
     import {t} from '../../lib/i18n.js';
 
     let {params = {}} = $props();
 
-    let feed = $state(null);
+    let feed = $state<IArticleFeed | null>(null);
     let error = $state('');
     let loading = $state(true);
 
@@ -44,7 +45,7 @@
             {
                 if(!cancelled)
                 {
-                    error = failure.message;
+                    error = (failure as Error)?.message ?? '';
                     feed = null;
                 }
             }
@@ -60,7 +61,7 @@
         return () => (cancelled = true);
     });
 
-    function categoryHref(id)
+    function categoryHref(id: string): string
     {
         return id ? `/community/category/${id}` : '/community/category/all';
     }

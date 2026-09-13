@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `home/messaging/discussions/discussions.html`: the home's second tab, listing the last
     // conversations — the other participant's avatar on the left, up to three messages, and a reply
     // link that hands off to the CLIENT rather than replying on the site

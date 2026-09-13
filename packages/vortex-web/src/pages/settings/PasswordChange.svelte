@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `/settings/password` — `settings/password-change/…` + `common/form/password-current` +
     // `common/form/password-new`: a plain fieldset for the current password, then a BOXED one
     // holding the new password, its help paragraph and the repeat field. Every password input
@@ -34,7 +34,7 @@
     const weak = $derived(next.length > 0
         && (next.length < 6 || !/[a-zA-Z]/.test(next) || !/[0-9\W]/.test(next)));
 
-    async function submit(event)
+    async function submit(event: SubmitEvent): Promise<void>
     {
         event.preventDefault();
 
@@ -63,7 +63,7 @@
         }
         catch(failure)
         {
-            error = failure.message;
+            error = (failure as Error)?.message ?? '';
         }
         finally
         {

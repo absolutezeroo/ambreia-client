@@ -25,6 +25,7 @@
     import Sprite from './Sprite.svelte';
     import * as api from '../lib/api.js';
     import type {IPlayerPurse} from '../lib/api.js';
+    import type {ISpriteName} from '../lib/sprite.js';
     import {selectedId, signedIn} from '../lib/session.js';
     import {t} from '../lib/i18n.js';
 
@@ -54,7 +55,10 @@
 
     // Two columns of items, in habbo.com's own order. A membership at zero says so rather than
     // printing "0 jours".
-    const COLUMNS = $derived(purse === null ? [] : [
+    //
+    // Typed against the sheet's own names so a renamed icon is a compile error here rather than a
+    // 0x0 span in the panel.
+    const COLUMNS = $derived<{icon: ISpriteName; label: string}[][]>(purse === null ? [] : [
         [
             {icon: 'credits', label: t('SHOP_PURSE_CREDITS', {creditBalance: purse.credits})},
             {icon: 'diamonds', label: t('SHOP_PURSE_DIAMONDS', {diamondBalance: purse.diamonds})},

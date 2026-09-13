@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `/` — `home/home.html` + `home/news/news.html`.
     //
     //   <habbo-tabs> Actualites | Messagerie
@@ -20,12 +20,13 @@
     import {HOME_TABS} from '../lib/tabs.js';
     import {t} from '../lib/i18n.js';
     import * as api from '../lib/api.js';
+    import type {IArticleFeed} from '../lib/api.js';
     import {signedIn} from '../lib/session.js';
 
     // The same feed the community tab reads — `news.html` fills this column from the CMS on
     // habbo.com, and the emulator's /api/public/articles is that CMS here. Anonymous, so the front
     // page renders with no session.
-    let feed = $state(null);
+    let feed = $state<IArticleFeed | null>(null);
 
     $effect(() =>
     {

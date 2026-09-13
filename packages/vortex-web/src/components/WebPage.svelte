@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `common/…` and `playing_habbo/…` — habbo.com's `<habbo-web-pages key="…">`, which fetches an
     // HTML fragment from its CMS and injects it. Same job here, except the fragments are mirrored
     // into src/webpages/ by tools/fetch-web-pages.mjs, so the hotel serves its own copy.

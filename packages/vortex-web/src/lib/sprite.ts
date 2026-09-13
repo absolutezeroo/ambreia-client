@@ -122,3 +122,19 @@ export const SPRITE = {
     twitter: [716, 878, 30, 30],
     youtube: [748, 878, 30, 30],
 };
+
+/**
+ * Every icon the sheet actually has.
+ *
+ * `Sprite` takes this rather than a string, and that is not decoration: an unknown name used to
+ * render a `<span>` of 0x0 — nothing on screen, nothing in the console, nothing in the network tab.
+ * The one place a name is computed rather than written (`productIcon`, off a number an operator
+ * typed into a product row) has to say what it does when the answer is not one of these.
+ */
+export type ISpriteName = keyof typeof SPRITE;
+
+/** Whether a computed name is one the sheet can draw. */
+export function isSpriteName(name: string): name is ISpriteName
+{
+    return Object.hasOwn(SPRITE, name);
+}

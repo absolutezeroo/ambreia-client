@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `habbo-password-toggle-mask`: a password field with the show/hide eye inside it. Two things
     // come from the stylesheet — the input reserves 35px on its right for the icon
     // (`[habbo-password-toggle-mask]{padding-right:35px}`) and the eye sits at right 12 / top 12.1,
@@ -15,6 +15,14 @@
         invalid = false,
         autocomplete = 'current-password',
         className = '',
+    }: {
+        label?: string;
+        name?: string;
+        value?: string;
+        invalid?: boolean;
+        /** The browser's own vocabulary — 'off' for a security answer, which is not a password. */
+        autocomplete?: AutoFill;
+        className?: string;
     } = $props();
 
     let shown = $state(false);

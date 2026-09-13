@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `/settings/privacy` — `settings/privacy-settings/privacy-settings-form.html`. Six fieldsets,
     // and they ALTERNATE plain / boxed, which is what gives the page its striped look:
     //
@@ -47,7 +47,7 @@
         return () => (cancelled = true);
     });
 
-    async function save(event)
+    async function save(event: SubmitEvent): Promise<void>
     {
         event.preventDefault();
         saving = true;
@@ -66,7 +66,7 @@
         }
         catch(failure)
         {
-            error = failure?.message ?? '';
+            error = (failure as Error)?.message ?? '';
         }
         finally
         {

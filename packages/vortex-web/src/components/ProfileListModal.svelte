@@ -31,7 +31,7 @@
     import type {IProfileBadge, IProfileFriend, IProfileGroup, IProfileRoom} from '../lib/api.js';
     import {t} from '../lib/i18n.js';
 
-    type IProfileListKind = 'badges' | 'friends' | 'rooms' | 'groups';
+    export type IProfileListKind = 'badges' | 'friends' | 'rooms' | 'groups';
 
     let {
         kind,

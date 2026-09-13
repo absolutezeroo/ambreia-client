@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `security/login/login-modal.html`, which is four elements and nothing else:
     //
     //   <div class="login">

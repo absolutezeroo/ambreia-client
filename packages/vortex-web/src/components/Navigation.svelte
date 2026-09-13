@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `.navigation`: the white band under the header, 70px tall, its five links spread with
     // `justify-content: space-around`, each an icon above a 12px condensed uppercase label. The
     // icon has three states (idle / hover / active) and swapping it is the point of the sheet —
@@ -12,12 +12,25 @@
     import {link, location} from 'svelte-spa-router';
     import Sprite from './Sprite.svelte';
     import {signedIn} from '../lib/session.js';
+    import type {ISpriteName} from '../lib/sprite.js';
     import {t} from '../lib/i18n.js';
 
     // Order, membership AND labels are `common/header/navigation/navigation.html`'s, not a guess:
     // home, community, SHOP, playing-habbo, NFT — the shop sits third, before "Les clés du jeu" —
     // and each label is the translate key that template names.
-    const ITEMS = [
+    // Each icon is really THREE cuts — idle, hover, active — named by suffix in the sheet, which is
+    // what `iconFor` builds. Typing the base against the sheet's own names is what makes a missing
+    // `…Hover` or `…Active` cut a compile error here rather than an icon that silently disappears
+    // on hover.
+    interface INavigationItem
+    {
+        href: string;
+        icon: 'navHome' | 'navCommunity' | 'navShop' | 'navPlaying';
+        label: string;
+        strict?: boolean;
+    }
+
+    const ITEMS: INavigationItem[] = [
         {href: '/', icon: 'navHome', label: t('NAVIGATION_HOME'), strict: true},
         {href: '/community', icon: 'navCommunity', label: t('NAVIGATION_COMMUNITY')},
         {href: '/shop', icon: 'navShop', label: t('NAVIGATION_SHOP')},
@@ -25,14 +38,14 @@
         {href: '/habbo-nft', icon: 'navShop', label: t('NAVIGATION_HABBO_NFT')},
     ];
 
-    function isActive(item)
+    function isActive(item: INavigationItem): boolean
     {
         return item.strict ? $location === item.href : $location.startsWith(item.href);
     }
 
     let hovered = $state('');
 
-    function iconFor(item)
+    function iconFor(item: INavigationItem): ISpriteName
     {
         if(isActive(item))
         {

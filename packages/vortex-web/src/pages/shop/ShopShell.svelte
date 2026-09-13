@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `shop/shop.html` — the shell, and only the shell:
     //
     //   <habbo-header-small active="shop">

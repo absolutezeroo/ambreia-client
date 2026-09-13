@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `.form__field` + `.form__label` + `.form__input`. The input is a light box on the dark page
     // with an inset highlight along its top edge (--shadow-field), which is the detail that makes
     // the field read as sunken rather than pasted on.

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `common/message-container/message-container.html` — habbo.com's status block, the thing every
     // settings page leads with and this port was drawing as an ordinary panel:
     //
@@ -9,12 +9,21 @@
     //
     // The disc is white and the mark sits on it — an orange "!", a tick, or one of the two 2FA
     // padlocks — which is why the box reads as a status and not as a paragraph in a box.
+    import type {Snippet} from 'svelte';
     import Sprite from './Sprite.svelte';
+    import type {ISpriteName} from '../lib/sprite.js';
 
-    let {type = 'exclamation', className = '', children} = $props();
+    // habbo.com's own four `type` values. It indexes MARKS below, and a fifth name used to fall
+    // through to the exclamation silently — a box claiming a state it was not asked for.
+    let {type = 'exclamation', className = '', children}:
+    {
+        type?: 'exclamation' | 'check' | '2fa-off' | '2fa-on';
+        className?: string;
+        children: Snippet;
+    } = $props();
 
     // Each mark's offset inside the disc, from the ::after rules (margin-left / top).
-    const MARKS = {
+    const MARKS: Record<string, {name: ISpriteName; left: number; top: number}> = {
         exclamation: {name: 'statusExclamation', left: 20, top: 2.5},
         check: {name: 'statusCheck', left: 14, top: 11.5},
         '2fa-off': {name: 'status2faOff', left: -1, top: -3},

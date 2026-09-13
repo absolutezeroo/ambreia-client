@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `security/login/login-form.html`. Three shapes of the same form:
     //
     //   modal   — the full one habbo.com shows in its login modal: a "connect with one of these"
@@ -38,7 +38,7 @@
     let busy = $state(false);
     let error = $state('');
 
-    async function submit(event)
+    async function submit(event: SubmitEvent): Promise<void>
     {
         event.preventDefault();
 
@@ -68,7 +68,7 @@
                 mfa = true;
             }
 
-            error = failure.message;
+            error = (failure as Error)?.message ?? '';
         }
         finally
         {

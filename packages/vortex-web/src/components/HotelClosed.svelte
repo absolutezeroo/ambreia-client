@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `common/hotel-closed/hotel-closed.html`, styled off `habbo-hotel-closed` / `.hotel-closed`.
     //
     // habbo.com has NO site-wide error strip. When the hotel is not open it renders this box, and

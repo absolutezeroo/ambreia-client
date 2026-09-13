@@ -23,7 +23,10 @@
     import Sprite from './Sprite.svelte';
     import {t} from '../lib/i18n.js';
 
-    const SOCIALS = ['facebook', 'twitter', 'youtube', 'instagram', 'rss'];
+    // `as const` so each name narrows to the sheet's own union rather than widening to `string`:
+    // `Sprite` refuses a name the sheet cannot draw, and a bare array would hide a typo here behind
+    // a 0x0 span.
+    const SOCIALS = ['facebook', 'twitter', 'youtube', 'instagram', 'rss'] as const;
 
     const LINKS = [
         'FOOTER_SUPPORT',

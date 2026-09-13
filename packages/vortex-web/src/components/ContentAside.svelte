@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // The standard content layout, and it really is standard: `home/news/news.html`,
     // `community/category/category.html` and `community/article/article.html` are all
     //

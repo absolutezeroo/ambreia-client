@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `common/tabs/tabs.html`. Every page on habbo.com has one of these under the navigation.
     //
     // The bar sits on its OWN dark band — `habbo-tabs { background-color: #001726; display: block }`
@@ -13,14 +13,15 @@
     // condensed — and `line-height: 50px` is what gives the band its height.
     import {link, location} from 'svelte-spa-router';
     import Sprite from './Sprite.svelte';
+    import type {ITab} from '../lib/tabs.js';
 
-    let {title = '', tabs = []} = $props();
+    let {title = '', tabs = []}: {title?: string; tabs?: ITab[]} = $props();
 
     let open = $state(false);
 
     // `strict` mirrors habbo.com's `strict-path`: / and /shop must match exactly or they would stay
     // active on every child route.
-    function isActive(tab)
+    function isActive(tab: ITab): boolean
     {
         return tab.strict ? $location === tab.path : $location.startsWith(tab.path);
     }

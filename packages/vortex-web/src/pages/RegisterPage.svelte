@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `/registration` — `registration/registration-form.html`. Two columns, not a centred card:
     //
     //   left  (.form--left, 66% from 532px)   h1, then the fieldsets, then the big blue submit
@@ -55,7 +55,7 @@
         {key: 'APPLE_SIGN_IN', class: 'bg-white border-[#d0d0d0] text-black'},
     ];
 
-    async function submit(event)
+    async function submit(event: SubmitEvent): Promise<void>
     {
         event.preventDefault();
 
@@ -77,7 +77,7 @@
         }
         catch(failure)
         {
-            error = failure.message;
+            error = (failure as Error)?.message ?? '';
         }
         finally
         {

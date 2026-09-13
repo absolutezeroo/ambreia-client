@@ -10,6 +10,8 @@
 // turns that into the visitor's own notation, so nothing here formats a currency by hand.
 import {SHOP_KIND, SHOP_ORDER} from './api.js';
 import type {IShopProduct, IShopOrder} from './api.js';
+import {isSpriteName} from './sprite.js';
+import type {ISpriteName} from './sprite.js';
 import {t} from './i18n.js';
 
 /**
@@ -38,9 +40,15 @@ export function productName(product: IShopProduct | IShopOrder): string
 }
 
 /** Which shop sprite a product's tile draws. The API carries the number; club has no sprite of its own. */
-export function productIcon(product: IShopProduct): string
+export function productIcon(product: IShopProduct): ISpriteName
 {
-    return `credit${product.icon}`;
+    const name = `credit${product.icon}`;
+
+    // `icon` is an integer an operator typed into a product row, so it can be anything. The sheet
+    // has six credit icons; a seventh used to render a 0x0 span — an invisible tile the visitor
+    // could still click, with no error anywhere. Falling back to the first one keeps the tile
+    // visible and wrong, which is the failure an operator can actually see and fix.
+    return isSpriteName(name) ? name : 'credit1';
 }
 
 // The section headings, off `store/inventory/*.html`. Each `<section>` there leads with an

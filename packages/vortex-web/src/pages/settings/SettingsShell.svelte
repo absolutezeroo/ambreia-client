@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `settings/settings.html` — and it is ONLY the shell:
     //
     //   <habbo-header-small active="settings">

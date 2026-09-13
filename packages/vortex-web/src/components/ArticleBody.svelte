@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // An article body, rendered from the emulator's closed block vocabulary
     // (Vortex.Database/Entities/Web/WebArticleBody.cs):
     //
@@ -18,10 +18,31 @@
     import {link} from 'svelte-spa-router';
     import {IMAGES} from '../lib/config.js';
 
-    let {body = []} = $props();
+    // One rendered block of an article. `href` is the field an editor controls that the browser will
+    // EXECUTE, so it stays `unknown` rather than `string`: nothing here may assume the shape the API
+    // promised, and both guards below re-test it themselves.
+    interface IArticleBlock
+    {
+        type?: string;
+        text?: string;
+        href?: unknown;
+        src?: string;
+        caption?: string;
+        label?: string;
+    }
+
+    // `unknown[]`, deliberately. The API declares this field as `JsonNode[]` — the emulator hands
+    // the blocks through as raw JSON — so the generated type says nothing at all about their shape,
+    // and pretending otherwise at the prop boundary would move the lie one file up. This component
+    // is the one place that knows what a block looks like, so it is the one place that narrows, and
+    // `safe()` re-validates the only field that matters anyway.
+    let {body = []}: {body?: unknown[]} = $props();
 
     // `#/…` is an in-site route and goes through the router; everything else is a plain link.
-    function internal(href)
+    // Both guards are type predicates, not plain booleans. That is the point of keeping `href` as
+    // `unknown`: the only way to reach `.slice(1)` or an `href=` attribute is THROUGH one of them,
+    // so a future branch that renders a link without asking cannot compile.
+    function internal(href: unknown): href is string
     {
         return typeof href === 'string' && href.startsWith('#/');
     }
@@ -32,7 +53,7 @@
     // in one place only makes the whole site's safety depend on that one place never being bypassed
     // — a direct DB write, a second writer, a relaxed rule — and this component cannot see any of
     // those. A block whose href fails renders as plain text rather than as a link.
-    function safe(href)
+    function safe(href: unknown): href is string
     {
         if(typeof href !== 'string' || !href || href.length > 2048)
         {
@@ -51,7 +72,8 @@
     }
 </script>
 
-{#each body as block, index (index)}
+{#each body as raw, index (index)}
+    {@const block = raw as IArticleBlock}
     {#if block.type === 'p'}
         <p>{block.text}</p>
     {:else if block.type === 'h'}

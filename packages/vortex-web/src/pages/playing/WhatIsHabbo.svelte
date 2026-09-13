@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `/playing-habbo/what-is-habbo` — `playing-habbo/what-is-habbo.html`. habbo.com redirects
     // `/playing-habbo` here (`t.when('/playing-habbo', '/playing-habbo/what-is-habbo')`).
     //

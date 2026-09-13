@@ -8,12 +8,25 @@
 // this avoids.
 import {t} from './i18n.js';
 
-export const HOME_TABS = [
+/**
+ * One tab in a bar.
+ *
+ * `strict` is habbo.com's own `strict-path`: `/` and `/shop` must match exactly, or they stay
+ * highlighted on every child route under them.
+ */
+export interface ITab
+{
+    path: string;
+    label: string;
+    strict?: boolean;
+}
+
+export const HOME_TABS: ITab[] = [
     {path: '/', label: t('HOME_NEWS_TAB'), strict: true},
     {path: '/messaging', label: t('HOME_MESSAGING_TAB')},
 ];
 
-export const COMMUNITY_TABS = [
+export const COMMUNITY_TABS: ITab[] = [
     {path: '/community/photos', label: t('COMMUNITY_PHOTOS_TAB')},
     {path: '/community/rooms', label: t('COMMUNITY_ROOMS_TAB')},
     {path: '/community/fansites', label: t('COMMUNITY_FANSITES_TAB')},
@@ -22,13 +35,13 @@ export const COMMUNITY_TABS = [
     {path: '/community', label: t('COMMUNITY_NEWS_TAB')},
 ];
 
-export const SHOP_TABS = [
+export const SHOP_TABS: ITab[] = [
     {path: '/shop', label: t('SHOP_BUY_TAB'), strict: true},
     {path: '/shop/prepaid', label: t('SHOP_PREPAID_TAB')},
     {path: '/shop/history', label: t('SHOP_HISTORY_TAB')},
 ];
 
-export const SETTINGS_TABS = [
+export const SETTINGS_TABS: ITab[] = [
     {path: '/settings/privacy', label: t('SETTINGS_PRIVACY_TAB')},
     {path: '/settings/security', label: t('SETTINGS_ACCOUNT_SECURITY_TAB')},
     {path: '/settings/2fa', label: t('SETTINGS_TWO_FACTOR_AUTH_TAB')},
@@ -40,7 +53,7 @@ export const SETTINGS_TABS = [
     // "nothing is connected" is worse than no tab.
 ];
 
-export const PLAYING_HABBO_TABS = [
+export const PLAYING_HABBO_TABS: ITab[] = [
     {path: '/playing-habbo', label: t('PLAYING_HABBO_WHAT_IS_HABBO_TAB'), strict: true},
     {path: '/playing-habbo/how-to-play', label: t('PLAYING_HABBO_HOW_TO_PLAY_TAB')},
     {path: '/playing-habbo/habbo-way', label: t('PLAYING_HABBO_HABBO_WAY_TAB')},

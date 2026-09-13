@@ -1,8 +1,15 @@
-<script>
+<script lang="ts">
     // `.static-content`: habbo.com's editorial pages — safety, help, terms, privacy, staff — are one
     // template fed by the route. They differ only in their text, so they are one component here;
     // five near-identical files would drift apart the first time one was edited.
     import {location, link} from 'svelte-spa-router';
+
+    /** A heading and its paragraphs: `[title, ...body]` per block. */
+    interface IStaticPage
+    {
+        title: string;
+        blocks: string[][];
+    }
 
     const PAGES = {
         '/safety': {
@@ -58,7 +65,10 @@
         },
     };
 
-    const page = $derived(PAGES[$location] ?? PAGES['/help']);
+    // `$location` is any route the router lands on, so the lookup is a miss by default — `/help` is
+    // the fallback and always exists. Indexing a literal object with an arbitrary string needs the
+    // record type to say so; without it TypeScript is right that the answer could be undefined.
+    const page = $derived((PAGES as Record<string, IStaticPage>)[$location] ?? PAGES['/help']);
 </script>
 
 <div class="mx-auto max-w-[720px] px-3 py-6">

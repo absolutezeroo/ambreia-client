@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `common/header/header-large.html` + `home/register-banner/register-banner.html`. The
     // signed-out front page, and it is a REGISTER pitch over the hotel:
     //

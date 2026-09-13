@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `common/header/header-small.html`, verbatim in structure:
     //
     //   <header class="header__wrapper wrapper">

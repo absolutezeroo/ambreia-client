@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `.form__fieldset`, and its boxed variant. habbo.com's settings forms alternate the two — plain,
     // boxed, plain, boxed — which is what gives those pages their striped look:
     //

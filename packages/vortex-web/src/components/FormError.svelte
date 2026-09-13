@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `.form__popover--error` — habbo.com never puts a line of red text under a field. It puts a
     // crimson card there, with a triangle pointing up at the field it belongs to and a hard 4px
     // shadow under it:

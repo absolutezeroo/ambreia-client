@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `/playing-habbo/safety` — `playing-habbo/safety.html`: the parents' guide and the help box.
     import PlayingShell from './PlayingShell.svelte';
 </script>

@@ -11,13 +11,15 @@
         // Svelte compiles each file in isolation, so a type-only import has to say so or the
         // compiler leaves a runtime import of something that does not exist at runtime.
         "verbatimModuleSyntax": true,
+        // `allowJs` and `checkJs` are both on, and there is no longer any .js under src/ for either
+        // to apply to — the conversion this comment used to describe ("the 59 components are still
+        // plain `<script>`… a component starts being checked when it takes `lang=\"ts\"`, one at a
+        // time") finished on 2026-09-13. All 72 components and the entry point are TypeScript.
+        //
+        // They stay on so that a .js file ADDED from here is checked rather than silently exempt.
+        // That is the whole point of having finished: the escape hatch is closed, not merely unused.
         "allowJs": true,
-
-        // NOT `checkJs`. The 59 components are still plain `<script>`, and checking them before they
-        // are converted reports every untyped prop in the site at once — hundreds of diagnostics
-        // nobody reads, which is how a checker gets switched off in week one. A component starts
-        // being checked when it takes `lang="ts"`, one at a time.
-        "checkJs": false,
+        "checkJs": true,
 
         "types": ["svelte", "vite/client"]
     },

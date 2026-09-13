@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `/room/:id` — `room/room.html` -> `room/room-open/room-open.html`:
     //
     //   .room__thumbnail          110x110, top left
@@ -23,6 +23,7 @@
     import Sprite from '../components/Sprite.svelte';
     import Avatar from '../components/Avatar.svelte';
     import * as api from '../lib/api.js';
+    import type {IRoomSummary} from '../lib/api.js';
     import {roomUrl, hideOnError} from '../lib/config.js';
     import {t} from '../lib/i18n.js';
     import {signedIn} from '../lib/session.js';
@@ -42,13 +43,13 @@
     // hotel is opened in a session and not on a second click. Closing that needs either habbo.com's
     // server-side forward or a message channel into the iframe; until then it beats what this was
     // doing, which was opening the hotel and dropping the visitor in their own room.
-    function enterLink(roomId)
+    function enterLink(roomId: number): string
     {
         return `/hotel?link=${encodeURIComponent(`navigator/goto/${roomId}`)}`;
     }
 
     /** `navigator/report/<id>/<base64 name>`, built the way `RoomOpenController` builds it. */
-    function reportLink(roomId, name)
+    function reportLink(roomId: number, name: string): string
     {
         // Non-ASCII stripped BEFORE btoa, which is habbo.com's own `replace(/[^\x00-\x7F]/g, "")`:
         // btoa throws on anything above U+00FF, and an appart called "★ L'HÔTEL" is not rare.
@@ -57,7 +58,7 @@
         return `/hotel?link=${encodeURIComponent(`navigator/report/${roomId}/${ascii}`)}`;
     }
 
-    let room = $state(null);
+    let room = $state<IRoomSummary | null>(null);
     let loading = $state(true);
 
     $effect(() =>

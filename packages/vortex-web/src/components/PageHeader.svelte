@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `.photos__header` / `.rooms__header` — the band a section leads with, and the piece that was
     // missing from every page here:
     //
@@ -13,7 +13,17 @@
     //
     // The illustration is habbo.com's own `teaser_stories_channels` sheet; its negative left margin
     // lets it hang off the wrapper's left edge, which is why the band has to clip.
-    let {title = '', description = '', illustration = false, children} = $props();
+    import type {Snippet} from 'svelte';
+    // `children` is OPTIONAL — most headers are a title and a sentence, and the three that add a
+    // control (the rooms filter, the shop's tabs) pass one. It was required by inference, so every
+    // caller without one was a type error the moment this file started being checked.
+    let {title = '', description = '', illustration = false, children}:
+    {
+        title?: string;
+        description?: string;
+        illustration?: boolean;
+        children?: Snippet;
+    } = $props();
 
     const TEASER = new URL('../assets/teaser_channels.png', import.meta.url).href;
 </script>

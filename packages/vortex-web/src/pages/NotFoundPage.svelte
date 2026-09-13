@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `not-found/not-found.html`, which is four elements:
     //
     //   <main class="wrapper wrapper--content not-found">

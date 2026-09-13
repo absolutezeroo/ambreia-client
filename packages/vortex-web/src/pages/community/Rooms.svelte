@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `community/rooms/rooms.html`: the page-header band, then a flat list of `.room-item`. The
     // geometry is habbo.com's own and nothing about it is a list-with-dividers:
     //
@@ -22,9 +22,10 @@
     import Avatar from '../../components/Avatar.svelte';
     import EmptyResults from '../../components/EmptyResults.svelte';
     import * as api from '../../lib/api.js';
+    import type {IRoomSummary} from '../../lib/api.js';
     import {t} from '../../lib/i18n.js';
 
-    let rooms = $state([]);
+    let rooms = $state<IRoomSummary[]>([]);
     let loading = $state(true);
 
     $effect(() =>

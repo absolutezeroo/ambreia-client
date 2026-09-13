@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `/profile/:name` — `profile/profile.html`, whose shape is specific and was guessed wrong here
     // before:
     //
@@ -21,7 +21,10 @@
     import EmptyResults from '../components/EmptyResults.svelte';
     import ProfileListModal from '../components/ProfileListModal.svelte';
     import {me} from '../lib/session.js';
+    import type {Snippet} from 'svelte';
     import * as api from '../lib/api.js';
+    import type {IPlayerProfile} from '../lib/api.js';
+    import type {IProfileListKind} from '../components/ProfileListModal.svelte';
     import {loadBadgeTexts, badgeName} from '../lib/badges.js';
     import {badgeUrl, groupBadgeUrl, hideOnError} from '../lib/config.js';
     import {t} from '../lib/i18n.js';
@@ -46,12 +49,15 @@
     // STACKED form. This port unfolded the card in place instead, which is a different screen: the
     // card is capped at five deliberately, and the descriptions the modal exists to show are hidden
     // in the grid by `.item-list--grid .item__description{display:none}`.
-    let opened = $state('');
+    // Which of the four lists the modal is showing, or none. Typed against the modal's own union
+    // rather than a bare string — it is also what builds the `PROFILE_<TYPE>_TITLE` key, so a fifth
+    // value would render a key instead of a heading.
+    let opened = $state<IProfileListKind | ''>('');
 
     const FIVE = 5;
 
     // Same format as the news feed's dates, which is the only other date the site prints.
-    function joined(date)
+    function joined(date: string): string
     {
         return new Date(date).toLocaleDateString('fr-FR', {day: 'numeric', month: 'long', year: 'numeric'});
     }
@@ -60,7 +66,7 @@
     const wanted = $derived(params.name || $me?.name || '');
     const own = $derived(!params.name || params.name === $me?.name);
 
-    let profile = $state(null);
+    let profile = $state<IPlayerProfile | null>(null);
     let texts = $state({});
     let error = $state('');
     let loading = $state(true);
@@ -94,9 +100,9 @@
 
     // `orderBy: random | limitTo: 5`. Copied before sorting: `toSorted` leaves the source list alone,
     // and the modal renders that same list in its own order.
-    function fiveOf(list)
+    function fiveOf<T>(list: T[]): T[]
     {
-        return list.toSorted(() => 0.5 - Math.random()).slice(0, FIVE);
+        return [...list].sort(() => 0.5 - Math.random()).slice(0, FIVE);
     }
 
     $effect(() =>
@@ -155,7 +161,7 @@
                 if(!cancelled)
                 {
                     profile = null;
-                    error = failure?.message ?? '';
+                    error = (failure as Error)?.message ?? '';
                 }
             }
             finally
@@ -260,7 +266,7 @@
 
 <!-- `.profile__card__wrapper--<kind>` > `.profile__card__aligner` > `.profile__card`, all four
      identical but for the illustration and the list. -->
-{#snippet card(kind, teaser, title, count, items)}
+{#snippet card(kind: IProfileListKind, teaser: string, title: string, count: string, items: Snippet)}
     <div class="relative mt-[140px] pb-3 md:w-1/2 md:pl-3">
         <img src={teaser} alt="" class="pointer-events-none absolute -top-[140px] left-0 h-[140px] [image-rendering:pixelated] md:left-3" />
 

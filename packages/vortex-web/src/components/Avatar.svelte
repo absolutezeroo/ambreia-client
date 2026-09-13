@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // Rendered by packages/vortex-imager, which runs the client's own avatar pipeline — so a head
     // here is pixel-identical to the same head in a room, which is the whole reason the imager
     // exists rather than a second renderer.

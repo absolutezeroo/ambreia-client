@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `/article/:id/:title` — `community/article/article.html`, the standard `main--fixed` + 304px
     // safety aside, and the community tab bar stays lit on it.
     //
@@ -20,31 +20,35 @@
     import ArticleBody from '../../components/ArticleBody.svelte';
     import Panel from '../../components/Panel.svelte';
     import * as api from '../../lib/api.js';
+    import type {IArticleDetail, IArticleSummary} from '../../lib/api.js';
     import {IMAGES} from '../../lib/config.js';
     import {t} from '../../lib/i18n.js';
 
     let {params = {}} = $props();
 
-    let detail = $state(null);
-    let newest = $state([]);
-    let categories = $state([]);
+    let detail = $state<IArticleDetail | null>(null);
+    let newest = $state<IArticleSummary[]>([]);
+    let categories = $state<{id: string; label: string}[]>([]);
     let error = $state('');
     let loading = $state(true);
 
     const article = $derived(detail?.article ?? null);
 
     // The date and the category read together as one italic line, so they are resolved together.
-    function label(id)
+    function label(id: string): string
     {
         return categories.find((category) => category.id === id)?.label ?? id;
     }
 
-    function when(date)
+    function when(date: string): string
     {
         return new Date(date).toLocaleDateString('fr-FR', {day: 'numeric', month: 'long', year: 'numeric'});
     }
 
-    function href(entry)
+    // Takes only what it reads. The "Nouveautés" panel passes a full summary and the related list
+    // passes an `ArticleLink`, which is just an id and a title — asking for a summary here made the
+    // second caller a type error for fields the function never touches.
+    function href(entry: {id: string}): string
     {
         return `/article/${entry.id}/${entry.id}`;
     }
@@ -79,7 +83,7 @@
             {
                 if(!cancelled)
                 {
-                    error = failure.message;
+                    error = (failure as Error)?.message ?? '';
                     detail = null;
                 }
             }
@@ -102,7 +106,10 @@
         <div>
             {#if loading}
                 <p class="py-12 text-center">...</p>
-            {:else if !article}
+            <!-- Guarded on BOTH: `article` is derived from `detail`, and the checker cannot infer
+                 one from the other — so without naming `detail` here the branch below reads its
+                 `body` and `related` off a value it has not proved is there. -->
+            {:else if !detail || !article}
                 <h1>{error || t('EMPTY_RESULTS_TEXT')}</h1>
                 <p><a href="/community" use:link>{t('NEWS_TITLE')}</a></p>
             {:else}

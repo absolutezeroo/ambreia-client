@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // `.aside--box`: the rounded blue block every sidebar widget and most page sections sit in.
     //
     // Its first heading is not plain text — habbo.com bleeds it into a darker band across the top of

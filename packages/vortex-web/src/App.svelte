@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // The site shell. habbo.com has TWO headers and picks between them per page
     // (`home.html`: `ng-if="HomeController.hasHeaderLarge()"`): the large one is the signed-out
     // front page — a register pitch over the hotel art — and the small one is every other page.

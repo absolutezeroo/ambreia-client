@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     // habbo.com has three button ramps and they differ only in colour: blue for everything
     // (`.login-form__button`, `.claim__button`), green for entering the hotel and for a form's own
     // submit inside a dialog (`.claim__button--primary`, `.two-factor-auth__auth-button`), and
@@ -6,6 +6,9 @@
     // `.account-security__disable`). All three press DOWN 2px on :active and drop their shadow from
     // 3px to 1px at the same time, which is what makes them feel physical — a colour-only :active
     // state is the usual tell that a Habbo button was rebuilt from a screenshot.
+    import type {Snippet} from 'svelte';
+    // `variant` is the three ramps and nothing else: it indexes RAMP below, and a fourth name used
+    // to produce `undefined` in the class list — a button with no background at all.
     let {
         variant = 'blue',
         type = 'button',
@@ -14,6 +17,14 @@
         className = '',
         onclick = undefined,
         children,
+    }: {
+        variant?: 'blue' | 'green' | 'red';
+        type?: 'button' | 'submit' | 'reset';
+        href?: string;
+        disabled?: boolean;
+        className?: string;
+        onclick?: (() => void) | undefined;
+        children: Snippet;
     } = $props();
 
     const RAMP = {
