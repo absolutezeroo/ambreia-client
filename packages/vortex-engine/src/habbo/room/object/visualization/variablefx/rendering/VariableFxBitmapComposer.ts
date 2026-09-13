@@ -177,6 +177,111 @@ export class VariableFxBitmapComposer
         this.drawBitmap(scratch, left, top, blendMode, opacity);
     }
 
+    /**
+     * Draws `source` stretched to `width`, keeping its two end caps at their natural size — the
+     * horizontal half of a nine-slice, which is what every bar is built from.
+     *
+     * Two details that are easy to lose. The left cap is clipped to the requested width, so a bar
+     * narrower than its own cap draws part of one rather than overflowing; and the right cap is
+     * given whatever width is left after the left cap and the stretched middle, so the two never
+     * overlap when the bar is only a few pixels wide.
+     *
+     * A `tint` turns the whole thing into a tinted draw — that is how one grey bar asset becomes
+     * every colour a config can ask for.
+     */
+    // AS3: .../rendering/VariableFxBitmapComposer.as::drawThreeSlice()
+    drawThreeSlice(
+        source: VariableFxDrawable,
+        leftWidth: number,
+        rightWidth: number,
+        width: number,
+        x: number,
+        y: number,
+        blendMode: string,
+        opacity: number,
+        clipRect: VariableFxClipRect | null = null,
+        tint: number | null = null
+    ): void
+    {
+        const left = Math.max(0, leftWidth | 0);
+        const right = Math.max(0, rightWidth | 0);
+        const total = Math.max(0, width | 0);
+        const middleSourceWidth = Math.max(0, source.width - left - right);
+        const middleTargetWidth = Math.max(0, total - left - right);
+
+        const transform = tint === null
+            ? VariableFxBitmapComposer.createAlphaColorTransform(opacity)
+            : VariableFxBitmapComposer.createTintColorTransform(tint, opacity);
+
+        this.drawSourceRegionWithTransform(
+            source, 0, 0, Math.min(left, total), source.height, x, y, blendMode, clipRect, transform
+        );
+
+        if(middleSourceWidth > 0 && middleTargetWidth > 0)
+        {
+            this.drawScaledHorizontalRegion(
+                source, left, middleSourceWidth, source.height,
+                x + left, y, middleTargetWidth, blendMode, opacity, clipRect, transform
+            );
+        }
+
+        const rightDrawn = Math.min(right, Math.max(0, total - left - middleTargetWidth));
+
+        if(rightDrawn > 0)
+        {
+            this.drawSourceRegionWithTransform(
+                source, source.width - rightDrawn, 0, rightDrawn, source.height,
+                x + total - rightDrawn, y, blendMode, clipRect, transform
+            );
+        }
+    }
+
+    /**
+     * The stretched middle of {@link drawThreeSlice}: the only place anything is SCALED, and the
+     * one draw whose matrix is not a plain translation.
+     */
+    // AS3: .../rendering/VariableFxBitmapComposer.as::drawScaledHorizontalRegion()
+    private drawScaledHorizontalRegion(
+        source: VariableFxDrawable,
+        sourceX: number,
+        sourceWidth: number,
+        sourceHeight: number,
+        destX: number,
+        destY: number,
+        destWidth: number,
+        blendMode: string,
+        opacity: number,
+        clipRect: VariableFxClipRect | null,
+        colorTransform: VariableFxColorTransform | null
+    ): void
+    {
+        const scale = sourceWidth <= 0 ? 1 : destWidth / sourceWidth;
+        const bounds = this.getTargetBounds(destX, destY, destWidth, sourceHeight, clipRect);
+        const clip = VariableFxBitmapComposer.boundsToClipRect(bounds);
+
+        if(clip.width <= 0 || clip.height <= 0 || sourceWidth <= 0 || sourceHeight <= 0 || destWidth <= 0) return;
+
+        const transformed = colorTransform === null || colorTransform.isAlphaOnly
+            ? source
+            : this.applyColorTransform(source, colorTransform);
+
+        if(transformed === null) return;
+
+        const alpha = VariableFxBitmapComposer.clampOpacity(opacity);
+
+        this._context.save();
+        this._context.globalCompositeOperation = toCanvasBlendMode(blendMode);
+        this._context.globalAlpha = alpha / 255;
+        this._context.beginPath();
+        this._context.rect(clip.x, clip.y, Math.max(0, clip.width), Math.max(0, clip.height));
+        this._context.clip();
+        // The same matrix AS3 builds: scale horizontally, and translate so the scaled source
+        // column lands at destX.
+        this._context.setTransform(scale, 0, 0, 1, (destX | 0) - (sourceX | 0) * scale, destY | 0);
+        this._context.drawImage(transformed, 0, 0);
+        this._context.restore();
+    }
+
     // AS3: .../rendering/VariableFxBitmapComposer.as::drawSourceRegion()
     drawSourceRegion(
         source: VariableFxDrawable,
