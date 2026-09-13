@@ -5,6 +5,8 @@ import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 import type {IWindow} from '@core/window/IWindow';
 import type {IWindowContainer} from '@core/window/IWindowContainer';
 import {WindowEvent} from '@core/window/events/WindowEvent';
+import type {ILinkEventTracker} from '@core/runtime/events/ILinkEventTracker';
+import {PerkType} from '@habbo/communication/enum/PerkType';
 import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
 import type {IStaticBitmapWrapperWindow} from '@core/window/components/IStaticBitmapWrapperWindow';
 import type {IBitmapWrapperWindow} from '@core/window/components/IBitmapWrapperWindow';
@@ -34,7 +36,7 @@ const log = Logger.getLogger('habbo.toolbar.BottomBarLeft');
  *
  * @see sources/win63_version/habbo/toolbar/BottomBarLeft.as
  */
-export class BottomBarLeft 
+export class BottomBarLeft implements ILinkEventTracker
 {
     // AS3: .../src/com/sulake/habbo/toolbar/BottomBarLeft.as::DEFAULT_LOCATION
     private static readonly DEFAULT_LOCATION = {x: 0, y: 500};
@@ -206,6 +208,12 @@ export class BottomBarLeft
 
         this._newItemsNotificationEnabled = this.isNewItemsNotificationEnabled();
         this.checkSize();
+
+        // Last thing the AS3 constructor does, and the port had dropped it while keeping
+        // `linkPattern` and `linkReceived` — so every `toolbar/...` link was handed to nobody.
+        // `createLinkEvent()` only reaches trackers that registered, and it logs nothing when none
+        // match, so the symptom is a link that silently does nothing.
+        toolbar.context.addLinkEventTracker(this);
 
         log.debug('BottomBarLeft constructed with IWindow tree');
     }
@@ -471,7 +479,7 @@ export class BottomBarLeft
                 // (TOGGLE/VISIBLE_ROOM/VISIBLE_COLLAPSED/VISIBLE_NOOB) but would diverge the moment
                 // a tag changes.
                 const cameraPosition = this._toolbar!.getProperty('camera.launch.ui.position');
-                const cameraAllowed = this._toolbar!.sessionDataManager?.isPerkAllowed?.('CAMERA') ?? false;
+                const cameraAllowed = this._toolbar!.sessionDataManager?.isPerkAllowed?.(PerkType.CAMERA) ?? false;
                 child.visible = child.visible && isRoomState && cameraPosition === 'bottom-icons' && cameraAllowed;
             }
             else if(child.name === 'WIRED_MENU')
@@ -1011,6 +1019,8 @@ export class BottomBarLeft
     public dispose(): void 
     {
         if(this._disposed) return;
+
+        this._toolbar?.context.removeLinkEventTracker(this);
 
         if(this._meMenuController)
         {
