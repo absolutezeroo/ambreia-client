@@ -18,6 +18,7 @@
     import Button from '../../components/Button.svelte';
     import FormError from '../../components/FormError.svelte';
     import * as api from '../../lib/api.js';
+    import {emailProblem} from '../../lib/password.js';
     import * as notifier from '../../lib/notifier.js';
     import {t} from '../../lib/i18n.js';
 
@@ -28,6 +29,8 @@
     let currentEmail = $state('');
     let error = $state('');
     let busy = $state(false);
+
+    const emailError = $derived(email ? emailProblem(email) : null);
 
     $effect(() =>
     {
@@ -97,8 +100,16 @@
             <PasswordField name="email-password" label={t('CURRENT_PASSWORD_LABEL')} bind:value={current} />
         </Fieldset>
 
-        <Fieldset box title="Nouvel Email" help={t('EMAIL_NEW_HELP')}>
+        <!-- `FORM_NEW_EMAIL_LABEL` is habbo.com's own wording for this box; it was hand-written
+             French ("Nouvel Email") before. -->
+        <Fieldset box title={t('FORM_NEW_EMAIL_LABEL')} help={t('EMAIL_NEW_HELP')}>
             <Field name="email-new" type="email" bind:value={email} autocomplete="email" />
+
+            <!-- `email-address.html`'s own message. "Already used" is the server's to know and
+                 lib/api.ts words it off `email_taken`. -->
+            {#if emailError}
+                <p class="mt-1.5 text-sm text-error">{emailError}</p>
+            {/if}
         </Fieldset>
 
         {#if needsCode}
@@ -113,7 +124,7 @@
         {/if}
 
         <Fieldset>
-            <Button type="submit" disabled={busy || !current || !email.trim()}>
+            <Button type="submit" disabled={busy || !current || !email.trim() || emailError !== null}>
                 {t('EMAIL_CHANGE_TITLE')}
             </Button>
         </Fieldset>

@@ -15,9 +15,11 @@
     import Field from '../../components/Field.svelte';
     import FormError from '../../components/FormError.svelte';
     import Button from '../../components/Button.svelte';
+    import PasswordStrength from '../../components/PasswordStrength.svelte';
     import * as api from '../../lib/api.js';
+    import {passwordProblem, PASSWORD_MIN_LENGTH} from '../../lib/password.js';
     import * as notifier from '../../lib/notifier.js';
-    import {avatars, selectedId} from '../../lib/session.js';
+    import {avatars, selectedId, me} from '../../lib/session.js';
     import {t} from '../../lib/i18n.js';
 
     let current = $state('');
@@ -27,18 +29,19 @@
     let busy = $state(false);
     let error = $state('');
 
+    // `password-new.html` lists SIX messages for this one field and each says what is wrong. This
+    // page had a single boolean — "weak" — and, worse, it was calibrated on habbo.com's floor of
+    // SIX characters where this hotel's server refuses anything under EIGHT
+    // (`PasswordChangeResult.MINIMUM_LENGTH`). A visitor typing seven got a green field and then a
+    // refusal they could not explain. See lib/password.ts.
+    const problem = $derived(next.length > 0 ? passwordProblem(next, {name: $me?.name}) : null);
     const mismatch = $derived(repeat.length > 0 && next !== repeat);
-
-    // habbo.com's own rule (`habbo-password-pattern`): at least 6 characters, at least one letter,
-    // and at least one digit or special character.
-    const weak = $derived(next.length > 0
-        && (next.length < 6 || !/[a-zA-Z]/.test(next) || !/[0-9\W]/.test(next)));
 
     async function submit(event: SubmitEvent): Promise<void>
     {
         event.preventDefault();
 
-        if(busy || mismatch || weak)
+        if(busy || mismatch || problem !== null || !next)
         {
             return;
         }
@@ -84,14 +87,25 @@
             <PasswordField name="password-current" label={t('CURRENT_PASSWORD_LABEL')} bind:value={current} />
         </Fieldset>
 
-        <Fieldset box title={t('NEW_PASSWORD_LABEL')} help={t('PASSWORD_CHANGE_HELP')}>
-            <PasswordField name="password-new" bind:value={next} autocomplete="new-password" invalid={weak} />
+        <!-- NOT `PASSWORD_CHANGE_HELP`: habbo.com's sentence is "Utilise au moins 6 caractères",
+             and six is not this hotel's floor. The rest of it is habbo's, word for word. -->
+        <Fieldset box title={t('NEW_PASSWORD_LABEL')}
+                  help="Utilise au moins {PASSWORD_MIN_LENGTH} caracteres. Inclue au moins une lettre et au moins un chiffre ou un caractere special.">
+            <PasswordField name="password-new" bind:value={next} autocomplete="new-password" invalid={problem !== null} />
+
+            <!-- `habbo-password-strength` wraps the field's own messages, so the meter and the
+                 reason it is red are one block rather than two. -->
+            <PasswordStrength password={next}>
+                {#if problem}
+                    <span class="text-error">{problem}</span>
+                {/if}
+            </PasswordStrength>
 
             <label class="mt-3 block text-white" for="password-repeat">{t('PASSWORD_REPEAT_LABEL')}</label>
             <PasswordField name="password-repeat" bind:value={repeat} autocomplete="new-password" invalid={mismatch} />
 
             {#if mismatch}
-                <FormError inline>Les deux mots de passe ne sont pas identiques.</FormError>
+                <FormError inline>{t('ERROR_PASSWORDS_NOT_MATCHING')}</FormError>
             {/if}
         </Fieldset>
 
@@ -103,7 +117,7 @@
 
         <Fieldset>
             <p class="text-sm">Changer ton mot de passe déconnecte toutes tes sessions, y compris celle-ci.</p>
-            <Button type="submit" disabled={busy || mismatch || weak} className="mt-3">
+            <Button type="submit" disabled={busy || mismatch || problem !== null || !next} className="mt-3">
                 {busy ? '...' : t('PASSWORD_CHANGE_TITLE')}
             </Button>
         </Fieldset>

@@ -18,7 +18,9 @@
     import {push, link} from 'svelte-spa-router';
     import Button from '../components/Button.svelte';
     import HotelClosed from '../components/HotelClosed.svelte';
+    import PasswordStrength from '../components/PasswordStrength.svelte';
     import * as api from '../lib/api.js';
+    import {passwordProblem, emailProblem, PASSWORD_MIN_LENGTH} from '../lib/password.js';
     import {refresh, outage} from '../lib/session.js';
     import {t} from '../lib/i18n.js';
 
@@ -40,10 +42,11 @@
     const email = $derived(local && domain ? `${local}@${domain}` : '');
     const mismatch = $derived(repeat.length > 0 && password !== repeat);
 
-    // habbo.com's own rule, from `habbo-password-pattern`: at least 6 characters, at least one
-    // letter, and at least one digit or special character.
-    const weak = $derived(password.length > 0
-        && (password.length < 6 || !/[a-zA-Z]/.test(password) || !/[0-9\W]/.test(password)));
+    // Six messages, not one boolean — and calibrated on the SERVER's floor of eight rather than
+    // habbo.com's six, which is what `RegisterAsync` actually refuses under. The address is passed
+    // in so "contains your e-mail" can be answered here rather than after the round trip.
+    const problem = $derived(password.length > 0 ? passwordProblem(password, {email}) : null);
+    const emailError = $derived(local || domain ? emailProblem(email) : null);
 
     const DAYS = Array.from({length: 31}, (unused, index) => index + 1);
     const MONTHS = Array.from({length: 12}, (unused, index) => index + 1);
@@ -59,7 +62,7 @@
     {
         event.preventDefault();
 
-        if(busy || mismatch || weak || !terms || !email)
+        if(busy || mismatch || problem !== null || emailError !== null || !password || !terms || !email)
         {
             return;
         }
@@ -114,28 +117,41 @@
                     <input id="email-domain" bind:value={domain} autocomplete="off" autocapitalize="none" spellcheck="false"
                            class="w-full rounded-[5px] border-[3px] border-field-line bg-field px-3 py-[5px] text-field-ink shadow-field focus:border-field-line-focus focus:bg-white focus:outline-none" />
                 </div>
+
+                <!-- `email-address.html` names three messages for this field: invalid, already used
+                     at registration, already used at change. Only the first can be answered here —
+                     the other two are the SERVER's to know, and lib/api.ts words them off the
+                     refusal it sends back. -->
+                {#if emailError}
+                    <p class="mt-1.5 text-sm text-error">{emailError}</p>
+                {/if}
             </fieldset>
 
             <!-- password: `.form__fieldset--box` (#103960). -->
             <fieldset class="my-6 rounded-[3px] bg-box p-3">
                 <label class="block text-white" for="password-new">{t('NEW_PASSWORD_LABEL')}</label>
-                <p class="mt-3">{t('PASSWORD_CHANGE_HELP')}</p>
+                <!-- NOT `PASSWORD_CHANGE_HELP`: it says "au moins 6 caractères" and this hotel's
+                     floor is eight. -->
+                <p class="mt-3">
+                    Utilise au moins {PASSWORD_MIN_LENGTH} caracteres. Inclue au moins une lettre et
+                    au moins un chiffre ou un caractere special.
+                </p>
 
                 <input id="password-new" type="password" bind:value={password} autocomplete="new-password"
-                       class="mt-3 w-full rounded-[5px] border-[3px] bg-field px-3 py-[5px] text-field-ink shadow-field focus:bg-white focus:outline-none {weak ? 'border-error' : 'border-field-line focus:border-field-line-focus'}" />
+                       class="mt-3 w-full rounded-[5px] border-[3px] bg-field px-3 py-[5px] text-field-ink shadow-field focus:bg-white focus:outline-none {problem ? 'border-error' : 'border-field-line focus:border-field-line-focus'}" />
 
-                {#if weak}
-                    <p class="mt-1.5 text-sm text-white">
-                        Trop facile, le mot de passe doit utiliser au moins une lettre et un caractère spécial ou chiffre.
-                    </p>
-                {/if}
+                <PasswordStrength password={password}>
+                    {#if problem}
+                        <span class="text-sm text-error">{problem}</span>
+                    {/if}
+                </PasswordStrength>
 
                 <label class="mt-3 block text-white" for="password-repeat">{t('PASSWORD_REPEAT_LABEL')}</label>
                 <input id="password-repeat" type="password" bind:value={repeat} autocomplete="new-password"
                        class="mt-1.5 w-full rounded-[5px] border-[3px] bg-field px-3 py-[5px] text-field-ink shadow-field focus:bg-white focus:outline-none {mismatch ? 'border-error' : 'border-field-line focus:border-field-line-focus'}" />
 
                 {#if mismatch}
-                    <p class="mt-1.5 text-sm text-white">Les deux mots de passe ne sont pas identiques.</p>
+                    <p class="mt-1.5 text-sm text-error">{t('ERROR_PASSWORDS_NOT_MATCHING')}</p>
                 {/if}
             </fieldset>
 
@@ -196,7 +212,7 @@
             </p>
 
             <div class="mt-6 px-3">
-                <Button type="submit" disabled={busy || mismatch || weak || !terms || !email} className="w-full">
+                <Button type="submit" disabled={busy || mismatch || problem !== null || emailError !== null || !password || !terms || !email} className="w-full">
                     {busy ? '...' : t('REGISTRATION_BUTTON')}
                 </Button>
                 <p class="mt-3 text-sm">{t('REGISTRATION_PURCHASES')}</p>
