@@ -193,7 +193,15 @@ export class WindowRendererItem
             if(buffer !== this._buffer)
             {
                 this._buffer = buffer;
-                this._bufferCtx = buffer ? buffer.getContext('2d') : null;
+
+                // `willReadFrequently` because this buffer is read back per window per mouse
+                // event: `WindowController.testLocalPointHitAgainstAlpha()` samples it through
+                // `BitmapHitTest.hitTestAlpha()`, which is the port's stand-in for Flash's native
+                // `BitmapData.hitTest()`. That module asks for the flag too, but a canvas hands
+                // back the context it already has and silently drops the options — so the flag has
+                // to be set HERE, where the context is first acquired, or every mouse move pays a
+                // GPU readback and Chrome logs the "Multiple readback operations" warning for it.
+                this._bufferCtx = buffer ? buffer.getContext('2d', {willReadFrequently: true}) : null;
 
                 if(this._bufferCtx)
                 {
