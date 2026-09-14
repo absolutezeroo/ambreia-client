@@ -4705,6 +4705,33 @@ other window's clip moved. This is the one-pass equivalent of AS3's per-`BitmapD
 
 ## Recent Work Recorded
 
+- 🆕 **The catalog closed itself mid-browse — 2026-09-14.** Reported as "sometimes I'm looking at
+  items and it just closes". Not a crash and not a disconnect: it was the drag-an-item-into-the-room
+  gesture firing on an ordinary click.
+
+  `ProductGridItem.eventProc()` records the window a press landed on, and the first `WME_OUT` on
+  that same window hands the offer to `IItemGrid.startDragAndDrop()` →
+  `HabboCatalog.requestSelectedItemToMover()` → `initializeRoomObjectInsert()` → `hideMainWindow()`.
+  The catalog only hides when the insert is *accepted*, so the tell is a furni ghost stuck to the
+  cursor afterwards.
+
+  The port is faithful here — the AS3 has the same four branches, in the same order, with the same
+  absence of any travel measurement (`ProductGridItem.as::eventProc`), and `WME_UP_OUTSIDE` is a
+  real event of that system (`WindowMouseEvent.as:28`, produced at `MouseEventProcessor.as:130`)
+  that neither side clears on. The user confirms the same behaviour on live Habbo. So this is not a
+  regression: it is a gesture with no threshold, in a grid whose items are small and are built from
+  nested windows (container, icon, border) that `WME_OUT` fires *between*.
+
+  Taken as a deliberate `DEVIATION:` rather than left alone, because the absence of a threshold is
+  not a design decision anyone made — Flash had none to offer. A press now has to travel
+  `DRAG_THRESHOLD` (4px) before leaving the item counts as a drag, and a press whose button is
+  already released (`WME_UP_OUTSIDE`) stops being a pending drag. Nothing AS3 accepts past 4px is
+  refused.
+
+  No test: this repository has no test runner, and adding one for this was not in scope. The check
+  is in-game and unambiguous — an ordinary click keeps the catalog open, a deliberate drag still
+  places.
+
 - 🆕 **An empty text field could not be clicked — 2026-09-14.** Every wired dialog's input was
   dead, whatever the box: no caret, nothing typed. The window debugger cleared each of the usual
   suspects in turn — `state=0` so nothing was disabled, `param=2177` so the input-event-processor

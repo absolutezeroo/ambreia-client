@@ -3,6 +3,7 @@ import type {IWindow} from '@core/window/IWindow';
 import type {IInteractiveWindow} from '@core/window/components/IInteractiveWindow';
 import type {IBitmapWrapperWindow} from '@core/window/components/IBitmapWrapperWindow';
 import type {WindowEvent} from '@core/window/events/WindowEvent';
+import type {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
 import type {IAvatarImageListener} from '@habbo/avatar/IAvatarImageListener';
 import type {HabboCatalog} from '../HabboCatalog';
 import type {IGridItem} from './IGridItem';
@@ -31,6 +32,17 @@ export class ProductGridItem implements IGridItem
     private _disposed: boolean = false;
 
     private _mouseDownTarget: IWindow | null = null;
+
+    /**
+     * How far the pointer must travel from where it was pressed before leaving a grid item counts
+     * as dragging it into the room rather than as an imprecise click.
+     */
+    // TS-only: AS3 has no threshold at all — see the DEVIATION note on `eventProc()`.
+    private static readonly DRAG_THRESHOLD: number = 4;
+
+    /** Where the pointer was pressed, in stage coordinates, or null when no press is pending. */
+    // TS-only: AS3 records only the window, never the point, because it never measures the travel.
+    private _mouseDownAt: { x: number; y: number } | null = null;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/viewer/ProductGridItem.as::_catalog
     private _catalog: HabboCatalog | null;
@@ -180,33 +192,71 @@ export class ProductGridItem implements IGridItem
         }
     }
 
+    /**
+     * Pressing a grid item and then leaving it is how an item is dragged into the room: the grid
+     * hands the offer to the mover, the room engine arms a placement preview, and the catalog
+     * hides itself so the room is clear to drop into.
+     */
+    // DEVIATION: AS3 starts that drag on the first WME_OUT after a press, with no measure of how
+    //   far the pointer actually travelled — and a grid item is small, is made of nested windows
+    //   (container, icon, border), and WME_OUT fires between them, so a click that drifts a pixel
+    //   or crosses into the item's own icon reads as a drag. The catalog then closes on what the
+    //   player experienced as an ordinary click, with a furni stuck to the cursor. The gesture is
+    //   kept; only the trigger is given the travel threshold Flash never had. Nothing is refused
+    //   that AS3 accepts beyond DRAG_THRESHOLD pixels.
+    //   WME_UP_OUTSIDE clears the pending press for the same reason it is not in AS3's list by
+    //   oversight rather than by design: a press whose button is already released can never become
+    //   a drag, and leaving it armed is what lets a later, buttonless WME_OUT fire one.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/viewer/ProductGridItem.as::eventProc()
     private eventProc(event: WindowEvent, window: IWindow | null): void
     {
-        if(event.type === 'WME_UP')
+        if(event.type === 'WME_UP' || event.type === 'WME_UP_OUTSIDE')
         {
-            this._mouseDownTarget = null;
+            this.clearPendingDrag();
         }
         else if(event.type === 'WME_DOWN')
         {
             if(window == null) return;
 
+            const down = event as WindowMouseEvent;
+
             this._grid!.select(this, true);
             this._mouseDownTarget = window;
+            this._mouseDownAt = {x: down.stageX, y: down.stageY};
         }
         else if(event.type === 'WME_OUT' && this._mouseDownTarget != null && this._mouseDownTarget === window)
         {
+            if(!this.travelledFarEnoughToDrag(event as WindowMouseEvent)) return;
+
             const started = this._grid!.startDragAndDrop(this);
 
             if(started)
             {
-                this._mouseDownTarget = null;
+                this.clearPendingDrag();
             }
         }
         else if(event.type === 'WME_CLICK' || event.type === 'WME_DOUBLE_CLICK')
         {
-            this._mouseDownTarget = null;
+            this.clearPendingDrag();
         }
+    }
+
+    // TS-only: the measurement AS3 never makes. See the DEVIATION note on `eventProc()`.
+    private travelledFarEnoughToDrag(event: WindowMouseEvent): boolean
+    {
+        if(this._mouseDownAt === null) return true;
+
+        const dx = event.stageX - this._mouseDownAt.x;
+        const dy = event.stageY - this._mouseDownAt.y;
+
+        return (dx * dx) + (dy * dy) >= ProductGridItem.DRAG_THRESHOLD * ProductGridItem.DRAG_THRESHOLD;
+    }
+
+    // TS-only: the two fields are one state — a pending press — so they are cleared together.
+    private clearPendingDrag(): void
+    {
+        this._mouseDownTarget = null;
+        this._mouseDownAt = null;
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/viewer/ProductGridItem.as::setIconImage()
