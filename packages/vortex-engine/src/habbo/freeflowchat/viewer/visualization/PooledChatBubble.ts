@@ -215,10 +215,15 @@ export class PooledChatBubble extends Container
         const layout = layoutChatText(measureCtx, runs, fontFace, fontSize, innerWidth);
         const multiline = layout.lines.length > 1;
 
-        // 4. Content box — AS3 (PooledChatBubble.as:182) hard-caps the background at
-        // MAX_WIDTH_DEFAULT (300), independent of the wrap width above; the port capped at
-        // maxWidth, so a WIDE (2000) setting let the bubble grow to ~1985px.
-        let contentWidth = Math.min(PooledChatBubble.MAX_WIDTH_DEFAULT, layout.width + margins.x + margins.width);
+        // 4. Content box — the background is capped at the *same* bubble width the text wrapped
+        // to above, never at a fixed 300. PooledChatBubble.as:182 reads `Math.min(300,...)` only
+        // because the decompiler inlined line 129's ternary into `_loc7_` and re-materialised the
+        // width at its second use as the else-branch constant; three trees carry the variable:
+        // ChatBubble.as:160 (same tree, same algorithm, `_loc27_`), PRODUCTION's
+        // PooledChatBubble.as:150 (`_local_5`) and AIR's :191 (`_loc22_`).
+        // Capping at 300 while wrapping at ChatBubbleWidth.NORMAL (350) left the last ~30px of a
+        // full line drawn outside the bubble background.
+        let contentWidth = Math.min(maxWidth, layout.width + margins.x + margins.width);
         let contentHeight = layout.height + margins.y + margins.height;
 
         if(!style.isSystemStyle) contentHeight = Math.min(maxHeight, contentHeight);
