@@ -1,5 +1,6 @@
 import type {IWindow} from '../IWindow';
 import type {IWindowContext} from '../IWindowContext';
+import type {IDesktopWindow} from './IDesktopWindow';
 import type {ITextFieldWindow} from './ITextFieldWindow';
 import type {WindowController} from '../WindowController';
 import {TextController} from './TextController';
@@ -485,6 +486,7 @@ export class TextFieldController extends TextController implements ITextFieldWin
             }
 
             this.syncInputPosition();
+            this.syncCaretVisibility();
             this._caretTrackRaf = requestAnimationFrame(tick);
         };
 
@@ -496,16 +498,101 @@ export class TextFieldController extends TextController implements ITextFieldWin
     // so its visibility has to be derived from the window chain by hand.
     private isEffectivelyVisible(): boolean
     {
+        const desktop = this.desktop;
         let window: IWindow | null = this as unknown as IWindow;
 
         while(window !== null)
         {
             if(window.disposed || !window.visible) return false;
+            if(window === desktop) return true;
 
             window = window.parent;
         }
 
-        return true;
+        // The walk has to *reach the desktop*, not merely run out of parents. Detaching a window
+        // from its parent is how most of this client closes one (see the catalog's misnamed
+        // `hideMainWindow()`), and `WindowRenderer.invalidate()` only ever walks down from the
+        // desktop, so anything off that tree is not drawn. Stopping at `parent === null` therefore
+        // called a closed window visible, the bridge kept its focus, and the browser went on
+        // blinking a caret over the room — above every window, since the element sits on top of
+        // the canvas at z-index 9999.
+        //
+        // A null desktop means the context is not wired up yet; that stays visible rather than
+        // killing every caret in the client.
+        return desktop === null;
+    }
+
+    /**
+     * Hides the bridge's caret — and only the caret — while another window is drawn over the field.
+     *
+     * Flash needed no equivalent: the TextField and its caret lived in the same display list as
+     * every window, so a window in front simply painted over them. The bridge is a DOM element
+     * sitting on top of the canvas at z-index 9999, so it has no z-order relative to the windows at
+     * all and the caret blinked through anything opened over the field.
+     *
+     * `caret-color` is what goes transparent, not the element: blurring or hiding it would take the
+     * keystrokes and the IME with it, and the field is still the focused one — it is merely behind
+     * something. Restoring the colour is a plain re-derivation from `_textColor`, the same one
+     * `positionInputElement()` makes.
+     */
+    // TS-only: Flash's caret was part of the display list, so nothing had to test for occlusion.
+    private syncCaretVisibility(): void
+    {
+        if(!this._inputElement) return;
+
+        const color = this._textColor & 0xFFFFFF;
+
+        this._inputElement.style.caretColor = this.isCoveredByAnotherWindow()
+            ? 'transparent'
+            : '#' + color.toString(16).padStart(6, '0');
+    }
+
+    /**
+     * Deliberately narrow, and it fails open — the only window that can hide a caret is the
+     * desktop's *active* one, stacked above the field's own and covering it.
+     *
+     * The tempting version scans every desktop child above the field's window, and that is what
+     * makes it dangerous: plenty of them are full-screen layout containers that paint nothing, and
+     * one of those sitting above the chat bar would kill its caret permanently for no visible
+     * reason. A window has to have been activated to cover anything here, which is exactly the case
+     * being fixed — a dialog opened over a window whose field still holds focus.
+     *
+     * Only the desktop's own children are compared; windows *inside* the field's window are not
+     * consulted, since a border or an icon drawn after the field is part of it, not on top of it.
+     * The sampled point is the field's left edge at mid-height: that is where the caret sits in an
+     * empty field, and for a whole window dropped on top it gives the same answer the caret's real
+     * x would. Measuring that x exactly would mean re-measuring the text every frame.
+     */
+    // TS-only: see syncCaretVisibility().
+    private isCoveredByAnotherWindow(): boolean
+    {
+        const desktop = this.desktop as IDesktopWindow | null;
+
+        if(!desktop) return false;
+
+        const active = desktop.getActiveWindow();
+
+        if(active === (desktop as unknown as IWindow) || !active.visible) return false;
+
+        let top: IWindow = this as unknown as IWindow;
+
+        while(top.parent !== null && top.parent !== (desktop as unknown as IWindow))
+        {
+            top = top.parent;
+        }
+
+        // The field's own window being the active one is the normal case, not an occlusion.
+        if(top === active || desktop.getChildIndex(active) < desktop.getChildIndex(top)) return false;
+
+        const position = {x: 0, y: 0};
+
+        this.getGlobalPosition(position);
+
+        const rect = active.rectangle;
+        const x = position.x;
+        const y = position.y + this._height / 2;
+
+        return x >= rect.x && x < rect.x + rect.width && y >= rect.y && y < rect.y + rect.height;
     }
 
     private stopInputPositionTracking(): void
