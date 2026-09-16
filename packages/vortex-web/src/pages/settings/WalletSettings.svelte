@@ -333,7 +333,11 @@
      Both cuts are habbo.com's: `.wallet-setting-perk-active::before` is `statusCheck` at 22x27 with
      28px of clearance, `-inactive::before` is `statusCross` at 25x27 with 31px. -->
 {#snippet perk(address: string)}
-    {@const held = wallets?.relicHolders.includes(address) ?? false}
+    <!-- `?.` on a field the type says is always there, because the site and the web API deploy as
+         two separate containers: a page shipped ahead of its API reads `undefined` here, and
+         `undefined.includes` is a crash that takes the whole settings screen with it. An unmarked
+         row is the right answer to "this API does not report that yet". -->
+    {@const held = wallets?.relicHolders?.includes(address) ?? false}
 
     <div class={TEXTS}>
         <div class="{PERK} {held ? 'pr-[28px]' : 'pr-[31px]'}">
