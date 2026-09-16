@@ -224,6 +224,7 @@ import {GuildSettingsChangedInManageEvent} from '@habbo/groups/events/GuildSetti
 import {GuildMembershipsMessageEvent} from '@habbo/communication/messages/incoming/users/GuildMembershipsMessageEvent';
 import {GuildMembershipsController} from './guilds/GuildMembershipsController';
 import {PurchaseConfirmationDialog} from './purchase/PurchaseConfirmationDialog';
+import {ProductTypeEnum} from './enum/ProductTypeEnum';
 import type {IHabboCatalog} from './IHabboCatalog';
 import type {IPurchasableOffer} from './IPurchasableOffer';
 import type {ICatalogNavigator} from './navigation/ICatalogNavigator';
@@ -2504,6 +2505,27 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
     public getMintTokenProductIcon(): ImageBitmap | null
     {
         return this.getIconBitmap('minting_token_large');
+    }
+
+    /**
+     * Closes the confirmation dialog once a stamp purchase has been answered.
+     *
+     * Guarded on the product type rather than closing whatever is open: `MintInventoryListTab` calls
+     * this from the balance message, and the tab asks for that balance when it opens as well as
+     * after a purchase — so an unguarded close would shut a dialog the player opened somewhere else.
+     */
+    // DEVIATION: the AS3 has no counterpart and needs one. `_SafeStr_4602` is touched in 18 places
+    //   in HabboCatalog.as and not one of them is the mint-token path, so the dialog that
+    //   `onBuyStampsClicked` opens is never closed — and `onBuyButtonClick` disables Buy and Cancel
+    //   before sending, leaving two dead buttons and a close cross. The sibling purchase does have
+    //   one (`onNftStorePurchase` disposes it on the answer), which is the shape copied here.
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::onNftStorePurchase()
+    public closeMintTokenPurchaseConfirmation(): void
+    {
+        if(this._purchaseConfirmationDialog?.productType !== ProductTypeEnum.PRODUCT_TYPE_MINT_TOKEN) return;
+
+        this._purchaseConfirmationDialog.dispose();
+        this._purchaseConfirmationDialog = null;
     }
 
     // TS-only: the shared body of the three icon getters above. AS3 clones the BitmapData at each

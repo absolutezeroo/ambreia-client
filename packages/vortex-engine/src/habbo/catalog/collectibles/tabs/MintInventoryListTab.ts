@@ -253,6 +253,20 @@ export class MintInventoryListTab implements IUpdateReceiver
         if(balance !== null) balance.text = String(this._tokenBalance);
 
         this.updateReadyState(true);
+
+        // DEVIATION: the AS3 stops at the line above, and the confirmation dialog it opened in
+        // onBuyStampsClicked() is left on screen for good. `onBuyButtonClick()` disables Buy AND
+        // Cancel before sending — so what remains is a dialog with two dead buttons and a close
+        // cross, which the player has to dismiss by hand after every purchase.
+        //
+        // Not an impression: `_SafeStr_4602` (the dialog) is touched in 18 places in HabboCatalog.as
+        // and none of them is a mint-token path. Its sibling purchase has one — `onNftStorePurchase`
+        // disposes it on the answer — and this message is this purchase's answer, arriving with the
+        // new balance. The dialog is closed here for the same reason and at the same moment.
+        //
+        // Only ever its own dialog: this message is also what the tab requests when it opens, and
+        // closing whatever happens to be on screen then would shut a purchase somebody else started.
+        (this._controller.catalog as unknown as HabboCatalog | null)?.closeMintTokenPurchaseConfirmation();
     };
 
     // AS3: MintInventoryListTab.as::onCollectibleMintingEnabledMessage()
