@@ -13,7 +13,8 @@
 //     (`FOOTER_TOS_LINK = /playing-habbo/terms-of-service`), not at top-level pages.
 //   - there is no group page anywhere on habbo.com: groups appear as lists on a profile and link
 //     into the client, so this port does not invent one.
-//   - habbo.com's eighth settings tab, `/settings/wallet` (Metamask), is deliberately absent.
+//   - habbo.com's eighth settings tab, `/settings/wallet` (Metamask), is here now. It used to be
+//     absent because there was nothing to connect a wallet TO; the hotel runs its own chain today.
 //
 // Pages load on demand: `load` must stay a literal `() => import('../pages/X.svelte')` or Vite
 // cannot see the import statically and folds every page back into one chunk. The home is eager
@@ -104,6 +105,7 @@ export const routes = {
     '/settings/password': guarded(() => import('../pages/settings/PasswordChange.svelte')),
     '/settings/email': guarded(() => import('../pages/settings/EmailChange.svelte')),
     '/settings/avatars': guarded(() => import('../pages/settings/AvatarSelection.svelte')),
+    '/settings/wallet': guarded(() => import('../pages/settings/WalletSettings.svelte')),
 
     // The remaining editorial pages habbo.com serves out of its CMS.
     '/safety': open(() => import('../pages/StaticPage.svelte')),

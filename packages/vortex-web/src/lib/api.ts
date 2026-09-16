@@ -309,6 +309,44 @@ export function getPurse(): Promise<IPlayerPurse>
     return request('/api/user/purse');
 }
 
+// The player's wallets: the one the hotel derives and holds for them, and the ones they proved.
+export interface IWallets
+{
+    stardustAddress: string | null;
+    linkedAddresses: string[];
+}
+
+// The nonce to sign, AND the exact message to sign it in. The message is used verbatim and never
+// rebuilt here: the server verifies the bytes it named, and composing our own from the nonce is how
+// the two drift apart over a newline — the failure then reads as "wrong wallet".
+export interface IWalletChallenge
+{
+    nonce: string;
+    message: string;
+}
+
+export function getWallets(): Promise<IWallets>
+{
+    return request('/api/user/wallets');
+}
+
+export function getWalletChallenge(): Promise<IWalletChallenge>
+{
+    return request('/api/user/wallets/challenge', {method: 'POST', body: {}});
+}
+
+// The address rides along only so the server can catch a wallet that switched accounts mid-flow.
+// What gets stored is what the signature recovers to, never what is sent here.
+export function linkWallet(address: string, signature: string): Promise<IWallets>
+{
+    return request('/api/user/wallets', {method: 'POST', body: {address, signature}});
+}
+
+export function unlinkWallet(address: string): Promise<IWallets>
+{
+    return request(`/api/user/wallets/${encodeURIComponent(address)}`, {method: 'DELETE'});
+}
+
 // What the hotel sells. Anonymous: the store page renders for a visitor who has not signed in.
 export function getShopProducts(): Promise<IShopCatalog>
 {

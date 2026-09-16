@@ -48,9 +48,11 @@ export const SETTINGS_TABS: ITab[] = [
     {path: '/settings/password', label: t('SETTINGS_PASSWORD_TAB')},
     {path: '/settings/email', label: t('SETTINGS_EMAIL_TAB')},
     {path: '/settings/avatars', label: t('SETTINGS_AVATAR_TAB')},
-    // habbo.com has an eighth tab here, `/settings/wallet` — "Connecter le porte-monnaie Metamask".
-    // Deliberately dropped: this hotel has no wallet to connect, and a tab whose only content is
-    // "nothing is connected" is worse than no tab.
+    // habbo.com's eighth tab, and it used to be dropped here on the grounds that this hotel had no
+    // wallet to connect — a tab whose only content is "nothing is connected" being worse than no
+    // tab. That stopped being true: the hotel runs its own chain, mints its own coin and its Relics
+    // are real ERC-721s, so connecting a wallet now does something.
+    {path: '/settings/wallet', label: t('SETTINGS_WALLET_TAB')},
 ];
 
 export const PLAYING_HABBO_TABS: ITab[] = [
