@@ -44,11 +44,19 @@
                 </button>
             </div>
 
-            <ul class="{open ? 'block' : 'hidden'} md:flex md:items-center md:justify-start">
+            <!-- DEVIATION: `flex-wrap` and `whitespace-nowrap` are ours; habbo.com's bar is a plain
+                 non-wrapping row. Its tabs are flex items, so once they no longer fit they SHRINK,
+                 and the label breaks mid-word: "PROTECTION DU / COMPTE" over two lines with the
+                 separators stranded at the baseline of the first. habbo.com does this too, which is
+                 why it is not a porting gap — but it is ugly at any width where a bar is one label
+                 too long, and the settings bar has been exactly that since the wallet tab arrived.
+                 Wrapping whole tabs onto a second row is the same information, laid out as rows of
+                 tabs instead of rows of syllables. -->
+            <ul class="{open ? 'block' : 'hidden'} md:flex md:flex-wrap md:items-center md:justify-start">
                 {#each tabs as tab, index (tab.path)}
                     <li class="block w-full md:w-auto md:pr-6 xl:flex xl:items-center xl:pr-0">
                         <a href={tab.path} use:link onclick={() => (open = false)}
-                           class="block w-full leading-[50px] uppercase hover:border-b-0 xl:w-auto {isActive(tab) ? 'text-[#6796b1]' : 'text-white hover:text-[#406180]'}">
+                           class="block w-full leading-[50px] uppercase hover:border-b-0 md:whitespace-nowrap xl:w-auto {isActive(tab) ? 'text-[#6796b1]' : 'text-white hover:text-[#406180]'}">
                             {tab.label}
                         </a>
 
