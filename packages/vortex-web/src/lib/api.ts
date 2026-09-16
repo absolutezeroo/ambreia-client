@@ -314,6 +314,10 @@ export interface IWallets
 {
     stardustAddress: string | null;
     linkedAddresses: string[];
+    // Which of the two above the chain says holds at least one Relic — what habbo.com's
+    // `habbo-nft-perk` mark reports. A set rather than a flag per address, so it cannot fall out of
+    // step with the list it describes. Empty when no chain is configured, or when it did not answer.
+    relicHolders: string[];
 }
 
 // The nonce to sign, AND the exact message to sign it in. The message is used verbatim and never

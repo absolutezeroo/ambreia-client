@@ -94,6 +94,11 @@ export const SPRITE = {
     walletMetamask: [834, 830, 47, 42],
     walletAdd: [786, 830, 46, 44],
 
+    // `habbo-text-copy`'s idle icon (`.text-copy-active`). Its second state, the tick it flips to
+    // once the address is on the clipboard, is `statusCheck` above at scale(.6) — habbo.com's
+    // `.text-copy-inactive` points at that same cut, which is why there is no third entry here.
+    textCopy: [375, 310, 19, 22],
+
     // Buttons and controls.
     habbo: [489, 612, 16, 16],
     login: [451, 612, 17, 17],

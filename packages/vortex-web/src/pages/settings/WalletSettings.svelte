@@ -24,6 +24,11 @@
     let busy = $state(false);
     let loaded = $state(false);
 
+    // `habbo-text-copy`'s `status`: 0 is the copy icon, 1 the tick it flips to. habbo.com never
+    // flips it back — the component is created with status 0 and the click sets 1 — and neither does
+    // this, for the same reason it reads well: the tick is a receipt, not a state to leave.
+    let copied = $state('');
+
     // Whether a browser wallet is present at all. `window.ethereum` is what every extension injects,
     // and its absence is the ordinary case rather than an error — most visitors have no wallet.
     const injected = $derived.by(() => typeof window !== 'undefined' && 'ethereum' in window);
@@ -194,12 +199,13 @@
         {
             await navigator.clipboard.writeText(address);
 
-            notifier.success('NATIVE_HOTEL_LAUNCH_COPIED_CODE');
+            copied = address;
         }
         catch
         {
             // Clipboard access is refused outside a secure context and in some embedded browsers.
-            // The address is on screen and selectable either way.
+            // The address is on screen and selectable either way, and the icon stays as it was
+            // rather than claiming a copy that did not happen.
         }
     }
 
@@ -217,7 +223,13 @@
     // the top of the card and the button at the bottom, instead of both drifting to a moving middle.
     const ROW = 'my-[15px] flex w-full flex-row justify-between rounded-[3px] bg-panel-head px-2.5 py-5';
     const BEGIN = 'flex min-w-0 flex-row self-start';
-    const END = 'flex flex-row justify-end self-end';
+    const END = 'flex flex-row items-center justify-end self-end';
+
+    // `.wallet-setting-end-texts`: the perk column is drawn at 80%, and habbo.com scales the mark
+    // inside it AGAIN by 80% — so the tick ends up at 64% of the cut. Both are kept, because
+    // flattening them to one factor is how a "pixel-identical" port stops being one.
+    const TEXTS = 'flex origin-right scale-80 flex-col pr-[5px]';
+    const PERK = 'relative text-right leading-[27px]';
 
     interface IEthereum
     {
@@ -238,17 +250,11 @@
                 <div class={BEGIN}>
                     <Sprite name="walletStardust" className="mr-1.5" />
                     <span class="leading-[45px]">{shorten(wallets.stardustAddress)}</span>
+                    {@render copyIcon(wallets.stardustAddress)}
                 </div>
 
                 <div class={END}>
-                    <!-- DEVIATION: habbo.com's `habbo-text-copy` is an ICON with two sprite states
-                         and no text at all (`text-copy-button.html`), and that cut is not in this
-                         port's sprite index. A labelled button says the same thing; the label is
-                         habbo.com's own word for this action, from the one other place it copies
-                         something. -->
-                    <Button onclick={() => copy(wallets!.stardustAddress!)}>
-                        {t('NATIVE_HOTEL_LAUNCH_COPY_CODE')}
-                    </Button>
+                    {@render perk(wallets.stardustAddress)}
                 </div>
             </div>
         {/if}
@@ -260,14 +266,9 @@
                     <span class="leading-[42px]">{shorten(address)}</span>
                 </div>
 
-                <!-- habbo.com puts its `habbo-nft-perk` mark between the address and this button —
-                     "Avantages activés" with a tick, or "non activés" with a cross. It reports
-                     whether the wallet holds a Habbo Avatar NFT, which decides free HC and the
-                     Immutable wardrobe. Nothing in this hotel is gated on what a wallet holds, so
-                     the column would have one permanent answer and is left out rather than made up.
-                     The two sprite cuts it uses are already in the index as statusCheck/statusCross
-                     if that ever changes. -->
                 <div class={END}>
+                    {@render perk(address)}
+
                     <Button disabled={busy} onclick={() => disconnect(address)}>
                         {t('WALLET_SETTINGS_DISCONNECT')}
                     </Button>
@@ -315,12 +316,46 @@
             </div>
 
             <div class={END}>
-                <Button onclick={() => copy(chain!.treasuryAddress!)}>
-                    {t('NATIVE_HOTEL_LAUNCH_COPY_CODE')}
-                </Button>
+                {@render copyIcon(chain.treasuryAddress)}
             </div>
         </div>
 
         <p class="text-sm opacity-70">{t('WALLET_SETTINGS_OWN_TREASURY_DESCRIPTION')}</p>
     {/if}
 </SettingsShell>
+
+<!-- `habbo-nft-perk`, and it means here what it means there: whether this wallet holds one of the
+     hotel's own NFTs. habbo.com asks it about a Habbo Avatar, which buys free HC and the Immutable
+     wardrobe; this hotel asks it about a Relic, which is the thing its collection is made of. The
+     question is the same one, so the mark is not decoration — an address that shows no tick is an
+     address the Transfer tab has not sent anything to yet.
+
+     Both cuts are habbo.com's: `.wallet-setting-perk-active::before` is `statusCheck` at 22x27 with
+     28px of clearance, `-inactive::before` is `statusCross` at 25x27 with 31px. -->
+{#snippet perk(address: string)}
+    {@const held = wallets?.relicHolders.includes(address) ?? false}
+
+    <div class={TEXTS}>
+        <div class="{PERK} {held ? 'pr-[28px]' : 'pr-[31px]'}">
+            {t(held ? 'WALLET_SETTINGS_PERKS_ACTIVE' : 'WALLET_SETTINGS_PERKS_INACTIVE')}
+
+            <Sprite
+                name={held ? 'statusCheck' : 'statusCross'}
+                className="absolute right-0 top-1/2 -translate-y-1/2 scale-80"
+            />
+        </div>
+    </div>
+{/snippet}
+
+<!-- `habbo-text-copy`: an icon, not a labelled button, and it flips to a tick once the address is on
+     the clipboard. `.text-copy` carries the 20px/10px offset that sets it beside the address. -->
+{#snippet copyIcon(address: string)}
+    <button type="button" class="ml-5 mt-2.5 self-start" onclick={() => copy(address)}
+            aria-label={t('NATIVE_HOTEL_LAUNCH_COPY_CODE')}>
+        {#if copied === address}
+            <Sprite name="statusCheck" className="scale-60" />
+        {:else}
+            <Sprite name="textCopy" />
+        {/if}
+    </button>
+{/snippet}
