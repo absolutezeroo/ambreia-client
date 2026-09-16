@@ -14,6 +14,7 @@
     // reason — a copy button where the others have Disconnect.
     import SettingsShell from './SettingsShell.svelte';
     import Button from '../../components/Button.svelte';
+    import Sprite from '../../components/Sprite.svelte';
     import * as api from '../../lib/api.js';
     import * as notifier from '../../lib/notifier.js';
     import {t} from '../../lib/i18n.js';
@@ -208,6 +209,16 @@
         return `${address.slice(0, 8)}…${address.slice(-6)}`;
     }
 
+    // `.wallet-setting`, `-begin` and `-end`, verbatim. The card is #0e3955 — the panel-head token,
+    // NOT --color-card, which is the lighter #0b6395 every other boxed thing on the site uses.
+    //
+    // `self-start` / `self-end` rather than `items-center` is habbo.com's own choice and it is what
+    // makes the row survive a perk mark stacking two lines beside the button: the address stays at
+    // the top of the card and the button at the bottom, instead of both drifting to a moving middle.
+    const ROW = 'my-[15px] flex w-full flex-row justify-between rounded-[3px] bg-panel-head px-2.5 py-5';
+    const BEGIN = 'flex min-w-0 flex-row self-start';
+    const END = 'flex flex-row justify-end self-end';
+
     interface IEthereum
     {
         request(args: {method: string; params?: unknown[]}): Promise<unknown>;
@@ -223,41 +234,67 @@
         <!-- The hotel's own wallet, first and shaped differently: it has a copy button where the
              others have Disconnect, because nobody disconnects the one the hotel holds for them. -->
         {#if wallets.stardustAddress}
-            <div class="mb-1.5 flex items-center justify-between gap-3 rounded-[3px] bg-card px-3 py-3">
-                <code class="min-w-0 truncate text-sm">{shorten(wallets.stardustAddress)}</code>
-                <!-- DEVIATION: habbo.com's `habbo-text-copy` is an ICON with two sprite states and
-                     no text at all (`text-copy-button.html`), and that cut is not in this port's
-                     sprite index. A labelled button says the same thing; the label is habbo.com's
-                     own word for this action, from the one other place it copies something. -->
-                <button type="button" class="shrink-0 underline"
-                        onclick={() => copy(wallets!.stardustAddress!)}>
-                    {t('NATIVE_HOTEL_LAUNCH_COPY_CODE')}
-                </button>
+            <div class={ROW}>
+                <div class={BEGIN}>
+                    <Sprite name="walletStardust" className="mr-1.5" />
+                    <span class="leading-[45px]">{shorten(wallets.stardustAddress)}</span>
+                </div>
+
+                <div class={END}>
+                    <!-- DEVIATION: habbo.com's `habbo-text-copy` is an ICON with two sprite states
+                         and no text at all (`text-copy-button.html`), and that cut is not in this
+                         port's sprite index. A labelled button says the same thing; the label is
+                         habbo.com's own word for this action, from the one other place it copies
+                         something. -->
+                    <Button onclick={() => copy(wallets!.stardustAddress!)}>
+                        {t('NATIVE_HOTEL_LAUNCH_COPY_CODE')}
+                    </Button>
+                </div>
             </div>
         {/if}
 
         {#each wallets.linkedAddresses as address (address)}
-            <div class="mb-1.5 flex items-center justify-between gap-3 rounded-[3px] bg-card px-3 py-3">
-                <code class="min-w-0 truncate text-sm">{shorten(address)}</code>
-                <button type="button" class="shrink-0 underline" disabled={busy}
-                        onclick={() => disconnect(address)}>
-                    {t('WALLET_SETTINGS_DISCONNECT')}
-                </button>
+            <div class={ROW}>
+                <div class={BEGIN}>
+                    <Sprite name="walletMetamask" className="mr-1.5" />
+                    <span class="leading-[42px]">{shorten(address)}</span>
+                </div>
+
+                <!-- habbo.com puts its `habbo-nft-perk` mark between the address and this button —
+                     "Avantages activés" with a tick, or "non activés" with a cross. It reports
+                     whether the wallet holds a Habbo Avatar NFT, which decides free HC and the
+                     Immutable wardrobe. Nothing in this hotel is gated on what a wallet holds, so
+                     the column would have one permanent answer and is left out rather than made up.
+                     The two sprite cuts it uses are already in the index as statusCheck/statusCross
+                     if that ever changes. -->
+                <div class={END}>
+                    <Button disabled={busy} onclick={() => disconnect(address)}>
+                        {t('WALLET_SETTINGS_DISCONNECT')}
+                    </Button>
+                </div>
             </div>
         {/each}
 
         {#if injected}
-            <div class="mt-3 flex flex-wrap gap-2">
-                <Button variant="green" onclick={connect} disabled={busy}>
-                    {t('WALLET_SETTINGS_CONNECT')}
-                </Button>
+            <!-- `.wallet-setting-add`: the same card at HALF width, with the add icon where the
+                 other rows have their wallet's. -->
+            <div class="{ROW} md:w-1/2">
+                <div class={BEGIN}>
+                    <Sprite name="walletAdd" />
+                </div>
 
-                <!-- Only with a chain to add. A button that tells a wallet about a network the
-                     hotel does not run would fail in the extension, where the error is somebody
-                     else's to explain. -->
-                {#if chain}
-                    <Button onclick={addNetwork}>{t('WALLET_SETTINGS_OWN_NETWORK')}</Button>
-                {/if}
+                <div class="{END} flex-wrap gap-2">
+                    <!-- Only with a chain to add. A button that tells a wallet about a network the
+                         hotel does not run would fail inside the extension, where the error is
+                         somebody else's to explain. -->
+                    {#if chain}
+                        <Button onclick={addNetwork}>{t('WALLET_SETTINGS_OWN_NETWORK')}</Button>
+                    {/if}
+
+                    <Button onclick={connect} disabled={busy}>
+                        {t('WALLET_SETTINGS_CONNECT')}
+                    </Button>
+                </div>
             </div>
         {:else}
             <!-- habbo.com's own line for this, and the ordinary case: most visitors have no wallet
@@ -270,14 +307,18 @@
          the player sends the token themselves, from their own wallet, and the hotel notices. So the
          only thing this page owes them is the address and what happens when they use it. -->
     {#if chain?.treasuryAddress}
-        <h3 class="mt-8 mb-2">{t('WALLET_SETTINGS_OWN_TREASURY')}</h3>
+        <h3 class="mt-8">{t('WALLET_SETTINGS_OWN_TREASURY')}</h3>
 
-        <div class="mb-1.5 flex items-center justify-between gap-3 rounded-[3px] bg-card px-3 py-3">
-            <code class="min-w-0 truncate text-sm">{shorten(chain.treasuryAddress)}</code>
-            <button type="button" class="shrink-0 underline"
-                    onclick={() => copy(chain!.treasuryAddress!)}>
-                {t('NATIVE_HOTEL_LAUNCH_COPY_CODE')}
-            </button>
+        <div class={ROW}>
+            <div class={BEGIN}>
+                <span class="leading-[45px]">{shorten(chain.treasuryAddress)}</span>
+            </div>
+
+            <div class={END}>
+                <Button onclick={() => copy(chain!.treasuryAddress!)}>
+                    {t('NATIVE_HOTEL_LAUNCH_COPY_CODE')}
+                </Button>
+            </div>
         </div>
 
         <p class="text-sm opacity-70">{t('WALLET_SETTINGS_OWN_TREASURY_DESCRIPTION')}</p>

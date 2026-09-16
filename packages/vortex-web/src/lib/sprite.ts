@@ -82,6 +82,18 @@ export const SPRITE = {
     // The little door on the appart page's enter button (`.room__enter-button__text::before`).
     enterRoom: [1188, 1084, 21, 26],
 
+    // The wallet rows on `/settings/wallet` — `.wallet-setting-name-sd::before` for the one the
+    // hotel holds, `.wallet-setting-name-mm::before` for a connected Metamask, and
+    // `.wallet-setting-add-icon::before` for the row that is the Connect button. Three different
+    // cuts and three different sizes, which is why the rows do not share one icon.
+    //
+    // The perk marks beside them are `statusCheck` and `statusCross` above — habbo.com's own
+    // `.wallet-setting-perk-active/-inactive` point at those same two cuts, so there is nothing to
+    // add for them if this hotel ever has a perk to report.
+    walletStardust: [1149, 776, 49, 45],
+    walletMetamask: [834, 830, 47, 42],
+    walletAdd: [786, 830, 46, 44],
+
     // Buttons and controls.
     habbo: [489, 612, 16, 16],
     login: [451, 612, 17, 17],
