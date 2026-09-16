@@ -19,6 +19,10 @@
     // (`.navigation__item--hotel`), which leaves a phone with no way into the hotel at all. So this
     // menu carries one. The label is still habbo.com's own word for the action
     // (`NAVIGATION_NATIVE_HOTEL`), and the icon the same sprite cut its green button uses.
+    //
+    // It is hidden from 767px, the exact width at which the green button appears, so the menu a
+    // laptop opens is habbo.com's own four rows and the addition only exists where it is the only
+    // way in. Shown at every width it was a second door next to a visible first one.
     const ITEMS: {href: string; icon: ISpriteName; label: string; added?: boolean}[] = [
         {href: '/hotel', icon: 'habbo', label: t('NAVIGATION_NATIVE_HOTEL'), added: true},
         {href: '/profile', icon: 'profile', label: t('NAVIGATION_PROFILE')},
@@ -74,9 +78,13 @@
          it silently clipped "Se déconnecter" off the bottom. -->
     <div class="absolute top-0 left-0 z-[200] w-full overflow-hidden rounded-[10px] bg-black/90 transition-[max-height,opacity] duration-200 ease-out"
          style="max-height:{open ? '280px' : '0'};opacity:{open ? 1 : 0}">
-        <ul class="pb-3">
+        <!-- The 70px that clears the header is habbo.com's `.user-menu__item:first-child`, moved
+             onto the list: `:first-child` is structural and does not care that the hotel row is
+             `display:none` from 767px, so left on the row it would have gone on being applied to a
+             hidden one and dropped the clearance for every width that shows four items. -->
+        <ul class="pt-[69px] pb-3">
             {#each ITEMS as item (item.href)}
-                <li class="px-3 pt-[1px] first:pt-[70px]">
+                <li class="px-3 pt-[1px] {item.added ? 'md:hidden' : ''}">
                     <a href={item.href} use:link onclick={() => (open = false)}
                        class="relative block py-1.5 pl-6 font-condensed leading-[22px] uppercase hover:border-b-0 {$location === item.href ? 'text-nav-link-active' : 'text-white hover:text-nav-link-hover'}">
                         <Sprite name={item.icon} className="absolute left-0 top-1/2 -translate-y-1/2" />

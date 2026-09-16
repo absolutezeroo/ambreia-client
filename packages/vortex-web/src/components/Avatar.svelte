@@ -62,8 +62,16 @@
           style="width:{well}px;height:{well}px">
         <!-- `image-rendering: auto` here and only here: the source is a 2x render being scaled DOWN,
              and nearest-neighbour on a non-integer downscale drops every other pixel row. -->
+        <!-- `pointer-events: none` is not decoration. habbo.com's `.user-menu__avatar img` is a
+             `size="bighead"` render — an image the size of a head — where this one is the imager's
+             `l`, a 180x260 body canvas scaled to 0.7 and offset by the head's own centre. Same
+             picture, box seven times the size: 125x181 of transparency hanging 129px BELOW a 46px
+             well that is not `overflow:hidden` (the head is deliberately larger than the circle).
+             Inside the user menu's toggle button that box reached across the whole navigation bar
+             and swallowed the right half of the green hotel button — clicking JOUER opened the user
+             menu instead. Nothing needs to receive a click on a head. -->
         <img {src} alt={user || 'Avatar'} loading="lazy" onerror={hideOnError}
-             class="absolute max-w-none [image-rendering:auto]"
+             class="pointer-events-none absolute max-w-none [image-rendering:auto]"
              style="left:{offsetX}px;top:{offsetY}px;width:{CANVAS_W * scale}px;height:{CANVAS_H * scale}px" />
     </span>
 {:else}

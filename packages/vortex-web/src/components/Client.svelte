@@ -195,8 +195,14 @@
         <!-- The close button's arrow head, built from two borders exactly as
              `.client__close::before/::after` are — 15px in the border colour, 13px in the fill —
              and pointing LEFT, back towards the site. -->
-        <button type="button" onclick={onClose}
-                class="group relative mr-1 rounded-l-none rounded-r-[5px] border-2 border-[#ffea00] bg-[#ffb900] px-3 py-1.5 text-xs leading-[1.2] text-black uppercase drop-shadow-[-1px_4px_0_rgba(0,0,0,0.3)] hover:border-b-2 hover:border-[#fffd70] hover:bg-[#ffd400] active:translate-y-[2px] active:border-[#ffce37] active:bg-[#f89400] active:drop-shadow-[-1px_2px_0_rgba(0,0,0,0.3)]"
+        <!-- `.client__close { margin-left: 14px; padding: 5px 6px; border-left-width: 1px }`, and
+             the margin is the load-bearing one: the arrow head is `left: -31px` on a 15px border,
+             so its visible half starts 16px to the LEFT of the button. Sat flush against the row's
+             own `left: 12px` that put the point at -4px and the browser clipped it, which is what
+             made this button read as a squared-off block rather than an arrow. The 12px of padding
+             this carried instead of 6 made the pill a sixth wider than habbo.com's on top of it. -->
+        <button type="button" onclick={onClose} style="border-left-width:1px"
+                class="group relative mr-1 ml-[14px] rounded-l-none rounded-r-[5px] border-2 border-[#ffea00] bg-[#ffb900] px-1.5 py-[5px] text-xs leading-[1.2] text-black uppercase drop-shadow-[-1px_4px_0_rgba(0,0,0,0.3)] hover:border-b-2 hover:border-[#fffd70] hover:bg-[#ffd400] active:translate-y-[2px] active:border-[#ffce37] active:bg-[#f89400] active:drop-shadow-[-1px_2px_0_rgba(0,0,0,0.3)]"
                 title={t('CLIENT_TO_WEB_BUTTON')}>
             <span class="absolute -top-[2px] -left-[31px] block border-[15px] border-transparent border-r-[#ffea00] group-hover:border-r-[#fffd70] group-active:border-r-[#ffce37]"></span>
             <span class="absolute top-0 -left-[26px] block border-[13px] border-transparent border-r-[#ffb900] group-hover:border-r-[#ffd400] group-active:border-r-[#f89400]"></span>
@@ -211,8 +217,10 @@
             </span>
         </button>
 
+        <!-- `.client__fullscreen { padding-left: 6px; padding-right: 6px }` narrows the row's shared
+             `padding: 6px 12px` to a square around the icon. -->
         <button type="button" onclick={toggleFullscreen}
-                class="rounded-l-none rounded-r-[5px] border-2 border-[#ffea00] bg-[#ffb900] px-3 py-1.5 text-black shadow-btn hover:border-b-2 hover:border-[#fffd70] hover:bg-[#ffd400] active:translate-y-[2px] active:border-[#ffce37] active:bg-[#f89400] active:shadow-btn-active"
+                class="rounded-l-none rounded-r-[5px] border-2 border-[#ffea00] bg-[#ffb900] px-1.5 py-1.5 text-black shadow-btn hover:border-b-2 hover:border-[#fffd70] hover:bg-[#ffd400] active:translate-y-[2px] active:border-[#ffce37] active:bg-[#f89400] active:shadow-btn-active"
                 title="{fullscreen ? 'Reduire' : 'Plein ecran'}">
             <Sprite name={fullscreen ? 'fullscreenBack' : 'fullscreen'} />
         </button>
