@@ -1,4 +1,5 @@
-import type {Container, Texture} from 'pixi.js';
+import {Container, Graphics} from 'pixi.js';
+import type {Texture} from 'pixi.js';
 import type {IAvatarImage} from '@habbo/avatar/IAvatarImage';
 import type {IWindow} from '@core/window/IWindow';
 import type {IWindowContainer} from '@core/window/IWindowContainer';
@@ -155,6 +156,21 @@ export class ProductViewCatalogWidget extends CatalogWidget implements IGetImage
     // RoomPreviewerWidget.syncCanvasPosition() already does for the inventory item preview.
     private _canvasDisplayObject: Container | null = null;
 
+    /**
+     * The clip the canvas is drawn inside: AS3 wraps it in a Sprite whose `scrollRect` is the
+     * `room_canvas` rect, and that clip is the only thing keeping the 2x avatar zoom inside the
+     * window. A Pixi `Container` cannot be given a scroll rect, so the rect is a mask child here.
+     *
+     * Name DERIVED — the AS3 field is `_SafeStr_4721`, obfuscated in WIN63 and in AIR-1.0.31
+     * alike, and `win63_version`'s copy of the class predates the preview zoom entirely.
+     */
+    // AS3: .../src/com/sulake/habbo/catalog/viewer/widgets/ProductViewCatalogWidget.as::_SafeStr_4721
+    private _roomCanvasClip: Container | null = null;
+
+    // TS-only: AS3 clips with `scrollRect` on the wrapper and so has no mask object; this is the
+    //   rect, held separately only because `updateRoomCanvasClipRect()` redraws it.
+    private _roomCanvasClipMask: Graphics | null = null;
+
     private readonly _syncCanvasPositionBound = (): void => this.syncCanvasPosition();
 
     // AS3: sources/win63_version/habbo/catalog/viewer/widgets/ProductViewCatalogWidget.as::_previewOffset
@@ -250,7 +266,7 @@ export class ProductViewCatalogWidget extends CatalogWidget implements IGetImage
         this._toggleZoomButton = null;
         this.setFloorFurnitureRotationAvailabilityMonitorEnabled(false);
         this.stopPreviewZoomAnimation();
-        PreviewCanvasStack.unregister(this._canvasDisplayObject);
+        PreviewCanvasStack.unregister(this._roomCanvasClip);
         this._catalog?.roomEngine?.unregisterCanvasSyncCallback(this._syncCanvasPositionBound);
 
         // Take the canvas off the stage rather than merely dropping the reference
@@ -267,8 +283,22 @@ export class ProductViewCatalogWidget extends CatalogWidget implements IGetImage
         // canvas out from under it — they key on the same preview room id. The
         // engine's own canvas record is replaced safely on the next
         // getRoomCanvas() in init(), which disposes whatever it superseded.
-        this._canvasDisplayObject?.parent?.removeChild(this._canvasDisplayObject);
+        //
+        // The clip goes with it, and it is this widget's own object, so unlike the canvas it can
+        // be destroyed outright — but only once the canvas is out of it, or `children: true` would
+        // destroy the shared canvas with it. The parent test is what makes that safe in the
+        // dispose-after-replacement order above: a canvas the fresh widget has already re-parented
+        // into its own clip is left exactly where it is.
+        if(this._canvasDisplayObject != null && this._canvasDisplayObject.parent === this._roomCanvasClip)
+        {
+            this._roomCanvasClip?.removeChild(this._canvasDisplayObject);
+        }
+
         this._canvasDisplayObject = null;
+        this._roomCanvasClip?.parent?.removeChild(this._roomCanvasClip);
+        this._roomCanvasClip?.destroy({children: true});
+        this._roomCanvasClip = null;
+        this._roomCanvasClipMask = null;
         this._catalog = null;
         this._priceBox = null;
         super.dispose();
@@ -319,11 +349,13 @@ export class ProductViewCatalogWidget extends CatalogWidget implements IGetImage
 
                 if(canvas != null)
                 {
-                    this._roomCanvas.setDisplayObject(canvas);
-                    this._canvasDisplayObject = canvas;
-                    PreviewCanvasStack.register(canvas, this._roomCanvas as unknown as IWindow);
+                    const clip = this.bindRoomCanvasDisplayObject(canvas);
+
+                    this._roomCanvas.setDisplayObject(clip);
+                    PreviewCanvasStack.register(clip, this._roomCanvas as unknown as IWindow);
                     this._catalog!.roomEngine?.registerCanvasSyncCallback(this._syncCanvasPositionBound);
                     this.syncCanvasPosition();
+                    this.applyRoomCanvasZoom();
                 }
             }
             else
@@ -393,19 +425,96 @@ export class ProductViewCatalogWidget extends CatalogWidget implements IGetImage
         return true;
     }
 
+    /**
+     * Puts the canvas inside the clip and returns the clip, which is what takes the canvas's place
+     * on the stage and on `room_canvas` — AS3 hands the wrapper to `setDisplayObject()` too.
+     *
+     * The clip is what makes the zoom survivable: `applyRoomCanvasZoom()` scales the canvas, and
+     * the canvas's own mask is a child of the container being scaled, so it grows with it and
+     * clips nothing. Without an outer, unscaled rect the 2x avatar preview spills over the catalog
+     * window and over the room behind it.
+     */
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/viewer/widgets/ProductViewCatalogWidget.as::bindRoomCanvasDisplayObject()
+    private bindRoomCanvasDisplayObject(canvas: Container): Container
+    {
+        if(this._roomCanvasClip == null)
+        {
+            const clip = new Container();
+
+            clip.label = 'catalog_room_canvas_clip';
+            clip.eventMode = 'none';
+            clip.interactiveChildren = false;
+
+            this._roomCanvasClipMask = new Graphics();
+            this._roomCanvasClipMask.label = 'clip';
+            clip.addChild(this._roomCanvasClipMask);
+            clip.mask = this._roomCanvasClipMask;
+
+            // The canvas is already on the shared root stage — RoomEngine.createRoomCanvas() parents
+            // it there rather than into the window tree — so the clip takes its place there.
+            canvas.parent?.addChild(clip);
+
+            this._roomCanvasClip = clip;
+
+            if(this._previewZoomAnimationProgress !== this._previewZoomAnimationTargetProgress)
+            {
+                this.startPreviewZoomAnimation();
+            }
+
+            this.setFloorFurnitureRotationAvailabilityMonitorEnabled(
+                this._previewMode === ProductViewCatalogWidget.PREVIEW_MODE_FLOOR_FURNITURE
+            );
+        }
+
+        if(this._canvasDisplayObject !== canvas || canvas.parent !== this._roomCanvasClip)
+        {
+            if(this._canvasDisplayObject != null && this._canvasDisplayObject.parent === this._roomCanvasClip)
+            {
+                this._roomCanvasClip.removeChild(this._canvasDisplayObject);
+            }
+
+            this._roomCanvasClip.addChild(canvas);
+            this._canvasDisplayObject = canvas;
+        }
+
+        this.updateRoomCanvasClipRect();
+
+        return this._roomCanvasClip;
+    }
+
+    /**
+     * The clip's rect, which is AS3's `scrollRect` on the wrapper. AS3 re-assigns it from
+     * `applyRoomCanvasZoom()` as well as at bind time, so a `room_canvas` that changed size is
+     * re-clipped; an empty mask would hide the preview entirely, so both paths draw it.
+     */
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/viewer/widgets/ProductViewCatalogWidget.as::applyRoomCanvasZoom() (scrollRect)
+    private updateRoomCanvasClipRect(): void
+    {
+        if(this._roomCanvasClipMask == null || this._roomCanvas == null) return;
+
+        this._roomCanvasClipMask
+            .clear()
+            .rect(0, 0, this._roomCanvas.width, this._roomCanvas.height)
+            .fill(0xFFFFFF);
+    }
+
     // TS deviation: mirrors RoomPreviewerWidget.syncCanvasPosition() - see this._canvasDisplayObject's
     // field comment for why this is needed (canvas parented onto the shared root stage, not this
     // widget's own window tree).
     private syncCanvasPosition(): void
     {
-        if(!this._canvasDisplayObject || !this._roomCanvas) return;
+        if(!this._roomCanvasClip || !this._roomCanvas) return;
 
         const globalPosition = {x: 0, y: 0};
 
         this._roomCanvas.getGlobalPosition(globalPosition);
 
-        this._canvasDisplayObject.x = globalPosition.x;
-        this._canvasDisplayObject.y = globalPosition.y;
+        // The clip, not the canvas: the canvas's own x/y are the zoom offsets applyRoomCanvasZoom()
+        // writes, relative to the clip, and this runs every frame — writing the screen position
+        // onto the canvas is what used to erase them and anchor the 2x preview to the rect's
+        // top-left corner instead of its centre.
+        this._roomCanvasClip.x = globalPosition.x;
+        this._roomCanvasClip.y = globalPosition.y;
 
         // This canvas and the inventory previewer's are siblings on the shared
         // stage, so neither can decide its own depth — both used to re-assert
@@ -438,7 +547,7 @@ export class ProductViewCatalogWidget extends CatalogWidget implements IGetImage
             window = window.parent;
         }
 
-        this._canvasDisplayObject.visible = visible && reachedDesktop;
+        this._roomCanvasClip.visible = visible && reachedDesktop;
     }
 
     /**
@@ -920,24 +1029,15 @@ export class ProductViewCatalogWidget extends CatalogWidget implements IGetImage
     {
         if(this._roomCanvas == null || this._canvasDisplayObject == null) return;
 
+        this.updateRoomCanvasClipRect();
+
         const scale = 1 + (2 - 1) * this._previewZoomAnimationProgress;
         const offsetY = ProductViewCatalogWidget.PREVIEW_ZOOM_IN_CAMERA_OFFSET_Y * this._previewZoomAnimationProgress;
 
         this._canvasDisplayObject.scale.x = scale;
         this._canvasDisplayObject.scale.y = scale;
-
-        // TS deviation: AS3 assigns _roomCanvasDisplayObject.x/y directly, relative to a wrapper
-        // Sprite that's separately positioned/clipped. Our canvas is parented onto the shared
-        // root stage and kept aligned with room_canvas's screen position every frame by
-        // syncCanvasPosition() - so the zoom offset here is applied on top of that same base
-        // position (re-read fresh, not accumulated onto whatever .x/.y already holds) to avoid
-        // drifting across repeated calls during the zoom animation.
-        const basePosition = {x: 0, y: 0};
-
-        this._roomCanvas.getGlobalPosition(basePosition);
-
-        this._canvasDisplayObject.x = basePosition.x - (this._roomCanvas.width * scale - this._roomCanvas.width) / 2;
-        this._canvasDisplayObject.y = basePosition.y - (this._roomCanvas.height * scale - this._roomCanvas.height) / 2 - offsetY;
+        this._canvasDisplayObject.x = -(this._roomCanvas.width * scale - this._roomCanvas.width) / 2;
+        this._canvasDisplayObject.y = -(this._roomCanvas.height * scale - this._roomCanvas.height) / 2 - offsetY;
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/viewer/widgets/ProductViewCatalogWidget.as::normalizeAvatarDirection()
