@@ -19,6 +19,7 @@
     import {t} from '../../lib/i18n.js';
 
     let wallets = $state<api.IWallets | null>(null);
+    let chain = $state<api.IChainDescriptor | null>(null);
     let busy = $state(false);
     let loaded = $state(false);
 
@@ -43,7 +44,67 @@
         }
     }
 
+    // Separately, and never in the way: the chain is what the network button and the hotel's
+    // treasury address come from, and a hotel running without one is the ordinary case. A failure
+    // here hides those two rows and nothing else.
+    async function loadChain(): Promise<void>
+    {
+        try
+        {
+            const descriptor = await api.getChain();
+
+            chain = descriptor.enabled ? descriptor : null;
+        }
+        catch
+        {
+            // Nothing to say: no chain means no network to add and nowhere to send a Relic back to.
+        }
+    }
+
     load();
+    loadChain();
+
+    // `wallet_addEthereumChain` is how a wallet learns a network it has never seen. It is idempotent
+    // — a wallet that already has this chain id simply switches to it — so the button stays useful
+    // rather than being something to press exactly once.
+    async function addNetwork(): Promise<void>
+    {
+        const ethereum = (window as unknown as {ethereum?: IEthereum}).ethereum;
+
+        if(!ethereum || !chain)
+        {
+            return;
+        }
+
+        try
+        {
+            await ethereum.request({
+                method: 'wallet_addEthereumChain',
+                params: [{
+                    chainId: chain.chainIdHex,
+                    chainName: chain.currencyName,
+                    rpcUrls: [chain.rpcUrl],
+                    nativeCurrency: {
+                        name: chain.currencyName,
+                        symbol: chain.currencySymbol,
+                        decimals: chain.currencyDecimals,
+                    },
+                }],
+            });
+        }
+        catch(failure)
+        {
+            if((failure as {code?: number})?.code === 4001)
+            {
+                return;
+            }
+
+            notifier.errorStickyRawMessage(
+                (failure as Error)?.message ?? '',
+                'WALLET_SETTINGS_TITLE'
+            );
+        }
+    }
 
     async function connect(): Promise<void>
     {
@@ -186,15 +247,39 @@
         {/each}
 
         {#if injected}
-            <div class="mt-3">
+            <div class="mt-3 flex flex-wrap gap-2">
                 <Button variant="green" onclick={connect} disabled={busy}>
                     {t('WALLET_SETTINGS_CONNECT')}
                 </Button>
+
+                <!-- Only with a chain to add. A button that tells a wallet about a network the
+                     hotel does not run would fail in the extension, where the error is somebody
+                     else's to explain. -->
+                {#if chain}
+                    <Button onclick={addNetwork}>{t('WALLET_SETTINGS_OWN_NETWORK')}</Button>
+                {/if}
             </div>
         {:else}
             <!-- habbo.com's own line for this, and the ordinary case: most visitors have no wallet
                  extension, which is not an error and gets no red box. -->
             <p class="mt-3 text-sm opacity-70">{t('WALLET_SETTINGS_NOT_INSTALLED')}</p>
         {/if}
+    {/if}
+
+    <!-- The way back in, which has no button anywhere because it is not an action the hotel takes:
+         the player sends the token themselves, from their own wallet, and the hotel notices. So the
+         only thing this page owes them is the address and what happens when they use it. -->
+    {#if chain?.treasuryAddress}
+        <h3 class="mt-8 mb-2">{t('WALLET_SETTINGS_OWN_TREASURY')}</h3>
+
+        <div class="mb-1.5 flex items-center justify-between gap-3 rounded-[3px] bg-card px-3 py-3">
+            <code class="min-w-0 truncate text-sm">{shorten(chain.treasuryAddress)}</code>
+            <button type="button" class="shrink-0 underline"
+                    onclick={() => copy(chain!.treasuryAddress!)}>
+                {t('NATIVE_HOTEL_LAUNCH_COPY_CODE')}
+            </button>
+        </div>
+
+        <p class="text-sm opacity-70">{t('WALLET_SETTINGS_OWN_TREASURY_DESCRIPTION')}</p>
     {/if}
 </SettingsShell>

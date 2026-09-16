@@ -347,6 +347,31 @@ export function unlinkWallet(address: string): Promise<IWallets>
     return request(`/api/user/wallets/${encodeURIComponent(address)}`, {method: 'DELETE'});
 }
 
+// The hotel's own chain, shaped the way `wallet_addEthereumChain` wants it. Anonymous, because a
+// chain is public and a wallet has to be able to add the network before anything is linked.
+//
+// `rpcUrl` is the web API's filtered proxy and never the node itself — the node answers
+// `anvil_setBalance` beside the standard methods, so its port is not published at all.
+export interface IChainDescriptor
+{
+    enabled: boolean;
+    chainId: number;
+    chainIdHex: string;
+    rpcUrl: string;
+    currencyName: string;
+    currencySymbol: string;
+    currencyDecimals: number;
+    coinAddress: string | null;
+    collectibleAddress: string | null;
+    // Where a Relic is sent to bring it back into the hotel.
+    treasuryAddress: string | null;
+}
+
+export function getChain(): Promise<IChainDescriptor>
+{
+    return request('/api/public/chain');
+}
+
 // What the hotel sells. Anonymous: the store page renders for a visitor who has not signed in.
 export function getShopProducts(): Promise<IShopCatalog>
 {
