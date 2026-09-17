@@ -138,8 +138,15 @@
                     type: 'ERC20',
                     options: {
                         address: chain.coinAddress,
-                        symbol: chain.currencySymbol,
-                        decimals: chain.currencyDecimals,
+                        // NOT `chain.currencySymbol`/`currencyDecimals`: those describe the chain's
+                        // NATIVE coin, the one that pays for gas, and the endpoint hardcodes 18
+                        // because that is how the node counts wei. They agree with the token today
+                        // only because both were called VTX — which is also why a wallet lists two
+                        // VTX rows. These come from the token itself: VortexCoin.sol declares
+                        // `ERC20("VortexCoin", "VTX")` and does not override `decimals()`, so
+                        // OpenZeppelin's 18 stands.
+                        symbol: 'VTX',
+                        decimals: 18,
                         image: `${location.origin}/vortexcoin-256.png`,
                     },
                 },
