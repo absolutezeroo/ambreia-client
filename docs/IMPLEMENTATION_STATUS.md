@@ -69,6 +69,42 @@ single missing member — so 45 commands landed and the number went 304 → 309.
 things is worth less than five covering five, and any reading of this file that treats the total as
 a score will get that backwards.
 
+### A Vortex skin could not add anything without forking the dump (2026-09-17)
+
+VortexCoin had no icon, so it needed a currency icon style — two `<template>`s, two `<layout>`s and
+two `<window>` entries. The cost of adding them was forking **108 KB** of dump XML:
+`App.readVortexSkins()` *replaced* a skin wholesale and replaced the element description wholesale,
+so `src/vortex-skins/` could only hold complete copies of `habbo_skin_icon_set_xml` (42 KB) and
+`habbo_element_description_xml` (66 KB). That directory had stayed empty since it was created,
+which is the tell: a mechanism nobody could afford to use.
+
+It merges now. `mergeSkin()` folds templates/layouts/states by name, `mergeElementDescription()`
+folds entries by `(typeId, style)` — the pair `ElementDescriptorRegistry` looks a descriptor up by
+— and `mergeByKey()` **substitutes in place** rather than appending, because both the skin renderer
+and the registry keep the first entry they meet for a key: a replacement appended at the end would
+lose to the dump's and be dead with nothing logged. The two authored files are now 55 and 25 lines.
+
+Three things this turned up, all of the silent-failure kind this port specialises in:
+
+- **A skin template can only draw out of an atlas.** `BitmapSkinParser.parseTemplateList()` resolves
+  its bitmap with `atlases.get(assetName)` over a map built solely from `App.ATLAS_NAMES`, and
+  returns `null` on a miss — a standalone PNG in the image bundle is not something this system can
+  draw, and saying otherwise costs an invisible icon and no warning. Hence `vortex_icons.png`, a
+  Vortex-owned sheet, and a new `ATLAS_NAMES` entry. A stale `vortex-client-assets.zip` degrades
+  safely: `getImageBitmap()` returns null rather than throwing, so only the new icon goes missing.
+- **Redefining `<variable key="asset">` in an authored skin repoints the whole dump skin.** The
+  variables merge too, and the dump's 86 templates all resolve `asset="$asset"` through it. The
+  atlas name belongs on the template.
+- The name is normalised — `vortex_icons_png` and `vortex_icons` both reach the `vortex_icons`
+  entry (`normalizeAssetName()`, `WindowXmlAssetParser.ts:414`).
+
+`ActivityPointTypeEnum.getIconStyleFor()` needed no branch: an unknown activity-point type already
+falls through to `currencyiconstyle.big.<type>` / `.small.<type>`, so binding the icon is two
+external-variable lines. The art and the atlas are drawn by
+`packages/vortex-client/tools/build-vortexcoin-icon.mjs`, which exists because `*.png` is gitignored
+repo-wide — without it a fresh clone with no `--pack` behind it has no way to produce the icon at
+all.
+
 ### Variable FX: the bar family draws (2026-09-13)
 
 The second feature out of the AIR dump, and the large one — ~14,500 lines of AS3 for wired-variable

@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!--
+	VortexCoin's currency icon, merged into the dump's icon set by App.readVortexSkins().
+
+	Only the additions are here: everything this file is silent about is kept from
+	src/assets/window-skins/habbo_skin_icon_set_xml.xml, and a template or layout whose name
+	the dump already uses would replace that one. 84 and 85 are free - the dump's templates
+	stop at icon_83.
+
+	`asset` is Vortex's own sheet rather than the dump's `$asset` (habbo_icons_png), which is
+	why it is written out instead of referencing the variable: redefining `asset` here would
+	repoint every one of the dump's 86 templates at a 37x24 image.
+-->
+<skin name="icon_set_skin" version="0.0">
+
+	<templates>
+
+		<!-- VortexCoin, big -->
+		<template name="icon_84" asset="vortex_icons_png">
+			<entities>
+				<entity name="icon" type="bitmap"><region><Rectangle x="0" y="0" width="24" height="24" /></region></entity>
+			</entities>
+		</template>
+
+		<!-- VortexCoin, small -->
+		<template name="icon_85" asset="vortex_icons_png">
+			<entities>
+				<entity name="icon" type="bitmap"><region><Rectangle x="24" y="0" width="13" height="13" /></region></entity>
+			</entities>
+		</template>
+
+	</templates>
+
+	<layouts>
+
+		<layout name="iconVortexCoinBig" transparent="true">
+			<entities>
+				<entity name="icon" id="0">
+					<region><Rectangle x="0" y="0" width="24" height="24" /></region>
+					<scale horizontal="fixed" vertical="fixed" />
+				</entity>
+			</entities>
+		</layout>
+
+		<layout name="iconVortexCoinSmall" transparent="true">
+			<entities>
+				<entity name="icon" id="0">
+					<region><Rectangle x="0" y="0" width="13" height="13" /></region>
+					<scale horizontal="fixed" vertical="fixed" />
+				</entity>
+			</entities>
+		</layout>
+
+	</layouts>
+
+</skin>

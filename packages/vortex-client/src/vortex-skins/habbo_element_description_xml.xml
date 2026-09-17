@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+	Binds the two VortexCoin icon styles to the skin templates that draw them, merged into the
+	dump's element description by App.readVortexSkins() on (type, style) - the pair
+	ElementDescriptorRegistry looks a descriptor up by. Only the additions are here; an entry
+	whose type/style the dump already declares would replace that one.
+
+	Style 84/85 is what ActivityPointTypeEnum.getIconStyleFor() has to return for VortexCoin.
+	It has no branch for it and needs none: an activity-point type it does not know falls
+	through to `currencyiconstyle.big.<type>` / `currencyiconstyle.small.<type>` in the
+	external variables, so the binding is two configuration lines rather than a code change.
+-->
+<skin name="habbo" version="0.1">
+
+	<window type="icon" intent="VortexCoin Big" style="84" renderer="skin" asset="habbo_skin_icon_set_xml" layout="iconVortexCoinBig">
+		<states><state name="default" layout="iconVortexCoinBig" template="icon_84" /></states>
+	</window>
+
+	<window type="icon" intent="VortexCoin Small" style="85" renderer="skin" asset="habbo_skin_icon_set_xml" layout="iconVortexCoinSmall">
+		<states><state name="default" layout="iconVortexCoinSmall" template="icon_85" /></states>
+	</window>
+
+</skin>

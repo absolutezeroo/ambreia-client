@@ -112,6 +112,53 @@
         }
     }
 
+    // VortexCoin is an ERC-20 (VortexCoin.sol), so a wallet does not show it until it is imported,
+    // and `wallet_watchAsset` is the only way to hand it an icon: MetaMask's own import form has no
+    // image field, and its token API only indexes public chains. Idempotent like addNetwork().
+    //
+    // The image URL is absolute because the extension fetches it itself, and versioned because
+    // MetaMask stores the URL and the browser caches the file — overwriting the PNG in place would
+    // leave part of the players on the old icon forever. Bump the name to change the art.
+    async function addCoin(): Promise<void>
+    {
+        const ethereum = (window as unknown as {ethereum?: IEthereum}).ethereum;
+
+        if(!ethereum || !chain?.coinAddress)
+        {
+            return;
+        }
+
+        try
+        {
+            await ethereum.request({
+                method: 'wallet_watchAsset',
+                // Alone among the wallet methods, this one takes an object rather than an array —
+                // passing it wrapped in one is rejected as an invalid request.
+                params: {
+                    type: 'ERC20',
+                    options: {
+                        address: chain.coinAddress,
+                        symbol: chain.currencySymbol,
+                        decimals: chain.currencyDecimals,
+                        image: `${location.origin}/vortexcoin-256.png`,
+                    },
+                },
+            });
+        }
+        catch(failure)
+        {
+            if((failure as {code?: number})?.code === 4001)
+            {
+                return;
+            }
+
+            notifier.errorStickyRawMessage(
+                (failure as Error)?.message ?? '',
+                'WALLET_SETTINGS_TITLE'
+            );
+        }
+    }
+
     async function connect(): Promise<void>
     {
         const ethereum = (window as unknown as {ethereum?: IEthereum}).ethereum;
@@ -233,7 +280,9 @@
 
     interface IEthereum
     {
-        request(args: {method: string; params?: unknown[]}): Promise<unknown>;
+        // `params` is an array for every method here but `wallet_watchAsset`, which EIP-747
+        // defines as a bare object.
+        request(args: {method: string; params?: unknown[] | Record<string, unknown>}): Promise<unknown>;
     }
 </script>
 
@@ -290,6 +339,12 @@
                          somebody else's to explain. -->
                     {#if chain}
                         <Button onclick={addNetwork}>{t('WALLET_SETTINGS_OWN_NETWORK')}</Button>
+                    {/if}
+
+                    <!-- Separately gated: a hotel can run a chain with no coin deployed on it yet,
+                         and then there is nothing for a wallet to watch. -->
+                    {#if chain?.coinAddress}
+                        <Button onclick={addCoin}>{t('WALLET_SETTINGS_OWN_COIN')}</Button>
                     {/if}
 
                     <Button onclick={connect} disabled={busy}>

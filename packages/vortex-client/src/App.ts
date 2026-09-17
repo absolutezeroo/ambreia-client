@@ -869,6 +869,10 @@ export class VortexApp
         'illumina_purple_border_frame',
         'illumina_purple_button_default',
         'illumina_purple_button_frame_close',
+
+        // Vortex's own sheet, not from the dump: the art src/vortex-skins/ cuts its regions out of.
+        // Built by tools/build-vortexcoin-icon.mjs, which is also what documents its layout.
+        'vortex_icons',
     ];
 
     /**
@@ -1196,11 +1200,11 @@ export class VortexApp
             }
 
             // 2b. Vortex's own authored skins (src/vortex-skins/*.xml), registered last so a file
-            // named after a dump skin replaces it. Same reasoning as readVortexLayouts() below:
+            // named after a dump skin merges into it. Same reasoning as readVortexLayouts() below:
             // src/assets/window-skins/ is gitignored and rebuilt from the dump by
             // tools/build-window-assets.mjs, so a hand-authored file placed there would be wiped
             // on the next asset build.
-            const vortexElementDescription = this.readVortexSkins(skins);
+            const vortexElementDescription = this.readVortexSkins(skins, windowAssets.elementDescription ?? null);
 
             if(vortexElementDescription)
             {
@@ -1537,23 +1541,29 @@ export class VortexApp
      * readVortexLayouts().
      *
      * The basename is the skin id, which is what an element descriptor's `asset` field points at
-     * (HabboWindowManager.loadSkinAssets()). So a file named after a dump skin — e.g.
-     * `habbo_skin_frame.xml` — replaces that skin wholesale for every descriptor using it, while a
-     * brand-new id renders nothing until some descriptor asks for it: skins are only ever reached
-     * through the element description, never by name from a layout.
+     * (HabboWindowManager.loadSkinAssets()). A file named after a dump skin — e.g.
+     * `habbo_skin_frame.xml` — is **merged into** it: templates, layouts and states replace the
+     * dump's entry of the same name and every other one is left alone, so a file may carry only
+     * what it adds. `habbo_element_description_xml.xml` merges the same way, by (type, style),
+     * which is the key the registry itself looks descriptors up by. A brand-new skin id renders
+     * nothing until some descriptor asks for it: skins are only ever reached through the element
+     * description, never by name from a layout.
      *
-     * That is what the `habbo_element_description_xml.xml` override is for. A file under that name
-     * replaces the dump's element description entirely (it is one XML, not a merge), which is the
-     * only way to bind a new skin id to a type/style/intent triplet.
+     * Merging rather than replacing is deliberate. These two files are 42 KB and 66 KB, so the
+     * wholesale override this used to do meant forking both of them — and a fork stops following
+     * the dump the moment it is taken, which for the element description means every window in the
+     * client silently keeping the shape it had on the day someone wanted one new icon.
      *
      * Templates still resolve their bitmaps out of the atlases decoded above, so a skin here can
      * only reference an atlas listed in ATLAS_NAMES — a new spritesheet needs a new entry there
-     * plus the PNG in the image bundle.
+     * plus the PNG in the image bundle. BitmapSkinParser.parseTemplateList() looks the asset up
+     * with `atlases.get()` and renders nothing at all when it misses, with no warning.
      *
      * @param sink - the skin map being built, mutated in place
-     * @returns the element-description override if one was authored, otherwise null
+     * @param base - the dump's element description, the thing an authored one merges into
+     * @returns the merged element description if one was authored, otherwise null
      */
-    private readVortexSkins(sink: Map<string, ISkinData>): IElementDescriptionData | null
+    private readVortexSkins(sink: Map<string, ISkinData>, base: IElementDescriptionData | null): IElementDescriptionData | null
     {
         const modules = import.meta.glob('./vortex-skins/*.xml', {
             query: '?raw',
@@ -1573,13 +1583,17 @@ export class VortexApp
             {
                 if(name === ELEMENT_DESCRIPTION_ASSET)
                 {
-                    elementDescription = parseElementDescriptionFromBundle(xml, path);
+                    const authored = parseElementDescriptionFromBundle(xml, path);
+
+                    if(authored) elementDescription = VortexApp.mergeElementDescription(elementDescription ?? base, authored);
+                    else log.warn(`Vortex element description did not parse, ignored: ${path}`);
+
                     continue;
                 }
 
                 const skin = parseSkinFromBundle(xml, name, path);
 
-                if(skin) sink.set(skin.id, skin);
+                if(skin) sink.set(skin.id, VortexApp.mergeSkin(sink.get(skin.id) ?? null, skin));
                 else log.warn(`Vortex skin has no <skin> root element, ignored: ${path}`);
             }
             catch (error)
@@ -1589,6 +1603,88 @@ export class VortexApp
         }
 
         return elementDescription;
+    }
+
+    /**
+     * Merges an authored skin over the dump's skin of the same id: templates, layouts and states
+     * with a name the dump already has replace it, the rest are appended, and everything the
+     * authored file is silent about is kept.
+     *
+     * With no dump skin of that id — a brand-new Vortex skin — the authored one is the whole of it.
+     *
+     * @param base - the dump's skin, or null when this id is new
+     * @param authored - the file read out of src/vortex-skins/
+     * @returns the skin to register under this id
+     */
+    private static mergeSkin(base: ISkinData | null, authored: ISkinData): ISkinData
+    {
+        if(!base) return authored;
+
+        // The dump's `name`/`source` are kept: they identify where the bulk of the skin came from,
+        // and an authored fragment carrying only two templates is not a better answer to that.
+        return {
+            id: base.id,
+            name: base.name,
+            source: base.source,
+            variables: {...base.variables, ...authored.variables},
+            templates: VortexApp.mergeByKey(base.templates, authored.templates, (entry) => entry.name),
+            layouts: VortexApp.mergeByKey(base.layouts, authored.layouts, (entry) => entry.name),
+            states: VortexApp.mergeByKey(base.states, authored.states, (entry) => entry.name)
+        };
+    }
+
+    /**
+     * Merges an authored element description over the dump's, keyed by (typeId, style) — the pair
+     * ElementDescriptorRegistry itself looks a descriptor up by, so two entries agreeing on it are
+     * the same entry and the authored one wins.
+     *
+     * @param base - the dump's element description, or null if it failed to load
+     * @param authored - the file read out of src/vortex-skins/
+     * @returns the element description to hand the window manager
+     */
+    private static mergeElementDescription(base: IElementDescriptionData | null, authored: IElementDescriptionData): IElementDescriptionData
+    {
+        if(!base) return authored;
+
+        return {
+            id: base.id,
+            source: base.source,
+            elements: VortexApp.mergeByKey(base.elements, authored.elements, (entry) => `${entry.typeId}/${entry.style}`)
+        };
+    }
+
+    /**
+     * Base list with `authored` applied over it: an authored entry whose key already exists
+     * replaces that entry **in place**, so the dump's ordering is preserved, and any remaining
+     * authored entry is appended in the order it was written.
+     *
+     * Order matters here: both the skin renderer and the descriptor registry keep the first entry
+     * for a key they meet, so appending a replacement instead of substituting it would leave the
+     * dump's version winning and the authored one dead — visible as nothing at all.
+     */
+    private static mergeByKey<T>(base: T[], authored: T[], key: (entry: T) => string): T[]
+    {
+        const byKey = new Map(authored.map((entry) => [key(entry), entry]));
+        const used = new Set<string>();
+
+        const merged = base.map((entry) =>
+        {
+            const k = key(entry);
+            const replacement = byKey.get(k);
+
+            if(!replacement) return entry;
+
+            used.add(k);
+
+            return replacement;
+        });
+
+        for(const entry of authored)
+        {
+            if(!used.has(key(entry))) merged.push(entry);
+        }
+
+        return merged;
     }
 
     /**
