@@ -30,6 +30,11 @@ export const COMMUNITY_TABS: ITab[] = [
     {path: '/community/photos', label: t('COMMUNITY_PHOTOS_TAB')},
     {path: '/community/rooms', label: t('COMMUNITY_ROOMS_TAB')},
     {path: '/community/fansites', label: t('COMMUNITY_FANSITES_TAB')},
+    // DEVIATION: habbo.com has no such tab, and this bar is otherwise their own membership. This
+    // hotel runs its own chain and its own coin, so the standings are a thing it has and they had
+    // no reason to. Its label and every string on its page are ours, marked `_OWN_` in fr.json so
+    // nobody later mistakes them for habbo.com's.
+    {path: '/community/leaderboard', label: t('COMMUNITY_LEADERBOARD_TAB')},
     // habbo.com's news tab matches /community/category AND /community/article — the article page
     // keeps the tab lit.
     {path: '/community', label: t('COMMUNITY_NEWS_TAB')},

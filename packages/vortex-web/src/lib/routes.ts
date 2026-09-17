@@ -61,6 +61,10 @@ export const routes = {
     '/community/photos': open(() => import('../pages/community/Photos.svelte')),
     '/community/rooms': open(() => import('../pages/community/Rooms.svelte')),
     '/community/fansites': open(() => import('../pages/community/Fansites.svelte')),
+    // Ours, not habbo.com's — see the note on COMMUNITY_TABS. Open rather than guarded: every
+    // balance in it is readable off the chain by anyone who has the addresses, and the addresses
+    // are public, so a session in front of it would protect nothing.
+    '/community/leaderboard': open(() => import('../pages/community/Leaderboard.svelte')),
     '/article/:id': open(() => import('../pages/community/Article.svelte')),
     '/article/:id/:title': open(() => import('../pages/community/Article.svelte')),
 

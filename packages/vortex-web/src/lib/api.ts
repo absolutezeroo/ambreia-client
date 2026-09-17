@@ -376,6 +376,37 @@ export function getChain(): Promise<IChainDescriptor>
     return request('/api/public/chain');
 }
 
+// One place in the coin standings.
+//
+// Both balances are STRINGS and must stay strings. A JSON number is an IEEE double in every browser,
+// and a wei balance is up to 78 digits — parsing it as a number is how the last digits of somebody's
+// standing quietly become zeroes. `balance` is the readable figure in whole coins, `balanceWei` the
+// exact one to compare or sum with.
+export interface ILeaderboardEntry
+{
+    rank: number;
+    playerId: number;
+    playerName: string;
+    address: string;
+    balance: string;
+    balanceWei: string;
+}
+
+// A SNAPSHOT, not a live read: the hotel re-reads every balance on a timer, because a standings
+// table asks one `eth_call` per player. `takenAtUtc` is null until the first refresh, and the page
+// shows it — a leaderboard that hides its age invites the reader to think it is live.
+export interface ILeaderboard
+{
+    enabled: boolean;
+    takenAtUtc: string | null;
+    standings: ILeaderboardEntry[];
+}
+
+export function getLeaderboard(): Promise<ILeaderboard>
+{
+    return request('/api/public/leaderboard/coins');
+}
+
 // What the hotel sells. Anonymous: the store page renders for a visitor who has not signed in.
 export function getShopProducts(): Promise<IShopCatalog>
 {
