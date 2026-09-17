@@ -205,9 +205,18 @@ export class PooledChatBubble extends Container
         const margins = style.textFieldMargins;
         const fontFace = style.textFormat.fontFace;
         const fontSize = Math.max(1, Math.round(style.textFormat.fontSize * chatFlow.chatFontSizeScale));
-        const linkColor = style.styleSheet ? Number(style.styleSheet.linkColor.replace('#', '0x')) : color;
+        // AS3 (PooledChatBubble.as:119, ChatBubble.as:97) spends `color` on
+        // getNewBackgroundSprite() and nowhere else - it is the bubble *tint*, read off the
+        // speaker's `ch` part colour by ChatBubbleFactory. The text is drawn with the style's own
+        // format instead: createScaledTextFormat() copies `textFormat.color` onto the TextField's
+        // defaultTextFormat, which is also the colour HabboFreeFlowChat.fixHtml() already bases
+        // its markup on. Passing the tint here painted every message in the speaker's shirt
+        // colour, so a light shirt drew near-white text on a bubble its own tint had left white -
+        // a full-width, entirely blank bubble.
+        const textColor = style.textFormat.color;
+        const linkColor = style.styleSheet ? Number(style.styleSheet.linkColor.replace('#', '0x')) : textColor;
 
-        const runs = buildChatTextRuns(item.text, userName, style.isAnonymous, isShout, italic, color, linkColor, item.links);
+        const runs = buildChatTextRuns(item.text, userName, style.isAnonymous, isShout, italic, textColor, linkColor, item.links);
 
         const measureCanvas = new OffscreenCanvas(1, 1);
         const measureCtx = measureCanvas.getContext('2d')!;
@@ -307,6 +316,11 @@ export class PooledChatBubble extends Container
 
         this._textSprite.texture = Texture.from(textCanvas.transferToImageBitmap());
         this._textSprite.position.set(margins.x, margins.y);
+        // AS3 (PooledChatBubble.as:148-155) fades the TextField to 60% for the same `italic`
+        // condition the font above already reads - whispers and every system chat type - and
+        // back to full for speak/shout. The port took the font half of that branch and dropped
+        // the opacity half, so a whisper was indistinguishable from normal speech.
+        this._textSprite.alpha = italic ? 0.6 : 1;
 
         if(this._textSprite.parent !== this) this.addChild(this._textSprite);
 

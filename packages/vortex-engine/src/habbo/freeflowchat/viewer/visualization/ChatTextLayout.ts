@@ -215,6 +215,31 @@ interface IStyledSpan
 const MARKUP_TAG_RE = /<(\/?)(b|i|u|font)(?:\s+color="(#[0-9A-Fa-f]{6})")?>/g;
 
 /**
+ * Undoes the `&lt;`/`&gt;` escaping HabboFreeFlowChat.fixHtml() applies to a non-allowHTML
+ * style's text, plus the other entities a server-sent message can carry.
+ *
+ * AS3 needs no counterpart: fixHtml() escapes so that markup typed by a user can't open a tag,
+ * then hands the string to `TextField.htmlText`, and Flash decodes the entities back to literal
+ * characters as it renders. This port draws the text itself, so nothing was undoing the escape
+ * and a message containing `<` reached the canvas as the literal `&lt;`.
+ *
+ * `&amp;` is decoded last so `&amp;lt;` stays `&lt;` instead of collapsing to `<`.
+ */
+// TS-only: no AS3 counterpart; Flash's TextField decoded entities itself when handed `htmlText`.
+function decodeEntities(text: string): string
+{
+    if(text.indexOf('&') === -1) return text;
+
+    return text
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&apos;/g, '\'')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&');
+}
+
+/**
  * Splits text containing the inline tags ChatMarkup.applyToElements()/
  * applyColourToChat() produce (`<b>`, `<i>`, `<u>`, `<font color="#hex">`)
  * into plain-text spans with resolved bold/italic/underline/color state -
@@ -252,7 +277,7 @@ function parseInlineMarkup(text: string): IStyledSpan[]
     {
         if(segment.length === 0) return;
 
-        spans.push({text: segment, ...currentStyle()});
+        spans.push({text: decodeEntities(segment), ...currentStyle()});
     };
 
     MARKUP_TAG_RE.lastIndex = 0;
