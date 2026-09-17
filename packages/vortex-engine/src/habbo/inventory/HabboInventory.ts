@@ -3065,6 +3065,25 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
 
         if(!parser) return;
 
+        // AS3 (_SafeCls_1951.as::onFurniList():223-231) builds the inventory view here — hidden —
+        // and then bails if the model is still null. Both lines were dropped, and `_furniModel` only
+        // exists once `init()` has run, which nothing does until the player opens the inventory
+        // window: a furni list arriving before that found `undefined`, took the `?.` below and threw
+        // the whole list away, silently, without marking the category initialised.
+        //
+        // That is what left the Relics grid empty. Opening the Collector's Guild asks for the furni
+        // inventory (MintInventoryListTab.initializeData() → checkCategoryInitilization('furni'),
+        // which requests as a side effect) and then waits on HABBO_INVENTORY_CATEGORY_INITIALIZED —
+        // an event only insertFurniture() raises. The reply was dropped, the wait never cleared, and
+        // the tab stayed blank until the player opened the inventory by hand and the next list
+        // landed with the model finally built.
+        if(!this.isMainViewInitialized)
+        {
+            this.initializeFurniturePage();
+        }
+
+        if(!this._furniModel) return;
+
         for(const [itemId, item] of parser.items)
         {
             this._furniListFragments.set(itemId, item);
