@@ -1,6 +1,9 @@
-// The site's own bitmaps, fetched from habbo.com. They are NOT committed — `*.png` is gitignored
-// repo-wide, like every other dump-derived asset here — so this is what makes a fresh checkout
-// render: without it the sprite sheet is missing and every icon, the logo included, is a blank box.
+// The site's own bitmaps, fetched from habbo.com. `*.png` is gitignored repo-wide like every other
+// dump-derived asset, but .gitignore un-ignores THIS directory
+// (`!packages/vortex-web/src/assets/*.png`) — so what this tool writes is committed, and a fetched
+// asset that is left untracked is a blank box for everybody else. Vite leaves an unresolvable
+// `new URL('../assets/x.png', import.meta.url)` as a literal string rather than failing, so the
+// miss builds green and is reported nowhere.
 //
 //   node tools/fetch-assets.mjs
 //
@@ -51,6 +54,15 @@ const ASSETS = {
     // 264x212, centred with 12px under it).
     'room_key.png': 'room_key.6e69d1d8.png',
 
+    // The collectibles illustration on /habbo-nft — the stack of convertible furni. ABSOLUTE,
+    // because it is not part of the web app's asset bundle: habbo.com's own NFT page pulls it from
+    // the c_images host inside a CMS fragment (`habbo_nft/nft_furni_and_clothing`). It carries no
+    // hash there, so there is nothing to pin and nothing that moves under us.
+    //
+    // The picture is all this port takes from that page. Its TEXT describes Immutable, OpenSea,
+    // TokenTrove and an avatar collection, none of which this hotel has — see pages/HabboNft.svelte.
+    'nft_furni.png': 'https://images.habbo.com/c_images/nft/nft_furni.png',
+
     // The four profile-card illustrations.
     'teaser_profile_badges.png': 'teaser_profile_badges.b20597b3.png',
     'teaser_profile_friends.png': 'teaser_profile_friends.45ec1e42.png',
@@ -64,7 +76,9 @@ let bytes = 0;
 
 for(const [name, remote] of Object.entries(ASSETS))
 {
-    const response = await fetch(`${BASE}/${remote}`);
+    // An absolute value is taken as-is: a couple of these live on the c_images host rather than in
+    // the web app's hashed asset bundle.
+    const response = await fetch(remote.startsWith('https://') ? remote : `${BASE}/${remote}`);
 
     if(!response.ok)
     {
