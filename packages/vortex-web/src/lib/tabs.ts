@@ -60,6 +60,14 @@ export const SETTINGS_TABS: ITab[] = [
     {path: '/settings/wallet', label: t('SETTINGS_WALLET_TAB')},
 ];
 
+// `habbo-nft/habbo-nft.html`'s own bar, membership and all: two tabs at habbo.com's own paths, with
+// the two `translation-key` values its `<habbo-tab>` elements name. What each page SAYS is this
+// hotel's — see pages/nft/ — but the section is theirs.
+export const HABBO_NFT_TABS: ITab[] = [
+    {path: '/habbo-nft/habbo-avatars', label: t('HABBO_NFT_HABBO_AVATARS')},
+    {path: '/habbo-nft/nft-furni-and-clothing', label: t('HABBO_NFT_FURNI_AND_CLOTHING')},
+];
+
 export const PLAYING_HABBO_TABS: ITab[] = [
     {path: '/playing-habbo', label: t('PLAYING_HABBO_WHAT_IS_HABBO_TAB'), strict: true},
     {path: '/playing-habbo/how-to-play', label: t('PLAYING_HABBO_HOW_TO_PLAY_TAB')},
