@@ -12,6 +12,8 @@ import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
 import type {NftStoreOffer} from '@habbo/communication/messages/parser/collectibles/NftStoreOffer';
 import type {NftStoreOffersMessageParser} from '@habbo/communication/messages/parser/collectibles/NftStoreOffersMessageParser';
 import {NftStoreOffersMessageEvent} from '@habbo/communication/messages/incoming/collectibles/NftStoreOffersMessageEvent';
+import {NftStorePurchaseMessageEvent} from '@habbo/communication/messages/incoming/collectibles/NftStorePurchaseMessageEvent';
+import {NftStorePurchaseMessageParser} from '@habbo/communication/messages/parser/collectibles/NftStorePurchaseMessageParser';
 import {GetNftStoreOffersComposer} from '@habbo/communication/messages/outgoing/collectibles/GetNftStoreOffersComposer';
 
 import type {HabboCatalog} from '../../HabboCatalog';
@@ -87,6 +89,8 @@ export class ShopTab implements IUpdateReceiver
     private _currentOffers: NftStoreOffer[] = [];
     // AS3: ShopTab.as::_offersByCategory (keyed by the *localized* category name)
     private _offersByCategory: Map<string, NftStoreOffer[]> = new Map<string, NftStoreOffer[]>();
+    // TS-only: what to put back on screen after a post-purchase refresh; see `onNftStorePurchase()`.
+    private _restoreOnRefresh: {category: string | null; productCode: string | null} | null = null;
 
     // AS3: ShopTab.as::ShopTab()
     constructor(view: CollectiblesView, controller: CollectiblesController)
@@ -141,13 +145,45 @@ export class ShopTab implements IUpdateReceiver
         controller.registerUpdateReceiver(this, 1);
     }
 
+    // DEVIATION: AS3 listens for the offers message alone, so its mint counter and its buy button
+    //   keep the numbers they were sent when the tab opened -- a purchase only shows up after the
+    //   Collectors Guild is closed and reopened. The purchase answer is listened for here as well,
+    //   and a successful one asks the server for the list again.
     // AS3: ShopTab.as::addMessageEvents()
     private addMessageEvents(): void
     {
-        this._messageEvents = [new NftStoreOffersMessageEvent(this.onNftStoreOffers)];
+        this._messageEvents = [
+            new NftStoreOffersMessageEvent(this.onNftStoreOffers),
+            new NftStorePurchaseMessageEvent(this.onNftStorePurchase)
+        ];
 
         for(const event of this._messageEvents) this._controller.addMessageEvent(event);
     }
+
+    /**
+     * Asks again rather than counting to itself: another player buying the last copy has to close
+     * this tab's buy button too, and `NftStoreOffer` is a parsed wire value with no setters — a
+     * locally incremented count would be this tab's opinion rather than the hotel's.
+     *
+     * The active category and the selected cell are carried across the round trip, because being
+     * thrown back to the first category is a worse answer to "I just bought this" than a stale
+     * number was.
+     */
+    // TS-only: AS3 never reacts to the purchase answer; only `HabboCatalog` reads it, to raise the
+    //   alert or the notification.
+    private onNftStorePurchase = (event: IMessageEvent): void =>
+    {
+        const parser = event.parser as NftStorePurchaseMessageParser | null;
+
+        if(parser === null || parser.result === NftStorePurchaseMessageParser.RESULT_ERROR) return;
+
+        this._restoreOnRefresh = {
+            category: this._activeCategory?.category ?? null,
+            productCode: this._selectedItem?.offer.productCode ?? null
+        };
+
+        this.requestNftStoreOffers();
+    };
 
     /**
      * The double guard is AS3's and it is a de-duplicator: the reply is ignored unless this tab
@@ -169,7 +205,27 @@ export class ShopTab implements IUpdateReceiver
 
         this.createNavigationNodes();
 
-        if(this._renderableItems.length > 0) this.activateCategory(this._renderableItems[0]);
+        const restore = this._restoreOnRefresh;
+
+        this._restoreOnRefresh = null;
+
+        if(this._renderableItems.length > 0)
+        {
+            const previous = restore?.category == null
+                ? null
+                : this._renderableItems.find(node => node.category === restore.category) ?? null;
+
+            this.activateCategory(previous ?? this._renderableItems[0]);
+
+            if(restore?.productCode != null)
+            {
+                const cell = this._gridItems.find(
+                    item => item.offer.productCode === restore.productCode
+                );
+
+                if(cell !== undefined) this.selectItem(cell);
+            }
+        }
 
         this.setReady(true);
 
@@ -412,6 +468,11 @@ export class ShopTab implements IUpdateReceiver
         return this._container?.findChildByName('loaded_content') as IWindowContainer | null ?? null;
     }
 
+    // DEVIATION: AS3 leaves `_offersByCategory` behind, which is harmless there because it only
+    //   ever clears the list once, on the single request it makes. Cleared here because the tab now
+    //   requests twice: the surviving keys would make `createNavigationNodes()` skip every node --
+    //   an empty category list and a hidden grid -- while still appending each offer to the old
+    //   buckets.
     // AS3: ShopTab.as::clearNavigationList()
     private clearNavigationList(): void
     {
@@ -421,6 +482,7 @@ export class ShopTab implements IUpdateReceiver
         for(const node of this._renderableItems) node.dispose();
 
         this._renderableItems = [];
+        this._offersByCategory.clear();
     }
 
     // AS3: ShopTab.as::removeMessageEvents()
