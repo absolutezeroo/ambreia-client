@@ -54,14 +54,15 @@ const ASSETS = {
     // 264x212, centred with 12px under it).
     'room_key.png': 'room_key.6e69d1d8.png',
 
-    // The collectibles illustration on /habbo-nft — the stack of convertible furni. ABSOLUTE,
-    // because it is not part of the web app's asset bundle: habbo.com's own NFT page pulls it from
-    // the c_images host inside a CMS fragment (`habbo_nft/nft_furni_and_clothing`). It carries no
-    // hash there, so there is nothing to pin and nothing that moves under us.
+    // The two illustrations of the /habbo-nft section, one per tab. ABSOLUTE, because they are not
+    // part of the web app's asset bundle: habbo.com's own NFT pages pull them from the c_images host
+    // inside their CMS fragments (`habbo_nft/nft_furni_and_clothing`, `habbo_nft/habbo_avatars`).
+    // They carry no hash there, so there is nothing to pin and nothing that moves under us.
     //
-    // The picture is all this port takes from that page. Its TEXT describes Immutable, OpenSea,
-    // TokenTrove and an avatar collection, none of which this hotel has — see pages/HabboNft.svelte.
+    // The pictures are all this port takes from those pages. Their TEXT describes Immutable,
+    // OpenSea, TokenTrove and an avatar collection, none of which this hotel has — see pages/nft/.
     'nft_furni.png': 'https://images.habbo.com/c_images/nft/nft_furni.png',
+    'nft_avatars.png': 'https://images.habbo.com/c_images/nft/nft_avatars.png',
 
     // The four profile-card illustrations.
     'teaser_profile_badges.png': 'teaser_profile_badges.b20597b3.png',

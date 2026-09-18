@@ -15,9 +15,15 @@
     import {link} from 'svelte-spa-router';
     import NftShell from './NftShell.svelte';
     import {t} from '../../lib/i18n.js';
+
+    // The two cards habbo.com floats on this tab, at the same place. It is the only thing the port
+    // takes from their page — see tools/fetch-assets.mjs.
+    const AVATARS = new URL('../../assets/nft_avatars.png', import.meta.url).href;
 </script>
 
 <NftShell>
+    <img src={AVATARS} alt="" class="align-right" width="220" />
+
     <h2>{t('HABBO_NFT_HABBO_AVATARS')}</h2>
 
     <p>{t('HABBO_NFT_OWN_AVATARS_LEAD')}</p>
