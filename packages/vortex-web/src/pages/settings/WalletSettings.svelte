@@ -33,6 +33,19 @@
     // and its absence is the ordinary case rather than an error — most visitors have no wallet.
     const injected = $derived.by(() => typeof window !== 'undefined' && 'ethereum' in window);
 
+    // The chain the wallet is on RIGHT NOW, as `eth_chainId` reports it. It is the only thing a
+    // wallet will tell us about its networks: there is no "do you know chain X" call, so the step
+    // below says "you are on the Vortex network" — which is observable — and never "you have added
+    // it", which is not.
+    let chainId = $state<string | null>(null);
+
+    // Whether VortexCoin was added FROM THIS BROWSER. `wallet_watchAsset` answers at the moment of
+    // the call and nowhere else: a reload cannot ask the wallet what tokens it lists. So this is
+    // remembered locally and the step says as much rather than implying the wallet was asked.
+    let coinAdded = $state(false);
+
+    const COIN_ADDED_KEY = 'vortex.wallet.coin';
+
     async function load(): Promise<void>
     {
         try
@@ -60,6 +73,13 @@
             const descriptor = await api.getChain();
 
             chain = descriptor.enabled ? descriptor : null;
+
+            // Keyed by the chain, because a hotel that redeploys onto a new chain id has a new
+            // token at a new address and the old tick would be about something else.
+            if(chain)
+            {
+                coinAdded = read(`${COIN_ADDED_KEY}.${chain.chainIdHex}`) === '1';
+            }
         }
         catch
         {
@@ -67,8 +87,77 @@
         }
     }
 
+    // Storage is refused outright in a private window and in some embedded browsers, and it throws
+    // on ACCESS rather than returning null. An unticked optional step is the right answer there.
+    function read(key: string): string | null
+    {
+        try
+        {
+            return localStorage.getItem(key);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    function write(key: string, value: string): void
+    {
+        try
+        {
+            localStorage.setItem(key, value);
+        }
+        catch
+        {
+            // As above. The tick simply does not survive the reload.
+        }
+    }
+
+    async function readNetwork(): Promise<void>
+    {
+        const ethereum = (window as unknown as {ethereum?: IEthereum}).ethereum;
+
+        if(!ethereum)
+        {
+            return;
+        }
+
+        try
+        {
+            chainId = await ethereum.request({method: 'eth_chainId'}) as string;
+        }
+        catch
+        {
+            // A locked wallet answers this one anyway, but an extension that is still starting up
+            // may not. Left null: the step reads as not-yet-done, and its button still works.
+        }
+    }
+
     load();
     loadChain();
+    readNetwork();
+
+    // The network step is the one piece of this page that changes without anybody touching it — a
+    // player switching networks in the extension. Without this the tick would only ever be right
+    // until the first switch, which is worse than no tick.
+    $effect(() =>
+    {
+        const ethereum = (window as unknown as {ethereum?: IEthereum}).ethereum;
+
+        if(!ethereum?.on)
+        {
+            return;
+        }
+
+        const changed = (id: string): void =>
+        {
+            chainId = id;
+        };
+
+        ethereum.on('chainChanged', changed);
+
+        return () => ethereum.removeListener?.('chainChanged', changed);
+    });
 
     // `wallet_addEthereumChain` is how a wallet learns a network it has never seen. It is idempotent
     // — a wallet that already has this chain id simply switches to it — so the button stays useful
@@ -97,6 +186,11 @@
                     },
                 }],
             });
+
+            // It also SWITCHES to the chain, so the step below is done the moment this returns —
+            // but a wallet that was already on it emits no `chainChanged`, and one that emits none
+            // at all would leave the tick behind forever. Asking costs one call.
+            await readNetwork();
         }
         catch(failure)
         {
@@ -130,7 +224,10 @@
 
         try
         {
-            await ethereum.request({
+            // EIP-747 answers with a boolean, and it is the only readback this action ever gets.
+            // MetaMask resolves `false` on a refusal where other wallets throw 4001, so both are
+            // handled: anything that is not an explicit `false` counts as added.
+            const added = await ethereum.request({
                 method: 'wallet_watchAsset',
                 // Alone among the wallet methods, this one takes an object rather than an array —
                 // passing it wrapped in one is rejected as an invalid request.
@@ -151,6 +248,12 @@
                     },
                 },
             });
+
+            if(added !== false && chain)
+            {
+                coinAdded = true;
+                write(`${COIN_ADDED_KEY}.${chain.chainIdHex}`, '1');
+            }
         }
         catch(failure)
         {
@@ -290,7 +393,75 @@
         // `params` is an array for every method here but `wallet_watchAsset`, which EIP-747
         // defines as a bare object.
         request(args: {method: string; params?: unknown[] | Record<string, unknown>}): Promise<unknown>;
+        // EIP-1193's event half. Optional because it is not what makes this page work — a wallet
+        // without it simply never re-reports its network on its own.
+        on?(event: string, handler: (payload: never) => void): void;
+        removeListener?(event: string, handler: (payload: never) => void): void;
     }
+
+    /** One line of the setup list: what it is, why, whether it is done, and the button that does it. */
+    interface IStep
+    {
+        label: string;
+        hint: string;
+        done: boolean;
+        action: string;
+        run: () => void;
+    }
+
+    // DEVIATION from habbo.com, which puts three unordered buttons in the add row. They are not
+    // unordered here: connecting is the only one the hotel needs, and the other two configure the
+    // wallet so that what it now holds is visible and can be sent back. Numbering them says that
+    // once, where a row of buttons asks every player to guess it.
+    //
+    // Every step's button stays clickable after its tick, because all three actions are idempotent
+    // and the second one is often the point: connecting a SECOND wallet, switching back to the
+    // Vortex network, re-adding the token in another browser. A tick is the current state, not a
+    // door that closes.
+    const linked = $derived((wallets?.linkedAddresses.length ?? 0) > 0);
+
+    // Case-insensitively, because `eth_chainId` is minimal hex (`0x7a69`) and nothing promises the
+    // two sides spell the same digits the same way.
+    const onNetwork = $derived(
+        !!chain && !!chainId && chainId.toLowerCase() === chain.chainIdHex.toLowerCase()
+    );
+
+    const steps = $derived.by(() =>
+    {
+        const list: IStep[] = [{
+            label: t('WALLET_SETTINGS_OWN_STEP_CONNECT'),
+            hint: t('WALLET_SETTINGS_OWN_STEP_CONNECT_HINT'),
+            done: linked,
+            action: t('WALLET_SETTINGS_CONNECT'),
+            run: connect,
+        }];
+
+        // Gated exactly as the buttons were: no chain means no network to add, and a chain with no
+        // coin deployed on it yet means there is nothing for a wallet to watch.
+        if(chain)
+        {
+            list.push({
+                label: t('WALLET_SETTINGS_OWN_STEP_NETWORK'),
+                hint: t('WALLET_SETTINGS_OWN_STEP_NETWORK_HINT'),
+                done: onNetwork,
+                action: t('WALLET_SETTINGS_OWN_NETWORK'),
+                run: addNetwork,
+            });
+        }
+
+        if(chain?.coinAddress)
+        {
+            list.push({
+                label: t('WALLET_SETTINGS_OWN_STEP_COIN'),
+                hint: t('WALLET_SETTINGS_OWN_STEP_COIN_HINT'),
+                done: coinAdded,
+                action: t('WALLET_SETTINGS_OWN_COIN'),
+                run: addCoin,
+            });
+        }
+
+        return list;
+    });
 </script>
 
 <SettingsShell>
@@ -333,30 +504,47 @@
         {/each}
 
         {#if injected}
-            <!-- `.wallet-setting-add`: the same card at HALF width, with the add icon where the
-                 other rows have their wallet's. -->
-            <div class="{ROW} md:w-1/2">
+            <!-- `.wallet-setting-add`, with the add icon where the other rows have their wallet's —
+                 but at full width rather than habbo.com's `md:w-1/2`, because what sits beside the
+                 icon is now three labelled lines instead of one button. -->
+            <div class="{ROW} flex-col gap-5 md:flex-row">
                 <div class={BEGIN}>
                     <Sprite name="walletAdd" />
                 </div>
 
-                <div class="{END} flex-wrap gap-2">
-                    <!-- Only with a chain to add. A button that tells a wallet about a network the
-                         hotel does not run would fail inside the extension, where the error is
-                         somebody else's to explain. -->
-                    {#if chain}
-                        <Button onclick={addNetwork}>{t('WALLET_SETTINGS_OWN_NETWORK')}</Button>
-                    {/if}
+                <div class="flex w-full min-w-0 flex-col gap-5 md:pl-5">
+                    {#each steps as step, index (step.label)}
+                        <div class="flex flex-row flex-wrap items-center gap-x-4 gap-y-3">
+                            <!-- The number turns into habbo.com's own tick, the same one the perk
+                                 mark and the copy button use. -->
+                            <div class="flex size-7 shrink-0 self-start items-center justify-center
+                                        rounded-full font-condensed text-sm
+                                        {step.done ? 'bg-play' : 'bg-btn'}">
+                                {#if step.done}
+                                    <Sprite name="statusCheck" className="scale-60" />
+                                {:else}
+                                    {index + 1}
+                                {/if}
+                            </div>
 
-                    <!-- Separately gated: a hotel can run a chain with no coin deployed on it yet,
-                         and then there is nothing for a wallet to watch. -->
-                    {#if chain?.coinAddress}
-                        <Button onclick={addCoin}>{t('WALLET_SETTINGS_OWN_COIN')}</Button>
-                    {/if}
+                            <div class="min-w-0 flex-1">
+                                <div class="font-condensed uppercase">{step.label}</div>
+                                <p class="text-sm opacity-70">{step.hint}</p>
+                            </div>
 
-                    <Button onclick={connect} disabled={busy}>
-                        {t('WALLET_SETTINGS_CONNECT')}
-                    </Button>
+                            <!-- One width for the three, or a column of buttons sized by their own
+                                 labels reads as three unrelated actions rather than a list. Only
+                                 from `md`: at phone width the button is the full row. -->
+                            <Button
+                                variant={index === 0 && !step.done ? 'green' : 'blue'}
+                                className="w-full md:w-auto md:min-w-[230px]"
+                                disabled={busy}
+                                onclick={step.run}
+                            >
+                                {step.action}
+                            </Button>
+                        </div>
+                    {/each}
                 </div>
             </div>
         {:else}
