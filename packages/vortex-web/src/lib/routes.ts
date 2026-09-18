@@ -85,7 +85,12 @@ export const routes = {
     '/playing-habbo/privacy-notice': open(() => import('../pages/StaticPage.svelte')),
     '/playing-habbo/dsa': open(() => import('../pages/StaticPage.svelte')),
 
-    '/habbo-nft': open(() => import('../pages/StaticPage.svelte')),
+    // habbo-nft — the nav's "COLLECTIBLES". A real page since the hotel has a chain: it used to be
+    // a StaticPage whose text said the opposite. The Relic route is open for the same reason the
+    // leaderboard is — whoever holds one may have no account here at all, which is the point of
+    // having taken it out.
+    '/habbo-nft': open(() => import('../pages/HabboNft.svelte')),
+    '/habbo-nft/relic/:id': open(() => import('../pages/RelicPage.svelte')),
 
     // shop — three genuinely different templates, plus one route habbo.com has no need of: a SPA
     // needs somewhere for a payment provider to send the browser BACK to. It only reads the order's

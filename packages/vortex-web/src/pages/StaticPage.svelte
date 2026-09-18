@@ -50,13 +50,10 @@
             ],
         },
         // /community/fansites is NOT here: it is a real tabbed community page on habbo.com
-        // (pages/community/Fansites.svelte), not an editorial one.
-        '/habbo-nft': {
-            title: 'Habbo NFT',
-            blocks: [
-                ['Pas sur cet hotel', 'L\'onglet existe parce que habbo.com l\'a dans sa navigation. Rien n\'est branche derriere : ce hotel n\'a pas de portefeuille.'],
-            ],
-        },
+        // (pages/community/Fansites.svelte), not an editorial one. Neither is /habbo-nft, for the
+        // same reason plus a worse one: its entry here said the hotel had no wallet, which was true
+        // when it was written and became the site's most visible wrong sentence the day the chain
+        // was deployed. It is pages/HabboNft.svelte now.
         '/forgot': {
             title: 'Mot de passe oublie',
             blocks: [
@@ -81,5 +78,7 @@
         </section>
     {/each}
 
-    <p class="mt-12"><a href="/me" use:link class="hover:underline">Retour a l'accueil</a></p>
+    <!-- `/`, not `/me`: habbo.com has no such route and neither does this port — see the note at the
+         top of lib/routes.ts. The link fell through to the 404. -->
+    <p class="mt-12"><a href="/" use:link class="hover:underline">Retour a l'accueil</a></p>
 </div>

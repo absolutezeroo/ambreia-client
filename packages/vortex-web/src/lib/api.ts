@@ -376,6 +376,35 @@ export function getChain(): Promise<IChainDescriptor>
     return request('/api/public/chain');
 }
 
+// One Relic's ERC-721 metadata — the SAME document `tokenURI` serves to a wallet or a marketplace,
+// read here by the page that describes it. Two consumers of one route on purpose: a page built on a
+// second, friendlier endpoint is a page that can disagree with what the token itself says.
+//
+// Its field names are the schema's and not this site's, `trait_type` included. They are not
+// camelCased on the way in for the same reason the server does not camelCase them on the way out.
+export interface ITokenAttribute
+{
+    trait_type: string;
+    // A string for the classname, a number for the edition figures. Printed either way.
+    value: string | number;
+}
+
+export interface ITokenMetadata
+{
+    name: string;
+    description: string;
+    // Null when the hotel has no asset host configured: the document would rather carry no picture
+    // than a URL that resolves to nothing.
+    image: string | null;
+    attributes: ITokenAttribute[];
+}
+
+// 404 `asset_not_found` for an id that is not a Relic, or one an admin deleted.
+export function getCollectible(assetId: number | string): Promise<ITokenMetadata>
+{
+    return request(`/api/public/collectibles/${encodeURIComponent(assetId)}`);
+}
+
 // One place in the coin standings.
 //
 // Both balances are STRINGS and must stay strings. A JSON number is an IEEE double in every browser,
