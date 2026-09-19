@@ -58,6 +58,8 @@ export class DisconnectReasonMessageEvent extends MessageEvent implements IMessa
                 return '${disconnected.idle}';
             case 122:
                 return '${disconnected.incompatible_client_version}';
+            // AS3 spells out 39 more cases (4, 5, 16-17, 22-29, 100-126) before its own default,
+            // and every one of them returns this same key. Collapsing them changes nothing.
             default:
                 return '${disconnected.generic}';
         }

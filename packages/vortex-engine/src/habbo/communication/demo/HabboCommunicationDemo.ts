@@ -526,57 +526,52 @@ export class HabboCommunicationDemo extends Component implements IHabboCommunica
     }
 
     /**
-	 * Handle error messages from the server
+	 * Handle error messages from the server.
 	 *
-	 * Routes error codes to appropriate actions:
-	 * - 0: Server error (AS3 shows alert)
-	 * - 1001-1019: Close connection (fatal errors)
-	 * - 4013: Maintenance (AS3 shows alert)
-	 * - Other: Generic server error (AS3 shows alert)
-	 *
-	 * @see source_as_win63/habbo/communication/demo/HabboCommunicationDemo.as handleErrorMessage()
+	 * - 1001-1019: fatal, close the connection silently
+	 * - 4013: the room is under maintenance
+	 * - anything else, code 0 included: a server error alert carrying the code
 	 */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/communication/demo/_SafeCls_98.as::handleErrorMessage()
     handleErrorMessage(errorCode: number, messageId: number): void
     {
         switch(true)
         {
-            case errorCode === 0:
-                log.error(`Server error: ${errorCode}`);
-                break;
-
             case errorCode >= 1001 && errorCode <= 1019:
-                // AS3: _communication.connection.close()
                 log.error(`Fatal server error ${errorCode}, closing connection`);
 
-                if(this._communication?.connection)
-                {
-                    this._communication.connection.close();
-                }
+                this._communication?.connection?.close();
                 break;
 
             case errorCode === 4013:
-                // AS3: alert("${connection.room.maintenance.title}", ...)
                 log.warn('Room maintenance in progress');
+                this.alert('${connection.room.maintenance.title}', '${connection.room.maintenance.desc}');
                 break;
 
+            // AS3 lists code 0 and the default arm separately and gives them the same body.
             default:
                 log.error(`Server error: ${errorCode} (message: ${messageId})`);
+                this._localization?.registerParameter('connection.server.error.desc', 'errorCode', String(errorCode));
+                this.alert('${connection.server.error.title}', '${connection.server.error.desc}');
                 break;
         }
     }
 
     /**
-	 * Handle hotel closed message
-	 *
-	 * In AS3 this shows the login screen with disconnected text.
-	 *
-	 * @see source_as_win63/habbo/communication/demo/HabboCommunicationDemo.as handleLoginFailedHotelClosedMessage()
+	 * The hotel is closed; the server says when it reopens and hangs up.
 	 */
+    // DEVIATION: AS3 calls `loginFlow.showDisconnectedWithText(12)`, 12 being the reason code for
+    //   `${disconnected.hotel_closed}`. The port has no `showDisconnectedWithText` on any login
+    //   flow — grep finds the name nowhere — so it goes through `disconnected()`, the substitute
+    //   this file already uses for the two core-error paths above, with the same reason code.
+    //   Without it the message was a log line: nothing on screen, and a socket about to close.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/communication/demo/_SafeCls_98.as::handleLoginFailedHotelClosedMessage()
     handleLoginFailedHotelClosedMessage(openHour: number, openMinute: number): void
     {
+        // AS3 drops the opening time too — the disconnect text takes no parameter for it.
         log.warn(`Hotel is closed. Opens at ${openHour}:${String(openMinute).padStart(2, '0')}`);
+
+        this.disconnected(12, '');
     }
 
     /**

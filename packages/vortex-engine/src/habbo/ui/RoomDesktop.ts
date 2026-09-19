@@ -43,6 +43,12 @@ import type {IHabboModeration} from '@habbo/moderation/IHabboModeration';
 import type {IDesktopWindow} from '@core/window/components/IDesktopWindow';
 import type {IRoomObject} from '@room/object/IRoomObject';
 import type {IUserData} from '@habbo/session/IUserData';
+import type {IToolTipWindow} from '@core/window/components/IToolTipWindow';
+import {WindowType} from '@core/window/enum/WindowType';
+import {WindowStyle} from '@core/window/enum/WindowStyle';
+import {WindowParam} from '@core/window/enum/WindowParam';
+import {HabboWebTools} from '@habbo/utils/HabboWebTools';
+import {RoomEngineRoomAdEvent} from '@habbo/room/events/RoomEngineRoomAdEvent';
 import {RoomObjectVariableEnum} from '@habbo/room/object/RoomObjectVariableEnum';
 import {RoomObjectCategoryEnum} from '@habbo/room/object/RoomObjectCategoryEnum';
 import {RoomObjectOperationEnum} from '@habbo/room/object/RoomObjectOperationEnum';
@@ -419,6 +425,10 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
     {
         this._config = value;
     }
+
+    // The hover tooltip of a room ad, at most one at a time.
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::roomAdTooltip
+    private _roomAdTooltip: IToolTipWindow | null = null;
 
     // AS3: .../src/com/sulake/habbo/ui/RoomDesktop.as::_localization
     private _localization: IHabboLocalizationManager | null = null;
@@ -1717,8 +1727,7 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
                 return;
             // AS3: RoomDesktop.as::processRoomObjectEvent() "RETWE_REQUEST_TROPHY" (line 1249) —
             // the engine says a trophy was used; turn it into the widget message the trophy
-            // handler claims. The remaining RETWE_REQUEST_* cases follow the same two lines each,
-            // and land as their widgets are ported.
+            // handler claims.
             case RoomEngineToWidgetEvent.REQUEST_TROPHY:
                 this.processWidgetMessage(new RoomWidgetFurniToWidgetMessage(
                     RoomWidgetFurniToWidgetMessage.WIDGET_MESSAGE_REQUEST_TROPHY_WIDGET,
@@ -1785,6 +1794,68 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
                 ));
 
                 return;
+            // AS3: RoomDesktop.as::processRoomObjectEvent() "RERAE_FURNI_CLICK" (line 1269)
+            case RoomEngineRoomAdEvent.FURNI_CLICK:
+            case RoomEngineRoomAdEvent.FURNI_DOUBLE_CLICK:
+                this.handleRoomAdClick(event);
+
+                return;
+            // AS3: RoomDesktop.as::processRoomObjectEvent() "RERAE_TOOLTIP_SHOW" (line 1273)
+            case RoomEngineRoomAdEvent.TOOLTIP_SHOW:
+            case RoomEngineRoomAdEvent.TOOLTIP_HIDE:
+                this.handleRoomAdTooltip(event);
+
+                return;
+            // AS3: RoomDesktop.as::processRoomObjectEvent() "RETWE_REQUEST_TEASER" (line 1253)
+            case RoomEngineToWidgetEvent.REQUEST_TEASER:
+                this.processWidgetMessage(new RoomWidgetFurniToWidgetMessage(
+                    RoomWidgetFurniToWidgetMessage.WIDGET_MESSAGE_REQUEST_TEASER_WIDGET,
+                    event.objectId, event.category, event.roomId
+                ));
+
+                return;
+            // AS3: RoomDesktop.as::processRoomObjectEvent() "RETWE_REQUEST_PLAYLIST_EDITOR" (line 1281)
+            case RoomEngineToWidgetEvent.REQUEST_PLAYLIST_EDITOR:
+                this.processWidgetMessage(new RoomWidgetFurniToWidgetMessage(
+                    RoomWidgetFurniToWidgetMessage.WIDGET_MESSAGE_REQUEST_PLAYLIST_EDITOR_WIDGET,
+                    event.objectId, event.category, event.roomId
+                ));
+
+                return;
+            // AS3: RoomDesktop.as::processRoomObjectEvent() "RETWE_REQUEST_ACHIEVEMENT_RESOLUTION_ENGRAVING" (line 1285)
+            case RoomEngineToWidgetEvent.REQUEST_ACHIEVEMENT_RESOLUTION_ENGRAVING:
+                this.processWidgetMessage(new RoomWidgetFurniToWidgetMessage(
+                    RoomWidgetFurniToWidgetMessage.WIDGET_MESSAGE_REQUEST_ACHIEVEMENT_RESOLUTION_ENGRAVING,
+                    event.objectId, event.category, event.roomId
+                ));
+
+                return;
+            // AS3: RoomDesktop.as::processRoomObjectEvent() "RETWE_REQUEST_BADGE_DISPLAY_ENGRAVING" (line 1289)
+            case RoomEngineToWidgetEvent.REQUEST_BADGE_DISPLAY_ENGRAVING:
+                this.processWidgetMessage(new RoomWidgetFurniToWidgetMessage(
+                    RoomWidgetFurniToWidgetMessage.WIDGET_MESSAGE_REQUEST_BADGE_DISPLAY_ENGRAVING,
+                    event.objectId, event.category, event.roomId
+                ));
+
+                return;
+            // Only the owner is told the engraving failed — the others just see the unresolved
+            // badge. This is the one arm of the group with a guard.
+            // AS3: RoomDesktop.as::processRoomObjectEvent() "RETWE_REQUEST_ACHIEVEMENT_RESOLUTION_FAILED" (line 1293)
+            case RoomEngineToWidgetEvent.REQUEST_ACHIEVEMENT_RESOLUTION_FAILED:
+            {
+                const object = this._roomEngine?.getRoomObject(event.roomId, event.objectId, event.category) ?? null;
+
+                if(object !== null
+                    && object.getModel().getNumber('furniture_owner_id') === this._sessionDataManager?.userId)
+                {
+                    this.processWidgetMessage(new RoomWidgetFurniToWidgetMessage(
+                        RoomWidgetFurniToWidgetMessage.WIDGET_MESSAGE_REQUEST_ACHIEVEMENT_RESOLUTION_FAILED,
+                        event.objectId, event.category, event.roomId
+                    ));
+                }
+
+                return;
+            }
             case RoomEngineObjectEvent.REOE_SELECTED:
                 // AS3 only builds the update event when selection is allowed; when it is disabled
                 // the local stays null and nothing is dispatched.
@@ -2158,10 +2229,16 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
 
         log.debug(`Disposing RoomDesktop for room ${this._session.roomId}`);
 
-        if(this._toolbar) 
+        if(this._toolbar)
         {
             this._toolbar.toolbarEvents.off(HabboToolbarEvent.ICON_ZOOM, this.onToolbarEvent);
             this._toolbar = null;
+        }
+
+        if(this._roomAdTooltip !== null)
+        {
+            this._roomAdTooltip.dispose();
+            this._roomAdTooltip = null;
         }
 
         // Dispose all widgets
@@ -2271,6 +2348,86 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
         }
 
         return disabled;
+    }
+
+    /**
+     * Opens a room ad's target page.
+     *
+     * The two arms are exclusive: a plain visitor opens it on a single click, a room controller
+     * only on a double click — so that moving the furniture around does not fire the ad.
+     */
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::handleRoomAdClick()
+    private handleRoomAdClick(event: RoomEngineObjectEvent): void
+    {
+        const object = this._roomEngine?.getRoomObject(event.roomId, event.objectId, event.category) ?? null;
+
+        if(object === null) return;
+
+        const url = object.getModel().getString(RoomObjectVariableEnum.FURNITURE_AD_URL);
+
+        if(url === null || url.indexOf('http') !== 0) return;
+
+        const isController = (this.roomSession?.roomControllerLevel ?? 0) >= 1
+            || (this._sessionDataManager?.isAnyRoomController ?? false);
+
+        if(event.type === RoomEngineRoomAdEvent.FURNI_CLICK)
+        {
+            if(isController) return;
+        }
+        else if(!isController)
+        {
+            return;
+        }
+
+        HabboWebTools.openWebPage(url);
+    }
+
+    /**
+     * Shows or hides the hover tooltip of a room ad: the furniture's own `.tooltip` text, or the
+     * ad URL itself when it has none.
+     */
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::handleRoomAdTooltip()
+    private handleRoomAdTooltip(event: RoomEngineObjectEvent): void
+    {
+        if(event.type === RoomEngineRoomAdEvent.TOOLTIP_HIDE)
+        {
+            if(this._roomAdTooltip === null) return;
+
+            this._roomAdTooltip.dispose();
+            this._roomAdTooltip = null;
+
+            return;
+        }
+
+        if(this._roomAdTooltip !== null || this._windowManager === null) return;
+
+        const object = this._roomEngine?.getRoomObject(event.roomId, event.objectId, event.category) ?? null;
+
+        if(object === null) return;
+
+        // AS3 asks for `<type>.tooltip` with `${ads.roomad.tooltip}` as the fallback, then tests
+        // the result for null — `getLocalization()` returning the fallback is the normal outcome,
+        // and the URL branch below only runs when even that is missing.
+        let text: string | null = this._localization?.getLocalization(object.getType() + '.tooltip', '${ads.roomad.tooltip}') ?? null;
+
+        if(text === null || text === '')
+        {
+            const url = object.getModel().getString(RoomObjectVariableEnum.FURNITURE_AD_URL);
+
+            if(url !== null && url.indexOf('http') === 0) text = url;
+        }
+
+        if(text === null || text === '') return;
+
+        this._roomAdTooltip = this._windowManager.createWindow(
+            'room_ad_tooltip', text, WindowType.TOOLTIP, WindowStyle.DEFAULT, WindowParam.BOUND_TO_PARENT_RECT
+        ) as IToolTipWindow | null;
+
+        if(this._roomAdTooltip === null) return;
+
+        this._roomAdTooltip.setParamFlag(WindowParam.INPUT_EVENT_PROCESSOR, false);
+        this._roomAdTooltip.visible = true;
+        this._roomAdTooltip.center();
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::onRoomViewResized()
