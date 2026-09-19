@@ -28,6 +28,7 @@ import type {IWindow} from '@core/window/IWindow';
 import type {IWindowContainer} from '@core/window/IWindowContainer';
 import type {IBitmapWrapperWindow} from '@core/window/components/IBitmapWrapperWindow';
 import type {ITextFieldWindow} from '@core/window/components/ITextFieldWindow';
+import type {IStaticBitmapWrapperWindow} from '@core/window/components/IStaticBitmapWrapperWindow';
 import {WindowEvent} from '@core/window/events/WindowEvent';
 import {WindowKeyboardEvent} from '@core/window/events/WindowKeyboardEvent';
 import {IID_HabboCommunicationManager} from '@iid/IIDHabboCommunicationManager';
@@ -4018,6 +4019,18 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         const caption = searchInput.text ?? '';
         const keyCode = (event as WindowKeyboardEvent).keyCode;
 
+        // The two things the search box does on every key-up, and neither was ported: the helper
+        // label shows only while the field is empty, and the icon beside it swaps between a close
+        // cross and a pen. AS3 does both BEFORE the empty/Enter branches below, so they happen on
+        // the keystroke that empties the field too.
+        const helper = this._mainWindow?.findChildByName('search.helper') ?? null;
+
+        if(helper !== null) helper.visible = caption.length === 0;
+
+        const clearIcon = this._mainWindow?.findChildByName('search.clear.icon') as unknown as IStaticBitmapWrapperWindow | null;
+
+        if(clearIcon) clearIcon.assetUri = caption.length > 0 ? 'icons_close' : 'common_small_pen';
+
         if(caption.length === 0)
         {
             this.onClearSearch();
@@ -4266,9 +4279,28 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         if(searchInput)
         {
             searchInput.text = '';
+            // AS3 selects the (now empty) text and takes focus back, so the next keystroke goes
+            // into the field rather than nowhere.
+            searchInput.setSelection(0, searchInput.text.length);
+            searchInput.focus();
         }
 
-        this.currentCatalogNavigator?.showIndex();
+        const clearIcon = this._mainWindow?.findChildByName('search.clear.icon') as unknown as IStaticBitmapWrapperWindow | null;
+
+        if(clearIcon) clearIcon.assetUri = 'common_small_pen';
+
+        // Not `showIndex()`: AS3 goes BACK to the page the user was on before they searched, and
+        // only when there is one. Showing the index instead threw away their place.
+        const previousPageId = this._catalogViewer?.previousPageId ?? 0;
+
+        if(previousPageId > 0)
+        {
+            this.currentCatalogNavigator?.openPageById(previousPageId, -1);
+        }
+
+        const helper = this._mainWindow?.findChildByName('search.helper') ?? null;
+
+        if(helper !== null) helper.visible = true;
     };
 
     /**

@@ -354,6 +354,7 @@ export class PurchaseCatalogWidget extends CatalogWidget
     {
         this._catalog!.rememberPageDuringVipPurchase(this.page.pageId);
         this._catalog!.openClubCenter();
+        this._catalog!.tracking?.trackEventLog('Catalog', 'click', 'BUY_CLUB');
     };
 
     private onSetPreviewerStuffData = (event: SetRoomPreviewerStuffDataEvent): void =>
