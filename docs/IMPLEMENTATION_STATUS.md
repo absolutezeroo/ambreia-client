@@ -1700,13 +1700,45 @@ guard, and the buy/publish/competition state machine including the publish cool-
   and `class_2200`), plus a new `getSortableSpriteList()` on the canvas. Both `collectPhotoData()`
   implementations now return a real, sendable composer.
 
-Two `TODO(AS3)` markers remain in the collector, and they are genuine narrowings rather than
-blockers: `getFurniData()` skips AS3's pass that merges *canvas-culled* objects and re-parents
+One `TODO(AS3)` marker remains in the collector, and it is a genuine narrowing rather than a
+blocker: `getFurniData()` skips AS3's pass that merges *canvas-culled* objects and re-parents
 boutique-mannequin sprites (needs `IRoomEngine.getRoomObjects()` and
-`IRoomObjectSpriteVisualization.getSpriteList()`), and `getRoomPlanes()` emits only the background
-plane, because `RoomVisualization` exposes no `planes` accessor and `RoomPlane` has no
-`getDrawingDatas()`. The photo therefore carries the furniture and avatars over a flat
-room-coloured backdrop rather than over the tiled floor and walls.
+`IRoomObjectSpriteVisualization.getSpriteList()`).
+
+#### `RoomPlane.getDrawingDatas()` — closed 2026-09-19
+
+`getRoomPlanes()` first emitted only the background plane, then one flat-coloured quad per plane,
+because `RoomPlane.getDrawingDatas()` was marked `DEVIATION` — the argument being that this port's
+rasterizer paints straight to a canvas instead of returning asset-name columns, so there was no
+separate drawing-data step to expose. **That was unfinished work wearing a deviation marker**, the
+exact failure `.claude/rules/30-as3-traceability.md` describes: the AS3 method is fifty readable
+lines and every piece it walks was already ported — `PlaneRasterizer.getLayers()`,
+`PlaneMaterial.getMaterialCellMatrix()`, `PlaneMaterialCellMatrix.getColumns()/isBottomAligned()`,
+`PlaneMaterialCellColumn.getCells()/isRepeated()`, `PlaneMaterialCell.getAssetName()`,
+`PlaneDrawingData.addAssetColumn()`, `Randomizer.setSeed()`. The consequence was not local: the
+room render happens **on the server**, off this JSON, so the floor and walls came back as flat
+colour in every photo and thumbnail while `RenderRoomMessageComposer.getRoomPlanesDataArray()` —
+already complete — serialised the `texCols` and `masks` arrays it was never given anything to put
+in.
+
+Now ported faithfully, with `resolveMasks()`, `screenWidth()` and `RoomPlane.blend()` beside it, and
+`Canvas.colorize()` (the one caller of which is `blend()`) added to `habbo/utils/Canvas`. Three
+notes, each checkable in the primary tree:
+
+- AS3's `colorize()` ends on `(color && 0xFF000000) | ...` — a **logical** and, in all three source
+  trees, so it is the original code and not a decompiler slip. `blend()` masks the result with
+  `0xFFFFFF`, so the byte it produces is discarded before anyone reads it; reproduced and thrown
+  away exactly as there.
+- AS3 wraps the whole layer walk in a try/catch and lets a null rasterizer, cell matrix or column
+  abort it, losing the plane's remaining layers. `getMaterialCellMatrix()` answers null for a normal
+  none of the material's ranges covers — ordinary data, not a defect — so the guards throw into the
+  same catch rather than repairing it, because the photo has to match what Flash produced.
+- The one place the port cannot follow: AS3's `getTexture()` allocates a flat-coloured bitmap even
+  with no rasterizer, so `_maskBitmapData` always exists; this port's returns null. A mask whose
+  offsets cannot be measured is dropped instead of taking the plane's layers down with it.
+
+`IRoomPlane` gets the member back — it is the sixth in the AS3 interface, and `RoomPlane` is its
+only implementer.
 
 The nine remaining markers in the widget layer are all the same immutable-bitmap constraint —
 per-button filter thumbnails, `renderAllEffects()`, save-to-file. The effect *state* is fully
@@ -1725,6 +1757,20 @@ five (`RenderRoom`, `PublishPhoto`, `PurchasePhoto`, `PhotoCompetition`,
 `RequestCameraConfiguration`) are a bare `await ValueTask.CompletedTask.ConfigureAwait(false);` —
 the message is accepted and dropped, and no `InitCamera`/`CameraStorageUrl`/`ThumbnailStatus` ever
 comes back. **117 of the emulator's 515 handlers are that shape**, crafting's five included.
+
+> **Superseded for the camera, 2026-09-19.** All five handlers are real now, behind
+> `CameraSceneDecoder`, a Skia `RoomPhotoRenderer` and a `camera_photos` table (migration
+> `20260919042559_AddCameraPhotos`). `CameraSceneRenderer` calls `FillTexturedQuad` with each
+> plane's texture columns and falls back to the flat colour only when they resolve to nothing —
+> which is what every plane did until `getDrawingDatas()` was ported above, so the fallback was
+> the whole behaviour. It also reads those same columns to tell a wall from a floor
+> (`IsWall()`), so before the port every plane classified as floor. `plane.Masks` is decoded and
+> validated but still not drawn: doorways do not appear cut out yet.
+>
+> **The thumbnail path is still dead, and not for want of a handler.** `RenderRoomThumbnail` is
+> header 1985 in WIN63's registry and the emulator's `Revision20260701/Headers.cs` has no 1985
+> at all — the composer is complete and sends into nothing. The paragraph below already said
+> this; it is still true.
 
 `scripts/wire-coverage.mjs` was reporting these as "the server is implemented and waiting" because
 it matched on the handler *filename*. It now classifies the body, and the headline number drops from

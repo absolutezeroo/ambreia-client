@@ -16,6 +16,12 @@ import type {IPlaneRasterizer} from './rasterizer/IPlaneRasterizer';
 import type {PlaneBitmapData} from './utils/PlaneBitmapData';
 import {Randomizer} from './utils/Randomizer';
 import type {PlaneMaskManager} from './mask/PlaneMaskManager';
+import {PlaneDrawingData} from './PlaneDrawingData';
+import {PlaneVisualizationLayer} from './rasterizer/basic/PlaneVisualizationLayer';
+import {Canvas} from '@habbo/utils/Canvas';
+import {Logger} from '@core';
+
+const log = Logger.getLogger('habbo.room.object.visualization.room.RoomPlane');
 
 /**
  * Bitmap mask data for plane masking (doors, windows).
@@ -259,14 +265,197 @@ export class RoomPlane implements IRoomPlane
     // artwork behind them. Rectangle masks never went through either path — they carry their own
     // lengths and are exact.
 
-    // DEVIATION: AS3 walks the rasterizer's layers/material-cell-matrix here and returns
-    //   PlaneDrawingData (asset-name columns) for an external renderer to composite. This port
-    //   lets the rasterizer paint straight to a canvas instead: FloorRasterizer/WallRasterizer's
-    //   render() delegates to FloorPlane/WallPlane.render(), which resolves the same
-    //   layer/material/column data internally and returns a finished bitmap. The drawing-data
-    //   step is folded into that render(), the same way _SafeCls_1821 is folded into RoomEngine,
-    //   so there is no separate one to expose.
+    /**
+     * `layerColor` scaled per channel by this plane's own colour, the plane acting as a tint.
+     *
+     * Note the argument order: AS3 passes the *plane* colour first and hands it to `colorize()`
+     * second, as the tint.
+     */
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/room/RoomPlane.as::blend()
+    private static blend(planeColor: number, layerColor: number): number
+    {
+        return Canvas.colorize(layerColor, (planeColor | 0xFF000000) >>> 0) & 0xFFFFFF;
+    }
+
+    /**
+     * The plane's width in screen pixels, which is the width the material's columns are laid out
+     * over. One tile's screen width times the plane's own length along its left side.
+     */
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/room/RoomPlane.as::screenWidth()
+    private screenWidth(geometry: IRoomGeometry): number
+    {
+        const origin = geometry.getScreenPoint(new Vector3d(0, 0, 0));
+        const unit = geometry.getScreenPoint(new Vector3d(0, 1, 0));
+
+        // AS3 dereferences both unguarded; see getDrawingDatas() for what its catch does with the
+        // resulting null-reference, which is what this reproduces.
+        if(origin === null || unit === null) throw new Error('RoomPlane.screenWidth: no projection');
+
+        return Math.round(this._leftSide.length * Math.abs(origin.x - unit.x));
+    }
+
+    /**
+     * The masks (doors, windows) cut into this plane, as artwork names and texture-space offsets.
+     *
+     * This is the payload half of the mask system: the renderer on the other side of the photo has
+     * the same artwork and stamps it at these offsets. The offsets are measured from the far edge
+     * inward — `width * (1 - leftSideLoc / leftSide.length)` — because a plane's texture runs the
+     * opposite way to its side vectors, the same convention `applyBitmapMasks()` uses to cut them
+     * locally.
+     *
+     * The dimensions come from the cached texture bitmap because that is what AS3's mask bitmap is
+     * sized from: `update()` calls `updateMask(texture.bitmap, geometry)`, and `updateMask()`
+     * allocates `_maskBitmapData` at that bitmap's width and height.
+     *
+     * @returns the mask data, or null when this plane takes no masks at all
+     */
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/room/RoomPlane.as::resolveMasks()
+    private resolveMasks(geometry: IRoomGeometry): PlaneDrawingData | null
+    {
+        if(!this._useMask) return null;
+
+        const data = new PlaneDrawingData();
+
+        for(const mask of this._bitmapMasks)
+        {
+            const planeMask = this._maskManager === null ? null : this._maskManager.getMask(mask.type);
+
+            if(planeMask === null) continue;
+
+            const assetName = planeMask.getAssetName(geometry.scale);
+
+            if(assetName === null) continue;
+
+            const normal = geometry.getCoordinatePosition(this._normal);
+
+            if(normal === null) continue;
+
+            const asset = planeMask.getGraphicAsset(geometry.scale, normal);
+
+            if(asset === null) continue;
+
+            const bitmap = this._cachedTextureBitmap === null ? null : this._cachedTextureBitmap.bitmap;
+
+            // AS3 reads `_maskBitmapData.width` here with no guard, and can: its `getTexture()`
+            // allocates a flat-coloured bitmap even when there is no rasterizer, so a plane that
+            // reached `update()` always has one. This port's `getTexture()` returns null in that
+            // case instead, so the dimensions the offsets are measured against can be missing —
+            // and a mask that cannot be placed is dropped rather than taking the plane's layers
+            // down with it.
+            if(bitmap === null) continue;
+
+            // AS3 stores both in an `int`, so the products truncate toward zero.
+            const x = Math.trunc(bitmap.width * (1 - mask.leftSideLoc / this._leftSide.length));
+            const y = Math.trunc(bitmap.height * (1 - mask.rightSideLoc / this._rightSide.length));
+
+            data.addMask(assetName, {x: x + asset.offsetX, y: y + asset.offsetY}, asset.flipH, asset.flipV);
+        }
+
+        return data;
+    }
+
+    /**
+     * This plane as drawing data: one entry per visualization layer, each carrying the layer's
+     * blended colour and — for a textured layer — the names of the artwork assets that fill it,
+     * column by column.
+     *
+     * Nothing in the client renders from this. It exists for the camera: `SpriteDataCollector`
+     * stamps the plane's projected corners onto every entry and `RenderRoomMessageComposer`
+     * serialises them, so the server can redraw the room's floor and walls with their real
+     * textures rather than as flat coloured quads. The local renderer paints planes straight to a
+     * canvas from the same material data (`FloorPlane`/`WallPlane.render()`), which is why this
+     * method has no caller inside the room engine.
+     *
+     * The `Randomizer.setSeed()` per layer is what makes a randomised material come out the same
+     * here as it did when `getTexture()` rasterised it — both reset to the plane's own seed first.
+     *
+     * AS3 wraps the whole walk in a try/catch and lets a null rasterizer, material cell matrix or
+     * column abort it; the guards below throw for exactly those cases so the catch keeps behaving
+     * the way it does there — partial results are kept, and an empty result falls back to a single
+     * flat-coloured entry.
+     */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/room/RoomPlane.as::getDrawingDatas()
+    getDrawingDatas(geometry: IRoomGeometry): PlaneDrawingData[]
+    {
+        const drawingDatas: PlaneDrawingData[] = [];
+
+        if(!this._isVisible) return drawingDatas;
+
+        let maskData: PlaneDrawingData | null = null;
+
+        try
+        {
+            maskData = this.resolveMasks(geometry);
+
+            const layers = this._rasterizer === null ? [] : this._rasterizer.getLayers(this._id ?? 'default');
+
+            for(const entry of layers)
+            {
+                // AS3's `layers[i] as PlaneVisualizationLayer` — an animation layer is not one of
+                // these (it implements the interface rather than extending the class), so the cast
+                // answers null there and it is skipped.
+                if(!(entry instanceof PlaneVisualizationLayer)) continue;
+
+                const material = entry.getMaterial();
+
+                if(!this._hasTexture || material === null)
+                {
+                    drawingDatas.push(new PlaneDrawingData(maskData, RoomPlane.blend(this._color, entry.getColor())));
+                    continue;
+                }
+
+                const normal = geometry.getCoordinatePosition(this._normal);
+
+                if(normal === null) throw new Error('RoomPlane.getDrawingDatas: no coordinate position');
+
+                const matrix = material.getMaterialCellMatrix(normal);
+
+                // Ordinary data reaches this: a material declares a cell matrix per normal range
+                // and answers null for a normal none of them covers. AS3 dereferences it anyway,
+                // so the remaining layers of this plane are lost to its catch — the behaviour is
+                // kept rather than repaired, because the photo has to match what Flash produced.
+                if(matrix === null) throw new Error('RoomPlane.getDrawingDatas: no material cell matrix');
+
+                const data = new PlaneDrawingData(
+                    maskData, RoomPlane.blend(this._color, entry.getColor()), matrix.isBottomAligned()
+                );
+
+                Randomizer.setSeed(this._randomSeed);
+
+                for(const column of matrix.getColumns(this.screenWidth(geometry)))
+                {
+                    if(column === null) throw new Error('RoomPlane.getDrawingDatas: null material column');
+
+                    const assetNames: string[] = [];
+
+                    for(const cell of column.getCells())
+                    {
+                        const name = cell.getAssetName(normal);
+
+                        if(name !== null) assetNames.push(name);
+                    }
+
+                    if(assetNames.length === 0) continue;
+
+                    // The empty name terminates a column that does not repeat, so the renderer on
+                    // the other side stops rather than tiling the last cell to the plane's edge.
+                    if(!column.isRepeated()) assetNames.push('');
+
+                    data.addAssetColumn(assetNames);
+                }
+
+                if(data.assetNameColumns.length > 0) drawingDatas.push(data);
+            }
+        }
+        catch (error)
+        {
+            log.warn('Error in getting RoomPlane drawing data.', error);
+        }
+
+        if(drawingDatas.length === 0) drawingDatas.push(new PlaneDrawingData(maskData, this._color));
+
+        return drawingDatas;
+    }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/room/RoomPlane.as::_disposed
     private _disposed: boolean = false;

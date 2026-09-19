@@ -509,20 +509,17 @@ export class SpriteDataCollector
 
                 const sorted = SpriteDataCollector.sortQuadPoints(origin, left, right, far);
 
-                // DEVIATION: AS3 expands each plane into `plane.getDrawingDatas(geometry)` — one
-                //   entry per texture column, with its masks — and stamps the shared corners and z
-                //   onto every one. `RoomPlane.getDrawingDatas()` does not exist here on purpose:
-                //   this port's rasterizer paints straight to a canvas instead of handing back
-                //   asset-name columns (see that method's own DEVIATION on `RoomPlane`). One entry
-                //   per plane carries the geometry — which is what turns the photo's flat backdrop
-                //   into real floor and wall quads — and not the texture breakdown.
+                // One entry per visualization layer, each with its own blended colour and asset
+                // columns; they all share this plane's projected corners and z, which is what AS3
+                // stamps on here — the corner array is shared by reference there too.
                 // AS3: .../habbo/room/utils/_SafeCls_1840.as::getRoomPlanes()
-                const data = new PlaneDrawingData(null, plane.color);
+                for(const data of plane.getDrawingDatas(geometry))
+                {
+                    data.cornerPoints = sorted;
+                    data.z = z;
 
-                data.cornerPoints = sorted;
-                data.z = z;
-
-                planes.push(data);
+                    planes.push(data);
+                }
             }
         }
 

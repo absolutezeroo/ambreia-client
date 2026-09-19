@@ -1,24 +1,19 @@
 import type {Texture} from 'pixi.js';
 
 /**
- * `averageColor()`, the one member of AS3's `Canvas` this port needs.
+ * `averageColor()` and `colorize()`, the two members of AS3's `Canvas` this port needs.
  *
  * The room-photo payload cannot carry pixels, so for the sprites whose appearance is a *downloaded
  * image* — a wall photo, a group badge, a skewed thumbnail — it carries the average colour of that
  * image instead, and the renderer on the other side fills a rectangle with it. Without this those
  * sprites serialise as whatever tint the sprite carries, which for an untinted photo is white.
  *
- * The other three public members stay out, and each claim below is checkable in the primary tree:
+ * The other two public members stay out, and the claim below is checkable in the primary tree:
  *
  * - `drawQuad()` and `fillTriangle()` have **no call site anywhere** — `grep -rn "drawQuad\|
  *   fillTriangle" com/sulake/` finds only `drawQuad` calling `fillTriangle` inside this file.
  *   They are a software rasteriser for a textured quad, written against `BitmapData.setPixel()`
  *   per pixel, and nothing in the client ever asked for one.
- * - `colorize()` has exactly one caller, `RoomPlane.blend()`, and `blend()` has exactly two — both
- *   inside `RoomPlane.getDrawingDatas()`, the method this port deviates from (the rasterizer paints
- *   straight to a canvas instead of returning asset-name columns; see the DEVIATION on `RoomPlane`
- *   and on `SpriteDataCollector.getRoomPlanes()`). Its arithmetic is a per-channel multiply, which
- *   is what the port's `sprite.color = plane.color` already does to the finished plane.
  *
  * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/utils/Canvas.as
  */
@@ -27,6 +22,34 @@ export class Canvas
     /** AS3's return when there is nothing to average: opaque white. */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/utils/Canvas.as::averageColor()
     private static readonly NO_PIXELS: number = 0xFFFFFF;
+
+    /**
+     * `color` multiplied per channel by `tint`, the tint acting as a 0..1 factor per channel.
+     *
+     * The one caller is `RoomPlane.blend()`, which masks the result with `0xFFFFFF` — so the alpha
+     * byte AS3 carries through is discarded before anyone reads it. That matters because AS3's own
+     * last line is `(param1 && 0xFF000000) | ...`, a **logical** and, not a bitwise one: it yields
+     * `0xFF000000` for any non-zero colour and `0` for black, which is not what "keep the source
+     * alpha" would produce. All three source trees agree on the `&&`, so it is the original code
+     * and not a decompiler slip; it is reproduced here and then thrown away by the caller exactly
+     * as it is there.
+     *
+     * The three channel products are `uint` in AS3, so the division truncates toward zero.
+     *
+     * @param color - `0xAARRGGBB` (or `0xRRGGBB`) to tint
+     * @param tint - `0xAARRGGBB` whose RGB bytes are the per-channel factors; `0xFFFFFFFF` is a no-op
+     */
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/utils/Canvas.as::colorize()
+    public static colorize(color: number, tint: number): number
+    {
+        if(tint === 0xFFFFFFFF) return color;
+
+        const red = Math.trunc((color >>> 16 & 0xFF) * (tint >>> 16 & 0xFF) / 0xFF);
+        const green = Math.trunc((color >>> 8 & 0xFF) * (tint >>> 8 & 0xFF) / 0xFF);
+        const blue = Math.trunc((color & 0xFF) * (tint & 0xFF) / 0xFF);
+
+        return ((color ? 0xFF000000 : 0) | red << 16 | green << 8 | blue) >>> 0;
+    }
 
     /**
      * The mean RGB of every pixel with a non-zero alpha.
