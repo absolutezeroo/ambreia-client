@@ -50,6 +50,7 @@ import {RoomWidgetRoomObjectMessage} from '@habbo/ui/widget/messages/RoomWidgetR
 import {RoomWidgetUserInfoUpdateEvent} from '@habbo/ui/widget/events/RoomWidgetUserInfoUpdateEvent';
 import {RoomWidgetPetCommandsUpdateEvent} from '@habbo/ui/widget/events/RoomWidgetPetCommandsUpdateEvent';
 import {RoomWidgetRoomObjectUpdateEvent} from '@habbo/ui/widget/events/RoomWidgetRoomObjectUpdateEvent';
+import {RoomWidgetFurniInfoUpdateEvent} from '@habbo/ui/widget/events/RoomWidgetFurniInfoUpdateEvent';
 import {RoomWidgetRoomObjectNameEvent} from '@habbo/ui/widget/events/RoomWidgetRoomObjectNameEvent';
 import {RoomWidgetPetInfoUpdateEvent} from '@habbo/ui/widget/events/RoomWidgetPetInfoUpdateEvent';
 import {RoomWidgetPetStatusUpdateEvent} from '@habbo/ui/widget/events/RoomWidgetPetStatusUpdateEvent';
@@ -779,6 +780,22 @@ export class AvatarInfoWidget extends RoomWidgetBase implements IContextMenuPare
     // — the bubble is dismissed when the avatar/selection is deselected, which the
     // room engine now emits for an unhandled (floor/empty-space) click.
     private onObjectDeselected = (): void =>
+    {
+        this.close();
+        this.removeUseProductViews();
+        this.removeBreedPetViews();
+    };
+
+    /**
+     * Clicking a furni closes whatever this widget has open.
+     *
+     * The infostand raises `RWFIUE_FURNI` for the furni it is about to describe; deselection does
+     * not fire in that case, because a furni click *is* a selection. Without this arm an avatar
+     * bubble stayed up next to the furni's infostand, still offering to trade with someone the
+     * player had stopped pointing at.
+     */
+    // AS3: AvatarInfoWidget.as::updateEventHandler() (RWFIUE_FURNI case)
+    private onFurniInfoUpdate = (): void =>
     {
         this.close();
         this.removeUseProductViews();
@@ -1732,6 +1749,7 @@ export class AvatarInfoWidget extends RoomWidgetBase implements IContextMenuPare
             [RoomWidgetRentableBotSkillListUpdateEvent.SKILL_LIST, this.onRentableBotSkillListUpdate],
             [RoomWidgetRentableBotForceOpenContextMenuEvent.OPEN, this.onRentableBotForceOpenContextMenu],
             [RoomWidgetRoomObjectUpdateEvent.FURNI_ADDED, this.onFurniAdded],
+            [RoomWidgetFurniInfoUpdateEvent.FURNI, this.onFurniInfoUpdate],
         ];
     }
 
