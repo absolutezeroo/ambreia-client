@@ -62,25 +62,24 @@ interface ILabelWindowShape
  */
 export class LabelRenderer extends TextSkinRenderer
 {
-    /**
-     * No top gutter on a label.
-     *
-     * A label IS a TextField in Flash and does carry the gutter, but this
-     * port's TextLabelController extends WindowController, not TextController,
-     * so it never grew the box by the two gutters the way text windows did —
-     * `caption` in the friend list is authored 13px tall and measures a 13px
-     * line. Offsetting into that pushes the descenders straight out of the
-     * bottom, which is what happened the moment the gate came off.
-     *
-     * The offset stays off here until the label boxes are measured against
-     * their authored heights the same way the text ones were
-     * (scripts/extract-flash-text-metrics.mjs), rather than assumed to follow
-     * the same rule.
-     */
-    protected override get topGutter(): number
-    {
-        return 0;
-    }
+    // An override used to sit here returning 0, so that no label ever took the base class's 2px
+    // gutter. It asked, in as many words, to be revisited once the label boxes had been measured
+    // the way the text ones were. They have been, and it said the opposite of what it assumed:
+    //
+    // - AS3 draws a **TextField** in both renderers — `LabelRenderer.as` blits one out of
+    //   `TextFieldCache` at `drawOffsetY` exactly as `TextSkinRenderer.as` blits its own at
+    //   `margins.top` — so a label carries the same 2px internal gutter a text window does.
+    // - Of the 148 shipped labels whose style resolves to a size `FLASH_LINE_BOX` knows, **134
+    //   are authored at exactly `lineBox + 4`** and not one at `lineBox` alone. They are sized
+    //   for both gutters.
+    //
+    // The counter-example the note cited — the friend list's `caption`, style `bold`, size 9,
+    // authored 13px — no longer clips, and the reason is that the note predates
+    // `FlashTextMetrics`. `measureFontLineHeight()` now answers 10 for size 9 where it used to
+    // return the browser's font box, which for Ubuntu runs several pixels taller; 2 + 10 = 12
+    // fits in 13, and it is the old taller number that was pushing descenders out.
+    //
+    // So: no override. A label is a TextField and gets the gutter.
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/core/window/graphics/renderer/LabelRenderer.as::isStateDrawable()
     public override isStateDrawable(state: number): boolean
