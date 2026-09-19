@@ -239,6 +239,7 @@ import {Product} from './viewer/Product';
 import {CatalogWindowState} from './CatalogWindowState';
 import {BuilderFurniPlaceableStatus} from './enum/BuilderFurniPlaceableStatus';
 import {CatalogType} from './enum/CatalogType';
+import {HabboCatalogTrackingEvent} from './enum/HabboCatalogTrackingEvent';
 import {CatalogSearchEntry} from './search/CatalogSearchEntry';
 import {FurnitureOffer} from './viewer/FurnitureOffer';
 import type {IOfferCenter} from './offers/IOfferCenter';
@@ -2268,11 +2269,13 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
 
             const searchInput = this._mainWindow!.findChildByName('search.input') as unknown as ITextFieldWindow | null;
 
-            if(searchInput) 
+            if(searchInput)
             {
                 searchInput.focus();
                 searchInput.setSelection(0, searchInput.text.length);
             }
+
+            this._tracking?.trackGoogle('catalogue', 'open');
         }
 
         this.refreshCatalogWindowChrome(catalogType, this._mainWindow);
@@ -2289,6 +2292,15 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
             this.currentCatalogNavigator.showIndex();
             this._catalogViewer?.setForceRefresh();
         }
+
+        // Flag 9 of the crash report's error context, and the only thing that writes it: a report
+        // filed from here says whether the catalog was on screen. AS3 dispatches this in the same
+        // `if(mainWindowVisible())` as the recycler branch below; kept separate because this port
+        // guards that branch on `_recycler` being built, and the flag must be set either way.
+        // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::toggleCatalog()
+        this.events.emit(this.mainWindowVisible()
+            ? HabboCatalogTrackingEvent.HABBO_CATALOG_TRACKING_EVENT_OPEN
+            : HabboCatalogTrackingEvent.HABBO_CATALOG_TRACKING_EVENT_CLOSE);
 
         // Opening the catalog *on* the recycler page starts the machine; leaving it cancels a run
         // in progress. Note which viewer each branch asks: on open it is the current one, on close

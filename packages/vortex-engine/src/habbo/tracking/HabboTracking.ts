@@ -34,11 +34,17 @@ import {IID_HabboWindowManager} from '@iid/IIDHabboWindowManager';
 import {IID_HabboNavigator} from '@iid/IIDHabboNavigator';
 import {IID_HabboInventory} from '@iid/IIDHabboInventory';
 import {IID_HabboFriendList} from '@iid/IIDHabboFriendList';
+import {IID_HabboCatalog} from '@iid/IIDHabboCatalog';
+import {IID_HabboHelp} from '@iid/IIDHabboHelp';
 import {HabboWindowTrackingEvent} from '@habbo/window/enum/HabboWindowTrackingEvent';
 import {HabboNavigatorTrackingEvent} from '@habbo/navigator/events/HabboNavigatorTrackingEvent';
 import {HabboRoomSettingsTrackingEvent} from '@habbo/navigator/events/HabboRoomSettingsTrackingEvent';
 import {HabboInventoryTrackingEvent} from '@habbo/inventory/events/HabboInventoryTrackingEvent';
 import {HabboFriendListTrackingEvent} from '@habbo/friendlist/events/HabboFriendListTrackingEvent';
+import {HabboCatalogTrackingEvent} from '@habbo/catalog/enum/HabboCatalogTrackingEvent';
+import {HabboHelpTrackingEvent} from '@habbo/help/enum/HabboHelpTrackingEvent';
+import {CatalogPageOpenedEvent} from '@habbo/catalog/navigation/events/CatalogPageOpenedEvent';
+import {CatalogFurniPurchaseEvent} from '@habbo/catalog/navigation/events/CatalogFurniPurchaseEvent';
 import {LatencyTracker} from './LatencyTracker';
 import {FramerateTracker} from './FramerateTracker';
 import {LagWarningLogger} from './LagWarningLogger';
@@ -78,8 +84,12 @@ export class HabboTracking extends Component implements IHabboTracking, IUpdateR
     private _communication: IHabboCommunicationManager | null = null;
     // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::_messageEvents
     private _messageEvents: IMessageEvent[] = [];
+    // AS3 fills these eleven zeros in the constructor, *before* `super()`, and the reason shows
+    // here: `setErrorContextFlag()` bounds-checks against `length`, so a flag arriving while the
+    // array is still empty is dropped in silence. Filled at field-init rather than in
+    // `initComponent()` for that reason.
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/tracking/HabboTracking.as::_errorContextFlags
-    private _errorContextFlags: number[] = [];
+    private _errorContextFlags: number[] = new Array(HabboTracking.ERROR_DATA_FLAG_COUNT).fill(0);
     private _hasFatalError: boolean = false;
 
     // Sub-trackers
@@ -127,57 +137,77 @@ export class HabboTracking extends Component implements IHabboTracking, IUpdateR
             // Passing `this.onWindowTrackingEvent` directly hands `undefined` to
             // `events.on()`, which throws "The listener must be a function" and takes the whole
             // DI unlock chain with it. The lambda defers the lookup to call time.
-            // Four of the six UI buses AS3 listens to, in its own order — the two it skips are
-            // TODO'd below because nothing in this port emits on them yet. Every bus here already
-            // emits; only the listener was missing, so `_errorContextFlags` was written by nobody
-            // and read by nobody. All non-hard: tracking must never be what locks a component, and
-            // an absent subsystem simply contributes no flag.
+            //
+            // The lambda also RE-STATES ITS OWN TYPE, and that is not decoration. AS3 handlers
+            // switch on `event.type` off the Flash Event they are handed; this port's emitters
+            // call `events.emit(TYPE)` with no payload — all 28 sites, measured — so a handler
+            // reading the first argument saw `undefined` and matched no case. Every flag in
+            // `_errorContextFlags` was therefore still written by nobody after the listeners
+            // landed. The subscription already knows which type it is registering; binding it
+            // here is what makes the switch below able to answer.
             // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::get dependencies()
             new ComponentDependency(IID_HabboWindowManager, null, false, [
-                {type: HabboWindowTrackingEvent.HABBO_WINDOW_TRACKING_EVENT_INPUT, callback: (...a: unknown[]) => this.onWindowTrackingEvent(...a)},
-                {type: HabboWindowTrackingEvent.HABBO_WINDOW_TRACKING_EVENT_RENDER, callback: (...a: unknown[]) => this.onWindowTrackingEvent(...a)},
-                {type: HabboWindowTrackingEvent.HABBO_WINDOW_TRACKING_EVENT_SLEEP, callback: (...a: unknown[]) => this.onWindowTrackingEvent(...a)},
+                {type: HabboWindowTrackingEvent.HABBO_WINDOW_TRACKING_EVENT_INPUT, callback: () => this.onWindowTrackingEvent(HabboWindowTrackingEvent.HABBO_WINDOW_TRACKING_EVENT_INPUT)},
+                {type: HabboWindowTrackingEvent.HABBO_WINDOW_TRACKING_EVENT_RENDER, callback: () => this.onWindowTrackingEvent(HabboWindowTrackingEvent.HABBO_WINDOW_TRACKING_EVENT_RENDER)},
+                {type: HabboWindowTrackingEvent.HABBO_WINDOW_TRACKING_EVENT_SLEEP, callback: () => this.onWindowTrackingEvent(HabboWindowTrackingEvent.HABBO_WINDOW_TRACKING_EVENT_SLEEP)},
             ]),
             new ComponentDependency(IID_HabboNavigator, null, false, [
-                {type: HabboNavigatorTrackingEvent.CLOSED, callback: (...a: unknown[]) => this.onNavigatorTrackingEvent(...a)},
-                {type: HabboNavigatorTrackingEvent.EVENTS, callback: (...a: unknown[]) => this.onNavigatorTrackingEvent(...a)},
-                {type: HabboNavigatorTrackingEvent.ROOMS, callback: (...a: unknown[]) => this.onNavigatorTrackingEvent(...a)},
-                {type: HabboNavigatorTrackingEvent.ME, callback: (...a: unknown[]) => this.onNavigatorTrackingEvent(...a)},
-                {type: HabboNavigatorTrackingEvent.OFFICIAL, callback: (...a: unknown[]) => this.onNavigatorTrackingEvent(...a)},
-                {type: HabboNavigatorTrackingEvent.SEARCH, callback: (...a: unknown[]) => this.onNavigatorTrackingEvent(...a)},
-                {type: HabboRoomSettingsTrackingEvent.CLOSED, callback: (...a: unknown[]) => this.onRoomSettingsTrackingEvent(...a)},
-                {type: HabboRoomSettingsTrackingEvent.DEFAULT, callback: (...a: unknown[]) => this.onRoomSettingsTrackingEvent(...a)},
-                {type: HabboRoomSettingsTrackingEvent.ADVANCED, callback: (...a: unknown[]) => this.onRoomSettingsTrackingEvent(...a)},
+                {type: HabboNavigatorTrackingEvent.CLOSED, callback: () => this.onNavigatorTrackingEvent(HabboNavigatorTrackingEvent.CLOSED)},
+                {type: HabboNavigatorTrackingEvent.EVENTS, callback: () => this.onNavigatorTrackingEvent(HabboNavigatorTrackingEvent.EVENTS)},
+                {type: HabboNavigatorTrackingEvent.ROOMS, callback: () => this.onNavigatorTrackingEvent(HabboNavigatorTrackingEvent.ROOMS)},
+                {type: HabboNavigatorTrackingEvent.ME, callback: () => this.onNavigatorTrackingEvent(HabboNavigatorTrackingEvent.ME)},
+                {type: HabboNavigatorTrackingEvent.OFFICIAL, callback: () => this.onNavigatorTrackingEvent(HabboNavigatorTrackingEvent.OFFICIAL)},
+                {type: HabboNavigatorTrackingEvent.SEARCH, callback: () => this.onNavigatorTrackingEvent(HabboNavigatorTrackingEvent.SEARCH)},
+                // The ten search-type events, each onto `legacyTrackGoogle("navigator", …)`.
+                // `MainViewCtrl.sendTrackingEvent()` emits eleven — AS3 subscribes ten of them
+                // here and has no case for MY_FREQUENT_HISTORY, so neither has this.
+                {type: HabboNavigatorTrackingEvent.SEARCHTYPE_MY_FAVOURITES, callback: () => this.onNavigatorTrackingEvent(HabboNavigatorTrackingEvent.SEARCHTYPE_MY_FAVOURITES)},
+                {type: HabboNavigatorTrackingEvent.SEARCHTYPE_MY_FRIENDS_ROOMS, callback: () => this.onNavigatorTrackingEvent(HabboNavigatorTrackingEvent.SEARCHTYPE_MY_FRIENDS_ROOMS)},
+                {type: HabboNavigatorTrackingEvent.SEARCHTYPE_MY_HISTORY, callback: () => this.onNavigatorTrackingEvent(HabboNavigatorTrackingEvent.SEARCHTYPE_MY_HISTORY)},
+                {type: HabboNavigatorTrackingEvent.SEARCHTYPE_MY_ROOMS, callback: () => this.onNavigatorTrackingEvent(HabboNavigatorTrackingEvent.SEARCHTYPE_MY_ROOMS)},
+                {type: HabboNavigatorTrackingEvent.SEARCHTYPE_OFFICIALROOMS, callback: () => this.onNavigatorTrackingEvent(HabboNavigatorTrackingEvent.SEARCHTYPE_OFFICIALROOMS)},
+                {type: HabboNavigatorTrackingEvent.SEARCHTYPE_POPULAR_ROOMS, callback: () => this.onNavigatorTrackingEvent(HabboNavigatorTrackingEvent.SEARCHTYPE_POPULAR_ROOMS)},
+                {type: HabboNavigatorTrackingEvent.SEARCHTYPE_ROOMS_WHERE_MY_FRIENDS_ARE, callback: () => this.onNavigatorTrackingEvent(HabboNavigatorTrackingEvent.SEARCHTYPE_ROOMS_WHERE_MY_FRIENDS_ARE)},
+                {type: HabboNavigatorTrackingEvent.SEARCHTYPE_ROOMS_WITH_HIGHEST_SCORE, callback: () => this.onNavigatorTrackingEvent(HabboNavigatorTrackingEvent.SEARCHTYPE_ROOMS_WITH_HIGHEST_SCORE)},
+                {type: HabboNavigatorTrackingEvent.SEARCHTYPE_TAG_SEARCH, callback: () => this.onNavigatorTrackingEvent(HabboNavigatorTrackingEvent.SEARCHTYPE_TAG_SEARCH)},
+                {type: HabboNavigatorTrackingEvent.SEARCHTYPE_TEXT_SEARCH, callback: () => this.onNavigatorTrackingEvent(HabboNavigatorTrackingEvent.SEARCHTYPE_TEXT_SEARCH)},
+                {type: HabboRoomSettingsTrackingEvent.CLOSED, callback: () => this.onRoomSettingsTrackingEvent(HabboRoomSettingsTrackingEvent.CLOSED)},
+                {type: HabboRoomSettingsTrackingEvent.DEFAULT, callback: () => this.onRoomSettingsTrackingEvent(HabboRoomSettingsTrackingEvent.DEFAULT)},
+                {type: HabboRoomSettingsTrackingEvent.ADVANCED, callback: () => this.onRoomSettingsTrackingEvent(HabboRoomSettingsTrackingEvent.ADVANCED)},
             ]),
-            // TODO(AS3): .../src/com/sulake/habbo/tracking/HabboTracking.as::get dependencies() also
-            //   takes IIDHabboCatalog with HABBO_CATALOG_TRACKING_EVENT_OPEN/_CLOSE onto flag 9,
-            //   plus CATALOG_PAGE_OPENED onto legacyTrackGoogle(). Not subscribed for the same
-            //   reason as help below: the whole bus is silent here — `HabboCatalogTrackingEvent` is
-            //   declared and nothing emits either member. Partial buses ARE subscribed (navigator,
-            //   room settings and inventory each emit most of their members and will emit the rest
-            //   as those tabs are wired); a bus with no speaker at all is not.
-            //   `scripts/check-tracking-buses.mjs` tells the two apart.
+            // CATALOG_FURNI_PURCHASE is subscribed and `onCatalogTrackingEvent()` has no case for
+            // it — that is AS3's own shape, not an omission: it routes the purchase to the same
+            // handler and the switch ignores it.
+            new ComponentDependency(IID_HabboCatalog, null, false, [
+                {type: CatalogPageOpenedEvent.CATALOG_PAGE_OPENED, callback: (...a: unknown[]) => this.onCatalogPageOpened(a[0] as CatalogPageOpenedEvent)},
+                {type: HabboCatalogTrackingEvent.HABBO_CATALOG_TRACKING_EVENT_OPEN, callback: () => this.onCatalogTrackingEvent(HabboCatalogTrackingEvent.HABBO_CATALOG_TRACKING_EVENT_OPEN)},
+                {type: HabboCatalogTrackingEvent.HABBO_CATALOG_TRACKING_EVENT_CLOSE, callback: () => this.onCatalogTrackingEvent(HabboCatalogTrackingEvent.HABBO_CATALOG_TRACKING_EVENT_CLOSE)},
+                {type: CatalogFurniPurchaseEvent.CATALOG_FURNI_PURCHASE, callback: () => this.onCatalogTrackingEvent(CatalogFurniPurchaseEvent.CATALOG_FURNI_PURCHASE)},
+            ]),
             new ComponentDependency(IID_HabboInventory, null, false, [
-                {type: HabboInventoryTrackingEvent.CLOSED, callback: (...a: unknown[]) => this.onInventoryTrackingEvent(...a)},
-                {type: HabboInventoryTrackingEvent.FURNI, callback: (...a: unknown[]) => this.onInventoryTrackingEvent(...a)},
-                {type: HabboInventoryTrackingEvent.POSTERS, callback: (...a: unknown[]) => this.onInventoryTrackingEvent(...a)},
-                {type: HabboInventoryTrackingEvent.BADGES, callback: (...a: unknown[]) => this.onInventoryTrackingEvent(...a)},
-                {type: HabboInventoryTrackingEvent.ACHIEVEMENTS, callback: (...a: unknown[]) => this.onInventoryTrackingEvent(...a)},
-                {type: HabboInventoryTrackingEvent.TRADING, callback: (...a: unknown[]) => this.onInventoryTrackingEvent(...a)},
+                {type: HabboInventoryTrackingEvent.CLOSED, callback: () => this.onInventoryTrackingEvent(HabboInventoryTrackingEvent.CLOSED)},
+                {type: HabboInventoryTrackingEvent.FURNI, callback: () => this.onInventoryTrackingEvent(HabboInventoryTrackingEvent.FURNI)},
+                {type: HabboInventoryTrackingEvent.POSTERS, callback: () => this.onInventoryTrackingEvent(HabboInventoryTrackingEvent.POSTERS)},
+                {type: HabboInventoryTrackingEvent.BADGES, callback: () => this.onInventoryTrackingEvent(HabboInventoryTrackingEvent.BADGES)},
+                {type: HabboInventoryTrackingEvent.ACHIEVEMENTS, callback: () => this.onInventoryTrackingEvent(HabboInventoryTrackingEvent.ACHIEVEMENTS)},
+                {type: HabboInventoryTrackingEvent.TRADING, callback: () => this.onInventoryTrackingEvent(HabboInventoryTrackingEvent.TRADING)},
             ]),
             new ComponentDependency(IID_HabboFriendList, null, false, [
-                {type: HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_CLOSED, callback: (...a: unknown[]) => this.onFriendListTrackingEvent(...a)},
-                {type: HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_FRIENDS, callback: (...a: unknown[]) => this.onFriendListTrackingEvent(...a)},
-                {type: HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_SEARCH, callback: (...a: unknown[]) => this.onFriendListTrackingEvent(...a)},
-                {type: HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_REQUEST, callback: (...a: unknown[]) => this.onFriendListTrackingEvent(...a)},
-                {type: HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_MINIMIZED, callback: (...a: unknown[]) => this.onFriendListTrackingEvent(...a)},
+                {type: HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_CLOSED, callback: () => this.onFriendListTrackingEvent(HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_CLOSED)},
+                {type: HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_FRIENDS, callback: () => this.onFriendListTrackingEvent(HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_FRIENDS)},
+                {type: HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_SEARCH, callback: () => this.onFriendListTrackingEvent(HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_SEARCH)},
+                {type: HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_REQUEST, callback: () => this.onFriendListTrackingEvent(HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_REQUEST)},
+                {type: HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_MINIMIZED, callback: () => this.onFriendListTrackingEvent(HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_MINIMIZED)},
             ]),
-            // TODO(AS3): .../src/com/sulake/habbo/tracking/HabboTracking.as::get dependencies() also
-            //   takes IIDHabboHelp with HABBO_HELP_TRACKING_EVENT_CLOSED/_DEFAULT onto flag 10.
-            //   Not subscribed: nothing in this port emits either — `HabboHelpTrackingEvent` is
-            //   declared and re-exported and never sent, so the listener would be a listener for a
-            //   bus with no speaker, which is the exact defect this whole change removes. Subscribe
-            //   it when HabboHelp emits; `scripts/check-tracking-buses.mjs` is the check.
+            // Subscribed although NOTHING emits either member — and nothing does in AS3 either:
+            // `HABBO_HELP_TRACKING_EVENT_CLOSED`/`_DEFAULT` appear in the enum and in this
+            // dependency list and in no dispatch site, in any of the three trees (grepped
+            // 2026-09-19). The pair is ported because AS3 subscribes it, not because flag 10 is
+            // expected to move; `scripts/check-tracking-buses.mjs` reports it as a partial bus.
+            new ComponentDependency(IID_HabboHelp, null, false, [
+                {type: HabboHelpTrackingEvent.HABBO_HELP_TRACKING_EVENT_CLOSED, callback: () => this.onHelpTrackingEvent(HabboHelpTrackingEvent.HABBO_HELP_TRACKING_EVENT_CLOSED)},
+                {type: HabboHelpTrackingEvent.HABBO_HELP_TRACKING_EVENT_DEFAULT, callback: () => this.onHelpTrackingEvent(HabboHelpTrackingEvent.HABBO_HELP_TRACKING_EVENT_DEFAULT)},
+            ]),
         ];
     }
 
@@ -426,12 +456,6 @@ export class HabboTracking extends Component implements IHabboTracking, IUpdateR
 	 */
     protected override initComponent(): void
     {
-        // Initialize error context flags array
-        for(let i = 0; i < HabboTracking.ERROR_DATA_FLAG_COUNT; i++)
-        {
-            this._errorContextFlags.push(0);
-        }
-
         // The other half of the error context: AS3 folds the flags into every error report through
         // `storeErrorDetails()`. Without this the array was written by nobody and read by nobody.
         // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::onError()
@@ -486,9 +510,9 @@ export class HabboTracking extends Component implements IHabboTracking, IUpdateR
 	 * numbers and not a bitmask.
 	 */
     // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::onWindowTrackingEvent()
-    private onWindowTrackingEvent = (...args: unknown[]): void =>
+    private onWindowTrackingEvent = (type: string): void =>
     {
-        switch(this.eventType(args))
+        switch(type)
         {
             case HabboWindowTrackingEvent.HABBO_WINDOW_TRACKING_EVENT_SLEEP: this.setErrorContextFlag(0, 3); break;
             case HabboWindowTrackingEvent.HABBO_WINDOW_TRACKING_EVENT_RENDER: this.setErrorContextFlag(1, 3); break;
@@ -496,10 +520,16 @@ export class HabboTracking extends Component implements IHabboTracking, IUpdateR
         }
     };
 
+    /**
+	 * The six flag cases and the ten search-type ones are one switch in AS3, and stay one here.
+	 * Note the two Google labels that are NOT their constant lower-cased — `my_favorites` without
+	 * the `u` and `highest_score` rather than `rooms_with_highest_score`; they are the strings the
+	 * analytics side already keys on, so they are copied verbatim rather than derived.
+	 */
     // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::onNavigatorTrackingEvent()
-    private onNavigatorTrackingEvent = (...args: unknown[]): void =>
+    private onNavigatorTrackingEvent = (type: string): void =>
     {
-        switch(this.eventType(args))
+        switch(type)
         {
             case HabboNavigatorTrackingEvent.CLOSED: this.setErrorContextFlag(0, 4); break;
             case HabboNavigatorTrackingEvent.EVENTS: this.setErrorContextFlag(1, 4); break;
@@ -507,19 +537,23 @@ export class HabboTracking extends Component implements IHabboTracking, IUpdateR
             case HabboNavigatorTrackingEvent.ME: this.setErrorContextFlag(3, 4); break;
             case HabboNavigatorTrackingEvent.OFFICIAL: this.setErrorContextFlag(4, 4); break;
             case HabboNavigatorTrackingEvent.SEARCH: this.setErrorContextFlag(5, 4); break;
+            case HabboNavigatorTrackingEvent.SEARCHTYPE_MY_FAVOURITES: this.legacyTrackGoogle('navigator', 'my_favorites'); break;
+            case HabboNavigatorTrackingEvent.SEARCHTYPE_MY_FRIENDS_ROOMS: this.legacyTrackGoogle('navigator', 'my_friends_rooms'); break;
+            case HabboNavigatorTrackingEvent.SEARCHTYPE_MY_HISTORY: this.legacyTrackGoogle('navigator', 'my_history'); break;
+            case HabboNavigatorTrackingEvent.SEARCHTYPE_MY_ROOMS: this.legacyTrackGoogle('navigator', 'my_rooms'); break;
+            case HabboNavigatorTrackingEvent.SEARCHTYPE_OFFICIALROOMS: this.legacyTrackGoogle('navigator', 'official_rooms'); break;
+            case HabboNavigatorTrackingEvent.SEARCHTYPE_POPULAR_ROOMS: this.legacyTrackGoogle('navigator', 'popular_rooms'); break;
+            case HabboNavigatorTrackingEvent.SEARCHTYPE_ROOMS_WHERE_MY_FRIENDS_ARE: this.legacyTrackGoogle('navigator', 'rooms_where_my_friends_are'); break;
+            case HabboNavigatorTrackingEvent.SEARCHTYPE_ROOMS_WITH_HIGHEST_SCORE: this.legacyTrackGoogle('navigator', 'highest_score'); break;
+            case HabboNavigatorTrackingEvent.SEARCHTYPE_TAG_SEARCH: this.legacyTrackGoogle('navigator', 'tag_search'); break;
+            case HabboNavigatorTrackingEvent.SEARCHTYPE_TEXT_SEARCH: this.legacyTrackGoogle('navigator', 'text_search'); break;
         }
     };
 
-    // TODO(AS3): .../src/com/sulake/habbo/tracking/HabboTracking.as::onNavigatorTrackingEvent() also
-    //   maps the eleven SEARCHTYPE_* events onto `legacyTrackGoogle("navigator", <name>)`. Not wired
-    //   here because nothing in this port emits a SEARCHTYPE_* event yet — the constants exist in
-    //   HabboNavigatorTrackingEvent and have no `emit` site, so subscribing would be a listener for
-    //   a bus with no speaker. Wire them with the emitters, not before.
-
     // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::onRoomSettingsTrackingEvent()
-    private onRoomSettingsTrackingEvent = (...args: unknown[]): void =>
+    private onRoomSettingsTrackingEvent = (type: string): void =>
     {
-        switch(this.eventType(args))
+        switch(type)
         {
             case HabboRoomSettingsTrackingEvent.CLOSED: this.setErrorContextFlag(0, 7); break;
             case HabboRoomSettingsTrackingEvent.DEFAULT: this.setErrorContextFlag(1, 7); break;
@@ -527,15 +561,26 @@ export class HabboTracking extends Component implements IHabboTracking, IUpdateR
         }
     };
 
-    // TODO(AS3): .../src/com/sulake/habbo/tracking/HabboTracking.as::onCatalogTrackingEvent() maps
-    //   OPEN/CLOSE onto flag 9. Not written: see the catalog TODO in `get dependencies()` — the bus
-    //   has no emitter, and a handler for a subscription that does not exist is worse than no
-    //   handler, because it reads as covered.
+    // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::onCatalogTrackingEvent()
+    private onCatalogTrackingEvent = (type: string): void =>
+    {
+        switch(type)
+        {
+            case HabboCatalogTrackingEvent.HABBO_CATALOG_TRACKING_EVENT_OPEN: this.setErrorContextFlag(1, 9); break;
+            case HabboCatalogTrackingEvent.HABBO_CATALOG_TRACKING_EVENT_CLOSE: this.setErrorContextFlag(0, 9); break;
+        }
+    };
+
+    // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::onCatalogPageOpened()
+    private onCatalogPageOpened = (event: CatalogPageOpenedEvent | null): void =>
+    {
+        this.legacyTrackGoogle('catalogue', 'page', [event?.pageLocalization]);
+    };
 
     // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::onInventoryTrackingEvent()
-    private onInventoryTrackingEvent = (...args: unknown[]): void =>
+    private onInventoryTrackingEvent = (type: string): void =>
     {
-        switch(this.eventType(args))
+        switch(type)
         {
             case HabboInventoryTrackingEvent.CLOSED: this.setErrorContextFlag(0, 5); break;
             case HabboInventoryTrackingEvent.FURNI: this.setErrorContextFlag(1, 5); break;
@@ -547,9 +592,9 @@ export class HabboTracking extends Component implements IHabboTracking, IUpdateR
     };
 
     // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::onFriendlistTrackingEvent()
-    private onFriendListTrackingEvent = (...args: unknown[]): void =>
+    private onFriendListTrackingEvent = (type: string): void =>
     {
-        switch(this.eventType(args))
+        switch(type)
         {
             case HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_CLOSED: this.setErrorContextFlag(0, 6); break;
             case HabboFriendListTrackingEvent.HABBO_FRIENDLIST_TRACKING_EVENT_FRIENDS: this.setErrorContextFlag(1, 6); break;
@@ -559,28 +604,15 @@ export class HabboTracking extends Component implements IHabboTracking, IUpdateR
         }
     };
 
-    // TODO(AS3): .../src/com/sulake/habbo/tracking/HabboTracking.as::onHelpTrackingEvent() maps
-    //   CLOSED/DEFAULT onto flag 10. Not written, for the same reason as the catalog one above.
-
-    /**
-	 * AS3 reads `event.type` off the Flash Event it is handed. This port's dependency subscriptions
-	 * forward whatever the emitter passed, and the emitters are not uniform — some emit the type
-	 * string alone, some an object carrying it — so both shapes are accepted rather than assuming
-	 * one and silently matching no case.
-	 */
-    // TS-only: Flash's Event carries `type`; an EventEmitter payload does not have to.
-    private eventType(args: unknown[]): string
+    // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::onHelpTrackingEvent()
+    private onHelpTrackingEvent = (type: string): void =>
     {
-        const first = args[0];
-
-        if(typeof first === 'string') return first;
-        if(first && typeof first === 'object' && typeof (first as {type?: unknown}).type === 'string')
+        switch(type)
         {
-            return (first as {type: string}).type;
+            case HabboHelpTrackingEvent.HABBO_HELP_TRACKING_EVENT_CLOSED: this.setErrorContextFlag(0, 10); break;
+            case HabboHelpTrackingEvent.HABBO_HELP_TRACKING_EVENT_DEFAULT: this.setErrorContextFlag(1, 10); break;
         }
-
-        return '';
-    }
+    };
 
     /**
 	 * AS3 also sets `_SafeStr_9384` on a critical error and calls
