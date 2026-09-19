@@ -10,6 +10,7 @@ import type {IAvatarFigureContainer} from './IAvatarFigureContainer';
 import type {IAvatarImageListener} from './IAvatarImageListener';
 import type {IAvatarEffectListener} from './IAvatarEffectListener';
 import type {IFigureData} from './structure/IFigureData';
+import {ErrorReportStorage} from '@core/utils/ErrorReportStorage';
 import {AvatarStructure} from './AvatarStructure';
 import type {IGraphicAsset} from '@room/object/visualization/utils/IGraphicAsset';
 import {AssetAliasCollection} from './alias/AssetAliasCollection';
@@ -940,22 +941,76 @@ export class AvatarRenderManager extends Component implements IAvatarRenderManag
         }
     }
 
+    /**
+	 * Repairs a figure before it is rendered, and answers whether it was already sound.
+	 *
+	 * Three things were missing, and the middle one is the one that shows: the port only filled in
+	 * a mandatory part that was ABSENT. A part that is present but names a set id the figure data
+	 * does not contain — an item removed from the hotel, a hand-edited figure string, a figure
+	 * from another hotel — was left alone and drew nothing. AS3 replaces it with the default too.
+	 *
+	 * The club level is AS3's own `2`, not `0`: it decides which set types count as mandatory, so
+	 * validating at 0 checked a shorter list than the one the renderer then draws.
+	 *
+	 * The return value is `true` when NOTHING had to be repaired — note the inversion, AS3 returns
+	 * `!changed`.
+	 */
     // AS3: .../src/com/sulake/habbo/avatar/_SafeCls_582.as::validateAvatarFigure()
-    private validateAvatarFigure(figure: AvatarFigureContainer, gender: string): void 
+    private validateAvatarFigure(figure: AvatarFigureContainer, gender: string): boolean
     {
-        const mandatoryTypes = this._structure.getMandatorySetTypeIds(gender, 0);
-
-        for(const partType of mandatoryTypes) 
+        if(this._structure === null)
         {
-            if(!figure.hasPartType(partType)) 
+            ErrorReportStorage.addDebugData('AvatarRenderManager', 'validateAvatarFigure: structure is null!');
+        }
+
+        const mandatoryTypes = this._structure.getMandatorySetTypeIds(gender, 2);
+
+        if(!mandatoryTypes) return true;
+
+        const figureData = this._structure.figureData;
+
+        if(!figureData)
+        {
+            ErrorReportStorage.addDebugData('AvatarRenderManager', 'validateAvatarFigure: figureData is null!');
+        }
+
+        let changed = false;
+
+        for(const partType of mandatoryTypes)
+        {
+            if(!figure.hasPartType(partType))
             {
                 const defaultPartSet = this._structure.getDefaultPartSet(partType, gender);
 
-                if(defaultPartSet) 
+                if(defaultPartSet)
                 {
                     figure.updatePart(partType, defaultPartSet.id, [0]);
+                    changed = true;
                 }
+
+                continue;
+            }
+
+            const setType = figureData?.getSetType(partType) ?? null;
+
+            if(setType === null)
+            {
+                ErrorReportStorage.addDebugData('AvatarRenderManager', 'validateAvatarFigure: setType is null!');
+
+                continue;
+            }
+
+            if(setType.getPartSet(figure.getPartSetId(partType)) !== null) continue;
+
+            const fallback = this._structure.getDefaultPartSet(partType, gender);
+
+            if(fallback)
+            {
+                figure.updatePart(partType, fallback.id, [0]);
+                changed = true;
             }
         }
+
+        return !changed;
     }
 }
