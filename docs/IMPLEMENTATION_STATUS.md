@@ -69,6 +69,57 @@ single missing member — so 45 commands landed and the number went 304 → 309.
 things is worth less than five covering five, and any reading of this file that treats the total as
 a score will get that backwards.
 
+### Working the body-diff backlog, module by module (2026-09-19)
+
+Six passes, and the defects are one shape: **the data reaches the last step and nobody consumes
+it.** Not one of them was a missing file, and not one is visible to the other four measures.
+
+| where | what was lost |
+|---|---|
+| `HabboCommunicationManager` | `messageReceived/Sent/ParseError` wrote to `addDebugData` where AS3 writes `setParameter` — the crash report's named slots (`rece_msg_time`, `sent_msg_time`, `sent_msg_data`), which is why nothing was ever under them |
+| `HabboCatalog` | the search box never updated its helper label or swapped its clear icon; clearing the search showed the index instead of **reopening the page the user was on**, and did not take focus back |
+| `PurchaseCatalogWidget` | `trackEventLog("Catalog","click","BUY_CLUB")` |
+| `CameraViewFinder` / `CameraPhotoLab` | the two `Stories` analytics events; `toggleVisible`'s `source` — the only thing the event reports — was `_source` |
+| `RoomEngine.disposeObjectWallItem()` | the whole pickup: no fly-to-inventory icon, no `updateObjectRoomWindow`, no `removeButtonMouseCursorOwner` (that one leaks). Its floor twin is ported in full, `playPickupAnimation()` included |
+| `RoomMessageHandler.onUsers()` | `figure_is_muted` on entry — `onIgnoreResult()` handles ignoring someone *while* in the room, so an already-ignored user entered unmuted |
+| `HabboNavigator.goToRoom()` | the whole navigation tracking, and `roomCategory` — the room's **rank in the list it was clicked from** — reported as 0 |
+| `HabboNavigator.getButton()` | `return null` behind "until asset system is wired"; `PopupCtrl` asks it for a list's two scroll arrows |
+| `MonsterPlantSeedConfirmationView` | AS3's `!param1` guard, so a failed image load still refreshed the preview |
+
+**The highest-yield search is now direct, not per-module.** Two of those were a parameter accepted
+and ignored, so `--unused-params` looks for exactly that: a TS parameter named `_x` whose AS3
+counterpart reads `paramN` at the same rank. The decompiler numbers parameters positionally, which
+makes the correspondence mechanical. 49 across the port. The heuristic needed one correction —
+the `_` prefix does not prove disuse, `CategoryListCtrl.refreshEntry()` passes a `_currentCount` it
+named badly — so the TS body decides too.
+
+**Six corrections to the probe itself, each with a fixture and a mutation check** (20 now, and
+every rule is mutation-covered):
+
+- `readInteger` → `readInt`. `IMessageDataWrapper` is identical on both sides but for that one
+  name, and it alone reported 220 parsers: the parser layer went **467 findings → 50**, and the
+  five that still name a missing read are inlined helpers, checked.
+- Colours: the decompiler prints decimal (`13891476`), the port writes hex (`0xD3F794`), and AS3
+  writes CSS (`"#336a95"`) where the port writes an int. A number now counts in any of its forms.
+- A same-named class in two packages was resolved by guessing. `MeMenuSoundSettingsItem.as` exists
+  under `habbo/toolbar/memenu/` **and** `habbo/ui/widget/memenu/`; an abbreviated citation matches
+  both, and `updateSoundIcons()` was being compared against a different class. The TS file's own
+  package decides now, the tree order breaks ties.
+- An inline **return** type was read as the body: `getFurniData(o): {id: number; …} | null`
+  measured its own type. The port is Allman-braced, so the body is the first brace that opens a
+  line, at zero depth.
+- Calls weigh half of literals in the ranking: three of four verified false positives were a body
+  factored into a helper or a table. The hoisting rule must NOT be extended to calls — a method
+  name is in its own file merely by being declared there, which would have hidden the
+  `refreshBuilderStatus()` that was a real defect.
+
+**And one hygiene hole the probe walked into.** `DoorbellWidgetHandler.processEvent()` carried its
+trace inside a JSDoc block, so the probe compared the helper declared below it instead — and
+`check-as3-trace.mjs` requires `// AS3:`, a line comment, so that member is untraced as far as
+rule 30 is concerned. **530 traces in the port are written in JSDoc, 169 of them with no line
+comment after**: that many members the traceability tool and the body diff both count as
+unmeasured. One fixed here; the rest is a measured backlog item.
+
 ### A fifth measure: looking INSIDE a member (2026-09-19)
 
 The four measures answer "is it there". None of them looks inside a body, and the dominant defect
