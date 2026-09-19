@@ -114,6 +114,24 @@ export class FurnitureParticleSystem
         }
     }
 
+    // TODO(AS3): sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/
+    //   furniture/FurnitureParticleSystem.as::updateAnimation() (l.211-258) and ::updateCanvas()
+    //   (l.111-152). Only the emitter bookkeeping is ported; the particles are never drawn, so
+    //   every particle furni (fireworks, fountains, campfire smoke) emits nothing visible.
+    //
+    //   What is missing: `updateCanvas()` clones the `canvas_id` sprite's bitmap into a working
+    //   surface and reassigns the sprite to it; `updateAnimation()` then, per frame, refills that
+    //   surface with `_bgColor` (or draws the blend background when `alphaMultiplier < 1`) and
+    //   blits each `emitter.particles` entry at
+    //   `(canvasOffsetX + (p.x - p.z) * scaleFactor, canvasOffsetY - offsetY * scaleFactor +
+    //   (p.y + (p.x + p.z) / 2) * scaleFactor)` plus the asset's own offsets — `copyPixels` when
+    //   opaque, `draw()` with an alpha transform when the particle is fading, and a 2×2 white
+    //   rectangle when it has no asset at all.
+    //
+    //   The pieces exist: `FurnitureParticleSystemParticle.getAsset()` already resolves the frame,
+    //   and `Texture.from({resource: <OffscreenCanvas>})` is how the rest of the port surfaces a
+    //   per-frame surface. What is not settled is reading the sprite's current `Texture` back into
+    //   a 2D context to seed the clone, which is why this is left rather than guessed at.
     // AS3: .../src/com/sulake/habbo/room/object/visualization/furniture/FurnitureParticleSystem.as::updateAnimation()
     updateAnimation(): void
     {

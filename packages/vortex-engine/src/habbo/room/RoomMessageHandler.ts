@@ -23,6 +23,7 @@ import type {
 } from '@habbo/communication/messages/parser/userdefinedroomevents';
 import {Vector3d} from '@room/utils/Vector3d';
 import type {IVector3d} from '@room/utils/IVector3d';
+import {RoomObjectUserTypes, getUserTypeName} from '@habbo/room/object/RoomObjectUserTypes';
 import {FurniStackingHeightMap} from './utils/FurniStackingHeightMap';
 
 // Message Events - Room Session
@@ -223,6 +224,11 @@ export class RoomMessageHandler implements IRoomMessageHandler
 {
     // AS3: _SafeCls_1984.as::onSpecialRoomEvent() — `new Timer(1000, discoColours.length + 1)`
     private static readonly DISCO_TICK_MS = 1000;
+
+    // Name derived from the value: AS3 spells the literal 16 inline in `onUsers()`, the only pet
+    // type whose posture it applies on room entry.
+    // AS3: .../src/com/sulake/habbo/room/_SafeCls_1984.as::onUsers()
+    private static readonly MONSTERPLANT_PET_TYPE_ID = 16;
 
     public static readonly EFFECT_NONE = 0;
     // AS3: .../src/com/sulake/habbo/room/_SafeCls_1984.as::EFFECT_ROOM_SHAKE
@@ -2073,15 +2079,20 @@ export class RoomMessageHandler implements IRoomMessageHandler
             return;
         }
 
-        for(let i = 0; i < parser.userCount; i++) 
+        for(let i = 0; i < parser.userCount; i++)
         {
             const data = parser.getUser(i);
 
-            if(data !== null) 
+            if(data !== null)
             {
                 this.addUser(this._currentRoomId, data);
             }
         }
+
+        // AS3's last statement. The guide/requester ids survive a room change, and the avatars
+        // that carry the marker only exist once this loop has added them — without this the
+        // marker was applied to a room that had no users yet and never re-applied.
+        this.updateGuideMarker();
     }
 
     // AS3: .../src/com/sulake/habbo/room/_SafeCls_1984.as::onUserUpdate()
@@ -2456,9 +2467,13 @@ export class RoomMessageHandler implements IRoomMessageHandler
         );
 
         // Check if this is the own user
-        if(data.webID === this._ownUserId) 
+        if(data.webID === this._ownUserId)
         {
             this._roomCreator.setOwnUserId(roomId, data.roomIndex);
+            // AS3 pairs these two. `setOwnUserId()` only records the index; this is what tells the
+            // avatar object itself, through `RoomObjectAvatarOwnMessage`, and the visualization
+            // needs it for everything that applies only to you. It was ported and never called.
+            this._roomCreator.updateObjectUserOwnUserAvatar(roomId, data.roomIndex);
         }
 
         // Update user figure
@@ -2470,6 +2485,15 @@ export class RoomMessageHandler implements IRoomMessageHandler
             data.subType,
             data.isRiding
         );
+
+        // A monsterplant (pet type 16) carries its growth stage as a posture, and it is the only
+        // pet type AS3 applies this to. `RoomUserData.petPosture` was parsed and read by nobody,
+        // so every monsterplant in a room you walked into stood in its default pose.
+        if(getUserTypeName(data.userType) === RoomObjectUserTypes.PET
+            && this._roomCreator.getPetTypeId(data.figure) === RoomMessageHandler.MONSTERPLANT_PET_TYPE_ID)
+        {
+            this._roomCreator.updateObjectUserPosture(roomId, data.roomIndex, data.petPosture, '');
+        }
 
         // The muted marker on entry. `onIgnoreResult()` already handles ignoring someone WHILE in
         // the room; this is the other half, and without it walking into a room showed everyone on
