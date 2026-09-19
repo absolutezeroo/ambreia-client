@@ -729,6 +729,14 @@ export class IncomingMessages
         // Handle access denied
     }
 
+    /**
+	 * The answer to "what is this old global room id now?", and both of its uses are terminal:
+	 * the site asked to REPORT that room, or the user followed a link INTO it. The port parsed the
+	 * reply, logged it and stopped — so a room link carrying a global id entered nothing, and a
+	 * report started from the website never reached the CFH. Every piece it needed was already
+	 * here: `webRoomReport`, `webRoomReportedName`, `habboHelp.reportRoom()` and the
+	 * `forwardToRoom()` two other handlers already call.
+	 */
     // AS3: .../src/com/sulake/habbo/navigator/_SafeCls_1951.as::onConvertedRoomId()
     private onConvertedRoomId(event: IMessageEvent): void
     {
@@ -738,8 +746,15 @@ export class IncomingMessages
 
         if(!parser) return;
 
-        log.debug(`Converted room ID: ${parser.globalId} -> ${parser.convertedId}`);
-        // Handle room ID conversion result
+        if(this._navigator.webRoomReport)
+        {
+            this._navigator.habboHelp?.reportRoom(parser.convertedId, this._navigator.webRoomReportedName ?? '', '');
+
+            return;
+        }
+
+        log.debug(`Got converted room ID for ${parser.globalId}, forward to room ${parser.convertedId}`);
+        this.forwardToRoom(parser.convertedId);
     }
 
     private onCompetitionRoomsData(event: IMessageEvent): void

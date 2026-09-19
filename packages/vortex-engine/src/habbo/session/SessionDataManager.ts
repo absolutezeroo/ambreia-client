@@ -195,6 +195,7 @@ import {IgnoredUsersManager} from './IgnoredUsersManager';
 import {BlockedUsersManager} from './BlockedUsersManager';
 import {HabboGroupInfoManager} from './HabboGroupInfoManager';
 import {PerkType} from '../communication/enum/PerkType';
+import {HabboWebTools} from '@habbo/utils/HabboWebTools';
 
 const log = Logger.getLogger('habbo.session.SessionDataManager');
 
@@ -1258,11 +1259,34 @@ export class SessionDataManager extends Component implements ISessionDataManager
         this.initFurnitureData(false);
     }
 
+    /**
+	 * The comment this replaces said opening external pages "is not applicable in this client".
+	 * It is: `HabboWebTools.navigateToURL()` has six callers here, `HabboFriendList` among them,
+	 * and it opens into the same `habboMain` window AS3 names. The method logged and returned, so
+	 * every route to a player's home page — the profile, the friend list — went nowhere.
+	 *
+	 * The `link.format.userpage` gate is AS3's own: no external variable, no navigation.
+	 */
     // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::openHabboHomePage()
-    openHabboHomePage(_userId: number, _userName: string): void
+    openHabboHomePage(userId: number, userName: string): void
     {
-        // Opening external pages is not applicable in this client
-        log.debug(`Open Habbo home page: ${_userName}`);
+        if(!this.propertyExists('link.format.userpage'))
+        {
+            return;
+        }
+
+        const url = this.getProperty('link.format.userpage')
+            .replace('%ID%', String(userId))
+            .replace('%username%', userName);
+
+        try
+        {
+            HabboWebTools.navigateToURL(url, 'habboMain');
+        }
+        catch
+        {
+            log.error('Error occurred!');
+        }
     }
 
     /**
