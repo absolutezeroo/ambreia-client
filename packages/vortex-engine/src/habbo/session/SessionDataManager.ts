@@ -196,6 +196,8 @@ import {BlockedUsersManager} from './BlockedUsersManager';
 import {HabboGroupInfoManager} from './HabboGroupInfoManager';
 import {PerkType} from '../communication/enum/PerkType';
 import {HabboWebTools} from '@habbo/utils/HabboWebTools';
+import {WindowEvent} from '@core/window/events/WindowEvent';
+import type {IDisposable} from '@core/runtime/IDisposable';
 
 const log = Logger.getLogger('habbo.session.SessionDataManager');
 
@@ -1294,10 +1296,41 @@ export class SessionDataManager extends Component implements ISessionDataManager
 	 *
 	 * @see sources/win63_version/habbo/session/SessionDataManager.as pickAllFurniture()
 	 */
+    /**
+	 * The five room-owner commands below all fired IMMEDIATELY — no rights check and no
+	 * confirmation — where AS3 resolves the session, refuses anyone without rights over the room,
+	 * and puts a yes/no in front of the destructive ones. Ejecting every piece of furniture in a
+	 * room on a single click is exactly the accident the dialog exists to prevent.
+	 *
+	 * `ejectPets()` is the deliberate odd one out in AS3 too: a narrower guard (no
+	 * `roomControllerLevel`) and no confirmation at all.
+	 */
     // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::pickAllFurniture()
-    pickAllFurniture(_roomId: number): void
+    pickAllFurniture(roomId: number): void
     {
-        this.sendSpecialCommandMessage(':pickall');
+        this.confirmRoomCommand(roomId, '${room.confirm.pick_all}', ':pickall');
+    }
+
+    /**
+	 * The guard and the dialog the four confirmed commands share, written once. AS3 repeats it
+	 * verbatim in each, closure included.
+	 */
+    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::pickAllFurniture()
+    private confirmRoomCommand(roomId: number, message: string, command: string): void
+    {
+        if(this._roomSessionManager === null || this._windowManager === null) return;
+
+        const session = this._roomSessionManager.getSession(roomId);
+
+        if(session === null) return;
+        if(!session.isRoomOwner && !this.isAnyRoomController && session.roomControllerLevel < 1) return;
+
+        this._windowManager.confirm('${generic.alert.title}', message, 0, (dialog: IDisposable, event: WindowEvent) =>
+        {
+            dialog.dispose();
+
+            if(event.type === WindowEvent.WE_OK) this.sendSpecialCommandMessage(command);
+        });
     }
 
     /**
@@ -1306,9 +1339,9 @@ export class SessionDataManager extends Component implements ISessionDataManager
 	 * @see sources/win63_version/habbo/session/SessionDataManager.as resetScores()
 	 */
     // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::resetScores()
-    resetScores(_roomId: number): void
+    resetScores(roomId: number): void
     {
-        this.sendSpecialCommandMessage(':resetscores');
+        this.confirmRoomCommand(roomId, '${room.confirm.resetscores}', ':resetscores');
     }
 
     /**
@@ -1316,10 +1349,11 @@ export class SessionDataManager extends Component implements ISessionDataManager
 	 *
 	 * @see sources/win63_version/habbo/session/SessionDataManager.as ejectAllFurniture()
 	 */
+    /** `message` IS the command AS3 sends — the caller picks it; `:ejectall` was hardcoded here. */
     // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::ejectAllFurniture()
-    ejectAllFurniture(_roomId: number, _message: string): void
+    ejectAllFurniture(roomId: number, message: string): void
     {
-        this.sendSpecialCommandMessage(':ejectall');
+        this.confirmRoomCommand(roomId, '${room.confirm.eject_all}', message);
     }
 
     /**
@@ -1327,9 +1361,15 @@ export class SessionDataManager extends Component implements ISessionDataManager
 	 *
 	 * @see sources/win63_version/habbo/session/SessionDataManager.as ejectPets()
 	 */
+    /** No confirmation and no `roomControllerLevel` — AS3's own asymmetry, kept. */
     // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::ejectPets()
-    ejectPets(_roomId: number): void
+    ejectPets(roomId: number): void
     {
+        const session = this._roomSessionManager?.getSession(roomId) ?? null;
+
+        if(session === null) return;
+        if(!session.isRoomOwner && !this.isAnyRoomController) return;
+
         this.sendSpecialCommandMessage(':ejectpets');
     }
 
@@ -1339,9 +1379,9 @@ export class SessionDataManager extends Component implements ISessionDataManager
 	 * @see sources/win63_version/habbo/session/SessionDataManager.as pickAllBuilderFurniture()
 	 */
     // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::pickAllBuilderFurniture()
-    pickAllBuilderFurniture(_roomId: number): void
+    pickAllBuilderFurniture(roomId: number): void
     {
-        this.sendSpecialCommandMessage(':pickallbc');
+        this.confirmRoomCommand(roomId, '${room.confirm.pick_all_bc}', ':pickallbc');
     }
 
     /**
