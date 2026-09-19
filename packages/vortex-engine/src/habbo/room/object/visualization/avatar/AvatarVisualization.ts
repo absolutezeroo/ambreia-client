@@ -280,6 +280,17 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
         super();
     }
 
+    /**
+     * Frames left before this avatar drops the action images it is no longer playing.
+     *
+     * Seeded at random between 200 and 400 so that a room full of avatars does not sweep on the
+     * same frame, then 500 between sweeps.
+     */
+    // Name derived: the field is `_SafeStr_6882` in the primary tree, `var_2194` in win63_version
+    //   and `_SafeStr_6785` in AIR — obfuscated in all three, and absent from the 2016 build.
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/avatar/AvatarVisualization.as::cacheDisposeCountdown
+    private _cacheDisposeCountdown: number = Math.random() * 200 + 200;
+
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/room/object/visualization/avatar/AvatarVisualization.as::_angle
     private _angle: number = -1;
 
@@ -451,6 +462,15 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
         if(roomObject == null) return;
         if(geometry == null) return;
         if(this._visualizationData == null) return;
+
+        // AS3 runs this right after the three null guards, before anything else in update().
+        // `AvatarImage.disposeInactiveActionCache()` was ported and had no caller, so an avatar
+        // kept every action image it had ever rendered for as long as it stayed in the room.
+        if(--this._cacheDisposeCountdown <= 0 && this._activeAvatarImage !== null)
+        {
+            this._activeAvatarImage.disposeInactiveActionCache();
+            this._cacheDisposeCountdown = 500;
+        }
 
         const animationFrameDue = time >= (this._lastAnimationUpdateTime + AvatarVisualization.GEOMETRY_UPDATE_INTERVAL_MS);
 

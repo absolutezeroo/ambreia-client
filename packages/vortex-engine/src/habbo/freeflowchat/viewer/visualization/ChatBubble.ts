@@ -27,6 +27,9 @@ export class ChatBubble
 {
     private _bubble: PooledChatBubble | null;
 
+    // DEVIATION: AS3 composes the bubble inline here, repeating ~250 lines that
+    //   `PooledChatBubble.recreate()` already carries step for step; this builds one of those and
+    //   rasterizes it. See the class header for the comparison the claim rests on.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/freeflowchat/viewer/visualization/ChatBubble.as::ChatBubble()
     constructor(
         item: ChatItem,

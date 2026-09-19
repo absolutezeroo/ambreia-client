@@ -307,7 +307,8 @@ export interface IRoomEngine extends IDisposable {
         ownerId: number,
         ownerName: string | null,
         synchronize?: boolean,
-        data?: IStuffData | null
+        data?: IStuffData | null,
+        realRoomObject?: boolean
     ): boolean;
 
     addRoomObjectWallItem(
@@ -321,7 +322,8 @@ export interface IRoomEngine extends IDisposable {
         expiryTime: number,
         usagePolicy: number,
         ownerId: number,
-        ownerName: string | null
+        ownerName: string | null,
+        realRoomObject?: boolean
     ): boolean;
 
     // AS3: .../src/com/sulake/habbo/room/IRoomEngine.as::isMoveBlocked()

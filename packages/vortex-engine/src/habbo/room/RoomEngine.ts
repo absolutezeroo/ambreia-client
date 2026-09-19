@@ -3035,8 +3035,9 @@ export class RoomEngine extends Component implements IRoomEngine,
         ownerId: number,
         ownerName: string | null,
         _synchronize = true,
-        data: IStuffData | null = null
-    ): boolean 
+        data: IStuffData | null = null,
+        realRoomObject: boolean = true
+    ): boolean
     {
         const room = this.getRoomInstance(roomId);
 
@@ -3078,6 +3079,16 @@ export class RoomEngine extends Component implements IRoomEngine,
             model.setNumber(RoomObjectVariableEnum.FURNITURE_COLOR, this.getFurnitureColorIndex(typeId), true);
             model.setNumber(RoomObjectVariableEnum.FURNITURE_TYPE_ID, typeId);
             model.setNumber(RoomObjectVariableEnum.FURNITURE_DATA, state);
+            // AS3: _SafeCls_90.as::addObjectFurnitureFromData() — neither of these two was written.
+            // `furniture_real_room_object` gates fifteen `getNumber(...) === 1` tests across the
+            // furniture logics (dimmer, jukebox, song disk, sound machine, crackable, high score,
+            // pet customization, pet product, background colour, area hide, and FurnitureLogic's
+            // own widget dispatch), and with no writer every one of them was permanently false:
+            // clicking any of that furniture opened nothing. `furniture_ad_url` is what
+            // `RoomDesktop.handleRoomAdClick()`/`handleRoomAdTooltip()` read, and
+            // `RoomContentLoader.getRoomObjectAdURL()` had no caller either.
+            model.setString(RoomObjectVariableEnum.FURNITURE_AD_URL, this.roomContentLoader.getRoomObjectAdURL(className), true);
+            model.setNumber(RoomObjectVariableEnum.FURNITURE_REAL_ROOM_OBJECT, realRoomObject ? 1 : 0, false);
             // AS3: _SafeCls_90.as::addObjectFurnitureFromData() - expiry_time/expirty_timestamp/
             // usage_policy were never written here, so InfoStandWidgetHandler's getNumber() reads
             // (both default to NaN when unset) always failed their === 1/=== 2 usage-policy checks
@@ -3154,12 +3165,13 @@ export class RoomEngine extends Component implements IRoomEngine,
         expiryTime: number,
         usagePolicy: number,
         ownerId: number,
-        ownerName: string | null
-    ): boolean 
+        ownerName: string | null,
+        realRoomObject: boolean = true
+    ): boolean
     {
         const room = this.getRoomInstance(roomId);
 
-        if(!room) 
+        if(!room)
         {
             return false;
         }
@@ -3188,6 +3200,13 @@ export class RoomEngine extends Component implements IRoomEngine,
             model.setNumber(RoomObjectVariableEnum.FURNITURE_COLOR, this.getWallItemColorIndex(typeId), false);
             model.setNumber(RoomObjectVariableEnum.FURNITURE_TYPE_ID, typeId);
             model.setNumber(RoomObjectVariableEnum.FURNITURE_DATA, state);
+            // The same two the floor path was missing, plus `object_accurate_z_value`, which the
+            // renderer reads per object through `roomObjectVariableAccurateZ` (set at :5873) —
+            // AS3 writes it on every wall item and only on wall items.
+            // AS3: _SafeCls_90.as::addObjectWallItemFromData()
+            model.setString(RoomObjectVariableEnum.FURNITURE_AD_URL, this.roomContentLoader.getRoomObjectAdURL(className), true);
+            model.setNumber(RoomObjectVariableEnum.FURNITURE_REAL_ROOM_OBJECT, realRoomObject ? 1 : 0, false);
+            model.setNumber(RoomObjectVariableEnum.OBJECT_ACCURATE_Z_VALUE, 1, true);
             // AS3: _SafeCls_90.as::addObjectWallItemFromData() - see addRoomObjectFurniture()'s
             // matching comment above; the wall-item path had the exact same gap.
             model.setNumber(RoomObjectVariableEnum.FURNITURE_USAGE_POLICY, usagePolicy);

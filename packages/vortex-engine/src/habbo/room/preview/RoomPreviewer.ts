@@ -258,7 +258,11 @@ export class RoomPreviewer
                 0,
                 '',
                 true,
-                data
+                data,
+                // AS3 passes `false` for `realRoomObject` from both preview call sites: a previewed
+                // item must not behave like one placed in a room (no dimmer dialog, no jukebox
+                // playlist, no crackable click) — see `RoomEngine.addRoomObjectFurniture()`.
+                false
             ))
             {
                 this._previousAutomaticStateChangeTime = RoomPreviewer.getTimer();
@@ -307,7 +311,8 @@ export class RoomPreviewer
                 Number.NaN,
                 -1,
                 0,
-                ''
+                '',
+                false
             ))
             {
                 this._previousAutomaticStateChangeTime = RoomPreviewer.getTimer();
