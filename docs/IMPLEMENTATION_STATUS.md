@@ -1700,10 +1700,13 @@ guard, and the buy/publish/competition state machine including the publish cool-
   and `class_2200`), plus a new `getSortableSpriteList()` on the canvas. Both `collectPhotoData()`
   implementations now return a real, sendable composer.
 
-One `TODO(AS3)` marker remains in the collector, and it is a genuine narrowing rather than a
-blocker: `getFurniData()` skips AS3's pass that merges *canvas-culled* objects and re-parents
-boutique-mannequin sprites (needs `IRoomEngine.getRoomObjects()` and
-`IRoomObjectSpriteVisualization.getSpriteList()`).
+Two `TODO(AS3)` markers remained in the collector at the time of writing — the *canvas-culled*
+object pass and the boutique-mannequin re-parenting. **Both are closed** (verified 2026-09-19:
+`grep -n "TODO" SpriteDataCollector.ts` finds none). The culled pass is the
+`getRoomObjectScreenLocation()` loop in `getFurniData()`; the mannequins are
+`addMannequinSprites()`, which carries a `DEVIATION` rather than a TODO — AS3 offsets the *live*
+sprites and visibly drifts the mannequin in the room while the photo is composed, where this port
+converts each part to its own record first.
 
 #### `RoomPlane.getDrawingDatas()` — closed 2026-09-19
 
@@ -1744,6 +1747,12 @@ The nine remaining markers in the widget layer are all the same immutable-bitmap
 per-button filter thumbnails, `renderAllEffects()`, save-to-file. The effect *state* is fully
 tracked regardless: `getEffectDataJson()` reports the chosen filters correctly, so the render the
 server produces carries them even though the local preview does not composite them.
+
+> **Closed since, verified 2026-09-19.** `grep -rn "TODO" habbo/ui/widget/camera/` finds nothing,
+> and `renderAllEffects()` is implemented (`CameraPhotoLab.ts:851`, with the `applyFilter()` call
+> at 921). The whole monorepo is down to **one** `TODO(AS3)`, in
+> `WindowController.getGraphicContext()`, unrelated to the camera. Do not re-quote the nine from
+> here — the paragraph above is the state of 2026-08-13.
 
 `habbo/communication/messages/{incoming,parser,outgoing}/camera/` is complete: 6 events, 6 parsers,
 6 composers, the 4 `Json*` payload DTOs, all 12 headers registered. Wire coverage moves 52 → 47 send
