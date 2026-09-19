@@ -14,6 +14,9 @@ import type {IWindow} from '@core/window/IWindow';
 import type {WindowEvent} from '@core/window/events/WindowEvent';
 import type {IWindowContainer} from '@core/window/IWindowContainer';
 import type {IBitmapWrapperWindow} from '@core/window/components/IBitmapWrapperWindow';
+import {WindowType} from '@core/window/enum/WindowType';
+import {WindowStyle} from '@core/window/enum/WindowStyle';
+import {WindowParam} from '@core/window/enum/WindowParam';
 import type {IHabboCatalog} from '@habbo/catalog/IHabboCatalog';
 import type {IHabboNavigator} from './IHabboNavigator';
 import type {ILinkEventTracker} from '@core/runtime/events/ILinkEventTracker';
@@ -788,13 +791,47 @@ export class HabboNavigator extends Component implements IHabboNavigator, ILinkE
     }
 
     /**
-     * Gets a button image wrapper window.
-     * Stub — returns null until asset system is wired.
-     */
+	 * A standalone bitmap button, sized to its own image.
+	 *
+	 * This was `return null` behind a "until asset system is wired" note, long after it was —
+	 * the same stale stub `refreshButton()` carried. `PopupCtrl` is the live caller: it asks for
+	 * the two scroll arrows of a popup list and got nothing back, so the list had no arrows.
+	 *
+	 * The window is created with the image's own dimensions, and `disposesBitmap` stays false
+	 * because the bitmap belongs to the asset library and is shared with every other button
+	 * showing it — the same reason `prepareButton()` refuses to re-fetch one it already has.
+	 */
     // AS3: .../src/com/sulake/habbo/navigator/HabboNavigator.as::getButton()
-    getButton(_assetName: string, _stateSuffix: string, _callback: (event: WindowEvent, window: IWindow) => void, _x: number = 0, _y: number = 0, _index: number = 0): IWindowContainer | null
+    getButton(assetName: string, stateSuffix: string, callback: (event: WindowEvent, window: IWindow) => void, x: number = 0, y: number = 0, index: number = 0): IWindowContainer | null
     {
-        return null;
+        const windowManager = this._windowManager;
+
+        if(windowManager === null) return null;
+
+        const bitmap = this.getButtonImage(stateSuffix);
+
+        if(bitmap === null)
+        {
+            log.warn(`Navigator button image "${stateSuffix}" is not in the asset library`);
+
+            return null;
+        }
+
+        const window = windowManager.createWindow(
+            assetName,
+            '',
+            WindowType.BITMAP_WRAPPER,
+            WindowStyle.DEFAULT,
+            WindowParam.INPUT_EVENT_PROCESSOR | WindowParam.USE_PARENT_GRAPHIC_CONTEXT,
+            {x, y, width: bitmap.width, height: bitmap.height},
+            callback as (event: unknown, window: IWindow) => void,
+            index
+        ) as unknown as IBitmapWrapperWindow;
+
+        window.bitmap = bitmap;
+        window.disposesBitmap = false;
+
+        return window as unknown as IWindowContainer;
     }
 
     /**
