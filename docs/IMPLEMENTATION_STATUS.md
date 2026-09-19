@@ -5012,6 +5012,65 @@ other window's clip moved. This is the one-pass equivalent of AS3's per-`BitmapD
 
 ## Recent Work Recorded
 
+- 🆕 **Second body-diff sweep: seven fixes, and what the probe gets wrong — 2026-09-19.**
+  `scripts/member-body-diff.mjs` compares a ported member's body against the AS3 body its own
+  `AS3:` line cites — literals, numbers, calls — and this is the second pass worked from its
+  output. Six commits, `508563ea`…`601e5ded`.
+
+  The real findings, in order of how much they cost:
+
+  - **`furniture_real_room_object` had fifteen readers and no writer.** Every furniture logic
+    gates its widget on `getNumber('furniture_real_room_object') === 1` — dimmer, jukebox, song
+    disk, sound machine, crackable, high score, pet customization, pet product, background
+    colour, area hide, plus `FurnitureLogic`'s own dispatch — and `RoomEngine` never set it.
+    Clicking any of that furniture opened nothing. Set now in both
+    `addRoomObjectFurniture()` and `addRoomObjectWallItem()`, alongside two more model variables
+    those methods were also skipping: `furniture_ad_url` (whose producer,
+    `RoomContentLoader.getRoomObjectAdURL()`, had no caller either) and `object_accurate_z_value`
+    (read per object by the renderer through `roomObjectVariableAccurateZ`). **Worth watching:**
+    those fifteen paths have never run once.
+  - **The legacy navigator's Official tab drew empty rows.** A class-level note on
+    `OfficialRoomEntryManager` claimed nothing called `createEntry()`/`refreshEntry()` and that
+    the entry layer was a superseded path safely left unported. `OfficialRoomListCtrl` calls
+    both, for every row. `createEntry()` also asked for `orl_wide_entry`/`orl_narrow_entry`, two
+    layouts that exist in no tree — the AS3 name, `grs_official_room_row_phase_one`, ships. The
+    whole entry layer is ported now; `OfficialRoomListCtrl` also returned "keep going" to a
+    `while(true)` when creation failed, so a missing layout froze the browser.
+  - **Seven missing switch arms in `RoomDesktop.roomObjectEventHandler()`**: the four `RERAE_*`
+    room-ad arms (`RoomUI` subscribes all four, and they fell into the generic dispatch) plus
+    `PLAYLIST_EDITOR`, the two engraving requests and the owner-gated engraving failure.
+    `handleRoomAdClick()`/`handleRoomAdTooltip()` came with them.
+  - **`AvatarImage.disposeInactiveActionCache()` had no caller.** `AvatarVisualization.update()`
+    was missing the 500-frame countdown that runs it, so an avatar kept every action image it had
+    ever rendered for as long as it stayed in the room.
+  - **The device fingerprint was random per connection.** `generateFingerprint()` returned
+    `generateRandomHexString(32)`; the value goes to the server in `UniqueIDMessageComposer`, so
+    every reconnect looked like a new machine. Rebuilt from the browser equivalents of AS3's five
+    inputs (fonts excepted — the browser does not enumerate them), MD5 verified against node's.
+  - **Three omissions in `RoomMessageHandler.onUsers()`**: `updateObjectUserOwnUserAvatar()`,
+    the monsterplant posture (`RoomUserData.petPosture` was parsed and read by nobody) and the
+    trailing `updateGuideMarker()`.
+  - Smaller: `HabboCommunicationDemo.handleErrorMessage()` logged "AS3 shows alert" on three of
+    four branches; `handleLoginFailedHotelClosedMessage()` was a log line; `AvatarInfoWidget`
+    was missing the `RWFIUE_FURNI` arm, so an avatar bubble stayed open beside a furni infostand.
+
+  **Left open, deliberately:** `FurnitureParticleSystem` ports only the emitter bookkeeping —
+  `updateCanvas()` does not exist and `updateAnimation()` stops before the drawing half, so no
+  particle furni emits anything visible. The `TODO(AS3)` on the method carries the position
+  formula, the three blit cases and the one unresolved piece (reading a sprite's current
+  `Texture` back into a 2D context). It is renderer code that cannot be checked by reading.
+
+  **What the probe gets wrong, measured on this pass** — eleven candidates verified, nine of them
+  false positives, each for a reason worth not re-deriving: a body factored into a base-class hook
+  (`InfoStandSongDiskView`/`InfoStandJukeboxView.createWindow()`), a switch split into per-event
+  listeners (`MeMenuWidgetHandler`, `AvatarInfoWidget`, `AvatarVisualization`), constants standing
+  in for literals (`Classes.init()`, `RoomEngine.handleRoomObjectEvent()`), documented dead code
+  (`ToolbarView`), a deliberate deduplication (`ChatBubble`), and a deliberate de-obfuscation
+  (`HabboCommunicationManager.updateHostParameters()`, which says so by name). Two were misplaced
+  traces rather than missing code: `ChatItem.set style()` cited
+  `ChatBubbleFactory.applySpecialChatContent()`, and `RoomUI`'s `roomSessionDialogEventHandler`
+  comment block sat above `roomSessionEventHandler()`.
+
 - 🆕 **The catalog closed itself mid-browse — 2026-09-14.** Reported as "sometimes I'm looking at
   items and it just closes". Not a crash and not a disconnect: it was the drag-an-item-into-the-room
   gesture firing on an ordinary click.

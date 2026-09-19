@@ -18,7 +18,8 @@ export class TextWindowUtils
      * would need per-anchor mouse tracking the text layout does not do — but they are assembled
      * anyway so the rule set stays whole rather than trimmed to what is read today.
      *
-     * The one caller is `PhoneNumberCollectView.createWindow()` (`collect_summary`).
+     * Callers: `PhoneNumberCollectView.createWindow()` (`collect_summary`) and
+     * `LocalizationCatalogWidget.setLinkStyle()`, which passes the catalog's darker palette.
      */
     // AS3: .../src/com/sulake/habbo/utils/TextWindowUtils.as::setHTMLLinkStyle()
     public static setHTMLLinkStyle(
