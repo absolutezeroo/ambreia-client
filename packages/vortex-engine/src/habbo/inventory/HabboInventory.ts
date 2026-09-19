@@ -2091,13 +2091,42 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
         return groups;
     }
 
+    /**
+	 * Four guards, and none of them was here. Three say the client is not in a state to open a
+	 * trade at all; the fourth refuses a trade whose requirements ask the user to give NOTHING,
+	 * which AS3 calls "not possible" and drops on the floor. Each writes into the crash report on
+	 * the way out, which is where a trade that silently never opened would otherwise leave no
+	 * trace whatsoever.
+	 */
     // AS3: .../src/com/sulake/habbo/inventory/_SafeCls_1951.as::onWiredTradeInitiate()
     private onWiredTradeInitiate = (event: IMessageEvent): void =>
     {
+        if(this.sessionData === null)
+        {
+            ErrorReportStorage.addDebugData('IncomingEvent', 'Trading open - sessionData not available!');
+
+            return;
+        }
+
+        if(this.roomSession === null)
+        {
+            ErrorReportStorage.addDebugData('IncomingEvent', 'Trading open - roomSession not available!');
+
+            return;
+        }
+
         const parser = event.parser as WiredTradeInitiateMessageParser | null;
         const requirement = parser?.requirement ?? null;
 
         if(requirement == null) return;
+
+        if(requirement.rules !== null && requirement.rules.youGiveRule === null)
+        {
+            ErrorReportStorage.addDebugData(
+                'IncomingEvent', 'Initiated a trade where the user gives nothing - not possible');
+
+            return;
+        }
 
         this.wiredTradingModel?.onWiredTradeInitiate(
             requirement,
