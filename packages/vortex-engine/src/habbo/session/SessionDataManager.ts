@@ -2078,6 +2078,12 @@ export class SessionDataManager extends Component implements ISessionDataManager
 	 * Handle user name change result
 	 * @see source_as_win63/habbo/session/SessionDataManager.as line 456
 	 */
+    // DEVIATION: on success AS3 also rewrites the AIR window's title bar —
+    //   `stage.nativeWindow.title = "Habbo " + environment.id.replace("pt","br").replace("en","com")
+    //   .toUpperCase() + " | " + name`. There is no native window here, and the replacement pair is
+    //   Habbo's own domain scheme (habbo.com.br, habbo.com), which says nothing about this hotel.
+    //   `document.title` is the nearest thing and it is the SITE's, not the client's: the client is
+    //   served under vortex-web, which owns the tab.
     // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::onChangeUserNameResult()
     private onChangeUserNameResult(event: IMessageEvent): void
     {

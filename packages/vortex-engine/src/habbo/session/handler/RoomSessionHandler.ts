@@ -4,6 +4,7 @@ import type {IRoomHandlerListener} from '../IRoomHandlerListener';
 import {BaseHandler} from './BaseHandler';
 import {RoomSessionDoorbellEvent} from '../events/RoomSessionDoorbellEvent';
 import {RoomSessionQueueEvent} from '../events/RoomSessionQueueEvent';
+import {ErrorReportStorage} from '@core/utils/ErrorReportStorage';
 
 // Message events
 import {
@@ -170,6 +171,10 @@ export class RoomSessionHandler extends BaseHandler
         }
 
         const roomId = parser.roomId;
+
+        // The room a crash report was filed from. Written by nobody until now, like the rest of
+        // that report — see `HabboTracking.storeErrorDetails()`.
+        ErrorReportStorage.addDebugData('RoomID', `Room id: ${roomId}`);
 
         if(this.listener)
         {
