@@ -1,4 +1,6 @@
 import type {IEncryptedLocalStorage} from './IEncryptedLocalStorage';
+import {MD5} from '../../hurlant/crypto/hash/MD5';
+import {Hex} from '../../hurlant/util/Hex';
 import {Logger} from '@core/utils/Logger';
 
 const log = Logger.getLogger('habbo.utils.CommunicationUtils');
@@ -320,17 +322,50 @@ export class CommunicationUtils
     }
 
     /**
-	 * Generate a browser fingerprint.
+	 * The device fingerprint sent with `UniqueIDMessageComposer`.
 	 *
-	 * In the original AS3, this used Flash capabilities, fonts, and plugins
-	 * to generate an MD5 hash fingerprint. In the web version, we generate
-	 * a simplified random hex string since browser fingerprinting APIs differ.
+	 * AS3 joins five stable machine facts with `#` — user agent, `Capabilities.serverString`,
+	 * timezone offset, plugin list, installed non-embedded regular fonts — MD5s the result, and
+	 * prefixes the digest with `~` when the plugin list came back empty. The point of it is that
+	 * the same machine produces the same string every time.
 	 *
 	 * @returns A fingerprint string
 	 */
+    // DEVIATION: the port had been returning `generateRandomHexString(32)`, which is a different
+    //   value on every connection — the one property a fingerprint must not have, and it made
+    //   every reconnect look like a new device to the server. The five inputs are rebuilt from
+    //   their browser equivalents below; only the font list has none (the browser does not
+    //   enumerate fonts), so that field stays empty. The `~` rule is AS3's own and is kept.
     // AS3: .../src/com/sulake/habbo/utils/CommunicationUtils.as::generateFingerprint()
     static generateFingerprint(): string
     {
-        return CommunicationUtils.generateRandomHexString(32);
+        try
+        {
+            const userAgent = navigator.userAgent;
+            const plugins = Array.from(navigator.plugins ?? []).map((plugin) => plugin.name).join(',');
+            // `Capabilities.serverString` is Flash's own `&`-joined capability query string; these
+            // are the browser facts that play the same role — stable per machine, coarse enough
+            // not to change between sessions.
+            const capabilities = [
+                navigator.language,
+                screen.width + 'x' + screen.height,
+                String(screen.colorDepth),
+                String(navigator.hardwareConcurrency ?? 0)
+            ].join('&');
+            const timezoneOffset = String(new Date().getTimezoneOffset());
+            const fonts = '';
+
+            const source = `${userAgent}#${capabilities}#${timezoneOffset}#${plugins}#${fonts}`;
+            const digest = Hex.fromArray(new MD5().hash(new TextEncoder().encode(source)), false);
+
+            return plugins.length === 0 ? '~' + digest : digest;
+        }
+        catch (error)
+        {
+            // AS3 swallows any failure and returns the empty string.
+            log.warn(`Could not build a device fingerprint: ${String(error)}`);
+
+            return '';
+        }
     }
 }

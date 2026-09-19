@@ -1215,16 +1215,6 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
     };
 
     /**
-     * Handles room session lifecycle events.
-     */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomUI.as::roomSessionDialogEventHandler()
-    // The room-session errors that surface as a plain alert. Without this the server's
-    // PetPlacingError (3195) and its bot/kick siblings reached RoomUsersHandler, were turned into a
-    // RoomSessionErrorMessageEvent, and then died with no subscriber — the placement simply failed
-    // in silence.
-    /**
-     * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomUI.as::roomSessionEventHandler()
-     *
      * The route from a room session to the widget handlers. AS3 forwards to the *current* desktop
      * only, guarded on the event carrying a session and the room engine being up; this port keeps
      * both guards and the same single-desktop target.
@@ -1243,6 +1233,13 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
         this._currentDesktop?.processEvent(event);
     }
 
+    /**
+     * The room-session errors that surface as a plain alert. Without this the server's
+     * PetPlacingError (3195) and its bot/kick siblings reached RoomUsersHandler, were turned into
+     * a RoomSessionErrorMessageEvent, and then died with no subscriber — the placement simply
+     * failed in silence.
+     */
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomUI.as::roomSessionDialogEventHandler()
     private roomSessionDialogEventHandler(event: RoomSessionEvent): void
     {
         let errorTitle = '${error.title}';
