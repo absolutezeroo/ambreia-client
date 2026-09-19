@@ -47,7 +47,8 @@ import type {
     NotificationDialogMessageEventParser,
     PetLevelNotificationEventParser,
     PetReceivedMessageEventParser,
-    PetRespectFailedEventParser} from "@habbo/communication";
+    PetRespectFailedEventParser,
+    RoomMessageNotificationMessageEventParser} from "@habbo/communication";
 import {
     HabboAchievementNotificationMessageEvent,
     HabboActivityPointNotificationMessageEvent,
@@ -252,16 +253,31 @@ export class NotificationMessageHandler implements IAvatarImageListener
 	 *
 	 * @see source_as_win63/habbo/notifications/class_3353.as onRoomMessagesNotification()
 	 */
+    /**
+	 * "N messages were posted in <room>" — the toast that told you your room had visitors while
+	 * you were away. It was parsed and dropped on the floor.
+	 */
     // AS3: .../src/com/sulake/habbo/notifications/_SafeCls_1951.as::onRoomMessagesNotification()
     private onRoomMessagesNotification(event: IMessageEvent): void
     {
         if(!event) return;
 
-        const parser = (event as RoomMessageNotificationMessageEvent).parser;
+        const parser = (event as RoomMessageNotificationMessageEvent).parser as RoomMessageNotificationMessageEventParser | null;
+        const localization = this._notifications?.localizationManager;
+        const singularController = this._notifications?.singularController;
 
-        if(!parser) return;
+        if(!parser || localization == null || singularController == null) return;
 
-        // Show room messages posted notification
+        const message = localization.getLocalizationWithParamMap(
+            'notifications.text.room.messages.posted',
+            '',
+            new Map<string, string>([
+                ['room_name', parser.roomName],
+                ['messages_count', String(parser.messageCount)]
+            ])
+        );
+
+        singularController.addItem(message, 'roommessagesposted', null);
     }
 
     /**
@@ -621,12 +637,45 @@ export class NotificationMessageHandler implements IAvatarImageListener
 
         if(NotificationMessageHandler.CALL_FOR_HELP_NOTIFICATION_TYPE === parser.type)
         {
-            // Show CFH created notification
+            this.showCallCreatedNotification(
+                parser.parameters?.get('message') ?? '',
+                parser.parameters?.get('linkUrl') ?? null
+            );
         }
         else
         {
             this._notifications?.showNotification(parser.type, parser.parameters);
         }
+    }
+
+    /**
+	 * The receipt for a call for help: without it, sending one produced no answer of any kind.
+	 * The FAQ link is optional and the two AS3 branches differ only by it.
+	 */
+    // AS3: .../src/com/sulake/habbo/notifications/_SafeCls_1951.as::showCallCreatedNotification()
+    private showCallCreatedNotification(message: string, linkUrl: string | null): void
+    {
+        const windowManager = this._notifications?.windowManager;
+
+        if(!windowManager) return;
+
+        // Same literal `\r` the broadcast carries — the server escapes its newlines.
+        const text = message.replace(/\\r/g, '\r');
+
+        if(linkUrl !== null)
+        {
+            windowManager.simpleAlert(
+                '${help.cfh.sent.title}', '', text, '${help.main.faq.link.text}', linkUrl, null,
+                'illumina_alert_illustrations_frank_neutral_png'
+            );
+
+            return;
+        }
+
+        windowManager.simpleAlert(
+            '${help.cfh.sent.title}', '', text, null, null, null,
+            'illumina_alert_illustrations_frank_neutral_png'
+        );
     }
 
     /**
