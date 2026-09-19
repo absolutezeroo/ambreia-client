@@ -86,6 +86,16 @@ it.** Not one of them was a missing file, and not one is visible to the other fo
 | `HabboNavigator.getButton()` | `return null` behind "until asset system is wired"; `PopupCtrl` asks it for a list's two scroll arrows |
 | `MonsterPlantSeedConfirmationView` | AS3's `!param1` guard, so a failed image load still refreshed the preview |
 
+Three more passes after those, and the same shape again:
+
+| where | what was lost |
+|---|---|
+| `SessionDataManager` | `:ejectall`, `:pickall`, `:pickallbc`, `:resetscores`, `:ejectpets` fired with **no rights check and no confirmation**; `ejectAllFurniture` sent `:ejectall` hardcoded instead of the command its caller passes |
+| `HabboInventory.onWiredTradeInitiate()` | all four AS3 guards, including the one that refuses a trade whose requirements ask the user to give **nothing** |
+| `AvatarRenderManager.validateAvatarFigure()` | the half that repairs a part which is PRESENT but names a set id the figure data does not have — a garment removed from the hotel draws nothing and was left alone. Also validated at club level 0 where AS3 uses 2, and returned `void` where AS3 answers "was it already sound" |
+| `HabboNavigator.getButton()` | `return null` behind a stale "until asset system is wired"; `PopupCtrl` asks it for a list's scroll arrows |
+| `HTMLTextController.convertLinksToEvents()` | nothing — but the port silently FIXES AS3's greedy `(.*)`, which eats two links into one mangled anchor. Now marked |
+
 **The highest-yield search is now direct, not per-module.** Two of those were a parameter accepted
 and ignored, so `--unused-params` looks for exactly that: a TS parameter named `_x` whose AS3
 counterpart reads `paramN` at the same rank. The decompiler numbers parameters positionally, which
@@ -112,6 +122,15 @@ every rule is mutation-covered):
   factored into a helper or a table. The hoisting rule must NOT be extended to calls — a method
   name is in its own file merely by being declared there, which would have hidden the
   `refreshBuilderStatus()` that was a real defect.
+- Four notation gaps found by checking its own output, each worth a family of false positives:
+  the constants index read only single quotes, so `WindowMouseEvent`'s **backtick**-declared
+  members were unindexed and every switch using `WME_DOUBLE_CLICK` was reported; the decompiler
+  **escapes apostrophes** inside double-quoted strings and the port does not; it expands
+  `Math.PI` and `Number.MAX_VALUE` into their literals, and splitting `1.7976931348623157e+308`
+  even produced a phantom "308".
+
+**24 fixtures now, and every rule is mutation-covered** — including the two the mutation pass
+caught as decorative, which is the whole reason to run it.
 
 **And one hygiene hole the probe walked into.** `DoorbellWidgetHandler.processEvent()` carried its
 trace inside a JSDoc block, so the probe compared the helper declared below it instead — and
