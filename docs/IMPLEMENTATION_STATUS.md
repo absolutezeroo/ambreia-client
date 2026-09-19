@@ -99,6 +99,27 @@ Three more passes after those, and the same shape again:
 | `IssueManager.updateSanctionData()` | the whole method — a `log.debug` where AS3 builds the sanction label and pushes it to the issue handler or the account's mod-action view. `ModActionCtrl` says it in its own header: the default-sanction button "stays disabled until it does" |
 | `RoomSessionHandler.onRoomReady()` | `RoomID` in the crash report — the last line of that family |
 
+**The best signal of the whole campaign is not in the body diff at all: it is a comment.** The
+broadcast stub was literally `// Show broadcast alert dialog` followed by a closing brace, and
+that shape is greppable — a comment naming an action with no code after it. **Six in the port,
+six of them real**, where the literals signal runs at one in three:
+
+| | |
+|---|---|
+| `onBroadcastMessageEvent()` | a hotel-wide announcement displayed nothing — and the line above it was `message.replace(…)` with the result discarded, so a multi-line one would have arrived as a single run |
+| `showCallCreatedNotification()` | did not exist: sending a call for help produced **no answer at all**, no receipt and no FAQ link |
+| `onRoomMessagesNotification()` | "N messages were posted in <room>" parsed and dropped |
+| `onDoorbell()` / `onFlatAccessDenied()` | ringing a closed door showed neither "waiting" nor "nobody answered" |
+| `onCanCreateRoomEvent()` | the answer to the click: neither the form nor the refusal with its reason |
+| `onRoomInfoUpdated()` | the message says a room changed without saying what; AS3 re-requests it, the port kept the stale data |
+
+**Its sibling is the stale stub marker**, which the port has been bitten by before
+(`project_todo_blockers_are_stale`): `RoomDesktop.roomEngineEventHandler()` was "will route to
+appropriate handling when widgets are ported" — all 47 are — and it was the last thing between
+the engine announcing game mode and any widget hearing it;
+`HabboNavigator.openCatalogClubPage()` was "no-op until catalog is wired", while the method
+immediately below it carried the same sentence and already called the catalog.
+
 **The highest-yield search is now direct, not per-module.** Two of those were a parameter accepted
 and ignored, so `--unused-params` looks for exactly that: a TS parameter named `_x` whose AS3
 counterpart reads `paramN` at the same rank. The decompiler numbers parameters positionally, which
