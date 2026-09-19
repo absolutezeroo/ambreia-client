@@ -7,6 +7,7 @@ import type {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
 import {ActivityPointTypeEnum} from '@habbo/catalog/purse/ActivityPointTypeEnum';
 import {PurseEvent} from '@habbo/catalog/purse/PurseEvent';
 import {ToolbarDisplayExtensionIds} from '../../../ToolbarDisplayExtensionIds';
+import {ColorConverter} from '@room/utils/ColorConverter';
 import {CurrencyIndicatorBase} from '../CurrencyIndicatorBase';
 import {formatPurseAmount} from '../PurseAmountFormatter';
 
@@ -73,7 +74,7 @@ export class SeasonalCurrencyIndicator extends CurrencyIndicatorBase
     {
         if(!this._toolbar) return 0;
 
-        return this.hexToNumber(this._toolbar.getProperty(`seasonalcurrency.preset.${this.currencyColor}.border`));
+        return ColorConverter.hexToUint(this._toolbar.getProperty(`seasonalcurrency.preset.${this.currencyColor}.border`));
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/toolbar/extensions/purse/indicators/SeasonalCurrencyIndicator.as::get currencyTextColor()
@@ -81,7 +82,7 @@ export class SeasonalCurrencyIndicator extends CurrencyIndicatorBase
     {
         if(!this._toolbar) return 0;
 
-        return this.hexToNumber(this._toolbar.getProperty(`seasonalcurrency.preset.${this.currencyColor}.font`));
+        return ColorConverter.hexToUint(this._toolbar.getProperty(`seasonalcurrency.preset.${this.currencyColor}.font`));
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/toolbar/extensions/purse/indicators/SeasonalCurrencyIndicator.as::get seasonalCurrencyId()
@@ -213,13 +214,5 @@ export class SeasonalCurrencyIndicator extends CurrencyIndicatorBase
             icon.style = ActivityPointTypeEnum.getIconStyleFor(this.displayedActivityPointType, this._toolbar.configuration, true);
             icon.fitToSize?.();
         }
-    }
-
-    private hexToNumber(value: string): number
-    {
-        const normalized = value.replace('#', '').replace('0x', '');
-        const parsed = parseInt(normalized, 16);
-
-        return Number.isNaN(parsed) ? 0 : parsed;
     }
 }
