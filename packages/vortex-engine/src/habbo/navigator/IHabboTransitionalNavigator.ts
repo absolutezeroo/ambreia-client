@@ -91,12 +91,17 @@ export interface IHabboTransitionalNavigator extends IHabboNavigator
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/navigator/IHabboTransitionalNavigator.as::registerParameter()
     registerParameter(key: string, param: string, value: string): string;
 
-    getButton(assetName: string, stateSuffix: string, callback: (event: WindowEvent, window: IWindow) => void, x?: number, y?: number, index?: number): IWindowContainer | null;
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/navigator/IHabboTransitionalNavigator.as::getButton()
+    getButton(assetName: string, stateSuffix: string, callback: ((event: WindowEvent, window: IWindow) => void) | null, x?: number, y?: number, index?: number): IWindowContainer | null;
 
-    // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/navigator/IHabboTransitionalNavigator.as::refreshButton()
-    refreshButton(container: IWindowContainer, name: string, visible: boolean, callback: (event: WindowEvent, window: IWindow) => void, index: number, tooltip?: string | null): void;
+    // AS3 passes `null` for the callback wherever a button is only decoration — `createEntry()`
+    //   does it four times — and the implementation has always handled it. The interface declared
+    //   it non-null, so every such call site had to be written around the type.
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/navigator/IHabboTransitionalNavigator.as::refreshButton()
+    refreshButton(container: IWindowContainer, name: string, visible: boolean, callback: ((event: WindowEvent, window: IWindow) => void) | null, index: number, tooltip?: string | null): void;
 
-    getButtonImage(assetName: string, suffix?: string): unknown | null;
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/navigator/IHabboTransitionalNavigator.as::getButtonImage()
+    getButtonImage(assetName: string, suffix?: string): ImageBitmap | null;
 
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/navigator/IHabboTransitionalNavigator.as::openCatalogClubPage()
     openCatalogClubPage(source: string): void;

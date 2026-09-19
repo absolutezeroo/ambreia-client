@@ -314,19 +314,19 @@ export class LegacyNavigator implements IHabboTransitionalNavigator
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/navigator/transitional/LegacyNavigator.as::getButton()
-    getButton(assetName: string, stateSuffix: string, callback: (event: WindowEvent, window: IWindow) => void, x: number = 0, y: number = 0, index: number = 0): IWindowContainer | null
+    getButton(assetName: string, stateSuffix: string, callback: ((event: WindowEvent, window: IWindow) => void) | null, x: number = 0, y: number = 0, index: number = 0): IWindowContainer | null
     {
         return this._oldNavigator?.getButton(assetName, stateSuffix, callback, x, y, index) ?? null;
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/navigator/transitional/LegacyNavigator.as::refreshButton()
-    refreshButton(container: IWindowContainer, name: string, visible: boolean, callback: (event: WindowEvent, window: IWindow) => void, index: number, tooltip: string | null = null): void
+    refreshButton(container: IWindowContainer, name: string, visible: boolean, callback: ((event: WindowEvent, window: IWindow) => void) | null, index: number, tooltip: string | null = null): void
     {
         this._oldNavigator?.refreshButton(container, name, visible, callback, index, tooltip);
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/navigator/transitional/LegacyNavigator.as::getButtonImage()
-    getButtonImage(assetName: string, suffix: string = '_png'): unknown | null
+    getButtonImage(assetName: string, suffix: string = '_png'): ImageBitmap | null
     {
         return this._oldNavigator?.getButtonImage(assetName, suffix) ?? null;
     }

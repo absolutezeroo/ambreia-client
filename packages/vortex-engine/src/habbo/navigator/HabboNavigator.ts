@@ -807,7 +807,7 @@ export class HabboNavigator extends Component implements IHabboNavigator, ILinkE
 	 * showing it — the same reason `prepareButton()` refuses to re-fetch one it already has.
 	 */
     // AS3: .../src/com/sulake/habbo/navigator/HabboNavigator.as::getButton()
-    getButton(assetName: string, stateSuffix: string, callback: (event: WindowEvent, window: IWindow) => void, x: number = 0, y: number = 0, index: number = 0): IWindowContainer | null
+    getButton(assetName: string, stateSuffix: string, callback: ((event: WindowEvent, window: IWindow) => void) | null, x: number = 0, y: number = 0, index: number = 0): IWindowContainer | null
     {
         const windowManager = this._windowManager;
 

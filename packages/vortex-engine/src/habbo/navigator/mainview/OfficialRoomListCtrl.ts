@@ -123,7 +123,10 @@ export class OfficialRoomListCtrl implements IViewCtrl
 
             const created = this._navigator.officialRoomEntryManager!.createEntry(isOdd);
 
-            if(created === null) return false;
+            // AS3 cannot fail here and has no guard. The port's `createEntry()` can return null,
+            // and `false` means "keep going" to the `while(true)` caller — so a missing layout
+            // hung the browser instead of stopping the list.
+            if(created === null) return true;
 
             this._itemList!.addListItem(created);
             entry = created;
