@@ -7,7 +7,6 @@ import {IssueHandler} from './IssueHandler';
 import type {ModActionCtrl} from './ModActionCtrl';
 import {IssueBrowser} from './IssueBrowser';
 import {IssueBundle} from './IssueBundle';
-import {Logger} from '@core/utils/Logger';
 import type {ModerationManager} from './ModerationManager';
 import {PickIssuesMessageComposer} from '@habbo/communication/messages/outgoing/moderation/PickIssuesMessageComposer';
 import {
@@ -18,8 +17,7 @@ import {
     CloseIssueDefaultActionMessageComposer
 } from '@habbo/communication/messages/outgoing/moderation/CloseIssueDefaultActionMessageComposer';
 import {ModToolSanctionComposer} from '@habbo/communication/messages/outgoing/moderation/ModToolSanctionComposer';
-
-const log = Logger.getLogger('habbo.moderation.IssueManager');
+import type {SanctionTypeData} from '@habbo/communication/messages/parser/moderation/CfhSanctionMessageParser';
 
 /**
  * Core issue/report management.
@@ -594,10 +592,44 @@ export class IssueManager
 	 * @param accountId - The account ID
 	 * @param sanctionData - The sanction data object
 	 */
+    /**
+	 * The sanction the server proposes for an account, turned into the one line a moderator
+	 * reads: the sanction's name, `(avatar)` when it touches the avatar only, its length — in
+	 * DAYS past twenty-four hours, in hours below — and any trade lock or machine ban appended
+	 * with `&`.
+	 *
+	 * This was a `log.debug` and nothing else, so the "default sanction" the moderation tool
+	 * waits for never arrived and its button stayed disabled. Where it goes depends on how the
+	 * request was made: from an issue, to the handler of whichever bundle holds that issue; from
+	 * an account lookup with no issue, straight to that account's own mod-action view.
+	 */
     // AS3: .../src/com/sulake/habbo/moderation/IssueManager.as::updateSanctionData()
-    updateSanctionData(issueId: number, accountId: number, sanctionData: unknown): void
+    updateSanctionData(issueId: number, accountId: number, sanctionData: SanctionTypeData | null): void
     {
-        log.debug('Update sanction data:', issueId, accountId, sanctionData);
+        if(sanctionData === null) return;
+
+        let label = sanctionData.name + (sanctionData.avatarOnly ? ' (avatar) ' : ' ');
+
+        label += sanctionData.sanctionLengthInHours > 24
+            ? `${sanctionData.sanctionLengthInHours / 24} days`
+            : `${sanctionData.sanctionLengthInHours}h`;
+
+        if(sanctionData.tradeLockInfo !== '') label += ` & ${sanctionData.tradeLockInfo}`;
+        if(sanctionData.machineBanInfo !== '') label += ` & ${sanctionData.machineBanInfo}`;
+
+        if(issueId > 0)
+        {
+            for(const bundle of this._bundles.values())
+            {
+                if(!bundle.contains(issueId)) continue;
+
+                this._issueHandlers.get(bundle.id)?.showDefaultSanction(accountId, label);
+            }
+
+            return;
+        }
+
+        this._modActionViews.get(accountId)?.showDefaultSanction(accountId, label);
     }
 
     /**
