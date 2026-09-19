@@ -97,10 +97,11 @@ export class LevelDetailsRenderer implements IVariableFxRenderer
     private _frame: VariableFxFrame = new VariableFxFrame();
 
     /**
-     * TODO(AS3): `_SafeStr_10568` is ASSIGNED in `renderFrame()` (to the digit count) and read
-     *   nowhere in the AIR dump — a dead field. Kept so the assignment in `renderFrame()` is a
-     *   faithful transcription rather than a silent omission; delete both if a later build shows
-     *   it was never meant to exist.
+     * A dead field in the source, and ported as one. `_SafeStr_10568` has exactly three
+     * occurrences in the whole AIR dump — its declaration (l.59), one assignment in
+     * `renderFrame()` (l.284) and the decompiler's identifier footer — so nothing reads it.
+     * Kept because the assignment in `renderFrame()` is then a faithful transcription rather
+     * than a silent omission; there is no behaviour owed here.
      */
     // AS3: .../renderers/level/LevelDetailsRenderer.as::_lastRenderedDigitCount (name derived)
     private _lastRenderedDigitCount: number = 0;

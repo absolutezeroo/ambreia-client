@@ -88,17 +88,39 @@ export interface ISkinData
  */
 export class BitmapSkinParser
 {
+    // The eight state names a skin XML may carry, as the AS3 class publishes them. Three keep a
+    // readable identifier in the primary tree (`WINDOW_STATE_DEFAULT`/`_ACTIVE`/`_HOVERING`); the
+    // other five are obfuscated there and named `ACTIVE`/`FOCUSED`/… in the 2016 tree, so the
+    // `WINDOW_STATE_` prefix on them is DERIVED from the three that survived — the *values* are
+    // the source's own.
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/core/window/graphics/_SafeCls_4380.as::WINDOW_STATE_DEFAULT
+    public static readonly WINDOW_STATE_DEFAULT: string = 'default';
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/core/window/graphics/_SafeCls_4380.as::WINDOW_STATE_ACTIVE
+    public static readonly WINDOW_STATE_ACTIVE: string = 'active';
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/core/window/graphics/_SafeCls_4380.as::WINDOW_STATE_FOCUSED
+    public static readonly WINDOW_STATE_FOCUSED: string = 'focused';
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/core/window/graphics/_SafeCls_4380.as::WINDOW_STATE_HOVERING
+    public static readonly WINDOW_STATE_HOVERING: string = 'hovering';
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/core/window/graphics/_SafeCls_4380.as::WINDOW_STATE_SELECTED
+    public static readonly WINDOW_STATE_SELECTED: string = 'selected';
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/core/window/graphics/_SafeCls_4380.as::WINDOW_STATE_PRESSED
+    public static readonly WINDOW_STATE_PRESSED: string = 'pressed';
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/core/window/graphics/_SafeCls_4380.as::WINDOW_STATE_DISABLED
+    public static readonly WINDOW_STATE_DISABLED: string = 'disabled';
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/core/window/graphics/_SafeCls_4380.as::WINDOW_STATE_LOCKED
+    public static readonly WINDOW_STATE_LOCKED: string = 'locked';
+
     /** State name → state flag mapping (AS3 BitmapSkinParser.parseState switch). */
     private static readonly STATE_FLAGS: Record<string, number> =
         {
-            'default': 0,
-            'active': 1,
-            'focused': 2,
-            'hovering': 4,
-            'selected': 8,
-            'pressed': 16,
-            'disabled': 32,
-            'locked': 64
+            [BitmapSkinParser.WINDOW_STATE_DEFAULT]: 0,
+            [BitmapSkinParser.WINDOW_STATE_ACTIVE]: 1,
+            [BitmapSkinParser.WINDOW_STATE_FOCUSED]: 2,
+            [BitmapSkinParser.WINDOW_STATE_HOVERING]: 4,
+            [BitmapSkinParser.WINDOW_STATE_SELECTED]: 8,
+            [BitmapSkinParser.WINDOW_STATE_PRESSED]: 16,
+            [BitmapSkinParser.WINDOW_STATE_DISABLED]: 32,
+            [BitmapSkinParser.WINDOW_STATE_LOCKED]: 64
         };
 
     /**

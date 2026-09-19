@@ -105,11 +105,10 @@ export function parseElementDescriptionXml(
 //   `addLayout()`/`registerLayoutForRenderState()` per node — so it needs one static helper per
 //   nesting level. This parser returns plain `ISkinData` and the renderer is built from it
 //   afterwards, so parseLayout(), parseLayoutEntityList(), parseTemplateEntityList() and
-//   parseState() are the `.map()` bodies below rather than four more functions. The state-name
-//   constants that go with them (`WINDOW_STATE_DEFAULT` etc.) are the keys of
-//   `WindowState.STATE_NAME_TO_VALUE`, and parseState()'s name→bit switch is
-//   `BitmapSkinParser.STATE_FLAGS`; `as3-member-coverage.mjs` reports all seven as absent because
-//   it joins on the citing file, and neither of those two cites this AS3 class.
+//   parseState() are the `.map()` bodies below rather than four more functions. The eight
+//   state-name constants that go with them live on the engine's `BitmapSkinParser`, which is the
+//   real port of this AS3 class and now cites it member by member, and parseState()'s name→bit
+//   switch is that class's `STATE_FLAGS`, keyed off those same constants.
 // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/core/window/graphics/_SafeCls_4380.as::parseSkinDescription()
 export function parseSkinXml(
     xml: string,

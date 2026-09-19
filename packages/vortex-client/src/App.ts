@@ -933,6 +933,17 @@ export class VortexApp
      */
     private readonly _globalPosScratch = {x: 0, y: 0};
 
+    // DEVIATION: AS3's `createLoadingScreen()` is a method OF this class — it news up a
+    //   `HabboLoadingScreen` sized off `stage`, nudges the bar to 0.6 and `addChild`s it. All
+    //   three have a home here and none of them can be that method. The screen is a DOM overlay
+    //   that sizes itself at 100%/100% and appends itself in its own constructor, so there is no
+    //   stage to measure and no child to add; the 0.6 survives as `CORE_RATIO` in `init()`, which
+    //   is the same ceiling reached progressively rather than in one jump. What is left — the
+    //   `new` — is hoisted to `index.ts` ON PURPOSE: it runs before `new VortexApp()` so that a
+    //   failure inside the constructor or `init()` still has a screen to show its error on, which
+    //   `index.ts`'s own `.catch()` relies on. Injecting it also keeps this class with one owner
+    //   for the screen's lifetime — the second, ungated owner is a bug this file has had before.
+    // AS3: sources/WIN63-202607011411-782849652/src/binaryData/HabboAir.as::createLoadingScreen()
     constructor(loadingScreen?: VortexLoadingScreen)
     {
         this._loadingScreen = loadingScreen ?? null;

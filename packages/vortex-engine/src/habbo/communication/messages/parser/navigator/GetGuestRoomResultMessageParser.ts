@@ -1,5 +1,6 @@
 import type {IMessageParser} from '@core/communication/messages/IMessageParser';
 import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
+import type {IDisposable} from '@core/runtime/IDisposable';
 import {GuestRoomData, RoomModerationSettings} from '../../incoming/navigator';
 import {RoomChatSettings} from '../roomsettings/RoomChatSettings';
 
@@ -14,7 +15,7 @@ import {RoomChatSettings} from '../roomsettings/RoomChatSettings';
  *
  * @see sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2064/_SafeCls_2063.as
  */
-export class GetGuestRoomResultMessageParser implements IMessageParser
+export class GetGuestRoomResultMessageParser implements IMessageParser, IDisposable
 {
     private _enterRoom: boolean = false;
 
@@ -123,5 +124,22 @@ export class GetGuestRoomResultMessageParser implements IMessageParser
         this._openingConnection = wrapper.readBoolean();
 
         return true;
+    }
+
+    /**
+	 * No `_disposed` flag, deliberately: AS3 carries none either and answers `disposed` off the
+	 * moderation settings being null, so that one field is both the payload and the flag. A parser
+	 * that has never parsed therefore reads as disposed, which is the source's own behaviour.
+	 */
+    // AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2064/_SafeCls_2063.as::get disposed()
+    get disposed(): boolean
+    {
+        return this._roomModerationSettings === null;
+    }
+
+    // AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2064/_SafeCls_2063.as::dispose()
+    dispose(): void
+    {
+        this._roomModerationSettings = null;
     }
 }

@@ -169,10 +169,12 @@ export class NumberDisplayRendererBase implements IVariableFxRenderer
     }
 
     /**
-     * TODO(AS3): both subclasses override this and NOTHING in the AIR dump calls it — the hook has
-     *   two implementations and no caller. Ported as declared rather than dropped, because the
-     *   caller is presumably in code this port has not reached yet (the stacked-additions layer is
-     *   the obvious candidate); revisit when that lands and either wire it or say why it is dead.
+     * A hook with two implementations and no caller, in the source as here. `resolveBitmapDataClassLayer`
+     * has exactly three occurrences in the AIR dump — this declaration and the two overrides in
+     * `BakedColorNumberDisplayRenderer` / `RecolorableNumberDisplayRenderer` — and the port carries
+     * all three. The stacked-additions layer, which was the candidate caller when this was first
+     * written, has since landed and does not call it either. Nothing is owed; it is declared so the
+     * two overrides have something to override, exactly as in AS3.
      */
     // AS3: .../renderers/number/NumberDisplayRendererBase.as::resolveBitmapDataClassLayer()
     protected resolveBitmapDataClassLayer(): VariableFxDrawable | null

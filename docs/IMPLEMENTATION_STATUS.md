@@ -69,6 +69,73 @@ single missing member — so 45 commands landed and the number went 304 → 309.
 things is worth less than five covering five, and any reading of this file that treats the total as
 a score will get that backwards.
 
+### The marker backlog, emptied — and the tracking flags nobody was writing (2026-09-19)
+
+`todo-inventory.mjs` read 9 `TODO(AS3)` and `as3-member-coverage.mjs` 5 absent public members, both
+having risen from 0 with the Variable FX work. Both are back down: **1 marker, 0 absents.** Almost
+none of it was porting; it was checking claims that had gone stale, which is the recurring lesson
+of this file.
+
+**Five of the nine markers were in `HabboTracking`, and four of the five were wrong.** Each said the
+same thing — "the bus has no emitter in this port, so subscribing would be a listener with no
+speaker". Measured:
+
+- **The ten `SEARCHTYPE_*` navigator events.** `MainViewCtrl.sendTrackingEvent()` emits all eleven
+  and has since it was ported; the marker predates it and was never re-checked. They are subscribed
+  now, onto `legacyTrackGoogle("navigator", …)`. Two labels are not their constant lower-cased —
+  `my_favorites` (no `u`) and `highest_score` — and are copied verbatim. AS3 subscribes ten of the
+  eleven and has no case for `MY_FREQUENT_HISTORY`; neither has this.
+- **The catalog bus.** Two of its four subscriptions were live all along (`CATALOG_PAGE_OPENED`
+  from `CatalogNavigator`, `CATALOG_FURNI_PURCHASE` from `HabboCatalog`). The other two were the
+  real gap and it was on the *emitter* side: `HabboCatalog.toggleCatalog()` never dispatched
+  `HABBO_CATALOG_TRACKING_EVENT_OPEN`/`_CLOSE`, and skipped `trackGoogle("catalogue","open")` too.
+  Both restored at AS3's own place in the method, outside the recycler branch this port guards on
+  `_recycler`.
+- **The help bus** is the one the marker got right, and for the wrong reason: nothing emits it
+  *here*, and nothing emits it in AS3 either — `HABBO_HELP_TRACKING_EVENT_CLOSED`/`_DEFAULT` appear
+  in the enum and in `HabboTracking`'s dependency list and in no dispatch site, in any tree. That
+  is a faithfully dead pair, so it is ported, not skipped.
+
+**And the whole mechanism was inert anyway.** The handlers switched on `eventType(args)`, which
+reads the emitted payload — but all 28 emit sites call `events.emit(TYPE)` with no payload, so the
+switch matched nothing and **not one error-context flag had ever been written**, after the pass
+that existed to start writing them. The subscription already knows its own type; it now passes it,
+`eventType()` is gone, and `_errorContextFlags` is filled at field-init rather than in
+`initComponent()` (AS3 fills it before `super()`, and `setErrorContextFlag()` bounds-checks against
+`length`, so a flag arriving early was dropped in silence).
+
+`scripts/check-tracking-buses.mjs` failed on the help subscription, correctly by its old rule. The
+rule was too strong: the defect is the port LOSING an emitter, so it now falls back to the primary
+tree and separates "silent here" from "silent in AS3 too". 39 subscriptions, 0 real silent buses.
+
+**The four remaining markers were not work.** `_lastRenderedDigitCount` (assigned once, read
+nowhere in the AIR dump) and `resolveBitmapDataClassLayer()` (a base plus two overrides, no caller
+anywhere) are dead in the source and ported as such — each now says so with the occurrence count
+instead of promising a revisit. `WindowController.getGraphicContext()` keeps its marker: the two
+overrides need draw-into-parent, which is the `WindowComposite` rewrite.
+
+**`VariablesWebApiAddon` is ported** — the last AIR file outside VariableFx, and the one marker
+that *was* work. 171 lines of add-on plus the `ApiKeySection` preset (120 l. AS3), `ButtonPreset.set
+buttonText` and `IUserDefinedRoomEventsCtrl.getCurrentWiredId()`, both AIR-only members, and three
+messages. Headers follow the raid-protection precedent and needed no reassignment this time: AIR's
+composer 2819 and event 59 are unused in both tables of the WIN63 registry, in `HabboMessages.ts`
+and in the emulator, so both keep AIR's own number, declared on both sides. **The server has
+neither handler**: no key is minted, so the dialog builds and the generate button answers nothing.
+
+**A live wire mismatch fell out of checking those ids.** The emulator sent
+`VariableFxConfigUpdateMessageComposer` on **267**, which WIN63 spends on `FriendFurniCancelLock`
+and the client registers as exactly that — so every Variable FX config push was decoded by the
+wrong parser and no configured bar could appear. The client's own comment had recorded the correct
+assignment (AIR 267 → 3390) and the emulator had not followed it. Fixed in `vortex-emulator`;
+`VariableFxConfigRemove` has no composer there at all and is still owed.
+
+The five absent members were three files: `dispose()`/`get disposed` on the guest-room-result
+parser (AS3 answers `disposed` off the moderation settings being null — no `_disposed` flag, here
+either), `HabboAir.createLoadingScreen()`, which is a `DEVIATION` and now says why (the screen is a
+self-appending DOM overlay built in `index.ts` *before* `VortexApp`, so a constructor failure still
+has somewhere to report), and the eight `WINDOW_STATE_*` constants, which existed only as magic
+strings in `BitmapSkinParser.STATE_FLAGS` and are now the named surface that table is keyed off.
+
 ### A Vortex skin could not add anything without forking the dump (2026-09-17)
 
 VortexCoin had no icon, so it needed a currency icon style — two `<template>`s, two `<layout>`s and
