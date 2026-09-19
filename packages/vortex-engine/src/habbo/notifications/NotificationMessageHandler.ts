@@ -586,16 +586,23 @@ export class NotificationMessageHandler implements IAvatarImageListener
 	 *
 	 * @see source_as_win63/habbo/notifications/class_3353.as onBroadcastMessageEvent()
 	 */
+    /**
+	 * A hotel-wide broadcast, and it showed nothing: the dialog was a `// Show broadcast alert
+	 * dialog` comment. The line above it was worse than missing — `message.replace(...)` with the
+	 * result thrown away, which in AS3 is the same mistake and in JavaScript is guaranteed to be
+	 * one, strings being immutable. The server escapes its newlines as a literal `\r`, so without
+	 * the substitution a multi-line announcement arrives as one run-on line.
+	 */
     // AS3: .../src/com/sulake/habbo/notifications/_SafeCls_1951.as::onBroadcastMessageEvent()
     private onBroadcastMessageEvent(event: IMessageEvent): void
     {
         const parser = (event as HabboBroadcastMessageEvent).parser as HabboBroadcastMessageEventParser;
+        const message = parser.messageText.replace(/\\r/g, '\r');
 
-        const message = parser.messageText;
-
-        message.replace(/\\r/g, '\r');
-
-        // Show broadcast alert dialog
+        this._notifications?.windowManager?.simpleAlert(
+            '${notifications.broadcast.title}', '', message, '', '', null,
+            'illumina_alert_illustrations_frank_neutral_png'
+        );
     }
 
     /**
