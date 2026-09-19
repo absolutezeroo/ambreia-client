@@ -495,10 +495,15 @@ export class HabboNavigator extends Component implements IHabboNavigator, ILinkE
         this.send(new RemoveOwnRoomRightsRoomMessageComposer(roomId));
     }
 
+    /**
+	 * Opens the room-create form — one line in AS3, and it logged instead. Two live callers ask
+	 * for it: the guild window's "create a room for this guild", and the navigator's own
+	 * room-limit reply. Both got nothing.
+	 */
     // AS3: .../src/com/sulake/habbo/navigator/HabboNavigator.as::startRoomCreation()
-    startRoomCreation(): void 
+    startRoomCreation(): void
     {
-        log.debug('Starting room creation');
+        this.transitionalNavigator?.roomCreateViewCtrl?.show();
     }
 
     createRoom(name: string, description: string, model: string, categoryId: number, maxUsers: number, tradeMode: number): void 
