@@ -358,23 +358,45 @@ export class HabboNavigator extends Component implements IHabboNavigator, ILinkE
         log.debug(`Go to room network: ${roomId}, homeRoom=${homeRoomId}`);
     }
 
+    /**
+	 * `roomCategory` is the room's RANK in the list the user clicked it from, and it was accepted
+	 * and ignored: every entry reported position 0, when it reported at all. AS3 keys the category
+	 * on the selected tab and sends `rank + 1`, or 0 when there is no rank.
+	 */
     // AS3: .../src/com/sulake/habbo/navigator/HabboNavigator.as::goToRoom()
-    goToRoom(roomId: number, closeNavigator: boolean = true, password: string = '', _roomCategory: number = -1, skipOpc: boolean = false): void 
+    goToRoom(roomId: number, closeNavigator: boolean = true, password: string = '', roomCategory: number = -1, skipOpc: boolean = false): void
     {
         log.info(`Going to room: ${roomId}`);
 
-        if(closeNavigator) 
+        if(closeNavigator)
         {
             this.closeNavigator();
         }
 
-        if(!this._roomSessionManager) 
+        if(!this._roomSessionManager)
         {
             log.error('RoomSessionManager not available');
             return;
         }
 
         this._roomSessionManager.gotoRoom(roomId, password, '', skipOpc);
+
+        const selected = this.tabs?.getSelected() ?? null;
+
+        if(selected === null) return;
+
+        const rank = roomCategory > -1 ? roomCategory + 1 : 0;
+        const filterCategory = selected.tabPageDecorator.filterCategory ?? '';
+
+        // `id - 1`, AS3's own rebase: the tab ids are 1-based and the switch is not.
+        switch(selected.id - 1)
+        {
+            case 0: this.trackNavigationDataPoint('Events', 'go.events', String(roomId), rank); break;
+            case 1: this.trackNavigationDataPoint(filterCategory, 'go.rooms', String(roomId), rank); break;
+            case 2: this.trackNavigationDataPoint(filterCategory, 'go.me', String(roomId), rank); break;
+            case 3: this.trackNavigationDataPoint(filterCategory, 'go.official', String(roomId), rank); break;
+            case 4: this.trackNavigationDataPoint('Search', 'go.search', String(roomId), rank); break;
+        }
     }
 
     // AS3: .../src/com/sulake/habbo/navigator/HabboNavigator.as::performTagSearch()

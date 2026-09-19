@@ -285,14 +285,19 @@ export class MonsterPlantSeedConfirmationView implements IGetImageListener
         }
     };
 
+    /**
+	 * `data` is a guard, not a source: AS3's `updatePreviewImage(param1)` uses it only to bail on
+	 * `!param1`, then re-reads both images from the asset library by name. The port had the
+	 * re-read and not the guard, so a failed load still refreshed the preview.
+	 */
     // AS3: .../contextmenu/MonsterPlantSeedConfirmationView.as::imageReady()
-    public imageReady(id: number, _data: ImageBitmap | null): void
+    public imageReady(id: number, data: ImageBitmap | null): void
     {
         if(this._disposed) return;
 
         if(this._previewImageId === id)
         {
-            this.updatePreviewImage();
+            if(data !== null) this.updatePreviewImage();
 
             this._previewImageId = 0;
         }
