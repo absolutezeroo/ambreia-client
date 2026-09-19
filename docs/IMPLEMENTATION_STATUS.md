@@ -132,6 +132,22 @@ every rule is mutation-covered):
 **24 fixtures now, and every rule is mutation-covered** — including the two the mutation pass
 caught as decorative, which is the whole reason to run it.
 
+**Two whole-repo sweeps were tried on top of the per-module passes, and only one is worth
+repeating.** `--unused-params` earned its place: it found the room-owner commands, the wall-item
+pickup and the navigator's room rank, and its remaining 34 are mostly documented decisions that
+only lacked the marker. The **size ratio is not a sweep**: a list of the 49 worst AS3-to-TS
+statement drops was checked four deep and every one was a false positive — `getWidgetMessages()`
+is 67 `push` calls against one `return [...]`, `contentLoaded()` and `applySpecialChatContent()`
+are bodies factored into a helper, and the fourth was a trace used as a cross-reference rather
+than a citation. Statement counts stay what the header calls them, a last-resort smell, and the
+literals are the signal.
+
+**A trace that cross-references rather than cites is the probe's remaining blind spot.** Twice now
+a member carried `// AS3: X.as::otherMember()` to explain where a value comes from, and the diff
+faithfully compared it against that other member's body. Both cost a full investigation to
+dismiss. There is no rule that separates the two; the only defence is reading the citation before
+believing the finding.
+
 **And one hygiene hole the probe walked into.** `DoorbellWidgetHandler.processEvent()` carried its
 trace inside a JSDoc block, so the probe compared the helper declared below it instead — and
 `check-as3-trace.mjs` requires `// AS3:`, a line comment, so that member is untraced as far as
