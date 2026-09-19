@@ -129,6 +129,7 @@ import type {
 import type {
     ActivityPointsMessageParser
 } from '@habbo/communication/messages/parser/notifications/ActivityPointsMessageParser';
+import {EventLogMessageComposer} from '@habbo/communication/messages/outgoing/tracking/EventLogMessageComposer';
 
 const log = Logger.getLogger('habbo.quest.QuestMessageHandler');
 
@@ -318,15 +319,20 @@ export class QuestMessageHandler implements IDisposable
 
         log.info(`Quest completed: ${parser.questData?.campaignCode} quest: ${parser.questData?.id}`);
 
-        // Dispatch seasonal quest completed event if applicable
         if(parser.questData)
         {
             this._engine.questController?.onQuestCompleted(parser.questData, parser.showDialog);
 
-            this._engine.events.emit(
-                QuestCompletedEvent.QUEST_SEASONAL,
-                new QuestCompletedEvent(QuestCompletedEvent.QUEST_SEASONAL, parser.questData)
-            );
+            // The gate is AS3's and it was missing: the event fired for EVERY completed quest,
+            // and `seasonalcalendar/MainWindow` listens to it — so the calendar reacted to
+            // ordinary quests as though they were its own.
+            if(this._engine.isSeasonalQuest(parser.questData))
+            {
+                this._engine.events.emit(
+                    QuestCompletedEvent.QUEST_SEASONAL,
+                    new QuestCompletedEvent(QuestCompletedEvent.QUEST_SEASONAL, parser.questData)
+                );
+            }
         }
     }
 
@@ -344,6 +350,13 @@ export class QuestMessageHandler implements IDisposable
 
         log.debug(`Quest cancelled: ${parser.quest?.id}`);
         this._engine.questController?.onQuestCancelled(parser.quest?.campaignChainCode ?? '');
+
+        // A quest can be cancelled for two reasons and only one of them is the player's doing.
+        // Without this the expired ones simply vanished from the list with no explanation.
+        if(parser.expired)
+        {
+            this._engine.windowManager?.alert('${quests.expired.title}', '${quests.expired.body}', 0, null);
+        }
     }
 
     /**
@@ -510,6 +523,14 @@ export class QuestMessageHandler implements IDisposable
         const parser = event.parser as HabboAchievementNotificationMessageEventParser;
 
         if(!parser) return;
+
+        // Levelling an achievement is reported before the controller is told, and it was not
+        // reported at all. The name sent is the badge's BASE name — `getBadgeBaseName()` strips
+        // the level suffix — so the five levels of one achievement aggregate as one thing.
+        const badgeBaseName = this._engine.localization?.getBadgeBaseName(parser.data?.badgeCode ?? '') ?? '';
+
+        this._engine.send(new EventLogMessageComposer(
+            'Achievements', badgeBaseName, 'Leveled', '', parser.data?.level ?? 0));
 
         this._engine.achievementsResolutionController?.onLevelUp(parser.data);
 
