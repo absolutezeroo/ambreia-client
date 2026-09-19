@@ -719,24 +719,36 @@ export class HabboWebApiSession implements IHabboWebApiSession, IApiListener
     }
 
     /**
-     * AS3: addHeaders(request)
      * Adds device ID and type headers to the request.
      */
+    // DEVIATION: AS3 sends these three as `X-Habbo-Device-ID`, `x-habbo-api-deviceid` and
+    //   `X-Habbo-Device-Type` (HabboWebApiSession.as:200-202). Renamed: this hotel is Vortex, and
+    //   the only thing on the other end is `Vortex.WebApi`, which reads none of the three — so the
+    //   old names were a former hotel's branding travelling to our own API and answering to
+    //   nobody. The duplicate spelling is AS3's own and is kept: it sends the id twice, once
+    //   title-cased and once lower-cased, because the two were read by different services.
     // AS3: .../src/com/sulake/habbo/communication/HabboWebApiSession.as::addHeaders()
-    private addHeaders(headers: Record<string, string>): void 
+    private addHeaders(headers: Record<string, string>): void
     {
-        headers['X-Habbo-Device-ID'] = this._deviceId;
-        headers['x-habbo-api-deviceid'] = this._deviceId;
-        headers['X-Habbo-Device-Type'] = 'web';
+        headers['X-Vortex-Device-ID'] = this._deviceId;
+        headers['x-vortex-api-deviceid'] = this._deviceId;
+        headers['X-Vortex-Device-Type'] = 'web';
     }
 
     /**
-     * AS3: generateDeviceId(machineId)
-     * Generates a random device ID. In AS3, this was SHA1(SHARED_SECRET + machineId).
-     * In the browser, we use crypto.randomUUID() or a random hex string.
+     * Generates a device ID.
      */
+    // DEVIATION: AS3 returns `machineId + ":" + SHA1(SHARED_SECRET + machineId)` — an id a server
+    //   can RECOMPUTE, and one that is stable for a given machine. This returns a fresh random
+    //   UUID per page load: no machine id to hash (Flash read one off `Capabilities`; a browser
+    //   has no equivalent that is not fingerprinting), and no hash, because `crypto.subtle` is
+    //   async and this is called from a constructor. Two consequences worth knowing before
+    //   relying on it: the value identifies nothing across reloads, and it has neither the `:`
+    //   nor the digest, so a server that validates the shape rejects it outright. Nothing does
+    //   today — it goes out on the `*-Device-ID` headers above and `Vortex.WebApi` reads none of
+    //   them — which is the only reason this is a note and not a defect.
     // AS3: .../src/com/sulake/habbo/communication/HabboWebApiSession.as::generateDeviceId()
-    private generateDeviceId(): string 
+    private generateDeviceId(): string
     {
         if(typeof crypto !== 'undefined' && crypto.randomUUID) 
         {

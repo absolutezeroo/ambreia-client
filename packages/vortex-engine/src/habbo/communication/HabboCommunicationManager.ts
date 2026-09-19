@@ -21,6 +21,7 @@ import type {IHabboWebApiSession} from './IHabboWebApiSession';
 import {HabboWebApiSession} from './HabboWebApiSession';
 import {IID_CoreCommunicationManager} from "@iid/IIDCoreCommunicationManager";
 import {ErrorReportStorage} from '@core/utils/ErrorReportStorage';
+import {HabboErrorVariableEnum} from '@habbo/tracking/HabboErrorVariableEnum';
 
 const log = Logger.getLogger('habbo.communication.HabboCommunicationManager');
 
@@ -324,6 +325,14 @@ export class HabboCommunicationManager extends Component implements IHabboCommun
 	 * AS3: updateHostParameters()
 	 * Reads connection.info.host and connection.info.port from configuration
 	 * and updates the internal host/port list.
+	 *
+	 * The AS3 body looks nothing like this and yet does exactly this: it rebuilds the two property
+	 * names at runtime from arrays of character codes (`[65162,65162,65158,65155]` and friends,
+	 * through `getKeyValue()`) so that `connection.info.host` appears nowhere in the SWF. It is
+	 * anti-tamper, not behaviour — the key looked up is the same string — and reproducing it in a
+	 * readable port would hide the one thing this method is about. Hence the plaintext keys, and
+	 * hence `member-body-diff.mjs` reporting eight "missing" numbers here that are the obfuscation
+	 * payload itself.
 	 */
     // AS3: .../src/com/sulake/habbo/communication/HabboCommunicationManager.as::updateHostParameters()
     updateHostParameters(): void
@@ -461,24 +470,34 @@ export class HabboCommunicationManager extends Component implements IHabboCommun
         this.tryNextPort();
     }
 
+    /**
+	 * `setParameter`, not `addDebugData`: the two are different halves of a crash report, and all
+	 * three of these went into the wrong one. A parameter is a named slot the report carries —
+	 * which is what `HabboErrorVariableEnum` declares these keys for, and why nothing was ever
+	 * written under them — while debug data is an appended list. AS3 puts the times and the
+	 * offending payload in the slots and only the message QUEUE in the list.
+	 */
     // AS3: .../src/com/sulake/habbo/communication/HabboCommunicationManager.as::messageReceived()
     messageReceived(messageId: string): void
     {
-        ErrorReportStorage.addDebugData('rece_msg_time', String(Date.now()));
+        ErrorReportStorage.setParameter(
+            HabboErrorVariableEnum.ERROR_VARIABLE_RECEIVED_MESSAGE_TIME, String(Date.now()));
         this.appendMessageQueue('R', messageId);
     }
 
     // AS3: .../src/com/sulake/habbo/communication/HabboCommunicationManager.as::messageSent()
     messageSent(messageId: string): void
     {
-        ErrorReportStorage.addDebugData('sent_msg_time', String(Date.now()));
+        ErrorReportStorage.setParameter(
+            HabboErrorVariableEnum.ERROR_VARIABLE_SENT_MESSAGE_TIME, String(Date.now()));
         this.appendMessageQueue('S', messageId);
     }
 
     // AS3: .../src/com/sulake/habbo/communication/HabboCommunicationManager.as::messageParseError()
     messageParseError(message: IMessageDataWrapper): void
     {
-        ErrorReportStorage.addDebugData('sent_msg_data', String(message));
+        ErrorReportStorage.setParameter(
+            HabboErrorVariableEnum.ERROR_VARIABLE_SENT_MESSAGE_DATA, String(message));
         this.setMessageQueueErrorDebugData();
     }
 
