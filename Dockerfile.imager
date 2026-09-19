@@ -71,4 +71,17 @@ VOLUME /cache
 
 EXPOSE 8081
 
+# The server already has the route — src/server.ts serves `/health` with the cache sizes, the room
+# pipeline's state and a database ping. The probe only asks for a 2xx: a database reported "down"
+# in that body is an upstream's problem, and restarting the imager does not fix it.
+#
+# `node -e` rather than curl, and no apt layer to get one: node:22-slim ships neither curl nor
+# wget, and node 22 has a global fetch. The port is read back out of the environment so overriding
+# IMAGER_PORT does not leave the probe knocking on 8081.
+#
+# start-period is generous because the imager resolves its avatar configuration and warms the
+# asset host over HTTP before it listens.
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD ["node", "-e", "fetch(`http://127.0.0.1:${process.env.IMAGER_PORT ?? 8081}/health`).then(r => process.exit(r.ok ? 0 : 1), () => process.exit(1))"]
+
 CMD ["node", "packages/vortex-imager/dist/index.js"]

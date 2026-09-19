@@ -81,3 +81,16 @@ COPY --from=build /src/packages/vortex-client/dist /srv
 # gamedata/hashes.json.
 
 EXPOSE 80
+
+# This container's own build, and nothing else. `/` is the SPA entry point, so a 200 means Caddy is
+# up AND /srv holds an index.html — an empty build output falls through `try_files` to a 404 rather
+# than passing.
+#
+# Every upstream in the Caddyfile is deliberately outside the probe. The emulator being down is not
+# this container being unhealthy, and probing /webapi would turn one outage into two restarting
+# services.
+#
+# wget rather than curl: it is the busybox applet already in the alpine base, and this image ships
+# no other HTTP client. `-O /dev/null` rather than `--spider`, which not every busybox build has.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+    CMD wget -q -O /dev/null http://127.0.0.1/ || exit 1

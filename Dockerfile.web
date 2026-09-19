@@ -48,3 +48,9 @@ COPY Caddyfile.web /etc/caddy/Caddyfile
 COPY --from=build /src/packages/vortex-web/dist /srv
 
 EXPOSE 80
+
+# Same probe and same reasoning as the client's Dockerfile: `/` proves Caddy is up and /srv holds a
+# build, the two upstreams (/api, /habbo-imaging) stay out of it so an emulator outage does not
+# restart the website, and wget is the busybox applet the alpine base already carries.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+    CMD wget -q -O /dev/null http://127.0.0.1/ || exit 1
