@@ -2,6 +2,7 @@ import type {HabboToolbar} from '../../../HabboToolbar';
 import type {IHabboCatalog} from '@habbo/catalog/IHabboCatalog';
 import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
+import type {ITextWindow} from '@core/window/components/ITextWindow';
 import type {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
 import {ActivityPointTypeEnum} from '@habbo/catalog/purse/ActivityPointTypeEnum';
 import {PurseEvent} from '@habbo/catalog/purse/PurseEvent';
@@ -177,12 +178,15 @@ export class SeasonalCurrencyIndicator extends CurrencyIndicatorBase
     {
         if(!this.window) return;
 
-        const name = this.window.findChildByName('seasonal_name');
+        // AS3 assigns `textColor`, which is the glyph colour. `color` is WindowController's, and on
+        // a text window it sets the fill behind the glyphs - so the label kept the layout's own
+        // `text_color` and the `seasonalcurrency.preset.*.font` variable read as having no effect.
+        const name = this.window.findChildByName('seasonal_name') as ITextWindow | null;
 
-        if(name) 
+        if(name)
         {
-            name.caption = this.getActivityPointName(this.displayedActivityPointType);
-            name.color = this.currencyTextColor;
+            name.caption = this._catalog?.getActivityPointName(this.displayedActivityPointType) ?? '';
+            name.textColor = this.currencyTextColor;
         }
 
         const bg = this.window.findChildByName('seasonal_bg');
@@ -211,12 +215,7 @@ export class SeasonalCurrencyIndicator extends CurrencyIndicatorBase
         }
     }
 
-    private getActivityPointName(type: number): string 
-    {
-        return this._localization?.getLocalization(`achievements.activitypoint.${type}`, `Currency ${type}`) ?? `Currency ${type}`;
-    }
-
-    private hexToNumber(value: string): number 
+    private hexToNumber(value: string): number
     {
         const normalized = value.replace('#', '').replace('0x', '');
         const parsed = parseInt(normalized, 16);
