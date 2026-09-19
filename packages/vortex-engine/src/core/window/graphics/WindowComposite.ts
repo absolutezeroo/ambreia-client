@@ -460,6 +460,14 @@ export class WindowComposite
         // an ancestor already painted (e.g. the cover art behind it) without
         // anything replacing it. Draw it straight into the composite instead,
         // same as any other bitmap window.
+        //
+        // An *empty* wrapper is the third case and must paint nothing at all. AS3 gives it a
+        // GC_TYPE_CONTAINER — an empty Sprite — which has no skin buffer, so `WindowRendererItem`
+        // blits nothing and the parent's pixels stay put. Clearing there erases whatever the
+        // window already painted underneath: `camera_editor_xml` stacks `save_click_catcher` and
+        // `purchase_display_object`, both pure click catchers with no display object, exactly on
+        // top of `save_button` and `purchase_button`, and both buttons came out as black holes
+        // punched through to the page background.
         if(window.type === WindowType.DISPLAY_OBJECT_WRAPPER)
         {
             const displayObject = (window as unknown as {getDisplayObject?: () => unknown}).getDisplayObject?.();
@@ -468,7 +476,7 @@ export class WindowComposite
             {
                 ctx.drawImage(displayObject, absX, absY);
             }
-            else
+            else if(displayObject !== null && displayObject !== undefined)
             {
                 ctx.clearRect(absX, absY, w, h);
             }
