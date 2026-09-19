@@ -29,6 +29,7 @@ import type {IHabboTracking} from './IHabboTracking';
 import {HabboLoginTrackingStep} from './HabboLoginTrackingStep';
 import {HabboErrorVariableEnum} from './HabboErrorVariableEnum';
 import {ErrorReportStorage} from '@core/utils/ErrorReportStorage';
+import {Exception} from '@core/runtime/exceptions/Exception';
 import {ComponentEvents} from '@core/runtime';
 import {IID_HabboWindowManager} from '@iid/IIDHabboWindowManager';
 import {IID_HabboNavigator} from '@iid/IIDHabboNavigator';
@@ -226,12 +227,19 @@ export class HabboTracking extends Component implements IHabboTracking, IUpdateR
     }
 
     /**
-	 * Track an event via Google Analytics (no-op in web client)
+	 * Track an event via Google Analytics
 	 *
 	 * @param category The event category
 	 * @param action The event action
 	 * @param label Optional numeric label
 	 */
+    // DEVIATION: the three `FlashExternalInterface.*` calls this class makes — `track`,
+    //   `legacyTrack` and `logError` — are calls INTO the page that embedded the SWF, through an
+    //   API that exists because Flash could not reach the DOM. The port IS the page, and the hotel
+    //   ships no analytics endpoint for them to reach, so all three log instead of calling out.
+    //   The arguments are kept in AS3's own order and spelling, which is what makes them
+    //   forwardable the day one exists; `ExternalInterface.available` has no counterpart either,
+    //   so the unavailable-branch text is gone with it.
     // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::trackGoogle()
     trackGoogle(category: string, action: string, label: number = -1): void
     {
@@ -239,12 +247,14 @@ export class HabboTracking extends Component implements IHabboTracking, IUpdateR
     }
 
     /**
-	 * Legacy Google Analytics tracking (no-op in web client)
+	 * Legacy Google Analytics tracking
 	 *
 	 * @param category The event category
 	 * @param action The event action
 	 * @param labels Optional array of label values
 	 */
+    // DEVIATION: see `trackGoogle()` — `FlashExternalInterface.legacyTrack` is the same
+    //   page-callback mechanism, and it logs here for the same reason.
     // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::legacyTrackGoogle()
     legacyTrackGoogle(category: string, action: string, labels?: unknown[]): void
     {
@@ -256,6 +266,8 @@ export class HabboTracking extends Component implements IHabboTracking, IUpdateR
 	 *
 	 * @param message The error message
 	 */
+    // DEVIATION: see `trackGoogle()` — `FlashExternalInterface.logError` is the same page callback.
+    //   The message still reaches a human: the bug reporter captures `log.error`.
     // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::logError()
     logError(message: string): void
     {
@@ -335,6 +347,10 @@ export class HabboTracking extends Component implements IHabboTracking, IUpdateR
 	 * @param step The login step identifier
 	 * @param extra Optional extra data
 	 */
+    // DEVIATION: see `trackGoogle()` — `FlashExternalInterface.logLoginStep` is the same page
+    //   callback and logs here instead. The `processlog.enabled` gate above it is AS3's own and
+    //   is kept: it decides whether the step is reported at all, and only the first `log.debug`
+    //   (AS3's own unconditional trace) precedes it.
     // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::trackLoginStep()
     trackLoginStep(step: string, extra?: string): void
     {
@@ -345,8 +361,6 @@ export class HabboTracking extends Component implements IHabboTracking, IUpdateR
             return;
         }
 
-        // In the web client, login step tracking is handled differently
-        // than in the Flash client (no ExternalInterface)
         log.debug(`[LoginStep] ${step}${extra ? ' ' + extra : ''}`);
     }
 
@@ -360,16 +374,20 @@ export class HabboTracking extends Component implements IHabboTracking, IUpdateR
     {
         const currentTime = performance.now();
 
+        // Both counters go into the crash report, which is the only place AS3 ever reads them —
+        // they were incremented and logged here and nothing carried them anywhere.
         if(this._currentTime > -1 && currentTime < this._currentTime)
         {
             this._invalidTimeCounter++;
             log.warn('Invalid time detected, count:', this._invalidTimeCounter);
+            ErrorReportStorage.addDebugData('Invalid time counter', `Invalid times: ${this._invalidTimeCounter}`);
         }
 
         if(this._currentTime > -1 && currentTime - this._currentTime > 15000)
         {
             this._timeLeapCounter++;
             log.warn('Time leap detected, count:', this._timeLeapCounter);
+            ErrorReportStorage.addDebugData('Time leap counter', `Time leaps: ${this._timeLeapCounter}`);
         }
 
         this._currentTime = currentTime;
@@ -621,7 +639,7 @@ export class HabboTracking extends Component implements IHabboTracking, IUpdateR
 	 * arrives on the event itself, which is what is logged instead.
 	 */
     // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::onError()
-    private onError = (event: {message?: string; fatal?: boolean}): void =>
+    private onError = (event: {message?: string; fatal?: boolean; code?: number; error?: Error | null}): void =>
     {
         this.storeErrorDetails(event);
         this.logError(event?.message ?? '');
@@ -632,8 +650,13 @@ export class HabboTracking extends Component implements IHabboTracking, IUpdateR
 	 * how a crash report says which screens were open when it happened. That is the entire reason
 	 * the six bus subscriptions above exist.
 	 */
+    /**
+	 * Everything below `error_ctx` was missing, and the report was the poorer for exactly the
+	 * fields that say what happened: no description, no category, no stack trace. The three keys
+	 * were already declared in `HabboErrorVariableEnum` and written by nobody.
+	 */
     // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::storeErrorDetails()
-    private storeErrorDetails(event: {fatal?: boolean}): void
+    private storeErrorDetails(event: {message?: string; fatal?: boolean; code?: number; error?: Error | null}): void
     {
         ErrorReportStorage.setParameter(
             HabboErrorVariableEnum.ERROR_VARIABLE_IS_FATAL, String(event?.fatal === true));
@@ -645,6 +668,37 @@ export class HabboTracking extends Component implements IHabboTracking, IUpdateR
         // AS3 follows this with `flash_version` and `avg_update` off its FramerateTracker
         // equivalent. `flash_version` has no counterpart; `avg_update` is left to the tracker that
         // owns it rather than reached into from here.
+        ErrorReportStorage.setParameter(
+            HabboErrorVariableEnum.ERROR_PARAM_KEY_DESCRIPTION, event?.message ?? '');
+
+        // AS3's `ErrorEvent.category` is an int and this port keeps it as one; the emitter spells
+        // it `code` on the payload.
+        ErrorReportStorage.setParameter(
+            HabboErrorVariableEnum.ERROR_PARAM_KEY_CATEGORY, String(event?.code ?? 0));
+
+        // AS3 skips the key when the chain yields nothing; the port's `getChainedStackTrace()`
+        // answers '' rather than null for the same case.
+        const stack = event?.error ? Exception.getChainedStackTrace(event.error) : '';
+
+        if(stack !== '')
+        {
+            ErrorReportStorage.setParameter(HabboErrorVariableEnum.ERROR_PARAM_KEY_DATA, stack);
+        }
+
+        this._communication?.setMessageQueueErrorDebugData();
+
+        // DEVIATION: AS3 reports `System.totalMemory`, which every Flash player answers. The
+        //   browser equivalent is `performance.memory`, non-standard and Chromium-only, so the
+        //   line is written when the engine offers it and skipped — rather than guessed at —
+        //   when it does not.
+        // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::storeErrorDetails()
+        const memory = (performance as {memory?: {usedJSHeapSize?: number}}).memory;
+
+        if(memory?.usedJSHeapSize !== undefined)
+        {
+            ErrorReportStorage.addDebugData(
+                'Memory usage', `Memory usage: ${Math.round(memory.usedJSHeapSize / 1048576)} MB`);
+        }
     }
 
     // AS3: .../src/com/sulake/habbo/tracking/HabboTracking.as::setErrorContextFlag()
@@ -692,6 +746,13 @@ export class HabboTracking extends Component implements IHabboTracking, IUpdateR
         }
 
         const parser = (event as RoomEntryInfoMessageEvent).parser as RoomEntryInfoMessageParser;
+
+        // The other half of the crash report's room context, and it was missing: a report filed
+        // from inside a room said neither which room nor that the user was in one.
+        ErrorReportStorage.setParameter(
+            HabboErrorVariableEnum.ERROR_VARIABLE_LAST_VISITED_ROOM, String(parser.guestRoomId));
+        ErrorReportStorage.setParameter(HabboErrorVariableEnum.ERROR_VARIABLE_IS_IN_ROOM, 'true');
+
         this.legacyTrackGoogle('navigator', 'private', [parser.guestRoomId]);
     }
 

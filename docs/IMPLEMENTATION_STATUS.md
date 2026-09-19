@@ -69,6 +69,61 @@ single missing member — so 45 commands landed and the number went 304 → 309.
 things is worth less than five covering five, and any reading of this file that treats the total as
 a score will get that backwards.
 
+### A fifth measure: looking INSIDE a member (2026-09-19)
+
+The four measures answer "is it there". None of them looks inside a body, and the dominant defect
+in this port is no longer a missing method — it is a present, correctly named, correctly traced
+method that dropped one line. `toggleCatalog()` without its two dispatches, `disabledStyles`
+fading to 0.4 where AS3 fades to 0.5, `onBuildersClubFurniCount()` without `refreshBuilderStatus()`:
+every one of those was found by a human reading the neighbouring member, which is chance.
+
+`scripts/member-body-diff.mjs` measures it. What makes it possible HERE and not in an ordinary
+rewrite is rule 30 plus the port's habit of keeping AS3's identifiers: a trace names the AS3
+member, so the two bodies can be lined up and compared on the three things a port cannot rename
+away — **string literals, numeric literals, and calls to names the port knows**. A value in the
+AS3 body with no occurrence in the TS body is the lead.
+
+Four noise sources had to be answered before the output was worth reading, and each is a real
+property of this port rather than a hack:
+
+- **An event name is referenced through its enum**, never as a literal (`.claude/rules` and the
+  `feedback_events_use_enum_not_string` lesson). So every constant in the corpus that HOLDS the
+  string counts as the string. Without this, every switch handler reports its whole switch.
+- **One AS3 member, several TS declarations.** The port legitimately splits a 200-statement
+  `processWidgetMessage` switch into a method per case; comparing each piece against the whole
+  switch reported the other cases as missing from every one. Grouped and diffed as a union:
+  6,406 → 6,102.
+- **A value hoisted to a class constant** is not a value lost. A literal the member lacks but its
+  file has is dropped (`UsersMessageParser.SWIM_COLOURS`, 32 colours, was the model): 6,102 → 5,610.
+  `--strict` keeps them.
+- **A `DEVIATION:` marker already answers the question** better than any count, so those members
+  are excluded — 71 of them today.
+
+**It found three real defects in the first module it was pointed at**, all in the crash-report
+path, all invisible to the other four measures:
+
+- `storeErrorDetails()` wrote `is_fatal`, `crash_time` and `error_ctx` and stopped. AS3 also writes
+  `error_desc`, `error_cat` and `error_data` — the message, the category and the chained stack
+  trace — plus the message-queue debug data and a memory line. **A crash report from this client
+  said something had failed and nothing about what.** The three keys were already declared in
+  `HabboErrorVariableEnum` and written by nobody.
+- `update()` incremented `_invalidTimeCounter` and `_timeLeapCounter` and logged them. AS3 puts
+  both into the report through `addDebugData`, which is the only place it ever reads them.
+- `onRoomEnter()` never set `last_room`/`in_room`, so a report filed from inside a room said
+  neither which room nor that the user was in one.
+
+Four more members in the same module turned out to be genuine, undocumented deviations — the
+`FlashExternalInterface.*` calls, which are calls *into the page that embedded the SWF* and have
+no counterpart when the port IS the page. They now say so, which is both the honest marker and
+what takes them out of the measure.
+
+**Read it as a worklist, sorted, per module — never as a total.** Repo-wide it compares 31,222
+members and reports 5,610, and the sampled precision is roughly one real finding in three to five:
+in `habbo/tracking` it reported 14 and 3 were defects, 4 were undocumented deviations, the rest
+were shape. A constructor whose work the port moved into `initialize()`, a helper folded into its
+caller and a branch AS3 itself cannot reach all surface here. `.claude/rules/00-mandate.md` applies
+to this output exactly as to any other audit: read the AS3 body before acting on a line of it.
+
 ### The marker backlog, emptied — and the tracking flags nobody was writing (2026-09-19)
 
 `todo-inventory.mjs` read 9 `TODO(AS3)` and `as3-member-coverage.mjs` 5 absent public members, both
