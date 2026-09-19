@@ -121,6 +121,11 @@ export class TextController extends WindowController implements ITextWindow
 
     protected _textColor: number = 0;
     protected _bold: boolean = false;
+
+    // TS-only: remembers that `_bold` came from a Flash font NAME rather than from a `bold` var,
+    //   so that switching the name back to a regular one can take it away again. Flash needs no
+    //   such flag — there, the two are different fonts and the bold flag is untouched by either.
+    protected _boldFromFontName: boolean = false;
     protected _italic: boolean = false;
     protected _underline: boolean = false;
     protected _fontFace: string = 'Ubuntu, Arial, sans-serif';
@@ -353,6 +358,9 @@ export class TextController extends WindowController implements ITextWindow
     public set bold(value: boolean)
     {
         this._bold = value;
+        // An explicit weight outranks one inferred from a font name, and stops `set fontFace()`
+        // from taking it back on the next assignment.
+        this._boldFromFontName = false;
         this.refreshTextImage();
         // AS3's setBold() writes "bold" whatever the argument is, so turning
         // bold off still marks the weight explicitly set. Ported as written.
@@ -409,12 +417,25 @@ export class TextController extends WindowController implements ITextWindow
         // `font_face="Volter Bold"` windows in the shipped layouts carry no `bold` var, because
         // in Flash there was nothing to carry.
         //
-        // Not applied over a weight already set, so an explicit `bold` var still wins whichever
-        // side of `font_face` it sits on in the layout.
-        if(this._explicitStyle.fontWeight == null && TextStyleManager.isBoldFontName(value))
+        // The inference goes both ways, and it has to: `IssueHandler.updateIssues()` toggles a
+        // row between `"Volter Bold"` and `"Volter"` by assigning this very property, so a
+        // one-way rule would leave every row that was ever highlighted permanently bold. Only a
+        // weight this setter put there is taken back — an explicit `bold` var, or a `bold` set
+        // through `defaultTextFormat`, is left alone whichever side of `font_face` it lands on.
+        if(TextStyleManager.isBoldFontName(value))
         {
-            this._bold = true;
-            this._explicitStyle.fontWeight = 'bold';
+            if(this._explicitStyle.fontWeight == null || this._boldFromFontName)
+            {
+                this._bold = true;
+                this._boldFromFontName = true;
+                this._explicitStyle.fontWeight = 'bold';
+            }
+        }
+        else if(this._boldFromFontName)
+        {
+            this._bold = false;
+            this._boldFromFontName = false;
+            delete this._explicitStyle.fontWeight;
         }
 
         this.refreshTextImage();
@@ -1437,6 +1458,7 @@ export class TextController extends WindowController implements ITextWindow
         cloned._maxLines = this._maxLines;
         cloned._textColor = this._textColor;
         cloned._bold = this._bold;
+        cloned._boldFromFontName = this._boldFromFontName;
         cloned._italic = this._italic;
         cloned._underline = this._underline;
         cloned._fontFace = this._fontFace;

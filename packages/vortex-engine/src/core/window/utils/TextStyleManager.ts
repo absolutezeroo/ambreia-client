@@ -853,8 +853,14 @@ tag {
                 return 'Volter (Goldfish), Ubuntu, Arial, sans-serif';
             case 'Ubuntu bold':
                 return 'Ubuntu, Arial, sans-serif';
+            // Both fields that ask for it hold text laid out in columns — the floor plan's tile
+            // grid (`floor_plan_export_import_xml`) and the wiki source editor
+            // (`habbopedia_edit_xml`) — and both were being handed Ubuntu, a proportional face,
+            // which takes the grid apart. No monospace font ships, so this is the system one: the
+            // glyph atlas declines an unregistered family and the field falls back to
+            // `fillText()`, which is the right trade for a field whose columns have to line up.
             case 'Courier':
-                return 'Ubuntu, Arial, sans-serif';
+                return '"Courier New", Courier, monospace';
             default:
                 return family + ', Arial, sans-serif';
         }
