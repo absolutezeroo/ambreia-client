@@ -124,6 +124,40 @@ were shape. A constructor whose work the port moved into `initialize()`, a helpe
 caller and a branch AS3 itself cannot reach all surface here. `.claude/rules/00-mandate.md` applies
 to this output exactly as to any other audit: read the AS3 body before acting on a line of it.
 
+#### What it is worth — measured, not asserted
+
+A measure whose own error rate is unknown cannot be used to call a module clean, so the same day it
+was built the probe was measured three ways.
+
+**`--self-test`, 12 fixtures.** Every noise rule above was tuned by hand against the repository,
+which means the next tuning can undo one and the output would simply get quieter — indistinguishable
+from progress. The fixtures pin the four noise rules and the signals they must not eat (a dropped
+dispatch, a dropped call, a changed threshold), plus the three body extractors.
+
+**Mutation-checked, and one fixture was decorative.** Breaking each rule in a copy must fail
+exactly one case. Two of three did; the split-switch fixture passed even with the union broken,
+because its `file` contained both bodies and the *hoisting* rule was quietly covering for it. It
+now carries only the first body. **A self-test that has never been shown to fail is not evidence** —
+the same rule as the screenshot harness.
+
+**Recall: 5 of 5 on the defects fixed by hand that day.** `--ts-root` points the TS side at a
+`git worktree` of an older commit while the AS3 side stays put — `sources/` is gitignored, so the
+trees are identical on every commit and the parent of a fix is a replay of the defect. Against
+`247120bf^` the probe names all five: the ten missing `SEARCHTYPE_*` mappings (its top finding in
+the module), `storeErrorDetails`, `update()`, `onRoomEnter()`, and `toggleCatalog()` — the last with
+both missing dispatch literals and `trackGoogle` spelled out. It also flags `HabboCatalog.dispose()`
+at 37 AS3 statements against 2, which nobody has looked at.
+
+**And one miss, which is the most useful result of the three.** Replayed against `dfcb3ef4^` — the
+2026-09-02 fix where a whole `reward_track_item` style was never built — the probe reports nothing.
+Not a heuristic failure: `fillStyleTable()` traces to **PRODUCTION**, whose 2016 body has no
+`reward_track` either, so the comparison was against a ten-year-old build and correctly found
+nothing. **The probe's recall is bounded by where the trace points**, which is the same drift
+`project_production_traced_parsers_drift` and the 2026-08-09 repointing of 3,684 traces are about.
+It cannot repair the citation, so it counts them instead: **2,985 of 31,222 comparisons (9.6%) are
+made against a non-primary tree**, and "no gap" on one of those is a weaker answer than "no gap" on
+the other 28,237. That number is now in the header of every run.
+
 ### The marker backlog, emptied — and the tracking flags nobody was writing (2026-09-19)
 
 `todo-inventory.mjs` read 9 `TODO(AS3)` and `as3-member-coverage.mjs` 5 absent public members, both
