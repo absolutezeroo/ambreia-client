@@ -2470,6 +2470,20 @@ export class RoomMessageHandler implements IRoomMessageHandler
             data.subType,
             data.isRiding
         );
+
+        // The muted marker on entry. `onIgnoreResult()` already handles ignoring someone WHILE in
+        // the room; this is the other half, and without it walking into a room showed everyone on
+        // your ignore list as though they were not. AS3 does it here, per user, behind the same
+        // flag.
+        if(this._roomCreator.configuration?.getBoolean('avatar.ignored.bubble.enabled'))
+        {
+            this._roomCreator.updateObjectUserAction(
+                roomId,
+                data.roomIndex,
+                RoomObjectVariableEnum.AVATAR_IS_MUTED,
+                this._roomCreator.sessionDataManager?.isIgnored(data.webID) === true ? 1 : 0
+            );
+        }
     }
 
     /**

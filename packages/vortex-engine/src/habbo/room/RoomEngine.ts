@@ -5193,17 +5193,82 @@ export class RoomEngine extends Component implements IRoomEngine,
         ) as IRoomObjectController | null;
     }
 
+    /**
+	 * The wall sibling of `disposeObjectFurniture()`, and it had none of what makes that one more
+	 * than a delete: no fly-to-inventory animation, no room-window update, no mouse-cursor
+	 * release. All three are AS3's, and the last one leaks — the object keeps owning a hand cursor
+	 * after it is gone.
+	 */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::disposeObjectWallItem()
     disposeObjectWallItem(
         roomId: number,
         id: number,
-        _pickerId?: number
+        pickerId: number = -1
     ): boolean
     {
         // AS3 drops the pending entry first, before anything else in the method.
         this.getWallItemDataWithId(roomId, id);
 
-        return this.disposeRoomObject(roomId, id, RoomObjectCategoryEnum.OBJECT_CATEGORY_WALL);
+        this.playWallItemPickupAnimation(roomId, id, pickerId);
+
+        const success = this.disposeRoomObject(roomId, id, RoomObjectCategoryEnum.OBJECT_CATEGORY_WALL);
+
+        this.updateObjectRoomWindow(roomId, id, false);
+        this.removeButtonMouseCursorOwner(roomId, RoomObjectCategoryEnum.OBJECT_CATEGORY_WALL, id);
+
+        return success;
+    }
+
+    /**
+	 * Same animation as `playPickupAnimation()`, with the two differences AS3 makes for a wall
+	 * item: the icon comes from `getWallItemIcon()`, and the exclusion is by TYPE rather than by a
+	 * model flag — a post-it and an external image have no inventory icon to fly.
+	 */
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::disposeObjectWallItem()
+    private playWallItemPickupAnimation(roomId: number, id: number, pickerId: number): void
+    {
+        const toolbar = this._toolbar;
+
+        if(toolbar === null || this._sessionDataManager === null) return;
+        if(pickerId !== this._sessionDataManager.userId) return;
+        if(BuilderClubUtils.isBuilderClubId(id) || BuilderClubUtils.isTempId(id)) return;
+
+        const object = this.getRoomObject(roomId, id, RoomObjectCategoryEnum.OBJECT_CATEGORY_WALL);
+
+        if(object === null) return;
+
+        const type = object.getType();
+
+        if(type.indexOf('post_it') !== -1 || type.indexOf('external_image_wallitem') !== -1) return;
+
+        const screenLocation = this.getRoomObjectScreenLocation(
+            roomId, id, RoomObjectCategoryEnum.OBJECT_CATEGORY_WALL
+        );
+
+        if(screenLocation === null) return;
+
+        const model = object.getModel();
+
+        if(model === null) return;
+
+        const typeId = model.getNumber(RoomObjectVariableEnum.FURNITURE_TYPE_ID);
+        const furnitureData = model.getString(RoomObjectVariableEnum.FURNITURE_DATA);
+        const startX = screenLocation.x;
+        const startY = screenLocation.y;
+        const listener: IGetImageListener = {
+            imageReady: (_imageId: number, data: ImageBitmap | null): void =>
+            {
+                if(data !== null) toolbar.createTransitionToIcon(HabboToolbarIconEnum.INVENTORY, data, startX, startY);
+            },
+            imageFailed: (): void =>
+            {
+                // Nothing to do: a missing icon costs the animation, not the pickup.
+            },
+        };
+
+        const icon = this.getWallItemIcon(typeId, listener, furnitureData);
+
+        if(icon.data !== null) toolbar.createTransitionToIcon(HabboToolbarIconEnum.INVENTORY, icon.data, startX, startY);
     }
 
     addObjectUser(
