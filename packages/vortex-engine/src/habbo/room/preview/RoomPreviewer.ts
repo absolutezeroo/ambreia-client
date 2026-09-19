@@ -643,6 +643,9 @@ export class RoomPreviewer
      * `RoomObjectAvatarCarryObjectUpdateMessage.itemName`, and no AvatarLogic — nor anything else
      * under `habbo/room/` — ever reads that field.
      */
+    // DEVIATION: the fifth argument is accepted and dropped, for the reason set out just above —
+    //   checked, not assumed: no caller in the primary tree passes it and nothing reads the field
+    //   it would feed. The marker is what tells `--unused-params` this one is answered.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/preview/RoomPreviewer.as::updateObjectUserAction()
     updateObjectUserAction(action: string, value: number, _parameter: string | null = null): void
     {

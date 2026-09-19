@@ -208,6 +208,11 @@ export class EffectsModel implements IEffectsModel, IInventoryModel
         }
     }
 
+    // DEVIATION: `refresh` drives AS3's `refreshViews()`, which repaints the legacy inventory
+    //   EffectsView this port deliberately does not carry (see the class doc). The live
+    //   equivalent is not lost: the sole caller, `HabboInventory.deselectAllEffects()`, calls
+    //   `notifyChangedEffects()` on the line after this one, which is what the me-menu widget
+    //   listens to.
     // AS3: EffectsModel.as::stopUsingAllEffects()
     stopUsingAllEffects(sendStop: boolean = true, _refresh: boolean = true, clearLastActivated: boolean = false): void
     {

@@ -403,6 +403,13 @@ export class NameChangeDialog
         return this._okIcon != null && this._okIcon.visible;
     }
 
+    /**
+	 * The argument really is discarded, and that is AS3's own doing rather than a porting slip:
+	 * line 366 of `NameChangeDialog.as` opens with `param1 = true;`, overwriting the parameter
+	 * before the two visibility lines read it. The tick is therefore always shown and the alert
+	 * always hidden, whatever the caller passed. Ported as found, and said here because
+	 * `const value = true` otherwise reads exactly like the bug it is faithfully reproducing.
+	 */
     // AS3: .../src/com/sulake/habbo/friendbar/onBoardingHc/NameChangeDialog.as::set nameIsCorrect()
     protected set nameIsCorrect(_value: boolean)
     {

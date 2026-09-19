@@ -113,6 +113,11 @@ export class OfficialRoomEntryManager implements IDisposable
         this._navigator = null;
     }
 
+    // DEVIATION: AS3 fills the entry here — `refreshCell`, `refreshDetails`, `refreshUserCount`,
+    //   height 68. None of those three is ported, deliberately and for the reason set out at the
+    //   top of this class: nothing calls `refreshEntry()`, and the live path for a navigator
+    //   result is the new navigator's `RoomEntryElementFactory`. Also note AS3 takes TWO
+    //   parameters where this takes three, so the ranks do not line up.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/navigator/mainview/OfficialRoomEntryManager.as::refreshNormalEntry()
     private refreshNormalEntry(container: IWindowContainer, _isWide: boolean, _entryData: unknown): void
     {

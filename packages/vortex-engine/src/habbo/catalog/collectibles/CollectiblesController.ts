@@ -827,12 +827,16 @@ export class CollectiblesController extends Component implements ICollectorHub, 
      * Note the first parameter is named `productTypeId` after AS3's own signature but is passed
      * `item.type` by `FurniModel`; the mint tab reads only the second and third.
      */
+    // DEVIATION: AS3 hands `amountChangedForItem()` its FIRST argument; this hands it the second,
+    //   for the reason set out just above — the port's caller (`FurniModel`) feeds `item.type`
+    //   into the first, so passing it on would key the mint tab's count by the wrong number.
     // AS3: CollectiblesController.as::itemAddedToInventory()
     itemAddedToInventory(_productTypeId: number, itemTypeId: number, isWallItem: boolean): void
     {
         this._hubView?.mintInventoryListWidget?.amountChangedForItem('furni', itemTypeId, isWallItem);
     }
 
+    // DEVIATION: the same argument swap as `itemAddedToInventory()` above, for the same reason.
     // AS3: CollectiblesController.as::itemRemovedFromInventory()
     itemRemovedFromInventory(_productTypeId: number, itemTypeId: number, isWallItem: boolean): void
     {

@@ -373,10 +373,11 @@ export class LegacyNavigator implements IHabboTransitionalNavigator
         this._roomCreateViewCtrl.hide();
     }
 
+    /** The `-1` here discarded the room's rank in the list it was clicked from; AS3 forwards it. */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/navigator/transitional/LegacyNavigator.as::goToRoom()
-    goToRoom(roomId: number, closeNavigator: boolean, password: string = '', _roomCategory: number = -1, skipOpc: boolean = false): void
+    goToRoom(roomId: number, closeNavigator: boolean, password: string = '', roomCategory: number = -1, skipOpc: boolean = false): void
     {
-        this._oldNavigator?.goToRoom(roomId, false, password, -1, skipOpc);
+        this._oldNavigator?.goToRoom(roomId, false, password, roomCategory, skipOpc);
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/navigator/transitional/LegacyNavigator.as::isPerkAllowed()
