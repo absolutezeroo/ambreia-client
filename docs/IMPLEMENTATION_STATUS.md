@@ -95,6 +95,9 @@ Three more passes after those, and the same shape again:
 | `AvatarRenderManager.validateAvatarFigure()` | the half that repairs a part which is PRESENT but names a set id the figure data does not have — a garment removed from the hotel draws nothing and was left alone. Also validated at club level 0 where AS3 uses 2, and returned `void` where AS3 answers "was it already sound" |
 | `HabboNavigator.getButton()` | `return null` behind a stale "until asset system is wired"; `PopupCtrl` asks it for a list's scroll arrows |
 | `HTMLTextController.convertLinksToEvents()` | nothing — but the port silently FIXES AS3's greedy `(.*)`, which eats two links into one mangled anchor. Now marked |
+| `QuestMessageHandler` | the alert an EXPIRED quest owes the player (it just vanished); the `isSeasonalQuest()` gate, so `QUEST_SEASONAL` fired for every quest and the seasonal calendar answered ordinary ones; the level-up `EventLog` |
+| `IssueManager.updateSanctionData()` | the whole method — a `log.debug` where AS3 builds the sanction label and pushes it to the issue handler or the account's mod-action view. `ModActionCtrl` says it in its own header: the default-sanction button "stays disabled until it does" |
+| `RoomSessionHandler.onRoomReady()` | `RoomID` in the crash report — the last line of that family |
 
 **The highest-yield search is now direct, not per-module.** Two of those were a parameter accepted
 and ignored, so `--unused-params` looks for exactly that: a TS parameter named `_x` whose AS3
@@ -132,8 +135,13 @@ every rule is mutation-covered):
 **24 fixtures now, and every rule is mutation-covered** — including the two the mutation pass
 caught as decorative, which is the whole reason to run it.
 
-**Two whole-repo sweeps were tried on top of the per-module passes, and only one is worth
-repeating.** `--unused-params` earned its place: it found the room-owner commands, the wall-item
+**Three whole-repo sweeps were tried on top of the per-module passes, and only one is worth
+repeating.** The third was `--dropped-guards`: AS3 writes a guard as an early `return`, and the
+two best finds of the campaign — the room commands with no rights check, the wired trade with no
+requirements check — were exactly that. It does not survive contact either. Checked three deep,
+three false positives: TypeScript compresses guards that AS3 spells out, `||` for three `if`s,
+`?.` for a null check, an if/else for a closure that returned twice. The mode is kept because it
+costs nothing on a single module, but it is not a backlog. `--unused-params` earned its place: it found the room-owner commands, the wall-item
 pickup and the navigator's room rank, and its remaining 34 are mostly documented decisions that
 only lacked the marker. The **size ratio is not a sweep**: a list of the 49 worst AS3-to-TS
 statement drops was checked four deep and every one was a false positive — `getWidgetMessages()`
