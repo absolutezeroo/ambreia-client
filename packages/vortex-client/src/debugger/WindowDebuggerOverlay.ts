@@ -2748,9 +2748,26 @@ function findDeclaredMismatches(root: IWindowDebugNode): {mismatches: IDeclaredM
                 // auto-sizes, the authored height is what the Flash IDE
                 // computed from the player's line metrics and the live height
                 // is what measureFontLineHeight() computed from the browser's.
+                //
+                // Two kinds of field have to come out of the sample, because for
+                // them the authored height is not a rendered line box and the
+                // comparison only produces noise. Both were reported as real
+                // gaps before this filter existed:
+                //
+                // - `multiline`. The authored height is one line at design time;
+                //   the runtime text is as many lines as it needs. A perfectly
+                //   correct two-line field reads as "+15" against a one-line
+                //   authored box (`camera.competition.header`, `removal_disclaimer`).
+                // - A collapsed placeholder. A field authored a few pixels tall
+                //   and grown entirely at runtime says nothing about Flash's
+                //   metrics — `purchase_credit_cost_text` is authored 4x4 and
+                //   read as "Flash 4, port 19 (+15)".
                 const autoSize = hit.vars.get('auto_size');
+                const multiline = hit.vars.get('multiline')?.trim() === 'true';
+                const collapsed = hit.height !== null && hit.height < style.fontSize;
 
-                if(hit.height !== null && autoSize !== undefined && autoSize.trim() !== 'none')
+                if(hit.height !== null && autoSize !== undefined && autoSize.trim() !== 'none'
+                    && !multiline && !collapsed)
                 {
                     heights.push({
                         name: node.name,
