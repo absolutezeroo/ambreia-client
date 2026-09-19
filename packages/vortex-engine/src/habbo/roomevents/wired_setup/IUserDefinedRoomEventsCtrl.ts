@@ -101,4 +101,8 @@ export interface IUserDefinedRoomEventsCtrl
 
     // AS3: _SafeCls_2147.as::hasUIOpen()
     hasUIOpen(): boolean;
+
+    /** AIR-only, and the last member the interface gained: the id of the furni being edited. */
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/roomevents/wired_setup/_SafeCls_2229.as::getCurrentWiredId()
+    getCurrentWiredId(): number;
 }

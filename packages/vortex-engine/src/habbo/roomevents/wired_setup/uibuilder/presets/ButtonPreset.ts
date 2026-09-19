@@ -52,6 +52,13 @@ export class ButtonPreset extends WiredUIPreset
         }
     };
 
+    /** Only the AIR build has this setter; `ApiKeySection` is its one caller, in both trees. */
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/roomevents/wired_setup/uibuilder/presets/ButtonPreset.as::set buttonText()
+    set buttonText(value: string)
+    {
+        this._container.caption = value;
+    }
+
     // AS3: ButtonPreset.as::get window()
     override get window(): IWindow
     {

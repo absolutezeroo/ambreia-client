@@ -1123,6 +1123,16 @@ export class UserDefinedRoomEventsCtrl implements IUserDefinedRoomEventsCtrl
         return this._frame != null;
     }
 
+    /**
+	 * The furni whose wired dialog is open, or -1. AIR-only, and `VariablesWebApiAddon` is its one
+	 * caller: an API key belongs to a furni, so both the request and the answer are keyed by this.
+	 */
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/roomevents/wired_setup/UserDefinedRoomEventsCtrl.as::getCurrentWiredId()
+    getCurrentWiredId(): number
+    {
+        return this._currentDef?.id ?? -1;
+    }
+
     // AS3: UserDefinedRoomEventsCtrl.as::get activeFurniPicks()
     get activeFurniPicks(): number
     {

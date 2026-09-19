@@ -16,3 +16,4 @@ export * from './VariableFxConfigUpdateParser';
 export * from './VariableFxConfigRemoveParser';
 export * from './VariableFxStatusUpdateParser';
 export * from './VariableFxStatusRemoveParser';
+export * from './WiredApiKeyResultParser';

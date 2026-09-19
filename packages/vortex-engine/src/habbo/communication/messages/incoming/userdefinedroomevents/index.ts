@@ -17,3 +17,4 @@ export * from './VariableFxConfigUpdateMessageEvent';
 export * from './VariableFxConfigRemoveMessageEvent';
 export * from './VariableFxStatusUpdateMessageEvent';
 export * from './VariableFxStatusRemoveMessageEvent';
+export * from './WiredApiKeyResultMessageEvent';

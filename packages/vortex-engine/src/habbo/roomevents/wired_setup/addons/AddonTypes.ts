@@ -33,6 +33,7 @@ import {VariableFxBossBarAddon} from './variablefx/VariableFxBossBarAddon';
 import {VariableFxHealthPointsAddon} from './variablefx/VariableFxHealthPointsAddon';
 import {VariableFxLevellingProgressAddon} from './variablefx/VariableFxLevellingProgressAddon';
 import {VariableFxNumberDisplayAddon} from './variablefx/VariableFxNumberDisplayAddon';
+import {VariablesWebApiAddon} from './VariablesWebApiAddon';
 import {VariableFxProgressBarAddon} from './variablefx/VariableFxProgressBarAddon';
 import {VariableFxStatusBarAddon} from './variablefx/VariableFxStatusBarAddon';
 
@@ -79,7 +80,8 @@ export class AddonTypes implements IWiredTypeHolder
         new VariableFxLevellingProgressAddon(),
         new VariableFxStatusBarAddon(),
         new VariableFxBossBarAddon(),
-        new VariableFxNumberDisplayAddon()
+        new VariableFxNumberDisplayAddon(),
+        new VariablesWebApiAddon()
     ];
 
     // AS3: AddonTypes.as::getByCode()

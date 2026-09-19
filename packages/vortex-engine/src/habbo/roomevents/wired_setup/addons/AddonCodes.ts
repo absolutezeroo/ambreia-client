@@ -112,9 +112,6 @@ export class AddonCodes
     // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/roomevents/wired_setup/addons/AddonCodes.as::VARIABLE_FX_NUMBER_DISPLAY
     public static readonly VARIABLE_FX_NUMBER_DISPLAY: number = 1205;
 
-    // The add-on itself is not ported yet; the code is here because `AddonTypes` is what reports an
-    // unported one, and a code with no entry reads exactly like a bug in the dialog.
-    // TODO(AS3): port `VariablesWebApiAddon` — sources/AIR-1.0.31/src/com/sulake/habbo/roomevents/wired_setup/addons/VariablesWebApiAddon.as
     // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/roomevents/wired_setup/addons/AddonCodes.as::VARIABLES_WEB_API
     public static readonly VARIABLES_WEB_API: number = 2002;
 }

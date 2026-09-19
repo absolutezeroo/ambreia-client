@@ -487,7 +487,8 @@ import {
     VariableFxConfigUpdateMessageEvent,
     VariableFxConfigRemoveMessageEvent,
     VariableFxStatusUpdateMessageEvent,
-    VariableFxStatusRemoveMessageEvent
+    VariableFxStatusRemoveMessageEvent,
+    WiredApiKeyResultMessageEvent
 } from './messages/incoming/userdefinedroomevents';
 // Outgoing Composers - User Defined Room Events (Wired)
 import {
@@ -500,7 +501,8 @@ import {
     UpdateTriggerMessageComposer,
     UpdateVariableMessageComposer,
     WiredClickUserMessageComposer,
-    WiredDebugCommandMessageComposer
+    WiredDebugCommandMessageComposer,
+    GenerateWiredApiKeyMessageComposer
 } from './messages/outgoing/userdefinedroomevents';
 import {
     GetAllVariablesMessageComposer
@@ -2322,6 +2324,14 @@ export class HabboMessages implements IMessageConfiguration
         this._events.set(3889, VariableFxStatusUpdateMessageEvent);
         this._events.set(3388, VariableFxStatusRemoveMessageEvent);
 
+        // === WIRED WEB API ===
+        // AIR-1.0.31 only, and the easy case of the three: AIR's event 59 is free as an event AND
+        // as a composer in the WIN63 registry (58 is RewardTrackPremiumPurchaseResult, 59 and 60
+        // are unused), in this file and in the emulator's Revision20260701 headers, so AIR's own
+        // number is kept. The emulator has neither this nor its composer yet; both must be
+        // assigned there identically.
+        this._events.set(59, WiredApiKeyResultMessageEvent);
+
         this._events.set(3287, AllVariablesHashMessageEvent);
         this._events.set(2733, AllVariablesDiffMessageEvent);
         // Overview tab: variable-holders push (WIN63 registry _SafeCls_2046.as: 3506 -> _SafeCls_2537).
@@ -3051,6 +3061,10 @@ export class HabboMessages implements IMessageConfiguration
         this._composers.set(2475, UpdateVariableMessageComposer);
         this._composers.set(510, UpdateSelectorMessageComposer);
         this._composers.set(2790, ApplySnapshotMessageComposer);
+        // Wired web API — AIR-1.0.31 only; see the events block for how these two ids were
+        // settled. 2819 is free as a composer AND as an event in the WIN63 registry (2818 is
+        // WiredTradeAccept), in this file and in the emulator, so AIR's own number is kept.
+        this._composers.set(2819, GenerateWiredApiKeyMessageComposer);
         this._composers.set(984, GetAllVariablesMessageComposer);
         this._composers.set(797, GetAllVariablesDiffMessageComposer);
         this._composers.set(3124, SetWiredMenuPreferencesComposer);

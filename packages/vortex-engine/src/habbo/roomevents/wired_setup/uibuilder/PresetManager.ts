@@ -47,6 +47,7 @@ import {TradeRuleListEditorPreset} from './presets/contracts/TradeRuleListEditor
 import type {NodeOverviewClickCallback} from './presets/contracts/NodeOverviewPreset';
 import {UsageInfoSection} from './presets/sections/UsageInfoSection';
 import {UsageWarningSection} from './presets/sections/UsageWarningSection';
+import {ApiKeySection} from './presets/sections/ApiKeySection';
 import {ChronoMaskFilterPreset} from './presets/applications/ChronoMaskFilterPreset';
 import {ChronoRangeFilterPreset} from './presets/applications/ChronoRangeFilterPreset';
 import {SubVariableCreatorPreset} from './presets/applications/SubVariableCreatorPreset';
@@ -521,6 +522,12 @@ export class PresetManager
     createUsageWarningSection(text: string): UsageWarningSection
     {
         return new UsageWarningSection(this._roomEvents, this, this.wiredStyle, text);
+    }
+
+    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/roomevents/wired_setup/uibuilder/PresetManager.as::createApiKeySection()
+    createApiKeySection(writeKey: boolean, onGenerateKey: (() => void) | null, onKeyChange: ((key: string) => void) | null = null): ApiKeySection
+    {
+        return new ApiKeySection(this._roomEvents, this, this.wiredStyle, writeKey, onGenerateKey, onKeyChange);
     }
 
     // AS3: PresetManager.as::createChronoMaskFilter()
