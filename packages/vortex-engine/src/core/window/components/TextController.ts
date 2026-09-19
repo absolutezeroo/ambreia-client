@@ -402,6 +402,21 @@ export class TextController extends WindowController implements ITextWindow
     public set fontFace(value: string)
     {
         this._fontFace = TextStyleManager.mapFontFamily(value);
+
+        // The stylesheet path infers the weight out of the same name (`parseStyleBlock()`, the
+        // `Volter Bold` arm); this one did not, so a layout that asked for bold the only way
+        // Flash lets it — by naming the bold font — got the regular face. 113 of the 115
+        // `font_face="Volter Bold"` windows in the shipped layouts carry no `bold` var, because
+        // in Flash there was nothing to carry.
+        //
+        // Not applied over a weight already set, so an explicit `bold` var still wins whichever
+        // side of `font_face` it sits on in the layout.
+        if(this._explicitStyle.fontWeight == null && TextStyleManager.isBoldFontName(value))
+        {
+            this._bold = true;
+            this._explicitStyle.fontWeight = 'bold';
+        }
+
         this.refreshTextImage();
         this._explicitStyle.fontFamily = this._fontFace;
     }

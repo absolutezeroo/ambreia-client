@@ -714,8 +714,10 @@ tag {
 
                 style.fontFamily = TextStyleManager.mapFontFamily(rawFamily);
 
-                // "Volter Bold" is a separate font-family in AS3 — infer bold weight
-                if(rawFamily === 'Volter Bold' && style.fontWeight == null) 
+                // "Volter Bold" is a separate font-family in AS3 — infer bold weight.
+                // Shared with the layout path (`TextController.set fontFace()`), which used to
+                // have no such inference at all; `Ubuntu bold` is the other name that occurs.
+                if(style.fontWeight == null && TextStyleManager.isBoldFontName(rawFamily))
                 {
                     style.fontWeight = 'bold';
                 }
@@ -849,11 +851,28 @@ tag {
                 return 'Volter (Goldfish), Ubuntu, Arial, sans-serif';
             case 'Volter Bold':
                 return 'Volter (Goldfish), Ubuntu, Arial, sans-serif';
+            case 'Ubuntu bold':
+                return 'Ubuntu, Arial, sans-serif';
             case 'Courier':
                 return 'Ubuntu, Arial, sans-serif';
             default:
                 return family + ', Arial, sans-serif';
         }
+    }
+
+    /**
+     * Whether a Flash font name carries its weight in the name.
+     *
+     * Flash embeds "Volter Bold" as a font of its own, so a layout that wants bold says so by
+     * naming that font and nothing else — 113 of the 115 `font_face="Volter Bold"` windows in the
+     * shipped layouts carry no `bold` var at all. A CSS family cannot work that way: the port
+     * ships the same file as the *bold weight* of family `Volter (Goldfish)`, so the name has to
+     * be split into family plus weight, and this is the weight half.
+     */
+    // TS-only: Flash has no counterpart — it looks the name up in its own font table.
+    public static isBoldFontName(family: string): boolean
+    {
+        return /\bbold$/i.test(family.trim());
     }
 
     /**
