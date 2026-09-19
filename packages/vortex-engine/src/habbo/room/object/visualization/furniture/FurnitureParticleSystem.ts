@@ -145,6 +145,8 @@ export class FurnitureParticleSystem
         this.fillBackground();
     }
 
+    // TS-only: AS3 allocates the two BitmapDatas inline in `updateCanvas()`; a canvas plus its
+    //   context plus a Texture is enough lines to be worth its own method.
     private createCanvas(width: number, height: number): void
     {
         this._canvas = new OffscreenCanvas(width, height);
@@ -183,6 +185,8 @@ export class FurnitureParticleSystem
      * AS3 only nulls the reference in the two places this is called from — a size change and
      * `copyStateFrom()` — and disposes the bitmap solely in `dispose()`.
      */
+    // TS-only: AS3 writes `_canvas = null` inline at both call sites; a Texture has more pieces
+    //   hanging off it than a BitmapData does.
     private releaseCanvas(): void
     {
         this._canvasTexture = null;
@@ -191,6 +195,8 @@ export class FurnitureParticleSystem
         this._blendCanvas = null;
     }
 
+    // The `dispose()` arm: AS3 calls `BitmapData.dispose()` on both surfaces there and only there.
+    // AS3: .../src/com/sulake/habbo/room/object/visualization/furniture/FurnitureParticleSystem.as::dispose()
     private disposeCanvas(): void
     {
         this._canvasTexture?.destroy(true);
@@ -202,6 +208,8 @@ export class FurnitureParticleSystem
      * Replaces the surface with the background colour — Flash's `fillRect`, which overwrites
      * alpha as well, not a composite.
      */
+    // AS3: .../src/com/sulake/habbo/room/object/visualization/furniture/FurnitureParticleSystem.as::updateCanvas()
+    //   (the two `fillRect(rect, _bgColor)` calls, shared with `updateAnimation()`'s blend==1 arm)
     private fillBackground(): void
     {
         const context = this._canvasContext;
