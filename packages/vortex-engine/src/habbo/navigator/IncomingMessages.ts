@@ -487,7 +487,10 @@ export class IncomingMessages
         if(!parser) return;
 
         log.debug(`Room info updated: ${parser.flatId}`);
-        // Trigger refresh of room info
+
+        // The message says "this room changed", not what changed: AS3 answers it by asking for
+        // the room again. Without that, a settings edit left the navigator showing the old data.
+        this._navigator.send(new GetGuestRoomMessageComposer(parser.flatId, false, false));
     }
 
     // AS3: .../src/com/sulake/habbo/navigator/_SafeCls_1951.as::onRoomRating()
@@ -637,7 +640,26 @@ export class IncomingMessages
         if(!parser) return;
 
         log.debug(`Can create room event: ${parser.canCreateEvent}, error=${parser.errorCode}`);
-        // Handle room event creation permission check result
+
+        // This is the ANSWER to the click on "create an event": either the form opens or the
+        // refusal is shown, and neither happened. The error key is built from the code, so the
+        // player is told which rule stopped them.
+        if(parser.canCreateEvent)
+        {
+            this._navigator.roomEventViewCtrl?.show();
+
+            return;
+        }
+
+        const transitional = this._navigator.transitionalNavigator;
+
+        if(transitional === null) return;
+
+        new SimpleAlertView(
+            transitional,
+            '${navigator.cannotcreateevent.title}',
+            `\${navigator.cannotcreateevent.error.${parser.errorCode}}`
+        ).show();
     }
 
     // AS3: .../src/com/sulake/habbo/navigator/_SafeCls_1951.as::onFlatCreated()
@@ -713,7 +735,13 @@ export class IncomingMessages
         if(!parser) return;
 
         log.debug(`Doorbell: ${parser.userName}`);
-        // Handle doorbell notification
+
+        // An empty name means the bell is YOURS: you rang and are waiting outside. A name means
+        // someone else rang a room you have rights over, which the room-side doorbell widget
+        // handles — hence AS3's early return, kept.
+        if(parser.userName !== '') return;
+
+        this._navigator.doorbell?.showWaiting();
     }
 
     // AS3: .../src/com/sulake/habbo/navigator/_SafeCls_1951.as::onFlatAccessDenied()
@@ -726,7 +754,13 @@ export class IncomingMessages
         if(!parser) return;
 
         log.debug(`Flat access denied: roomId=${parser.flatId}, user=${parser.userName}`);
-        // Handle access denied
+
+        // Same rule as the bell itself: no name means it was your own ring that went unanswered,
+        // and the waiting dialog has to say so rather than hang there.
+        if(parser.userName === null || parser.userName === '')
+        {
+            this._navigator.doorbell?.showNoAnswer();
+        }
     }
 
     /**
