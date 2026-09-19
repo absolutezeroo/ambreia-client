@@ -326,6 +326,11 @@ export class HTMLTextController extends TextFieldController implements IHTMLText
 	 *
 	 * In AS3, this replaced `<a href="http://...">` with `<a href="event:http://...">`.
 	 */
+    // DEVIATION: AS3's two regexes capture the link text with a GREEDY `(.*)`, so a string with
+    //   two links matches from the first `<a` to the LAST `</a>` and both are swallowed into one
+    //   mangled anchor. This port uses `(.*?)`. It is a fix, not a transcription, and it is here
+    //   because Flash hid it: the catalog and help texts that reach this method carry one link
+    //   each, so the bug never had two to eat.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/core/window/components/HTMLTextController.as::convertLinksToEvents()
     private static convertLinksToEvents(html: string): string
     {
