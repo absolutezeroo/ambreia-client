@@ -54,7 +54,7 @@ import type {IRoomWidgetFactory} from './IRoomWidgetFactory';
 import type {IRoomWidgetHandler} from './IRoomWidgetHandler';
 import {RoomDesktopLayoutManager} from './RoomDesktopLayoutManager';
 import {ColorTransitioner} from '@room/utils/ColorTransitioner';
-import type {RoomEngineEvent} from '@habbo/room/events/RoomEngineEvent';
+import {RoomEngineEvent} from '@habbo/room/events/RoomEngineEvent';
 import {RoomEngineObjectEvent} from '@habbo/room/events/RoomEngineObjectEvent';
 import {RoomWidgetRoomObjectUpdateEvent} from './widget/events/RoomWidgetRoomObjectUpdateEvent';
 import {RoomWidgetRoomViewUpdateEvent} from './widget/events/RoomWidgetRoomViewUpdateEvent';
@@ -142,6 +142,7 @@ import type {
 import {
     RoomWidgetRentableBotSkillListUpdateEvent
 } from './widget/events/RoomWidgetRentableBotSkillListUpdateEvent';
+import {RoomWidgetRoomEngineUpdateEvent} from './widget/events/RoomWidgetRoomEngineUpdateEvent';
 import {
     RoomWidgetRentableBotForceOpenContextMenuEvent
 } from './widget/events/RoomWidgetRentableBotForceOpenContextMenuEvent';
@@ -1882,12 +1883,29 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
     }
 
     /**
-     * Handles room engine events (mode changes, zoom, etc.).
+     * Turns the room engine's own mode switch into the widget event the widgets listen for.
+     *
+     * The note this replaces said "will route to appropriate handling when widgets are ported".
+     * They are — all 47 of them — and this was the last thing standing between the engine saying
+     * "this room is now a game" and any widget hearing it.
      */
     // AS3: .../src/com/sulake/habbo/ui/RoomDesktop.as::roomEngineEventHandler()
-    public roomEngineEventHandler(_event: RoomEngineEvent): void 
+    public roomEngineEventHandler(event: RoomEngineEvent): void
     {
-        // Stub — will route to appropriate handling when widgets are ported
+        let update: RoomWidgetRoomEngineUpdateEvent | null = null;
+
+        if(event.type === RoomEngineEvent.REE_NORMAL_MODE)
+        {
+            update = new RoomWidgetRoomEngineUpdateEvent(RoomWidgetRoomEngineUpdateEvent.NORMAL_MODE, event.roomId);
+        }
+        else if(event.type === RoomEngineEvent.REE_GAME_MODE)
+        {
+            update = new RoomWidgetRoomEngineUpdateEvent(RoomWidgetRoomEngineUpdateEvent.GAME_MODE, event.roomId);
+        }
+
+        if(update === null) return;
+
+        this._desktopEvents.emit(update.type, update);
     }
 
     /**

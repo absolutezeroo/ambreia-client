@@ -928,18 +928,20 @@ export class HabboNavigator extends Component implements IHabboNavigator, ILinkE
     }
 
     /**
-     * Opens the catalog club page.
-     * Stub — no-op until catalog is wired.
+     * Opens the catalog's club centre.
+     *
+     * The note this replaces said "no-op until catalog is wired" — it has been for a long time,
+     * and `openCatalogRoomAdsPage()` just below was already using it while carrying the same
+     * stale sentence. `source` is unused in AS3 too: it takes the argument and never reads it.
      */
     // AS3: .../src/com/sulake/habbo/navigator/HabboNavigator.as::openCatalogClubPage()
-    openCatalogClubPage(_source: string): void 
+    openCatalogClubPage(_source: string): void
     {
-        log.debug('openCatalogClubPage');
+        this._catalog?.openClubCenter();
     }
 
     /**
      * Opens the catalog room ads page.
-     * Stub — no-op until catalog is wired.
      */
     // AS3: .../src/com/sulake/habbo/navigator/HabboNavigator.as::openCatalogRoomAdsPage()
     openCatalogRoomAdsPage(): void
