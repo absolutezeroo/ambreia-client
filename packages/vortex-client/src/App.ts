@@ -750,6 +750,15 @@ const LIBRARY_IMAGE_NAMES: ReadonlySet<string> = new Set([
     'dimmer_slider_button',
     'icon_nft',
 
+    // The photo lab's two filter-type tabs. Invisible to the prescribed grep for the same reason
+    // as the chat tray above: `CameraPhotoLab.createTypeButton(type, iconAssetName)` resolves the
+    // name through its parameter, so no literal sits inside the `getAssetByName()` call. Both are
+    // declared in `binaryData/HabboWindowManagerCom.as` and ship as PNGs; without them each tab
+    // drew its frame and nothing inside it. `camera_icon_frame` is the third of the family and is
+    // deliberately absent — AS3 builds two tabs, not three.
+    'camera_icon_colorfilter',
+    'camera_icon_compositefilter',
+
     // HabboCatalog.getSubscriptionProductIcon() / getMintTokenProductIcon(): the two icons every
     // subscription and mint-token product renders with. `fx_icon_*` (its third sibling) is
     // already covered by the prefix rule above.

@@ -1,6 +1,7 @@
 import type {IAssetLibrary} from '@core/assets/IAssetLibrary';
 import type {IWindow} from '@core/window/IWindow';
 import type {IWindowContainer} from '@core/window/IWindowContainer';
+import type {IBitmapWrapperWindow} from '@core/window/components/IBitmapWrapperWindow';
 import type {WindowEvent} from '@core/window/events/WindowEvent';
 import type {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
 import type {CameraPhotoLab} from './CameraPhotoLab';
@@ -135,7 +136,7 @@ export class CameraFxStrengthSlider
 
         if(clickArea) clickArea.procedure = this.shaftProcedure;
 
-        const sliderBase = this._window.findChildByName('slider_base');
+        const sliderBase = this._window.findChildByName('slider_base') as IBitmapWrapperWindow | null;
 
         if(sliderBase !== null && this._sliderBaseAsset !== null)
         {
@@ -145,6 +146,7 @@ export class CameraFxStrengthSlider
             // assigning it. The copy buys nothing: `_activeBaseArea` is only ever touched again by
             // `buttonProcedure`, which sets its `width` — a window property, not a bitmap
             // operation — so the pixels are never mutated and the asset can be assigned whole.
+            sliderBase.bitmap = this._sliderBaseAsset;
             this._activeBaseArea = sliderBase;
         }
 
@@ -152,10 +154,11 @@ export class CameraFxStrengthSlider
 
         if(movementArea !== null)
         {
-            const button = movementArea.findChildByName('slider_button');
+            const button = movementArea.findChildByName('slider_button') as IBitmapWrapperWindow | null;
 
             if(button !== null && this._sliderButtonAsset !== null)
             {
+                button.bitmap = this._sliderButtonAsset;
                 button.procedure = this.buttonProcedure;
 
                 this._referenceWidth = movementArea.width - button.width;

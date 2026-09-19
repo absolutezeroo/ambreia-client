@@ -1,7 +1,9 @@
 import type {IWindow} from '@core/window/IWindow';
 import {Logger} from '@core/utils/Logger';
 import type {IWindowContainer} from '@core/window/IWindowContainer';
+import type {IFrameWindow} from '@core/window/components/IFrameWindow';
 import type {IScrollableGridWindow} from '@core/window/components/IScrollableGridWindow';
+import type {ITextWindow} from '@core/window/components/ITextWindow';
 import type {WindowEvent} from '@core/window/events/WindowEvent';
 import type {WindowKeyboardEvent} from '@core/window/events/WindowKeyboardEvent';
 import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';
@@ -193,7 +195,10 @@ export class CameraPhotoLab
             return;
         }
 
-        const left = this._itemGrid.x;
+        // `addChild` on a frame places the tab in the frame's *outer* space, while `_itemGrid.x`
+        // is measured inside the content area — hence AS3's `margins.left`, which the port had
+        // dropped and which left both tabs short of the grid by the frame's border.
+        const left = (this._window as unknown as IFrameWindow).margins.left + this._itemGrid.x;
         const colorButton = this.createTypeButton(CameraEffect.TYPE_COLORMATRIX, 'camera_icon_colorfilter');
 
         if(colorButton)
@@ -416,6 +421,9 @@ export class CameraPhotoLab
         }
 
         this._itemGrid = this._window.findChildByName('item_grid') as unknown as IScrollableGridWindow | null;
+
+        if(this._itemGrid !== null) this._itemGrid.spacing = 7;
+
         this._imageWindow = this._window.findChildByName('image') as (IWindow & { bitmap?: ImageBitmap | null }) | null;
         this._window.procedure = this.windowEventHandler;
 
@@ -423,8 +431,20 @@ export class CameraPhotoLab
 
         if(captionInput) captionInput.procedure = this.captionProcedure;
 
-        // AS3 lays a transparent Sprite over these two regions to catch clicks; the port routes
-        // both through the window procedure below instead, which the layout already supports.
+        // Both labels are declared 90 wide and drawn left-aligned next to their icon, so the
+        // region's `centerizer` can only centre the pair once the label is shrunk to the text it
+        // actually holds — which is what makes the margin constant above load-bearing.
+        // AS3: .../ui/widget/camera/CameraPhotoLab.as::openPhotoLab()
+        for(const name of ['zoom_text', 'save_text'])
+        {
+            const label = this._window.findChildByName(name) as ITextWindow | null;
+
+            if(label !== null) label.width = label.textWidth + CameraPhotoLab.TEXT_WIDTH_MARGIN;
+        }
+
+        // AS3 lays a transparent Sprite over the purchase and save click catchers; the port has no
+        // display list to host one, so `windowEventHandler` takes both clicks on the control
+        // underneath instead — see the DEVIATION note on those cases.
         this.buildTypeButtons();
         this.setImageAndFilterButtons(image);
 
@@ -703,15 +723,26 @@ export class CameraPhotoLab
                 this.renderAllEffects();
                 break;
 
+            // DEVIATION: AS3 drops an invisible Sprite into each of the two click catchers
+            //   (`beginFill(0xff0000, 0)` + `drawRect`, `setDisplayObject()`) and hangs a Flash
+            //   `click` listener on it — which is why its own switch leaves `save_button` an empty
+            //   case and never mentions `purchase_button` at all. The port has no Flash display
+            //   list to host that Sprite, and the wrappers carry `params="0"`, so
+            //   `hitTestRecursive()` never returns them: only a window with param flag 1 is a hit
+            //   target. The click therefore has to be taken on the control underneath, which is a
+            //   mouse-sensitive region occupying the wrapper's exact rect. The wrapper names are
+            //   kept alongside so the wiring still reads against the AS3.
+            // AS3: .../ui/widget/camera/CameraPhotoLab.as::openPhotoLab()
+            case 'purchase_button':
             case 'purchase_display_object':
                 this.openPurchaseConfirmationDialog();
                 break;
 
+            case 'save_button':
             case 'save_click_catcher':
                 this.offerSaveAsFile();
                 break;
 
-            case 'save_button':
             case 'slider_container':
                 break;
 
