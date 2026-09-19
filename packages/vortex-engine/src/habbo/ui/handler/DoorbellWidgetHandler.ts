@@ -68,12 +68,11 @@ export class DoorbellWidgetHandler implements IRoomWidgetHandler
     }
 
     /**
-     * AS3: .../DoorbellWidgetHandler.as::processEvent()
-     *
      * One session event maps to one widget event of the same meaning. The rejected and accepted
      * cases exist so that a doorbell answered *elsewhere* — by another room owner — still clears
      * the row here.
      */
+    // AS3: .../DoorbellWidgetHandler.as::processEvent()
     processEvent(event: RoomSessionDoorbellEvent): void
     {
         if(event.userName === undefined || event.userName === null) return;

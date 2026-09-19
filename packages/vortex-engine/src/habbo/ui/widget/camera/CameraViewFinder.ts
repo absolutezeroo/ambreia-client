@@ -233,8 +233,12 @@ export class CameraViewFinder
         };
     }
 
+    /**
+	 * `source` is not decoration: it is the only thing the opening event reports — which button
+	 * opened the camera — and the parameter existed here with nothing reading it.
+	 */
     // AS3: .../ui/widget/camera/CameraViewFinder.as::toggleVisible()
-    toggleVisible(_source: string): void
+    toggleVisible(source: string): void
     {
         if(this._window === null) return;
 
@@ -244,6 +248,10 @@ export class CameraViewFinder
         }
         else
         {
+            // AS3 reaches tracking through its `HabboTracking.getInstance()` singleton; this port
+            // replaced that with DI at the call site, and RoomUI is the component that holds it.
+            this._widget.component?.habboTracking?.trackEventLog(
+                'Stories', 'camera', 'stories.camera.opened', source);
             this.show();
             this.setMode(false);
         }

@@ -534,6 +534,9 @@ export class CameraPhotoLab
 
         const sent = this._widget.sendPhotoData();
 
+        this._widget.component?.habboTracking?.trackEventLog(
+            'Stories', 'camera', 'stories.photo.purchase_dialog_opened');
+
         CameraPhotoLab._purchaseDialog.setPrices(
             this._widget.handler?.creditPrice ?? 0,
             this._widget.handler?.ducketPrice ?? 0,
