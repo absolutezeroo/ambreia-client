@@ -6,7 +6,9 @@
  * Container for particle emitters. Manages particle animation, rendering,
  * and sprite delegation.
  */
+import {Texture} from 'pixi.js';
 import type {IGraphicAsset} from '@room/object/visualization/utils/IGraphicAsset';
+import type {IRoomObjectSprite} from '@room/object/visualization/IRoomObjectSprite';
 import type {AnimatedFurnitureVisualization} from './AnimatedFurnitureVisualization';
 import {FurnitureParticleSystemEmitter} from './FurnitureParticleSystemEmitter';
 
@@ -29,6 +31,37 @@ export class FurnitureParticleSystem
     private _canvasOffsetY: number = 0;
     private _scaleFactor: number = 1;
 
+    /**
+     * The surface the particles are drawn onto, which replaces the `canvasId` layer's own texture.
+     *
+     * AS3 clones the layer's `BitmapData` and hands the clone to the sprite; the clone's *pixels*
+     * never survive, because `updateCanvas()` fills the whole thing with `_bgColor` on the next
+     * line. Only its dimensions matter, so this port allocates a blank canvas of the same size
+     * instead of reading the layer's texture back — same result, no GPU readback.
+     */
+    // AS3: .../src/com/sulake/habbo/room/object/visualization/furniture/FurnitureParticleSystem.as::_canvas
+    private _canvas: OffscreenCanvas | null = null;
+    private _canvasContext: OffscreenCanvasRenderingContext2D | null = null;
+    private _canvasTexture: Texture | null = null;
+    // AS3: .../src/com/sulake/habbo/room/object/visualization/furniture/FurnitureParticleSystem.as::_canvasSprite
+    private _canvasSprite: IRoomObjectSprite | null = null;
+    /**
+     * A surface filled with `_bgColor` and nothing else, drawn over the canvas at `_blend` alpha
+     * once per frame when `blend < 1`. That is AS3's fade: the previous frame's particles are
+     * pulled `blend` of the way back to the background instead of being erased, which is what
+     * gives a rocket its trail.
+     */
+    // AS3: .../src/com/sulake/habbo/room/object/visualization/furniture/FurnitureParticleSystem.as::_blendCanvas
+    private _blendCanvas: OffscreenCanvas | null = null;
+    // AS3 keeps this as `_blendTransform.alphaMultiplier`; there is no ColorTransform here.
+    // AS3: .../src/com/sulake/habbo/room/object/visualization/furniture/FurnitureParticleSystem.as::_blend
+    private _blend: number = 1;
+    // Opaque black, and it is load-bearing: the canvas layer of every shipped fireworks furni is
+    // declared `ink="ADD"`, under which black adds nothing. None of the 2,504 particle systems in
+    // the shipped set carries a `bgColor` of its own, so this default is what they all use.
+    // AS3: .../src/com/sulake/habbo/room/object/visualization/furniture/FurnitureParticleSystem.as::_bgColor
+    private _bgColor: number = 0xFF000000;
+
     constructor(visualization: AnimatedFurnitureVisualization)
     {
         this._visualization = visualization;
@@ -44,6 +77,7 @@ export class FurnitureParticleSystem
 
         this._emitters.clear();
         this._activeEmitter = null;
+        this.disposeCanvas();
     }
 
     // AS3: .../src/com/sulake/habbo/room/object/visualization/furniture/FurnitureParticleSystem.as::reset()
@@ -56,6 +90,7 @@ export class FurnitureParticleSystem
 
         this._activeEmitter = null;
         this._hasIgnited = false;
+        this.updateCanvas();
     }
 
     // AS3: .../src/com/sulake/habbo/room/object/visualization/furniture/FurnitureParticleSystem.as::setAnimation()
@@ -68,6 +103,125 @@ export class FurnitureParticleSystem
 
         this._activeEmitter = this._emitters.get(animationId) || null;
         this._hasIgnited = false;
+        this.updateCanvas();
+    }
+
+    /**
+     * Points the `canvasId` layer at this system's own drawing surface, allocating it on first use
+     * and whenever the layer changes size, then clears it.
+     *
+     * Both clears run whenever the surface exists, even if the sprite is not ready yet — that is
+     * AS3's own bracketing, and it is what makes a re-ignition start from a blank canvas.
+     */
+    // AS3: .../src/com/sulake/habbo/room/object/visualization/furniture/FurnitureParticleSystem.as::updateCanvas()
+    private updateCanvas(): void
+    {
+        if(this._activeEmitter === null) return;
+        if(this._canvasId < 0) return;
+
+        const sprite = this._visualization.getSprite(this._canvasId);
+
+        if(sprite !== null && sprite.texture !== null)
+        {
+            const width = Math.floor(sprite.width);
+            const height = Math.floor(sprite.height);
+
+            if(width <= 1 || height <= 1) return;
+
+            if(this._canvas !== null && (this._canvas.width !== width || this._canvas.height !== height))
+            {
+                this.releaseCanvas();
+            }
+
+            if(this._canvas === null) this.createCanvas(width, height);
+
+            this._canvasOffsetX = -sprite.offsetX;
+            this._canvasOffsetY = -sprite.offsetY;
+            this._canvasSprite = sprite;
+
+            if(this._canvasTexture !== null) sprite.texture = this._canvasTexture;
+        }
+
+        this.fillBackground();
+    }
+
+    private createCanvas(width: number, height: number): void
+    {
+        this._canvas = new OffscreenCanvas(width, height);
+        this._canvasContext = this._canvas.getContext('2d');
+
+        if(this._canvasContext === null)
+        {
+            this._canvas = null;
+
+            return;
+        }
+
+        this._canvasContext.imageSmoothingEnabled = false;
+        this._canvasTexture = Texture.from({resource: this._canvas, alphaMode: 'premultiply-alpha-on-upload'});
+
+        // AS3 only allocates the fade surface when there is a fade to apply.
+        if(this._blend !== 1)
+        {
+            this._blendCanvas = new OffscreenCanvas(width, height);
+
+            const context = this._blendCanvas.getContext('2d');
+
+            if(context !== null)
+            {
+                context.fillStyle = FurnitureParticleSystem.toCssColor(this._bgColor);
+                context.fillRect(0, 0, width, height);
+            }
+        }
+    }
+
+    /**
+     * Drops the surface without destroying its texture.
+     *
+     * The room's own `ExtendedSprite` is still pointing at that texture until the next render
+     * pass reads `sprite.texture` again, so destroying it here would blank the layer for a frame.
+     * AS3 only nulls the reference in the two places this is called from — a size change and
+     * `copyStateFrom()` — and disposes the bitmap solely in `dispose()`.
+     */
+    private releaseCanvas(): void
+    {
+        this._canvasTexture = null;
+        this._canvasContext = null;
+        this._canvas = null;
+        this._blendCanvas = null;
+    }
+
+    private disposeCanvas(): void
+    {
+        this._canvasTexture?.destroy(true);
+        this.releaseCanvas();
+        this._canvasSprite = null;
+    }
+
+    /**
+     * Replaces the surface with the background colour — Flash's `fillRect`, which overwrites
+     * alpha as well, not a composite.
+     */
+    private fillBackground(): void
+    {
+        const context = this._canvasContext;
+
+        if(context === null || this._canvas === null) return;
+
+        context.clearRect(0, 0, this._canvas.width, this._canvas.height);
+        context.fillStyle = FurnitureParticleSystem.toCssColor(this._bgColor);
+        context.fillRect(0, 0, this._canvas.width, this._canvas.height);
+    }
+
+    // TS-only: Flash takes an ARGB uint straight into `fillRect`; a 2D context wants CSS.
+    private static toCssColor(argb: number): string
+    {
+        const alpha = ((argb >>> 24) & 0xFF) / 255;
+        const red = (argb >>> 16) & 0xFF;
+        const green = (argb >>> 8) & 0xFF;
+        const blue = argb & 0xFF;
+
+        return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
     }
 
     // AS3: .../src/com/sulake/habbo/room/object/visualization/furniture/FurnitureParticleSystem.as::getSpriteYOffset()
@@ -95,9 +249,17 @@ export class FurnitureParticleSystem
     // AS3: .../src/com/sulake/habbo/room/object/visualization/furniture/FurnitureParticleSystem.as::updateSprites()
     updateSprites(): void
     {
-        if(this._activeEmitter === null)
+        if(this._activeEmitter === null || this._canvasSprite === null)
         {
             return;
+        }
+
+        // `AnimatedFurnitureVisualization.updateSprites()` has just run — the caller invokes it
+        // through `super` first — and it puts the layer's own library asset back on the sprite.
+        // This is AS3's answer to that, and without it the canvas is shown for no frame at all.
+        if(this._canvasTexture !== null && this._canvasSprite.texture !== this._canvasTexture)
+        {
+            this._canvasSprite.texture = this._canvasTexture;
         }
 
         if(this._hasIgnited)
@@ -114,24 +276,6 @@ export class FurnitureParticleSystem
         }
     }
 
-    // TODO(AS3): sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/
-    //   furniture/FurnitureParticleSystem.as::updateAnimation() (l.211-258) and ::updateCanvas()
-    //   (l.111-152). Only the emitter bookkeeping is ported; the particles are never drawn, so
-    //   every particle furni (fireworks, fountains, campfire smoke) emits nothing visible.
-    //
-    //   What is missing: `updateCanvas()` clones the `canvas_id` sprite's bitmap into a working
-    //   surface and reassigns the sprite to it; `updateAnimation()` then, per frame, refills that
-    //   surface with `_bgColor` (or draws the blend background when `alphaMultiplier < 1`) and
-    //   blits each `emitter.particles` entry at
-    //   `(canvasOffsetX + (p.x - p.z) * scaleFactor, canvasOffsetY - offsetY * scaleFactor +
-    //   (p.y + (p.x + p.z) / 2) * scaleFactor)` plus the asset's own offsets — `copyPixels` when
-    //   opaque, `draw()` with an alpha transform when the particle is fading, and a 2×2 white
-    //   rectangle when it has no asset at all.
-    //
-    //   The pieces exist: `FurnitureParticleSystemParticle.getAsset()` already resolves the frame,
-    //   and `Texture.from({resource: <OffscreenCanvas>})` is how the rest of the port surfaces a
-    //   per-frame surface. What is not settled is reading the sprite's current `Texture` back into
-    //   a 2D context to seed the clone, which is why this is left rather than guessed at.
     // AS3: .../src/com/sulake/habbo/room/object/visualization/furniture/FurnitureParticleSystem.as::updateAnimation()
     updateAnimation(): void
     {
@@ -145,92 +289,190 @@ export class FurnitureParticleSystem
             this._hasIgnited = true;
         }
 
+        // AS3 computes this before stepping the emitter, and it is an int there.
+        const verticalOffset = Math.trunc(this._offsetY * this._scaleFactor);
+
         this._activeEmitter.update();
 
-        if(this._hasIgnited)
-        {
-            if(this._activeEmitter.roomObjectSpriteId >= 0)
-            {
-                const sprite = this._visualization.getSprite(this._activeEmitter.roomObjectSpriteId);
+        if(!this._hasIgnited) return;
 
-                if(sprite !== null)
-                {
-                    sprite.visible = false;
-                }
+        if(this._activeEmitter.roomObjectSpriteId >= 0)
+        {
+            const sprite = this._visualization.getSprite(this._activeEmitter.roomObjectSpriteId);
+
+            if(sprite !== null)
+            {
+                sprite.visible = false;
             }
         }
-    }
 
-    // AS3: .../src/com/sulake/habbo/room/object/visualization/furniture/FurnitureParticleSystem.as::parseData()
-    parseData(data: any): void
-    {
-        this._size = parseInt(data.size || data['@size']) || 0;
-        this._canvasId = parseInt(data.canvas_id || data['@canvas_id']) ?? -1;
-        this._offsetY = parseInt(data.offset_y || data['@offset_y']) || 10;
-        this._scaleFactor = this._size / 64;
+        if(this._canvas === null) this.updateCanvas();
 
-        const emitters = data.emitter || data.emitters || [];
-        const emitterList = Array.isArray(emitters) ? emitters : [emitters];
+        const context = this._canvasContext;
 
-        for(const emitterData of emitterList)
+        if(context === null || this._canvas === null) return;
+
+        if(this._blend === 1)
         {
-            const id = parseInt(emitterData.id || emitterData['@id']);
-            const name = emitterData.name || emitterData['@name'] || '';
-            const spriteId = parseInt(emitterData.sprite_id || emitterData['@sprite_id']) || -1;
+            this.fillBackground();
+        }
+        else if(this._blendCanvas !== null)
+        {
+            context.globalAlpha = this._blend;
+            context.drawImage(this._blendCanvas, 0, 0);
+            context.globalAlpha = 1;
+        }
 
-            const emitter = new FurnitureParticleSystemEmitter(name, spriteId);
-            this._emitters.set(id, emitter);
+        for(const particle of this._activeEmitter.particles)
+        {
+            // AS3's `* 10 / 10` on both terms is an identity left by the decompiler; the int
+            // assignment that follows it is not, hence the truncation.
+            const x = Math.trunc(this._canvasOffsetX + (particle.x - particle.z) * this._scaleFactor);
+            const y = Math.trunc(
+                this._canvasOffsetY - verticalOffset
+                + (particle.y + (particle.x + particle.z) / 2) * this._scaleFactor
+            );
+            const asset = particle.getAsset();
 
-            const maxParticles = parseInt(emitterData.max_num_particles || emitterData['@max_num_particles']) || 0;
-            const particlesPerFrame = parseInt(emitterData.particles_per_frame || emitterData['@particles_per_frame']) || 0;
-            const burstPulse = parseInt(emitterData.burst_pulse || emitterData['@burst_pulse']) || 1;
-            const fuseTime = parseInt(emitterData.fuse_time || emitterData['@fuse_time']) || 10;
-
-            const sim = emitterData.simulation || {};
-            const force = parseFloat(sim.force || sim['@force']) || 0;
-            const dirY = parseFloat(sim.direction || sim['@direction']) || 0;
-            const gravity = parseFloat(sim.gravity || sim['@gravity']) || 0;
-            const airFriction = parseFloat(sim.airfriction || sim['@airfriction']) || 0;
-            const shape = sim.shape || sim['@shape'] || 'cone';
-            const energy = parseFloat(sim.energy || sim['@energy']) || 1;
-
-            const particles = emitterData.particles || {};
-            const particleList = particles.particle || [];
-            const pList = Array.isArray(particleList) ? particleList : [particleList];
-
-            for(const pData of pList)
+            if(asset === null)
             {
-                const lifeTime = parseInt(pData.lifetime || pData['@lifetime']) || 20;
-                const isEmitter = pData.is_emitter !== 'false' && pData['@is_emitter'] !== 'false';
-                const fade = pData.fade === 'true' || pData['@fade'] === 'true';
+                // A particle with no frame is a 2×2 white dot. Opaque, so source-over and Flash's
+                // replacing `fillRect` agree.
+                context.fillStyle = '#ffffff';
+                context.fillRect(x - 1, y - 1, 2, 2);
 
-                const frames: IGraphicAsset[] = [];
-                const frameList = pData.frame || [];
-                const fList = Array.isArray(frameList) ? frameList : [frameList];
-
-                for(const fData of fList)
-                {
-                    const frameName = fData.name || fData['@name'];
-
-                    if(frameName && this._visualization.assetCollection !== null)
-                    {
-                        const asset = this._visualization.assetCollection.getAsset(frameName);
-
-                        if(asset !== null)
-                        {
-                            frames.push(asset);
-                        }
-                    }
-                }
-
-                emitter.configureParticle(lifeTime, isEmitter, frames, fade);
+                continue;
             }
 
-            emitter.setup(maxParticles, particlesPerFrame, force, {
-                x: 0,
-                y: dirY,
-                z: 0
-            }, gravity, airFriction, shape, energy, fuseTime, burstPulse);
+            if(particle.fade && particle.alphaMultiplier < 1)
+            {
+                context.globalAlpha = particle.alphaMultiplier;
+                FurnitureParticleSystem.drawAsset(context, asset, x, y);
+                context.globalAlpha = 1;
+            }
+            else
+            {
+                FurnitureParticleSystem.drawAsset(context, asset, x, y);
+            }
+        }
+
+        // The texture object never changes identity, so the sprite keeps pointing at it; this is
+        // what tells PixiJS the pixels behind it did change.
+        this._canvasTexture?.source.update();
+    }
+
+    /**
+     * Blits one particle frame onto the surface.
+     *
+     * `asset.offsetX/offsetY` are added exactly as AS3 adds them: the port's accessor already
+     * carries the same sign as Flash's — `FurnitureVisualization` uses the two interchangeably at
+     * the same lines on both sides.
+     */
+    // TS-only: Flash reaches the pixels through `asset.asset.content` and `copyPixels`; here the
+    //   frame is a rect inside a shared spritesheet texture and has to be blitted by hand.
+    private static drawAsset(
+        context: OffscreenCanvasRenderingContext2D,
+        asset: IGraphicAsset,
+        x: number,
+        y: number
+    ): void
+    {
+        const texture = asset.texture;
+
+        if(texture === null) return;
+
+        const resource = (texture.source as unknown as {resource?: unknown} | null)?.resource;
+
+        if(!FurnitureParticleSystem.isDrawable(resource)) return;
+
+        // A rotated or trimmed frame is not simply its frame rect, and no particle frame in the
+        // shipped set is either — so decline rather than draw it wrong.
+        if((texture.rotate ?? 0) !== 0 || texture.trim) return;
+
+        const frame = texture.frame;
+
+        context.drawImage(
+            resource as CanvasImageSource,
+            frame.x, frame.y, frame.width, frame.height,
+            x + asset.offsetX, y + asset.offsetY, frame.width, frame.height
+        );
+    }
+
+    // TS-only: the same four CPU-side sources `RoomEngine.blitTextureFrame()` accepts.
+    private static isDrawable(resource: unknown): boolean
+    {
+        return (typeof ImageBitmap !== 'undefined' && resource instanceof ImageBitmap)
+            || (typeof OffscreenCanvas !== 'undefined' && resource instanceof OffscreenCanvas)
+            || (typeof HTMLCanvasElement !== 'undefined' && resource instanceof HTMLCanvasElement)
+            || (typeof HTMLImageElement !== 'undefined' && resource instanceof HTMLImageElement);
+    }
+
+    /**
+     * Reads one `<particlesystem>` — as the bundle's `logic.particleSystems[n]`.
+     *
+     * This used to be written against the Flash XML: `@`-prefixed attribute names, snake_case
+     * keys, a `frame` element list, string values. The bundle carries none of that — the keys are
+     * camelCase and the values are real numbers and booleans — so every lookup missed and every
+     * `|| default` handed back its default. `particlesPerFrame` and `maxNumParticles` both came
+     * out 0, which is an emitter that emits nothing, and `spriteId` came out -1, so nothing was
+     * hidden either. Measured against the 2,504 particle systems in the shipped furni set.
+     *
+     * Defaults are applied on *absence*, as AS3 does: `offsetY` is legitimately 0 in this data,
+     * and `|| 10` turned that into 10.
+     */
+    // AS3: .../src/com/sulake/habbo/room/object/visualization/furniture/FurnitureParticleSystem.as::parseData()
+    parseData(data: IParticleSystemData): void
+    {
+        this._size = Number(data.size ?? 0);
+        this._canvasId = data.canvasId !== undefined ? Number(data.canvasId) : -1;
+        this._offsetY = data.offsetY !== undefined ? Number(data.offsetY) : 10;
+        this._scaleFactor = this._size / 64;
+        // AS3 clamps: the shipped set contains a `blend` of 3.5.
+        this._blend = Math.min(data.blend !== undefined ? Number(data.blend) : 1, 1);
+        this._bgColor = data.bgColor !== undefined ? parseInt(String(data.bgColor), 16) : 0xFF000000;
+
+        for(const emitterData of data.emitters ?? [])
+        {
+            const emitter = new FurnitureParticleSystemEmitter(
+                String(emitterData.name ?? ''),
+                Number(emitterData.spriteId ?? -1)
+            );
+
+            this._emitters.set(Number(emitterData.id ?? 0), emitter);
+
+            const simulation = emitterData.simulation ?? {};
+
+            for(const particleData of emitterData.particles ?? [])
+            {
+                const frames: IGraphicAsset[] = [];
+
+                for(const frameName of particleData.frames ?? [])
+                {
+                    const asset = this._visualization.assetCollection?.getAsset(frameName) ?? null;
+
+                    if(asset !== null) frames.push(asset);
+                }
+
+                emitter.configureParticle(
+                    Number(particleData.lifeTime ?? 0),
+                    particleData.isEmitter !== false,
+                    frames,
+                    particleData.fade === true
+                );
+            }
+
+            emitter.setup(
+                Number(emitterData.maxNumParticles ?? 0),
+                Number(emitterData.particlesPerFrame ?? 0),
+                Number(simulation.force ?? 0),
+                {x: 0, y: Number(simulation.direction ?? 0), z: 0},
+                Number(simulation.gravity ?? 0),
+                Number(simulation.airFriction ?? 0),
+                String(simulation.shape ?? ''),
+                Number(simulation.energy ?? 0),
+                Number(emitterData.fuseTime ?? 0),
+                emitterData.burstPulse !== undefined ? Number(emitterData.burstPulse) : 1
+            );
         }
     }
 
@@ -257,5 +499,49 @@ export class FurnitureParticleSystem
         {
             this._activeEmitter.copyStateFrom(source._activeEmitter, source._size / this._size);
         }
+
+        // AS3 drops the surface here: the new system draws at a different scale, so the old
+        // canvas is the wrong size and `updateCanvas()` must allocate again.
+        this.releaseCanvas();
     }
+}
+
+/**
+ * One `particlesystem` as the furni bundle carries it, under `logic.particleSystems`.
+ *
+ * Verified against every fireworks furni in the shipped set (30 of them, 2,504 systems): these
+ * are all the keys that occur, the numbers are numbers and `isEmitter`/`fade` are booleans.
+ * `bgColor` occurs nowhere, which is why the AS3 default matters.
+ */
+// TS-only: AS3 reads an `XML` here; the port's asset pipeline delivers the same tree as JSON.
+export interface IParticleSystemData
+{
+    size?: number;
+    canvasId?: number;
+    offsetY?: number;
+    blend?: number;
+    bgColor?: string;
+    emitters?: Array<{
+        id?: number;
+        name?: string;
+        spriteId?: number;
+        maxNumParticles?: number;
+        particlesPerFrame?: number;
+        burstPulse?: number;
+        fuseTime?: number;
+        simulation?: {
+            force?: number;
+            direction?: number;
+            gravity?: number;
+            airFriction?: number;
+            shape?: string;
+            energy?: number;
+        };
+        particles?: Array<{
+            lifeTime?: number;
+            isEmitter?: boolean;
+            fade?: boolean;
+            frames?: string[];
+        }>;
+    }>;
 }

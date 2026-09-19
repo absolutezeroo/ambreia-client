@@ -7,6 +7,11 @@
  */
 import {AnimatedFurnitureVisualization} from './AnimatedFurnitureVisualization';
 import {FurnitureParticleSystem} from './FurnitureParticleSystem';
+import type {IParticleSystemData} from './FurnitureParticleSystem';
+import {RoomObjectVariableEnum} from '@habbo/room/object/RoomObjectVariableEnum';
+import {Logger} from '@core/utils/Logger';
+
+const log = Logger.getLogger('habbo.room.object.visualization.furniture.FurnitureFireworksVisualization');
 
 export class FurnitureFireworksVisualization extends AnimatedFurnitureVisualization
 {
@@ -125,40 +130,47 @@ export class FurnitureFireworksVisualization extends AnimatedFurnitureVisualizat
             return;
         }
 
-        const dataStr = model.getString('furniture_fireworks_data');
+        const dataStr = model.getString(RoomObjectVariableEnum.FURNITURE_FIREWORKS_DATA);
 
         if(dataStr === null || dataStr.length === 0)
         {
+            log.debug('No particle system data found');
+
             return;
         }
 
-        let data: any;
+        let systems: IParticleSystemData[];
 
         try
         {
-            data = JSON.parse(dataStr);
+            // `FurnitureFireworksLogic` stores the bundle's `logic.particleSystems` array as
+            // JSON, which is what AS3 stores as the XML text of the same node list.
+            systems = JSON.parse(dataStr) as IParticleSystemData[];
         }
-        catch
+        catch (error)
         {
+            log.warn(`Particle system data is not readable: ${String(error)}`);
+
             return;
         }
 
+        if(!Array.isArray(systems)) return;
+
         this._particleSystems = new Map();
-        const systems = data.particlesystem || data.particleSystems || [];
-        const systemList = Array.isArray(systems) ? systems : [systems];
 
-        for(const sysData of systemList)
+        for(const systemData of systems)
         {
-            const size = parseInt(sysData.size || sysData['@size']);
-
-            if(isNaN(size))
+            if(systemData.size === undefined)
             {
+                log.warn('Particle system does not have size property!');
+
                 continue;
             }
 
             const system = new FurnitureParticleSystem(this);
-            system.parseData(sysData);
-            this._particleSystems.set(size, system);
+
+            system.parseData(systemData);
+            this._particleSystems.set(Number(systemData.size), system);
         }
     }
 }

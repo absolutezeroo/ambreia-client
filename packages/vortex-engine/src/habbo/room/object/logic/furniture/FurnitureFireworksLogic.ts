@@ -9,6 +9,7 @@ import type {IRoomGeometry} from '@room/utils/IRoomGeometry';
 import type {RoomSpriteMouseEvent} from '@room/events/RoomSpriteMouseEvent';
 import {FurnitureLogic} from './FurnitureLogic';
 import {RoomObjectStateChangeEvent} from '@habbo/room/events/RoomObjectStateChangeEvent';
+import {RoomObjectVariableEnum} from '@habbo/room/object/RoomObjectVariableEnum';
 
 export class FurnitureFireworksLogic extends FurnitureLogic
 {
@@ -76,11 +77,21 @@ export class FurnitureFireworksLogic extends FurnitureLogic
             return;
         }
 
-        const config = data as { particlesystems?: string };
+        // The bundle nests the furni's logic config under a `logic` key, as `FurnitureLogic`'s own
+        // `initialize()` note sets out — this read was one level too high and at the Flash name
+        // (`particlesystems`), so it never found anything and the visualization had no definition
+        // to read. The bundle spells it `logic.particleSystems`, an array of objects; AS3 stores
+        // the definition on the model as text and the visualization parses it back, so the array
+        // travels as JSON.
+        const config = data as {logic?: {particleSystems?: unknown[]}};
+        const particleSystems = config.logic?.particleSystems;
 
-        if(config.particlesystems)
+        if(Array.isArray(particleSystems) && particleSystems.length > 0)
         {
-            this.object?.getModelController()?.setString('furniture_fireworks_data', config.particlesystems);
+            this.object?.getModelController()?.setString(
+                RoomObjectVariableEnum.FURNITURE_FIREWORKS_DATA,
+                JSON.stringify(particleSystems)
+            );
         }
     }
 }

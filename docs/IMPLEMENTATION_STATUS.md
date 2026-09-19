@@ -5012,6 +5012,44 @@ other window's clip moved. This is the one-pass equivalent of AS3's per-`BitmapD
 
 ## Recent Work Recorded
 
+- 🆕 **Particle furniture: dead at four links, not one — 2026-09-19.** Fireworks, fountains and
+  anything else with an emitter drew nothing. The obvious missing piece was the rendering, and it
+  was the *last* of four breaks in the chain; fixing it alone would have changed nothing.
+
+  1. **`FurnitureFireworksLogic.initialize()` read the wrong key at the wrong level.** It looked
+     for `data.particlesystems` at the bundle root. The bundle spells it
+     `logic.particleSystems` — the same `logic` nesting `FurnitureLogic.initialize()` already
+     digs into for `model.dimensions`, and that one works, which is what proves the path.
+     `furniture_fireworks_data` was therefore never set on the model at all.
+  2. **`readDefinition()` expected the Flash XML document** where the port now carries the
+     bundle's array.
+  3. **`parseData()` was written entirely against the Flash XML** — `@`-prefixed attributes,
+     snake_case names, a `frame` element list, string values. The real data is camelCase with
+     real numbers and booleans, so every lookup missed and every `|| default` fired.
+     `maxNumParticles` and `particlesPerFrame` both came out `0`, which is an emitter that never
+     emits, and `spriteId` came out `-1`, so the rocket sprite was never hidden either. `offsetY`
+     is legitimately `0` in this data and `|| 10` turned it into 10 — the falsy-zero trap again.
+  4. **`updateCanvas()` did not exist and `updateAnimation()` stopped before the drawing half.**
+
+  Both are ported now. The piece previously called unresolved — reading a sprite's `Texture` back
+  into a 2D context to seed the clone — turned out not to be needed: AS3 clones the layer's bitmap
+  and then overwrites the whole thing with `_bgColor` on the very next line, so only the
+  *dimensions* of the clone matter. A blank `OffscreenCanvas` of the same size is the same result
+  with no GPU readback. The default `_bgColor` of opaque black is load-bearing rather than odd:
+  every shipped fireworks furni declares its canvas layer `ink="ADD"`, under which black adds
+  nothing, and none of the 2,504 particle systems in the set carries a `bgColor` of its own.
+
+  **Measured, not assumed.** The shapes above come from decoding the shipped furni set
+  (`C:\Laragon\www\vortex-assets\dcr\hof_furni`, 38,435 bundles): 30 furni carry real emitters,
+  2,504 particle systems, and the key union across all of them is what the new parser accepts.
+  A scratchpad harness runs the whole chain — bundle JSON → logic → visualization → parse →
+  ignite → blit — against a pixi shim: **29 emitters, 398,793 blits, nothing thrown**, first
+  particle on frame 20 for a `fuseTime` of 20, 14,651 distinct positions in 200 frames.
+
+  **Not verified:** how it *looks*. The harness proves the particles are computed and blitted at
+  sane coordinates; it cannot tell you the burst sits where it should over the furni, or that ADD
+  blending reads right. That needs the client.
+
 - 🆕 **Second body-diff sweep: seven fixes, and what the probe gets wrong — 2026-09-19.**
   `scripts/member-body-diff.mjs` compares a ported member's body against the AS3 body its own
   `AS3:` line cites — literals, numbers, calls — and this is the second pass worked from its
@@ -5054,11 +5092,7 @@ other window's clip moved. This is the one-pass equivalent of AS3's per-`BitmapD
     four branches; `handleLoginFailedHotelClosedMessage()` was a log line; `AvatarInfoWidget`
     was missing the `RWFIUE_FURNI` arm, so an avatar bubble stayed open beside a furni infostand.
 
-  **Left open, deliberately:** `FurnitureParticleSystem` ports only the emitter bookkeeping —
-  `updateCanvas()` does not exist and `updateAnimation()` stops before the drawing half, so no
-  particle furni emits anything visible. The `TODO(AS3)` on the method carries the position
-  formula, the three blit cases and the one unresolved piece (reading a sprite's current
-  `Texture` back into a 2D context). It is renderer code that cannot be checked by reading.
+  **Closed the next day — see the entry above.**
 
   **What the probe gets wrong, measured on this pass** — eleven candidates verified, nine of them
   false positives, each for a reason worth not re-deriving: a body factored into a base-class hook
