@@ -23,6 +23,11 @@ export class CameraViewFinder
     // AS3: .../ui/widget/camera/CameraViewFinder.as::NUMBER_OF_SLOTS
     private static readonly NUMBER_OF_SLOTS: number = 5;
 
+    // The side of a photo, which AS3 writes as the literal 320 in `clearCurrentSlot()` rather
+    // than reading `_imageWidth` — the same 320 the layout gives the `image` bitmap.
+    // AS3: .../ui/widget/camera/CameraViewFinder.as::clearCurrentSlot()
+    private static readonly PHOTO_SIZE: number = 320;
+
     // AS3: .../ui/widget/camera/CameraViewFinder.as::_SafeStr_8174
     private static _slotsFullAlertShown: boolean = false;
 
@@ -474,11 +479,53 @@ export class CameraViewFinder
     {
         const target = this._window?.findChildByName('cameraSlot_' + index) as (IWindow & { bitmap?: ImageBitmap | null }) | null;
 
-        if(target === null) return;
+        if(target === null || this._imageWidth <= 0) return;
 
-        // AS3 scales the photo into the slot's own BitmapData with a 1px inset; the port's bitmap
-        // windows fit an assigned image to the window, which produces the same framing.
-        target.bitmap = slot.image as ImageBitmap | null;
+        // AS3 allocates an opaque BitmapData the size of the slot and draws the photo into it
+        // through a matrix scaled by `(width - 2) / _imageWidth`, offset by (1,1) — the photo
+        // shrunk to 56x56 inside a 58x58 black frame. Assigning the photo to the window instead
+        // does *not* produce the same framing, which is what this used to claim: the layout
+        // declares `stretched_x`/`stretched_y` false on every `cameraSlot_N`, so the window draws
+        // the 320x320 image at native size and the slot showed its top-left corner.
+        const canvas = new OffscreenCanvas(target.width, target.height);
+        const ctx = canvas.getContext('2d');
+
+        if(ctx === null) return;
+
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        if(slot.image !== null)
+        {
+            const scale = (target.width - 2) / this._imageWidth;
+            const image = slot.image as ImageBitmap;
+
+            ctx.drawImage(image, 1, 1, image.width * scale, image.height * scale);
+        }
+
+        target.bitmap = canvas.transferToImageBitmap();
+    }
+
+    /**
+     * The blank photo an emptied slot holds: AS3's `new BitmapData(320, 320, false, 13816530)`.
+     *
+     * It is what makes deleting a shot visible — `clearCurrentSlot()` feeds it back through
+     * `addToCurrentSlot()`, which repaints both the thumbnail and the viewfinder with it. Passing
+     * `null` instead, as this used to, left `drawImageToSlot()` nothing to draw and the deleted
+     * photo stayed on screen.
+     */
+    // AS3: .../ui/widget/camera/CameraViewFinder.as::clearCurrentSlot()
+    private static createEmptyPhoto(): ImageBitmap | null
+    {
+        const canvas = new OffscreenCanvas(CameraViewFinder.PHOTO_SIZE, CameraViewFinder.PHOTO_SIZE);
+        const ctx = canvas.getContext('2d');
+
+        if(ctx === null) return null;
+
+        ctx.fillStyle = '#d2d2d2';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        return canvas.transferToImageBitmap();
     }
 
     // AS3: .../ui/widget/camera/CameraViewFinder.as::findNextEmptySlotIndex()
@@ -508,7 +555,7 @@ export class CameraViewFinder
         }
 
         CameraViewFinder._shotImages[this._activeSlot] = null;
-        this.addToCurrentSlot(null, true);
+        this.addToCurrentSlot(CameraViewFinder.createEmptyPhoto(), true);
 
         if(this._imageWindow)
         {
