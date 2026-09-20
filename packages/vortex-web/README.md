@@ -18,6 +18,24 @@ Same stack as the emulator's dashboard (`../../../vortex-emulator/Vortex.Dashboa
 runes, Vite, Tailwind 4, `svelte-spa-router`. No SvelteKit — this is a static SPA, and the emulator
 serves it the same way it serves the dashboard.
 
+### The router is on the History API, not the hash
+
+`svelte-spa-router` is hash-only by design, and habbo.com's URLs have no `#` in them. It is patched
+— `patches/svelte-spa-router@4.0.2.patch` at the repository root, applied by pnpm on install — so
+that the location comes from `window.location.pathname`, `push`/`replace`/`use:link` go through
+`history.pushState`, and the store is woken by `popstate` plus a `pushstate` event of our own.
+Nothing in `src/` imports differently; a destination may still be written `#/foo` and is normalised.
+
+Two things hold it up and neither is optional:
+
+- **the server must fall back to `index.html`** for any path that is not a file — `try_files {path}
+  /index.html` in `Caddyfile.web`, and Vite's own SPA fallback in dev. Without it every deep link,
+  reload and shared URL is a 404.
+- **`src/lib/links.ts`** intercepts clicks on plain `<a href="/…">`, because the markup injected by
+  `components/WebPage.svelte` and an article's own href come from the CMS and cannot carry
+  `use:link`. Letting one through reloads the document, which would tear down the game client that
+  `App.svelte` deliberately keeps mounted across navigations.
+
 ## Where it comes from
 
 Three reference files, all under `sources/` (gitignored, like the AS3 dumps — fetch them per

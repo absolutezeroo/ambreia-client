@@ -19,9 +19,9 @@
 
     const FRANK = new URL('../assets/teaser_frank_looking.png', import.meta.url).href;
 
-    // The key's own link is `href="/"`, which under a hash router would reload the whole app to get
-    // to the same place. `#/` is the same destination through the router.
-    const text = t('NOT_FOUND_PAGE_TEXT').replace('href="/"', 'href="#/"');
+    // The key's own link is `href="/"` and stays that way: the router is on the History API, so
+    // that is already its home route, and lib/links.ts keeps the click from reloading the page.
+    const text = t('NOT_FOUND_PAGE_TEXT');
 </script>
 
 <main class="mx-auto mb-0 max-w-[1200px] px-3 pt-3 pb-6">

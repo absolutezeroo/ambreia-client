@@ -1,5 +1,6 @@
 import {mount} from 'svelte';
 import App from './App.svelte';
+import {interceptLinks} from './lib/links.js';
 import './styles.css';
 
 // `#app` is in index.html and is the only thing this file assumes. It is asserted rather than
@@ -11,5 +12,8 @@ if(!target)
 {
     throw new Error('#app is missing from index.html; the site has nowhere to mount.');
 }
+
+// Before the mount, so a click landing during the first paint is already ours.
+interceptLinks();
 
 mount(App, {target});

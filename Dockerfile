@@ -15,6 +15,9 @@ WORKDIR /src
 # The lockfile and every package manifest first. As long as no dependency moves, editing a source
 # file reuses this layer instead of resolving and downloading the whole workspace again.
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+# `patchedDependencies` in pnpm-workspace.yaml names a file, and install fails without it. Here
+# rather than in the `COPY . .` below, because that one comes AFTER the install.
+COPY patches/ patches/
 COPY packages/vortex-client/package.json packages/vortex-client/
 COPY packages/vortex-engine/package.json packages/vortex-engine/
 COPY packages/vortex-glaze/package.json packages/vortex-glaze/

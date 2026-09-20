@@ -9,3 +9,6 @@ allowBuilds:
 onlyBuiltDependencies:
   - esbuild
   - sharp
+
+patchedDependencies:
+  svelte-spa-router@4.0.2: patches/svelte-spa-router@4.0.2.patch

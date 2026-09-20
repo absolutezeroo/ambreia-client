@@ -63,7 +63,7 @@
                 <p class="m-0">{t('FOLLOW_HABBO')}</p>
                 {#each SOCIALS as social (social)}
                     <span class="inline-block p-3 md:px-1.5 md:py-3">
-                        <a href="#/community" class="block hover:border-b-0"><Sprite name={social} label={social} /></a>
+                        <a href="/community" class="block hover:border-b-0"><Sprite name={social} label={social} /></a>
                     </span>
                 {/each}
             </div>

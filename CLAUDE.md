@@ -263,6 +263,13 @@ emulator alone.
 Tailwind 4 + `svelte-spa-router`, the same stack as the emulator's dashboard. `pnpm web` serves it on
 :5174. Its README has the full map; three things matter from outside it:
 
+- **The URLs have no `#`.** `svelte-spa-router` is hash-only by design and is patched to the History
+  API instead (`patches/svelte-spa-router@4.0.2.patch`, applied by pnpm on install — which is why
+  every Dockerfile copies `patches/` before `pnpm install`). Two things hold it up: the server's
+  `try_files {path} /index.html` fallback, and `src/lib/links.ts`, which routes clicks on the plain
+  `<a href="/…">` that injected CMS markup carries. Do not reintroduce `#/` in an href or a mirror
+  tool; a destination written that way still works, but it is no longer what the site produces.
+
 - **A page that looks empty next to habbo.com is usually a CMS page, not a porting gap.** Its
   editorial content is in none of the files below: `habbo-web-pages` fetches it at runtime from
   `images.habbo.com/habbo-web-pages/production/<key>.fr.html` (the whole "Les clés du jeu" section,

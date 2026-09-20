@@ -10,10 +10,13 @@
 //   node tools/fetch-web-pages.mjs
 //
 // writes src/webpages/<key>.html (the markup) and public/webpages/<file> (every image it
-// references). Two rewrites happen on the way in, and both are necessary:
+// references). One rewrite happens on the way in:
 //
-//   href="/playing-habbo/x"  ->  href="#/playing-habbo/x"   this site is on a hash router
 //   src="https://images.habbo.com/…"  ->  src="/webpages/…" so the page works with no route out
+//
+// habbo.com's own `href="/playing-habbo/x"` is left alone — the router is on the History API and
+// those ARE its paths. It used to be rewritten to `#/…` for the hash router; lib/links.ts is what
+// keeps such a link from reloading the document now.
 //
 // Re-run it to refresh; it is not part of `pnpm build`.
 import {writeFileSync, mkdirSync} from 'node:fs';
@@ -87,9 +90,6 @@ for(const key of KEYS)
     {
         html = html.split(source).join(await mirrorImage(source));
     }
-
-    // Site-internal links only — an absolute http(s) href is an external one and stays put.
-    html = html.replace(/href="\/(?!\/)/g, 'href="#/');
 
     const target = join(ROOT, 'src', 'webpages', `${key}.html`);
 

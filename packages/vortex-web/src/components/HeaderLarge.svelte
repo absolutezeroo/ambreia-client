@@ -39,7 +39,7 @@
             <h2 class="mx-auto max-w-[400px] md:my-0">{t('HEADER_TITLE')}</h2>
 
             <!-- `.register-banner__button` is the site's one 20px button. -->
-            <Button variant="green" href="#/registration" className="text-xl">{t('REGISTER_PROMPT_2')}</Button>
+            <Button variant="green" href="/registration" className="text-xl">{t('REGISTER_PROMPT_2')}</Button>
         </div>
     </div>
 </div>

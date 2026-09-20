@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  svelte-spa-router@4.0.2: 2d2304d6e044b743c70cc95b9e755ded8f69006ea20481b97ea095007c183691
+
 importers:
 
   .:
@@ -177,7 +180,7 @@ importers:
         version: 1.5.4
       svelte-spa-router:
         specifier: ^4.0.1
-        version: 4.0.2
+        version: 4.0.2(patch_hash=2d2304d6e044b743c70cc95b9e755ded8f69006ea20481b97ea095007c183691)
     devDependencies:
       '@sveltejs/vite-plugin-svelte':
         specifier: ^7.1.2
@@ -5499,7 +5502,7 @@ snapshots:
     transitivePeerDependencies:
       - picomatch
 
-  svelte-spa-router@4.0.2:
+  svelte-spa-router@4.0.2(patch_hash=2d2304d6e044b743c70cc95b9e755ded8f69006ea20481b97ea095007c183691):
     dependencies:
       regexparam: 2.0.2
 

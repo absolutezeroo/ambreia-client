@@ -46,9 +46,10 @@
 		root * /srv
 		file_server
 
-		# svelte-spa-router routes on the hash, so every real path is already a file and there is
-		# no history fallback to arrange. `try_files` stays anyway for the one case it covers: a
-		# deep link typed without the hash should land on the site rather than a 404.
+		# Load-bearing since the router moved off the hash (patches/svelte-spa-router@4.0.2.patch):
+		# `/community/rooms` is a ROUTE, not a file, and every deep link, reload and shared URL
+		# arrives here as a path the disk knows nothing about. Without this fallback the site
+		# answers 404 to everything but `/`.
 		try_files {path} /index.html
 	}
 }
