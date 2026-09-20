@@ -606,6 +606,20 @@ of looking through a hole: what you see through is where the two openings overla
 the near opening is tunnel wall. Written the other way round the band lands *outside* the hole, on
 the solid wall, which is how it shipped first.
 
+> **Removed 2026-09-20, by the project owner's call.** 174 lines: `drawMaskReveals()`,
+> `projectThickness()`, `REVEAL_COLOR`, `_revealCanvas`, `_revealOffset`, `_maskShapeCanvas`,
+> `RoomPlane.wallThickness` and its one assignment in `RoomVisualization`. The port is closer to
+> AS3 for it — this had no counterpart in either tree.
+>
+> **It is not established that it was the thing complained about**, and the measurement says
+> otherwise: the grey band reported at a doorway's foot is 64 px wide (a full tile at scale 64)
+> where a reveal is `0.25` tile, ~16 px; and it draws *in front of* the entrance floor tile while
+> the opening behind it draws *behind*, so the two are on different planes — the reveal is painted
+> into the very plane that carries the hole. Whatever paints that band is a one-tile wall plane
+> that descends about 1.4 tiles below the floor line, and it is still there. `RoomVisualizationData`
+> logs the mask count at room load; production hides `info`, so only the zero-mask `warn` is
+> visible, and its absence is how we know masks do resolve.
+
 ### The WIN63 file-level sweep (2026-09-02) — what is actually left, and the six gaps it found
 
 Counting uncited `.as` files against the primary tree is the wrong measure taken alone, and the raw

@@ -675,14 +675,6 @@ export class RoomVisualization extends RoomObjectSpriteVisualization
                 // carries doors and windows.
                 // AS3: .../src/com/sulake/habbo/room/object/visualization/room/RoomVisualization.as::updateRoomPlanes()
                 plane.maskManager = this._visualizationData.maskManager;
-
-                // TS-only: the depth a cut opening's reveal is drawn to, in world units — the base
-                //   thickness times the room's own multiplier, which is what `_wallThickness`
-                //   holds. AS3 keeps this in the plane parser, which builds the wall's edge planes
-                //   from it and never tells a plane; the reveal is drawn by the plane, so it has
-                //   to know. An unset room falls back to the parser's own default of 1.
-                plane.wallThickness = RoomVisualization.WALL_THICKNESS
-                    * (isNaN(this._wallThickness) ? 1 : this._wallThickness);
             }
 
             // Thin walls without texture (AS3 lines 624-626)
