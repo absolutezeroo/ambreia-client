@@ -5,8 +5,7 @@ import {RoomEngine, type IRoomEngineRectangle} from '@habbo/room/RoomEngine';
 import type {RoomRenderingCanvas} from '@habbo/room/renderer/RoomRenderingCanvas';
 import {PlaneDrawingData} from '@habbo/room/object/visualization/room/PlaneDrawingData';
 import type {IPlaneDrawingData} from '@room/object/visualization/IPlaneDrawingData';
-import {RoomObjectSpriteData} from '@room/data/RoomObjectSpriteData';
-import type {IRoomObjectSprite} from '@room/object/visualization/IRoomObjectSprite';
+import type {RoomObjectSpriteData} from '@room/data/RoomObjectSpriteData';
 import type {IRoomObjectSpriteVisualization} from '@room/object/visualization/IRoomObjectSpriteVisualization';
 import {RoomObjectCategoryEnum} from '@habbo/room/object/RoomObjectCategoryEnum';
 import type {RoomPlane} from '@habbo/room/object/visualization/room/RoomPlane';
@@ -75,11 +74,9 @@ export class SpriteDataCollector
 	 * parts are authored around the figure's own origin, which is the bottom centre of the
 	 * placeholder, less sixteen.
 	 *
-	 * DEVIATION: AS3 pushes the live `IRoomObjectSprite`s straight into the payload vector and adds
-	 *   the offsets **to the sprites themselves** — its sprite and its `RoomObjectSpriteData` are
-	 *   duck-compatible, so it gets away with it, and the mannequin visibly drifts in the room for
-	 *   as long as the photo is being composed. Here each part is converted into its own record
-	 *   first, so the offsets land on the payload and never on the room.
+	 * The offsets are added to the records in place, as AS3 does: `getSpriteList()` returns
+	 * payload records built for this call — `getServerRenderData()` hands its array over and clears
+	 * it — so nothing the room is drawing moves.
 	 */
     // AS3: .../habbo/room/utils/_SafeCls_1840.as::addMannequinSprites()
     private static addMannequinSprites(sprites: RoomObjectSpriteData[], engine: RoomEngine): RoomObjectSpriteData[]
@@ -105,46 +102,15 @@ export class SpriteDataCollector
 
             for(const part of parts)
             {
-                const partData = SpriteDataCollector.fromSprite(part, data.objectId);
+                part.x += data.x + data.width / 2 + 1;
+                part.y += data.y + data.height - SpriteDataCollector.MANNEQUIN_Y_OFFSET;
+                part.z += data.z;
 
-                partData.x += data.x + data.width / 2 + 1;
-                partData.y += data.y + data.height - SpriteDataCollector.MANNEQUIN_Y_OFFSET;
-                partData.z += data.z;
-
-                result.push(partData);
+                result.push(part);
             }
         }
 
         return result;
-    }
-
-    /**
-	 * A payload record for a sprite the canvas did not draw.
-	 *
-	 * The culled and mannequin passes both start from a visualization's raw sprite list, where a
-	 * sprite carries `offsetX`/`offsetY`/`relativeDepth` rather than a resolved screen position —
-	 * so those are what seed x/y/z, and the caller adds the object's own location on top.
-	 */
-    // AS3: .../habbo/room/utils/_SafeCls_1840.as::getFurniData()
-    private static fromSprite(sprite: IRoomObjectSprite, objectId: number): RoomObjectSpriteData
-    {
-        const data = new RoomObjectSpriteData();
-
-        data.objectId = objectId;
-        data.x = sprite.offsetX;
-        data.y = sprite.offsetY;
-        data.z = sprite.relativeDepth;
-        data.name = sprite.libraryAssetName;
-        data.flipH = sprite.flipH;
-        data.alpha = sprite.alpha;
-        data.color = sprite.color.toString();
-        data.blendMode = sprite.blendMode;
-        data.width = sprite.width;
-        data.height = sprite.height;
-        data.objectType = sprite.objectType ?? '';
-        data.posture = sprite.assetPosture ?? '';
-
-        return data;
     }
 
     /**
@@ -284,20 +250,18 @@ export class SpriteDataCollector
 
             for(const part of parts)
             {
-                const data = SpriteDataCollector.fromSprite(part, object.getId());
-
-                data.x += screen.x - canvas.screenOffsetX;
-                data.y += baseY;
-                data.z += baseZ;
+                part.x += screen.x - canvas.screenOffsetX;
+                part.y += baseY;
+                part.z += baseZ;
 
                 // The two swimming effects are authored a tile higher than they draw; AS3 pulls
                 // them back down by hand rather than fixing the assets.
-                if(data.name.indexOf('h_std_fx29_') === 0 || data.name.indexOf('h_std_fx185_') === 0)
+                if(part.name.indexOf('h_std_fx29_') === 0 || part.name.indexOf('h_std_fx185_') === 0)
                 {
-                    data.y += SpriteDataCollector.AVATAR_WATER_EFFECT_MAGIC_Y_OFFSET;
+                    part.y += SpriteDataCollector.AVATAR_WATER_EFFECT_MAGIC_Y_OFFSET;
                 }
 
-                sprites.push(data);
+                sprites.push(part);
             }
         }
 

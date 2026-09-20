@@ -24,6 +24,7 @@ import {AvatarImageDirectionCache} from './AvatarImageDirectionCache';
 import {AvatarImageBodyPartContainer} from '../AvatarImageBodyPartContainer';
 import type {IColorTransformData} from './ImageData';
 import {ImageData} from './ImageData';
+import {RoomObjectSpriteData} from '@room/data/RoomObjectSpriteData';
 
 /**
  * Main cache manager for avatar image rendering.
@@ -107,7 +108,8 @@ export class AvatarImageCache
     /** The rendering mode this cache's containers were built under. */
     // TS-only: see `AvatarRenderMode.generation`.
     private _renderGeneration: number = AvatarRenderMode.generation;
-    private _serverRenderData: any[];
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/cache/AvatarImageCache.as::_serverRenderData
+    private _serverRenderData: RoomObjectSpriteData[];
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/cache/AvatarImageCache.as::_largeScaledSmall
     private _largeScaledSmall: boolean;
 
@@ -481,7 +483,7 @@ export class AvatarImageCache
 	 * Returns and clears the accumulated server render data.
 	 */
     // AS3: .../src/com/sulake/habbo/avatar/cache/AvatarImageCache.as::getServerRenderData()
-    public getServerRenderData(): any[]
+    public getServerRenderData(): RoomObjectSpriteData[]
     {
         const data = this._serverRenderData;
 
@@ -578,7 +580,7 @@ export class AvatarImageCache
         partList: AvatarImagePartContainer[],
         frameIndex: number,
         action: IActiveActionData,
-        _forceUpdate: boolean = false,
+        forceUpdate: boolean = false,
         wantImage: boolean = false
     ): AvatarImageBodyPartContainer | null
     {
@@ -751,6 +753,62 @@ export class AvatarImageCache
                 const aliasFlipH = this._assets.getAliasFlipH(resolvedAsset!.assetName);
                 const totalAssetFlipH = aliasFlipH !== graphicAsset.flipH;
                 const effectiveFlipH = isPartFlipped !== totalAssetFlipH;
+
+                // The camera's half of this method. `forceUpdate` is AS3's `param5`, set only by
+                // `AvatarImage.getAvatarPartsForCamera()`, and it is what makes an avatar appear in
+                // a room photo at all: the server redraws the figure from these part names, and the
+                // drawn room sprite carries no name it could use (`RoomObject.getAvatarLibraryAssetName()`
+                // answers `avatar_<id>`, which only keys the merge in `SpriteDataCollector`).
+                //
+                // `offset` is AS3's `_loc19_` — the asset's own offset, which this port stores
+                // already negated — so the arithmetic below is AS3's verbatim. The name goes through
+                // the alias collection because the resolved part name may be an alias of the asset
+                // that actually holds the pixels, and it is the latter the server has.
+                if(forceUpdate)
+                {
+                    const data = new RoomObjectSpriteData();
+                    let flipH = isPartFlipped;
+
+                    data.name = this._assets.getAssetName(resolvedAsset!.assetName);
+                    data.x = -offset.x - 33;
+                    data.y = -offset.y;
+                    data.z = this._serverRenderData.length * -0.0001;
+                    data.width = graphicAsset.width;
+                    data.height = graphicAsset.height;
+
+                    if(assetPartDefinition === AvatarImageCache.LAY_BASE_ACTION) data.x += 53;
+
+                    // The direction's own mirror, on top of the part's. AS3 re-mirrors the record
+                    // rather than the pixels, because the receiving renderer flips at draw time.
+                    if(isFlippedDirection)
+                    {
+                        flipH = !flipH;
+
+                        if(flipH) data.x = -data.x - graphicAsset.width;
+                        else data.x += 65;
+                    }
+
+                    // DEVIATION: AS3 sends this flip alone. It can, because its asset library bakes
+                    //   an alias' `fliph` into the bitmap the alias names, so the name in the
+                    //   payload and the pixels on its own screen are already mirrored the same way.
+                    //   This port reads a Nitro bundle, which does not bake — that is what the
+                    //   `aliasFlipH` line above exists for — so a part drawn mirrored through an
+                    //   alias would be sent unmirrored and come back with the limb on the wrong
+                    //   side. The mirror is folded into the flag instead of the position, because an
+                    //   asset-level flip mirrors the part inside its own box and leaves x alone.
+                    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/cache/AvatarImageCache.as::renderBodyPart()
+                    data.flipH = flipH !== totalAssetFlipH;
+
+                    if(partContainer.isColorable && colorTransform !== null)
+                    {
+                        data.color = '0x'
+                            + AvatarImageCache.convertColorToHex(colorTransform.redMultiplier)
+                            + AvatarImageCache.convertColorToHex(colorTransform.greenMultiplier)
+                            + AvatarImageCache.convertColorToHex(colorTransform.blueMultiplier);
+                    }
+
+                    this._serverRenderData.push(data);
+                }
 
                 this._unionImages.push(new ImageData(
                     graphicAsset.texture,
@@ -1001,6 +1059,21 @@ export class AvatarImageCache
         container.size = {width, height};
 
         return container;
+    }
+
+    /**
+     * A 0..1 colour multiplier as the payload's two hex digits.
+     *
+     * No rounding, as AS3: a multiplier that is not an exact 1/255 step prints its fraction here in
+     * both languages, and the two-digit pad is skipped for the same reason in both (the check is on
+     * the string's length, and `"0.8"` is already longer than two).
+     */
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/cache/AvatarImageCache.as::convertColorToHex()
+    private static convertColorToHex(multiplier: number): string
+    {
+        const hex = (multiplier * 255).toString(16);
+
+        return hex.length < 2 ? `0${hex}` : hex;
     }
 
     /** A 0..1 colour multiplier as an 8-bit tint channel. */

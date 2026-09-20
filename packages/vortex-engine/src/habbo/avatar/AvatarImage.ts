@@ -2,6 +2,7 @@ import {Texture} from 'pixi.js';
 import type {AvatarStructure} from './AvatarStructure';
 import type {AssetAliasCollection} from './alias/AssetAliasCollection';
 import type {IGraphicAsset} from '@room/object/visualization/utils/IGraphicAsset';
+import type {RoomObjectSpriteData} from '@room/data/RoomObjectSpriteData';
 import {AvatarFigureContainer} from './AvatarFigureContainer';
 import type {IAvatarImage} from './IAvatarImage';
 import type {IAvatarFigureContainer} from './IAvatarFigureContainer';
@@ -190,7 +191,7 @@ export class AvatarImage implements IAvatarImage, IAvatarEffectListener
 	 * @returns An array of render data entries
 	 */
     // AS3: .../src/com/sulake/habbo/avatar/AvatarImage.as::getServerRenderData()
-    public getServerRenderData(): any[]
+    public getServerRenderData(): RoomObjectSpriteData[]
     {
         this.getAvatarPartsForCamera(AvatarImage.DEFAULT_AVATAR_SET);
 

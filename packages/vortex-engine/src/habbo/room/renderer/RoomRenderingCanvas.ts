@@ -1554,6 +1554,18 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
 
             sortable.name = objectId;
             sortable.sprite = sprite;
+
+            // An avatar's drawn sprite is one composed bitmap and has no library asset name of its
+            // own, so the canvas gives it the object's: `avatar_<id>`. Nothing resolves that name —
+            // it is a key. `SpriteDataCollector.getFurniData()` looks for it to read the drawn
+            // avatar's depth and baseline before merging in the figure's real part records, and
+            // without it every avatar in a photo landed at the room's own z.
+            // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/room/renderer/_SafeCls_3073.as::renderObject()
+            if(sprite.spriteType === RoomObjectSpriteType.AVATAR || sprite.spriteType === RoomObjectSpriteType.AVATAR_OWN)
+            {
+                sprite.libraryAssetName = object.getAvatarLibraryAssetName();
+            }
+
             // AS3 bakes the mirror into the bitmap itself (getBitmapData(asset, name, flipH, flipV,
             // color)), so a flipped sprite keeps the same top-left origin and occupies the same rect
             // as an unflipped one. This port mirrors with Pixi's scale.x/y = -1 instead, which

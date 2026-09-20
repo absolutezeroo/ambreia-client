@@ -9,7 +9,7 @@
  * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/furniture/FurnitureMannequinVisualization.as
  */
 import type {IRoomObjectVisualizationData} from '@room/object/visualization/IRoomObjectVisualizationData';
-import type {IRoomObjectSprite} from '@room/object/visualization/IRoomObjectSprite';
+import type {RoomObjectSpriteData} from '@room/data/RoomObjectSpriteData';
 import type {IAvatarImage} from '@habbo/avatar/IAvatarImage';
 import type {IAvatarImageListener} from '@habbo/avatar/IAvatarImageListener';
 import {RoomObjectVariableEnum} from '@habbo/room/object/RoomObjectVariableEnum';
@@ -151,7 +151,7 @@ export class FurnitureMannequinVisualization extends FurnitureVisualization impl
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/furniture/FurnitureMannequinVisualization.as::getSpriteList()
-    override getSpriteList(): IRoomObjectSprite[] | null
+    override getSpriteList(): RoomObjectSpriteData[] | null
     {
         if(this._avatarData === null || this._figure === null) return super.getSpriteList();
 
@@ -164,7 +164,7 @@ export class FurnitureMannequinVisualization extends FurnitureVisualization impl
 
         avatar.setDirection('full', this.direction);
 
-        return avatar.getServerRenderData() as IRoomObjectSprite[];
+        return avatar.getServerRenderData();
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/furniture/FurnitureMannequinVisualization.as::getSpriteAssetName()

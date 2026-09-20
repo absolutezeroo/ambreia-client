@@ -6,6 +6,7 @@ import type {IAvatarFigureContainer} from './IAvatarFigureContainer';
 import type {IPartColor} from './structure/figure/IPartColor';
 import type {IAvatarPartSpriteSet} from './AvatarPartSprite';
 import type {IGraphicAsset} from '@room/object/visualization/utils/IGraphicAsset';
+import type {RoomObjectSpriteData} from '@room/data/RoomObjectSpriteData';
 
 /**
  * Interface for avatar images that can be rendered.
@@ -45,7 +46,7 @@ export interface IAvatarImage
     getPartSprites(setType: string): IAvatarPartSpriteSet | null;
 
     // AS3: .../src/com/sulake/habbo/avatar/_SafeCls_1793.as::getServerRenderData()
-    getServerRenderData(): any[];
+    getServerRenderData(): RoomObjectSpriteData[];
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/_SafeCls_1793.as::getHeadRegPoints()
     getHeadRegPoints(scale: string): { x: number; y: number };

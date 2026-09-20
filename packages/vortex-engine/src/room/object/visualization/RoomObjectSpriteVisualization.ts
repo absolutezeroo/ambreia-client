@@ -16,6 +16,7 @@ import type {IRoomObjectSprite} from './IRoomObjectSprite';
 import type {IRoomObjectSpriteVisualization} from './IRoomObjectSpriteVisualization';
 import type {IRoomObjectVisualizationData} from './IRoomObjectVisualizationData';
 import type {IGraphicAssetCollection} from './utils/IGraphicAssetCollection';
+import type {RoomObjectSpriteData} from '@room/data/RoomObjectSpriteData';
 import {RoomObjectSprite} from './RoomObjectSprite';
 import {Vortex} from '../../../Vortex';
 
@@ -461,7 +462,7 @@ export class RoomObjectSpriteVisualization implements IRoomObjectSpriteVisualiza
     }
 
     // AS3: .../src/com/sulake/room/object/visualization/RoomObjectSpriteVisualization.as::getSpriteList()
-    getSpriteList(): IRoomObjectSprite[] | null
+    getSpriteList(): RoomObjectSpriteData[] | null
     {
         return null;
     }

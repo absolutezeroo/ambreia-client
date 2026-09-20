@@ -27,6 +27,7 @@ import type {IAvatarImageListener} from '@habbo/avatar/IAvatarImageListener';
 import type {IAvatarEffectListener} from '@habbo/avatar/IAvatarEffectListener';
 import type {IAvatarPartSpriteSet} from '@habbo/avatar/AvatarPartSprite';
 import type {IRoomObjectSprite} from '@room/object/visualization/IRoomObjectSprite';
+import {RoomObjectSpriteData} from '@room/data/RoomObjectSpriteData';
 import {AvatarRenderMode} from '@habbo/avatar/AvatarRenderMode';
 import type {IAvatarAddition} from './additions/IAvatarAddition';
 import {RoomObjectSpriteVisualization} from '@room/object/visualization/RoomObjectSpriteVisualization';
@@ -80,6 +81,13 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
 
     /** AS3 base Y scale used for figure_vertical_offset. */
     private static readonly BASE_Y_SCALE: number = 1000;
+
+    /**
+     * The scale the camera payload is measured in, hard-coded by AS3 rather than taken from the
+     * geometry — the renderer on the other side has no geometry to ask.
+     */
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/avatar/AvatarVisualization.as::getSpriteList()
+    private static readonly SERVER_RENDER_SCALE: number = 64;
 
     /** Maximum number of avatars with effect cached by the visualization. */
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/room/object/visualization/avatar/AvatarVisualization.as::MAX_AVATARS_WITH_EFFECT
@@ -780,6 +788,125 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
 
         super.dispose();
         this._disposed = true;
+    }
+
+    /**
+     * The figure as the camera's payload describes it: one record per body part, plus one per
+     * effect sprite, plus the shadow.
+     *
+     * Not what the room draws. A drawn avatar is one composed bitmap (or, in sprite-parts mode, a
+     * pool of textures) and carries no asset names the far end could resolve — `getAvatarLibraryAssetName()`
+     * answers `avatar_<id>`, which exists only so `SpriteDataCollector` can find the drawn sprite's
+     * depth. The names the server redraws the figure from (`h_std_bd_1_2_0`) are produced here,
+     * by re-rendering every body part through `AvatarImageCache` with its camera flag set — that is
+     * what `getServerRenderData()` collects and clears.
+     *
+     * The scale is AS3's hard-coded 64 and not the geometry's: these offsets are read by a renderer
+     * that has no geometry, so the payload is always in large-scale space.
+     *
+     * The shadow record is kept as AS3 writes it, `name` included — and `assetName` is a field
+     * `updateShadow()` never assigns (it sets `libraryAssetName`), so that record reaches
+     * `getFurniData()` with an empty name and is dropped by its own `name.length > 0` filter. The
+     * bug is AS3's; it is kept because the photo has to match what Flash produced.
+     */
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/avatar/AvatarVisualization.as::getSpriteList()
+    override getSpriteList(): RoomObjectSpriteData[] | null
+    {
+        if(this._activeAvatarImage === null) return null;
+
+        const shadowSprite = this.getSprite(AvatarVisualization.SPRITE_INDEX_SHADOW);
+        let shadowData: RoomObjectSpriteData | null = null;
+
+        if(shadowSprite)
+        {
+            shadowData = new RoomObjectSpriteData();
+
+            shadowData.alpha = shadowSprite.alpha;
+            shadowData.x = shadowSprite.offsetX;
+            shadowData.y = shadowSprite.offsetY;
+            shadowData.name = shadowSprite.assetName;
+            shadowData.width = shadowSprite.width;
+            shadowData.height = shadowSprite.height;
+        }
+
+        const result = this._activeAvatarImage.getServerRenderData();
+        const scale = AvatarVisualization.SERVER_RENDER_SCALE;
+
+        for(const spriteData of this._activeAvatarImage.getSprites())
+        {
+            const data = new RoomObjectSpriteData();
+            const layerData = this._activeAvatarImage.getLayerData(spriteData);
+            const direction = this._activeAvatarImage.getDirection();
+
+            let animFrame = 0;
+            let dx = spriteData.getDirectionOffsetX(direction);
+            let dy = spriteData.getDirectionOffsetY(direction);
+            const dz = spriteData.getDirectionOffsetZ(direction);
+            let dd = 0;
+
+            if(spriteData.hasDirections) dd = direction;
+
+            if(layerData != null)
+            {
+                animFrame = layerData.animationFrame;
+                dx = dx + layerData.dx;
+                dy = dy + layerData.dy;
+                dd = dd + layerData.dd;
+            }
+
+            if(dd < 0) dd = dd + 8;
+            else if(dd > 7) dd = dd - 8;
+
+            const assetName = `${this._activeAvatarImage.getScale()}_${spriteData.member}_${dd}_${animFrame}`;
+            const asset = this._activeAvatarImage.getAsset(assetName);
+
+            if(asset === null) continue;
+
+            // Same sign as the in-room path above: AS3 negates the Flash library's `<offset>`, and
+            // this port's assets arrive with that negation already applied.
+            data.x = asset.offsetX - scale / 2 + dx;
+            data.y = asset.offsetY + dy;
+
+            if(spriteData.hasStaticY)
+            {
+                data.y = data.y + (this._verticalOffset * scale) / (2 * AvatarVisualization.BASE_Y_SCALE);
+            }
+
+            if(spriteData.ink === 33) data.blendMode = 'add';
+
+            data.name = assetName;
+            data.z = this._isSittingManual
+                ? AvatarVisualization.AVATAR_SPRITE_LAYING_DEPTH - 0.001 * this.spriteCount * dz
+                : -(0.001 * this.spriteCount * dz);
+
+            // AS3 falls back to 60x60 for an asset with no rectangle; a `GraphicAsset` always has
+            // its frame, so that branch has no counterpart here.
+            data.width = asset.width;
+            data.height = asset.height;
+
+            result.push(data);
+        }
+
+        // A greyscale palette (the "ghost" transform) is applied to the figure but not to its
+        // effects or its shadow, which keep their own colours.
+        const avatarData = this._activeAvatarImage.avatarSpriteData;
+
+        if(avatarData != null && avatarData.paletteIsGrayscale)
+        {
+            const red = avatarData.reds[0].toString();
+
+            for(const data of result)
+            {
+                if(data.name.indexOf('h_std_fx') === -1 && data.name.indexOf('h_std_sd') === -1)
+                {
+                    data.color = red;
+                }
+            }
+        }
+
+        if(shadowData) result.push(shadowData);
+
+        return result;
     }
 
     /**

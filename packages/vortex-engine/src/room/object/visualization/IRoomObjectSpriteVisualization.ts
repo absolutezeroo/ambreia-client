@@ -10,6 +10,7 @@
 import type {IRoomObjectVisualization} from './IRoomObjectVisualization';
 import type {IRoomObjectSprite} from './IRoomObjectSprite';
 import type {IGraphicAssetCollection} from './utils/IGraphicAssetCollection';
+import type {RoomObjectSpriteData} from '@room/data/RoomObjectSpriteData';
 
 export interface IRoomObjectSpriteVisualization extends IRoomObjectVisualization
 {
@@ -26,8 +27,18 @@ export interface IRoomObjectSpriteVisualization extends IRoomObjectVisualization
     // AS3: .../src/com/sulake/room/object/visualization/IRoomObjectSpriteVisualization.as::getSprite()
     getSprite(index: number): IRoomObjectSprite | null;
 
+    /**
+     * The object as the camera's payload describes it, which is not what it draws.
+     *
+     * AS3 declares a bare `Array` and fills it with `RoomObjectSpriteData` — see
+     * `AvatarVisualization.getSpriteList()`, which builds one record per figure layer, and
+     * `SpriteDataCollector.getFurniData()`, which adds the object's screen position to the records
+     * in place. Typing it as the live sprites instead is what made the avatar and the mannequin
+     * unnameable in a photo: their body parts carry no `libraryAssetName`, and the names the server
+     * needs (`h_std_bd_1_2_0`) exist only on these records.
+     */
     // AS3: .../src/com/sulake/room/object/visualization/IRoomObjectSpriteVisualization.as::getSpriteList()
-    getSpriteList(): IRoomObjectSprite[] | null;
+    getSpriteList(): RoomObjectSpriteData[] | null;
 
     getUpdateID(): number;
 
