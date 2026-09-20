@@ -644,6 +644,26 @@ export class RoomVisualization extends RoomObjectSpriteVisualization
                 randomSeed
             );
 
+            // TEMPORARY diagnostic — remove once the doorway-threshold question is settled.
+            // `localStorage.setItem('vortex.planepaint', '1')` + reload repaints the room's own
+            // planes by what they are, so a screenshot says which one covers a given pixel:
+            //   magenta = a thickness face (a side/top slab, `leftSide` or `rightSide` under 1)
+            //   cyan    = any other wall plane
+            //   yellow  = any floor plane
+            try
+            {
+                if(localStorage.getItem('vortex.planepaint') === '1')
+                {
+                    const thin = leftSide.length < 1 || rightSide.length < 1;
+
+                    color = thin ? 0xFF00FF : (planeType === RoomPlane.TYPE_FLOOR ? 0xFFFF00 : 0x00FFFF);
+                }
+            }
+            catch
+            {
+                // no storage, no repaint
+            }
+
             plane.color = color;
 
             // Assign rasterizer from visualization data
