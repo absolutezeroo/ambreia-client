@@ -371,6 +371,66 @@ in `packages/vortex-web/src/lib/config.js` — nothing in the site's source chan
 Leave `VITE_ASSET_BASE` empty and the site asks *this* origin for promo art and badges, which
 nothing here serves: the pages render with every image missing and no error anywhere.
 
+## 8. Watch Paths, so one push does not rebuild all three
+
+Three applications share one repository, so by default every push fires all three webhooks: a
+one-line change in the client rebuilds the imager and the website too. **Configuration → General →
+Watch Paths**, one glob per line, is the whole fix — Coolify matches the push's changed files
+against them and skips the deploy when nothing matches. It gates the *webhook* only; **Redeploy**
+by hand always builds.
+
+Each list is the app's `COPY` surface, not its directory. The three roots are shared on purpose:
+`pnpm install --frozen-lockfile` runs in every build, so the lockfile and the workspace manifest
+invalidate all three.
+
+The client app (`/Dockerfile`):
+
+```
+packages/vortex-client/**
+packages/vortex-engine/**
+Dockerfile
+Caddyfile
+install.mjs
+vortex-client-assets.zip
+package.json
+pnpm-lock.yaml
+pnpm-workspace.yaml
+```
+
+The imager app (`/Dockerfile.imager`):
+
+```
+packages/vortex-imager/**
+packages/vortex-engine/**
+Dockerfile.imager
+install.mjs
+vortex-client-assets.zip
+package.json
+pnpm-lock.yaml
+pnpm-workspace.yaml
+```
+
+**`packages/vortex-client/**` is deliberately absent from the imager's list**, even though its
+Dockerfile runs `install.mjs` and reads `packages/vortex-client/src/assets/configurations`. That
+directory is gitignored: it comes out of `vortex-client-assets.zip`, which *is* watched. The only
+line in the imager pointing at the client is `src/config.ts`'s `avatarConfigDir`, and it resolves
+into the unpacked assets, never into the client's source. So client source is genuinely not an
+input here — which is the case the list exists for.
+
+The website app (`/Dockerfile.web`):
+
+```
+packages/vortex-web/**
+Dockerfile.web
+Caddyfile.web
+package.json
+pnpm-lock.yaml
+pnpm-workspace.yaml
+```
+
+`vortex-engine` is in nobody's list by accident: the client and the imager both depend on it
+through `workspace:*`, the website does not depend on it at all.
+
 ---
 
 ## Migrations
