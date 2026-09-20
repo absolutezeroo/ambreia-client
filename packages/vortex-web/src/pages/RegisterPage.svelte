@@ -1,33 +1,31 @@
 <script lang="ts">
-    // `/registration` — `registration/registration-form.html`. Two columns, not a centred card:
+    // `/registration` — `registration/registration-form.html`. An `<h1>`, then a NARROW form with
+    // the social block parked beside it:
     //
-    //   left  (.form--left, 66% from 532px)   h1, then the fieldsets, then the big blue submit
-    //   right                                 the social block over `teaser_registration`
+    //   .form--left        100% → 66% (532) → 50% (767) → 33% (959)
+    //   the social block   the form's own first child, absolute at right:-100% from 959px, so it
+    //                      sits exactly one form-width over; in flow with margin-top:24px below
     //
     // The fieldsets alternate plain and boxed (`.form__fieldset--box`, #103960): e-mail plain,
     // password boxed, birthdate plain, profile visibility boxed. Each carries a LABEL and a
     // paragraph of help above the field — habbo.com explains every box, which is most of why its
     // registration page looks the way it does.
     //
-    // The e-mail is split in two inputs either side of an `@`
-    // (`.registration-form__email-local-part` / `__email-domain`), reassembled before posting.
-    //
     // What the emulator takes is `{email, password, passwordRepeated}` and nothing else — so the
     // birthdate, the profile visibility and the newsletter box are rendered (they are habbo.com's
     // form) but NOT sent, and the comment on each says so rather than implying they save.
-    import {push, link} from 'svelte-spa-router';
+    import {push} from 'svelte-spa-router';
     import Button from '../components/Button.svelte';
     import HotelClosed from '../components/HotelClosed.svelte';
     import PasswordStrength from '../components/PasswordStrength.svelte';
     import * as api from '../lib/api.js';
     import {passwordProblem, emailProblem, PASSWORD_MIN_LENGTH} from '../lib/password.js';
     import {refresh, outage} from '../lib/session.js';
-    import {t} from '../lib/i18n.js';
+    import {t, tSite} from '../lib/i18n.js';
 
     const TEASER = new URL('../assets/teaser_registration.png', import.meta.url).href;
 
-    let local = $state('');
-    let domain = $state('');
+    let email = $state('');
     let password = $state('');
     let repeat = $state('');
     let day = $state('');
@@ -39,17 +37,22 @@
     let busy = $state(false);
     let error = $state('');
 
-    const email = $derived(local && domain ? `${local}@${domain}` : '');
     const mismatch = $derived(repeat.length > 0 && password !== repeat);
 
     // Six messages, not one boolean — and calibrated on the SERVER's floor of eight rather than
     // habbo.com's six, which is what `RegisterAsync` actually refuses under. The address is passed
     // in so "contains your e-mail" can be answered here rather than after the round trip.
     const problem = $derived(password.length > 0 ? passwordProblem(password, {email}) : null);
-    const emailError = $derived(local || domain ? emailProblem(email) : null);
+    const emailError = $derived(email ? emailProblem(email) : null);
 
     const DAYS = Array.from({length: 31}, (unused, index) => index + 1);
-    const MONTHS = Array.from({length: 12}, (unused, index) => index + 1);
+    // `birthdate.html` renders `<option ng-value="{{month.value}}" translate="{{month.translationKey}}">`
+    // — the month's NAME, not its number. fr.json carries all twelve (`MONTH_JANUARY` … ), and the
+    // value posted stays 1-12, so only the label changes.
+    const MONTHS = [
+        'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE',
+        'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER',
+    ].map((name, index) => ({value: index + 1, label: `MONTH_${name}`}));
     const YEARS = Array.from({length: 90}, (unused, index) => new Date().getFullYear() - 16 - index);
 
     const SOCIALS = [
@@ -96,27 +99,61 @@
              account cannot be created without the server that would hold it. -->
         <HotelClosed reason={$outage} />
     {:else}
-    <div class="flex flex-col gap-6 lg:flex-row lg:items-start">
-        <!-- `.form--left` -->
-        <form class="min-w-0 lg:w-[62%]" onsubmit={submit}>
-            <h1 class="mt-0">{t('REGISTRATION_TITLE')}</h1>
+    <div class="relative">
+        <!-- The `<h1>` is OUTSIDE the form on habbo.com, above it and full width. -->
+        <h1 class="mt-0">{t('REGISTRATION_TITLE')}</h1>
+
+        <!-- `.form.form--left.registration-form`. The whole ladder, not just its first rung:
+             100% → 66% at 532 → 50% at 767 → 33% at 959. (`.main .form--left` is 50% at 959, but
+             `registration.html` puts the form straight into `<main class="wrapper wrapper--content">`
+             without the `.main` section, so 33% is the one that applies.) This was a flat 62%,
+             which made the form nearly twice habbo.com's width on any desktop and left the social
+             block nowhere to go but on top of it. -->
+        <form class="relative min-w-0 xs:w-[66%] md:w-1/2 lg:w-[33%]" onsubmit={submit}>
+            <!-- `.registration-form__social__wrapper` is the FORM'S first child, and from 959px it
+                 is `position:absolute; right:-100%; width:100%` against `.registration-form`'s own
+                 `position:relative` — so it lands exactly one form-width to the right, never over
+                 it. Below 959 it is in flow with `margin-top:24px`. This was an `<aside>` beside
+                 the form in a flex row, which is what put it on top of the fields. -->
+            <div class="relative z-10 mt-6 lg:absolute lg:top-0 lg:right-[-100%] lg:mt-0 lg:w-full">
+                <!-- `.registration-form__social{background:rgba(0,0,0,.5); border-radius:3px;
+                     display:inline-block; padding:12px}` + `margin-left:48px` from 959. It was
+                     `bg-topbar/90` at a fixed 320px with a 96px right margin — none of which is a
+                     rule on the sheet. -->
+                <div class="inline-block rounded-[3px] bg-black/50 p-3 lg:ml-12">
+                    <!-- `.registration-form__connect{padding-left:12px}` -->
+                    <h3 class="mt-0 pl-3">{t('REGISTRATION_SOCIAL')}</h3>
+
+                    <div class="space-y-1.5">
+                        {#each SOCIALS as entry (entry.key)}
+                            <button type="button" disabled
+                                    class="block w-full rounded-[5px] border-2 px-6 py-3 text-center font-condensed text-sm uppercase opacity-70 shadow-btn {entry.class}"
+                                    title={t('SITE_SOCIAL_UNAVAILABLE')}>
+                                {t(entry.key)}
+                            </button>
+                        {/each}
+                    </div>
+                </div>
+            </div>
 
             {#if error}
                 <p class="my-3 rounded-[3px] bg-error px-3 py-3 text-white drop-shadow-[0_4px_0_rgba(0,0,0,0.3)]">{error}</p>
             {/if}
 
-            <!-- e-mail: plain fieldset, split input. -->
+            <!-- e-mail: plain fieldset, ONE `type="email"` input — `<habbo-email-address>`, which
+                 is what `registration-form.html` renders by default.
+
+                 This was a split local-part/@/domain pair, which is a different branch of the same
+                 template: `ng-if="RegistrationFormController.useDomainRestrictedEmailInput"`, the
+                 shape habbo.com gives a hotel that only accepts addresses on a fixed domain. It is
+                 off unless an email-domain policy says otherwise, and this emulator has no such
+                 setting at all — so the port was rendering the exceptional form as the normal one. -->
             <fieldset class="my-6 px-3">
-                <label class="block text-white" for="email-local-part">{t('FORM_EMAIL_LABEL')}</label>
+                <label class="block text-white" for="email-address">{t('FORM_EMAIL_LABEL')}</label>
                 <p class="mt-3">{t('EMAIL_NEW_HELP')}</p>
 
-                <div class="mt-3 flex items-center gap-1.5">
-                    <input id="email-local-part" bind:value={local} autocomplete="off" autocapitalize="none" spellcheck="false"
-                           class="w-full rounded-[5px] border-[3px] border-field-line bg-field px-3 py-[5px] text-field-ink shadow-field focus:border-field-line-focus focus:bg-white focus:outline-none" />
-                    <span class="shrink-0 text-white">@</span>
-                    <input id="email-domain" bind:value={domain} autocomplete="off" autocapitalize="none" spellcheck="false"
-                           class="w-full rounded-[5px] border-[3px] border-field-line bg-field px-3 py-[5px] text-field-ink shadow-field focus:border-field-line-focus focus:bg-white focus:outline-none" />
-                </div>
+                <input id="email-address" type="email" bind:value={email} autocomplete="off" autocapitalize="none" spellcheck="false"
+                       class="mt-3 w-full rounded-[5px] border-[3px] border-field-line bg-field px-3 py-[5px] text-field-ink shadow-field focus:border-field-line-focus focus:bg-white focus:outline-none" />
 
                 <!-- `email-address.html` names three messages for this field: invalid, already used
                      at registration, already used at change. Only the first can be answered here —
@@ -130,12 +167,10 @@
             <!-- password: `.form__fieldset--box` (#103960). -->
             <fieldset class="my-6 rounded-[3px] bg-box p-3">
                 <label class="block text-white" for="password-new">{t('NEW_PASSWORD_LABEL')}</label>
-                <!-- NOT `PASSWORD_CHANGE_HELP`: it says "au moins 6 caractères" and this hotel's
-                     floor is eight. -->
-                <p class="mt-3">
-                    Utilise au moins {PASSWORD_MIN_LENGTH} caracteres. Inclue au moins une lettre et
-                    au moins un chiffre ou un caractere special.
-                </p>
+                <!-- NOT `PASSWORD_CHANGE_HELP`: it names six characters in every language and this
+                     hotel's floor is eight, so it would be wrong nine times over. The port's own
+                     key takes the floor as a value instead of spelling a number into prose. -->
+                <p class="mt-3">{t('SITE_PASSWORD_HELP', {min: PASSWORD_MIN_LENGTH})}</p>
 
                 <input id="password-new" type="password" bind:value={password} autocomplete="new-password"
                        class="mt-3 w-full rounded-[5px] border-[3px] bg-field px-3 py-[5px] text-field-ink shadow-field focus:bg-white focus:outline-none {problem ? 'border-error' : 'border-field-line focus:border-field-line-focus'}" />
@@ -169,7 +204,7 @@
                     <select bind:value={month}
                             class="h-[35px] rounded-[5px] border-[3px] border-field-line bg-field px-3 text-field-ink shadow-field">
                         <option value="">{t('BIRTHDATE_MONTH')}</option>
-                        {#each MONTHS as value}<option {value}>{value}</option>{/each}
+                        {#each MONTHS as entry (entry.value)}<option value={entry.value}>{t(entry.label)}</option>{/each}
                     </select>
                     <select bind:value={year}
                             class="h-[35px] rounded-[5px] border-[3px] border-field-line bg-field px-3 text-field-ink shadow-field">
@@ -181,7 +216,7 @@
 
             <!-- profile visibility: boxed. Also not sent; the client's own settings own it. -->
             <fieldset class="my-6 rounded-[3px] bg-box p-3">
-                <label class="block text-white" for="profile-public">Confidentialité du Profil</label>
+                <label class="block text-white" for="profile-public">{t('SETTINGS_PROFILE_VISIBILITY_TITLE')}</label>
                 <p class="mt-3">{t('PROFILE_VISIBILITY_INFO')}</p>
 
                 <label class="mt-3 flex items-start gap-3" for="profile-public">
@@ -191,13 +226,15 @@
             </fieldset>
 
             <fieldset class="my-6 space-y-3 px-3">
+                <!-- `policies.html`'s required checkbox. The sentence, its three links and their
+                     destinations are all inside `POLICIES_TERMS_OF_SERVICE` — this had the French
+                     hand-written around two invented routes (`/terms`, `/privacy`), where the key
+                     points at `/playing-habbo/terms-of-service` and `/playing-habbo/privacy-notice`,
+                     which is where the footer sends people too. `tSite` is what drops habbo.fr's
+                     origin off them; the cookie policy has no page here and stays external. -->
                 <label class="flex items-start gap-3" for="terms">
                     <input id="terms" type="checkbox" bind:checked={terms} class="mt-1" required />
-                    <span>
-                        J'accepte
-                        <a href="/terms" use:link>Conditions d'utilisation</a>,
-                        <a href="/privacy" use:link>Politique de confidentialité</a>.
-                    </span>
+                    <span>{@html tSite('POLICIES_TERMS_OF_SERVICE')}</span>
                 </label>
 
                 <label class="flex items-start gap-3" for="marketing">
@@ -219,24 +256,11 @@
             </div>
         </form>
 
-        <!-- The social column, over habbo.com's own registration illustration. -->
-        <aside class="relative min-w-0 lg:w-[38%]">
-            <img src={TEASER} alt="" class="pointer-events-none absolute top-0 right-0 hidden max-w-none lg:block" />
-
-            <div class="relative z-10 rounded-[3px] bg-topbar/90 p-3 lg:mt-6 lg:mr-24 lg:w-[320px]">
-                <h3 class="mt-0">{t('REGISTRATION_SOCIAL')}</h3>
-
-                <div class="space-y-1.5">
-                    {#each SOCIALS as entry (entry.key)}
-                        <button type="button" disabled
-                                class="block w-full rounded-[5px] border-2 px-6 py-3 text-center font-condensed text-sm uppercase opacity-70 shadow-btn {entry.class}"
-                                title="Aucun fournisseur externe sur cet hotel">
-                            {t(entry.key)}
-                        </button>
-                    {/each}
-                </div>
-            </div>
-        </aside>
+        <!-- habbo.com's registration illustration. It is in none of the templates and in no rule on
+             the sheet — it is served as page art beside the form — so it is placed here rather than
+             cited: pinned to the right third, behind everything, and gone below 959 where the form
+             takes the full width. -->
+        <img src={TEASER} alt="" class="pointer-events-none absolute top-0 right-0 z-0 hidden max-w-none lg:block" />
     </div>
     {/if}
 </main>
