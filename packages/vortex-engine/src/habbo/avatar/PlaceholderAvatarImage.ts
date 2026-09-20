@@ -18,6 +18,7 @@ import {AvatarAction} from './enum/AvatarAction';
  */
 export class PlaceholderAvatarImage extends AvatarImage
 {
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/PlaceholderAvatarImage.as::_fullImageCache
     private static _fullImageCache: Map<string, Texture> = new Map();
 
     constructor(

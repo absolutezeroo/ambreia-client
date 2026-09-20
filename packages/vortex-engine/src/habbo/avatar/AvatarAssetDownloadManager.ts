@@ -409,7 +409,8 @@ export class AvatarAssetDownloadManager extends EventEmitter
      * are now complete, notifies their listeners, removes the completed library
      * from the mandatory list if applicable, and triggers the next batch of downloads.
      */
-    private libraryComplete(library: AvatarAssetDownloadLibrary): void 
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/AvatarAssetDownloadManager.as::libraryComplete()
+    private libraryComplete(library: AvatarAssetDownloadLibrary): void
     {
         // Remove from current downloads
         if(this._currentDownloadSet.delete(library)) 
