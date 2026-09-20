@@ -68,6 +68,23 @@ export class RoomPlane implements IRoomPlane
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/room/RoomVisualization.as::WALL_COLOR_SIDE
     private static readonly REVEAL_COLOR: number = 0xCCCCCC;
 
+    /**
+     * TEMPORARY diagnostic switch — remove once the doorway-threshold question is settled.
+     * `localStorage.setItem('vortex.reveals', '0')` then reload turns every opening's reveal off,
+     * which is the whole of `drawMaskReveals()` and nothing else.
+     */
+    private static readonly REVEALS_ENABLED: boolean = (() =>
+    {
+        try
+        {
+            return localStorage.getItem('vortex.reveals') !== '0';
+        }
+        catch
+        {
+            return true;
+        }
+    })();
+
     private _randomSeed: number = 0;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/room/RoomPlane.as::_origin
     private _origin: Vector3d;
@@ -1234,6 +1251,8 @@ export class RoomPlane implements IRoomPlane
     // TS-only: see drawMaskReveals().
     private projectThickness(geometry: IRoomGeometry): {x: number; y: number} | null
     {
+        if(!RoomPlane.REVEALS_ENABLED) return null;
+
         if(this._type !== RoomPlane.TYPE_WALL || this._wallThickness <= 0) return null;
 
         // Negative: into the wall, away from the viewer — the same sign `RoomPlaneParser` gives its

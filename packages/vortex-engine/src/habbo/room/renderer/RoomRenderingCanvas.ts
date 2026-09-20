@@ -34,6 +34,10 @@ import {RoomRotatingEffect} from '@room/utils/RoomRotatingEffect';
 import {RoomEnterEffect} from '@room/utils/RoomEnterEffect';
 import {RoomObjectSpriteType} from '@room/object/enum/RoomObjectSpriteType';
 import {ExtendedSprite} from './utils/ExtendedSprite';
+// TEMPORARY — for the `[stack-probe]` log in renderObject(); remove with it.
+import {Logger} from '@core';
+
+const log = Logger.getLogger('habbo.room.renderer.RoomRenderingCanvas');
 import {SortableSprite} from './utils/SortableSprite';
 import {ObjectMouseData} from './utils/ObjectMouseData';
 import {RoomCullingMode} from './RoomCullingMode';
@@ -330,6 +334,9 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
      */
     // TS-only: see the DEVIATION in renderObject().
     private static readonly STACK_LIFT: number = 2.5;
+
+    /** TEMPORARY — see the `[stack-probe]` log in renderObject(); remove with it. */
+    private static readonly STACKED_SEEN: Set<string> = new Set();
 
     /**
      * The floor's own altitude at a tile, excluding anything stacked on it — `RoomEngine` wires this
@@ -1473,6 +1480,28 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
         const location = object.getLocation();
         const floorHeight = this.floorHeightAt?.(Math.round(location.x), Math.round(location.y)) ?? location.z;
         const stacked = floorHeight >= 0 && (location.z - floorHeight) > RoomRenderingCanvas.STACK_EPSILON;
+
+        // TEMPORARY diagnostic — remove once the wall-item depth question is settled. One line per
+        // object, the first time it is seen stacked, naming what the lift and the clamp do to it.
+        if(stacked && !RoomRenderingCanvas.STACKED_SEEN.has(objectId))
+        {
+            RoomRenderingCanvas.STACKED_SEEN.add(objectId);
+
+            const offsets: number[] = [];
+
+            for(let s = 0; s < visualization.spriteCount; s++)
+            {
+                const sp = visualization.getSprite(s);
+
+                if(sp !== null) offsets.push(Number(sp.relativeDepth.toFixed(3)));
+            }
+
+            log.warn(
+                `[stack-probe] ${object.getType()} loc=(${location.x},${location.y},${location.z})`
+                + ` floorHeight=${floorHeight} lift=${(RoomRenderingCanvas.STACK_LIFT * (location.z - floorHeight)).toFixed(3)}`
+                + ` baseZ=${baseZ.toFixed(3)} relativeDepths=[${offsets.join(', ')}] (clamped to <=0)`
+            );
+        }
 
         if(stacked)
         {
