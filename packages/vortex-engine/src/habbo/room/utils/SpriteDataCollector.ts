@@ -330,15 +330,20 @@ export class SpriteDataCollector
     ): Record<string, unknown>
     {
         const data: Record<string, unknown> = {};
-        let name = sprite.name;
 
-        // A palette-swapped asset is `assetName@paletteId`; AS3 resolves the palette's source image
-        // through the content loader. That lookup needs `getGraphicAssetCollection().getPaletteXML()`
-        // and is left out with the name split kept, so the base asset still resolves server-side.
-        if(name.indexOf('@') !== -1)
-        {
-            name = name.split('@')[0];
-        }
+        // DEVIATION: AS3 splits `assetName@paletteId` here and resolves the palette's source image
+        //   itself, through `getGraphicAssetCollection().getPaletteXML()` and the content loader,
+        //   because its own renderer is the one that has to colour the pixels. This port sent the
+        //   base name alone — the split without the lookup — so a pet reached the photo in the
+        //   artwork's own colours rather than its owner's, which is a red dog where the room draws
+        //   a brown one.
+        //
+        //   The whole name goes now. This hotel's renderer splits it on the other side and applies
+        //   the bundle's palette itself (green channel as the index, 256 entries, alpha kept —
+        //   `GraphicAssetPalette.colorizePixels`), so keeping the id here is the difference between
+        //   it knowing which palette to use and guessing.
+        // AS3: .../habbo/room/utils/_SafeCls_1840.as::getSpriteDataObject()
+        const name = sprite.name;
 
         data.name = name;
         data.x = sprite.x - viewPort.left + canvas.screenOffsetX;
