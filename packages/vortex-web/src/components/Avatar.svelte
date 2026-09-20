@@ -3,16 +3,13 @@
     // here is pixel-identical to the same head in a room, which is the whole reason the imager
     // exists rather than a second renderer.
     //
-    // `well` is habbo.com's circular head badge (`.user-menu__avatar`, `.item__icon`), and the
-    // detail that makes it look right is that the head is BIGGER than the circle and is not clipped
-    // by it: habbo.com asks its imager for `size="bighead"` and lays that over a 46px well, so the
-    // circle shows as a rim around the jaw rather than as a frame the head sits inside. Clipping a
-    // 1x head into the circle — what this component did first — gives a small face in a dark disc,
-    // which is the thing that reads as "not Habbo".
+    // `well` is habbo.com's circular head badge (`.user-menu__avatar`, `.item__icon`): a 46px disc
+    // with the head laid over it, not clipped into it, so the circle reads as a rim around the jaw
+    // and the hair overhangs it. Clipping a 1x head inside the circle gives a small face in a dark
+    // disc, which is the thing that reads as "not Habbo".
     //
-    // So the well asks for `size=l` (the imager's zoom 2: a 180x260 canvas) and positions it by the
-    // head's own centre. Both numbers below are measured off the alpha bounding box of a rendered
-    // `headonly=1` at that size — box x 52-117, y 72-141 — not guessed.
+    // The well asks the imager for `size=l` (zoom 2, a 180x260 canvas) and places it by the head's
+    // own anchor — see the constants below for which anchor, and why it is not the bounding box.
     import {avatarUrl, hideOnError} from '../lib/config.js';
 
     let {
@@ -28,23 +25,39 @@
     } = $props();
 
     // The imager's zoom is fixed per size token (s .5 / m 1 / l 2 / b 3) — there is no arbitrary
-    // one — so the exact size habbo.com's "bighead" comes back at has to be reached in CSS. `l` is
-    // the closest source: a 180x260 canvas whose head measures 66x70 with its centre at (85, 107),
-    // all four numbers measured off the alpha bounding box of a rendered `headonly=1`.
+    // one — so the size habbo.com's "bighead" comes back at (54x62, from `getDimensions` in its own
+    // bundle) has to be reached in CSS from `l`, a 180x260 canvas.
     //
-    // The head is then drawn a touch LARGER than the well (1.06), which is what leaves the circle
-    // showing as a rim around the jaw instead of a frame the face sits inside. At 1x it is far too
-    // small for the circle; at full 2x it swamps it.
+    // THE ANCHOR IS THE CHIN AND THE BARE FACE, not the head's bounding box. That distinction is
+    // the whole fix: the box moves with the outfit, and measuring it once fixes the scale to
+    // whichever figure happened to be measured. Rendered `headonly=1` at `size=l`:
+    //
+    //   chauve             x 66-115 (50)   y  80-141 (62)
+    //   cheveux            x 48-115 (68)   y  72-141 (70)
+    //   cheveux + chapeau  x 48-119 (72)   y  68-141 (74)
+    //
+    // The bottom edge is 141 in all three — the chin is where the geometry cuts, and it does not
+    // care what is on the head. The top and the sides are the hair. Scaling the WHOLE box to the
+    // well, which is what this did, therefore drew a bald head at 62/70 of a haired one and a
+    // hatted one at 74/70, and at the 1.06 it used the head covered the well exactly: the circle
+    // never showed, which is the one thing it is there for.
+    //
+    // So the BARE FACE is mapped onto the well and the chin is parked just above its bottom edge.
+    // Hair and hats then overhang the top, which is what habbo.com's own crowned heads do.
     const CANVAS_W = 180;
     const CANVAS_H = 260;
-    const CANVAS_HEAD_H = 70;
-    const CENTRE_X = 85;
-    const CENTRE_Y = 107;
-    const OVERFLOW = 1.06;
 
-    const scale = $derived((well * OVERFLOW) / CANVAS_HEAD_H);
-    const offsetX = $derived(well / 2 - CENTRE_X * scale);
-    const offsetY = $derived(well / 2 - CENTRE_Y * scale);
+    /** The bald face: 62 tall, centred on x 90.5, chin at y 141. Properties of the geometry. */
+    const FACE_HEIGHT = 62;
+    const FACE_CENTRE_X = 90.5;
+    const CHIN_Y = 141;
+
+    /** How far the chin sits above the well's bottom edge, so the jaw is not flush with the rim. */
+    const CHIN_GAP = 4;
+
+    const scale = $derived(well / FACE_HEIGHT);
+    const offsetX = $derived(well / 2 - FACE_CENTRE_X * scale);
+    const offsetY = $derived((well - CHIN_GAP) - CHIN_Y * scale);
 
     const src = $derived(avatarUrl({
         figure,

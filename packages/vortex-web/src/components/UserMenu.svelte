@@ -70,7 +70,9 @@
     }
 }} />
 
-<div class="relative w-[190px]" data-user-menu>
+<!-- `.user-menu { width: 190px }` — and `240px` from 532, which was missed. The panel stayed at its
+     narrow width on every desktop, which is most of why it read as too small beside habbo.com's. -->
+<div class="relative w-[190px] xs:w-[240px]" data-user-menu>
     <!-- The list is a sibling of the toggle and sits under it: z-200 against the header's z-500.
 
          habbo.com's `.user-menu__list` caps at 240px, which fits ITS four rows under the 70px of top
@@ -84,7 +86,7 @@
              hidden one and dropped the clearance for every width that shows four items. -->
         <ul class="pt-[69px] pb-3">
             {#each ITEMS as item (item.href)}
-                <li class="px-3 pt-[1px] {item.added ? 'md:hidden' : ''}">
+                <li class="px-3 pt-[1px] xs:px-6 {item.added ? 'md:hidden' : ''}">
                     <a href={item.href} use:link onclick={() => (open = false)}
                        class="relative block py-1.5 pl-6 font-condensed leading-[22px] uppercase hover:border-b-0 {$location === item.href ? 'text-nav-link-active' : 'text-white hover:text-nav-link-hover'}">
                         <Sprite name={item.icon} className="absolute left-0 top-1/2 -translate-y-1/2" />
@@ -92,7 +94,7 @@
                     </a>
                 </li>
             {/each}
-            <li class="px-3 pt-[1px]">
+            <li class="px-3 pt-[1px] xs:px-6">
                 <button type="button" onclick={handleSignOut}
                         class="relative block w-full py-1.5 pl-6 text-left font-condensed leading-[22px] text-white uppercase hover:text-nav-link-hover">
                     <Sprite name="logout" className="absolute left-0 top-1/2 -translate-y-1/2" />
@@ -108,19 +110,30 @@
          links nowhere, and the profile is a row in the menu that opens. This port hung an
          `<a href="/profile">` on the head instead, so every click that landed a few pixels off the
          pill navigated away rather than opening anything. -->
-    <button type="button" onclick={() => (open = !open)}
-            class="relative z-[201] flex h-[70px] items-center">
-        <span class="block w-[145px] shrink-0 rounded-[3px] border-2 border-pill-line bg-pill py-[5px] pr-[39px] pl-3 font-condensed text-white uppercase shadow-pill xs:w-[171px]">
-            <span class="relative block truncate pl-6 text-right leading-[22px] normal-case">
-                <Sprite name="caret" className="absolute left-0 top-1/2 -translate-y-1/2 transition-transform duration-300 {open ? 'rotate-180' : ''}" />
-                {$me?.name ?? 'Habbo'}
+    <!-- `.user-menu__header { padding: 0 12px }`, and 24px from 532. It was absent, so the pill and
+         the head sat flush against the panel's edge instead of inside its gutter. -->
+    <div class="relative z-[201] px-3 xs:px-6">
+        <button type="button" onclick={() => (open = !open)}
+                class="relative flex h-[70px] w-full items-center">
+            <span class="block w-[145px] shrink-0 rounded-[3px] border-2 border-pill-line bg-pill py-[5px] pr-[39px] pl-3 font-condensed text-white uppercase shadow-pill xs:w-[171px]">
+                <span class="relative block truncate pl-6 text-right leading-[22px] normal-case">
+                    <Sprite name="caret" className="absolute left-0 top-1/2 -translate-y-1/2 transition-transform duration-300 {open ? 'rotate-180' : ''}" />
+                    {$me?.name ?? 'Habbo'}
+                </span>
             </span>
-        </span>
 
-        <!-- The head OVERLAPS the pill — that is what the pill's 39px of right padding is reserving
-             (`.user-menu__name__wrapper { padding: 5px 39px 5px 12px }`), and it is why the name is
-             right-aligned inside it. Pulling the well back over that padding is the whole trick: sat
-             beside the pill instead, the two read as two separate controls. -->
-        <Avatar user={$me?.name ?? ''} figure={$me?.figureString ?? ''} well={46} className="-ml-[33px] shadow-pill" />
-    </button>
+            <!-- The head OVERLAPS the pill — that is what the pill's 39px of right padding is
+                 reserving (`.form__label`-style padding on `.user-menu__name__wrapper`), and it is
+                 why the name is right-aligned inside it.
+
+                 It is PINNED, not in flow: `.user-menu__avatar { position:absolute; right:-6px;
+                 top:3px }`, with its 46px disc at `left:0; top:6px` inside a 54px-wide box — so the
+                 disc's right edge lands 2px inside the toggle and its top 9px down. This was a flex
+                 item pulled back by a negative margin, which put it wherever the pill's width left
+                 it rather than where the sheet says. -->
+            <span class="absolute top-[9px] right-[2px] block">
+                <Avatar user={$me?.name ?? ''} figure={$me?.figureString ?? ''} well={46} className="shadow-pill" />
+            </span>
+        </button>
+    </div>
 </div>
