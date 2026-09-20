@@ -37,6 +37,7 @@
     import SafetyQuestionsModal from '../../components/SafetyQuestionsModal.svelte';
     import SafetyLockModal from '../../components/SafetyLockModal.svelte';
     import SafetyChallengeModal from '../../components/SafetyChallengeModal.svelte';
+    import TrustedLocationsReset from '../../components/TrustedLocationsReset.svelte';
     import * as api from '../../lib/api.js';
     import type {ISafetyQuestions} from '../../lib/api.js';
     import * as notifier from '../../lib/notifier.js';
@@ -44,7 +45,6 @@
 
     let status = $state<ISafetyQuestions | null>(null);
     let dialog = $state<'edit' | 'disable' | 'challenge' | null>(null);
-    let resetting = $state(false);
 
     async function refresh(): Promise<void>
     {
@@ -69,39 +69,9 @@
         void refresh();
     }
 
-    async function resetLocations(): Promise<void>
-    {
-        if(resetting || !window.confirm(t('ACCOUNT_SECURITY_RESET_LOCATIONS_CONFIRMATION')))
-        {
-            return;
-        }
-
-        resetting = true;
-
-        try
-        {
-            await api.resetTrustedLocations();
-            notifier.success('ACCOUNT_SECURITY_TRUSTED_LOGINS_RESET_OK');
-        }
-        catch(failure)
-        {
-            // An untrusted session is refused here on purpose — forgetting every place is how a
-            // thief would make sure the owner is challenged next time — so it opens the challenge
-            // rather than reporting a failure.
-            if(api.needsSafetyUnlock(failure))
-            {
-                dialog = 'challenge';
-            }
-            else
-            {
-                notifier.error('ERROR_SERVER');
-            }
-        }
-        finally
-        {
-            resetting = false;
-        }
-    }
+    // The reset itself, its confirmation and the challenge it can open moved to
+    // `components/TrustedLocationsReset.svelte` — habbo.com's own
+    // `<habbo-trusted-locations-reset>`, which the 2FA page places as well.
 </script>
 
 <SettingsShell>
@@ -149,9 +119,7 @@
                 <h2>{t('ACCOUNT_SECURITY_TRUSTED_LOCATIONS_TITLE')}</h2>
                 <p>{@html t('ACCOUNT_SECURITY_TRUSTED_LOCATIONS_DESCRIPTION')}</p>
 
-                <Button className="mt-3" disabled={resetting} onclick={resetLocations}>
-                    {t('ACCOUNT_SECURITY_RESET_TRUSTED_LOGINS_BUTTON')}
-                </Button>
+                <TrustedLocationsReset className="mt-3" />
             </section>
         {:else}
             <MessageBox type="exclamation">

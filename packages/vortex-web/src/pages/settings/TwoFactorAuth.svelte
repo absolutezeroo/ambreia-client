@@ -27,6 +27,7 @@
     import Button from '../../components/Button.svelte';
     import TwoFactorRegisterModal from '../../components/TwoFactorRegisterModal.svelte';
     import TwoFactorDisableModal from '../../components/TwoFactorDisableModal.svelte';
+    import TrustedLocationsReset from '../../components/TrustedLocationsReset.svelte';
     import * as api from '../../lib/api.js';
     import {t} from '../../lib/i18n.js';
 
@@ -78,10 +79,16 @@
                 </Button>
             </div>
 
-            <!-- `_TRUSTED_LOCATIONS` and `<habbo-trusted-locations-reset>` belong here on
-                 habbo.com. Both are left out: the emulator keeps no trusted-login record, so the
-                 button would reset nothing and the paragraph would explain a control that is not
-                 there. -->
+            <!-- `<p …_TRUSTED_LOCATIONS>` then `<div class="two-factor-auth__status">` holding
+                 `<habbo-trusted-locations-reset>`. Both were left out here on the claim that the
+                 emulator keeps no trusted-login record — which was never true:
+                 `IAccountTrustedLocationService` backs `POST /api/user/trustedlocations/reset`, and
+                 the security page has been calling it all along. -->
+            <p class="mt-3">{t('TWO_FACTOR_AUTHENTICATION_TRUSTED_LOCATIONS')}</p>
+
+            <div class="xs:flex">
+                <TrustedLocationsReset className="mt-3" />
+            </div>
         </MessageBox>
     {:else}
         <MessageBox type="2fa-off">
