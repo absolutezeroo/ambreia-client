@@ -72,6 +72,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/public/camera/thumbnails/{roomId}.png": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetRoomThumbnail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/public/camera/photos/{photoKey}.png": {
         parameters: {
             query?: never;
@@ -1085,6 +1101,7 @@ export interface components {
             /** Format: int32 */
             likes: number;
             likedByMe: boolean;
+            likers: string[];
         };
         PlayerPreferencesResponse: {
             profileVisible: boolean;
@@ -1520,6 +1537,26 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ApiErrorResponse"];
                 };
+            };
+        };
+    };
+    GetRoomThumbnail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                roomId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

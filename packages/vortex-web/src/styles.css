@@ -157,6 +157,44 @@
         image-rendering: pixelated;
     }
 
+    /* THE CURSOR, and it is an element rule on habbo.com for the reason it is one here: it has to
+       apply to every control on the site without any of them naming it. habbo.css:
+
+           button, input[type=button], input[type=reset], input[type=submit] { cursor: pointer }
+           a                                                                 { cursor: pointer }
+           button, label                                                     { cursor: pointer }
+           [ng-click]                                                        { cursor: pointer }
+           button:disabled, input:disabled, select:disabled                  { cursor: not-allowed }
+           button[disabled], html input[disabled]                            { cursor: default }
+
+       Tailwind's preflight sets none of it, and a browser's own default for `<button>` is the ARROW
+       — so every button on this port read as inert: the user menu, the toggles, the like, the
+       pagination, the modals' own buttons. `<a href>` already gets a pointer from the browser, but
+       the rule is kept because habbo.com states it and an `<a>` without an href would not.
+
+       `[ng-click]` is habbo.com's click directive on a non-control element. Its counterpart here is
+       an element carrying an `onclick`, which Svelte compiles to a real attribute — so the selector
+       catches the same cases, and nothing has to remember to add a class.
+
+       `not-allowed` wins over `default` on a disabled button: the two habbo.css rules disagree and
+       the later one is the one that applies. Refusing a click is worth saying out loud. */
+    a,
+    button,
+    label,
+    [onclick],
+    input[type='button'],
+    input[type='reset'],
+    input[type='submit'] {
+        cursor: pointer;
+    }
+
+    button:disabled,
+    input:disabled,
+    select:disabled,
+    textarea:disabled {
+        cursor: not-allowed;
+    }
+
     /* habbo.com's type scale, verbatim. These are element rules on habbo.com and they are element
        rules here for the same reason: every page gets them without naming them, and a page that
        writes `text-3xl` on an <h1> is 30px where the site is 36px. Uppercase stops at h5 — h6 is
