@@ -30,7 +30,9 @@ import type {ImagerQuery} from './room/FurnitureRequest';
 import {
     furnitureCacheKey,
     parseFurnitureRequest,
+    parsePetRequest,
     parseRoomRequest,
+    petCacheKey,
     RoomNotFoundError,
     RoomRequestError,
     roomCacheKey
@@ -184,6 +186,55 @@ export function createServer(deps: IServerDependencies): FastifyInstance
         return renderAvatar(deps, query, reply);
     });
 
+    /**
+	 * One clothing item, on nothing.
+	 *
+	 * The figure string is the whole contract — `ch-255-73`, `hr-165-45.hd-180-1` — and it is
+	 * the avatar route underneath, with two differences that are the entire reason this exists:
+	 * the result is cropped by default, and no gender ever reaches it.
+	 *
+	 * That second one is not a convenience. `AvatarRenderManager.createAvatarImage()` runs
+	 * `validateAvatarFigure()` *only* when it is given a gender, and that method fills in the
+	 * default head, chest and legs for every mandatory set type the figure is missing — so the
+	 * same figure renders as a bare shirt without a gender and as a whole dressed avatar with
+	 * one. A route that silently did the second when a caller added `gender=M` would be a trap.
+	 */
+    app.get<{ Params: IAvatarParams }>('/habbo-imaging/clothing/:name', async (request, reply) =>
+    {
+        const query = {...request.query as AvatarQuery};
+
+        delete query.gender;
+        delete query.user;
+
+        query.figure = stripImageExtension(request.params.name);
+        query.crop ??= '1';
+        query.part = 'clothing';
+
+        return renderAvatar(deps, query, reply);
+    });
+
+    /**
+	 * A pet, in the isometric view the catalog previews one in.
+	 *
+	 * `/pet/<name>.png` or `?type=<name|type id>`, plus `palette`, `color`, `head`,
+	 * `direction`, `posture`, `gesture` and the usual `size`/`zoom`/`bg`/`frame`. There is no
+	 * Habbo route to match — the real hotel has no pet imager at all — so this follows the
+	 * furniture one's shape.
+	 */
+    app.get('/habbo-imaging/pet', async (request, reply) =>
+    {
+        return renderPet(deps, request.query as ImagerQuery, reply);
+    });
+
+    app.get<{ Params: IFurnitureParams }>('/habbo-imaging/pet/:name', async (request, reply) =>
+    {
+        const query = {...request.query as ImagerQuery};
+
+        query.type = stripImageExtension(request.params.name);
+
+        return renderPet(deps, query, reply);
+    });
+
     app.get<{ Params: IBadgeParams }>('/habbo-imaging/badge/:code', async (request, reply) =>
     {
         return renderBadge(deps, stripImageExtension(request.params.code), request.query as AvatarQuery, reply);
@@ -257,6 +308,34 @@ async function renderFurniture(deps: IServerDependencies, query: ImagerQuery, re
     catch (error)
     {
         await sendError(reply, error, 'furniture');
+    }
+}
+
+async function renderPet(deps: IServerDependencies, query: ImagerQuery, reply: FastifyReply): Promise<void>
+{
+    const rooms = deps.rooms;
+
+    if(rooms === null)
+    {
+        await reply.code(503).send({error: 'The room pipeline is not available'});
+
+        return;
+    }
+
+    try
+    {
+        const request = parsePetRequest(query, (q) => rooms.resolvePet(q));
+
+        const {buffer, hit} = await deps.cache.resolve(
+            `pet:${petCacheKey(request)}`,
+            () => rooms.renderPet(request)
+        );
+
+        sendImage(reply, buffer, hit);
+    }
+    catch (error)
+    {
+        await sendError(reply, error, 'pet');
     }
 }
 

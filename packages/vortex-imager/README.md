@@ -1,6 +1,6 @@
 # vortex-imager
 
-External avatar, group-badge, furniture and room imager for Vortex. It answers the same
+External avatar, clothing, pet, group-badge, furniture and room imager for Vortex. It answers the same
 `/habbo-imaging/…` routes a Habbo hotel already points at, so the client, the CMS and anything
 else that embeds an avatar or a guild badge can use it without changing a URL.
 
@@ -91,8 +91,10 @@ skip HTTP entirely, which matters because a single avatar pulls a dozen `.nitro`
 | `GET /habbo-imaging/avatarimage/<name>.png` | Path form; equivalent to `?user=<name>` |
 | `GET /habbo-imaging/badge/<code>.png` | Guild badge; `.gif` resolves to the same PNG |
 | `GET /habbo-imaging/badge-fill/<code>.png` | `group_logo_url_template`'s route |
+| `GET /habbo-imaging/clothing/<figure>.png` | One clothing item, on nobody |
 | `GET /habbo-imaging/effect/<id>.png` | An effect's own sprites, without the avatar |
 | `GET /habbo-imaging/handitem/<id>.png` | The object in the avatar's hand, without the avatar |
+| `GET /habbo-imaging/pet/<type>.png` | A pet; `?type=` is the query form |
 | `GET /habbo-imaging/furniture` | `?class=` or `?id=`, plus the parameters below |
 | `GET /habbo-imaging/furniture/<class>.png` | Path form; equivalent to `?class=<class>` |
 | `GET /habbo-imaging/room/<roomId>.png` | A whole room, from the database |
@@ -139,6 +141,56 @@ Glow effects were dark blobs until `render/extractDarknessToAlpha.ts` existed: t
 as light on black and drawn additively, which needs something to add to, and a transparent PNG
 is nothing. That pass — the engine's own, and AS3's before it — re-encodes the darkness as
 alpha. It fixed `?effect=` on the avatar route too, where the same blob had always been.
+
+### Clothing, on nobody
+
+**`/clothing/<figure>.png`** renders the figure string and nothing else — `clothing/ch-255-73.png`
+is that shirt, hanging in the air, with no body inside it. It takes the avatar route's `direction`,
+`size`, `zoom`, `action`, `gesture` and `frame`, so a garment can be shown in the pose it is drawn
+for. Several parts at once is just a longer figure (`clothing/hr-165-45.hd-180-1.png`).
+
+It is `/avatarimage` underneath, with two differences, and the second is the reason the route
+exists rather than a line of documentation:
+
+- **`crop=1` by default**, since a garment on its own is mostly empty canvas. `crop=0` gives the
+  full avatar canvas with the part in its usual place, which is what you want to overlay several.
+- **No gender ever reaches it.** `AvatarRenderManager.createAvatarImage()` runs
+  `validateAvatarFigure()` *only* when it is handed a gender, and that method fills in the default
+  head, chest and legs for every mandatory set type the figure is missing. So the same figure comes
+  back as a bare shirt without a gender and as a whole dressed avatar with one — `gender=` and
+  `user=` are dropped here rather than silently changing what the route means.
+
+A figure naming a part this hotel does not have answers **400**, not a transparent image. That is
+the one behaviour that differs from `/avatarimage`, which answers 200 with a 1x1 crop: a caller
+walking figuredata hits the case constantly, and a blank 200 is indistinguishable from a part that
+is genuinely invisible at that direction.
+
+### Pets
+
+**`/pet/<type>.png`** renders a pet in the same isometric view the catalog previews one in —
+`RoomEngine.getGenericRoomObjectImage()`'s category-100 branch, which is the path every pet
+widget in the client already takes.
+
+| Parameter | Values | Default |
+|---|---|---|
+| `type` | a pet name (`dog`, `monsterplant`) or its numeric type id | — |
+| `palette` | palette id, as `SellablePetPalettes` numbers them | 0 |
+| `color` | `RRGGBB` — the pet's own colour, not a background | `ffffff` |
+| `head` | `1` to render just the head | off |
+| `direction`, `head_direction` | 0–7 | 2 |
+| `posture` | the pet's own: `std`, `lay`, `sit`, `eat`, `ded`, … | the resting one |
+| `gesture` | the pet's own | — |
+| `figure` | a whole pet figure string, overriding the four above | — |
+| `size`, `zoom`, `bg`, `frame` | as everywhere else | `m` |
+
+The names come from the hotel's own `pet.configuration`, so a name this hotel does not offer
+answers 404 rather than downloading a bundle that is not there. `figure=` takes the string the wire
+and the `pets` table carry (`<typeId> <paletteId> <colorHex>[ head][ …custom parts]`) and is how
+you render a pet that has custom parts.
+
+`posture` is left unset by default because that is what the catalog does — `getPetImage()` takes a
+posture argument and every pet widget passes none. A posture a pet has no animation for falls back
+to the resting one rather than failing.
 
 ### Furniture parameters
 
@@ -191,7 +243,8 @@ only deterministic choice; `frame=N` advances every animated furni by N frames a
 full of static items renders identically at any `frame`.
 
 A room needs the database. Three things are deliberately **not** drawn: avatars, pets and bots —
-they are session state, not room contents, and there is nobody in a room the imager renders.
+they are session state, not room contents, and there is nobody in a room the imager renders. The
+`/pet/` route renders a pet on its own; it does not put one in a room.
 
 Rooms cache separately and briefly (`IMAGER_ROOM_CACHE_TTL_MS`, one minute by default). Every
 other route here is immutable for its URL — a figure string or a badge code fully describes its

@@ -26,8 +26,9 @@ import {RoomObjectRoomUpdateMessage} from '@habbo/room/messages/RoomObjectRoomUp
 import {RoomObjectRoomMaskUpdateMessage} from '@habbo/room/messages/RoomObjectRoomMaskUpdateMessage';
 import {RoomObjectDataUpdateMessage} from '@habbo/room/messages/RoomObjectDataUpdateMessage';
 import {LegacyStuffData} from '@habbo/room/object/data/LegacyStuffData';
+import {PetFigureData} from '@habbo/avatar/pets/PetFigureData';
 import type {RoomStack} from './RoomStack';
-import type {IFurnitureRequest, IRoomRequest, ImagerQuery} from './FurnitureRequest';
+import type {IFurnitureRequest, IPetRequest, IRoomRequest, ImagerQuery} from './FurnitureRequest';
 import {RoomNotFoundError, RoomRequestError} from './FurnitureRequest';
 import type {IRoomItemRow, IRoomRow} from '../db/Database';
 import {collectSprites, composeSprites} from '../render/composeSprites';
@@ -187,6 +188,120 @@ export class RoomRenderService
                     new RoomObjectDataUpdateMessage(request.state, stuffData)
                 );
             }
+
+            const visualization = object.getVisualization() as IRoomObjectSpriteVisualization | null;
+
+            if(visualization === null)
+            {
+                throw new RoomRequestError(`"${request.type}" has no visualization`);
+            }
+
+            const geometry = new RoomGeometry(request.scale, PREVIEW_DIRECTION, PREVIEW_LOCATION);
+
+            advanceVisualization(visualization, geometry, request.frame);
+
+            const layers = collectSprites(visualization, 0, 0, 0);
+            const composite = composeSprites(layers, {backgroundColor: request.backgroundColor});
+
+            geometry.dispose();
+
+            if(composite === null)
+            {
+                throw new RoomRequestError(`"${request.type}" rendered nothing — no visible sprites`);
+            }
+
+            return await canvasToPng(composite.canvas, request.zoom);
+        }
+        finally
+        {
+            this._stack.disposeRoom(roomKey);
+        }
+    }
+
+    /**
+	 * Resolves what a pet query is asking for.
+	 *
+	 * `type=` is either the pet's own name (`dog`) or its numeric type id, which is what the
+	 * wire and the `pets` table carry. Both are needed downstream and each gives the other:
+	 * the content loader keys its bundles on the name, and the figure payload carries the id.
+	 * The catalogue itself is the hotel's — `pet.configuration`, read by
+	 * `RoomContentLoader.initPetData()` — so a name this hotel does not offer 404s here rather
+	 * than downloading a bundle that is not there.
+	 */
+    resolvePet(query: ImagerQuery): { type: string; typeId: number } | null
+    {
+        const loader = this._stack.contentLoader;
+        const raw = readSingle(query, 'type');
+
+        if(raw === null) return null;
+
+        if(/^\d+$/.test(raw))
+        {
+            const type = loader.getPetType(Number(raw));
+
+            if(type === null) throw new RoomNotFoundError(`No pet with type id ${raw}`);
+
+            return {type, typeId: Number(raw)};
+        }
+
+        const typeId = loader.getPetTypeId(raw);
+
+        if(typeId < 0) throw new RoomNotFoundError(`No pet named "${raw}" in pet.configuration`);
+
+        return {type: raw, typeId};
+    }
+
+    /**
+	 * Renders one pet.
+	 *
+	 * `RoomEngine.getGenericRoomObjectImage()`'s category-100 branch, which is the one the
+	 * catalog's pet previews go through: the figure payload is parsed back by the engine's own
+	 * `PetFigureData`, its fields become model variables, and `AnimatedPetVisualization` reads
+	 * them. Nothing here decides what a pet looks like.
+	 *
+	 * The one thing that is *not* a copy is the direction. `getPetImage()` is called with
+	 * `new Vector3d(90)` by every widget — a pet preview is always shown from one angle — where
+	 * this takes the same 0–7 `direction` the furniture and avatar routes take, times 45.
+	 */
+    async renderPet(request: IPetRequest): Promise<Buffer>
+    {
+        const roomKey = this.nextRoomKey();
+
+        try
+        {
+            const object = await this._stack.createObject(
+                roomKey,
+                1,
+                request.type,
+                RoomObjectCategoryEnum.OBJECT_CATEGORY_USER
+            );
+
+            if(object === null)
+            {
+                throw new RoomRequestError(`No such pet: "${request.type}"`);
+            }
+
+            const model = object.getModelController();
+            const figure = new PetFigureData(request.figure);
+
+            model.setNumber(RoomObjectVariableEnum.PET_PALETTE_INDEX, figure.paletteId);
+            model.setNumber(RoomObjectVariableEnum.PET_COLOR, figure.color);
+            model.setNumber(RoomObjectVariableEnum.HEAD_DIRECTION, request.headDirection);
+
+            if(figure.headOnly) model.setNumber(RoomObjectVariableEnum.PET_HEAD_ONLY, 1);
+
+            if(figure.customLayerIds.length > 0)
+            {
+                model.setNumberArray(RoomObjectVariableEnum.PET_CUSTOM_LAYER_IDS, figure.customLayerIds);
+                model.setNumberArray(RoomObjectVariableEnum.PET_CUSTOM_PART_IDS, figure.customPartIds);
+                model.setNumberArray(RoomObjectVariableEnum.PET_CUSTOM_PALETTE_IDS, figure.customPaletteIds);
+            }
+
+            if(request.posture !== null) model.setString(RoomObjectVariableEnum.AVATAR_POSTURE, request.posture);
+            if(request.gesture !== null) model.setString(RoomObjectVariableEnum.AVATAR_GESTURE, request.gesture);
+
+            object.setDirection(new Vector3d(request.direction, 0, 0));
+            object.setState(-1, 0);
 
             const visualization = object.getVisualization() as IRoomObjectSpriteVisualization | null;
 

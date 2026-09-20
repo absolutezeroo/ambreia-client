@@ -174,6 +174,17 @@ export class AvatarRenderService
                 throw new Error(`Nothing rendered for figure "${request.figure}"`);
             }
 
+            // A figure naming a part this hotel does not have draws nothing, and nothing is a
+            // 200 with a transparent image — the silent failure the `/clothing/` route exists to
+            // avoid, since a caller walking figuredata hits it constantly. `getCroppedImage()`
+            // falls back to `{x: 0, y: 0, width: 1, height: 1}` when no part ever set its bounds,
+            // so a 1x1 crop *is* the engine saying it drew nothing. Only meaningful when cropped:
+            // uncropped, an empty avatar is a full-size empty canvas and indistinguishable here.
+            if(request.part === 'clothing' && request.cropped && texture.frame.width <= 1 && texture.frame.height <= 1)
+            {
+                throw new AvatarRequestError(`Nothing to draw for "${request.figure}" — no such part, or no art at this direction`);
+            }
+
             // After the full composite, never before: each body part's cache only holds an action
             // once the avatar has been rendered once, and `getImageContainer()` returns null
             // without one. Compositing the whole figure to throw it away is the price of getting

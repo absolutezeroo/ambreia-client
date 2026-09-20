@@ -5125,6 +5125,40 @@ other window's clip moved. This is the one-pass equivalent of AS3's per-`BitmapD
 
 ## Recent Work Recorded
 
+- 🆕 **`vortex-imager` renders clothing and pets — 2026-09-20.** Asked for three things: clothing
+  on its own, effects on their own, pets. One already shipped, one already worked by accident, and
+  only the third was missing — which is worth recording, because "add a route" was the wrong
+  instinct twice out of three.
+
+  - **Effects on their own already existed** (`GET /habbo-imaging/effect/<id>.png`, 2026-08-30) and
+    still work: `effect/1.png` is the spotlight cone with no avatar under it. Nothing to do. Most
+    effects legitimately answer 400 — they are an animation the avatar performs and add no sprites
+    of their own — but note that **effect 2 (Hoverboard) draws nothing even on `/avatarimage`**
+    against this asset build, where effect 1 draws correctly. Not investigated; it is an effect
+    bug, not a route one, and the composite path is demonstrably fine.
+  - **Clothing on its own already worked, by accident, and that is exactly why it needed a route.**
+    `AvatarRenderManager.createAvatarImage()` runs `validateAvatarFigure()` *only when it is handed
+    a gender*, and that method fills in the default head, chest and legs for every mandatory set
+    type the figure is missing. So `?figure=ch-255-73` renders a bare shirt — and
+    `?figure=ch-255-73&gender=M` renders a whole dressed avatar. Same figure, two meanings,
+    decided by a parameter that looks cosmetic. `GET /habbo-imaging/clothing/<figure>.png` pins it:
+    `gender=`/`user=` are dropped, `crop=1` is the default, and an unknown part answers **400**
+    rather than the 1x1 transparent PNG `/avatarimage` hands back. That sentinel is
+    `getCroppedImage()`'s own `bounds = {x: 0, y: 0, width: 1, height: 1}` fallback, not a guess.
+  - **Pets were the only real gap**, and the pipeline was already there — `RoomStack` needed two
+    lines. `GET /habbo-imaging/pet/<type>.png` mirrors
+    `RoomEngine.getGenericRoomObjectImage()`'s category-100 branch: the figure payload is parsed
+    back by the engine's own `PetFigureData`, its fields become the `pet_*` model variables, and
+    `AnimatedPetVisualization` does the rest. Verified against `dog`, `bear` (palette 2),
+    `monsterplant`, head-only, `posture=ded` and direction 4.
+    - **`visualizationFactory.assets` was never set.** `RoomStack.boot()` took an `assetLibrary`
+      parameter and used it for nothing; `RoomEngine` assigns it
+      (`_visualizationFactory.assets = assetLibrary`) and `AnimatedPetVisualizationData.commonAssets`
+      is what reads it. Furniture never does, which is why an unused parameter sat there unnoticed.
+    - **Category 100 was not registered for updates.** `RoomEngine.initializeRoomInstance()`
+      registers 0, 10, 20, 100 and 200; `RoomStack` registered three and its comment claimed that
+      was "the same three".
+
 - 🆕 **Particle furniture: dead at four links, not one — 2026-09-19.** Fireworks, fountains and
   anything else with an emitter drew nothing. The obvious missing piece was the rendering, and it
   was the *last* of four breaks in the chain; fixing it alone would have changed nothing.

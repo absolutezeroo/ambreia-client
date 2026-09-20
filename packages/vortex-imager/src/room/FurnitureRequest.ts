@@ -57,6 +57,48 @@ export interface IFurnitureRequest
     backgroundColor: number;
 }
 
+export interface IPetRequest
+{
+    /** The pet's own `.nitro` bundle name — `dog`, `monsterplant`, … — from `pet.configuration`. */
+    type: string;
+
+    /**
+	 * `RoomEngine.getPetImage()`'s payload, verbatim:
+	 * `<typeId> <paletteId> <colorHex>[ head][ <count> <layer> <part> <palette>…]`.
+	 *
+	 * Kept as the string rather than as fields because that is what the wire carries, what the
+	 * database stores, and what `PetFigureData` takes — composing it here means the renderer
+	 * parses exactly what a room would have parsed.
+	 */
+    figure: string;
+
+    /** Degrees, as the engine reads them: the tile rotation times 45. */
+    direction: number;
+
+    /** Degrees too. Ignored for the pets whose `isAllowedToTurnHead` is false. */
+    headDirection: number;
+
+    scale: number;
+    zoom: number;
+
+    /** Extra `visualization.update()` passes, to advance an animation. */
+    frame: number;
+
+    /**
+	 * `figure_posture` / `figure_gesture`, or null to leave them unset.
+	 *
+	 * Null is the default because it is the catalog's: `RoomEngine.getPetImage()` takes a
+	 * `posture` argument and every pet widget leaves it null, so the resting pose is what a
+	 * preview has always shown. A pet's postures are its own library's — `std`, `lay`, `sit`,
+	 * `eat`, `ded`, … — and one it has no animation for resolves to the resting one rather
+	 * than failing.
+	 */
+    posture: string | null;
+    gesture: string | null;
+
+    backgroundColor: number;
+}
+
 export interface IRoomRequest
 {
     roomId: number;
@@ -132,6 +174,60 @@ export function parseFurnitureRequest(
     };
 }
 
+/**
+ * Builds a pet request. `resolve` maps the `type=` the URL names — a pet's own name, or the
+ * numeric type id the wire and the database carry — onto both, since the payload needs the id
+ * and the content loader needs the name.
+ */
+export function parsePetRequest(
+    query: ImagerQuery,
+    resolve: (query: ImagerQuery) => { type: string; typeId: number } | null
+): IPetRequest
+{
+    const resolved = resolve(query);
+
+    if(resolved === null)
+    {
+        throw new RoomRequestError('Give a pet to render: `type=<name>` or `type=<type id>`');
+    }
+
+    const size = SIZE_MAP[readSingle(query, 'size')?.toLowerCase() ?? 'm'] ?? SIZE_MAP.m;
+    const direction = readNumber(query, 'direction', DEFAULT_DIRECTION);
+
+    return {
+        type: resolved.type,
+        figure: readSingle(query, 'figure') ?? buildPetFigure(resolved.typeId, query),
+        direction: (((direction % 8) + 8) % 8) * 45,
+        headDirection: (((readNumber(query, 'head_direction', direction) % 8) + 8) % 8) * 45,
+        scale: size.scale,
+        zoom: readZoom(query, size.zoom),
+        frame: Math.max(0, readNumber(query, 'frame', readNumber(query, 'frame_num', 0))),
+        posture: readSingle(query, 'posture'),
+        gesture: readSingle(query, 'gesture'),
+        backgroundColor: readColor(query, 'bg')
+    };
+}
+
+/**
+ * `RoomEngine.getPetImage()`'s payload, built from the loose parameters.
+ *
+ * The colour is hex and unprefixed because that is how `PetFigureData.parseColor()` reads it
+ * back (`parseInt(part, 16)`), and the `head` marker has to sit in position 4 or the custom
+ * part count is read off the wrong index — see `PetFigureData.parseCustomData()`.
+ */
+function buildPetFigure(typeId: number, query: ImagerQuery): string
+{
+    const palette = Math.max(0, readNumber(query, 'palette', 0));
+    const raw = (readSingle(query, 'color') ?? '').replace(/^#/, '');
+    const color = /^[0-9a-f]{6}$/i.test(raw) ? raw.toLowerCase() : 'ffffff';
+
+    let figure = `${typeId} ${palette} ${color}`;
+
+    if(readFlag(query, 'head', false)) figure += ' head';
+
+    return figure;
+}
+
 export function parseRoomRequest(roomId: number, query: ImagerQuery): IRoomRequest
 {
     if(!Number.isFinite(roomId) || roomId <= 0)
@@ -171,6 +267,23 @@ export function furnitureCacheKey(request: IFurnitureRequest): string
         request.state,
         request.frame,
         request.extra ?? '',
+        request.backgroundColor
+    ].join(':');
+}
+
+/** Cache key for a pet render. Immutable for its URL, exactly like a furni's. */
+export function petCacheKey(request: IPetRequest): string
+{
+    return [
+        request.type,
+        request.figure,
+        request.direction,
+        request.headDirection,
+        request.scale,
+        request.zoom,
+        request.frame,
+        request.posture ?? '',
+        request.gesture ?? '',
         request.backgroundColor
     ].join(':');
 }

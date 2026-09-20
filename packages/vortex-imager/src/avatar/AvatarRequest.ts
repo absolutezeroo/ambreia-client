@@ -57,17 +57,21 @@ export interface IAvatarRequest
     /**
 	 * Which part of the finished avatar to hand back.
 	 *
-	 * `body` is the avatar itself, effect sprites included — every existing route. The other
-	 * two answer "what does this thing look like on its own", which the avatar cannot: an
+	 * `body` is the avatar itself, effect sprites included — every existing route. The others
+	 * answer "what does this thing look like on its own", which the avatar cannot: an
 	 * effect's own sprites without the figure wearing them, and the object in the avatar's
 	 * hand without the hand. Both still need the whole pipeline to run — a handitem is a body
 	 * part of the figure, and an effect's sprites are resolved against its actions — so this
 	 * only changes what is composited at the end.
+	 *
+	 * `clothing` composites exactly like `body` — the figure *is* the garment, because nothing
+	 * filled in the rest of it. It is a distinct value only so an unknown part can be answered
+	 * as one; see `AvatarRenderService.render()`.
 	 */
     part: AvatarPart;
 }
 
-export type AvatarPart = 'body' | 'effect' | 'hand';
+export type AvatarPart = 'body' | 'clothing' | 'effect' | 'hand';
 
 /**
  * `size=` → which asset scale to composite from, and how the finished image is resized.
@@ -236,15 +240,16 @@ export function avatarCacheKey(request: IAvatarRequest): string
 }
 
 /**
- * `part=` is set by the route, not by the caller: `/effect/…` and `/handitem/…` inject it, and
- * `/avatarimage` never does. It is read from the query rather than passed as an argument so the
- * two new routes work the way `/avatarimage/<name>.png` already does — by filling in a
- * parameter and handing the query to the same parser.
+ * `part=` is set by the route, not by the caller: `/effect/…`, `/handitem/…` and `/clothing/…`
+ * inject it, and `/avatarimage` never does. It is read from the query rather than passed as an
+ * argument so those routes work the way `/avatarimage/<name>.png` already does — by filling in
+ * a parameter and handing the query to the same parser.
  */
 function readPart(query: AvatarQuery): AvatarPart
 {
     switch(readString(query, 'part'))
     {
+        case 'clothing': return 'clothing';
         case 'effect': return 'effect';
         case 'hand': return 'hand';
         default: return 'body';

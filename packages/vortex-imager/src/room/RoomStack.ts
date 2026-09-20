@@ -103,6 +103,12 @@ export class RoomStack
         const objectFactory = new RoomObjectFactory();
         const roomManager = new RoomManager(context);
 
+        // `RoomEngine`'s own wiring (`_visualizationFactory.assets = assetLibrary`). Furniture
+        // never reads it, which is why this parameter sat unused; a pet does —
+        // `AnimatedPetVisualizationData.commonAssets` is where the shared pet artwork comes
+        // from, and without it a pet renders its body and none of the common layers.
+        visualizationFactory.assets = assetLibrary;
+
         const stack = new RoomStack(contentLoader, roomManager);
 
         await stack.loadFurniData(configuration);
@@ -121,11 +127,13 @@ export class RoomStack
 
         // `RoomInstance.update()` only ticks the categories registered here, and it is what runs
         // each object's *logic* — the half of an object that reacts to its own data rather than
-        // to the geometry. `RoomEngine` registers the same three during bootstrap.
+        // to the geometry. `RoomEngine.initializeRoomInstance()` registers 0, 10, 20, 100 and
+        // 200; the cursor category is the only one nothing here ever creates.
         for(const category of [
             RoomObjectCategoryEnum.OBJECT_CATEGORY_ROOM,
             RoomObjectCategoryEnum.OBJECT_CATEGORY_FURNITURE,
-            RoomObjectCategoryEnum.OBJECT_CATEGORY_WALL
+            RoomObjectCategoryEnum.OBJECT_CATEGORY_WALL,
+            RoomObjectCategoryEnum.OBJECT_CATEGORY_USER
         ])
         {
             roomManager.addObjectUpdateCategory(category);
