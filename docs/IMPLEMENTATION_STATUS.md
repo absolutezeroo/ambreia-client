@@ -69,6 +69,54 @@ single missing member — so 45 commands landed and the number went 304 → 309.
 things is worth less than five covering five, and any reading of this file that treats the total as
 a score will get that backwards.
 
+### The infostand's "Phase 1" note outlived its blockers (2026-09-20)
+
+`InfoStandWidgetHandler.handleGetUserInfoMessage()` carried a header saying the peer half was
+deferred on dependencies the port lacked. Every one had landed since: `IRoomSession.tradeMode` /
+`roomModerationSettings` / `isPrivateRoom`, `ISessionDataManager.respectLeft` /
+`respectReplenishesLeft` / `systemShutDown` / `isIgnored` / `getGroupBadgeId`, and
+`IHabboGroupsManager.updateVisibleExtendedProfile()`. The note read as settled, so nobody looked,
+and three things stayed dead in the UI for as long as it sat there:
+
+- **`isIgnored` was never set**, so `AvatarMenuView` showed `ignore` and never `unignore` — the
+  peer menu could start an ignore and could not undo one.
+- **`canTrade`/`canTradeReason` were never set**, so the trade row was hidden on every peer
+  regardless of the room's trade mode, and its tooltip never said why.
+- **The trailing `GetRelationshipStatusInfoMessageComposer` was never sent.** `InfoStandWidgetHandler`
+  already listened for the answer and `InfoStandUserView.setRelationshipStatuses()` already knew how
+  to paint it; the whole heart/smile/bobba block was waiting on a request nobody made. This is the
+  "ported but never wired" shape again — both ends written, neither joined.
+
+Also restored with them: `respectLeft`/`respectReplenishesLeft`, `targetRoomControllerLevel` off the
+room object's `figure_flat_control`, the three moderation predicates
+(`determineCanBeMuted`/`Kicked`/`Banned` + the shared `determineModerationLevel` /
+`checkUserWithRightsModerationLevel`), and `groupId`/`groupBadgeId`/`groupName`.
+
+**The achievement score on the card was the server's, and the client was right to print 0.** The
+infostand read 0 for a player whose extended profile showed 140. Both numbers come from the same
+`PlayerSummarySnapshot.AchievementScore`, but the room avatar's copy is
+`RoomPlayerAvatar.ActivityPoints`, which was declared `init`-only with a `= 0` default and *nothing
+ever initialised it* — `RoomAvatarProvider.CreateAvatarFromPlayerSnapshot()` sets only
+ObjectId/PlayerId and then calls `UpdateWithPlayer()`, which did not touch it. So
+`RoomAvatarSerializer` wrote a hard 0 for every avatar in every room. Fixed in the emulator
+(`ActivityPoints` is now `private set`, assigned in `UpdateWithPlayer()`, which is both the entry
+and the player-update path). Worth reading twice before blaming a parser: the client's
+`UsersMessageParser` was reading the field correctly the whole time. `RoomPlayerAvatar.IsModerator`
+and `SwimFigure` are the same never-initialised `init` shape and are still 0/empty — `IsModerator`
+has no source on the summary snapshot, so closing it needs a field there first.
+
+**Chat bubbles, same day, unrelated cause.** Six chat styles rendered as an unstretched blob with the
+text drawn outside it: `notification_red`, `notification_green`, `notification_wrong`,
+`notification_correct_circle`, `notification_question_mark`, `notification_skull` (plus six `nft_*`).
+Their regpoints never shipped, so `ChatStyle` came up with a zeroed 9-slice grid — left cap 0, right
+cap = the whole bitmap, nothing stretchable — and zeroed text margins. The cause was one regex in
+`tools/import-chatstyles.mjs`: `RAW_EMBED_RE` listed `png|gif|jpg|swf|mp3|ttf|xml` and every
+regpoints embed is declared `_regPoints_txt$<hash>`, so all 46 of them failed the "is this already a
+raw hash-bearing name" test, fell through to the `_SafeCls_N`-only obfuscated map, resolved to null
+and were skipped. Adding `txt` takes the importer from 43/89 to **89/89 complete styles, 0
+unresolved**. Worth remembering when the next asset family comes up empty: the importer *reports*
+its own misses, and `node tools/import-chatstyles.mjs` (dry-run by default) prints them.
+
 ### Working the body-diff backlog, module by module (2026-09-19)
 
 Six passes, and the defects are one shape: **the data reaches the last step and nobody consumes

@@ -29,7 +29,13 @@ const DEFAULT_IMAGES_OUT = path.resolve(__dirname, '../src/assets/images');
 
 const MANIFEST_RELATIVE_PATH = path.join('src', 'binaryData', 'HabboFreeFlowChatCom.as');
 const FIELD_RE = /public\s+static\s+var\s+(\w+)\s*:\s*Class\s*=\s*([\w$]+)\s*;/g;
-const RAW_EMBED_RE = /_(png|gif|jpg|swf|mp3|ttf|xml)\$/;
+// `txt` belongs here: every style's regpoints embed is declared as
+// `_regPoints_txt$<hash>`, and leaving the extension out made all 46 of them fall through
+// to the obfuscated-name map (which only keys `_SafeCls_N`), resolve to null, and be
+// skipped. Six of the six regpoints files that then never shipped are the notification_*
+// styles, whose ChatStyle therefore came up with a zeroed 9-slice grid and zeroed text
+// margins - a bubble that cannot stretch, with the text drawn outside it.
+const RAW_EMBED_RE = /_(png|gif|jpg|swf|mp3|ttf|txt|xml)\$/;
 
 // Longest-suffix-first so "chat_bubble_emblem_multiline" isn't mis-split as
 // "chat_bubble_emblem" with a stray "_multiline" left in the style id.

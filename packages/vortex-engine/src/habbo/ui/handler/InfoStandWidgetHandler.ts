@@ -67,6 +67,10 @@ import type {IHabboMusicController} from '@habbo/sound/IHabboMusicController';
 import {NowPlayingEvent} from '@habbo/sound/events/NowPlayingEvent';
 import {SongInfoReceivedEvent} from '@habbo/sound/events/SongInfoReceivedEvent';
 import {RoomWidgetUserInfoUpdateEvent} from '@habbo/ui/widget/events/RoomWidgetUserInfoUpdateEvent';
+import type {RoomModerationSettings} from '@habbo/communication/messages/incoming/navigator';
+import {
+    GetRelationshipStatusInfoMessageComposer
+} from '@habbo/communication/messages/outgoing/friendlist/GetRelationshipStatusInfoMessageComposer';
 import {RoomWidgetRentableBotInfoUpdateEvent} from '@habbo/ui/widget/events/RoomWidgetRentableBotInfoUpdateEvent';
 import {RoomWidgetPetInfoUpdateEvent} from '@habbo/ui/widget/events/RoomWidgetPetInfoUpdateEvent';
 import {RoomSessionPetInfoUpdateEvent} from '@habbo/session/events/RoomSessionPetInfoUpdateEvent';
@@ -1476,18 +1480,21 @@ export class InfoStandWidgetHandler implements IRoomWidgetHandler, IGetImageList
     /**
      * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/InfoStandWidgetHandler.as::handleGetUserInfoMessage()
      *
-     * Phase 1 (identity only) — deferred, matching the AS3 method lines ~891-967:
-     * canBeMuted/canBeKicked/canBeBanned (moderation permission checks, needs
-     * IRoomSession.roomModerationSettings), canTrade/canTradeReason (trade
-     * eligibility), groupId/groupBadgeId/groupName, respectLeft/
-     * respectReplenishesLeft, isIgnored, targetRoomControllerLevel (from the
-     * room object's figure_flat_control model number). Badges read whatever is
-     * already cached via getUserSelectedBadges() and fire requestUserSelectedBadges()
-     * alongside it (AS3's own two methods), rather than awaiting the server's
-     * response before emitting this event - a full request/response round-trip
-     * for this one field is deferred with the group/respect fields below.
-     * habboGroupsManager.updateVisibleExtendedProfile() and the trailing
-     * composer send are deferred with the group/respect fields.
+     * This used to stop after the identity fields, with a "Phase 1" note listing the rest as
+     * deferred on dependencies the port did not have yet. Every one of them has since landed
+     * (`IRoomSession.tradeMode`/`roomModerationSettings`/`isPrivateRoom`,
+     * `ISessionDataManager.respectLeft`/`respectReplenishesLeft`/`systemShutDown`/`isIgnored`/
+     * `getGroupBadgeId`, `IHabboGroupsManager.updateVisibleExtendedProfile`), so the note was
+     * describing a blocker that no longer existed while three visible features stayed dead:
+     * `isIgnored` left AvatarMenuView permanently showing "ignore" and never "unignore",
+     * `canTrade` left the trade row hidden on every peer, and the missing trailing
+     * `GetRelationshipStatusInfo` send meant `InfoStandUserView.setRelationshipStatuses()` was
+     * waiting on an answer nobody had asked for, so the card's heart/smile/bobba rows never
+     * appeared.
+     *
+     * Badges still read whatever `getUserSelectedBadges()` has cached and fire
+     * `requestUserSelectedBadges()` beside it (AS3's own two calls, in AS3's order) rather than
+     * awaiting the answer, so the first card a player opens repaints when it lands.
      */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/InfoStandWidgetHandler.as::handleGetUserInfoMessage()
     private handleGetUserInfoMessage(roomId: number, roomIndex: number, category: number, userData: IUserData): void 
@@ -1537,19 +1544,77 @@ export class InfoStandWidgetHandler implements IRoomWidgetHandler, IGetImageList
         event.amIAnyRoomController = container.sessionDataManager.isAnyRoomController;
         event.amIAnAmbassador = container.sessionDataManager.isAmbassador;
 
-        if(!isOwnUser) 
+        if(!isOwnUser)
         {
             event.isBlocked = container.sessionDataManager.isBlocked(userData.webID);
             event.canBeAskedAsFriend = container.friendList?.canBeAskedForAFriend(userData.webID) ?? false;
 
             const friend = container.friendList?.getFriendById(userData.webID) ?? null;
 
-            if(friend) 
+            if(friend)
             {
                 event.realName = friend.realName;
                 event.isFriend = true;
             }
+
+            if(object)
+            {
+                // AS3 guards on isNaN() because the model returns NaN for a key it does not
+                // hold, which RoomObjectModel.getNumber() reproduces — so the guard is load-
+                // bearing here too, not decoration.
+                const flatControl = object.getModel().getNumber(RoomObjectVariableEnum.AVATAR_FLAT_CONTROL);
+
+                if(!isNaN(flatControl)) event.targetRoomControllerLevel = flatControl;
+
+                // Ordered as AS3 orders it: the three permission checks read
+                // targetRoomControllerLevel, which the line above has just set.
+                event.canBeMuted = this.determineCanBeMuted(event);
+                event.canBeKicked = this.determineCanBeKicked(event);
+                event.canBeBanned = this.determineCanBeBanned(event);
+            }
+
+            event.isIgnored = container.sessionDataManager.isIgnored(userData.webID);
+            event.respectLeft = container.sessionDataManager.respectLeft;
+            event.respectReplenishesLeft = container.sessionDataManager.respectReplenishesLeft;
+
+            const tradingAvailable = !container.sessionDataManager.systemShutDown;
+            const tradeMode = container.roomSession.tradeMode;
+
+            if(!tradingAvailable)
+            {
+                event.canTrade = false;
+            }
+            else
+            {
+                switch(tradeMode)
+                {
+                    case 1:
+                        event.canTrade =
+                            (event.myRoomControllerLevel !== 0 && event.myRoomControllerLevel !== 2)
+                            || (event.targetRoomControllerLevel !== 0 && event.targetRoomControllerLevel !== 2);
+                        break;
+                    case 2:
+                        event.canTrade = true;
+                        break;
+                    default:
+                        event.canTrade = false;
+                }
+            }
+
+            // Assigned in AS3's order, and the order is the behaviour: a non-trading room
+            // overwrites the shutdown reason, so `tradingroom` wins when both hold.
+            event.canTradeReason = 0;
+
+            if(!tradingAvailable) event.canTradeReason = 2;
+            if(tradeMode !== 2) event.canTradeReason = 3;
         }
+
+        // AS3 spells this `int(param4.groupID)` — the field is a string on IUserData here too.
+        const groupId = parseInt(userData.groupID, 10) || 0;
+
+        event.groupId = groupId;
+        event.groupBadgeId = container.sessionDataManager.getGroupBadgeId(groupId);
+        event.groupName = userData.groupName;
 
         // getUserSelectedBadges() is a pure cache read; requestUserSelectedBadges() is the
         // one that sends the composer — kept as two calls (matching AS3's own split) instead
@@ -1565,6 +1630,79 @@ export class InfoStandWidgetHandler implements IRoomWidgetHandler, IGetImageList
         event.figure = userData.figure;
 
         container.desktopEvents.emit(event.type, event);
+
+        container.habboGroupsManager?.updateVisibleExtendedProfile(userData.webID);
+        // The card's heart/smile/bobba rows are filled by onRelationshipStatusEvent() ->
+        // setRelationshipStatuses(); this is the request that answer replies to, and nothing
+        // else in the port sends it for the infostand.
+        container.connection?.send(new GetRelationshipStatusInfoMessageComposer(userData.webID));
+    }
+
+    /**
+     * Whether the room's moderation settings let *this* player mute the card's subject.
+     *
+     * AS3 writes the three as one `determineModerationLevel()` taking a closure that picks
+     * `whoCanMute`/`whoCanKick`/`whoCanBan` off the settings; kick alone short-circuits to true
+     * at level 2 before the shared check runs.
+     */
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/InfoStandWidgetHandler.as::determineCanBeMuted()
+    private determineCanBeMuted(userInfo: RoomWidgetUserInfoUpdateEvent): boolean
+    {
+        return this.determineModerationLevel(userInfo, (info, settings) =>
+            InfoStandWidgetHandler.checkUserWithRightsModerationLevel(info, settings.whoCanMute));
+    }
+
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/InfoStandWidgetHandler.as::determineCanBeKicked()
+    private determineCanBeKicked(userInfo: RoomWidgetUserInfoUpdateEvent): boolean
+    {
+        return this.determineModerationLevel(userInfo, (info, settings) =>
+        {
+            if(settings.whoCanKick === 2) return true;
+
+            return InfoStandWidgetHandler.checkUserWithRightsModerationLevel(info, settings.whoCanKick);
+        });
+    }
+
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/InfoStandWidgetHandler.as::determineCanBeBanned()
+    private determineCanBeBanned(userInfo: RoomWidgetUserInfoUpdateEvent): boolean
+    {
+        return this.determineModerationLevel(userInfo, (info, settings) =>
+            InfoStandWidgetHandler.checkUserWithRightsModerationLevel(info, settings.whoCanBan));
+    }
+
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/InfoStandWidgetHandler.as::checkUserWithRightsModerationLevel()
+    private static checkUserWithRightsModerationLevel(userInfo: RoomWidgetUserInfoUpdateEvent, level: number): boolean
+    {
+        const hasRights = userInfo.myRoomControllerLevel === 1 || userInfo.myRoomControllerLevel >= 4;
+        const isGuildAdmin = userInfo.isGuildRoom && userInfo.myRoomControllerLevel >= 3;
+
+        switch(level)
+        {
+            case 1:
+                return hasRights;
+            case 4:
+                return isGuildAdmin;
+            case 5:
+                return hasRights || isGuildAdmin;
+            default:
+                return userInfo.myRoomControllerLevel >= 4;
+        }
+    }
+
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/InfoStandWidgetHandler.as::determineModerationLevel()
+    private determineModerationLevel(
+        userInfo: RoomWidgetUserInfoUpdateEvent,
+        settingsFunction: (info: RoomWidgetUserInfoUpdateEvent, settings: RoomModerationSettings) => boolean
+    ): boolean
+    {
+        const container = this._container;
+
+        if(!container?.roomSession.isPrivateRoom) return false;
+
+        const settings = container.roomSession.roomModerationSettings;
+        const allowed = settings != null ? settingsFunction(userInfo, settings) : false;
+
+        return allowed && userInfo.targetRoomControllerLevel < 4;
     }
 
     /**
