@@ -464,10 +464,18 @@ export class IlluminaChatBubbleWidget implements IIlluminaChatBubbleWidget
             }
         }
 
-        // AS3 calls Rectangle.setEmpty(), which zeroes all four bounds - it releases the
-        // min/max pin taken at the top of this method so the next layout pass can resize the
-        // bubble again. IRectLimiter has no setEmpty(); assigning zeroes is the same state.
-        rootWindow.limits.assign(0, 0, 0, 0);
+        // Releases the min/max pin taken at the top of this method, so the next layout pass can
+        // resize the bubble again.
+        //
+        // This was `limits.assign(0, 0, 0, 0)`, on the reading that AS3's `Rectangle.setEmpty()`
+        // zeroes the four bounds and that `IRectLimiter` had no counterpart. Both halves are
+        // wrong. `IRectLimiter.setEmpty()` exists, and "empty" here means the four *int extremes*
+        // (`isEmpty` tests exactly that), not zeroes: `assign()` ends in `limit()`, so a maxWidth
+        // and maxHeight of 0 clamped the bubble's root to 0x0 on the spot and the pin kept it
+        // there. The root then handed `bubble_wrapper` a width of `0 - avatarHolder.width`, and
+        // every itemlist under it inherited a zero-width clip -- which is why the messenger drew
+        // laid-out, correctly measured text that nobody could see.
+        rootWindow.limits.setEmpty();
         this._arrowPoint?.invalidate();
 
         this._refreshing = false;
