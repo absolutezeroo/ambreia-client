@@ -4,12 +4,9 @@
     // exists rather than a second renderer.
     //
     // `well` is habbo.com's circular head badge (`.user-menu__avatar`, `.item__icon`): a 46px disc
-    // with the head laid over it, not clipped into it, so the circle reads as a rim around the jaw
-    // and the hair overhangs it. Clipping a 1x head inside the circle gives a small face in a dark
-    // disc, which is the thing that reads as "not Habbo".
-    //
-    // The well asks the imager for `size=l` (zoom 2, a 180x260 canvas) and places it by the head's
-    // own anchor — see the constants below for which anchor, and why it is not the bounding box.
+    // with the head laid over it and NOT clipped into it, so the circle shows all round the head —
+    // which, measured against habbo.fr's own render, is 34px in a 46px disc. See the constants
+    // below, and the table they come from.
     import {avatarUrl, hideOnError} from '../lib/config.js';
 
     let {
@@ -25,60 +22,54 @@
     } = $props();
 
     // The imager's zoom is fixed per size token (s .5 / m 1 / l 2 / b 3) — there is no arbitrary
-    // one — so the size habbo.com's "bighead" comes back at (54x62, from `getDimensions` in its own
-    // bundle) has to be reached in CSS from `l`, a 180x260 canvas.
+    // one — and `m` turns out to be exactly the one habbo.com uses here.
     //
-    // THE WELL IS THE ONE PLACE THAT ASKS FOR THE WHOLE CANVAS, and it is not an oversight. The
-    // imager can crop (`crop=1`), and the cropped head is far smaller — but the crop is tight to the
-    // ALPHA box, so its size is the outfit's:
+    // THE WELL DRAWS habbo.com's OWN PIXELS, 1:1, and the way to that was to stop reasoning about
+    // it and fetch one. habbo.fr's imager answers the very same request this hotel's does, so the
+    // two are directly comparable on the same figure — canvas, and the head's real alpha box inside
+    // it:
     //
-    //   chauve 50x62   cheveux 68x70   cheveux + chapeau 72x74
+    //                            canvas     coiffee    chauve
+    //   habbo.fr size=bighead    54x62      34x34      25x31
+    //   vortex   size=m          90x130     34x35      25x31
+    //   vortex   size=l          180x260    68x70      50x62
     //
-    // which leaves nothing stable to place it by. The uncropped canvas does: the chin is at y=141
-    // and the bare face is 62 tall centred on x=90.5 in EVERY figure, because those are properties
-    // of the geometry rather than of the hat. `m` would halve the download and is not an option
-    // either — its face is 31px against a 46px well, so the head would be upscaled and soft.
+    // `m` IS `bighead`: same renderer, same scale, identical to the pixel. `l` is exactly twice it,
+    // and that is what made every head in a disc too big — not the placement, the SIZE. Everything
+    // this component said about anchoring on the chin and scaling the bare face onto the well was
+    // solving the wrong problem, and its claim that "the head is bigger than the circle" was the
+    // opposite of what habbo.com draws: 34 in a 46 disc, with the circle showing all round it.
     //
-    // Everywhere else, `size` is what the caller asks for, and the callers were checked against
-    // habbo.com's own: `profile-header.html` passes NO size on a profile's own header, which is its
-    // imager's `big` (64x110) — this port was passing `l`, two steps up, which is what made the
-    // header avatar twice the size habbo.com draws.
+    // So nothing is scaled at a 46px well. The canvas is placed at a FIXED offset, which is what
+    // habbo.com does — `.user-menu__avatar` pins the img at the element origin and lets the head
+    // fall wherever the canvas puts it, so the head shifts a little with the hair and habbo.com
+    // simply accepts that. Their placement, measured:
     //
-    // THE ANCHOR IS THE CHIN AND THE BARE FACE, not the head's bounding box. That distinction is
-    // the whole fix: the box moves with the outfit, and measuring it once fixes the scale to
-    // whichever figure happened to be measured. Rendered `headonly=1` at `size=l`:
+    //   img 54x62 at the element origin, disc 46x46 at left:0 top:6
+    //   -> head at disc-relative x 6, y 9   (coiffee: img x 6-39, y 15-48)
     //
-    //   chauve             x 66-115 (50)   y  80-141 (62)
-    //   cheveux            x 48-115 (68)   y  72-141 (70)
-    //   cheveux + chapeau  x 48-119 (72)   y  68-141 (74)
-    //
-    // The bottom edge is 141 in all three — the chin is where the geometry cuts, and it does not
-    // care what is on the head. The top and the sides are the hair. Scaling the WHOLE box to the
-    // well, which is what this did, therefore drew a bald head at 62/70 of a haired one and a
-    // hatted one at 74/70, and at the 1.06 it used the head covered the well exactly: the circle
-    // never showed, which is the one thing it is there for.
-    //
-    // So the BARE FACE is mapped onto the well and the chin is parked just above its bottom edge.
-    // Hair and hats then overhang the top, which is what habbo.com's own crowned heads do.
-    const CANVAS_W = 180;
-    const CANVAS_H = 260;
+    // Ours sits at canvas x 26, y 38, so the canvas goes at (6-26, 9-38) = (-20, -29). Those two
+    // are the MEASURED values, not the arithmetic: computing them off the standalone render put the
+    // head at (8, 11) once it was in the page, so the offsets were closed against what the browser
+    // actually draws.
+    const CANVAS_W = 90;
+    const CANVAS_H = 130;
 
-    /** The bald face: 62 tall, centred on x 90.5, chin at y 141. Properties of the geometry. */
-    const FACE_HEIGHT = 62;
-    const FACE_CENTRE_X = 90.5;
-    const CHIN_Y = 141;
+    /** The disc habbo.com's numbers were measured against; a bigger well scales from it. */
+    const REFERENCE_WELL = 46;
 
-    /** How far the chin sits above the well's bottom edge, so the jaw is not flush with the rim. */
-    const CHIN_GAP = 4;
+    /** Where the canvas goes, relative to the disc's top-left, at REFERENCE_WELL. */
+    const CANVAS_X = -20;
+    const CANVAS_Y = -29;
 
-    const scale = $derived(well / FACE_HEIGHT);
-    const offsetX = $derived(well / 2 - FACE_CENTRE_X * scale);
-    const offsetY = $derived((well - CHIN_GAP) - CHIN_Y * scale);
+    const scale = $derived(well / REFERENCE_WELL);
+    const offsetX = $derived(CANVAS_X * scale);
+    const offsetY = $derived(CANVAS_Y * scale);
 
     const src = $derived(avatarUrl({
         figure,
         user,
-        size: well ? 'l' : size,
+        size: well ? 'm' : size,
         direction,
         headOnly: headOnly || well > 0,
         action,
@@ -89,18 +80,19 @@
 {#if well}
     <span class="relative block shrink-0 rounded-full border-2 border-pill-line bg-pill {className}"
           style="width:{well}px;height:{well}px">
-        <!-- `image-rendering: auto` here and only here: the source is a 2x render being scaled DOWN,
-             and nearest-neighbour on a non-integer downscale drops every other pixel row. -->
         <!-- `pointer-events: none` is not decoration. habbo.com's `.user-menu__avatar img` is a
-             `size="bighead"` render — an image the size of a head — where this one is the imager's
-             `l`, a 180x260 body canvas scaled to 0.7 and offset by the head's own centre. Same
-             picture, box seven times the size: 125x181 of transparency hanging 129px BELOW a 46px
-             well that is not `overflow:hidden` (the head is deliberately larger than the circle).
-             Inside the user menu's toggle button that box reached across the whole navigation bar
-             and swallowed the right half of the green hotel button — clicking JOUER opened the user
-             menu instead. Nothing needs to receive a click on a head. -->
+             54x62 `bighead`, an image barely bigger than the head; this is the imager's `m`, a
+             90x130 body canvas carrying the same head, so there is a good deal of transparency
+             hanging around a well that is not `overflow:hidden` — and it must not be, because the
+             hair overhangs the circle. Inside the user menu's toggle that box reached across the
+             navigation bar and swallowed the right half of the green hotel button: clicking JOUER
+             opened the user menu. Nothing needs to receive a click on a head.
+
+             `image-rendering: pixelated` comes from the base rule on `img` and is RIGHT here now:
+             at a 46px well the render is drawn 1:1, and at 60 it is a clean 1.304x of pixel art.
+             The `auto` this used to carry was for the 2x source that is gone. -->
         <img {src} alt={user || 'Avatar'} loading="lazy" onerror={hideOnError}
-             class="pointer-events-none absolute max-w-none [image-rendering:auto]"
+             class="pointer-events-none absolute max-w-none"
              style="left:{offsetX}px;top:{offsetY}px;width:{CANVAS_W * scale}px;height:{CANVAS_H * scale}px" />
     </span>
 {:else}
