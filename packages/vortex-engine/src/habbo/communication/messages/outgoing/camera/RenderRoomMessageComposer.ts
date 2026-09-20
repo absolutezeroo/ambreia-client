@@ -8,10 +8,6 @@ import {JsonMaskDrawingData} from './json/JsonMaskDrawingData';
 import {JsonPlaneDrawingData} from './json/JsonPlaneDrawingData';
 import {JsonPoint} from './json/JsonPoint';
 import {JsonTextureColumnData} from './json/JsonTextureColumnData';
-// TEMPORARY — for the `[plane-payload]` log in compressData(); remove with it.
-import {Logger} from '@core/utils/Logger';
-
-const log = Logger.getLogger('habbo.communication.camera.RenderRoomMessageComposer');
 
 /**
  * Asks the server to render the room as a photo.
@@ -188,60 +184,6 @@ export class RenderRoomMessageComposer extends MessageComposer<[ByteArray]>
                 return value;
             }
         );
-
-        // TEMPORARY diagnostic — remove once the doorway question is settled. One line per plane
-        // that is not the background and not a thin edge strip, with the quad exactly as it goes on
-        // the wire. The renderer clips every plane to these four corners, so if a photo shows a
-        // wall where the room shows an opening, one of these quads spans it — or none does and the
-        // fill is drawn after us.
-        for(const [index, plane] of this._roomPlanesData.entries())
-        {
-            const corners = plane.cornerPoints;
-
-            if(corners.length < 4) continue;
-
-            const width = Math.max(...corners.map((c) => c.x)) - Math.min(...corners.map((c) => c.x));
-            const height = Math.max(...corners.map((c) => c.y)) - Math.min(...corners.map((c) => c.y));
-
-            if(width < 8 || height < 8) continue;
-
-            log.warn(`[plane-payload] #${index} z=${plane.z.toFixed(3)} colour=#${(plane.color & 0xFFFFFF).toString(16)}`
-                + ` cols=${plane.texCols.length} masks=${plane.masks.length}`
-                + ` quad=${corners.map((c) => `(${Math.round(c.x)},${Math.round(c.y)})`).join(' ')}`);
-
-            // The one number the two logs are missing. A mask's position is measured in the plane's
-            // own texture — `leftSide.length * scale` across, so 832 for a wall thirteen tiles long
-            // — and the renderer punches it into a texture it sizes itself. Printing both the
-            // position and the space it was measured in is what settles whether the hole lands.
-            for(const mask of plane.masks)
-            {
-                log.warn(`[plane-payload]   mask ${mask.name} at (${mask.location.x},${mask.location.y})`
-                    + ` flipH=${mask.flipH} flipV=${mask.flipV}`);
-            }
-        }
-
-        // TEMPORARY diagnostic — remove with the one above. The sprites that are not body parts,
-        // with the colour exactly as it goes on the wire: furniture writes it decimal
-        // (`sprite.color.toString()`) and an avatar part writes it `0xRRGGBB`, so the string itself
-        // says which branch produced it. A pet that renders in the wrong colours is either sent a
-        // colour the room does not draw with, or sent the right one and tinted differently.
-        try
-        {
-            for(const sprite of JSON.parse(this._sprites) as Record<string, unknown>[])
-            {
-                const name = String(sprite.name ?? '');
-
-                if(name.startsWith('h_std_') || name.startsWith('sh_std_')) continue;
-
-                log.warn(`[sprite-payload] ${name} x=${sprite.x} y=${sprite.y} z=${sprite.z}`
-                    + ` colour=${sprite.color ?? '-'} alpha=${sprite.alpha ?? '-'}`
-                    + ` flipH=${sprite.flipH ?? false} blend=${sprite.blendMode ?? '-'}`);
-            }
-        }
-        catch (error)
-        {
-            log.warn('[sprite-payload] could not be read back', error);
-        }
 
         let dataStrJsonObj = RenderRoomMessageComposer.planesString() + roomPlanesDataJsonObj
             + RenderRoomMessageComposer.spritesString() + this._sprites
