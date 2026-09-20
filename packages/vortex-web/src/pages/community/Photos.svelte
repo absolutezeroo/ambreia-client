@@ -38,8 +38,10 @@
     <PageHeader title={t('PHOTOS_TITLE')} description={t('PHOTOS_DESCRIPTION')} illustration />
 
     <section class="mx-auto max-w-[1200px] px-3 pb-12">
-        <!-- The channel shape: every card carries its owner's head, because the feed mixes owners. -->
-        <PhotoColumns {photos} creator />
+        <!-- The channel shape: every card carries its owner's head, because the feed mixes owners.
+             `pool="channel"` is habbo.com's own query parameter — it is what makes the photo page's
+             arrows walk THIS feed rather than the owner's own photos. -->
+        <PhotoColumns bind:photos creator pool="channel" />
 
         {#if !loading && !photos.length}
             <EmptyResults className="py-12" />

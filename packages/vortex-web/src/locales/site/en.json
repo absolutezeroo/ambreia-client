@@ -77,5 +77,7 @@
     "SITE_ERROR_VOUCHER_EXPIRED": "This code has expired.",
     "SITE_ERROR_VOUCHER_LIMIT": "This code has reached its usage limit.",
     "SITE_PASSWORD_SHOW": "Show the password",
-    "SITE_PASSWORD_HIDE": "Hide the password"
+    "SITE_PASSWORD_HIDE": "Hide the password",
+    "SITE_PHOTO_PREVIOUS": "Previous photo",
+    "SITE_PHOTO_NEXT": "Next photo"
 }

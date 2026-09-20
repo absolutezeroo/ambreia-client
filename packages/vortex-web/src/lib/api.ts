@@ -331,6 +331,24 @@ export function getPlayerPhotos(uniqueId: string, limit?: number): Promise<IPhot
     return request(`/api/public/users/${encodeURIComponent(uniqueId)}/photos${query}`);
 }
 
+/** 404 `photo_not_found` for a key that is unknown, unpublished, or whose owner is hiding. */
+export function getPhoto(key: string): Promise<IPhotoSummary>
+{
+    return request(`/api/public/photos/${encodeURIComponent(key)}`);
+}
+
+/**
+ * Leaves or removes the caller's like, and answers the photo as it now stands.
+ *
+ * The WANTED STATE, not a toggle: the server takes `{liked}` because a toggle sent twice by a flaky
+ * connection lands on the opposite of what was pressed. So this is safe to retry, and the caller
+ * renders whatever comes back rather than guessing the new count.
+ */
+export function setPhotoLike(key: string, liked: boolean): Promise<IPhotoSummary>
+{
+    return request(`/api/user/photos/${encodeURIComponent(key)}/like`, {method: 'PUT', body: {liked}});
+}
+
 /**
  * Where a photo's pixels are.
  *

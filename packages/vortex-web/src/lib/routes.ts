@@ -107,6 +107,12 @@ export const routes = {
     '/profile': guarded(() => import('../pages/ProfilePage.svelte')),
     '/profile/:name': open(() => import('../pages/ProfilePage.svelte')),
 
+    // habbo.com's own `photo` state, url included: `/profile/:name/photo/:creationId?pool`. The
+    // pool decides which feed the page's arrows walk — see pages/PhotoPage.svelte. Declared BEFORE
+    // nothing in particular: `svelte-spa-router` matches on specificity, and `/profile/:name` does
+    // not swallow a three-segment path.
+    '/profile/:name/photo/:key': open(() => import('../pages/PhotoPage.svelte')),
+
     '/room/:id': open(() => import('../pages/RoomPage.svelte')),
     '/rooms': open(() => import('../pages/community/Rooms.svelte')),
 

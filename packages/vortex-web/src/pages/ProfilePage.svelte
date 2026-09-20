@@ -387,7 +387,7 @@
 {#if photos.length}
     <section class="mx-auto max-w-[1200px] px-3 py-6">
         <h2 class="mt-0">{t('PROFILE_PHOTOS_TITLE')}</h2>
-        <PhotoColumns {photos} />
+        <PhotoColumns bind:photos />
         <p class="mt-3"><a href="/community/photos" use:link>{t('PHOTOS_TITLE')}</a></p>
     </section>
 {/if}

@@ -343,6 +343,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/public/photos/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One published photo. */
+        get: operations["Photo"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/public/users/{uniqueId}/photos": {
         parameters: {
             query?: never;
@@ -474,6 +491,23 @@ export interface paths {
         put?: never;
         /** A payment provider's signed notification. The only thing that grants. */
         post: operations["ShopWebhook"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/user/photos/{key}/like": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Like or unlike a published photo. */
+        put: operations["PhotoLike"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1026,6 +1060,9 @@ export interface components {
             /** Format: int32 */
             sessionsRevoked: number;
         };
+        PhotoLikeRequest: {
+            liked: boolean;
+        };
         PhotoPage: {
             /** Format: int32 */
             page: number;
@@ -1045,6 +1082,9 @@ export interface components {
             roomName?: string | null;
             /** Format: date-time */
             takenAt: string;
+            /** Format: int32 */
+            likes: number;
+            likedByMe: boolean;
         };
         PlayerPreferencesResponse: {
             profileVisible: boolean;
@@ -1924,6 +1964,37 @@ export interface operations {
             };
         };
     };
+    Photo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PhotoSummary"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
     PlayerPhotos: {
         parameters: {
             query?: {
@@ -2224,6 +2295,50 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    PhotoLike: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PhotoLikeRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PhotoSummary"];
                 };
             };
             /** @description Unauthorized */
