@@ -601,8 +601,22 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
         const data = new RoomObjectSpriteData();
 
         data.objectId = objectId;
-        data.x = Math.round(sortable.x);
-        data.y = Math.round(sortable.y);
+
+        // The mirror correction, taken back out. `renderObject()` moves a flipped sprite's origin to
+        // the mirrored edge — `sortable.x = finalX + (flipH ? width : 0)` — because this port
+        // mirrors with `scale.x = -1`, which reflects about the anchor, where AS3 baked the flip
+        // into the bitmap and kept the top-left. That is a fact about how this canvas draws, and the
+        // payload is not about this canvas: AS3 writes `sortable.x` straight out and its value is
+        // the visual left edge whether or not the sprite is flipped.
+        //
+        // Sent uncorrected, a mirrored sprite landed one full width to the right of where it
+        // belongs — per layer, so an object made of several came apart by the difference between
+        // their widths. A pet was the visible case: its three body layers are 28, 21 and 13 wide,
+        // and only its mirrored directions (4, 5 and 6, which `dog.nitro` aliases off 2, 1 and 0)
+        // were wrong.
+        // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/room/renderer/cache/_SafeCls_4404.as::getSortableSpriteList()
+        data.x = Math.round(sortable.x - (sprite.flipH ? sprite.width : 0));
+        data.y = Math.round(sortable.y - (sprite.flipV ? sprite.height : 0));
         data.z = sortable.z;
         data.name = StringUtil.nonNull(sprite.libraryAssetName);
         data.flipH = sprite.flipH;
