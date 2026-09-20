@@ -307,7 +307,8 @@ There is no separate password-based login packet — authentication is **exclusi
 
 ### Login Response Burst
 
-`SSOTicketMessageHandler` sends roughly 15 composers in sequence after a successful login (exact set depends on account state — moderator bootstrap composers are conditional on rank): `AuthenticationOKMessageComposer`, avatar effects, navigator settings, favourite rooms, figure set ids, noobness level, user rights, club/gift info, credit balance, activity points, availability status, achievement score (always 0 — see §20), first-login-of-day flag, mystery box keys, builders club status, perk allowances, and (if the account has moderator rank) `ModeratorInitMessageComposer`/`CfhTopicsInitMessageComposer`.
+`SSOTicketMessageHandler` sends roughly 15 composers in sequence after a successful login (exact set depends on account state — moderator bootstrap composers are conditional on rank): `AuthenticationOKMessageComposer`, avatar effects, navigator settings, favourite rooms, figure set ids, noobness level, user rights, club/gift info, credit balance, activity points, availability status, achievement score (the player's real score — see §20, which used to claim
+otherwise), first-login-of-day flag, mystery box keys, builders club status, perk allowances, and (if the account has moderator rank) `ModeratorInitMessageComposer`/`CfhTopicsInitMessageComposer`.
 
 ### Permissions
 
@@ -565,7 +566,35 @@ Do not assume either protection exists when reasoning about client behavior — 
 
 **Limited-edition items** get their own dedicated grain, `LtdRaffleGrain` (keyed per LTD series) — batches raffle entries; a losing entry's refund is awaited (`Task.WhenAll`), not fire-and-forget (a real fix logged in `CONSOLIDATION.md`).
 
-Other catalog grains: `VoucherGrain` (redeem-code grain), a room-ad purchase path in `CatalogPurchaseGrain.RoomAd.cs` (marked partial — needs more room/furniture orchestration per `ROADMAP.md` Story 4.2). Builders Club subscription tiers are tracked in `Turbo.Players/BuildersClubService.cs`, but placing a Builders-Club-gifted item directly into a room (`BuildersClubPlaceRoomItemMessageHandler`/`...WallItemMessageHandler`) is explicitly deferred.
+Other catalog grains: `VoucherGrain` (redeem-code grain), a room-ad purchase path in `CatalogPurchaseGrain.RoomAd.cs` (marked partial — needs more room/furniture orchestration per `ROADMAP.md` Story 4.2). Builders Club subscription tiers are tracked in `Vortex.Players/BuildersClubService.cs`.
+
+**Builders Club is a catalog feature here and nothing more — the enforcement half does not exist.**
+Worth stating plainly, because every other mention of Builders Club in these docs is about the
+catalog and the placement flow, both of which work, and their absence of a caveat reads as
+"the feature is done". It is not:
+
+- **A lapsed subscription locks nothing.** In Habbo, a room whose owner is no longer paying is
+  invisible in the navigator and refuses entry to everyone but the owner and staff. There is no
+  Builders Club condition anywhere in the emulator's room-entry or navigator-listing paths — grep
+  `BuildersClub` under `Vortex.Rooms`/`Vortex.Navigator`/the navigator and room handlers and you
+  get nothing. `IBuildersClubService` is read by the catalog handler and the SSO handshake, and by
+  no one else.
+- **Nothing to port on the client side, either.** The rule is server-enforced: the AS3 client has
+  no room-access gate for it. Its only Builders-Club mentions outside the catalog are the toolbar,
+  the furni data, and a FAQ link in the room settings.
+- **The marker is missing one level deeper.** The client recognises a Builders Club item purely by
+  its **id range** — `2147418112 .. 2147483647` (`BuilderClubUtils.isBuilderClubId`, AS3
+  `_SafeCls_1824`). That range appears nowhere in the emulator, so Builders Club furniture is
+  allocated ordinary ids and the server has no way to answer "does this room contain Builders Club
+  furniture". Seven client call sites that consult it are therefore permanently false: the
+  "Builders Club" owner label in the furni chooser, the owner marker and provenance tint in
+  `InfoStandFurniView`, the pickup confirmation in `InfoStandWidgetHandler`, and two `RoomEngine`
+  guards.
+
+So the room lock is not a wiring job: allocating Builders Club furniture inside the id range the
+client already expects comes first — that alone revives the seven dead call sites — and only then
+can a navigator filter and an entry refusal (bypassed for the owner and for `room.moderate.any`)
+have anything to test.
 
 ### Currencies
 
@@ -796,7 +825,24 @@ No `Turbo.Games` project exists in the solution at all (confirmed against the fu
 
 ## 20. Achievements
 
-Does not exist as a system. `Inventory/Achievements/GetAchievementsMessageHandler.cs` is a fully empty stub (same no-op shape as Trading/Bots/Games). `PlayerGrain.cs` **hardcodes `AchievementScore = 0`** on every login — that field is read/serialized in several places (`PlayerSummarySnapshot`, `UserChangeMessageComposer`, extended profile) but never incremented anywhere in the codebase. No `AchievementEntity`, no progress-tracking grain or logic exists. `ROADMAP.md` Story 4.1 explicitly defers this: *"Achievements and Avatar Effects both need a full subsystem (DB entity + grain + progress logic) built from zero, not just wiring."* Badge-request handlers (`RequestABadgeMessageHandler`, `GetIsBadgeRequestFulfilledMessageHandler`) truthfully always report "not fulfilled" for exactly this reason — a greenfield gap, not a bug to fix in existing code.
+**This section was wrong on every claim it made, and was rewritten on 2026-09-20.** It said the
+system "does not exist", that `GetAchievementsMessageHandler.cs` was "a fully empty stub", and that
+`PlayerGrain.cs` "hardcodes `AchievementScore = 0` on every login". None of that holds: there is a
+real `Vortex.Progression/Achievements/` subsystem (progress calculator, resolution rules, account
+level ladder, event handlers), the handler is a working 42 lines, `PlayerGrain` loads
+`_state.AchievementScore` from the `players` row, and the login composer sends
+`summary.AchievementScore`. It is kept as a warning: a section stating a flat absence ages worse
+than one stating a mechanism, because nobody re-checks "does not exist".
+
+What is actually open is narrower and needs measuring, not asserting: **not every achievement has a
+trigger that can fire it**. Count the achievements defined against the ones some code path actually
+awards before quoting a number — an earlier count is a dated claim, not a fact.
+
+**The room avatar's copy of the score was a separate bug, fixed 2026-09-20.**
+`RoomPlayerAvatar.ActivityPoints` was `{ get; init; } = 0` and nothing ever initialised it, so the
+avatar block on the wire carried a hard 0 for everyone while the extended profile — built from the
+same `PlayerSummarySnapshot.AchievementScore` — showed the real score. The two numbers travel by
+different paths; seeing one right does not mean the other is.
 
 ---
 
