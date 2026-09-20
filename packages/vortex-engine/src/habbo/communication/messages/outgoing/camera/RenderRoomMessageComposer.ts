@@ -8,6 +8,10 @@ import {JsonMaskDrawingData} from './json/JsonMaskDrawingData';
 import {JsonPlaneDrawingData} from './json/JsonPlaneDrawingData';
 import {JsonPoint} from './json/JsonPoint';
 import {JsonTextureColumnData} from './json/JsonTextureColumnData';
+// TEMPORARY — for the `[plane-payload]` log in compressData(); remove with it.
+import {Logger} from '@core/utils/Logger';
+
+const log = Logger.getLogger('habbo.communication.camera.RenderRoomMessageComposer');
 
 /**
  * Asks the server to render the room as a photo.
@@ -184,6 +188,27 @@ export class RenderRoomMessageComposer extends MessageComposer<[ByteArray]>
                 return value;
             }
         );
+
+        // TEMPORARY diagnostic — remove once the doorway question is settled. One line per plane
+        // that is not the background and not a thin edge strip, with the quad exactly as it goes on
+        // the wire. The renderer clips every plane to these four corners, so if a photo shows a
+        // wall where the room shows an opening, one of these quads spans it — or none does and the
+        // fill is drawn after us.
+        for(const [index, plane] of this._roomPlanesData.entries())
+        {
+            const corners = plane.cornerPoints;
+
+            if(corners.length < 4) continue;
+
+            const width = Math.max(...corners.map((c) => c.x)) - Math.min(...corners.map((c) => c.x));
+            const height = Math.max(...corners.map((c) => c.y)) - Math.min(...corners.map((c) => c.y));
+
+            if(width < 8 || height < 8) continue;
+
+            log.warn(`[plane-payload] #${index} z=${plane.z.toFixed(3)} colour=#${(plane.color & 0xFFFFFF).toString(16)}`
+                + ` cols=${plane.texCols.length} masks=${plane.masks.length}`
+                + ` quad=${corners.map((c) => `(${Math.round(c.x)},${Math.round(c.y)})`).join(' ')}`);
+        }
 
         let dataStrJsonObj = RenderRoomMessageComposer.planesString() + roomPlanesDataJsonObj
             + RenderRoomMessageComposer.spritesString() + this._sprites
