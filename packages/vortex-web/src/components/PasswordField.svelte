@@ -7,6 +7,7 @@
     // A field that failed validation takes its own border, darker than the error popover:
     // `#903352`, `#ae1a50` when focused.
     import Sprite from './Sprite.svelte';
+    import {t} from '../lib/i18n.js';
 
     let {
         label = '',
@@ -43,8 +44,13 @@
             class="w-full rounded-[5px] border-[3px] bg-field py-[5px] pr-[35px] pl-3 text-base leading-[1.2] text-field-ink shadow-field focus:bg-white focus:outline-none {invalid ? 'border-error-line focus:border-error-line-focus' : 'border-field-line focus:border-field-line-focus'}"
         />
 
+        <!-- habbo.com's own toggle carries no accessible name at all — it is a bare `<div>` with a
+             background image — so a screen reader announces nothing. One is kept, and it is a key:
+             it was "Masquer"/"Afficher" typed in French, which is the one kind of string an
+             attribute hides from every sweep. -->
         <button type="button" onclick={() => (shown = !shown)}
-                class="absolute top-[12.1px] right-3 block" aria-label={shown ? 'Masquer' : 'Afficher'}>
+                class="absolute top-[12.1px] right-3 block"
+                aria-label={t(shown ? 'SITE_PASSWORD_HIDE' : 'SITE_PASSWORD_SHOW')}>
             <Sprite name={shown ? 'eyeActive' : 'eye'} />
         </button>
     </div>

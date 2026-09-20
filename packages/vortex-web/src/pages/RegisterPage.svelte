@@ -17,7 +17,7 @@
     import {push} from 'svelte-spa-router';
     import Button from '../components/Button.svelte';
     import HotelClosed from '../components/HotelClosed.svelte';
-    import PasswordStrength from '../components/PasswordStrength.svelte';
+    import PasswordNew from '../components/PasswordNew.svelte';
     import * as api from '../lib/api.js';
     import {passwordProblem, emailProblem, PASSWORD_MIN_LENGTH} from '../lib/password.js';
     import {refresh, outage} from '../lib/session.js';
@@ -148,7 +148,7 @@
                  shape habbo.com gives a hotel that only accepts addresses on a fixed domain. It is
                  off unless an email-domain policy says otherwise, and this emulator has no such
                  setting at all — so the port was rendering the exceptional form as the normal one. -->
-            <fieldset class="my-6 px-3">
+            <fieldset class="my-3 px-3">
                 <label class="block text-white" for="email-address">{t('FORM_EMAIL_LABEL')}</label>
                 <p class="mt-3">{t('EMAIL_NEW_HELP')}</p>
 
@@ -164,34 +164,14 @@
                 {/if}
             </fieldset>
 
-            <!-- password: `.form__fieldset--box` (#103960). -->
-            <fieldset class="my-6 rounded-[3px] bg-box p-3">
-                <label class="block text-white" for="password-new">{t('NEW_PASSWORD_LABEL')}</label>
-                <!-- NOT `PASSWORD_CHANGE_HELP`: it names six characters in every language and this
-                     hotel's floor is eight, so it would be wrong nine times over. The port's own
-                     key takes the floor as a value instead of spelling a number into prose. -->
-                <p class="mt-3">{t('SITE_PASSWORD_HELP', {min: PASSWORD_MIN_LENGTH})}</p>
-
-                <input id="password-new" type="password" bind:value={password} autocomplete="new-password"
-                       class="mt-3 w-full rounded-[5px] border-[3px] bg-field px-3 py-[5px] text-field-ink shadow-field focus:bg-white focus:outline-none {problem ? 'border-error' : 'border-field-line focus:border-field-line-focus'}" />
-
-                <PasswordStrength password={password}>
-                    {#if problem}
-                        <span class="text-sm text-error">{problem}</span>
-                    {/if}
-                </PasswordStrength>
-
-                <label class="mt-3 block text-white" for="password-repeat">{t('PASSWORD_REPEAT_LABEL')}</label>
-                <input id="password-repeat" type="password" bind:value={repeat} autocomplete="new-password"
-                       class="mt-1.5 w-full rounded-[5px] border-[3px] bg-field px-3 py-[5px] text-field-ink shadow-field focus:bg-white focus:outline-none {mismatch ? 'border-error' : 'border-field-line focus:border-field-line-focus'}" />
-
-                {#if mismatch}
-                    <p class="mt-1.5 text-sm text-error">{t('ERROR_PASSWORDS_NOT_MATCHING')}</p>
-                {/if}
-            </fieldset>
+            <!-- `<habbo-password-new>`: two joined boxes, the eye on both fields, and the strength
+                 meter in a popover that leaves the flow at 767px. This page and the password-change
+                 page each had their own copy of it, which is how they drifted. -->
+            <PasswordNew bind:password bind:repeat {problem} {mismatch}
+                         help={t('SITE_PASSWORD_HELP', {min: PASSWORD_MIN_LENGTH})} />
 
             <!-- birthdate: three selects. NOT sent — the web API takes no birthdate. -->
-            <fieldset class="my-6 px-3">
+            <fieldset class="my-3 px-3">
                 <label class="block text-white" for="birthdate-day">{t('FORM_BIRTHDATE_LABEL')}</label>
                 <p class="mt-3">{t('BIRTHDATE_HELP')}</p>
 
@@ -215,7 +195,7 @@
             </fieldset>
 
             <!-- profile visibility: boxed. Also not sent; the client's own settings own it. -->
-            <fieldset class="my-6 rounded-[3px] bg-box p-3">
+            <fieldset class="my-3 rounded-[3px] bg-box p-3">
                 <label class="block text-white" for="profile-public">{t('SETTINGS_PROFILE_VISIBILITY_TITLE')}</label>
                 <p class="mt-3">{t('PROFILE_VISIBILITY_INFO')}</p>
 
@@ -225,7 +205,7 @@
                 </label>
             </fieldset>
 
-            <fieldset class="my-6 space-y-3 px-3">
+            <fieldset class="my-3 space-y-3 px-3">
                 <!-- `policies.html`'s required checkbox. The sentence, its three links and their
                      destinations are all inside `POLICIES_TERMS_OF_SERVICE` — this had the French
                      hand-written around two invented routes (`/terms`, `/privacy`), where the key

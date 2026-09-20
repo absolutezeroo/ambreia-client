@@ -75,5 +75,7 @@
     "SITE_ERROR_SHOP_UNAVAILABLE": "La boutique n'est pas disponible pour le moment.",
     "SITE_ERROR_VOUCHER_INACTIVE": "Ce code n'est plus actif.",
     "SITE_ERROR_VOUCHER_EXPIRED": "Ce code a expiré.",
-    "SITE_ERROR_VOUCHER_LIMIT": "Ce code a atteint sa limite d'utilisations."
+    "SITE_ERROR_VOUCHER_LIMIT": "Ce code a atteint sa limite d'utilisations.",
+    "SITE_PASSWORD_SHOW": "Afficher le mot de passe",
+    "SITE_PASSWORD_HIDE": "Masquer le mot de passe"
 }

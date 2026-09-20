@@ -15,7 +15,7 @@
     import Field from '../../components/Field.svelte';
     import FormError from '../../components/FormError.svelte';
     import Button from '../../components/Button.svelte';
-    import PasswordStrength from '../../components/PasswordStrength.svelte';
+    import PasswordNew from '../../components/PasswordNew.svelte';
     import * as api from '../../lib/api.js';
     import {passwordProblem, PASSWORD_MIN_LENGTH} from '../../lib/password.js';
     import * as notifier from '../../lib/notifier.js';
@@ -87,27 +87,12 @@
             <PasswordField name="password-current" label={t('CURRENT_PASSWORD_LABEL')} bind:value={current} />
         </Fieldset>
 
-        <!-- NOT `PASSWORD_CHANGE_HELP`: habbo.com's sentence is "Utilise au moins 6 caractères",
-             and six is not this hotel's floor. The rest of it is habbo's, word for word. -->
-        <Fieldset box title={t('NEW_PASSWORD_LABEL')}
-                  help="Utilise au moins {PASSWORD_MIN_LENGTH} caracteres. Inclue au moins une lettre et au moins un chiffre ou un caractere special.">
-            <PasswordField name="password-new" bind:value={next} autocomplete="new-password" invalid={problem !== null} />
-
-            <!-- `habbo-password-strength` wraps the field's own messages, so the meter and the
-                 reason it is red are one block rather than two. -->
-            <PasswordStrength password={next}>
-                {#if problem}
-                    <span class="text-error">{problem}</span>
-                {/if}
-            </PasswordStrength>
-
-            <label class="mt-3 block text-white" for="password-repeat">{t('PASSWORD_REPEAT_LABEL')}</label>
-            <PasswordField name="password-repeat" bind:value={repeat} autocomplete="new-password" invalid={mismatch} />
-
-            {#if mismatch}
-                <FormError inline>{t('ERROR_PASSWORDS_NOT_MATCHING')}</FormError>
-            {/if}
-        </Fieldset>
+        <!-- `<habbo-password-new>`, the same component the registration page places. The help line
+             was hand-written French here — accents missing — where habbo.com's own
+             `PASSWORD_CHANGE_HELP` names six characters and this hotel's floor is eight; the key
+             below takes the floor as a value instead. -->
+        <PasswordNew bind:password={next} bind:repeat {problem} {mismatch}
+                     help={t('SITE_PASSWORD_HELP', {min: PASSWORD_MIN_LENGTH})} />
 
         <!-- habbo.com puts a captcha in this slot. This hotel has no captcha provider, and the web
              API takes the second factor here instead, so the code field stands in its place. -->
