@@ -6074,7 +6074,26 @@ export class RoomEngine extends Component implements IRoomEngine,
             // doing it here keeps the two call sites (camera, room thumbnail) from repeating it.
             context.fillStyle = `#${(backgroundColor >>> 0).toString(16).padStart(6, '0').slice(-6)}`;
             context.fillRect(0, 0, width, height);
-            context.drawImage(source, -Math.round(region?.left ?? 0), -Math.round(region?.top ?? 0));
+
+            // The room's pan, added back. `region` is measured on the room as the player is looking
+            // at it — `CameraViewFinder.getViewPort()` reads window coordinates — and that is also
+            // the space `getRenderRoomMessage()` subtracts it in, since every coordinate it writes
+            // carries `+ screenOffsetX/Y`. But `takeScreenShot()` re-renders the room at 1:1 with
+            // the offsets forced to zero, so its pixels are the room *unpanned*: cropping it at
+            // `region` alone framed a place the player was not looking at, and the photo came back
+            // showing somewhere else by exactly the distance the room had been dragged.
+            //
+            // AS3 has nothing to add back because it draws the live display object through a
+            // matrix, pan included; the zero-offset re-render is this port's own, and this is its
+            // other half.
+            const panX = Math.round(canvas.screenOffsetX);
+            const panY = Math.round(canvas.screenOffsetY);
+
+            context.drawImage(
+                source,
+                -(Math.round(region?.left ?? 0) - panX),
+                -(Math.round(region?.top ?? 0) - panY)
+            );
 
             return await createImageBitmap(target);
         }
