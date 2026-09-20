@@ -1838,6 +1838,21 @@ comes back. **117 of the emulator's 515 handlers are that shape**, crafting's fi
 > header 1985 in WIN63's registry and the emulator's `Revision20260701/Headers.cs` has no 1985
 > at all — the composer is complete and sends into nothing. The paragraph below already said
 > this; it is still true.
+>
+> **Closed 2026-09-20.** Header 1985 is registered, `RenderRoomThumbnailMessageParser` reads the
+> same one `ByteArray` the photo parser does, and `ThumbnailStatusMessageComposer` — which had no
+> fields and an empty `Serialize` — now writes the two booleans the client's parser reads. What
+> the picture is addressed by was the whole design question, and the client had already answered
+> it: with no `officialRoomPicRef`, `RoomEntryElementFactory`, `RoomInfoPopup` and
+> `RoomToolsToolbarCtrl` all ask for `navigator.thumbnail.url_base` + the room id + `.png`. So the
+> thumbnail is stored as `room-<id>.png`, served at
+> `/api/public/camera/thumbnails/{roomId}.png`, and **no column and no migration were needed** —
+> `RoomSettingsSerializer`'s never-set `RoomBitmaskFlags.Thumbnail` stays never-set on purpose.
+> The live `external_variables.json` key was repointed from `habbo-stories-content.s3.amazonaws.com`
+> to `${url.prefix}/webapi/api/public/camera/thumbnails/`; that file is hand-maintained on the
+> assets host and ships in the assets image, so the deployed hotel needs it rebuilt and pushed.
+> The one check the photo path does not do lives in the handler: a photo is the player's, a
+> thumbnail is the room's, so it is refused unless the sender owns the room.
 
 `scripts/wire-coverage.mjs` was reporting these as "the server is implemented and waiting" because
 it matched on the handler *filename*. It now classifies the body, and the headline number drops from
@@ -1858,7 +1873,8 @@ produced a confident wrong answer — see the warning above the message-category
 
 One more thing worth knowing before the camera UI is wired: **the emulator has no header 1985 at
 all**, so `RenderRoomThumbnailMessageComposer` is a client-only composer against this server, unlike
-the other five which at least have a registered (if inert) handler.
+the other five which at least have a registered (if inert) handler. *(Superseded 2026-09-20 — see
+the note above: 1985 is registered, parsed, answered and rendered.)*
 
 ### Full re-measure (2026-08-13)
 

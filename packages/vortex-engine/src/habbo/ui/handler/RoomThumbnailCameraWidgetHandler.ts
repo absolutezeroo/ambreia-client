@@ -131,9 +131,9 @@ export class RoomThumbnailCameraWidgetHandler implements IRoomWidgetHandler
             return null;
         }
 
-        // The `true` selects the thumbnail composer, which packs in its constructor. Note the
-        // emulator has no header 1985 at all, so this reaches a server that does not accept
-        // thumbnail renders — the client side is nonetheless correct.
+        // The `true` selects the thumbnail composer, which packs in its constructor. Header 1985 is
+        // the one the emulator answers on, and the picture it stores is what every listing of this
+        // room then shows — `navigator.thumbnail.url_base` + the room id + `.png`.
         return this._roomDesktop.roomEngine?.getRenderRoomMessage(
             this._widget.viewPort,
             this._roomDesktop.roomBackgroundColor,
