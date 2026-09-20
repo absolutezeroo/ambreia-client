@@ -20,10 +20,11 @@
     import Sprite from '../components/Sprite.svelte';
     import EmptyResults from '../components/EmptyResults.svelte';
     import ProfileListModal from '../components/ProfileListModal.svelte';
+    import PhotoColumns from '../components/PhotoColumns.svelte';
     import {me} from '../lib/session.js';
     import type {Snippet} from 'svelte';
     import * as api from '../lib/api.js';
-    import type {IPlayerProfile} from '../lib/api.js';
+    import type {IPlayerProfile, IPhotoSummary} from '../lib/api.js';
     import type {IProfileListKind} from '../components/ProfileListModal.svelte';
     import {loadBadgeTexts, badgeName} from '../lib/badges.js';
     import {badgeUrl, groupBadgeUrl, hideOnError} from '../lib/config.js';
@@ -67,6 +68,7 @@
     const own = $derived(!params.name || params.name === $me?.name);
 
     let profile = $state<IPlayerProfile | null>(null);
+    let photos = $state<IPhotoSummary[]>([]);
     let texts = $state({});
     let error = $state('');
     let loading = $state(true);
@@ -140,6 +142,14 @@
                 const answer = found.uniqueId === mine
                     ? await api.getOwnProfile()
                     : await api.getProfile(found.uniqueId);
+
+                // The photos are a separate route and a separate section, so they load beside the
+                // profile rather than inside it: a player with none is the common case, and the
+                // four cards must not wait on a query that will answer an empty list. A failure
+                // leaves the section absent, which is also what "no photos" looks like.
+                void api.getPlayerPhotos(found.uniqueId)
+                    .then((loaded) => !cancelled && (photos = loaded))
+                    .catch(() => !cancelled && (photos = []));
 
                 // The badge texts are a second fetch and a big one; the page must not wait on it to
                 // render, so the labels fill in when it lands.
@@ -359,6 +369,28 @@
         </li>
     {/each}
 {/snippet}
+
+<!-- `profile.html`'s photo section, between the four cards and the footer:
+
+       <section ng-if="photos.length > 0" class="wrapper wrapper--content">
+         <div class="profile__creations">
+           <h2 class="profile__creations__title" translate="PROFILE_PHOTOS_TITLE">
+           <habbo-columns-profile items="photos">
+           <a href="/community/photos" class="profile__photos__link" translate="PHOTOS_TITLE">
+
+     The section is absent, not empty, when the player has published none — habbo.com's own `ng-if`.
+     No head on these cards: on a profile every photo has the same owner.
+
+     habbo.com has a SECOND section under it, `PROFILE_CREATIONS_TITLE` over `stories`. Stories are
+     a habbo.com feature — user-written pages — and this hotel has no table, no editor and no packet
+     for them, so that section is not ported rather than ported empty. -->
+{#if photos.length}
+    <section class="mx-auto max-w-[1200px] px-3 py-6">
+        <h2 class="mt-0">{t('PROFILE_PHOTOS_TITLE')}</h2>
+        <PhotoColumns {photos} />
+        <p class="mt-3"><a href="/community/photos" use:link>{t('PHOTOS_TITLE')}</a></p>
+    </section>
+{/if}
 
 <!-- `.profile__joined` + `.profile__hearts` -->
 {#if user}

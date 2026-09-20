@@ -26,6 +26,8 @@ export type IProfileUser = Schemas['ProfileUser'];
 export type IPlayerProfile = Schemas['PlayerProfile'];
 export type IRoomSummary = Schemas['RoomSummary'];
 export type IRoomPage = Schemas['RoomPage'];
+export type IPhotoSummary = Schemas['PhotoSummary'];
+export type IPhotoPage = Schemas['PhotoPage'];
 export type IPlayerPurse = Schemas['PlayerPurse'];
 export type IAvatarInfo = Schemas['AvatarInfo'];
 export type IArticleSummary = Schemas['ArticleSummary'];
@@ -297,6 +299,49 @@ export function getProfile(uniqueId: string): Promise<IPlayerProfile>
 export function getOwnProfile(): Promise<IPlayerProfile>
 {
     return request('/api/user/profile');
+}
+
+// The photo gallery, newest first, and one player's photos.
+//
+// PUBLISHED photos only — the server enforces that, along with "not deleted" and "the owner is not
+// hiding their profile", in one place (`IWebApiPhotoService`). Anonymous, like the profile and
+// appart reads: a gallery is a page a signed-out visitor opens.
+export function getPhotos(options: {page?: number; pageSize?: number} = {}): Promise<IPhotoPage>
+{
+    const query = new URLSearchParams();
+
+    if(options.page)
+    {
+        query.set('page', String(options.page));
+    }
+
+    if(options.pageSize)
+    {
+        query.set('pageSize', String(options.pageSize));
+    }
+
+    return request(`/api/public/photos${query.size ? `?${query}` : ''}`);
+}
+
+/** An empty list for a player with none, one who does not exist, or one who is hiding. */
+export function getPlayerPhotos(uniqueId: string, limit?: number): Promise<IPhotoSummary[]>
+{
+    const query = limit ? `?limit=${limit}` : '';
+
+    return request(`/api/public/users/${encodeURIComponent(uniqueId)}/photos${query}`);
+}
+
+/**
+ * Where a photo's pixels are.
+ *
+ * `WebApiEndpointsCamera` owns this route and guards it with the key: a photo directory is never
+ * handed to a web server to walk, and the key is thirty-two random characters precisely because,
+ * once published, it is the only thing standing in front of the image. Same origin as the site, so
+ * nothing here needs ASSET_BASE.
+ */
+export function photoUrl(key: string): string
+{
+    return `/api/public/camera/photos/${encodeURIComponent(key)}.png`;
 }
 
 // Busiest first. A room whose door is invisible is in neither this nor getRoom(): the web API would

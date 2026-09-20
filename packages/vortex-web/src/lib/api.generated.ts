@@ -72,6 +72,56 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/public/camera/photos/{photoKey}.png": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetCameraPhoto"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/chain": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What a wallet needs to add the hotel's network. */
+        get: operations["ChainDescriptor"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/chain/rpc": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Forwards an allowlisted JSON-RPC call, or a batch of them, to the node. */
+        post: operations["ChainRpc"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/public/languages": {
         parameters: {
             query?: never;
@@ -268,6 +318,74 @@ export interface paths {
         };
         /** One appart. */
         get: operations["Room"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The photo gallery: every published photo, newest first. */
+        get: operations["Photos"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/users/{uniqueId}/photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One player's published photos, newest first. */
+        get: operations["PlayerPhotos"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/collectibles/{assetId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** ERC-721 metadata for one Relic, by its hotel asset id. */
+        get: operations["CollectibleMetadata"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/leaderboard/coins": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Who holds the most VortexCoin, as of the last snapshot. */
+        get: operations["CoinLeaderboard"];
         put?: never;
         post?: never;
         delete?: never;
@@ -705,6 +823,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/user/wallets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The player's hotel wallet and any self-custody wallets they linked. */
+        get: operations["UserWallets"];
+        put?: never;
+        /** Links a wallet by the signature it gave for the issued challenge. */
+        post: operations["LinkWallet"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/user/wallets/challenge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** A nonce to sign, and the exact message to sign it in. */
+        post: operations["WalletChallenge"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/user/wallets/{address}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Unlinks a wallet the player had proved. */
+        delete: operations["UnlinkWallet"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -761,6 +931,20 @@ export interface components {
             figureString: string;
             gender: string;
         };
+        ChainDescriptor: {
+            enabled: boolean;
+            /** Format: int64 */
+            chainId: number;
+            chainIdHex: string;
+            rpcUrl: string;
+            currencyName: string;
+            currencySymbol: string;
+            /** Format: int32 */
+            currencyDecimals: number;
+            coinAddress?: string | null;
+            collectibleAddress?: string | null;
+            treasuryAddress?: string | null;
+        };
         ChangeEmailRequest: {
             currentPassword?: string | null;
             email?: string | null;
@@ -796,6 +980,22 @@ export interface components {
         JsonNodeOptions: {
             propertyNameCaseInsensitive: boolean;
         };
+        LeaderboardEntryResponse: {
+            /** Format: int32 */
+            rank: number;
+            /** Format: int32 */
+            playerId: number;
+            playerName: string;
+            address: string;
+            balance: string;
+            balanceWei: string;
+        };
+        LeaderboardResponse: {
+            enabled: boolean;
+            /** Format: date-time */
+            takenAtUtc?: string | null;
+            standings: components["schemas"]["LeaderboardEntryResponse"][];
+        };
         LoginRequest: {
             email?: string | null;
             password?: string | null;
@@ -825,6 +1025,26 @@ export interface components {
         PasswordChangeResponse: {
             /** Format: int32 */
             sessionsRevoked: number;
+        };
+        PhotoPage: {
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            total: number;
+            items: components["schemas"]["PhotoSummary"][];
+        };
+        PhotoSummary: {
+            key: string;
+            ownerUniqueId: string;
+            ownerName: string;
+            ownerFigureString: string;
+            /** Format: int32 */
+            roomId?: number | null;
+            roomName?: string | null;
+            /** Format: date-time */
+            takenAt: string;
         };
         PlayerPreferencesResponse: {
             profileVisible: boolean;
@@ -1064,6 +1284,17 @@ export interface components {
             console?: string | null;
             readonly isValid: boolean;
         };
+        TokenAttribute: {
+            trait_type: string;
+            value: unknown;
+        };
+        TokenMetadata: {
+            name: string;
+            description: string;
+            image?: string | null;
+            attributes: components["schemas"]["TokenAttribute"][];
+            external_url?: string | null;
+        };
         TrustedLocationsResetResponse: {
             /** Format: int32 */
             forgotten: number;
@@ -1083,6 +1314,19 @@ export interface components {
         };
         TwoFactorStatusResponse: {
             enabled: boolean;
+        };
+        WalletChallengeResponse: {
+            nonce: string;
+            message: string;
+        };
+        WalletLinkRequest: {
+            address?: string | null;
+            signature?: string | null;
+        };
+        WalletsResponse: {
+            stardustAddress?: string | null;
+            linkedAddresses: string[];
+            relicHolders: string[];
         };
     };
     responses: never;
@@ -1236,6 +1480,68 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ApiErrorResponse"];
                 };
+            };
+        };
+    };
+    GetCameraPhoto: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                photoKey: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ChainDescriptor: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChainDescriptor"];
+                };
+            };
+        };
+    };
+    ChainRpc: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": unknown;
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -1591,6 +1897,104 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    Photos: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PhotoPage"];
+                };
+            };
+        };
+    };
+    PlayerPhotos: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                uniqueId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PhotoSummary"][];
+                };
+            };
+        };
+    };
+    CollectibleMetadata: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                assetId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenMetadata"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    CoinLeaderboard: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeaderboardResponse"];
                 };
             };
         };
@@ -2771,6 +3175,173 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    UserWallets: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WalletsResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    LinkWallet: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["WalletLinkRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WalletsResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    WalletChallenge: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WalletChallengeResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    UnlinkWallet: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                address: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WalletsResponse"];
                 };
             };
             /** @description Unauthorized */
