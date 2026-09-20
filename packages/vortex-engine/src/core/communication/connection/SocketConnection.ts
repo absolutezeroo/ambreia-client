@@ -52,11 +52,35 @@ export class SocketConnection extends EventEmitter<IConnectionEvents> implements
     private _host: string = '';
     private _port: number = 0;
 
+    // TS-only: no AS3 counterpart; diagnostics for the background-tab disconnect. `onclose`
+    // reports 1006 for every abnormal drop, and 1006 covers two opposite causes: the page was
+    // frozen by Chrome and the socket died with no JavaScript running (the close event is only
+    // DELIVERED on thaw, minutes later), or the link was cut while the page was live. The server
+    // PINGs a silent session every 30s (NetworkingConfig.IdleOkActivityWindow), so the gap since
+    // the last inbound byte separates them: minutes = the page was stopped, ~30s = the link was
+    // still carrying traffic when something in the path cut it.
+    private _lastReceivedAt: number = 0;
+    // TS-only: no AS3 counterpart; see _lastReceivedAt. Set by _onVisibilityChange().
+    private _hiddenSince: number = 0;
+
     constructor(callback?: IConnectionCallback)
     {
         super();
         this._callback = callback ?? null;
+
+        if(typeof document !== 'undefined')
+        {
+            document.addEventListener('visibilitychange', this._onVisibilityChange);
+        }
     }
+
+    // TS-only: no AS3 counterpart; see _lastReceivedAt. Recording when the tab went away is the
+    // only way to report how long it had been hidden — by the time a frozen page thaws and runs
+    // this close handler, visibilityState already reads 'visible' again.
+    private _onVisibilityChange = (): void =>
+    {
+        this._hiddenSince = (document.visibilityState === 'hidden') ? Date.now() : 0;
+    };
 
     private _connected: boolean = false;
 
@@ -367,6 +391,11 @@ export class SocketConnection extends EventEmitter<IConnectionEvents> implements
             return;
         }
 
+        if(typeof document !== 'undefined')
+        {
+            document.removeEventListener('visibilitychange', this._onVisibilityChange);
+        }
+
         this.close();
         this._receivedBuffer.clear();
         this._pendingMessages = [];
@@ -407,8 +436,12 @@ export class SocketConnection extends EventEmitter<IConnectionEvents> implements
             // shutdown, navigation); 1006 = no close frame at all, i.e. the TCP connection died —
             // which is what a backgrounded tab, a sleeping machine or a dropped route looks like.
             // Without this the disconnect was indistinguishable from every other disconnect.
+            const sinceLastRx = this._lastReceivedAt ? Date.now() - this._lastReceivedAt : -1;
+            const hiddenFor = this._hiddenSince ? Date.now() - this._hiddenSince : 0;
+
             log.warn(
                 `Connection closed: code=${event.code} reason="${event.reason}" clean=${event.wasClean}`
+                + ` sinceLastRx=${sinceLastRx}ms hiddenFor=${hiddenFor}ms visibility=${typeof document !== 'undefined' ? document.visibilityState : 'n/a'}`
                 + (event.code === 1006 ? ' — no close frame; the transport dropped rather than the peer closing' : '')
             );
 
@@ -450,6 +483,8 @@ export class SocketConnection extends EventEmitter<IConnectionEvents> implements
 
     private onDataReceived(data: ArrayBuffer): void
     {
+        this._lastReceivedAt = Date.now();
+
         const bytes = ByteArray.fromArrayBuffer(data);
         const oldPosition = this._receivedBuffer.position;
         this._receivedBuffer.position = this._receivedBuffer.length;
