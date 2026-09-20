@@ -609,16 +609,20 @@ the solid wall, which is how it shipped first.
 > **Removed 2026-09-20, by the project owner's call.** 174 lines: `drawMaskReveals()`,
 > `projectThickness()`, `REVEAL_COLOR`, `_revealCanvas`, `_revealOffset`, `_maskShapeCanvas`,
 > `RoomPlane.wallThickness` and its one assignment in `RoomVisualization`. The port is closer to
-> AS3 for it — this had no counterpart in either tree.
+> AS3 for it — this had no counterpart in either tree. **Confirmed on screen: removing it also
+> removed the grey band reported at the doorway's foot.** The reveal was the cause.
 >
-> **It is not established that it was the thing complained about**, and the measurement says
-> otherwise: the grey band reported at a doorway's foot is 64 px wide (a full tile at scale 64)
-> where a reveal is `0.25` tile, ~16 px; and it draws *in front of* the entrance floor tile while
-> the opening behind it draws *behind*, so the two are on different planes — the reveal is painted
-> into the very plane that carries the hole. Whatever paints that band is a one-tile wall plane
-> that descends about 1.4 tiles below the floor line, and it is still there. `RoomVisualizationData`
-> logs the mask count at room load; production hides `info`, so only the zero-mask `warn` is
-> visible, and its absence is how we know masks do resolve.
+> Recorded because the reasoning that argued otherwise was wrong and was written down first: two
+> pixel measurements off a screenshot — "the band is 64 px wide where a reveal would be ~16" and
+> "it draws in front of the entrance tile while the opening draws behind, so they are on different
+> planes" — were both used to conclude the reveal was innocent, and both conclusions were false.
+> The 16 px figure was invented: the band's screen width is a *projected* 3D offset through the
+> plane's affine transform, not `0.25` tile measured in tile units. Measuring the right pixels
+> does not make the inference from them sound.
+>
+> Still true and still useful: `RoomVisualizationData` logs the mask count at room load, production
+> hides `info`, so only the zero-mask `warn` is visible — and its absence is how we know masks
+> resolve at all.
 
 ### The WIN63 file-level sweep (2026-09-02) — what is actually left, and the six gaps it found
 
