@@ -208,6 +208,16 @@ export class RenderRoomMessageComposer extends MessageComposer<[ByteArray]>
             log.warn(`[plane-payload] #${index} z=${plane.z.toFixed(3)} colour=#${(plane.color & 0xFFFFFF).toString(16)}`
                 + ` cols=${plane.texCols.length} masks=${plane.masks.length}`
                 + ` quad=${corners.map((c) => `(${Math.round(c.x)},${Math.round(c.y)})`).join(' ')}`);
+
+            // The one number the two logs are missing. A mask's position is measured in the plane's
+            // own texture — `leftSide.length * scale` across, so 832 for a wall thirteen tiles long
+            // — and the renderer punches it into a texture it sizes itself. Printing both the
+            // position and the space it was measured in is what settles whether the hole lands.
+            for(const mask of plane.masks)
+            {
+                log.warn(`[plane-payload]   mask ${mask.name} at (${mask.location.x},${mask.location.y})`
+                    + ` flipH=${mask.flipH} flipV=${mask.flipV}`);
+            }
         }
 
         // TEMPORARY diagnostic — remove with the one above. The sprites that are not body parts,
