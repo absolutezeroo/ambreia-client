@@ -6237,9 +6237,7 @@ export class RoomEngine extends Component implements IRoomEngine,
             bucket = (this.getActiveRoomIsPlayingGame() && category === 100) ? 100 : -2;
         }
 
-        const dedupKey = `${bucket}_${event.type}`;
-
-        if(this._mouseEventIds.get(dedupKey) === event.eventId)
+        if(this.getMouseEventId(bucket, event.type) === event.eventId)
         {
             if(event.type === 'click' || event.type === 'doubleClick'
                 || event.type === 'mouseDown' || event.type === 'mouseUp' || event.type === 'mouseMove')
@@ -6249,7 +6247,7 @@ export class RoomEngine extends Component implements IRoomEngine,
         }
         else if(event.eventId !== '')
         {
-            this._mouseEventIds.set(dedupKey, event.eventId);
+            this.setMouseEventId(bucket, event.type, event.eventId);
         }
 
         const handler = object.getMouseHandler();
@@ -6258,6 +6256,27 @@ export class RoomEngine extends Component implements IRoomEngine,
         {
             handler.mouseEvent(event, geometry);
         }
+    }
+
+    /**
+     * Records the last event id delivered to a (category bucket, event type) slot. AS3 nests two
+     * maps — one per bucket, keyed by type inside it; this port flattens both keys into one string.
+     *
+     * Writing bucket 0 spends the click on the object that just handled it: the room planes sit in
+     * that bucket and are hit by the very same pixel, and the buffered events are flushed front to
+     * back, so marking it here makes processRoomCanvasMouseEvent() drop the floor's own tile event —
+     * the one that would have sent a MoveAvatar.
+     */
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_1821.as::setMouseEventId()
+    private setMouseEventId(category: number, type: string, eventId: string): void
+    {
+        this._mouseEventIds.set(`${category}_${type}`, eventId);
+    }
+
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_1821.as::getMouseEventId()
+    private getMouseEventId(category: number, type: string): string | null
+    {
+        return this._mouseEventIds.get(`${category}_${type}`) ?? null;
     }
 
     /**
@@ -9407,6 +9426,9 @@ export class RoomEngine extends Component implements IRoomEngine,
                     new RoomEngineObjectEvent(RoomEngineObjectEvent.REOE_REQUEST_ROTATE, this._activeRoomId, objId, category)
                 );
 
+                // AS3 line 769: a modifier gesture spends the click, floor included.
+                if(event.eventId !== '') this.setMouseEventId(0, 'click', event.eventId);
+
                 return;
             }
 
@@ -9417,6 +9439,8 @@ export class RoomEngine extends Component implements IRoomEngine,
                     RoomEngineObjectEvent.REOE_REQUEST_PICKUP,
                     new RoomEngineObjectEvent(RoomEngineObjectEvent.REOE_REQUEST_PICKUP, this._activeRoomId, objId, category)
                 );
+
+                if(event.eventId !== '') this.setMouseEventId(0, 'click', event.eventId);
 
                 return;
             }
@@ -9437,7 +9461,12 @@ export class RoomEngine extends Component implements IRoomEngine,
             && (objType === 'monsterplant' || objType === 'rentable_bot')
             && event.shiftKey && !event.ctrlKey && !event.altKey)
         {
-            if(this.modifyRoomObject(objId, category, RoomObjectOperationEnum.OBJECT_ROTATE_POSITIVE)) return;
+            if(this.modifyRoomObject(objId, category, RoomObjectOperationEnum.OBJECT_ROTATE_POSITIVE))
+            {
+                if(event.eventId !== '') this.setMouseEventId(0, 'click', event.eventId);
+
+                return;
+            }
         }
 
         if(!this.isGameMode && category === RoomObjectCategoryEnum.OBJECT_CATEGORY_USER
@@ -9448,13 +9477,24 @@ export class RoomEngine extends Component implements IRoomEngine,
             // OBJECT_PICKUP_PET (line 732).
             this.modifyRoomObject(objId, category, objType === 'rentable_bot' ? RoomObjectOperationEnum.OBJECT_PICKUP_BOT : RoomObjectOperationEnum.OBJECT_PICKUP_PET);
 
+            if(event.eventId !== '') this.setMouseEventId(0, 'click', event.eventId);
+
             return;
         }
 
         // AS3: _SafeCls_1821.as::handleRoomObjectMouseClick() line 738 — the `else` arm of the
         // cat-100 modifier chain above. Does nothing outside game mode; in it, a click on an avatar
         // is a snow-war throw at that player.
-        if(category === RoomObjectCategoryEnum.OBJECT_CATEGORY_USER) this.handleClickOnAvatar(objId, event);
+        if(category === RoomObjectCategoryEnum.OBJECT_CATEGORY_USER)
+        {
+            this.handleClickOnAvatar(objId, event);
+
+            // AS3 line 740-746: `if(!playingGame) _loc10_ = true`, which claims the click for the
+            // room bucket. Without it the floor plane's own tile event for the same physical click
+            // arrives next and walks the avatar — clicking a pet to open its panel walked you onto
+            // the tile under it, and clicking another player walked you at them.
+            if(event.eventId !== '') this.setMouseEventId(0, 'click', event.eventId);
+        }
 
         // AS3: _SafeCls_1821.as::handleRoomObjectMouseClick() — a plain (unmodified) furni click
         // notifies the server via ClickFurni (wired "click furni" triggers, click interactions),
@@ -9464,9 +9504,11 @@ export class RoomEngine extends Component implements IRoomEngine,
         // no-ops for avatars, pets and decorative furniture.
         this.clickRoomObject(event);
 
-        if(this.isWhereYouClickWhereYouGo())
+        // A walk onto the furni is a walk: AS3 seeds the same `_loc10_` with its result so the tile
+        // underneath does not send a second, contradicting MoveAvatar.
+        if(this.isWhereYouClickWhereYouGo() && this.handleMoveTargetFurni(event))
         {
-            this.handleMoveTargetFurni(event);
+            if(event.eventId !== '') this.setMouseEventId(0, 'click', event.eventId);
         }
 
         this.selectRoomObject(this._activeRoomId, objId, category);
