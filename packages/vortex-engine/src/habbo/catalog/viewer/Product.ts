@@ -376,6 +376,14 @@ export class Product extends ProductGridItem implements IProduct
         return false;
     }
 
+    // TS-only: no AS3 counterpart; re-pairs the inherited getter with the setter below. TypeScript
+    //   shadows the whole accessor pair when a subclass declares only one half, so without this
+    //   `this.view` reads `undefined` here - see the same note on `ProductContainer`.
+    override get view(): IWindowContainer
+    {
+        return super.view;
+    }
+
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/viewer/Product.as::set view()
     // The decompiled source computes multiContainer/multiCounter but the win63 build's
     // method body is truncated before using them - reconstructed from the clean reference

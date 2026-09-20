@@ -87,6 +87,16 @@ export class ProductContainer extends ProductGridItem implements IGetImageListen
     {
     }
 
+    // TS-only: no AS3 counterpart. AS3 keeps the inherited getter when a subclass overrides only
+    //   the setter; TypeScript does not - `set view` alone shadows the whole accessor pair, so
+    //   `this.view` reads `undefined` on every instance of this class. That is what disabled
+    //   `setClubIconLevel()` below (its `this.view == null` guard was permanently true), and why
+    //   every catalog item shipped with the HC badge `grid_item_with_price_*.xml` declares visible.
+    override get view(): IWindowContainer
+    {
+        return super.view;
+    }
+
     override set view(view: IWindowContainer)
     {
         super.view = view;

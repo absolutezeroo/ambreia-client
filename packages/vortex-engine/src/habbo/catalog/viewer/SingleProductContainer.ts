@@ -58,6 +58,14 @@ export class SingleProductContainer extends ProductContainer
         catalog.setImageFromAsset(this.targetIcon, assetName, null);
     }
 
+    // TS-only: no AS3 counterpart; re-pairs the inherited getter with the setter below. TypeScript
+    //   shadows the whole accessor pair when a subclass declares only one half, so without this
+    //   `this.view` reads `undefined` here - see the same note on `ProductContainer`.
+    override get view(): IWindowContainer
+    {
+        return super.view;
+    }
+
     override set view(view: IWindowContainer)
     {
         super.view = view;
