@@ -2,6 +2,7 @@ import type {IWindow} from '@core/window/IWindow';
 import type {IWindowContainer} from '@core/window/IWindowContainer';
 import type {ITextWindow} from '@core/window/components/ITextWindow';
 import type {ITextFieldWindow} from '@core/window/components/ITextFieldWindow';
+import type {IStaticBitmapWrapperWindow} from '@core/window/components/IStaticBitmapWrapperWindow';
 import type {WindowEvent} from '@core/window/events/WindowEvent';
 import type {GuestRoomData} from '@habbo/communication/messages/incoming/navigator';
 import {AddFavouriteRoomMessageComposer} from '@habbo/communication/messages/outgoing/navigator/AddFavouriteRoomMessageComposer';
@@ -556,6 +557,38 @@ export class RoomInfoViewCtrl
                     addThumbRegion.addEventListener(WindowMouseEvent.CLICK, this._onAddRoomThumbnail);
                 }
             }
+
+            // The picture itself, which this half of the method had been missing: the layout ships
+            // `thumbnail_image` already pointing at `newnavigator_default_room`, so a panel with no
+            // assignment looks furnished rather than broken and the gap survived unnoticed.
+            const thumbnailImage = win.findChildByName('thumbnail_image') as IStaticBitmapWrapperWindow | null;
+
+            if(thumbnailImage !== null)
+            {
+                const roomData = this._navigator.data.enteredGuestRoom;
+                const flatId = roomData !== null ? roomData.flatId : 0;
+                let uri: string;
+
+                // Both branches end at the same url unless the room has an official picture AND the
+                // Amazon flag is off. AS3 spells all three out, and so does this.
+                if(roomData !== null && roomData.officialRoomPicRef !== null)
+                {
+                    if(this._navigator.getBoolean('new.navigator.official.room.thumbnails.in.amazon'))
+                    {
+                        uri = this._navigator.getProperty('navigator.thumbnail.url_base') + flatId + '.png';
+                    }
+                    else
+                    {
+                        uri = this._navigator.getProperty('image.library.url') + roomData.officialRoomPicRef;
+                    }
+                }
+                else
+                {
+                    uri = this._navigator.getProperty('navigator.thumbnail.url_base') + flatId + '.png';
+                }
+
+                thumbnailImage.assetUri = uri;
+            }
         }
         else
         {
@@ -796,6 +829,15 @@ export class RoomInfoViewCtrl
 
         ctx?.createLinkEvent('roomThumbnailCamera/open');
         this.close();
+
+        // Evict the picture before the camera replaces it. The url does not change when a new
+        // thumbnail is taken — it is the room's id — so without this the panel keeps serving the
+        // cached copy of the old one and the camera looks like it did nothing.
+        const flatId = this._navigator.data.enteredGuestRoom?.flatId ?? 0;
+
+        this._navigator.windowManager?.resourceManager?.removeAsset(
+            this._navigator.getProperty('navigator.thumbnail.url_base') + flatId + '.png'
+        );
 
         this._navigator.trackGoogle('roomInfo', 'addThumbnail');
     };
