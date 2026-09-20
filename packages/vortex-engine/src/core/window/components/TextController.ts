@@ -315,6 +315,10 @@ export class TextController extends WindowController implements ITextWindow
         this._explicitStyle.color = value;
     }
 
+    // DEVIATION: AS3's TextController declares no `color` getter at all — the opacity below is
+    //   Flash's, supplied by the TextField this port does not have. Reproducing it in the getter
+    //   WindowComposite reads is the port's own move, which is why the trace is on the setter it
+    //   compensates for rather than on a member of the same name.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/core/window/components/TextController.as::set background()
     // AS3's TextController mirrors `background` onto a real flash.text.TextField
     // (`_field.background = param1`), and Flash always paints a TextField's background

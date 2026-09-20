@@ -21,7 +21,7 @@ export class AnimationLayerData implements IAnimationLayerData
         this._dx = parseInt(data.dx) || 0;
         this._dy = parseInt(data.dy) || 0;
         this._dz = parseInt(data.dz) || 0;
-        this._dd = parseInt(data.dd) || 0;
+        this._directionOffset = parseInt(data.dd) || 0;
         this._type = type;
         this._base = String(data.base || '');
 
@@ -94,12 +94,12 @@ export class AnimationLayerData implements IAnimationLayerData
         return this._dz;
     }
 
-    private _dd: number;
+    private _directionOffset: number;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/animation/AnimationLayerData.as::get directionOffset()
-    public get dd(): number
+    public get directionOffset(): number
     {
-        return this._dd;
+        return this._directionOffset;
     }
 
     private _type: string;

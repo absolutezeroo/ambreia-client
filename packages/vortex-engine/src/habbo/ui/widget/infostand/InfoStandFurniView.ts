@@ -901,6 +901,7 @@ export class InfoStandFurniView
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandFurniView.as::trimAdFurnitureExtramParam()
+    // "Extram" [sic] — the AS3 spelling, not carried into the port's method name.
     private trimAdFurnitureExtraParam(value: string): string
     {
         return value?.includes('\t') ? value.replace(/\t/g, '') : value;

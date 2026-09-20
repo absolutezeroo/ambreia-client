@@ -75,7 +75,7 @@ export class UnseenItemTracker
             // getIds(1)/getIds(2) off the tracker itself (FurniModel.as:1045-1046). The port
             // inverted that — updateUnseenItems() is handed the ids — so feed it the same two
             // categories AS3 reads.
-            this._inventory.furniModel.updateUnseenItems([
+            this._inventory.furniModel.updateUnseenItemsThumbs([
                 ...this.getIds(UnseenItemCategory.OWNED_FURNI),
                 ...this.getIds(UnseenItemCategory.RENTED_FURNI),
             ]);

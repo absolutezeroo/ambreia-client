@@ -3166,7 +3166,7 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
         {
             // AS3: `updateUnseenItemsThumbs(_loc8_, false)` - no grid refresh here; setViewToState()/
             // updateView() below already redraw it.
-            this._furniModel.updateUnseenItems(addedIds, false);
+            this._furniModel.updateUnseenItemsThumbs(addedIds, false);
         }
 
         this._furniModel.setViewToState();

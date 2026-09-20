@@ -24,7 +24,7 @@ import {AvatarAction} from './enum/AvatarAction';
 export class BlockedAvatarImage extends AvatarImage
 {
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/BlockedAvatarImage.as::_fullImageCache
-    private static _staticCache: Map<string, Texture> = new Map();
+    private static _fullImageCache: Map<string, Texture> = new Map();
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/BlockedAvatarImage.as::BlockedAvatarImage()
     constructor(
@@ -104,7 +104,7 @@ export class BlockedAvatarImage extends AvatarImage
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/BlockedAvatarImage.as::getFullImage()
     protected override getFullImage(key: string): Texture | null
     {
-        return BlockedAvatarImage._staticCache.get(key) || null;
+        return BlockedAvatarImage._fullImageCache.get(key) || null;
     }
 
     /**
@@ -114,15 +114,15 @@ export class BlockedAvatarImage extends AvatarImage
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/BlockedAvatarImage.as::cacheFullImage()
     protected override cacheFullImage(key: string, image: Texture): void
     {
-        const existing = BlockedAvatarImage._staticCache.get(key);
+        const existing = BlockedAvatarImage._fullImageCache.get(key);
 
         if(existing)
         {
             existing.destroy();
-            BlockedAvatarImage._staticCache.delete(key);
+            BlockedAvatarImage._fullImageCache.delete(key);
         }
 
-        BlockedAvatarImage._staticCache.set(key, image);
+        BlockedAvatarImage._fullImageCache.set(key, image);
     }
 
     /**

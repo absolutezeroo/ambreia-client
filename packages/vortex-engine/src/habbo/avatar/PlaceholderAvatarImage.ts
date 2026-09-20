@@ -18,7 +18,7 @@ import {AvatarAction} from './enum/AvatarAction';
  */
 export class PlaceholderAvatarImage extends AvatarImage
 {
-    private static _staticCache: Map<string, Texture> = new Map();
+    private static _fullImageCache: Map<string, Texture> = new Map();
 
     constructor(
         structure: AvatarStructure,
@@ -135,7 +135,7 @@ export class PlaceholderAvatarImage extends AvatarImage
 	 */
     protected override getFullImage(key: string): Texture | null
     {
-        return PlaceholderAvatarImage._staticCache.get(key) || null;
+        return PlaceholderAvatarImage._fullImageCache.get(key) || null;
     }
 
     /**
@@ -147,14 +147,14 @@ export class PlaceholderAvatarImage extends AvatarImage
 	 */
     protected override cacheFullImage(key: string, image: Texture): void
     {
-        const existing = PlaceholderAvatarImage._staticCache.get(key);
+        const existing = PlaceholderAvatarImage._fullImageCache.get(key);
 
         if(existing)
         {
             existing.destroy();
-            PlaceholderAvatarImage._staticCache.delete(key);
+            PlaceholderAvatarImage._fullImageCache.delete(key);
         }
 
-        PlaceholderAvatarImage._staticCache.set(key, image);
+        PlaceholderAvatarImage._fullImageCache.set(key, image);
     }
 }

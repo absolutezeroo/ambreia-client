@@ -310,7 +310,7 @@ export class AvatarAssetDownloadManager extends EventEmitter
                 this._assetLibrary
             );
 
-            library.on(AvatarAssetDownloadLibrary.COMPLETE, () => this.onLibraryComplete(library));
+            library.on(AvatarAssetDownloadLibrary.COMPLETE, () => this.libraryComplete(library));
 
             this._libraries.set(libName, library);
 
@@ -409,7 +409,7 @@ export class AvatarAssetDownloadManager extends EventEmitter
      * are now complete, notifies their listeners, removes the completed library
      * from the mandatory list if applicable, and triggers the next batch of downloads.
      */
-    private onLibraryComplete(library: AvatarAssetDownloadLibrary): void 
+    private libraryComplete(library: AvatarAssetDownloadLibrary): void 
     {
         // Remove from current downloads
         if(this._currentDownloadSet.delete(library)) 

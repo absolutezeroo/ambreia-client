@@ -456,6 +456,7 @@ export class RoomEngine extends Component implements IRoomEngine,
     /**
 	 * Keyed by `furniIconListenerKey()`, holding the chests waiting on one item's icon.
 	 */
+    // Name DERIVED from what it holds; the AS3 field is obfuscated in every tree.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::_SafeStr_5238
     private _pendingFurniIconObjects: Map<string, IRoomObjectController[]> = new Map();
     private _contentLoader: RoomContentLoader;
@@ -624,7 +625,7 @@ export class RoomEngine extends Component implements IRoomEngine,
         this._roomInstanceData = new Map();
 
         // Listen to object events from factory
-        this._roomObjectFactory.addObjectEventListener(this.onRoomObjectEvent.bind(this));
+        this._roomObjectFactory.addObjectEventListener(this.handleRoomObjectEvent.bind(this));
     }
 
     private _activeRoomId: number = -1;
@@ -7871,7 +7872,7 @@ export class RoomEngine extends Component implements IRoomEngine,
     // position instead of restoring the original one) and THEN resets it (line 2419-2421,
     // _loc11_ stays true for OBJECT_MOVE_TO - only OBJECT_MOVE sets it false). The reset is what
     // clears the selection so a *second* move can start; without it the stale OBJECT_MOVE_TO
-    // state left handleObjectMouseDown()'s "already busy" guard permanently tripped, so ALT-drag
+    // state left handleRoomObjectMouseDown()'s "already busy" guard permanently tripped, so ALT-drag
     // worked exactly once. (An earlier port comment wrongly claimed AS3 leaves the state set.)
     private confirmObjectMove(roomId: number): void
     {
@@ -8440,7 +8441,7 @@ export class RoomEngine extends Component implements IRoomEngine,
     // AS3 switches on `param1.type` (a RoomObjectEvent subtype's string constant) inside one method;
     // this port dispatches on the event's runtime class instead — see the per-branch AS3: traces
     // below for which switch case each `instanceof` arm replaces.
-    private onRoomObjectEvent(event: unknown): void
+    private handleRoomObjectEvent(event: unknown): void
     {
         // Handle tile mouse events for tile cursor
         if(event instanceof RoomObjectTileMouseEvent)
@@ -9299,7 +9300,7 @@ export class RoomEngine extends Component implements IRoomEngine,
         // emit site exists). Route them faithfully.
         if(event.type === RoomObjectMouseEvent.ROE_MOUSE_DOWN)
         {
-            this.handleObjectMouseDown(event);
+            this.handleRoomObjectMouseDown(event);
 
             return;
         }
@@ -9445,7 +9446,7 @@ export class RoomEngine extends Component implements IRoomEngine,
                 return;
             }
 
-            // ALT+drag move is a mouse-DOWN gesture — see handleObjectMouseDown().
+            // ALT+drag move is a mouse-DOWN gesture — see handleRoomObjectMouseDown().
         }
 
         // AS3: _SafeCls_1821.as::handleRoomObjectMouseClick() cat-100 branch (lines 700-748).
@@ -9826,7 +9827,7 @@ export class RoomEngine extends Component implements IRoomEngine,
     // (_SafeCls_1821.as:1063) — note the last two are matched by *type*, not by category. Wall
     // furni (20) is still excluded here: confirmObjectMove has no wall-move composer to finish the
     // drag with, so starting one would only ever be undone.
-    private handleObjectMouseDown(event: RoomObjectMouseEvent): void
+    private handleRoomObjectMouseDown(event: RoomObjectMouseEvent): void
     {
         if(this._activeRoomId < 0 || this.isGameMode) return;
 

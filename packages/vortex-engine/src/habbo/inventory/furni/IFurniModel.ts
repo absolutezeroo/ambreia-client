@@ -171,7 +171,7 @@ export interface IFurniModel
 	 * Update unseen flags on items based on tracker
 	 */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/furni/FurniModel.as::updateUnseenItemsThumbs()
-    updateUnseenItems(unseenIds: number[], refresh?: boolean): void;
+    updateUnseenItemsThumbs(unseenIds: number[], refresh?: boolean): void;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/furni/FurniModel.as::getWindowContainer()
     getWindowContainer(): IWindowContainer | null;

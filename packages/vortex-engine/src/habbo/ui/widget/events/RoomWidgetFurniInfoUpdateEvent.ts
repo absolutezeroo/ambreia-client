@@ -33,8 +33,8 @@ export class RoomWidgetFurniInfoUpdateEvent extends RoomWidgetUpdateEvent
     public roomControllerLevel: number = 0;
     // AS3: .../src/com/sulake/habbo/ui/widget/events/RoomWidgetFurniInfoUpdateEvent.as::get isAnyRoomController()
     public isAnyRoomController: boolean = false;
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/events/RoomWidgetFurniInfoUpdateEvent.as::_SafeStr_9024
-    // AS3 initialises this to -1, not 0 - matches the `event.expiration >= 0` gate on
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/events/RoomWidgetFurniInfoUpdateEvent.as::get expiration()
+    // AS3 initialises its backing field (_SafeStr_9024) to -1, not 0 - matches the `event.expiration >= 0` gate on
     // InfoStandFurniView.ts:608, though handleGetFurniInfoMessage() always assigns a real value
     // before emitting, so the default itself is never observed today.
     public expiration: number = -1;

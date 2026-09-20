@@ -604,16 +604,15 @@ export class RoomPlane implements IRoomPlane
         return this._height;
     }
 
-    // This is AS3's `cloneBitmapData()`, not `copyBitmapData(target)`: the only caller
-    // (RoomVisualization.updateSprite()) matches AS3's getPlaneBitmap(), which calls
-    // `plane.cloneBitmapData()`. A PixiJS Texture is immutable per source swap (render()
+    // The only caller (RoomVisualization.updateSprite()) matches AS3's getPlaneBitmap(), which
+    // calls `plane.cloneBitmapData()`. A PixiJS Texture is immutable per source swap (render()
     // replaces `_bitmapDataTexture` wholesale rather than mutating it in place), so handing
     // out the texture itself is already safe and no clone is needed. AS3's other overload,
     // one-argument `copyBitmapData(target)` that copies pixels into a caller-supplied
     // BitmapData, has no callers anywhere in the primary tree (dead code in AS3 itself) and
     // was not ported.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/room/RoomPlane.as::cloneBitmapData()
-    copyBitmapData(): Texture | null
+    cloneBitmapData(): Texture | null
     {
         if(!this.visible)
         {

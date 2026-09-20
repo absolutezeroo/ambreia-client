@@ -1092,7 +1092,7 @@ export class RoomVisualization extends RoomObjectSpriteVisualization
         sprite.color = plane.color;
 
         // AS3: sprite.asset = getPlaneBitmap(plane, name)
-        const planeTexture = plane.copyBitmapData();
+        const planeTexture = plane.cloneBitmapData();
 
         if(planeTexture !== null)
         {

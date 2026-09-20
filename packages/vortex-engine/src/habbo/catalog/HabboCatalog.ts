@@ -655,8 +655,8 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         return this._communication?.connection ?? null;
     }
 
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::onRoomSessionEvent()
-    // (privateRoomSessionActive is _SafeStr_7595, set alongside roomSession in that same handler)
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::get privateRoomSessionActive()
+    // The backing field is _SafeStr_7595, set by onRoomSessionEvent() alongside roomSession.
     get privateRoomSessionActive(): boolean
     {
         return this._roomSession?.isPrivateRoom ?? false;

@@ -1479,7 +1479,7 @@ export class ProductViewCatalogWidget extends CatalogWidget implements IGetImage
                 offsetY += layer.dy;
                 // `dd` is what the 2016 interface calls the 2026 one's `directionOffset`; the port
                 // took the older name and they are the same member.
-                spriteDirection += layer.dd;
+                spriteDirection += layer.directionOffset;
             }
 
             if(spriteDirection < 0) spriteDirection += 8;

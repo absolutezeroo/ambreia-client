@@ -75,7 +75,7 @@ export class WindowMouseOperator
             // disposed by the room changing. AS3 listens for it and ends the operation
             // (`WindowMouseOperator.as` l.74 and l.140-143); without it the operator keeps
             // dragging a disposed window by a reference nothing will clear.
-            this._window.addEventListener(WindowEvent.WE_DESTROYED, this._onWindowDestroyed);
+            this._window.addEventListener(WindowEvent.WE_DESTROYED, this.clientWindowDestroyed);
             this._active = true;
         }
 
@@ -84,7 +84,7 @@ export class WindowMouseOperator
 
     /** Ends the operation on the window that has just gone away. */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/core/window/services/WindowMouseOperator.as::clientWindowDestroyed()
-    private _onWindowDestroyed = (): void =>
+    private clientWindowDestroyed = (): void =>
     {
         if(this._window !== null) this.end(this._window);
     };
@@ -104,7 +104,7 @@ export class WindowMouseOperator
         {
             if(this._window === window)
             {
-                this._window.removeEventListener(WindowEvent.WE_DESTROYED, this._onWindowDestroyed);
+                this._window.removeEventListener(WindowEvent.WE_DESTROYED, this.clientWindowDestroyed);
                 this._window = null;
                 this._active = false;
             }

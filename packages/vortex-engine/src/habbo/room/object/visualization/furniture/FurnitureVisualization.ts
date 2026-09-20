@@ -45,6 +45,8 @@ export class FurnitureVisualization extends RoomObjectSpriteVisualization
     private _assetNamesHaveFrame: boolean[] = [];
     private _furnitureLift: number = 0;
     // protected: AnimatedPetVisualization reads this directly, as its AS3 counterpart does.
+    // Name DERIVED from its use (the size updateObject() resolved for this frame): the field is
+    // `_SafeStr_4728` in the primary tree and exists in no readable one. Not a recovered name.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/furniture/FurnitureVisualization.as::_SafeStr_4728
     protected _resolvedSize: number = -1;
     private _cachedDirectionId: number = -1;

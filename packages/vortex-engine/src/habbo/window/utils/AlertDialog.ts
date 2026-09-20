@@ -228,7 +228,7 @@ export class AlertDialog implements IAlertDialog
         return this._disposed;
     }
 
-    // AS3: sources/win63_version/habbo/window/utils/AlertDialog.as::var_393 (callback ref)
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/utils/AlertDialog.as::_callback
     protected _callback: AlertDialogCallback | null = null;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/utils/AlertDialog.as::get callback()

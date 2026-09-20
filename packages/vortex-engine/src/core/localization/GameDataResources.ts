@@ -52,20 +52,20 @@ export class GameDataResources implements IGameDataResources
         return this._externalTextsHash;
     }
 
-    private _furnitureDataUrl: string = '';
+    private _furniDataUrl: string = '';
 
     // AS3: sources/win63_version/core/localization/class_2118.as::getFurniDataUrl()
-    get furnitureDataUrl(): string 
+    get furniDataUrl(): string 
     {
-        return this._furnitureDataUrl;
+        return this._furniDataUrl;
     }
 
-    private _furnitureDataHash: string = '';
+    private _furniDataHash: string = '';
 
     // AS3: sources/win63_version/core/localization/class_2118.as::getFurniDataHash()
-    get furnitureDataHash(): string 
+    get furniDataHash(): string 
     {
-        return this._furnitureDataHash;
+        return this._furniDataHash;
     }
 
     private _productDataUrl: string = '';
@@ -123,8 +123,8 @@ export class GameDataResources implements IGameDataResources
                     resources._externalVariablesHash = entry.hash;
                     break;
                 case 'furnidata':
-                    resources._furnitureDataUrl = url;
-                    resources._furnitureDataHash = entry.hash;
+                    resources._furniDataUrl = url;
+                    resources._furniDataHash = entry.hash;
                     break;
                 case 'productdata':
                     resources._productDataUrl = url;
@@ -169,8 +169,8 @@ export class GameDataResources implements IGameDataResources
             this._externalTextsHash &&
             this._externalVariablesUrl &&
             this._externalVariablesHash &&
-            this._furnitureDataUrl &&
-            this._furnitureDataHash &&
+            this._furniDataUrl &&
+            this._furniDataHash &&
             this._productDataUrl &&
             this._productDataHash
         );

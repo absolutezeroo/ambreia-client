@@ -209,8 +209,10 @@ export class OrderedMap<K = unknown, V = unknown> implements IDisposable
         return copy;
     }
 
-    // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/core/utils/Map.as::nextValue() (for each..in iteration)
-    values(): V[] 
+    // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/core/utils/Map.as::getValues()
+    // Renamed: `getValues()` is what this returns; AS3's `nextValue()` is the flash_proxy hook that
+    // makes `for each..in` walk the same array, and has no counterpart here.
+    values(): V[]
     {
         return this._values;
     }

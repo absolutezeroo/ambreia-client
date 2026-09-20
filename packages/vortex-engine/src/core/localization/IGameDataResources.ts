@@ -15,9 +15,9 @@ export interface IGameDataResources
     // AS3: sources/win63_version/core/localization/class_1959.as::getExternalVariablesHash()
     readonly externalVariablesHash: string;
     // AS3: sources/win63_version/core/localization/class_1959.as::getFurniDataUrl()
-    readonly furnitureDataUrl: string;
+    readonly furniDataUrl: string;
     // AS3: sources/win63_version/core/localization/class_1959.as::getFurniDataHash()
-    readonly furnitureDataHash: string;
+    readonly furniDataHash: string;
     // AS3: sources/win63_version/core/localization/class_1959.as::getProductDataUrl()
     readonly productDataUrl: string;
     // AS3: sources/win63_version/core/localization/class_1959.as::getProductDataHash()

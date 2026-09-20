@@ -165,7 +165,7 @@ export class AvatarStructure
      *
      * Dead in AS3 too — no call site in the primary tree or in `win63_version`. The port's real
      * fx registration (`AvatarRenderManager.registerBuiltInAnimations()`,
-     * `EffectAssetDownloadManager.onLibraryComplete()`) registers per resolved asset and never
+     * `EffectAssetDownloadManager.libraryComplete()`) registers per resolved asset and never
      * needs the probe loop. Ported so the member exists with AS3's behaviour, including the
      * blunt "try 200 names" shape.
      */

@@ -405,6 +405,7 @@ export class PollContentDialog implements IPollDialog
      * but only in an NPS poll, where a plain poll resets it to 0.
      */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/poll/PollContentDialog.as::resolveRadionButtonTypeAnswer()
+    // "Radion" [sic] — the AS3 spelling, not carried into the port's method name.
     private resolveRadioButtonTypeAnswer(question: PollQuestion): string[]
     {
         const answers: string[] = [];

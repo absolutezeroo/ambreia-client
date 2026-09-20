@@ -28,6 +28,7 @@ export class GraphicAssetCollection implements IGraphicAssetCollection
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/room/object/visualization/utils/GraphicAssetCollection.as::_assets
     private _assets: Map<string, GraphicAsset> = new Map();
     private _palettes: Map<string, GraphicAssetPalette> = new Map();
+    // Name DERIVED from what it holds; the AS3 field is obfuscated in every tree.
     // AS3: sources/win63_version/room/object/visualization/utils/GraphicAssetCollection.as::var_2811
     private _paletteXML: Map<string, Record<string, unknown>> = new Map();
     private _paletteAssetNames: string[] = [];

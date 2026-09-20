@@ -44,7 +44,7 @@ export class WindowParser implements IWindowParser
     // AS3: .../src/com/sulake/core/window/utils/WindowParser.as::_disposed
     private _disposed: boolean = false;
 
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/core/window/utils/WindowParser.as::WindowParser()
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/core/window/utils/WindowParser.as::_context
     // AS3's constructor takes and stores the owning context, independent of whatever `parent` a
     // given parseAndConstruct() call is passed - buildFromXML() calls it with `parent = null`
     // (see HabboWindowManagerComponent.as::buildFromXML()), and this is how the top-level

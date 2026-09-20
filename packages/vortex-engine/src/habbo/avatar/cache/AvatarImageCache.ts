@@ -307,9 +307,9 @@ export class AvatarImageCache
 
                     if(layerData)
                     {
-                        animDirection = direction + layerData.dd;
+                        animDirection = direction + layerData.directionOffset;
 
-                        if(layerData.dd < 0)
+                        if(layerData.directionOffset < 0)
                         {
                             if(animDirection < 0)
                             {

@@ -3,21 +3,22 @@ import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDat
 
 /**
  * One playlist entry (`_SafeCls_2941` in the primary tree, `class_3334` in `win63_version` —
- * obfuscated in every available tree). Name DERIVED from its three fields and from
- * `YoutubeDisplayWidget.populatePlaylists()`, which reads `playlistId`/`title`/`description` off
- * it; never passed off as recovered.
+ * obfuscated in every available tree). The CLASS name is DERIVED, from its three fields and from
+ * `YoutubeDisplayWidget.populatePlaylists()`; never passed off as recovered. The three member
+ * names are not derived: the backing fields are obfuscated, but the getters over them
+ * (`get playlistId()`, `get title()`, `get description()`) are readable in the same file.
  *
  * AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2942/_SafeCls_2941.as
  */
 export interface IYoutubePlaylist
 {
-    // AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2942/_SafeCls_2941.as::_SafeStr_9308
+    // AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2942/_SafeCls_2941.as::get playlistId()
     playlistId: string;
 
-    // AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2942/_SafeCls_2941.as::_SafeStr_5263
+    // AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2942/_SafeCls_2941.as::get title()
     title: string;
 
-    // AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2942/_SafeCls_2941.as::_description
+    // AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2942/_SafeCls_2941.as::get description()
     description: string;
 }
 

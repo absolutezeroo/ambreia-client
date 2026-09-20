@@ -51,6 +51,7 @@ export class FurnitureFurniChestVisualization extends FurnitureChestVisualizatio
         [[14, -50, 2, 2], [-14, -59, 2, 2], [19, -78, 4, 2], [-20, -90, 4, 2]]
     ];
 
+    // Name DERIVED from what it holds; the AS3 field is obfuscated in every tree.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/furniture/_SafeCls_1802.as::_SafeStr_5778
     private _icons: (IGraphicAsset | null)[] | null = null;
 

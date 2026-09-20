@@ -253,7 +253,7 @@ export class EffectAssetDownloadManager extends EventEmitter
             this._assetLibrary
         );
 
-        library.on(EffectAssetDownloadLibrary.COMPLETE, () => this.onLibraryComplete(library));
+        library.on(EffectAssetDownloadLibrary.COMPLETE, () => this.libraryComplete(library));
 
         if(!this._effectMap.has(effectId)) 
         {
@@ -298,7 +298,7 @@ export class EffectAssetDownloadManager extends EventEmitter
      * carries its own `name`, which is the key `AnimationManager` registers it under.
      */
     // TS-only: no AS3 counterpart - AS3's effect resource holds exactly one animation, so it
-    // has nothing to flatten. See onLibraryComplete() for why the .nitro shape differs.
+    // has nothing to flatten. See libraryComplete() for why the .nitro shape differs.
     private static getAnimations(animation: unknown): unknown[]
     {
         if(!animation || typeof animation !== 'object') return [];
@@ -321,7 +321,7 @@ export class EffectAssetDownloadManager extends EventEmitter
      * library from current downloads, and triggers the next batch of downloads.
      */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/EffectAssetDownloadManager.as::libraryComplete()
-    private onLibraryComplete(library: EffectAssetDownloadLibrary): void
+    private libraryComplete(library: EffectAssetDownloadLibrary): void
     {
         // Register the library's assets and aliases so effect sprites resolve by name. See
         // _aliasCollection's declaration for why this has no AS3 counterpart.

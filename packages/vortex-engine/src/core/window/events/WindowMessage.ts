@@ -44,6 +44,8 @@ export class WindowMessage extends WindowEvent
      * @param cancelable - Whether a listener may prevent the operation
      * @returns A pooled, initialised event
      */
+    // Renamed, like WindowMouseEvent.allocateMouse(): AS3 calls it `allocate` as WindowEvent does,
+    // which TypeScript cannot do — a static in a subclass must stay assignable to the one it hides.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/core/window/events/WindowMessage.as::allocate()
     public static allocateMessage(
         message: string,

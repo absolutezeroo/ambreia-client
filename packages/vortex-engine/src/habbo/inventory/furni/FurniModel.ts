@@ -1284,7 +1284,7 @@ export class FurniModel implements IFurniModel
     // `_view.grid.itemsWereUpdated(changedGroups)` call — true from UnseenItemTracker's own
     // refresh, false from onFurnitureAddOrUpdate() (HabboInventory.ts's onFurniListAddOrUpdate),
     // which calls setViewToState()/updateView() itself right after.
-    updateUnseenItems(unseenIds: number[], refresh: boolean = true): void
+    updateUnseenItemsThumbs(unseenIds: number[], refresh: boolean = true): void
     {
         if(unseenIds.length === 0) return;
 

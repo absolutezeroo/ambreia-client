@@ -346,7 +346,7 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
      * never read anywhere in the primary tree) — kept because it is a 1:1 port of a real getter.
      */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/avatar/AvatarVisualization.as::get numAdditions()
-    protected get additionCount(): number
+    protected get numAdditions(): number
     {
         return (this._additions) ? this._additions.size : 0;
     }
@@ -851,7 +851,7 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
                 animFrame = layerData.animationFrame;
                 dx = dx + layerData.dx;
                 dy = dy + layerData.dy;
-                dd = dd + layerData.dd;
+                dd = dd + layerData.directionOffset;
             }
 
             if(dd < 0) dd = dd + 8;
@@ -2127,7 +2127,7 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
                         animFrame = layerData.animationFrame;
                         dx = dx + layerData.dx;
                         dy = dy + layerData.dy;
-                        dd = dd + layerData.dd;
+                        dd = dd + layerData.directionOffset;
                     }
 
                     if(scale < 48) 

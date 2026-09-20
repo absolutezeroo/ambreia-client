@@ -153,7 +153,7 @@ export class IncomingMessages
     {
         this._navigator = navigator;
 
-        this.registerEvents();
+        this.addMessageListeners();
     }
 
     // AS3: .../src/com/sulake/habbo/navigator/_SafeCls_1951.as::get data()
@@ -174,7 +174,7 @@ export class IncomingMessages
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/navigator/_SafeCls_2208.as::addMessageListeners()
-    private registerEvents(): void
+    private addMessageListeners(): void
     {
         // Settings & Favourites
         // Room settings. AS3 registers these in the navigator's own incoming-messages class
