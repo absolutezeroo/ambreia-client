@@ -210,6 +210,29 @@ export class RenderRoomMessageComposer extends MessageComposer<[ByteArray]>
                 + ` quad=${corners.map((c) => `(${Math.round(c.x)},${Math.round(c.y)})`).join(' ')}`);
         }
 
+        // TEMPORARY diagnostic — remove with the one above. The sprites that are not body parts,
+        // with the colour exactly as it goes on the wire: furniture writes it decimal
+        // (`sprite.color.toString()`) and an avatar part writes it `0xRRGGBB`, so the string itself
+        // says which branch produced it. A pet that renders in the wrong colours is either sent a
+        // colour the room does not draw with, or sent the right one and tinted differently.
+        try
+        {
+            for(const sprite of JSON.parse(this._sprites) as Record<string, unknown>[])
+            {
+                const name = String(sprite.name ?? '');
+
+                if(name.startsWith('h_std_') || name.startsWith('sh_std_')) continue;
+
+                log.warn(`[sprite-payload] ${name} x=${sprite.x} y=${sprite.y} z=${sprite.z}`
+                    + ` colour=${sprite.color ?? '-'} alpha=${sprite.alpha ?? '-'}`
+                    + ` flipH=${sprite.flipH ?? false} blend=${sprite.blendMode ?? '-'}`);
+            }
+        }
+        catch (error)
+        {
+            log.warn('[sprite-payload] could not be read back', error);
+        }
+
         let dataStrJsonObj = RenderRoomMessageComposer.planesString() + roomPlanesDataJsonObj
             + RenderRoomMessageComposer.spritesString() + this._sprites
             + RenderRoomMessageComposer.modifiersString() + this._modifiers
