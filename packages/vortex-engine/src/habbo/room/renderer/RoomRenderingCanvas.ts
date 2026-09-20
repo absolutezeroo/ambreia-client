@@ -34,10 +34,6 @@ import {RoomRotatingEffect} from '@room/utils/RoomRotatingEffect';
 import {RoomEnterEffect} from '@room/utils/RoomEnterEffect';
 import {RoomObjectSpriteType} from '@room/object/enum/RoomObjectSpriteType';
 import {ExtendedSprite} from './utils/ExtendedSprite';
-// TEMPORARY — for the `[stack-probe]` log in renderObject(); remove with it.
-import {Logger} from '@core';
-
-const log = Logger.getLogger('habbo.room.renderer.RoomRenderingCanvas');
 import {SortableSprite} from './utils/SortableSprite';
 import {ObjectMouseData} from './utils/ObjectMouseData';
 import {RoomCullingMode} from './RoomCullingMode';
@@ -69,6 +65,15 @@ interface IObjectSpriteCache {
     screenX: number;
     screenY: number;
     screenZ: number;
+
+    /**
+     * Whether the object carries `roomObjectVariableAccurateZ` — read once here rather than per
+     * frame, because it is written at creation and never changes. See its two readers:
+     * `getCachedScreenLocation()`, which skips the tile rounding for it, and `renderObject()`,
+     * which takes it as "this object is not resting on a tile".
+     */
+    // TS-only: AS3 reads the model in both places; the port caches the answer, which is constant.
+    accurateZ: boolean;
     spriteCount: number;
     sprites: SortableSprite[];
 }
@@ -334,9 +339,6 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
      */
     // TS-only: see the DEVIATION in renderObject().
     private static readonly STACK_LIFT: number = 2.5;
-
-    /** TEMPORARY — see the `[stack-probe]` log in renderObject(); remove with it. */
-    private static readonly STACKED_SEEN: Set<string> = new Set();
 
     /**
      * The floor's own altitude at a tile, excluding anything stacked on it — `RoomEngine` wires this
@@ -1477,31 +1479,23 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
         //   units - including the room object itself, whose location sits on one of those border
         //   tiles. That clamped every floor and wall plane's +1000 depth to 0 and put the room's own
         //   geometry in among the furniture.
+        //
+        //   And a wall item is not resting on anything either. It hangs on a wall, so
+        //   `LegacyWallGeometry.getLocation()` gives it a z measured *up the wall* while the tile
+        //   under it reads 0 - which makes every one of them look stacked by its own hanging
+        //   height, permanently. Measured in a live room: `xmas08_icewall` at z=1.797 took a
+        //   4.492 lift and had its +1.061 backward layer offset clamped to 0, so it drew about
+        //   eight tiles too far forward - over an avatar standing in front of it. The two
+        //   `external_image_wallitem_poster_small` beside it were identical. `accurateZ` is the
+        //   discriminator and it is not a convenience: `object_accurate_z_value` is written on
+        //   every wall item and only on wall items (AS3 `_SafeCls_90.as::addObjectWallItem()`
+        //   l.3297, this port's `RoomEngine.addRoomObjectWallItem()`), and it means "this z is
+        //   exact, do not round it to a tile" - which is the same thing as "not on a tile".
         const location = object.getLocation();
         const floorHeight = this.floorHeightAt?.(Math.round(location.x), Math.round(location.y)) ?? location.z;
-        const stacked = floorHeight >= 0 && (location.z - floorHeight) > RoomRenderingCanvas.STACK_EPSILON;
-
-        // TEMPORARY diagnostic — remove once the wall-item depth question is settled. One line per
-        // object, the first time it is seen stacked, naming what the lift and the clamp do to it.
-        if(stacked && !RoomRenderingCanvas.STACKED_SEEN.has(objectId))
-        {
-            RoomRenderingCanvas.STACKED_SEEN.add(objectId);
-
-            const offsets: number[] = [];
-
-            for(let s = 0; s < visualization.spriteCount; s++)
-            {
-                const sp = visualization.getSprite(s);
-
-                if(sp !== null) offsets.push(Number(sp.relativeDepth.toFixed(3)));
-            }
-
-            log.warn(
-                `[stack-probe] ${object.getType()} loc=(${location.x},${location.y},${location.z})`
-                + ` floorHeight=${floorHeight} lift=${(RoomRenderingCanvas.STACK_LIFT * (location.z - floorHeight)).toFixed(3)}`
-                + ` baseZ=${baseZ.toFixed(3)} relativeDepths=[${offsets.join(', ')}] (clamped to <=0)`
-            );
-        }
+        const stacked = !cache.accurateZ
+            && floorHeight >= 0
+            && (location.z - floorHeight) > RoomRenderingCanvas.STACK_EPSILON;
 
         if(stacked)
         {
@@ -1732,6 +1726,7 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
                 screenX: 0,
                 screenY: 0,
                 screenZ: 0,
+                accurateZ: false,
                 spriteCount: 0,
                 sprites: []
             };
@@ -1777,7 +1772,9 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
             const accurateZVariable = this._roomObjectContainer.roomObjectVariableAccurateZ;
             const accurateZ = accurateZVariable ? object.getModel().getNumber(accurateZVariable) : NaN;
 
-            if(Number.isNaN(accurateZ) || accurateZ === 0) 
+            cache.accurateZ = !Number.isNaN(accurateZ) && accurateZ !== 0;
+
+            if(Number.isNaN(accurateZ) || accurateZ === 0)
             {
                 cache.roundedLoc.x = Math.round(location.x);
                 cache.roundedLoc.y = Math.round(location.y);
