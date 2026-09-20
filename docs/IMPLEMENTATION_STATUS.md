@@ -1704,9 +1704,14 @@ Two `TODO(AS3)` markers remained in the collector at the time of writing — the
 object pass and the boutique-mannequin re-parenting. **Both are closed** (verified 2026-09-19:
 `grep -n "TODO" SpriteDataCollector.ts` finds none). The culled pass is the
 `getRoomObjectScreenLocation()` loop in `getFurniData()`; the mannequins are
-`addMannequinSprites()`, which carries a `DEVIATION` rather than a TODO — AS3 offsets the *live*
-sprites and visibly drifts the mannequin in the room while the photo is composed, where this port
-converts each part to its own record first.
+`addMannequinSprites()`.
+
+> **That mannequin `DEVIATION` was wrong and is gone (2026-09-20).** It read "AS3 offsets the
+> *live* sprites and visibly drifts the mannequin in the room while the photo is composed, where
+> this port converts each part to its own record first". AS3 offsets nothing live: `getSpriteList()`
+> returns `RoomObjectSpriteData` — payload records built for that call — and its `Vector.<RoomObjectSpriteData>`
+> would throw on a sprite. The port had typed the member `IRoomObjectSprite[]`, and the conversion
+> invented to bridge that is what the marker was excusing. See below.
 
 #### `RoomPlane.getDrawingDatas()` — closed 2026-09-19
 
@@ -1742,6 +1747,41 @@ notes, each checkable in the primary tree:
 
 `IRoomPlane` gets the member back — it is the sixth in the AS3 interface, and `RoomPlane` is its
 only implementer.
+
+#### `AvatarVisualization.getSpriteList()` — closed 2026-09-20
+
+With the planes fixed, a photo held the furniture and nothing else: no avatars, no mannequins. The
+obvious suspect is `getSortableSpriteList()`'s `if(sprite.libraryAssetName === '') continue`, since
+nothing in the port names an avatar's body parts. It is not the cause — that line is AS3's
+(`_SafeCls_4404.as:77`), and the official client does not name body parts either. What it *does*
+name is the whole drawn avatar, `avatar_<id>` from `RoomObject.getAvatarLibraryAssetName()`
+(`_SafeCls_3073.as:674`), and that is a key rather than an asset: `SpriteDataCollector.getFurniData()`
+looks it up to read the drawn avatar's depth and baseline before merging the figure in. The port
+never assigned it, so the lookup never matched and a merged avatar sat at the room's own z.
+
+The names the server redraws from (`h_std_bd_1_2_0`) come from a second path, and none of it was
+ported: `AvatarVisualization.getSpriteList()` → `AvatarImage.getServerRenderData()` →
+`AvatarImageCache.renderBodyPart()`, whose camera flag (`param5`, set only by
+`getAvatarPartsForCamera()`) makes it push one `RoomObjectSpriteData` per part into
+`_serverRenderData`. The port already carried the field, the getter and the flag down to
+`renderBodyPart()`'s signature — where it was `_forceUpdate`, unused.
+
+What hid all three is a type. `IRoomObjectSpriteVisualization.getSpriteList()` was declared
+`IRoomObjectSprite[] | null` where AS3 fills the array with `RoomObjectSpriteData`; the collector
+therefore converted each entry through a `fromSprite()` helper that read `libraryAssetName` off
+sprites that carry none, and produced empty records that its own `name.length > 0` filter dropped.
+The mannequin path (`FurnitureMannequinVisualization.getSpriteList()`, which returns
+`avatar.getServerRenderData()`) was casting straight through it. Both are fixed by the type.
+
+One deliberate deviation, at the push site: the payload's `flipH` also carries the alias mirror.
+Flash baked an alias' `fliph` into the bitmap its link names, so AS3 could send the part flip alone;
+this port reads a Nitro bundle that does not bake — hence the `getAliasFlipH()` line beside it — and
+the name it sends is the alias' *target*. The mirror is folded into the flag and not the position,
+because an asset-level flip mirrors the part inside its own box.
+
+Checked by booting the avatar pipeline headless in `vortex-imager` against the local asset root and
+calling `getServerRenderData()`: ten named records with plausible offsets and sizes, and in a
+mirrored direction (4) the same names with `flipH` set and the x values mirrored.
 
 The nine remaining markers in the widget layer are all the same immutable-bitmap constraint —
 per-button filter thumbnails, `renderAllEffects()`, save-to-file. The effect *state* is fully
