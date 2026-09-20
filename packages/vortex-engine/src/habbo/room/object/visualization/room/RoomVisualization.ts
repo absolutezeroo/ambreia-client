@@ -644,26 +644,6 @@ export class RoomVisualization extends RoomObjectSpriteVisualization
                 randomSeed
             );
 
-            // TEMPORARY diagnostic — remove once the doorway-threshold question is settled.
-            // `localStorage.setItem('vortex.planepaint', '1')` + reload repaints the room's own
-            // planes by what they are, so a screenshot says which one covers a given pixel:
-            //   magenta = a thickness face (a side/top slab, `leftSide` or `rightSide` under 1)
-            //   cyan    = any other wall plane
-            //   yellow  = any floor plane
-            try
-            {
-                if(localStorage.getItem('vortex.planepaint') === '1')
-                {
-                    const thin = leftSide.length < 1 || rightSide.length < 1;
-
-                    color = thin ? 0xFF00FF : (planeType === RoomPlane.TYPE_FLOOR ? 0xFFFF00 : 0x00FFFF);
-                }
-            }
-            catch
-            {
-                // no storage, no repaint
-            }
-
             plane.color = color;
 
             // Assign rasterizer from visualization data
@@ -712,6 +692,31 @@ export class RoomVisualization extends RoomObjectSpriteVisualization
                 {
                     plane.hasTexture = false;
                 }
+            }
+
+            // TEMPORARY diagnostic — remove once the doorway-threshold question is settled.
+            // `localStorage.setItem('vortex.planepaint', '1')` + reload repaints the room's own
+            // planes by what they are, so a screenshot says which one covers a given pixel:
+            //   magenta = a thickness face (a side/top slab, `leftSide` or `rightSide` under 1)
+            //   cyan    = any other wall plane
+            //   yellow  = any floor plane
+            // The texture goes with it: a plane's colour is only ever read by the flat fill
+            // (`RoomPlane.render()`), so tinting alone repaints nothing on a textured wall — which
+            // is why the first attempt at this probe came back looking like an ordinary room.
+            // It runs after the thin-wall branch above, which is the one that sets `hasTexture`.
+            try
+            {
+                if(localStorage.getItem('vortex.planepaint') === '1')
+                {
+                    const thin = leftSide.length < 1 || rightSide.length < 1;
+
+                    plane.color = thin ? 0xFF00FF : (planeType === RoomPlane.TYPE_FLOOR ? 0xFFFF00 : 0x00FFFF);
+                    plane.hasTexture = false;
+                }
+            }
+            catch
+            {
+                // no storage, no repaint
             }
 
             // The parser's own rectangle masks, replayed onto the plane. AS3 runs this loop for
