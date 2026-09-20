@@ -28,6 +28,22 @@
     // one — so the size habbo.com's "bighead" comes back at (54x62, from `getDimensions` in its own
     // bundle) has to be reached in CSS from `l`, a 180x260 canvas.
     //
+    // THE WELL IS THE ONE PLACE THAT ASKS FOR THE WHOLE CANVAS, and it is not an oversight. The
+    // imager can crop (`crop=1`), and the cropped head is far smaller — but the crop is tight to the
+    // ALPHA box, so its size is the outfit's:
+    //
+    //   chauve 50x62   cheveux 68x70   cheveux + chapeau 72x74
+    //
+    // which leaves nothing stable to place it by. The uncropped canvas does: the chin is at y=141
+    // and the bare face is 62 tall centred on x=90.5 in EVERY figure, because those are properties
+    // of the geometry rather than of the hat. `m` would halve the download and is not an option
+    // either — its face is 31px against a 46px well, so the head would be upscaled and soft.
+    //
+    // Everywhere else, `size` is what the caller asks for, and the callers were checked against
+    // habbo.com's own: `profile-header.html` passes NO size on a profile's own header, which is its
+    // imager's `big` (64x110) — this port was passing `l`, two steps up, which is what made the
+    // header avatar twice the size habbo.com draws.
+    //
     // THE ANCHOR IS THE CHIN AND THE BARE FACE, not the head's bounding box. That distinction is
     // the whole fix: the box moves with the outfit, and measuring it once fixes the scale to
     // whichever figure happened to be measured. Rendered `headonly=1` at `size=l`:

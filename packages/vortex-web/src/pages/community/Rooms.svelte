@@ -23,6 +23,7 @@
     import EmptyResults from '../../components/EmptyResults.svelte';
     import * as api from '../../lib/api.js';
     import type {IRoomSummary} from '../../lib/api.js';
+    import {roomThumbnailUrl, hideOnError} from '../../lib/config.js';
     import {t} from '../../lib/i18n.js';
 
     let rooms = $state<IRoomSummary[]>([]);
@@ -48,11 +49,19 @@
     {#each rooms as room (room.id)}
         <div class="relative mb-6 min-h-[110px] pl-[122px]">
             <a href="/room/{room.id}" use:link class="absolute top-0 left-0 block hover:border-b-0">
-                <!-- `.room-item__thumbnail::before` IS the picture here: the default plate off the
-                     sprite sheet. `__image` would lay the owner's photo over it at 0,0, and there is
-                     no photo — see the note in lib/config.ts. -->
-                <span class="block bg-[#6796b1] shadow-[3px_3px_rgba(0,0,0,0.3)]">
+                <!-- habbo.com's own two layers, and they are both here now:
+                       .room-item__thumbnail::before        the default plate, off the sprite sheet
+                       .room-item__thumbnail__image         the owner's PHOTO over it, at 0,0
+
+                     `habbo-remove-on-error` is what makes the pair work: the photo route answers 404
+                     when the room has none, the img goes away, and the plate underneath is what
+                     shows. `hideOnError` is that directive. This used to draw the plate alone with a
+                     note saying the camera was not ported — it is now, and it saves a thumbnail per
+                     room. -->
+                <span class="relative block bg-[#6796b1] shadow-[3px_3px_rgba(0,0,0,0.3)]">
                     <Sprite name="roomThumbnail" />
+                    <img src={roomThumbnailUrl(room.id)} alt="" onerror={hideOnError}
+                         class="absolute top-0 left-0 h-full w-full object-cover" />
                 </span>
             </a>
 

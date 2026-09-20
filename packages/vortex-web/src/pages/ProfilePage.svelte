@@ -219,7 +219,7 @@
     <div class="mx-auto flex h-[142px] max-w-[1200px] items-center px-3 md:pl-[90px] lg:pl-[130px]">
         <div class="w-[46px] shrink-0 self-start">
             <div class="relative ml-4 mr-6 w-[104px] pt-[5px] before:absolute before:-left-4 before:top-6 before:h-[88px] before:w-[88px] before:rounded-full before:border-2 before:border-pill-line before:bg-pill before:shadow-pill before:content-['']">
-                <Avatar figure={user?.figureString ?? ''} size="l" direction={2} className="relative block" />
+                <Avatar figure={user?.figureString ?? ""} size="m" direction={2} className="relative block" />
             </div>
         </div>
 

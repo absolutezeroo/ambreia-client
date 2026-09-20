@@ -84,18 +84,32 @@ export function groupBadgeUrl(code: string): string
 //   <habbo-room-picture>           the full-width band UNDER the room page
 //
 // All three read a field on the room — `room.thumbnailUrl` / `room.imageUrl` — which is a PHOTO,
-// taken in-game with the camera and chosen by the owner. Nothing here answers that field, and the
-// camera is not ported, so the two THUMBNAILS keep the default plate the sprite sheet already
-// carries (`::before` on both classes — what habbo.com shows underneath when a room has no photo).
+// taken in-game with the camera and chosen by the owner.
 //
-// The full-width band is the one that gets the render. packages/vortex-imager draws the appart's
-// actual furniture through the client's own renderer at `GET /habbo-imaging/room/:id`, and that band
-// is a big empty rectangle without it. A render is not the photo habbo.com puts there, but it is the
-// same subject at the same size in the same slot — where on a 110px plate it was a different kind of
-// picture standing in for one nobody took.
+// That used to be answered by nothing, and this comment used to say "the camera is not ported", so
+// the two thumbnails fell back to the default plate. Both halves are now false: the camera saves a
+// room thumbnail (`ICameraPhotoStore.SaveRoomThumbnailAsync`) and the web API serves it. So the
+// plate goes back to being what habbo.com uses it as — what shows UNDERNEATH when a room has no
+// photo — and the photo goes on top when there is one.
+//
+// The full-width band keeps the RENDER. packages/vortex-imager draws the appart's actual furniture
+// through the client's own renderer, and that band is a big empty rectangle without it. A render is
+// not the photo habbo.com puts there, but it is the same subject at the same size in the same slot.
 export function roomUrl(roomId: number | string): string
 {
     return `/habbo-imaging/room/${roomId}`;
+}
+
+/**
+ * The room's own photo, the one its owner took with the in-game camera.
+ *
+ * 404 when there is none, which is not an error to handle: it is what makes `hideOnError` uncover
+ * the default plate underneath — habbo.com does the same thing with `habbo-remove-on-error` on the
+ * very same `<img>`.
+ */
+export function roomThumbnailUrl(roomId: number | string): string
+{
+    return `/api/public/camera/thumbnails/${roomId}.png`;
 }
 
 // The imager is a separate process and is routinely not running while the site is worked on. A

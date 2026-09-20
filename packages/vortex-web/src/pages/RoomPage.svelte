@@ -24,7 +24,7 @@
     import Avatar from '../components/Avatar.svelte';
     import * as api from '../lib/api.js';
     import type {IRoomSummary} from '../lib/api.js';
-    import {roomUrl, hideOnError} from '../lib/config.js';
+    import {roomUrl, roomThumbnailUrl, hideOnError} from '../lib/config.js';
     import {t} from '../lib/i18n.js';
     import {signedIn} from '../lib/session.js';
 
@@ -124,14 +124,17 @@
                      against `.room-item__thumbnail`'s 110x110 on #6796b1 with a 3px offset shadow.
                      Two plates, one per screen.
 
-                     `.room__thumbnail__image` would lay the owner's photo over this at 0,0. There is
-                     no photo to lay: see the note at the top of the file.
+                     `.room__thumbnail__image` lays the owner's photo over this at 0,0, and it 404s
+                     when the room has none — which is what `habbo-remove-on-error` (here
+                     `hideOnError`) turns back into the plate underneath.
 
                      `self-start` because habbo.com's is `float:left` with a fixed 114px height, and
                      a flex child stretches to the row instead — which is why this plate used to run
                      the whole height of the panel beside it. -->
-                <div class="shrink-0 self-start rounded-[3px] border-2 border-pill-line bg-[#01353c] shadow-pill">
+                <div class="relative shrink-0 self-start overflow-hidden rounded-[3px] border-2 border-pill-line bg-[#01353c] shadow-pill">
                     <Sprite name="roomThumbnail" />
+                    <img src={roomThumbnailUrl(room.id)} alt="" onerror={hideOnError}
+                         class="absolute top-0 left-0 h-full w-full object-cover" />
                 </div>
 
                 <div class="min-w-0 flex-1">
