@@ -27,7 +27,7 @@
     import type {IProfileListKind} from '../components/ProfileListModal.svelte';
     import {loadBadgeTexts, badgeName} from '../lib/badges.js';
     import {badgeUrl, groupBadgeUrl, hideOnError} from '../lib/config.js';
-    import {t} from '../lib/i18n.js';
+    import {t, formatLongDate} from '../lib/i18n.js';
 
     // `.profile__card__wrapper--<kind> .profile__card__aligner::before`: a 140px-tall illustration
     // hanging ABOVE each card, which the aligner's own `margin-top:140px` reserves the room for.
@@ -56,10 +56,10 @@
 
     const FIVE = 5;
 
-    // Same format as the news feed's dates, which is the only other date the site prints.
+    // Same format as the news feed's dates — literally now: all three call `formatLongDate`.
     function joined(date: string): string
     {
-        return new Date(date).toLocaleDateString('fr-FR', {day: 'numeric', month: 'long', year: 'numeric'});
+        return formatLongDate(date);
     }
 
     // `/profile` with no name is the signed-in player's own, which is how the user menu links here.

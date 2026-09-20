@@ -19,7 +19,8 @@
     // loop stops the moment the order reaches a state it cannot leave.
     import {link} from 'svelte-spa-router';
     import ShopShell from './ShopShell.svelte';
-    import Panel from '../../components/Panel.svelte';
+    import Sprite from '../../components/Sprite.svelte';
+    import {t} from '../../lib/i18n.js';
     import Purse from '../../components/Purse.svelte';
     import MessageBox from '../../components/MessageBox.svelte';
     import * as api from '../../lib/api.js';
@@ -83,7 +84,7 @@
 
 <ShopShell>
     <header>
-        <h1 class="mt-0">Ta commande</h1>
+        <h1 class="mt-0">{t('SITE_ORDER_TITLE')}</h1>
     </header>
 
     <section class="flex flex-col gap-6 lg:flex-row lg:items-start">
@@ -91,52 +92,56 @@
             {#if error}
                 <MessageBox type="exclamation">
                     <h2 class="mt-0">{error}</h2>
-                    <p><a href="/shop" use:link>Retour a la boutique</a></p>
+                    <p><a href="/shop" use:link>{t('NAVIGATION_SHOP')}</a></p>
                 </MessageBox>
             {:else if !order}
-                <p>Chargement...</p>
+                <!-- `router/spinner/inline-spinner.html` — a turning sprite and no words. -->
+                <p><Sprite name="spinnerIndicator" className="[animation:rotating_1s_linear_infinite]" /></p>
             {:else}
                 <MessageBox type={order.state === SHOP_ORDER.FULFILLED ? 'check' : 'exclamation'}>
                     <h2 class="mt-0">{orderLabel(order)}</h2>
 
+                    <!-- Two of the five states have habbo.com wording of their own and take it:
+                         `CREDITS_PENDING_MESSAGE` is exactly "your transaction is still going, come
+                         back later", and `CREDITS_FAILURE_INSTRUCTIONS` is its refusal notice. The
+                         other three describe a hand-over habbo.com's shop does not have, so they are
+                         the port's own `SITE_ORDER_*` keys. All five were typed in French here. -->
                     {#if order.state === SHOP_ORDER.PENDING}
-                        <p>
-                            Cette commande attend son paiement. Elle se mettra a jour toute seule des
-                            que l'hotel aura recu la confirmation.
-                        </p>
+                        <p>{t('CREDITS_PENDING_MESSAGE')}</p>
                     {:else if order.state === SHOP_ORDER.PAID}
-                        <p>Ton paiement est arrive. La livraison est en cours.</p>
+                        <p>{t('SITE_ORDER_PAID_TEXT')}</p>
                     {:else if order.state === SHOP_ORDER.FULFILLED}
-                        <p>{productName(order)} : c'est sur ton compte.</p>
+                        <p>{t('SITE_ORDER_FULFILLED_TEXT', {product: productName(order)})}</p>
                     {:else if order.state === SHOP_ORDER.CANCELLED}
-                        <p>Le paiement n'a pas abouti. Rien ne t'a ete debite par l'hotel.</p>
+                        <p>{t('CREDITS_FAILURE_INSTRUCTIONS')}</p>
                     {:else}
                         <!-- NOT "échec". The money was taken and the hotel owes the goods; saying it
-                             failed is how a support ticket turns into a chargeback. -->
-                        <p>
-                            Ton paiement a bien ete recu et la livraison n'a pas pu se faire
-                            automatiquement. L'equipe a la commande sous les yeux, tu n'as rien a
-                            refaire.
-                        </p>
+                             failed is how a support ticket turns into a chargeback — which is why
+                             the note travels with the key, in locales/site/. -->
+                        <p>{t('SITE_ORDER_INTERVENTION_TEXT')}</p>
                     {/if}
                 </MessageBox>
 
+                <!-- The three column headings of `transactions-list.html` — habbo.com's own words
+                     for exactly these three facts — and the transaction line from
+                     `payment-details`, which already carries the reference inside the sentence. -->
                 <dl class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-1.5 px-3 text-sm">
-                    <dt>Produit</dt>
+                    <dt>{t('TRANSACTIONS_TABLE_PURCHASE')}</dt>
                     <dd class="m-0 text-white">{productName(order)}</dd>
 
-                    <dt>Montant</dt>
+                    <dt>{t('TRANSACTIONS_TABLE_VALUE')}</dt>
                     <dd class="m-0 text-white">{formatPrice(order.priceMinor, order.currency)}</dd>
 
-                    <dt>Passee le</dt>
+                    <dt>{t('TRANSACTIONS_TABLE_DATE')}</dt>
                     <dd class="m-0 text-white">{formatDate(order.createdAt)}</dd>
-
-                    <dt>Reference</dt>
-                    <dd class="m-0 font-mono text-xs break-all text-white">{order.id}</dd>
                 </dl>
 
+                <p class="px-3 font-mono text-xs break-all">
+                    {t('SHOP_PAYMENT_TRANSACTION_DETAILS', {transactionId: order.id})}
+                </p>
+
                 <p class="px-3 text-sm">
-                    <a href="/shop/history" use:link>Mon historique d'achats</a>
+                    <a href="/shop/history" use:link>{t('SHOP_TRANSACTIONS_TITLE')}</a>
                 </p>
             {/if}
         </div>

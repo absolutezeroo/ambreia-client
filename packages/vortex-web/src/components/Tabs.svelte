@@ -14,6 +14,7 @@
     import {link, location} from 'svelte-spa-router';
     import Sprite from './Sprite.svelte';
     import type {ITab} from '../lib/tabs.js';
+    import {t} from '../lib/i18n.js';
 
     let {title = '', tabs = []}: {title?: string; tabs?: ITab[]} = $props();
 
@@ -39,7 +40,7 @@
         {#if tabs.length > 1}
             <div class="flex h-[50px] items-center justify-center text-white md:hidden">
                 <button type="button" onclick={() => (open = !open)} class="relative pr-6 text-right leading-[22px] uppercase">
-                    {active?.label ?? ''}
+                    {active ? t(active.translationKey) : ''}
                     <Sprite name="caret" className="absolute right-0 top-1/2 -translate-y-1/2 transition-transform duration-300 {open ? 'rotate-180' : ''}" />
                 </button>
             </div>
@@ -57,7 +58,7 @@
                     <li class="block w-full md:w-auto md:pr-6 xl:flex xl:items-center xl:pr-0">
                         <a href={tab.path} use:link onclick={() => (open = false)}
                            class="block w-full leading-[50px] uppercase hover:border-b-0 md:whitespace-nowrap xl:w-auto {isActive(tab) ? 'text-[#6796b1]' : 'text-white hover:text-[#406180]'}">
-                            {tab.label}
+                            {t(tab.translationKey)}
                         </a>
 
                         <!-- `habbo-tab:not(:last-child)::after`: a 2px #406180 bar, 1em tall, with

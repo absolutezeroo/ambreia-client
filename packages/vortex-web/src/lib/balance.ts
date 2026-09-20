@@ -22,12 +22,18 @@
 //    `title`, so it is one hover away. A balance you cannot read exactly is a balance you cannot
 //    budget against.
 
+import {intlLocale} from './i18n.js';
+
 /** Below this, the exact number is short enough to read and is printed in full. */
 const COMPACT_FROM = 10_000;
 
-const COMPACT = new Intl.NumberFormat('fr-FR', {notation: 'compact', maximumFractionDigits: 1});
+// Built per call rather than once at import, and that is not a style choice: a module-level
+// formatter is constructed while `main.ts` is still resolving the language, so it would freeze
+// whatever locale happened to be active at import time — which was `'fr-FR'`, hardcoded, for every
+// language. `Intl` caches its own internals, so asking for the same options twice is cheap.
+const compact = () => new Intl.NumberFormat(intlLocale(), {notation: 'compact', maximumFractionDigits: 1});
 
-const EXACT = new Intl.NumberFormat('fr-FR');
+const exact = () => new Intl.NumberFormat(intlLocale());
 
 /**
  * Drops whatever the one displayed decimal cannot show, towards zero.
@@ -58,7 +64,7 @@ export function balance(amount: number): string
 {
     if(!Number.isFinite(amount))
     {
-        return EXACT.format(0);
+        return exact().format(0);
     }
 
     // Negative balances are not a thing the wallet produces, but a sign is the one piece of
@@ -66,14 +72,14 @@ export function balance(amount: number): string
     const magnitude = Math.abs(amount);
 
     return magnitude < COMPACT_FROM
-        ? EXACT.format(amount)
-        : COMPACT.format(truncateToDisplayedDigit(amount));
+        ? exact().format(amount)
+        : compact().format(truncateToDisplayedDigit(amount));
 }
 
 /** The full number, for the `title` of anything `balance()` has abbreviated. */
 export function balanceExact(amount: number): string
 {
-    return Number.isFinite(amount) ? EXACT.format(amount) : EXACT.format(0);
+    return exact().format(Number.isFinite(amount) ? amount : 0);
 }
 
 /** Whether `balance()` shortened this one — i.e. whether a `title` is worth attaching. */

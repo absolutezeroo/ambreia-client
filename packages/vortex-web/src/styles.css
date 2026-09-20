@@ -120,6 +120,14 @@
     to { width: 0; }
 }
 
+/* habbo.com's own, verbatim — `.spinner__indicator` turns on it while the site boots, and so does
+   the inline spinner. It is the loading screen's ONLY moving part: the rest is the logo out of the
+   sprite sheet, and there is no text anywhere on it. */
+@keyframes rotating {
+    from { transform: rotate(0); }
+    to { transform: rotate(360deg); }
+}
+
 @layer base {
     body {
         background-color: var(--color-page);

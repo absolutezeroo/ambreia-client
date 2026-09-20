@@ -19,7 +19,7 @@
     import HotelClosed from './HotelClosed.svelte';
     import * as api from '../lib/api.js';
     import {selectedId} from '../lib/session.js';
-    import {CLIENT_URL} from '../lib/config.js';
+    import {CLIENT_URL, HOTEL_NAME} from '../lib/config.js';
     import {t} from '../lib/i18n.js';
     import {ClientChannel} from '../lib/clientChannel.js';
 
@@ -183,7 +183,10 @@
              `navigator.clipboard.writeText`. Chrome does not inherit this one into a frame just
              because the frame is same-origin — it has to be named here. Read is NOT delegated:
              nothing in the client pastes, and `clipboard-read` prompts the user. -->
-        <iframe bind:this={frame} {src} title="Vortex" class="h-full w-full border-0" allow="autoplay; fullscreen; clipboard-write"></iframe>
+        <!-- habbo.com's `.client__frame` carries no `title`. One is kept because an iframe without
+             an accessible name is announced as "frame" and nothing else — but it is the HOTEL'S
+             NAME from config, not a word typed in one language. -->
+        <iframe bind:this={frame} {src} title={HOTEL_NAME} class="h-full w-full border-0" allow="autoplay; fullscreen; clipboard-write"></iframe>
     {:else}
         <div class="flex h-full items-center justify-center bg-page">
             <p class="font-condensed uppercase text-ink">...</p>
@@ -221,7 +224,7 @@
              `padding: 6px 12px` to a square around the icon. -->
         <button type="button" onclick={toggleFullscreen}
                 class="rounded-l-none rounded-r-[5px] border-2 border-[#ffea00] bg-[#ffb900] px-1.5 py-1.5 text-black shadow-btn hover:border-b-2 hover:border-[#fffd70] hover:bg-[#ffd400] active:translate-y-[2px] active:border-[#ffce37] active:bg-[#f89400] active:shadow-btn-active"
-                title="{fullscreen ? 'Reduire' : 'Plein ecran'}">
+                title={t(fullscreen ? 'SITE_CLIENT_FULLSCREEN_EXIT' : 'SITE_CLIENT_FULLSCREEN')}>
             <Sprite name={fullscreen ? 'fullscreenBack' : 'fullscreen'} />
         </button>
     </div>

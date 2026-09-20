@@ -96,7 +96,7 @@
                 {#each SOCIALS as entry (entry.key)}
                     <button type="button" disabled
                             class="block w-full rounded-[5px] border-2 px-6 py-3 text-center font-condensed text-sm uppercase opacity-70 shadow-btn {entry.class}"
-                            title="Aucun fournisseur externe sur cet hotel">
+                            title={t('SITE_SOCIAL_UNAVAILABLE')}>
                         {t(entry.key)}
                     </button>
                 {/each}
@@ -130,7 +130,7 @@
 
         {#if !compact}
             <p class="mt-3 text-center">
-                <a href="/forgot" use:link onclick={() => onDone?.()}>Mot de passe oublié</a>
+                <a href="/forgot" use:link onclick={() => onDone?.()}>{t('LOGIN_FORGOT_LABEL')}</a>
             </p>
 
             <!-- `.login-form__register`: a <small>, not a heading. -->

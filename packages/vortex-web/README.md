@@ -4,15 +4,53 @@ The hotel's website — a port of **habbo-web**, the modern habbo.com site, on t
 web API.
 
 ```bash
-node tools/fetch-assets.mjs      # first: the sprite sheet and the site's bitmaps
-node tools/fetch-web-pages.mjs   # then: habbo.com's editorial pages + their images
+cp .env.example .env             # first: the fallback language and the hotel's name
+node tools/fetch-assets.mjs      # the sprite sheet and the site's bitmaps
+node tools/fetch-web-pages.mjs   # habbo.com's editorial pages + their images, per language
+node tools/fetch-l10n.mjs        # its translations, one file per language
 pnpm web                         # dev server on http://localhost:5174
 pnpm web:build                   # bundle to dist/
+node tools/check-l10n.mjs        # any key the code asks for that a language cannot answer
 ```
 
-The two fetchers are **required on a fresh checkout**: `*.png` is gitignored repo-wide, like every
-other dump-derived asset here, so without `fetch-assets.mjs` the sprite sheet is missing and every
-icon — the logo included — is a blank box.
+`fetch-assets.mjs` is **required on a fresh checkout**: `*.png` is gitignored repo-wide, like every
+other dump-derived asset here, so without it the sprite sheet is missing and every icon — the logo
+included — is a blank box. The other two ship their output, so they are only needed to refresh it or
+to add a language.
+
+`cp .env.example .env` matters more than it looks: `.env` is gitignored, and `VITE_SITE_LOCALE` is
+the only place in the whole package where a language is named. Without it the site falls back to the
+first file in `src/locales/` alphabetically — `br`, which is nobody's decision, and which shows up
+as Portuguese filling the gaps in an English page.
+
+## Languages
+
+Nine: `fr en de es it nl fi br tr`, each a file in `src/locales/`, each fetched from
+`images.habbo.com/habbo-web-l10n/<lang>.json` — habbo.com's own. **The set is the contents of that
+directory**; `src/lib/i18n.ts` holds no list and names no language. Adding one is
+`node tools/fetch-l10n.mjs <code>` plus, for the editorial pages,
+`node tools/fetch-web-pages.mjs <code>`.
+
+Each file becomes its own chunk, so a visitor downloads one of them and never the other eight.
+
+Which one a visitor gets, in order of how deliberate the signal is: `?lang=` (remembered), what was
+remembered before, `navigator.languages`, then `VITE_SITE_LOCALE`. **habbo.com has no language
+switcher anywhere** — each of its languages is its own domain, and the choice is made by which one
+you opened — so this port does not invent one.
+
+Two things are not translations and do not live in a locale file:
+
+- **the hotel's name.** `VITE_HOTEL_NAME`, substituted into habbo.com's strings by the fetchers on
+  the way in (`\bHabbo`, case-sensitive: `HABBO` in the SMS keywords and the Sulake trademark line,
+  `habboClubDays`, `www.habbo.fr` and `/playing-habbo/` are all spared by the case alone). It used
+  to be a hand-edit of `fr.json`, which is why the first refresh of that file silently undid it.
+- **this hotel's own strings**, in `src/locales/site/<lang>.json`, merged over habbo.com's and all
+  prefixed `SITE_`. They are the screens habbo.com has no counterpart for — the order page above
+  all, and the chain/Relic/leaderboard pages. A language with no overlay falls back for those keys
+  only; `fr` and `en` are written today.
+
+`node tools/check-l10n.mjs` prints, per language, how many of the keys the code asks for it can
+answer, and fails on one no language answers at all.
 
 Same stack as the emulator's dashboard (`../../../vortex-emulator/Vortex.Dashboard.Web`): Svelte 5
 runes, Vite, Tailwind 4, `svelte-spa-router`. No SvelteKit — this is a static SPA, and the emulator

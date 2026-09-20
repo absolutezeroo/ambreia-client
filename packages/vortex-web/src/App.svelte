@@ -15,6 +15,7 @@
     import Footer from './components/Footer.svelte';
     import Client from './components/Client.svelte';
     import Toasts from './components/Toasts.svelte';
+    import Sprite from './components/Sprite.svelte';
     import {routes} from './lib/routes.js';
     import {refresh, signedIn} from './lib/session.js';
 
@@ -53,8 +54,18 @@
 </script>
 
 {#if status === 'loading'}
-    <div class="flex min-h-screen items-center justify-center bg-page">
-        <p class="font-condensed uppercase text-ink">Chargement de l'hotel...</p>
+    <!-- `router/spinner/spinner.html`: the logo, then the turning indicator, and NO TEXT — its
+         `<h1 class="spinner__logo">Habbo</h1>` is carried off-screen by `text-indent:-9999px`, so
+         what a visitor sees is two sprites. This said "Chargement de l'hotel..." in French, which
+         was both invented wording and the one string on the site that no language could reach,
+         since it is painted before anything else exists.
+
+         `.spinner__logo` is the header logo below 767px and the large cut above — the same two the
+         sheet already indexes. The backdrop is `.spinner-backdrop--solid`'s own 135° gradient. -->
+    <div class="flex min-h-screen flex-col items-center justify-center bg-linear-[135deg,var(--color-page-top),var(--color-page)]">
+        <Sprite name="logo" label="Habbo" className="mb-6 md:hidden" />
+        <Sprite name="bigLogo" label="Habbo" className="mb-6 hidden md:inline-block" />
+        <Sprite name="spinnerIndicator" className="[animation:rotating_1s_linear_infinite]" />
     </div>
 {:else}
     <!-- Outside every branch below, so navigating away cannot take it down with the page: closing

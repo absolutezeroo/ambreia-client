@@ -81,8 +81,12 @@
     <main class="mx-auto max-w-[1200px] px-3 py-6"></main>
 {:else if !room}
     <main class="mx-auto max-w-[1200px] px-3 py-6">
-        <h1>Cet appart n'existe pas</h1>
-        <p><a href="/community/rooms" use:link>{t('ROOMS_TITLE')}</a></p>
+        <!-- An appart that is not there is habbo.com's NOT-FOUND, not a message of its own: its
+             router has no per-resource wording and this had the French typed in. `…_TEXT` carries
+             its own link home, which is why it renders as HTML — see NotFoundPage. -->
+        <h3>{t('NOT_FOUND_PAGE_TITLE')}</h3>
+        <div class="static-content">{@html t('NOT_FOUND_PAGE_TEXT')}</div>
+        <p class="mt-3"><a href="/community/rooms" use:link>{t('ROOMS_TITLE')}</a></p>
     </main>
 {:else if !room.doorOpen}
     <!-- `room.html` branches before anything else: `<habbo-room-restricted ng-if="room.doorMode !=

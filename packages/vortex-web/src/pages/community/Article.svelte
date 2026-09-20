@@ -22,7 +22,7 @@
     import * as api from '../../lib/api.js';
     import type {IArticleDetail, IArticleSummary} from '../../lib/api.js';
     import {IMAGES} from '../../lib/config.js';
-    import {t} from '../../lib/i18n.js';
+    import {t, formatLongDate} from '../../lib/i18n.js';
 
     let {params = {}} = $props();
 
@@ -42,7 +42,7 @@
 
     function when(date: string): string
     {
-        return new Date(date).toLocaleDateString('fr-FR', {day: 'numeric', month: 'long', year: 'numeric'});
+        return formatLongDate(date);
     }
 
     // Takes only what it reads. The "Nouveautés" panel passes a full summary and the related list

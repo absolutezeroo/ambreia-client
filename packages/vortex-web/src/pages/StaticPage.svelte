@@ -3,6 +3,7 @@
     // template fed by the route. They differ only in their text, so they are one component here;
     // five near-identical files would drift apart the first time one was edited.
     import {location, link} from 'svelte-spa-router';
+    import {t} from '../lib/i18n.js';
 
     /** A heading and its paragraphs: `[title, ...body]` per block. */
     interface IStaticPage
@@ -78,7 +79,10 @@
         </section>
     {/each}
 
-    <!-- `/`, not `/me`: habbo.com has no such route and neither does this port — see the note at the
-         top of lib/routes.ts. The link fell through to the 404. -->
-    <p class="mt-12"><a href="/" use:link class="hover:underline">Retour a l'accueil</a></p>
+    <!-- `NAVIGATION_HOME` — the navigation's own word for this destination, in every language. It
+         was "Retour a l'accueil" typed in French, accents missing.
+
+         `/`, not `/me`: habbo.com has no such route and neither does this port — see the note at
+         the top of lib/routes.ts. The link fell through to the 404. -->
+    <p class="mt-12"><a href="/" use:link class="hover:underline">{t('NAVIGATION_HOME')}</a></p>
 </div>

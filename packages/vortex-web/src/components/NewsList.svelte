@@ -19,6 +19,7 @@
     import EmptyResults from './EmptyResults.svelte';
     import {IMAGES} from '../lib/config.js';
     import type {IArticleSummary} from '../lib/api.js';
+    import {formatLongDate} from '../lib/i18n.js';
 
     let {articles = [], categories = [], lead = false, columns = 1}:
     {
@@ -45,7 +46,7 @@
 
     function when(date: string): string
     {
-        return new Date(date).toLocaleDateString('fr-FR', {day: 'numeric', month: 'long', year: 'numeric'});
+        return formatLongDate(date);
     }
 </script>
 

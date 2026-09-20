@@ -116,7 +116,10 @@
         </Fieldset>
 
         <Fieldset>
-            <p class="text-sm">Changer ton mot de passe déconnecte toutes tes sessions, y compris celle-ci.</p>
+            <!-- habbo.com does not warn about this because its own password change does not revoke
+                 anything; `/api/public/authentication/password` here does, so the sentence is the
+                 port's own key rather than French in the markup. -->
+            <p class="text-sm">{t('SITE_PASSWORD_CHANGE_SESSIONS')}</p>
             <Button type="submit" disabled={busy || mismatch || problem !== null || !next} className="mt-3">
                 <!-- `password-change-form.html`'s button is `FORM_BUTTON_CHANGE` — "Changer". The
                      page title above it already says what is being changed. -->

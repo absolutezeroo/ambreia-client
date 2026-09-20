@@ -31,7 +31,7 @@
     import type {IShopOrder} from '../../lib/api.js';
     import {formatPrice, orderLabel, productName} from '../../lib/shop.js';
     import {signedIn} from '../../lib/session.js';
-    import {t} from '../../lib/i18n.js';
+    import {t, intlLocale} from '../../lib/i18n.js';
 
     // `limitTo` on habbo.com's own list, with "Tout montrer" below it.
     const FIRST_PAGE = 10;
@@ -68,7 +68,7 @@
     // `amDateFormat: 'D MMM YYYY'` — the day, the month abbreviated, the year.
     function shortDate(iso: string): string
     {
-        return new Intl.DateTimeFormat('fr-FR', {day: 'numeric', month: 'short', year: 'numeric'})
+        return new Intl.DateTimeFormat(intlLocale(), {day: 'numeric', month: 'short', year: 'numeric'})
             .format(new Date(iso));
     }
 </script>

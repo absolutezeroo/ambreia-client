@@ -12,6 +12,12 @@
 // VITE_ASSET_BASE still overrides it, for a deployment that serves c_images from a CDN.
 export const ASSET_BASE = import.meta.env.VITE_ASSET_BASE ?? '';
 
+// The hotel's name. NOT a translation — it is the same word in all nine languages, which is exactly
+// why it does not belong in a locale file: `tools/fetch-l10n.mjs` substitutes it into habbo.com's
+// own strings at fetch time (283 of them say "Habbo"), and this is the same value for the handful of
+// places the site names the hotel itself.
+export const HOTEL_NAME = import.meta.env.VITE_HOTEL_NAME ?? 'Vortex';
+
 export const IMAGES = `${ASSET_BASE}/c_images`;
 
 // The client itself. /hotel drops it in an iframe with the SSO ticket on the query string, which is

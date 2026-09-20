@@ -14,7 +14,7 @@
 // it, instead of an `undefined` nobody sees until the screen is blank. The aliases below exist only
 // so the pages import a name rather than a subscript chain.
 import type {components} from './api.generated';
-import {t} from './i18n.js';
+import {t, locale} from './i18n.js';
 
 type Schemas = components['schemas'];
 
@@ -80,42 +80,55 @@ export const SHOP_ORDER = {
 //
 // A literal only where habbo.com has nothing, because its own API never answers that case: a hotel
 // outage, a withdrawn shop product, an order id that is not yours. Those are ours to word.
+// A server CODE to the KEY that words it — never to a sentence. Two reasons, and the second is what
+// broke:
+//
+//   - a sentence typed here is in one language, on a site that has nine;
+//   - this map is built when the module is evaluated, which is before `main.ts` has awaited
+//     `initLocale()`, so the `t()` calls that used to sit in it resolved against an empty dictionary
+//     and every one of them froze as its own key name.
+//
+// `ApiError` resolves the key at THROW time instead, which is always after the language is loaded.
+//
+// habbo.com's own key wherever it has one; a `SITE_ERROR_*` key from `src/locales/site/` where its
+// API never answers that case — a hotel outage, a withdrawn shop product, an order id that is not
+// yours, the two voucher refusals this emulator invented. Those are ours to word, in every language.
 const ERRORS: Record<string, string> = {
-    'pocket.auth.missing_credentials': 'Il manque ton nom ou ton mot de passe.',
-    'pocket.auth.invalid_login': 'Nom ou mot de passe incorrect.',
-    'pocket.auth.mfa_required': 'Entre le code de ton application d\'authentification.',
-    'pocket.auth.invalid_code': t('TWO_FACTOR_AUTHENTICATION_INCORRECT_CODE'),
+    'pocket.auth.missing_credentials': 'SITE_ERROR_MISSING_CREDENTIALS',
+    'pocket.auth.invalid_login': 'SITE_ERROR_INVALID_LOGIN',
+    'pocket.auth.mfa_required': 'SITE_ERROR_MFA_REQUIRED',
+    'pocket.auth.invalid_code': 'TWO_FACTOR_AUTHENTICATION_INCORRECT_CODE',
     // Refused because the account already has a factor. habbo.com never answers this — its own
     // enrolment replaces rather than refuses — so the sentence is ours.
-    'pocket.auth.mfa_already_enabled': 'Ce compte a deja une authentification a deux facteurs.',
-    // habbo.com's own key for a refused challenge, and its own sentence.
-    'safetylock.invalid_answer': t('ERROR_SAFETY_LOCK_ANSWER'),
-    'safetylock.not_configured': 'Ce compte n\'a pas de questions de securite.',
+    'pocket.auth.mfa_already_enabled': 'SITE_ERROR_MFA_ALREADY_ENABLED',
+    // habbo.com's own key for a refused challenge.
+    'safetylock.invalid_answer': 'ERROR_SAFETY_LOCK_ANSWER',
+    'safetylock.not_configured': 'SITE_ERROR_SAFETY_NOT_CONFIGURED',
     // Never rendered: `needsSafetyUnlock` catches this one and opens the dialog instead, the way
     // `needsMfa` catches the second factor. The wording is here for the path that forgets to.
-    'safetylock.required': 'Reponds a tes questions de securite pour continuer.',
-    'pocket.auth.password_too_short': t('ERROR_PASSWORD_MIN_LENGTH'),
-    'pocket.auth.wrong_password': t('ERROR_INCORRECT_PASSWORD'),
-    'pocket.auth.no_avatars': 'Ce compte n\'a pas encore d\'avatar.',
-    'pocket.auth.name_taken': t('ERROR_FIELD_NAME_TAKEN'),
-    'email_taken': t('ERROR_EMAIL_CHANGE_USED'),
-    'avatar_not_owned': 'Cet avatar n\'appartient pas a ce compte.',
-    'invalid_request': 'Requete invalide.',
-    'article_not_found': 'Cet article n\'existe pas.',
-    'hotel_unreachable': 'L\'hotel ne repond pas.',
-    'order_not_found': 'Cette commande n\'existe pas.',
-    'unknown_product': 'Ce produit n\'est plus en vente.',
-    'too_many_open_orders': 'Tu as trop de commandes en attente. Termine-les d\'abord.',
-    'shop_unavailable': 'La boutique n\'est pas disponible pour le moment.',
+    'safetylock.required': 'SITE_ERROR_SAFETY_REQUIRED',
+    'pocket.auth.password_too_short': 'ERROR_PASSWORD_MIN_LENGTH',
+    'pocket.auth.wrong_password': 'ERROR_INCORRECT_PASSWORD',
+    'pocket.auth.no_avatars': 'SITE_ERROR_NO_AVATARS',
+    'pocket.auth.name_taken': 'ERROR_FIELD_NAME_TAKEN',
+    'email_taken': 'ERROR_EMAIL_CHANGE_USED',
+    'avatar_not_owned': 'SITE_ERROR_AVATAR_NOT_OWNED',
+    'invalid_request': 'SITE_ERROR_INVALID_REQUEST',
+    'article_not_found': 'SITE_ERROR_ARTICLE_NOT_FOUND',
+    'hotel_unreachable': 'SITE_ERROR_HOTEL_UNREACHABLE',
+    'order_not_found': 'SITE_ERROR_ORDER_NOT_FOUND',
+    'unknown_product': 'SITE_ERROR_UNKNOWN_PRODUCT',
+    'too_many_open_orders': 'SITE_ERROR_TOO_MANY_OPEN_ORDERS',
+    'shop_unavailable': 'SITE_ERROR_SHOP_UNAVAILABLE',
     // The voucher codes are the GRAIN's own, so the client's redeem dialog and this page say the
     // same thing about the same code. habbo.com words three of the five; `inactive` and
     // `max_redemptions_reached` are this emulator's own refusals and have no counterpart.
-    'not_found': t('ERROR_VOUCHER_CODE_NONEXISTENT'),
-    'already_redeemed': t('ERROR_VOUCHER_CODE_REDEEMED'),
-    'grant_failed': t('ERROR_VOUCHER_CODE_FAILED'),
-    'inactive': 'Ce code n\'est plus actif.',
-    'expired': 'Ce code a expire.',
-    'max_redemptions_reached': 'Ce code a atteint sa limite d\'utilisations.',
+    'not_found': 'ERROR_VOUCHER_CODE_NONEXISTENT',
+    'already_redeemed': 'ERROR_VOUCHER_CODE_REDEEMED',
+    'grant_failed': 'ERROR_VOUCHER_CODE_FAILED',
+    'inactive': 'SITE_ERROR_VOUCHER_INACTIVE',
+    'expired': 'SITE_ERROR_VOUCHER_EXPIRED',
+    'max_redemptions_reached': 'SITE_ERROR_VOUCHER_LIMIT',
 };
 
 export class ApiError extends Error
@@ -125,7 +138,10 @@ export class ApiError extends Error
 
     constructor(code?: string | null, status?: number, options: {cause?: unknown} = {})
     {
-        super(ERRORS[code ?? ''] ?? code ?? 'La connexion a echoue.');
+        // Resolved HERE, not in the map: by the time anything throws, the language is loaded. An
+        // unmapped code shows as itself — it is the only honest thing to print, and it is what makes
+        // a new server refusal visible instead of silently generic.
+        super(ERRORS[code ?? ''] ? t(ERRORS[code ?? '']) : (code ?? t('SITE_ERROR_CONNECTION')));
         this.name = 'ApiError';
         this.code = code ?? 'request_failed';
         this.status = status ?? 0;
@@ -213,13 +229,22 @@ export function getLanguages(): Promise<ISiteLanguages>
 // Anonymous by design — the front page has to render with no session at all — and the server does
 // the ordering: pinned first, then newest. `lang` in the answer is the language actually served,
 // which may not be the one asked for; a summary then carries `fallback: true`.
+//
+// The site's own language is SENT rather than left to the `Accept-Language` header, because the two
+// disagree the moment a visitor pins one with `?lang=`: the chrome would then be in the language
+// they asked for and the articles in the one their browser prefers. The server resolves the code
+// against its own `web_languages` and answers in the nearest it publishes, so asking for one the
+// hotel has no articles in is already handled there.
 export function getArticles(
     options: {category?: string; page?: number; pageSize?: number} = {}
 ): Promise<IArticleFeed>
 {
-    const query = new URLSearchParams();
+    const query = new URLSearchParams({lang: locale()});
 
-    if(options.category && options.category !== 'tout')
+    // `tout` and `all` are the ids of the emulator's seeded "everything" row, not categories — the
+    // filter row drops both (see pages/community/News.svelte, where the same pair is excluded).
+    // They are database ids that happen to be words, which is why the French one is spelled here.
+    if(options.category && options.category !== 'tout' && options.category !== 'all')
     {
         query.set('category', options.category);
     }
@@ -234,16 +259,14 @@ export function getArticles(
         query.set('pageSize', String(options.pageSize));
     }
 
-    const suffix = query.size ? `?${query}` : '';
-
-    return request(`/api/public/articles${suffix}`);
+    return request(`/api/public/articles?${query}`);
 }
 
 // 404 `article_not_found` when there is none. `body` is the stored block array — never HTML. See
 // components/ArticleBody.svelte.
 export function getArticle(slug: string): Promise<IArticleDetail>
 {
-    return request(`/api/public/articles/${encodeURIComponent(slug)}`);
+    return request(`/api/public/articles/${encodeURIComponent(slug)}?lang=${encodeURIComponent(locale())}`);
 }
 
 // 404 `user_not_found`. habbo.com's own two-step: the site routes on /profile/:name and the profile

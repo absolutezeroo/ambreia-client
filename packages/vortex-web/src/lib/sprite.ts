@@ -16,9 +16,15 @@ export const SPRITE_URL = new URL('../assets/sprite.png', import.meta.url).href;
 export const SPRITE = {
     logo: [620, 830, 116, 46],
     // The landing screen's logo is a second, larger cut of the same wordmark
-    // (`.register-banner__logo`), not the header's scaled up.
+    // (`.register-banner__logo`), not the header's scaled up. `.spinner__logo` uses the SAME two
+    // cuts — the small one below 767px and the large one above — which is why the loading screen
+    // needs no entry of its own.
     bigLogo: [396, 242, 197, 73],
     sulake: [212, 310, 87, 75],
+
+    // `.spinner__indicator`, the ring that turns under the logo while the site boots. It carries
+    // `animation: rotating 1s linear infinite` — the keyframe is in styles.css.
+    spinnerIndicator: [740, 552, 32, 32],
 
     // Navigation. `nft` genuinely shares `shop`'s coordinates in habbo.css — not a copy/paste slip
     // here; the sheet has no separate NFT icon.

@@ -42,7 +42,8 @@
                             {/each}
                         </ul>
 
-                        <p><a href="/hotel" use:link class="font-condensed uppercase">Repondre dans l'hotel</a></p>
+                        <!-- `discussions.html`'s own link, and its own key. -->
+                        <p><a href="/hotel" use:link class="font-condensed uppercase">{t('DISCUSSIONS_REPLY')}</a></p>
                     </div>
                 </li>
             {/each}
