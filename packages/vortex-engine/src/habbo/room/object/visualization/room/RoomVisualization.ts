@@ -695,8 +695,8 @@ export class RoomVisualization extends RoomObjectSpriteVisualization
             }
 
             // TEMPORARY diagnostic — remove once the doorway-threshold question is settled.
-            // `localStorage.setItem('vortex.planepaint', '1')` + reload repaints the room's own
-            // planes by what they are, so a screenshot says which one covers a given pixel:
+            // Repaints the room's own planes by what they are, so a screenshot says which one
+            // covers a given pixel:
             //   magenta = a thickness face (a side/top slab, `leftSide` or `rightSide` under 1)
             //   cyan    = any other wall plane
             //   yellow  = any floor plane
@@ -704,19 +704,19 @@ export class RoomVisualization extends RoomObjectSpriteVisualization
             // (`RoomPlane.render()`), so tinting alone repaints nothing on a textured wall — which
             // is why the first attempt at this probe came back looking like an ordinary room.
             // It runs after the thin-wall branch above, which is the one that sets `hasTexture`.
-            try
+            //
+            // Unconditional on purpose: behind a `localStorage` flag it repainted nothing twice,
+            // and a flag read from the wrong origin cannot be told apart from code that never ran.
+            // The log below settles that half — no line means this method is not being reached.
             {
-                if(localStorage.getItem('vortex.planepaint') === '1')
-                {
-                    const thin = leftSide.length < 1 || rightSide.length < 1;
+                const thin = leftSide.length < 1 || rightSide.length < 1;
 
-                    plane.color = thin ? 0xFF00FF : (planeType === RoomPlane.TYPE_FLOOR ? 0xFFFF00 : 0x00FFFF);
-                    plane.hasTexture = false;
-                }
-            }
-            catch
-            {
-                // no storage, no repaint
+                plane.color = thin ? 0xFF00FF : (planeType === RoomPlane.TYPE_FLOOR ? 0xFFFF00 : 0x00FFFF);
+                plane.hasTexture = false;
+
+                log.warn(`[plane-probe] #${i} type=${planeType} thin=${thin} color=${plane.color.toString(16)}`
+                    + ` left=${leftSide.length.toFixed(2)} right=${rightSide.length.toFixed(2)}`
+                    + ` loc=(${location.x},${location.y},${location.z})`);
             }
 
             // The parser's own rectangle masks, replayed onto the plane. AS3 runs this loop for
