@@ -678,9 +678,13 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
 
     /**
 	 * The per-object sprite cache entry, or null when the object drew nothing this frame.
+	 *
+	 * `screenZ` is the depth the canvas gave the object before any sprite's own `relativeDepth` —
+	 * what `SpriteDataCollector` needs for an avatar that draws as parts, since the composed sprite
+	 * whose depth AS3 reads does not exist in that mode.
 	 */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/room/renderer/_SafeCls_3073.as::getRoomObjectCacheItem()
-    getRoomObjectCacheItem(objectId: string): {objectId: number; sprites: SortableSprite[]} | null
+    getRoomObjectCacheItem(objectId: string): {objectId: number; screenZ: number; sprites: SortableSprite[]} | null
     {
         return this._objectSpriteCaches.get(objectId) ?? null;
     }
@@ -1558,10 +1562,23 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
             // An avatar's drawn sprite is one composed bitmap and has no library asset name of its
             // own, so the canvas gives it the object's: `avatar_<id>`. Nothing resolves that name —
             // it is a key. `SpriteDataCollector.getFurniData()` looks for it to read the drawn
-            // avatar's depth and baseline before merging in the figure's real part records, and
-            // without it every avatar in a photo landed at the room's own z.
+            // avatar's depth and baseline before merging in the figure's real part records.
+            //
+            // `i === 0` is the port's own guard and it is load-bearing. AS3 tests the sprite type
+            // alone because an avatar there *is* one sprite; here, in sprite-parts mode, every body
+            // part inherits `mainSprite.spriteType` (`AvatarVisualization.updatePartSprites()`), so
+            // testing the type alone named all fifteen of them. Two consequences, both seen in a
+            // photo: the parts stopped being dropped by `getSortableSpriteList()`'s empty-name
+            // filter and went out as fifteen unresolvable `avatar_<id>` records, and the baseline
+            // above was read off whichever part came first in the cache instead of off the whole
+            // avatar — which drew the figure some thirty pixels above its own feet. Sprite 0 is the
+            // composed image (`updateMainSprite()` takes `getSprite(0)`), and in sprite-parts mode
+            // it is the textureless anchor, which the `sprite.texture === null` check above has
+            // already skipped — so there, correctly, nothing is named at all.
             // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/room/renderer/_SafeCls_3073.as::renderObject()
-            if(sprite.spriteType === RoomObjectSpriteType.AVATAR || sprite.spriteType === RoomObjectSpriteType.AVATAR_OWN)
+            if(i === 0
+                && (sprite.spriteType === RoomObjectSpriteType.AVATAR
+                    || sprite.spriteType === RoomObjectSpriteType.AVATAR_OWN))
             {
                 sprite.libraryAssetName = object.getAvatarLibraryAssetName();
             }

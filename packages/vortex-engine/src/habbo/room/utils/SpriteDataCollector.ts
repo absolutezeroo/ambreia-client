@@ -246,7 +246,27 @@ export class SpriteDataCollector
 
             if(screen === null) continue;
 
-            if(baseY === 0) baseY = screen.y;
+            // The same absence, in the other axis: with no composed sprite there is no depth to read
+            // either, and `baseZ` left at AS3's zero would sort the whole figure against the room's
+            // origin — in front of every piece of furniture in the photo. The canvas kept the value
+            // the whole object was drawn at, which is that depth less the composed sprite's own
+            // `relativeDepth` (-0.01), an order of magnitude under the 0.0001 separating the figure's
+            // own parts.
+            if(baseZ === 0)
+            {
+                baseZ = canvas.getRoomObjectCacheItem(String(object.getInstanceId()))?.screenZ ?? 0;
+            }
+
+            // DEVIATION: AS3 writes `_loc16_ = _loc13_.y` — the screen location, with no correction.
+            //   The line below it subtracts `screenOffsetX` from `_loc13_.x` for exactly the same
+            //   value in the other axis, and `getSpriteDataObject()` adds `screenOffsetY` back at
+            //   the end, so the missing subtraction counts the pan twice. In Flash this branch only
+            //   ran for an avatar the canvas had culled, which is off screen anyway, so nothing
+            //   showed it; here it is the *normal* path, because in sprite-parts mode there is no
+            //   composed avatar sprite for the loop above to find. Restored, and it makes the two
+            //   agree: the composed branch resolves to the same value.
+            // AS3: .../habbo/room/utils/_SafeCls_1840.as::getFurniData()
+            if(baseY === 0) baseY = screen.y - canvas.screenOffsetY;
 
             for(const part of parts)
             {
