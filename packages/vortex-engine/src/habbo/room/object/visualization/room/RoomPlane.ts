@@ -309,6 +309,17 @@ export class RoomPlane implements IRoomPlane
             const y = Math.trunc(bitmap.height * (1 - mask.rightSideLoc / this._rightSide.length));
 
             data.addMask(assetName, {x: x + asset.offsetX, y: y + asset.offsetY}, asset.flipH, asset.flipV);
+
+            // TEMPORARY diagnostic — remove with the `[plane-payload]` log in
+            // RenderRoomMessageComposer. The position above is a fraction of *this* bitmap, and the
+            // receiving renderer has to rebuild a texture of the same size to read it back. That
+            // size has been assumed to be `side.length * scale` from `getTexture()`'s arguments and
+            // never measured; if the rasterizer returns anything else, every mask lands off by the
+            // ratio between the two.
+            log.warn(`[mask-space] ${assetName} at (${x + asset.offsetX},${y + asset.offsetY})`
+                + ` in ${bitmap.width}x${bitmap.height}`
+                + ` sides=${this._leftSide.length.toFixed(3)}x${this._rightSide.length.toFixed(3)}`
+                + ` scale=${geometry.scale} assetOffset=(${asset.offsetX},${asset.offsetY})`);
         }
 
         return data;
