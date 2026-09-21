@@ -8,6 +8,8 @@ import type {IItemListWindow} from '@core/window/components/IItemListWindow';
 import type {IStaticBitmapWrapperWindow} from '@core/window/components/IStaticBitmapWrapperWindow';
 import {HabbiconAssetManager} from '@habbo/habbicons/assets/HabbiconAssetManager';
 import type {ITextWindow} from '@core/window/components/ITextWindow';
+import type {IAvatarImageWidget} from './IAvatarImageWidget';
+import type {UpdatingTimeStampWidget} from './UpdatingTimeStampWidget';
 import {ChatBubbleMessage} from './ChatBubbleMessage';
 import {Logger} from '@core/utils/Logger';
 import {GetExtendedProfileMessageComposer} from '@habbo/communication/messages/outgoing/users/GetExtendedProfileMessageComposer';
@@ -88,8 +90,12 @@ export class IlluminaChatBubbleWidget implements IIlluminaChatBubbleWidget
     private _spacedMessageContainer: IWindow | null = null;
     private _userNameLabel: IWindow | null = null;
     private _userAvatarWidget: IWindow | null = null;
+    // AS3: .../IlluminaChatBubbleWidget.as::_avatarWidget
+    private _avatarWidget: IAvatarImageWidget | null = null;
     private _bubbleWrapper: IWindowContainer | null = null;
     private _postTimeWidget: IWindow | null = null;
+    // AS3: .../IlluminaChatBubbleWidget.as::_postTime
+    private _postTime: UpdatingTimeStampWidget | null = null;
     private _offlinePlaceholder: IWindow | null = null;
     // AS3: .../src/com/sulake/habbo/window/widgets/IlluminaChatBubbleWidget.as::_arrowPoint
     private _arrowPoint: IWindow | null = null;
@@ -115,6 +121,17 @@ export class IlluminaChatBubbleWidget implements IIlluminaChatBubbleWidget
             this._userNameLabel = root.findChildByName('user_name');
             this._userAvatarWidget = root.findChildByName('user_avatar');
 
+            // The bubble owns no figure/userId of its own: AS3's accessors are pure
+            // pass-throughs to the avatar widget living inside `user_avatar`. Keeping
+            // them in private fields — as this did — left every bubble on the avatar
+            // widget's default figure, whatever MainView assigned.
+            this._avatarWidget = (this._userAvatarWidget as unknown as IWidgetWindow | null)?.widget as IAvatarImageWidget | null ?? null;
+
+            if(this._avatarWidget === null)
+            {
+                log.warn('illumina_chat_bubble_xml has no "user_avatar" widget - every bubble keeps the default figure');
+            }
+
             // The *parent* of the avatar, not the avatar: refresh() moves this whole holder
             // from one side of the bubble to the other and measures the wrapper against its
             // width. AS3 reads it as `_loc3_.parent` off the same lookup.
@@ -122,7 +139,18 @@ export class IlluminaChatBubbleWidget implements IIlluminaChatBubbleWidget
 
             this._bubbleWrapper = root.findChildByName('bubble_wrapper') as IWindowContainer | null;
             this._postTimeWidget = root.findChildByName('post_time');
+            this._postTime = (this._postTimeWidget as unknown as IWidgetWindow | null)?.widget as UpdatingTimeStampWidget | null ?? null;
+
             this._offlinePlaceholder = root.findChildByName('offline_placeholder');
+
+            // The layout authors the strip at its full 16px with the "offline message
+            // sent" caption already in it, so a bubble that never hears from
+            // `friendOnlineStatus` shows it. AS3 collapses it here and the setter is the
+            // only thing that ever opens it again.
+            if(this._offlinePlaceholder !== null)
+            {
+                this._offlinePlaceholder.height = 0;
+            }
             this._arrowPoint = root.findChildByName('arrow_point');
             this._messageRegion = root.findChildByName('message_region');
 
@@ -159,6 +187,11 @@ export class IlluminaChatBubbleWidget implements IIlluminaChatBubbleWidget
 
             root.procedure = this._rootProcedureBound;
 
+            // The layout ships a placeholder "USER:" caption and the avatar widget its own
+            // default figure; AS3 clears both here, so a bubble nobody names shows neither.
+            this.userName = '';
+            this.figure = '';
+
             // Set rootWindow with param flag 147456
             this._widgetWindow.rootWindow = root as unknown as IWindow;
             (this._widgetWindow as IWindow).setParamFlag(IlluminaChatBubbleWidget.PARAM_FLAG_147456, true);
@@ -192,61 +225,64 @@ export class IlluminaChatBubbleWidget implements IIlluminaChatBubbleWidget
         this._flipped = value;
     }
 
-    // AS3: .../src/com/sulake/habbo/window/widgets/IlluminaChatBubbleWidget.as::_userName
-    private _userName: string = '';
-
     // AS3: .../src/com/sulake/habbo/window/widgets/IlluminaChatBubbleWidget.as::get userName()
     public get userName(): string
     {
-        return this._userName;
+        return (this._userNameLabel?.caption ?? '').slice(0, -1);
     }
 
     // AS3: .../src/com/sulake/habbo/window/widgets/IlluminaChatBubbleWidget.as::set userName()
     public set userName(value: string)
     {
-        this._userName = value;
+        if(this._userNameLabel !== null)
+        {
+            this._userNameLabel.caption = value + ':';
+        }
     }
-
-    private _userId: number = 0;
 
     // AS3: .../src/com/sulake/habbo/window/widgets/IlluminaChatBubbleWidget.as::get userId()
     public get userId(): number
     {
-        return this._userId;
+        return this._avatarWidget?.userId ?? 0;
     }
 
     // AS3: .../src/com/sulake/habbo/window/widgets/IlluminaChatBubbleWidget.as::set userId()
     public set userId(value: number)
     {
-        this._userId = value;
+        if(this._avatarWidget !== null)
+        {
+            this._avatarWidget.userId = value;
+        }
     }
-
-    private _figure: string = '';
 
     // AS3: .../src/com/sulake/habbo/window/widgets/IlluminaChatBubbleWidget.as::get figure()
     public get figure(): string
     {
-        return this._figure;
+        return this._avatarWidget?.figure ?? '';
     }
 
     // AS3: .../src/com/sulake/habbo/window/widgets/IlluminaChatBubbleWidget.as::set figure()
     public set figure(value: string)
     {
-        this._figure = value;
+        if(this._avatarWidget !== null)
+        {
+            this._avatarWidget.figure = value;
+        }
     }
-
-    private _timeStamp: number = 0;
 
     // AS3: .../src/com/sulake/habbo/window/widgets/IlluminaChatBubbleWidget.as::get timeStamp()
     public get timeStamp(): number
     {
-        return this._timeStamp;
+        return this._postTime?.timeStamp ?? 0;
     }
 
     // AS3: .../src/com/sulake/habbo/window/widgets/IlluminaChatBubbleWidget.as::set timeStamp()
     public set timeStamp(value: number)
     {
-        this._timeStamp = value;
+        if(this._postTime !== null)
+        {
+            this._postTime.timeStamp = value;
+        }
     }
 
     private _friendOnline: boolean = true;
@@ -285,8 +321,8 @@ export class IlluminaChatBubbleWidget implements IIlluminaChatBubbleWidget
 
         return [
             new PropertyStruct(IlluminaChatBubbleWidget.FLIPPED_KEY, this._flipped),
-            new PropertyStruct(IlluminaChatBubbleWidget.USER_NAME_KEY, this._userName),
-            new PropertyStruct(IlluminaChatBubbleWidget.FIGURE_KEY, this._figure),
+            new PropertyStruct(IlluminaChatBubbleWidget.USER_NAME_KEY, this.userName),
+            new PropertyStruct(IlluminaChatBubbleWidget.FIGURE_KEY, this.figure),
             new PropertyStruct(IlluminaChatBubbleWidget.MESSAGE_KEY, this.getSerializedMessages().join('\t')),
         ];
     }
@@ -838,9 +874,9 @@ export class IlluminaChatBubbleWidget implements IIlluminaChatBubbleWidget
                 // Clicking the name opens that user's profile. Guarded on a positive id
                 // because a group conversation carries a negative one, and on the region's
                 // name because the whole bubble shares this procedure.
-                if(this._userId > 0 && window.name === 'user_name_region')
+                if(this.userId > 0 && window.name === 'user_name_region')
                 {
-                    this._windowManager?.communication?.connection?.send(new GetExtendedProfileMessageComposer(this._userId));
+                    this._windowManager?.communication?.connection?.send(new GetExtendedProfileMessageComposer(this.userId));
                 }
 
                 break;

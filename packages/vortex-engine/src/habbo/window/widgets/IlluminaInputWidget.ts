@@ -4,6 +4,7 @@ import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
 import type {IHabboWindowManager} from '../IHabboWindowManager';
 import type {IWindow} from '@core/window/IWindow';
 import type {IWindowContainer} from '@core/window/IWindowContainer';
+import type {ITextFieldWindow} from '@core/window/components/ITextFieldWindow';
 import {PropertyStruct} from '@core/window/utils/PropertyStruct';
 import {WindowEvent} from '@core/window/events/WindowEvent';
 import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
@@ -38,6 +39,19 @@ export class IlluminaInputWidget implements IIlluminaInputWidget
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/IlluminaInputWidget.as::SINGLE_LINE_HEIGHT
     private static readonly SINGLE_LINE_HEIGHT: number = 28;
+
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/IlluminaInputWidget.as::BUTTON_CAPTION_DEFAULT
+    private static readonly BUTTON_CAPTION_DEFAULT: string = '${widgets.chatinput.say}';
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/IlluminaInputWidget.as::EMPTY_MESSAGE_DEFAULT
+    private static readonly EMPTY_MESSAGE_DEFAULT: string = '';
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/IlluminaInputWidget.as::MULTILINE_DEFAULT
+    private static readonly MULTILINE_DEFAULT: boolean = false;
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/IlluminaInputWidget.as::MAX_CHARS_DEFAULT
+    private static readonly MAX_CHARS_DEFAULT: number = 0;
+
+    /** AS3's `_SafeStr_4667.setParamFlag(2048, multiline)`. */
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/IlluminaInputWidget.as::set multiline()
+    private static readonly PARAM_FLAG_MULTILINE: number = 2048;
     private static readonly ENTER_KEY_CODE: number = 13;
 
     private _widgetWindow: IWidgetWindow | null = null;
@@ -71,10 +85,15 @@ export class IlluminaInputWidget implements IIlluminaInputWidget
             this._input = root.findChildByName('input');
             this._emptyMessageLabel = root.findChildByName('empty_message');
 
-            this._buttonCaption = '${widgets.chatinput.say}';
-            this._emptyMessage = '';
-            this._multiline = false;
-            this._maxChars = 0;
+            // Through the accessors, not the fields: AS3 assigns the four defaults by
+            // property, and the setters are the only thing that reaches the submit
+            // button, the placeholder label and the input. Writing the fields — as this
+            // did — left the send button captionless, because `illumina_input:button_caption`
+            // appears in no layout and the default here is its only source.
+            this.buttonCaption = String(IlluminaInputWidget.BUTTON_CAPTION_DEFAULT);
+            this.emptyMessage = IlluminaInputWidget.EMPTY_MESSAGE_DEFAULT;
+            this.multiline = IlluminaInputWidget.MULTILINE_DEFAULT;
+            this.maxChars = IlluminaInputWidget.MAX_CHARS_DEFAULT;
 
             this.refresh();
 
@@ -136,7 +155,10 @@ export class IlluminaInputWidget implements IIlluminaInputWidget
         if(this._submitButton)
         {
             this._submitButton.caption = value;
+            this._submitButton.visible = value !== null && value.length > 0;
         }
+
+        this.refresh();
     }
 
     private _emptyMessage: string = '';
@@ -170,6 +192,17 @@ export class IlluminaInputWidget implements IIlluminaInputWidget
     public set multiline(value: boolean)
     {
         this._multiline = value;
+
+        if(this._input !== null)
+        {
+            (this._input as unknown as ITextFieldWindow).multiline = value;
+        }
+
+        if(this._root !== null && this._widgetWindow !== null)
+        {
+            (this._root as unknown as IWindow).setParamFlag(IlluminaInputWidget.PARAM_FLAG_MULTILINE, value);
+            (this._root as unknown as IWindow).height = value ? this._widgetWindow.height : IlluminaInputWidget.SINGLE_LINE_HEIGHT;
+        }
     }
 
     private _maxChars: number = 0;
@@ -184,6 +217,11 @@ export class IlluminaInputWidget implements IIlluminaInputWidget
     public set maxChars(value: number)
     {
         this._maxChars = value;
+
+        if(this._input !== null)
+        {
+            (this._input as unknown as ITextFieldWindow).maxChars = value;
+        }
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/IlluminaInputWidget.as::get properties()
@@ -351,6 +389,17 @@ export class IlluminaInputWidget implements IIlluminaInputWidget
         if(this._emptyMessageLabel)
         {
             this._emptyMessageLabel.visible = (this._message.length === 0);
+        }
+
+        // Without this the field runs the full width of the border and slides under the
+        // submit button, so the tail of a long message is typed behind it.
+        if(this._input !== null && this._root !== null)
+        {
+            const rightEdge = this._submitButton !== null && this._submitButton.visible
+                ? this._submitButton.x
+                : (this._root as unknown as IWindow).width;
+
+            this._input.width = rightEdge - this._input.x * 2;
         }
     }
 }
