@@ -7,6 +7,7 @@
     // second implementation of it.
     import Panel from '../Panel.svelte';
     import Avatar from '../Avatar.svelte';
+    import Sprite from '../Sprite.svelte';
     import FeedBody from './FeedBody.svelte';
     // `<svelte:self>` is deprecated in this version (svelte_self_deprecated) — a component imports
     // itself by name instead.
@@ -359,20 +360,50 @@
     </div>
 </article>
 
-<!-- The gallery. A native `<dialog>`, so Escape, the backdrop and the focus trap come from the
-     browser rather than from us. `onclose` keeps the flag honest when the browser closes it. -->
+<!-- The viewer. A native `<dialog>`, so Escape, the backdrop and the focus trap come from the
+     browser rather than from us; `onclose` keeps the flag honest when the browser closes it.
+     `m-auto` because Tailwind's preflight strips the margin a modal dialog is centred by — without
+     it the panel sits wherever the default box lands, which is the top-left corner.
+
+     The row inside is `PhotoPage`'s own: two 69px arrow columns in `bg-box` around the picture,
+     the `arrowPrev`/`arrowNext` sprites, and a dead arrow left at `opacity-20` rather than removed
+     so the frame keeps its shape on the first and last photo. -->
 {#if post.kind === FEED_KIND.PHOTO && post.photos?.length}
     <dialog
         bind:this={dialog}
         onclose={() => (lightbox = false)}
-        class="max-h-[90vh] max-w-[90vw] bg-transparent backdrop:bg-black/80"
+        class="m-auto max-h-[90vh] max-w-[90vw] bg-transparent p-0 backdrop:bg-black/80"
     >
-        <button type="button" onclick={() => (lightbox = false)} class="block">
-            <img src={photoUrl(post.photos[shown]?.key ?? post.photos[0].key)} alt="" class="max-h-[85vh] w-auto" />
-        </button>
+        <div class="flex items-stretch">
+            <button
+                type="button"
+                onclick={() => (shown = Math.max(0, shown - 1))}
+                aria-label={t('SITE_PHOTO_PREVIOUS')}
+                class="flex w-[69px] items-center justify-center bg-box hover:bg-[#0d2f4f] {shown > 0 ? '' : 'pointer-events-none opacity-20'}"
+            >
+                <Sprite name="arrowPrev" />
+            </button>
 
+            <img
+                src={photoUrl(post.photos[shown]?.key ?? post.photos[0].key)}
+                alt=""
+                class="block max-h-[80vh] max-w-full"
+            />
+
+            <button
+                type="button"
+                onclick={() => (shown = Math.min(post.photos.length - 1, shown + 1))}
+                aria-label={t('SITE_PHOTO_NEXT')}
+                class="flex w-[69px] items-center justify-center bg-box hover:bg-[#0d2f4f] {shown < post.photos.length - 1 ? '' : 'pointer-events-none opacity-20'}"
+            >
+                <Sprite name="arrowNext" />
+            </button>
+        </div>
+
+        <!-- Thumbnails only when there is something to choose between, and centred under the
+             picture rather than under the whole frame including the arrow columns. -->
         {#if post.photos.length > 1}
-            <div class="mt-2 flex justify-center gap-1">
+            <div class="flex justify-center gap-1 bg-box px-[69px] py-2">
                 {#each post.photos as photo, i (photo.key)}
                     <button
                         type="button"
@@ -381,7 +412,7 @@
                         aria-current={i === shown}
                         class="w-16 border-2 {i === shown ? 'border-ink' : 'border-transparent'}"
                     >
-                        <img src={photoUrl(photo.key)} alt="" class="w-full" />
+                        <img src={photoUrl(photo.key)} alt="" class="block w-full" />
                     </button>
                 {/each}
             </div>
