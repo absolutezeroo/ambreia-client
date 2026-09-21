@@ -65,3 +65,13 @@ export function publish(body: {
 {
     return request('/api/user/feed', {method: 'POST', body});
 }
+
+/**
+ * Vote in a poll, or move an existing vote. Answers the post as it now stands, so the caller
+ * replaces its copy rather than adjusting a count by hand — the server is the one that knows
+ * whether this was a new voice or a moved one.
+ */
+export function vote(postId: number, choiceId: number): Promise<IFeedPost>
+{
+    return request(`/api/user/feed/${postId}/vote`, {method: 'POST', body: {choiceId}});
+}

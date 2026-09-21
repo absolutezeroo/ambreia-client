@@ -29,6 +29,10 @@
     // it contradict itself.
     let photosLoaded = $state(false);
 
+    // Two empty boxes to start: the minimum a poll can have, so the form shows what it needs
+    // rather than an "add a choice" button over nothing.
+    let choices = $state(['', '']);
+
     // Loaded when the tab is first opened rather than on mount: most posts are statuses, and a
     // player with three hundred photos should not pay for them to write one line.
     //
@@ -90,9 +94,24 @@
               : chosen;
     }
 
+    // What the server will accept, computed once so the button's disabled state and the submit
+    // guard can never disagree — two copies of this rule drifting is how a form ends up with a
+    // live button that always fails.
+    let filledChoices = $derived(choices.map((c) => c.trim()).filter((c) => c.length > 0));
+
+    let ready = $derived(
+        kind === FEED_KIND.PHOTO
+            ? chosen.length > 0
+            // A poll needs its question AND at least two answers; the server refuses either way,
+            // and `PollInvalid` is a worse way to learn it than a disabled button.
+            : kind === FEED_KIND.POLL
+              ? Boolean(body.trim()) && filledChoices.length >= 2
+              : Boolean(body.trim()),
+    );
+
     async function submit()
     {
-        if(busy || (kind === FEED_KIND.PHOTO ? !chosen.length : !body.trim()))
+        if(busy || !ready)
         {
             return;
         }
@@ -106,10 +125,12 @@
                 body,
                 parentId,
                 photoKeys: kind === FEED_KIND.PHOTO ? chosen : undefined,
+                pollChoices: kind === FEED_KIND.POLL ? filledChoices : undefined,
                 groupId,
             }));
             body = '';
             chosen = [];
+            choices = ['', ''];
         }
         catch(failure)
         {
@@ -148,6 +169,7 @@
             <div class="mb-2 flex gap-4 text-sm">
                 <button type="button" class:font-bold={kind === FEED_KIND.STATUS} onclick={() => (kind = FEED_KIND.STATUS)}>{t('SITE_FEED_TAB_STATUS')}</button>
                 <button type="button" class:font-bold={kind === FEED_KIND.PHOTO} onclick={() => (kind = FEED_KIND.PHOTO)}>{t('SITE_FEED_TAB_PHOTOS')}</button>
+                <button type="button" class:font-bold={kind === FEED_KIND.POLL} onclick={() => (kind = FEED_KIND.POLL)}>{t('SITE_FEED_TAB_POLL')}</button>
             </div>
 
             <textarea
@@ -170,14 +192,38 @@
                         </button>
                     {/each}
 
-                    {#if !mine.length}
+                    {#if photosLoaded && !mine.length}
                         <p class="col-span-4 text-sm">{t('SITE_FEED_NO_PHOTOS')}</p>
                     {/if}
                 </div>
             {/if}
 
+            <!-- The textarea above is the poll's QUESTION here — the screenshot's card shows the
+                 question as the post's own text with the choices under it, so the poll tab adds
+                 boxes rather than replacing the field. -->
+            {#if kind === FEED_KIND.POLL}
+                <div class="mt-2 flex flex-col gap-1">
+                    {#each choices as _, i (i)}
+                        <input
+                            bind:value={choices[i]}
+                            maxlength="80"
+                            placeholder={t('SITE_FEED_POLL_CHOICE')}
+                            class="w-full rounded-[5px] border-[3px] border-field-line bg-field px-3 py-[5px] text-base leading-[1.2] text-field-ink shadow-field placeholder:text-[#888] focus:border-field-line-focus focus:bg-white focus:outline-none"
+                        />
+                    {/each}
+
+                    <!-- Five is the server's cap. Same reasoning as the photo picker: a button
+                         that vanishes beats a refusal the player has to read. -->
+                    {#if choices.length < 5}
+                        <button type="button" onclick={() => (choices = [...choices, ''])} class="self-start text-sm underline">
+                            {t('SITE_FEED_POLL_ADD_CHOICE')}
+                        </button>
+                    {/if}
+                </div>
+            {/if}
+
             <div class="mt-2 flex justify-end">
-                <Button onclick={submit} disabled={busy || (kind === FEED_KIND.PHOTO ? !chosen.length : !body.trim())}>
+                <Button onclick={submit} disabled={busy || !ready}>
                     {t(parentId ? 'SITE_FEED_PUBLISH_COMMENT' : 'SITE_FEED_PUBLISH')}
                 </Button>
             </div>

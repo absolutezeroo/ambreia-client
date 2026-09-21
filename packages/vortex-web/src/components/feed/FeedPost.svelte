@@ -11,11 +11,16 @@
     // `<svelte:self>` is deprecated in this version (svelte_self_deprecated) — a component imports
     // itself by name instead.
     import FeedPost from './FeedPost.svelte';
+    import FeedPoll from './FeedPoll.svelte';
     import {FEED_KIND, type IFeedPost} from '../../lib/feed.js';
     import {photoUrl} from '../../lib/api.js';
     import {t} from '../../lib/i18n.js';
 
-    let {post, comment = false}: {post: IFeedPost; comment?: boolean} = $props();
+    // `post` is bindable because voting, reacting and commenting all answer with the WHOLE post as
+    // it now stands, and the card's job is then to show that answer rather than to adjust a count
+    // by hand. Writing back through the binding keeps the page's array the single copy — the
+    // alternative, a local override, would quietly win over a later refetch.
+    let {post = $bindable(), comment = false}: {post: IFeedPost; comment?: boolean} = $props();
 
     // "PRODIIGY published 2 new pictures" / "posted a new poll" / "updated his/her status" — the
     // screenshot's three headings, one per kind.
@@ -43,6 +48,10 @@
                 </div>
             {/if}
 
+            {#if post.kind === FEED_KIND.POLL}
+                <FeedPoll {post} onvoted={(updated) => (post = updated)} />
+            {/if}
+
             <!-- The counters bar. Its two reaction controls arrive in Task 8; until then it states
                  the numbers, which is what a signed-out visitor sees in any case. -->
             <div class="flex items-baseline gap-6 border-t border-rule pt-3 text-sm">
@@ -52,10 +61,13 @@
             </div>
         </Panel>
 
+        <!-- Bound like the page binds its own cards, and for the same reason: a comment may itself
+             be a poll — the design gives the comment form the same three tabs — so a vote inside
+             one has to write back somewhere rather than be lost on the next render. -->
         {#if !comment && post.comments?.length}
             <div class="mt-3 flex flex-col gap-3 pl-6">
-                {#each post.comments as child (child.id)}
-                    <FeedPost post={child} comment />
+                {#each post.comments as child, i (child.id)}
+                    <FeedPost bind:post={post.comments[i]} comment />
                 {/each}
             </div>
         {/if}

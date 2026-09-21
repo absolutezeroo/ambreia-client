@@ -39,8 +39,12 @@
                 <FeedComposer onpublished={(post) => (posts = [post, ...posts])} />
             {/if}
 
-            {#each posts as post (post.id)}
-                <FeedPost {post} />
+            <!-- `bind:` and an index, not `{post}`: a card answers a vote or a reaction with the
+                 whole post as it now stands, and writing it back here keeps this array the one
+                 copy. Bound through `posts[i]` because an each-block's alias is not itself a
+                 writable target. -->
+            {#each posts as post, i (post.id)}
+                <FeedPost bind:post={posts[i]} />
             {/each}
 
             {#if !loading && !posts.length}
