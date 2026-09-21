@@ -531,7 +531,7 @@ A comment is soft-deleted with its parent by the service, never cascaded away by
 - [ ] **Step 7: Generate the migration**
 
 Run from the emulator root: `scripts/ef.ps1 migrations add AddWebSocialFeed`
-Expected: a new pair of files under `Vortex.Database/Migrations/`. Read the generated `Up()` and confirm it creates seven tables and the four unique indexes. **Do not edit it.**
+Expected: a new pair of files under `Vortex.Database/Migrations/`. Read the generated `Up()` and confirm it creates seven tables and the six unique indexes — one each on `web_feed_post_photos`, `web_feed_poll_choices`, `web_feed_poll_votes`, `web_feed_reactions`, `web_feed_tags` and `web_feed_post_tags`, plus the non-unique one on `web_feed_post_tags.tag_id` and the three on `web_feed_posts`. **Do not edit it.**
 
 - [ ] **Step 8: Format and commit**
 
