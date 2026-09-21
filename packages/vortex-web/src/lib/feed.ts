@@ -100,8 +100,15 @@ export function setReaction(postId: number, kind: number, on: boolean): Promise<
  * `remove`, not `delete`: the latter is a reserved word and cannot be an export name. The server
  * answers the same 404 for "no such post", "already gone" and "not yours", so a caller has one
  * thing to do with a failure — stop showing the card either way.
+ *
+ * An account with a second factor is refused with `pocket.auth.mfa_required` until `code` carries
+ * one. It rides the query string rather than a body because a DELETE with a body is the kind of
+ * request an intermediary is entitled to strip; a TOTP is good for one 30-second window and for
+ * one use, so what an access log keeps of it is already spent.
  */
-export function remove(postId: number): Promise<unknown>
+export function remove(postId: number, code?: string): Promise<unknown>
 {
-    return request(`/api/user/feed/${postId}`, {method: 'DELETE'});
+    const query = code ? `?code=${encodeURIComponent(code)}` : '';
+
+    return request(`/api/user/feed/${postId}${query}`, {method: 'DELETE'});
 }

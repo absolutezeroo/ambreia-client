@@ -19,6 +19,7 @@
     // the owner is challenged from their own home — so the refusal is an invitation to answer the
     // questions, not an error. Both hosts then behave the same way without either having to know.
     import Button from './Button.svelte';
+    import ConfirmModal from './ConfirmModal.svelte';
     import SafetyChallengeModal from './SafetyChallengeModal.svelte';
     import * as api from '../lib/api.js';
     import * as notifier from '../lib/notifier.js';
@@ -26,18 +27,14 @@
 
     let {className = ''}: {className?: string} = $props();
 
-    let busy = $state(false);
+    let confirming = $state(false);
     let challenging = $state(false);
 
+    // `ConfirmModal` asks, and its own error line is what the refusal lands on — except the safety
+    // challenge, which is not a failure but a step: it closes this dialog and opens that one.
+    // Rethrowing anything else is how the dialog is told to stay open and say so.
     async function reset(): Promise<void>
     {
-        if(busy || !window.confirm(t('ACCOUNT_SECURITY_RESET_LOCATIONS_CONFIRMATION')))
-        {
-            return;
-        }
-
-        busy = true;
-
         try
         {
             await api.resetTrustedLocations();
@@ -45,25 +42,31 @@
         }
         catch(failure)
         {
-            if(api.needsSafetyUnlock(failure))
+            if(!api.needsSafetyUnlock(failure))
             {
-                challenging = true;
+                throw failure;
             }
-            else
-            {
-                notifier.error('ERROR_SERVER');
-            }
-        }
-        finally
-        {
-            busy = false;
+
+            confirming = false;
+            challenging = true;
         }
     }
 </script>
 
-<Button className={className} disabled={busy} onclick={reset}>
+<Button className={className} onclick={() => (confirming = true)}>
     {t('ACCOUNT_SECURITY_RESET_TRUSTED_LOGINS_BUTTON')}
 </Button>
+
+{#if confirming}
+    <ConfirmModal
+        title={t('ACCOUNT_SECURITY_RESET_TRUSTED_LOGINS_BUTTON')}
+        variant="blue"
+        confirm={reset}
+        onClose={() => (confirming = false)}
+    >
+        {t('ACCOUNT_SECURITY_RESET_LOCATIONS_CONFIRMATION')}
+    </ConfirmModal>
+{/if}
 
 {#if challenging}
     <!-- Answering does not re-run the reset: habbo.com's own dialog resolves to nothing and the

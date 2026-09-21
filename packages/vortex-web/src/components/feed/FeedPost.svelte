@@ -8,6 +8,7 @@
     import Panel from '../Panel.svelte';
     import Avatar from '../Avatar.svelte';
     import Sprite from '../Sprite.svelte';
+    import ConfirmModal from '../ConfirmModal.svelte';
     import FeedBody from './FeedBody.svelte';
     // `<svelte:self>` is deprecated in this version (svelte_self_deprecated) — a component imports
     // itself by name instead.
@@ -123,34 +124,10 @@
         };
     }
 
-    let deleting = $state(false);
-
-    async function destroy()
-    {
-        // A native confirm rather than a modal of our own: deleting takes the post's comments with
-        // it, including other people's, and that is worth one deliberate click. `confirm` is the
-        // browser's, so it is accessible and dismissible without us building either.
-        if(deleting || !confirm(t('SITE_FEED_DELETE_CONFIRM')))
-        {
-            return;
-        }
-
-        deleting = true;
-
-        try
-        {
-            await remove(post.id);
-            ondeleted?.();
-        }
-        catch(failure)
-        {
-            notifier.error((failure as Error).message);
-        }
-        finally
-        {
-            deleting = false;
-        }
-    }
+    // Deleting takes the post's comments with it, including other people's, so it asks first —
+    // through `ConfirmModal`, which is also what makes the second factor possible here. An account
+    // with 2FA is asked for a code, because the server refuses the delete without one.
+    let confirming = $state(false);
 
     async function expand()
     {
@@ -364,7 +341,7 @@
                 )}
 
                 {#if post.mine}
-                    <button type="button" onclick={destroy} disabled={deleting} class="text-white underline hover:text-nav-link-hover">
+                    <button type="button" onclick={() => (confirming = true)} class="text-white underline hover:text-nav-link-hover">
                         {t('SITE_FEED_DELETE')}
                     </button>
                 {/if}
@@ -414,6 +391,17 @@
         {/if}
     </div>
 </article>
+
+{#if confirming}
+    <ConfirmModal
+        title={t('SITE_FEED_DELETE')}
+        confirm={(code) => remove(post.id, code)}
+        onClose={() => (confirming = false)}
+        onDone={() => ondeleted?.()}
+    >
+        {t('SITE_FEED_DELETE_CONFIRM')}
+    </ConfirmModal>
+{/if}
 
 <!-- The viewer. A native `<dialog>`, so Escape, the backdrop and the focus trap come from the
      browser rather than from us; `onclose` keeps the flag honest when the browser closes it.
