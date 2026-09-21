@@ -5189,6 +5189,22 @@ other window's clip moved. This is the one-pass equivalent of AS3's per-`BitmapD
 
 ## Recent Work Recorded
 
+- 🆕 **Texts split by domain, and a language URL nobody could follow — 2026-09-21.** The ask was to
+  stop putting every string in `external_flash_texts` and have `external_catalog_text` /
+  `external_badges_text` beside it. AS3 cannot: `CoreLocalizationManager` reads exactly one
+  `external_texts` entry per language and `parseLocalizationData` builds a **fresh** dictionary, so
+  nothing accumulates. Our port is not AS3 on either count — `updateLocalization()` merges into a
+  persistent map, and `loadExternalTextUrls()` already took an **array**; it just had one caller
+  passing one URL. So the manager now follows every `external_text_*` entry in the manifest, in
+  manifest order (later file wins on a duplicate key), and those files are **optional**: a 404 or an
+  unusable body is warned and skipped, where `Promise.all` used to reject in one block and take every
+  text down with it. The prefix carries a trailing underscore so `external_texts` does not re-match
+  itself. Found on the way, and worse than the feature: `localization.<n>.url` was being written as a
+  **texts file** path while `loadLocalizationFromURL()` parses it as a **manifest** — the exact bug
+  this file already records once, "nothing threw, the parse simply produced no entries". The
+  dashboard now writes `gamedata/<code>/hashes.json`. The manifest is also the only place the split
+  files are named, so `:lang` and the split were the same fix.
+
 - 🆕 **`vortex-imager` renders clothing and pets — 2026-09-20.** Asked for three things: clothing
   on its own, effects on their own, pets. One already shipped, one already worked by accident, and
   only the third was missing — which is worth recording, because "add a route" was the wrong
