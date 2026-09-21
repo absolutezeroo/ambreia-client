@@ -12,8 +12,13 @@
     // itself by name instead.
     import FeedPost from './FeedPost.svelte';
     import FeedPoll from './FeedPoll.svelte';
-    import {FEED_KIND, FEED_REACTION, setReaction, type IFeedPost} from '../../lib/feed.js';
+    // FeedComposer imports FeedPost's sibling and FeedPost imports FeedComposer — a cycle Vite
+    // resolves because neither reads the other at module scope. Keep both imports inside the
+    // component and nothing at the top level of either module.
+    import FeedComposer from './FeedComposer.svelte';
+    import {FEED_KIND, FEED_REACTION, getPost, setReaction, type IFeedPost} from '../../lib/feed.js';
     import {photoUrl} from '../../lib/api.js';
+    import {groupBadgeUrl, hideOnError} from '../../lib/config.js';
     import {t} from '../../lib/i18n.js';
     import {signedIn} from '../../lib/session.js';
     import * as notifier from '../../lib/notifier.js';
@@ -35,6 +40,42 @@
     );
 
     let reacting = $state(false);
+    let expanding = $state(false);
+
+    // A new comment is appended and the count stepped by hand rather than refetching the post:
+    // the server already answered with the comment itself, and a refetch here would cost a round
+    // trip to learn what we are holding.
+    function added(child: IFeedPost)
+    {
+        post = {
+            ...post,
+            comments: [...(post.comments ?? []), child],
+            commentCount: post.commentCount + 1,
+        };
+    }
+
+    async function expand()
+    {
+        if(expanding)
+        {
+            return;
+        }
+
+        expanding = true;
+
+        try
+        {
+            post = await getPost(post.id);
+        }
+        catch(failure)
+        {
+            notifier.error((failure as Error).message);
+        }
+        finally
+        {
+            expanding = false;
+        }
+    }
 
     async function react(kind: number, on: boolean)
     {
@@ -64,7 +105,27 @@
 </script>
 
 <article class="flex gap-3">
-    <Avatar user={post.groupName ? '' : post.authorName} figure={post.authorFigureString} headOnly className="hidden shrink-0 xs:block" />
+    <!-- A post published under a group wears the GROUP'S BADGE, not its author's head. The row
+         still records who wrote it — `authorName` is what a delete checks and what moderation
+         reads — but the card is the group speaking, and showing a face there would attribute it
+         to the person instead.
+
+         The author is named on hover rather than nowhere: a group post with no attribution at all
+         lets a member speak as the group with nothing tying it back to them, and the row knows
+         perfectly well who wrote it. -->
+    {#if post.groupId}
+        <img
+            src={groupBadgeUrl(post.groupBadgeCode ?? '')}
+            alt={post.groupName ?? ''}
+            title="{post.groupName ?? ''} — {post.authorName}"
+            width="40"
+            height="40"
+            onerror={hideOnError}
+            class="hidden shrink-0 xs:block"
+        />
+    {:else}
+        <Avatar user={post.authorName} figure={post.authorFigureString} headOnly className="hidden shrink-0 xs:block" />
+    {/if}
 
     <div class="min-w-0 flex-1">
         <Panel title="{post.groupName ?? post.authorName}  {heading}" className={comment ? 'bg-panel-head' : ''}>
@@ -118,6 +179,20 @@
                 {#each post.comments as child, i (child.id)}
                     <FeedPost bind:post={post.comments[i]} comment />
                 {/each}
+            </div>
+        {/if}
+
+        <!-- The card carries the three most recent; the rest arrive with the whole post, so
+             expanding is one read and not a second paged endpoint. -->
+        {#if !comment && post.commentCount > (post.comments?.length ?? 0)}
+            <button type="button" onclick={expand} disabled={expanding} class="mt-3 pl-6 text-sm underline">
+                {t('SITE_FEED_SEE_ALL_COMMENTS', {count: String(post.commentCount)})}
+            </button>
+        {/if}
+
+        {#if !comment && $signedIn}
+            <div class="mt-3 pl-6">
+                <FeedComposer parentId={post.id} onpublished={added} />
             </div>
         {/if}
     </div>
