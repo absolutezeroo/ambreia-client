@@ -341,11 +341,19 @@
                     )}
                 </span>
 
+                <!-- habbo.com's OWN keys, not ours: `LIKE` and `UNLIKE` already say "J'aime" and
+                     "Je n'aime plus" in all nine languages, and `PhotoLike` already swaps between
+                     them. This read "Favoris" for a while, which was a word this hotel uses
+                     nowhere — invented beside a dictionary that already had the right one.
+
+                     The server still calls the row a `Favorite`; only the wording is the site's.
+                     Renaming the enum would be a rename across both repos for no behaviour, so it
+                     is left, and this comment is the bridge. -->
                 {@render reaction(
                     FEED_REACTION.FAVORITE,
                     post.favoritedByMe,
                     post.favoriteCount,
-                    post.favoritedByMe ? 'SITE_FEED_UNFAVORITE' : 'SITE_FEED_FAVORITES',
+                    post.favoritedByMe ? 'UNLIKE' : 'LIKE',
                     'like',
                 )}
 
