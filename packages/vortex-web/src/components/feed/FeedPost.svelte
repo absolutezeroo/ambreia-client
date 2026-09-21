@@ -12,9 +12,11 @@
     // itself by name instead.
     import FeedPost from './FeedPost.svelte';
     import FeedPoll from './FeedPoll.svelte';
-    import {FEED_KIND, type IFeedPost} from '../../lib/feed.js';
+    import {FEED_KIND, FEED_REACTION, setReaction, type IFeedPost} from '../../lib/feed.js';
     import {photoUrl} from '../../lib/api.js';
     import {t} from '../../lib/i18n.js';
+    import {signedIn} from '../../lib/session.js';
+    import * as notifier from '../../lib/notifier.js';
 
     // `post` is bindable because voting, reacting and commenting all answer with the WHOLE post as
     // it now stands, and the card's job is then to show that answer rather than to adjust a count
@@ -31,6 +33,34 @@
               ? t('SITE_FEED_POSTED_POLL')
               : t('SITE_FEED_UPDATED_STATUS'),
     );
+
+    let reacting = $state(false);
+
+    async function react(kind: number, on: boolean)
+    {
+        if(reacting)
+        {
+            return;
+        }
+
+        reacting = true;
+
+        try
+        {
+            // The server answers with the whole post, counters recomputed, so the card takes its
+            // word rather than incrementing locally — which would drift the moment two readers
+            // press at once.
+            post = await setReaction(post.id, kind, on);
+        }
+        catch(failure)
+        {
+            notifier.error((failure as Error).message);
+        }
+        finally
+        {
+            reacting = false;
+        }
+    }
 </script>
 
 <article class="flex gap-3">
@@ -52,12 +82,31 @@
                 <FeedPoll {post} onvoted={(updated) => (post = updated)} />
             {/if}
 
-            <!-- The counters bar. Its two reaction controls arrive in Task 8; until then it states
-                 the numbers, which is what a signed-out visitor sees in any case. -->
+            <!-- The counters bar. A signed-out visitor still reads every number — the two
+                 reaction controls are buttons only for someone who could act on them, rather than
+                 controls that look live and answer 401. -->
             <div class="flex items-baseline gap-6 border-t border-rule pt-3 text-sm">
                 <span><b>{post.commentCount}</b> {t('SITE_FEED_COMMENTS')}</span>
-                <span class="ml-auto"><b>{post.repostCount}</b> {t('SITE_FEED_REPOSTS')}</span>
-                <span><b>{post.favoriteCount}</b> {t('SITE_FEED_FAVORITES')}</span>
+
+                <button
+                    type="button"
+                    onclick={() => react(FEED_REACTION.REPOST, !post.repostedByMe)}
+                    disabled={reacting || !$signedIn}
+                    class="ml-auto disabled:cursor-default {post.repostedByMe ? 'text-ink' : ''}"
+                    aria-pressed={post.repostedByMe}
+                >
+                    <b>{post.repostCount}</b> {t('SITE_FEED_REPOSTS')}
+                </button>
+
+                <button
+                    type="button"
+                    onclick={() => react(FEED_REACTION.FAVORITE, !post.favoritedByMe)}
+                    disabled={reacting || !$signedIn}
+                    class="disabled:cursor-default {post.favoritedByMe ? 'text-ink' : ''}"
+                    aria-pressed={post.favoritedByMe}
+                >
+                    <b>{post.favoriteCount}</b> {t('SITE_FEED_FAVORITES')}
+                </button>
             </div>
         </Panel>
 

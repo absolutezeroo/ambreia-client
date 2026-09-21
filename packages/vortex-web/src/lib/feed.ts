@@ -24,6 +24,13 @@ export const FEED_KIND = {
     POLL: 2,
 } as const;
 
+// Vortex.Primitives/Feed/FeedReactionKind.cs decides these numbers, the same way FeedPostKind
+// decides the ones above. Named here so `kind === 1` never appears in a component.
+export const FEED_REACTION = {
+    REPOST: 0,
+    FAVORITE: 1,
+} as const;
+
 /** The feed, newest first. `tag` filters to one hashtag; it may be written with or without its `#`. */
 export function getFeed(options: {page?: number; pageSize?: number; tag?: string} = {}): Promise<IFeedPage>
 {
@@ -74,4 +81,15 @@ export function publish(body: {
 export function vote(postId: number, choiceId: number): Promise<IFeedPost>
 {
     return request(`/api/user/feed/${postId}/vote`, {method: 'POST', body: {choiceId}});
+}
+
+/**
+ * Leave or withdraw a repost or a favourite, and answer the post as it now stands.
+ *
+ * Takes the wanted state, not a toggle: a request the network retries would otherwise land on the
+ * opposite of what the reader pressed. `PUT` for the same reason — sending it twice leaves one row.
+ */
+export function setReaction(postId: number, kind: number, on: boolean): Promise<IFeedPost>
+{
+    return request(`/api/user/feed/${postId}/reaction`, {method: 'PUT', body: {kind, on}});
 }

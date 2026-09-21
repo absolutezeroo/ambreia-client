@@ -1026,6 +1026,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/user/feed/{id}/reaction": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Leave or withdraw a repost or a favourite. */
+        put: operations["FeedReaction"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1180,6 +1197,15 @@ export interface components {
             parentId?: number | null;
             /** Format: int32 */
             groupId?: number | null;
+        };
+        /**
+         * Format: int32
+         * @enum {integer}
+         */
+        FeedReactionKind: 0 | 1;
+        FeedReactionRequest: {
+            kind: components["schemas"]["FeedReactionKind"];
+            on: boolean;
         };
         FeedVoteRequest: {
             /** Format: int32 */
@@ -3872,6 +3898,50 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["FeedVoteRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeedPost"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    FeedReaction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FeedReactionRequest"];
             };
         };
         responses: {
