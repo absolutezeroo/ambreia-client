@@ -163,7 +163,15 @@
 
 <Panel titleSnippet={identityTitle}>
     <div class="flex gap-3">
-        <Avatar user={$me?.name ?? ''} figure={$me?.figureString ?? ''} headOnly className="hidden shrink-0 xs:block" />
+        <!-- `well` for the same reason as FeedPost's: a bare `headOnly` image has no dimensions
+             and a flex row stretches it to the row's height, which grows with the tab that is
+             open. -->
+        <Avatar
+            user={$me?.name ?? ''}
+            figure={$me?.figureString ?? ''}
+            well={parentId ? 46 : 60}
+            className="hidden self-start xs:block"
+        />
 
         <div class="min-w-0 flex-1">
             <div class="mb-2 flex gap-4 text-sm">

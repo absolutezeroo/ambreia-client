@@ -36,11 +36,20 @@
     // alternative, a local override, would quietly win over a later refetch.
     // `ondeleted` rather than writing through the binding: removing a card means splicing the
     // array it lives in, and a bound prop can replace its own element but not take it out.
+    // `comment` is the second level, `reply` the third. The server allows exactly these: a post,
+    // its comments, and replies to those comments — a reply to a reply is refused, so a reply
+    // draws no thread of its own.
     let {
         post = $bindable(),
         comment = false,
+        reply = false,
         ondeleted = undefined,
-    }: {post: IFeedPost; comment?: boolean; ondeleted?: (() => void) | undefined} = $props();
+    }: {
+        post: IFeedPost;
+        comment?: boolean;
+        reply?: boolean;
+        ondeleted?: (() => void) | undefined;
+    } = $props();
 
     // "PRODIIGY published 2 new pictures" / "posted a new poll" / "updated his/her status" — the
     // screenshot's three headings, one per kind.
@@ -54,6 +63,48 @@
 
     let reacting = $state(false);
     let expanding = $state(false);
+
+    // Which of the post's photos is the big one, and whether it is open full-screen.
+    let shown = $state(0);
+    let lightbox = $state(false);
+
+    // The comments are FOLDED by default. A feed where every card carries three comments plus a
+    // form is unreadable at a glance — the counter is the affordance, and opening is one click.
+    let open = $state(false);
+
+    let dialog = $state<HTMLDialogElement | null>(null);
+
+    async function toggle()
+    {
+        open = !open;
+
+        // Opening pulls the whole thread if the card is only carrying its preview. Done here
+        // rather than on mount because a folded card should cost nothing: the feed's own read
+        // already brought three, and the rest are only worth a round trip once somebody looks.
+        if(open && post.commentCount > (post.comments?.length ?? 0))
+        {
+            await expand();
+        }
+    }
+
+    // `<dialog>` is opened imperatively or not at all. Using the element rather than a div of our
+    // own buys Escape, the backdrop and the focus trap without writing any of the three.
+    $effect(() =>
+    {
+        if(!dialog)
+        {
+            return;
+        }
+
+        if(lightbox && !dialog.open)
+        {
+            dialog.showModal();
+        }
+        else if(!lightbox && dialog.open)
+        {
+            dialog.close();
+        }
+    });
 
     // A new comment is appended and the count stepped by hand rather than refetching the post:
     // the server already answered with the comment itself, and a refetch here would cost a round
@@ -163,21 +214,56 @@
             width="40"
             height="40"
             onerror={hideOnError}
-            class="hidden shrink-0 xs:block"
+            class="hidden shrink-0 self-start xs:block"
         />
     {:else}
-        <Avatar user={post.authorName} figure={post.authorFigureString} headOnly className="hidden shrink-0 xs:block" />
+        <!-- `well`, not a bare `headOnly` image. Without it `Avatar` renders an `<img>` with no
+             width or height, and a flex row stretches it to the row's own height — which is why a
+             tall card (a poll, a long thread) drew a grotesque elongated head while a short one
+             looked almost right. `well` is the site's own circular head badge and carries explicit
+             dimensions; 46 and 60 are the two sizes the rest of the site uses. -->
+        <Avatar
+            user={post.authorName}
+            figure={post.authorFigureString}
+            well={comment ? 46 : 60}
+            className="hidden self-start xs:block"
+        />
     {/if}
 
     <div class="min-w-0 flex-1">
         <Panel title="{post.groupName ?? post.authorName}  {heading}" className={comment ? 'bg-panel-head' : ''}>
             <p class="mb-3"><FeedBody body={post.body} /></p>
 
+            <!-- One photo shown big, the others as thumbnails under it — not a grid of equals.
+                 A grid of four halves every picture to fit the card; a gallery shows the one being
+                 looked at at full width and keeps the rest one click away. With a single photo
+                 there are no thumbnails to draw at all. -->
             {#if post.kind === FEED_KIND.PHOTO && post.photos?.length}
-                <div class="mb-3 grid grid-cols-2 gap-1">
-                    {#each post.photos as photo (photo.key)}
-                        <img src={photoUrl(photo.key)} alt="" class="w-full" loading="lazy" />
-                    {/each}
+                <div class="mb-3">
+                    <button type="button" onclick={() => (lightbox = true)} class="block w-full">
+                        <img
+                            src={photoUrl(post.photos[shown]?.key ?? post.photos[0].key)}
+                            alt=""
+                            class="w-full"
+                            loading="lazy"
+                        />
+                    </button>
+
+                    {#if post.photos.length > 1}
+                        <div class="mt-1 flex gap-1">
+                            {#each post.photos as photo, i (photo.key)}
+                                <button
+                                    type="button"
+                                    onclick={() => (shown = i)}
+                                    aria-label={t('SITE_FEED_PHOTO_N', {n: String(i + 1)})}
+                                    aria-current={i === shown}
+                                    class="w-16 border-2 {i === shown ? 'border-ink' : 'border-transparent'}"
+                                >
+                                    <img src={photoUrl(photo.key)} alt="" class="w-full" loading="lazy" />
+                                </button>
+                            {/each}
+                        </div>
+                    {/if}
                 </div>
             {/if}
 
@@ -189,7 +275,17 @@
                  reaction controls are buttons only for someone who could act on them, rather than
                  controls that look live and answer 401. -->
             <div class="flex items-baseline gap-6 border-t border-rule pt-3 text-sm">
-                <span><b>{post.commentCount}</b> {t('SITE_FEED_COMMENTS')}</span>
+                <!-- The counter IS the control that folds the thread open, on a comment as well as
+                     on a post: a reply is written under the comment it answers, so the comment
+                     needs the same affordance. A signed-out visitor can still open and read. -->
+                <button
+                    type="button"
+                    onclick={toggle}
+                    class="{open ? 'text-ink' : ''}"
+                    aria-expanded={open}
+                >
+                    <b>{post.commentCount}</b> {t('SITE_FEED_COMMENTS')}
+                </button>
 
                 <button
                     type="button"
@@ -219,37 +315,76 @@
             </div>
         </Panel>
 
-        <!-- Bound like the page binds its own cards, and for the same reason: a comment may itself
-             be a poll — the design gives the comment form the same three tabs — so a vote inside
-             one has to write back somewhere rather than be lost on the next render. -->
-        {#if !comment && post.comments?.length}
-            <div class="mt-3 flex flex-col gap-3 pl-6">
-                {#each post.comments as child, i (child.id)}
-                    <FeedPost
-                        bind:post={post.comments[i]}
-                        comment
-                        ondeleted={() => (post = {
-                            ...post,
-                            comments: (post.comments ?? []).filter((c) => c.id !== child.id),
-                            commentCount: Math.max(0, post.commentCount - 1),
-                        })}
-                    />
-                {/each}
-            </div>
-        {/if}
+        <!-- Everything below is behind `open`. Folded is the default: the counter says how many
+             there are, and a click brings the thread and its form.
 
-        <!-- The card carries the three most recent; the rest arrive with the whole post, so
-             expanding is one read and not a second paged endpoint. -->
-        {#if !comment && post.commentCount > (post.comments?.length ?? 0)}
-            <button type="button" onclick={expand} disabled={expanding} class="mt-3 pl-6 text-sm underline">
-                {t('SITE_FEED_SEE_ALL_COMMENTS', {count: String(post.commentCount)})}
-            </button>
-        {/if}
+             `reply` marks the third level — a reply has no thread of its own, so it gets no
+             counter to open and no form under it. That is the depth bound the server enforces,
+             drawn. -->
+        {#if open && !reply}
+            <!-- Bound like the page binds its own cards, and for the same reason: a comment may
+                 itself be a poll — its form has the same three tabs — so a vote inside one has to
+                 write back somewhere rather than be lost on the next render. -->
+            {#if post.comments?.length}
+                <div class="mt-3 flex flex-col gap-3 pl-6">
+                    {#each post.comments as child, i (child.id)}
+                        <FeedPost
+                            bind:post={post.comments[i]}
+                            comment
+                            reply={comment}
+                            ondeleted={() => (post = {
+                                ...post,
+                                comments: (post.comments ?? []).filter((c) => c.id !== child.id),
+                                commentCount: Math.max(0, post.commentCount - 1),
+                            })}
+                        />
+                    {/each}
+                </div>
+            {/if}
 
-        {#if !comment && $signedIn}
-            <div class="mt-3 pl-6">
-                <FeedComposer parentId={post.id} onpublished={added} />
-            </div>
+            <!-- The card carries the three most recent; the rest arrive with the whole post, so
+                 expanding is one read and not a second paged endpoint. -->
+            {#if post.commentCount > (post.comments?.length ?? 0)}
+                <button type="button" onclick={expand} disabled={expanding} class="mt-3 pl-6 text-sm underline">
+                    {t('SITE_FEED_SEE_ALL_COMMENTS', {count: String(post.commentCount)})}
+                </button>
+            {/if}
+
+            {#if $signedIn}
+                <div class="mt-3 pl-6">
+                    <FeedComposer parentId={post.id} onpublished={added} />
+                </div>
+            {/if}
         {/if}
     </div>
 </article>
+
+<!-- The gallery. A native `<dialog>`, so Escape, the backdrop and the focus trap come from the
+     browser rather than from us. `onclose` keeps the flag honest when the browser closes it. -->
+{#if post.kind === FEED_KIND.PHOTO && post.photos?.length}
+    <dialog
+        bind:this={dialog}
+        onclose={() => (lightbox = false)}
+        class="max-h-[90vh] max-w-[90vw] bg-transparent backdrop:bg-black/80"
+    >
+        <button type="button" onclick={() => (lightbox = false)} class="block">
+            <img src={photoUrl(post.photos[shown]?.key ?? post.photos[0].key)} alt="" class="max-h-[85vh] w-auto" />
+        </button>
+
+        {#if post.photos.length > 1}
+            <div class="mt-2 flex justify-center gap-1">
+                {#each post.photos as photo, i (photo.key)}
+                    <button
+                        type="button"
+                        onclick={() => (shown = i)}
+                        aria-label={t('SITE_FEED_PHOTO_N', {n: String(i + 1)})}
+                        aria-current={i === shown}
+                        class="w-16 border-2 {i === shown ? 'border-ink' : 'border-transparent'}"
+                    >
+                        <img src={photoUrl(photo.key)} alt="" class="w-full" />
+                    </button>
+                {/each}
+            </div>
+        {/if}
+    </dialog>
+{/if}
