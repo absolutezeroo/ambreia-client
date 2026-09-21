@@ -19,6 +19,20 @@
     import * as notifier from '../../lib/notifier.js';
     import {t} from '../../lib/i18n.js';
 
+    /**
+     * The token's picture, handed to the wallet by `wallet_watchAsset` — see its call below.
+     *
+     * `?no-inline` is load-bearing. The file is 2 KB, under Vite's 4 KB inlining limit, so without
+     * it the build turns this into a `data:image/png;base64,…` URI. That is fine for an `<img>`
+     * and wrong here: this string leaves the page and goes to MetaMask, which fetches and caches
+     * the image itself. It was an http url while the file lived in `public/`, and moving it into
+     * `assets/` is what silently changed its KIND — the sort of break a build does not report.
+     */
+    const COIN_IMAGE = new URL(
+        '../../assets/vortexcoin-256.png?no-inline',
+        import.meta.url,
+    ).href;
+
     let wallets = $state<api.IWallets | null>(null);
     let chain = $state<api.IChainDescriptor | null>(null);
     let busy = $state(false);
@@ -244,7 +258,13 @@
                         // OpenZeppelin's 18 stands.
                         symbol: 'VTX',
                         decimals: 18,
-                        image: `${location.origin}/vortexcoin-256.png`,
+                        // Imported, not `${location.origin}/vortexcoin-256.png`. The file left
+                        // `public/`, where it was the only thing not served by a route, and a
+                        // hand-built path would now point at nothing — Vite hashes an imported
+                        // asset into `/assets/`. `new URL(…, import.meta.url).href` still gives
+                        // the ABSOLUTE url this needs: MetaMask fetches the image itself, from
+                        // outside the page, so a relative path would not reach it.
+                        image: COIN_IMAGE,
                     },
                 },
             });
