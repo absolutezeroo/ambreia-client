@@ -62,8 +62,9 @@
               : t('SITE_FEED_UPDATED_STATUS'),
     );
 
-    // Drawn for this bar, because habbo.com's sprite sheet has nothing that means "repost".
+    // Drawn for this bar, because habbo.com's sprite sheet has nothing that means either of them.
     const ICON_SHARE = new URL('../../assets/icon_share.png', import.meta.url).href;
+    const ICON_COMMENT = new URL('../../assets/icon_comment.png', import.meta.url).href;
 
     let reacting = $state(false);
     let expanding = $state(false);
@@ -213,15 +214,17 @@
      The repost's comes from `src/assets/`, drawn for this bar, because habbo.com's sheet has
      nothing that means it. So the two icons here have two different sources — one a sprite-sheet
      cut, one a file — and the branch below is that, not an accident. -->
-{#snippet glyph(icon: 'like' | 'share' | null)}
+{#snippet glyph(icon: 'like' | 'share' | 'comment' | null)}
     {#if icon === 'like'}
         <Sprite name="like" />
     {:else if icon === 'share'}
         <img src={ICON_SHARE} alt="" class="block" />
+    {:else if icon === 'comment'}
+        <img src={ICON_COMMENT} alt="" class="block" />
     {/if}
 {/snippet}
 
-{#snippet reaction(kind: number, mine: boolean, count: number, key: string, icon: 'like' | 'share' | null)}
+{#snippet reaction(kind: number, mine: boolean, count: number, key: string, icon: 'like' | 'share' | 'comment' | null)}
     {#if $signedIn}
         <button
             type="button"
@@ -322,13 +325,16 @@
                 <!-- The counter IS the control that folds the thread open, on a comment as well as
                      on a post: a reply is written under the comment it answers, so the comment
                      needs the same affordance. A signed-out visitor can still open and read. -->
+                <!-- Same shape as the two reactions on the right, but not the same snippet: those
+                     send a reaction, this one folds the thread. Only the layout is shared. -->
                 <button
                     type="button"
                     onclick={toggle}
-                    class="text-white hover:text-nav-link-hover"
+                    class="inline-flex items-center gap-1.5 leading-6 text-white hover:text-nav-link-hover"
                     aria-expanded={open}
                 >
-                    <b>{post.commentCount}</b> {t('SITE_FEED_COMMENTS')}
+                    <span><b>{post.commentCount}</b> {t('SITE_FEED_COMMENTS')}</span>
+                    {@render glyph('comment')}
                 </button>
 
                 <span class="ml-auto">
