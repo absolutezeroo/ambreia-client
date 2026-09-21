@@ -3221,7 +3221,7 @@ The server already accepts `parentId` and already refuses a nested reply — Tas
         FeedPost root = (await Service(factory).PublishAsync(1, new FeedPublishRequest(FeedPostKind.Status, "coucou", null, null, null, null), default)).Post!;
 
         (FeedRefusal refusal, FeedPost? comment) = await Service(factory)
-            .PublishAsync(1, new FeedPublishRequest(FeedPostKind.Status, "et hop", null, null, null, root.Id), default);
+            .PublishAsync(1, new FeedPublishRequest(FeedPostKind.Status, "et hop", null, null, ParentId: root.Id, GroupId: null), default);
 
         refusal.Should().Be(FeedRefusal.None);
         comment!.Comments.Should().BeEmpty();
@@ -3234,10 +3234,10 @@ The server already accepts `parentId` and already refuses a nested reply — Tas
         await using WebApiTestFactory factory = new();
         await PlayerAsync(factory, 1, "Prodiigy");
         FeedPost root = (await Service(factory).PublishAsync(1, new FeedPublishRequest(FeedPostKind.Status, "coucou", null, null, null, null), default)).Post!;
-        FeedPost comment = (await Service(factory).PublishAsync(1, new FeedPublishRequest(FeedPostKind.Status, "et hop", null, null, null, root.Id), default)).Post!;
+        FeedPost comment = (await Service(factory).PublishAsync(1, new FeedPublishRequest(FeedPostKind.Status, "et hop", null, null, ParentId: root.Id, GroupId: null), default)).Post!;
 
         (FeedRefusal refusal, _) = await Service(factory)
-            .PublishAsync(1, new FeedPublishRequest(FeedPostKind.Status, "encore", null, null, null, comment.Id), default);
+            .PublishAsync(1, new FeedPublishRequest(FeedPostKind.Status, "encore", null, null, ParentId: comment.Id, GroupId: null), default);
 
         refusal.Should().Be(FeedRefusal.ParentNotRoot);
     }
@@ -3330,7 +3330,7 @@ git commit -- packages/vortex-web/src -m "web : le fil de commentaires et son fo
         await PlayerAsync(factory, 1, "Prodiigy");
         await PlayerAsync(factory, 2, "Autre");
         FeedPost root = (await Service(factory).PublishAsync(1, new FeedPublishRequest(FeedPostKind.Status, "coucou", null, null, null, null), default)).Post!;
-        FeedPost child = (await Service(factory).PublishAsync(2, new FeedPublishRequest(FeedPostKind.Status, "et hop", null, null, null, root.Id), default)).Post!;
+        FeedPost child = (await Service(factory).PublishAsync(2, new FeedPublishRequest(FeedPostKind.Status, "et hop", null, null, ParentId: root.Id, GroupId: null), default)).Post!;
 
         await Service(factory).DeleteAsync(1, root.Id, default);
 
