@@ -79,5 +79,14 @@
     "SITE_PASSWORD_SHOW": "Afficher le mot de passe",
     "SITE_PASSWORD_HIDE": "Masquer le mot de passe",
     "SITE_PHOTO_PREVIOUS": "Photo précédente",
-    "SITE_PHOTO_NEXT": "Photo suivante"
+    "SITE_PHOTO_NEXT": "Photo suivante",
+    "SITE_FEED_TAB": "Discussions",
+    "SITE_FEED_TITLE": "Discussions",
+    "SITE_FEED_DESCRIPTION": "Ce que l'hôtel raconte, en direct.",
+    "SITE_FEED_COMMENTS": "Commentaires",
+    "SITE_FEED_REPOSTS": "Partages",
+    "SITE_FEED_FAVORITES": "Favoris",
+    "SITE_FEED_PUBLISHED_PICTURES": "a publié {{count}} nouvelles images",
+    "SITE_FEED_POSTED_POLL": "a lancé un sondage",
+    "SITE_FEED_UPDATED_STATUS": "a mis à jour son statut"
 }

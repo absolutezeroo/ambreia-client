@@ -41,6 +41,10 @@ export const COMMUNITY_TABS: ITab[] = [
     // no reason to. Its label and every string on its page are ours, marked `_OWN_` in fr.json so
     // nobody later mistakes them for habbo.com's.
     {path: '/community/leaderboard', translationKey: 'COMMUNITY_LEADERBOARD_TAB'},
+    // DEVIATION: habbo.com has no such tab. The feed is this hotel's, built from a screenshot of a
+    // 2015-era dashboard; habbo.com's own community section has no social feed at all. Its label
+    // and every string on its page are ours, in src/locales/site/.
+    {path: '/community/chats', translationKey: 'SITE_FEED_TAB'},
     // habbo.com's news tab matches /community/category AND /community/article — the article page
     // keeps the tab lit.
     {path: '/community', translationKey: 'COMMUNITY_NEWS_TAB'},

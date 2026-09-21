@@ -79,5 +79,14 @@
     "SITE_PASSWORD_SHOW": "Show the password",
     "SITE_PASSWORD_HIDE": "Hide the password",
     "SITE_PHOTO_PREVIOUS": "Previous photo",
-    "SITE_PHOTO_NEXT": "Next photo"
+    "SITE_PHOTO_NEXT": "Next photo",
+    "SITE_FEED_TAB": "Chats",
+    "SITE_FEED_TITLE": "Chats",
+    "SITE_FEED_DESCRIPTION": "What the hotel is talking about, live.",
+    "SITE_FEED_COMMENTS": "Comments",
+    "SITE_FEED_REPOSTS": "Reposts",
+    "SITE_FEED_FAVORITES": "Favorites",
+    "SITE_FEED_PUBLISHED_PICTURES": "published {{count}} new pictures",
+    "SITE_FEED_POSTED_POLL": "posted a new poll",
+    "SITE_FEED_UPDATED_STATUS": "updated his/her status"
 }

@@ -176,7 +176,7 @@ interface IRequestOptions
 // The caller names what the route answers. It is an assertion and not a validation — nothing here
 // parses the payload — so the type is only as true as the C# record it was copied from. That is the
 // contract worth stating out loud: `WebApiEndpoints.cs` is its other half.
-async function request<T>(path: string, options: IRequestOptions = {}): Promise<T>
+export async function request<T>(path: string, options: IRequestOptions = {}): Promise<T>
 {
     let response: Response;
 
