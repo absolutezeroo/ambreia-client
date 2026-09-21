@@ -228,13 +228,13 @@
             onclick={() => react(kind, !mine)}
             disabled={reacting}
             aria-pressed={mine}
-            class="inline-flex items-center gap-1.5 leading-6 disabled:cursor-default {mine ? 'text-ink' : 'hover:text-nav-link-hover'}"
+            class="inline-flex items-center gap-1.5 leading-6 text-white hover:text-nav-link-hover disabled:cursor-default"
         >
             <span><b>{count}</b> {t(key)}</span>
             {@render glyph(icon)}
         </button>
     {:else}
-        <span class="inline-flex items-center gap-1.5 leading-6">
+        <span class="inline-flex items-center gap-1.5 leading-6 text-white">
             <span><b>{count}</b> {t(key)}</span>
             {@render glyph(icon)}
         </span>
@@ -325,7 +325,7 @@
                 <button
                     type="button"
                     onclick={toggle}
-                    class="{open ? 'text-ink' : ''}"
+                    class="text-white hover:text-nav-link-hover"
                     aria-expanded={open}
                 >
                     <b>{post.commentCount}</b> {t('SITE_FEED_COMMENTS')}
@@ -358,7 +358,7 @@
                 )}
 
                 {#if post.mine}
-                    <button type="button" onclick={destroy} disabled={deleting} class="underline">
+                    <button type="button" onclick={destroy} disabled={deleting} class="text-white underline hover:text-nav-link-hover">
                         {t('SITE_FEED_DELETE')}
                     </button>
                 {/if}
