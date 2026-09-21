@@ -44,21 +44,29 @@
         {kind: FEED_KIND.POLL, key: 'SITE_FEED_TAB_POLL'},
     ] as const;
 
-    // Me first, then the groups — one list so the menu and the label read off the same thing and
-    // cannot disagree about what is selected.
+    // Two 1:1 pixel icons that say which kind of author a row is — a person or a guild. They are
+    // different sizes on purpose (18x18 and 13x11) and are NOT stretched to match: each sits at
+    // its own size inside a fixed 18px slot, so the labels line up while neither icon is
+    // resampled. Scaling either would blur it, and a blurred 13px icon is worse than an
+    // off-centre one.
+    const ICON_USER = new URL('../../assets/icon_user.png', import.meta.url).href;
+    const ICON_GROUP = new URL('../../assets/icon_group.png', import.meta.url).href;
+
+    // Me first, then the groups — one list so the menu, the pill and the icon all read off the
+    // same thing and cannot disagree about what is selected.
     let identities = $derived([
         {
             id: undefined as number | undefined,
             name: t(parentId ? 'SITE_FEED_WRITE_AS_ME' : 'SITE_FEED_POST_AS_ME', {
                 name: $me?.name ?? '',
             }),
+            icon: ICON_USER,
         },
-        ...groups.map((g) => ({id: g.id as number | undefined, name: g.name})),
+        ...groups.map((g) => ({id: g.id as number | undefined, name: g.name, icon: ICON_GROUP})),
     ]);
 
-    let chosenIdentity = $derived(
-        identities.find((i) => i.id === groupId)?.name ?? identities[0].name,
-    );
+    // `identity`, not `chosen`: that name is already the list of picked photo keys above.
+    let identity = $derived(identities.find((i) => i.id === groupId) ?? identities[0]);
 
     // Loaded when the tab is first opened rather than on mount: most posts are statuses, and a
     // player with three hundred photos should not pay for them to write one line.
@@ -200,13 +208,17 @@
                 type="button"
                 onclick={() => (identityOpen = !identityOpen)}
                 aria-expanded={identityOpen}
-                class="relative block rounded-[3px] border-2 border-pill-line bg-pill py-[3px] pr-3 pl-8 font-condensed text-sm leading-[18px] text-white shadow-pill"
+                class="relative flex items-center gap-2 rounded-[3px] border-2 border-pill-line bg-pill py-[3px] pr-3 pl-8 font-condensed text-sm leading-[18px] text-white shadow-pill"
             >
                 <Sprite
                     name="caret"
                     className="absolute left-2 top-1/2 -translate-y-1/2 transition-transform duration-300 {identityOpen ? 'rotate-180' : ''}"
                 />
-                {chosenIdentity}
+                <!-- The icon is on the PILL too, not only in the open menu: which identity is
+                     armed has to be readable without opening anything, because it is what the
+                     next post will be signed with. -->
+                <img src={identity.icon} alt="" class="block shrink-0" />
+                {identity.name}
             </button>
 
             <!-- Opens DOWNWARD into the card's own body. `Panel` is `overflow-hidden`, so a panel
@@ -217,16 +229,27 @@
                 style="max-height:{identityOpen ? '240px' : '0'};opacity:{identityOpen ? 1 : 0}"
             >
                 <span class="block py-2">
-                    {#each identities as identity (identity.id ?? 0)}
+                    <!-- `option`, not `identity`: `identity` is the derived one on the pill, and a
+                         loop variable of the same name would shadow it here. It happens to work —
+                         both mean the right thing in their own scope — which is exactly why it
+                         would not survive the next edit. -->
+                    {#each identities as option (option.id ?? 0)}
                         <button
                             type="button"
                             onclick={() => {
-                                groupId = identity.id;
+                                groupId = option.id;
                                 identityOpen = false;
                             }}
-                            class="block w-full px-4 py-1.5 text-left font-condensed text-sm leading-[22px] whitespace-nowrap {groupId === identity.id ? 'text-nav-link-active' : 'text-white hover:text-nav-link-hover'}"
+                            class="flex w-full items-center gap-2 px-4 py-1.5 text-left font-condensed text-sm leading-[22px] whitespace-nowrap {groupId === option.id ? 'text-nav-link-active' : 'text-white hover:text-nav-link-hover'}"
                         >
-                            {identity.name}
+                            <!-- An 18px slot with the icon centred in it, rather than an 18px
+                                 icon: the guild glyph is 13x11 and stretching it to match the
+                                 user's 18x18 would blur both. The slot is what aligns the
+                                 labels. -->
+                            <span class="flex w-[18px] shrink-0 justify-center">
+                                <img src={option.icon} alt="" class="block" />
+                            </span>
+                            {option.name}
                         </button>
                     {/each}
                 </span>
