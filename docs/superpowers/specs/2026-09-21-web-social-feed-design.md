@@ -120,9 +120,10 @@ the game's poll system).
 
 `post_id`, `photo_id` (FK to `camera_photos`), `ordinal`.
 
-The foreign key, **not the photo key as a string**: the projection re-applies the photo service's
-own conditions (published, not deleted, owner not hiding), so a photo the owner later unpublishes
-disappears from the post instead of staying in it as a 404.
+The foreign key, **not the photo key as a string**: the projection re-checks that the photo is
+still published and not deleted, so a photo the owner later takes back disappears from the post
+instead of staying in it as a 404. It does **not** re-check the owner's `ProfileVisible` — see
+"Reads" under Trust boundary for why that column governs browsing a profile and not publishing.
 
 ### `web_feed_poll_choices` — `WebFeedPollChoiceEntity`
 
@@ -238,15 +239,31 @@ The feed is public, user-generated content. Nothing the browser sends is believe
 
 ### Reads
 
-Every query carries the same conditions, in one place in `WebApiFeedService`, the way
-`IWebApiPhotoService` does it:
+Every query carries the same condition, in one place in `WebApiFeedService` — **the post is not
+deleted** — and that is the whole of it.
 
-- not deleted
-- **the author is not hiding their profile** (`ProfileVisible`)
+**The feed does NOT gate on `ProfileVisible`, and this paragraph used to say the opposite.** It was
+written by copying `IWebApiPhotoService`'s rule across without checking what that column defaults
+to. It defaults to **false**: this hotel honours habbo.com's own promise on the registration form,
+*"Ton profil est privé par défaut"*. Gating the feed on it made the feature broken by default rather
+than private by default — a new player's posts were invisible to everyone including themselves, and
+the write path returned HTTP 200 with a `null` body because `PublishAsync` read its own new row back
+through that same gate, which crashed the page's render loop.
 
-The second is the one worth stating: a player who has hidden their profile has said they do not want
-to be browsed, and a feed that still lists their posts by name is the same disclosure by another
-door.
+The rule that replaces it: **publishing is the consent.** Posting to the hotel's public feed is
+itself an act of publication, and it is a different act from letting someone browse your profile.
+`ProfileVisible` governs the second and says nothing about the first. A player who does not want a
+post read does not post it; the delete in `DELETE /api/user/feed/{id}` is how they take one back.
+
+Two things this does **not** change:
+
+- **The photo gallery keeps its own rule.** `IWebApiPhotoService` still requires `ProfileVisible`,
+  because browsing a gallery of someone's photos by their name is browsing them. That is its
+  decision and it stands.
+- **A photo attached to a feed post is still re-checked for published and not-deleted**, so a
+  picture the owner takes back leaves the post. Only the `ProfileVisible` half of that re-check
+  goes, for the same reason as above — the author attached their own already-public photo to their
+  own public post.
 
 ### Writes — validation rules
 
@@ -293,7 +310,11 @@ above, plus:
 - a reaction is idempotent — reacting twice leaves one row, un-reacting removes it
 - one vote per player per poll, and changing a vote moves it rather than adding one
 - a photo belonging to another player is refused
-- a post by a player whose profile is hidden does not appear in an anonymous read
+- **a post by a player whose profile is private DOES appear, and its author gets it back on
+  publish** — the inverse of what this line asked for until the `ProfileVisible` rule was dropped.
+  Both halves matter: the read, because `profile_visible` is false by default and the feed would
+  otherwise be empty for nearly everyone; and the write, because `PublishAsync` reads its own new
+  row back, so a gate there returned HTTP 200 with a null body and crashed the page
 - a comment is returned under its root and never as a root itself
 
 `OpenApiDocumentTests` fails on its own if the shape moves without `openapi.json`.
