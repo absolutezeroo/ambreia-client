@@ -52,3 +52,16 @@ export function getPost(id: number): Promise<IFeedPost>
 {
     return request(`/api/public/feed/${id}`);
 }
+
+/** Publish a post, or a comment when `parentId` is set. */
+export function publish(body: {
+    kind: number;
+    body: string;
+    photoKeys?: string[];
+    pollChoices?: string[];
+    parentId?: number;
+    groupId?: number;
+}): Promise<IFeedPost>
+{
+    return request('/api/user/feed', {method: 'POST', body});
+}

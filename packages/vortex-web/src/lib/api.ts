@@ -131,6 +131,16 @@ const ERRORS: Record<string, string> = {
     'inactive': 'SITE_ERROR_VOUCHER_INACTIVE',
     'expired': 'SITE_ERROR_VOUCHER_EXPIRED',
     'max_redemptions_reached': 'SITE_ERROR_VOUCHER_LIMIT',
+    // The feed composer's own refusals — none of habbo.com's own API answers any of these, so the
+    // wording is ours, in `src/locales/site/`.
+    'feed_body_empty': 'SITE_ERROR_FEED_BODY_EMPTY',
+    'feed_body_too_long': 'SITE_ERROR_FEED_BODY_TOO_LONG',
+    'feed_too_many_photos': 'SITE_ERROR_FEED_TOO_MANY_PHOTOS',
+    'feed_photo_not_yours': 'SITE_ERROR_FEED_PHOTO_NOT_YOURS',
+    'feed_poll_invalid': 'SITE_ERROR_FEED_POLL_INVALID',
+    'feed_parent_not_root': 'SITE_ERROR_FEED_PARENT_NOT_ROOT',
+    'feed_group_not_member': 'SITE_ERROR_FEED_GROUP_NOT_MEMBER',
+    'feed_post_not_found': 'SITE_ERROR_FEED_POST_NOT_FOUND',
 };
 
 export class ApiError extends Error

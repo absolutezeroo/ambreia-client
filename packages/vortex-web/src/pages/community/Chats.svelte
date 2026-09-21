@@ -9,8 +9,10 @@
     import ContentAside from '../../components/ContentAside.svelte';
     import EmptyResults from '../../components/EmptyResults.svelte';
     import FeedPost from '../../components/feed/FeedPost.svelte';
+    import FeedComposer from '../../components/feed/FeedComposer.svelte';
     import {getFeed, type IFeedPost} from '../../lib/feed.js';
     import {t} from '../../lib/i18n.js';
+    import {signedIn} from '../../lib/session.js';
 
     let posts = $state<IFeedPost[]>([]);
     let loading = $state(true);
@@ -33,6 +35,10 @@
 
     <ContentAside>
         <div class="flex flex-col gap-6">
+            {#if $signedIn}
+                <FeedComposer onpublished={(post) => (posts = [post, ...posts])} />
+            {/if}
+
             {#each posts as post (post.id)}
                 <FeedPost {post} />
             {/each}
