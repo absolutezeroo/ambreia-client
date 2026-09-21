@@ -13,25 +13,72 @@
     import {getFeed, type IFeedPost} from '../../lib/feed.js';
     import {t} from '../../lib/i18n.js';
     import {signedIn} from '../../lib/session.js';
+    import {querystring, push, link} from 'svelte-spa-router';
 
     let posts = $state<IFeedPost[]>([]);
     let loading = $state(true);
 
+    // The filter lives in the URL, not in a local variable: a tag link in a post body is an
+    // ordinary `<a href="?tag=…">`, the browser's back button has to undo a filter, and a filtered
+    // feed has to survive being shared or reloaded.
+    let tag = $derived(new URLSearchParams($querystring ?? '').get('tag') ?? '');
+
+    let term = $state('');
+
+    // ONE effect, re-running whenever `tag` changes — reading it here is what subscribes it. A
+    // second effect beside the original would fetch the feed twice on every mount.
     $effect(() =>
     {
+        // Read before the async work so the dependency is registered on this run rather than
+        // after the first await, where the effect would never see it.
+        const wanted = tag;
+
         let cancelled = false;
 
-        void getFeed()
+        loading = true;
+
+        // `cancelled` now does real work: changing the filter starts a second request while the
+        // first is still open, and without this guard the slower answer overwrites the newer one.
+        void getFeed({tag: wanted || undefined})
             .then((answer) => !cancelled && (posts = answer.items ?? []))
             .catch(() => !cancelled && (posts = []))
             .finally(() => !cancelled && (loading = false));
 
         return () => (cancelled = true);
     });
+
+    function search(event: SubmitEvent)
+    {
+        event.preventDefault();
+
+        // The `#` is stripped because the links in a post body carry the bare word, and a player
+        // typing in this box will type the hash they can see. The server accepts either, but the
+        // URL should read the same whichever way the filter was reached.
+        const wanted = term.trim().replace(/^#/, '');
+
+        push(wanted ? `/community/chats?tag=${encodeURIComponent(wanted)}` : '/community/chats');
+    }
 </script>
 
 <CommunityShell>
-    <PageHeader title={t('SITE_FEED_TITLE')} description={t('SITE_FEED_DESCRIPTION')} />
+    <!-- The search sits in the page header, not in the tab bar: `Tabs` is shared by seven pages
+         and shells, and it has no business learning a search field for one of them. -->
+    <PageHeader title={t('SITE_FEED_TITLE')} description={t('SITE_FEED_DESCRIPTION')}>
+        <form onsubmit={search} class="mt-3 flex items-center gap-2">
+            <input
+                bind:value={term}
+                placeholder={t('SITE_FEED_SEARCH_TAGS')}
+                aria-label={t('SITE_FEED_SEARCH_TAGS')}
+                class="rounded-[5px] border-[3px] border-field-line bg-field px-3 py-[5px] text-base leading-[1.2] text-field-ink shadow-field placeholder:text-[#888] focus:border-field-line-focus focus:bg-white focus:outline-none"
+            />
+
+            {#if tag}
+                <a href="/community/chats" use:link class="text-sm underline">
+                    {t('SITE_FEED_CLEAR_TAG', {tag})}
+                </a>
+            {/if}
+        </form>
+    </PageHeader>
 
     <ContentAside>
         <div class="flex flex-col gap-6">

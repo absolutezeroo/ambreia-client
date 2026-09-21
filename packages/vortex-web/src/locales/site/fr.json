@@ -103,6 +103,8 @@
     "SITE_FEED_POST_AS_ME": "Publier en tant que {{name}}",
     "SITE_FEED_WRITE_AS_ME": "Écrire en tant que {{name}}",
     "SITE_FEED_TAB_POLL": "Sondage",
+    "SITE_FEED_SEARCH_TAGS": "Chercher un tag",
+    "SITE_FEED_CLEAR_TAG": "Tout le fil (on filtre sur #{{tag}})",
     "SITE_FEED_POLL_CHOICE": "Une réponse possible",
     "SITE_FEED_POLL_ADD_CHOICE": "Ajouter une réponse",
     "SITE_FEED_TAB_STATUS": "Statut",

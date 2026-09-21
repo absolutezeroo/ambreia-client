@@ -103,6 +103,8 @@
     "SITE_FEED_POST_AS_ME": "Post as {{name}}",
     "SITE_FEED_WRITE_AS_ME": "Write as {{name}}",
     "SITE_FEED_TAB_POLL": "Poll",
+    "SITE_FEED_SEARCH_TAGS": "Search for some tags",
+    "SITE_FEED_CLEAR_TAG": "All of it (filtered on #{{tag}})",
     "SITE_FEED_POLL_CHOICE": "An answer",
     "SITE_FEED_POLL_ADD_CHOICE": "Add an answer",
     "SITE_FEED_TAB_STATUS": "Status",
