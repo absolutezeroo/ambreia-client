@@ -18,6 +18,7 @@
     import {link} from 'svelte-spa-router';
     import Sprite from './Sprite.svelte';
     import UserMenu from './UserMenu.svelte';
+    import NotificationBell from './NotificationBell.svelte';
     import {signedIn} from '../lib/session.js';
     import {t} from '../lib/i18n.js';
 
@@ -38,7 +39,14 @@
         <span class="hidden md:block"><Sprite name="bigLogo" label="Vortex Hotel" /></span>
     </a>
 
-    <div class="ml-auto {$signedIn ? '-mr-3 self-start' : ''}">
+    <!-- The bell sits OUTSIDE the user-menu block and before it. Inside, it would be under the
+         menu's own 190px width and its dropdown; before it, the two panels open side by side and
+         neither has to know about the other. -->
+    {#if $signedIn}
+        <div class="ml-auto pr-3"><NotificationBell /></div>
+    {/if}
+
+    <div class="{$signedIn ? '-mr-3 self-start' : 'ml-auto'}">
         {#if $signedIn}
             <UserMenu />
         {:else}
