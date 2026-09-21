@@ -1011,7 +1011,17 @@ export class TextFieldController extends TextController implements ITextFieldWin
         // which moves the caret to the end — so it is put back where it was, minus however many
         // characters were dropped before it.
         const raw = this._inputElement.value;
-        const filtered = this.applyRestrict(raw);
+        let filtered = this.applyRestrict(raw);
+
+        // Flash: `multiline` is what decides whether the USER may put a line break in the field,
+        // and a single-line TextField simply swallows Enter. The DOM bridge is a `<textarea>`
+        // whenever the field *wraps* (see usesMultipleLines), and a textarea always takes the
+        // key — so every `word_wrap="true"` single-line input collected a "\n" the moment its
+        // handler submitted on Enter, and kept it as the head of the next message. In the
+        // messenger that newline went out with the text (an empty first line in every bubble,
+        // 12px taller each) and pushed what the user typed next onto a second line, below a box
+        // one line high: typing was invisible while the message still sent correctly.
+        if(!this._multiline) filtered = filtered.replace(/[\r\n]/g, '');
 
         if(filtered !== raw)
         {
