@@ -88,6 +88,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/public/camera/postcards/selfie/photos/{photoKey}.png": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetSelfiePhoto"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/public/camera/photos/{photoKey}.png": {
         parameters: {
             query?: never;
@@ -419,6 +435,40 @@ export interface paths {
         };
         /** Who holds the most VortexCoin, as of the last snapshot. */
         get: operations["CoinLeaderboard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/feed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The social feed: every post, newest first. */
+        get: operations["Feed"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/feed/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One post and its comments. */
+        get: operations["FeedPost"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1014,6 +1064,62 @@ export interface components {
             readonly isValid: boolean;
         };
         EmptyResponse: Record<string, never>;
+        FeedPage: {
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            total: number;
+            items: components["schemas"]["FeedPost"][];
+        };
+        FeedPoll: {
+            /** Format: int32 */
+            totalVotes: number;
+            /** Format: int32 */
+            myChoiceId?: number | null;
+            choices: components["schemas"]["FeedPollChoice"][];
+        };
+        FeedPollChoice: {
+            /** Format: int32 */
+            id: number;
+            label: string;
+            /** Format: int32 */
+            votes: number;
+        };
+        FeedPost: {
+            /** Format: int32 */
+            id: number;
+            authorUniqueId: string;
+            authorName: string;
+            authorFigureString: string;
+            /** Format: int32 */
+            groupId?: number | null;
+            groupName?: string | null;
+            groupBadgeCode?: string | null;
+            kind: components["schemas"]["FeedPostKind"];
+            body: string;
+            /** Format: date-time */
+            createdAt: string;
+            photos: components["schemas"]["PhotoSummary"][];
+            poll?: components["schemas"]["FeedPoll"];
+            tags: string[];
+            /** Format: int32 */
+            commentCount: number;
+            /** Format: int32 */
+            repostCount: number;
+            /** Format: int32 */
+            favoriteCount: number;
+            repostedByMe: boolean;
+            favoritedByMe: boolean;
+            mine: boolean;
+            comments: components["schemas"]["FeedPost"][];
+        };
+        /**
+         * Format: int32
+         * @enum {integer}
+         */
+        FeedPostKind: 0 | 1 | 2;
         HealthResponse: {
             status: string;
             database: string;
@@ -1546,6 +1652,26 @@ export interface operations {
             header?: never;
             path: {
                 roomId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GetSelfiePhoto: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                photoKey: string;
             };
             cookie?: never;
         };
@@ -2103,6 +2229,61 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["LeaderboardResponse"];
+                };
+            };
+        };
+    };
+    Feed: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                tag?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeedPage"];
+                };
+            };
+        };
+    };
+    FeedPost: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeedPost"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
                 };
             };
         };
