@@ -91,7 +91,7 @@
                  copy. Bound through `posts[i]` because an each-block's alias is not itself a
                  writable target. -->
             {#each posts as post, i (post.id)}
-                <FeedPost bind:post={posts[i]} />
+                <FeedPost bind:post={posts[i]} ondeleted={() => (posts = posts.filter((p) => p.id !== post.id))} />
             {/each}
 
             {#if !loading && !posts.length}

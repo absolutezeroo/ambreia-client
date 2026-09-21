@@ -16,7 +16,14 @@
     // resolves because neither reads the other at module scope. Keep both imports inside the
     // component and nothing at the top level of either module.
     import FeedComposer from './FeedComposer.svelte';
-    import {FEED_KIND, FEED_REACTION, getPost, setReaction, type IFeedPost} from '../../lib/feed.js';
+    import {
+        FEED_KIND,
+        FEED_REACTION,
+        getPost,
+        remove,
+        setReaction,
+        type IFeedPost,
+    } from '../../lib/feed.js';
     import {photoUrl} from '../../lib/api.js';
     import {groupBadgeUrl, hideOnError} from '../../lib/config.js';
     import {t} from '../../lib/i18n.js';
@@ -27,7 +34,13 @@
     // it now stands, and the card's job is then to show that answer rather than to adjust a count
     // by hand. Writing back through the binding keeps the page's array the single copy — the
     // alternative, a local override, would quietly win over a later refetch.
-    let {post = $bindable(), comment = false}: {post: IFeedPost; comment?: boolean} = $props();
+    // `ondeleted` rather than writing through the binding: removing a card means splicing the
+    // array it lives in, and a bound prop can replace its own element but not take it out.
+    let {
+        post = $bindable(),
+        comment = false,
+        ondeleted = undefined,
+    }: {post: IFeedPost; comment?: boolean; ondeleted?: (() => void) | undefined} = $props();
 
     // "PRODIIGY published 2 new pictures" / "posted a new poll" / "updated his/her status" — the
     // screenshot's three headings, one per kind.
@@ -52,6 +65,35 @@
             comments: [...(post.comments ?? []), child],
             commentCount: post.commentCount + 1,
         };
+    }
+
+    let deleting = $state(false);
+
+    async function destroy()
+    {
+        // A native confirm rather than a modal of our own: deleting takes the post's comments with
+        // it, including other people's, and that is worth one deliberate click. `confirm` is the
+        // browser's, so it is accessible and dismissible without us building either.
+        if(deleting || !confirm(t('SITE_FEED_DELETE_CONFIRM')))
+        {
+            return;
+        }
+
+        deleting = true;
+
+        try
+        {
+            await remove(post.id);
+            ondeleted?.();
+        }
+        catch(failure)
+        {
+            notifier.error((failure as Error).message);
+        }
+        finally
+        {
+            deleting = false;
+        }
     }
 
     async function expand()
@@ -168,6 +210,12 @@
                 >
                     <b>{post.favoriteCount}</b> {t('SITE_FEED_FAVORITES')}
                 </button>
+
+                {#if post.mine}
+                    <button type="button" onclick={destroy} disabled={deleting} class="underline">
+                        {t('SITE_FEED_DELETE')}
+                    </button>
+                {/if}
             </div>
         </Panel>
 
@@ -177,7 +225,15 @@
         {#if !comment && post.comments?.length}
             <div class="mt-3 flex flex-col gap-3 pl-6">
                 {#each post.comments as child, i (child.id)}
-                    <FeedPost bind:post={post.comments[i]} comment />
+                    <FeedPost
+                        bind:post={post.comments[i]}
+                        comment
+                        ondeleted={() => (post = {
+                            ...post,
+                            comments: (post.comments ?? []).filter((c) => c.id !== child.id),
+                            commentCount: Math.max(0, post.commentCount - 1),
+                        })}
+                    />
                 {/each}
             </div>
         {/if}

@@ -93,3 +93,15 @@ export function setReaction(postId: number, kind: number, on: boolean): Promise<
 {
     return request(`/api/user/feed/${postId}/reaction`, {method: 'PUT', body: {kind, on}});
 }
+
+/**
+ * Delete one of my own posts, and its comments with it.
+ *
+ * `remove`, not `delete`: the latter is a reserved word and cannot be an export name. The server
+ * answers the same 404 for "no such post", "already gone" and "not yours", so a caller has one
+ * thing to do with a failure — stop showing the card either way.
+ */
+export function remove(postId: number): Promise<unknown>
+{
+    return request(`/api/user/feed/${postId}`, {method: 'DELETE'});
+}
