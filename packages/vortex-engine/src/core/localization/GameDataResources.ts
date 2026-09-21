@@ -161,6 +161,25 @@ export class GameDataResources implements IGameDataResources
         return this._resourceHashes.get(name) ?? '';
     }
 
+    /**
+     * Every resource whose published name starts with `prefix`, in manifest order
+     *
+     * No AS3 counterpart: the official client loads exactly one texts file per language. Splitting
+     * the texts by domain is ours, and the order matters — the files land in one key store, so a
+     * key present in two of them keeps the value from the one listed last.
+     */
+    getResourceNames(prefix: string): string[]
+    {
+        const names: string[] = [];
+
+        for(const name of this._resourceUrls.keys())
+        {
+            if(name.startsWith(prefix)) names.push(name);
+        }
+
+        return names;
+    }
+
     // AS3: sources/win63_version/core/localization/class_2118.as::isValid()
     isValid(): boolean
     {

@@ -38,4 +38,7 @@ export interface IGameDataResources
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/core/localization/IGameDataResources.as::getResourceHash()
     getResourceHash(name: string): string;
+
+    /** Every resource whose published name starts with `prefix`, in manifest order. */
+    getResourceNames(prefix: string): string[];
 }

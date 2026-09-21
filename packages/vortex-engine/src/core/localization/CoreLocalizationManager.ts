@@ -27,6 +27,12 @@ export class CoreLocalizationManager extends Component implements ICoreLocalizat
     // AS3: .../src/com/sulake/core/localization/CoreLocalizationManager.as::INTERPOLATION_DEPTH_LIMIT
     private static readonly INTERPOLATION_DEPTH_LIMIT = 3;
 
+    /**
+     * Manifest names carrying texts split by domain, loaded after `external_texts` into the same
+     * key store. The trailing underscore is what keeps `external_texts` itself out of the match.
+     */
+    private static readonly SPLIT_TEXTS_PREFIX = 'external_text_';
+
     protected _localizations: Map<string, Localization> = new Map();
     protected _definitions: Map<string, LocalizationDefinition> = new Map();
     // AS3: .../src/com/sulake/core/localization/CoreLocalizationManager.as::_acceptEmptyMap
@@ -173,7 +179,16 @@ export class CoreLocalizationManager extends Component implements ICoreLocalizat
                         return;
                     }
 
-                    this.loadExternalTextUrls([`${externalTextsUrl}/${externalTextsHash}`], acceptEmpty);
+                    // The texts split by domain (external_text_catalog, external_text_badges, …).
+                    // They land in the same key store as the main file and are listed after it, so
+                    // a key defined in both keeps the split file's value. Note the trailing
+                    // underscore: `external_texts` itself does not match the prefix.
+                    const extraUrls = resources
+                        .getResourceNames(CoreLocalizationManager.SPLIT_TEXTS_PREFIX)
+                        .filter((name) => resources.getResourceUrl(name) && resources.getResourceHash(name))
+                        .map((name) => `${resources.getResourceUrl(name)}/${resources.getResourceHash(name)}`);
+
+                    this.loadExternalTextUrls([`${externalTextsUrl}/${externalTextsHash}`], acceptEmpty, extraUrls);
                 }
                 catch (error) 
                 {
@@ -432,36 +447,76 @@ export class CoreLocalizationManager extends Component implements ICoreLocalizat
         }
     }
 
-    private loadExternalTextUrls(urls: string[], acceptEmpty: boolean = false): void 
+    private loadExternalTextUrls(urls: string[], acceptEmpty: boolean = false, optionalUrls: string[] = []): void
     {
-        if(urls.length === 0) 
+        if(urls.length === 0)
         {
             this.events.emit(LocalizationEvent.LOCALIZATION_FAILED);
             return;
         }
 
-        for(const url of urls) 
+        for(const url of [...urls, ...optionalUrls])
         {
             this._acceptEmptyMap.set(url, acceptEmpty);
         }
 
-        Promise.all(urls.map(async (url) => 
-        {
-            const response = await fetch(url);
-
-            if(!response.ok) 
+        // The required files fail the load; the optional ones only fail themselves. A hotel that
+        // declares a split texts file it has not deployed yet would otherwise lose every text it
+        // has, which is a far worse outcome than the split file being missing.
+        Promise.all([
+            ...urls.map(async (url) =>
             {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
+                const response = await fetch(url);
 
-            return response.text();
-        }))
+                if(!response.ok)
+                {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                return response.text();
+            }),
+            ...optionalUrls.map(async (url) =>
+            {
+                try
+                {
+                    const response = await fetch(url);
+
+                    if(!response.ok)
+                    {
+                        log.warn(`Split texts file ${url} answered HTTP ${response.status}; skipped`);
+
+                        return null;
+                    }
+
+                    return await response.text();
+                }
+                catch (error)
+                {
+                    log.warn(`Split texts file ${url} could not be loaded: ${error}; skipped`);
+
+                    return null;
+                }
+            }),
+        ])
             .then((texts) => 
             {
-                for(const text of texts) 
+                // Promise.all keeps the input order, so the first `urls.length` results are the
+                // required files and everything after them is an optional split one.
+                for(const [index, text] of texts.entries())
                 {
-                    if(!this.validateLocalizationData(text, acceptEmpty)) 
+                    const optional = index >= urls.length;
+
+                    if(text === null) continue;   // an optional file that did not load
+
+                    if(!this.validateLocalizationData(text, acceptEmpty))
                     {
+                        if(optional)
+                        {
+                            log.warn(`Split texts file ${optionalUrls[index - urls.length]} is not usable; skipped`);
+
+                            continue;
+                        }
+
                         log.error('Invalid localization data received');
 
                         this.events.emit(LocalizationEvent.LOCALIZATION_FAILED);
