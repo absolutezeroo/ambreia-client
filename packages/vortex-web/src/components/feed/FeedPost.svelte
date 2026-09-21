@@ -203,11 +203,14 @@
      count sits beside it, and a signed-out visitor reads the number as plain text rather than
      pressing a control that always answers 401.
 
-     Only the favourite carries an icon. The sprite sheet has `heart`, which means exactly that;
-     it has nothing that means "repost" — the 2015 design's circular arrows are not in it — and a
-     thumb or a chevron borrowed from elsewhere would say the wrong thing more loudly than no icon
-     says nothing. Cutting a repost glyph into the sheet is its own job. -->
-{#snippet reaction(kind: number, mine: boolean, count: number, key: string, icon: 'heart' | null)}
+     The icon is `like`, the THUMB — the one `PhotoLike` already uses and the hotel's established
+     mark for this. It was a `heart` for a while, which was in the sprite sheet but nowhere in the
+     site: picked because it was available rather than because anything used it.
+
+     Still no icon on the repost. The sheet has nothing that means it — the 2015 design's circular
+     arrows are not in it — and borrowing a glyph that means something else would say the wrong
+     thing more loudly than no icon says nothing. -->
+{#snippet reaction(kind: number, mine: boolean, count: number, key: string, icon: 'like' | null)}
     {#if $signedIn}
         <button
             type="button"
@@ -336,7 +339,7 @@
                     post.favoritedByMe,
                     post.favoriteCount,
                     post.favoritedByMe ? 'SITE_FEED_UNFAVORITE' : 'SITE_FEED_FAVORITES',
-                    'heart',
+                    'like',
                 )}
 
                 {#if post.mine}
