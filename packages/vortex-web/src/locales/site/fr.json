@@ -107,6 +107,8 @@
     "SITE_FEED_SEE_ALL_COMMENTS": "Voir les {{count}} commentaires",
     "SITE_FEED_DELETE": "Supprimer",
     "SITE_FEED_PHOTO_N": "Photo {{n}}",
+    "SITE_FEED_UNREPOST": "Ne plus partager",
+    "SITE_FEED_UNFAVORITE": "Retirer des favoris",
     "SITE_FEED_DELETE_CONFIRM": "Supprimer ce message ? Ses commentaires partiront avec, ceux des autres joueurs compris.",
     "SITE_FEED_CLEAR_TAG": "Tout le fil (on filtre sur #{{tag}})",
     "SITE_FEED_POLL_CHOICE": "Une réponse possible",

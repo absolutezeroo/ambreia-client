@@ -198,6 +198,39 @@
     }
 </script>
 
+<!-- One reaction, built the way `PhotoLike.svelte` builds the site's like: the LABEL SWAPS on
+     state ("Partages" ↔ "Ne plus partager", as habbo.com's own control swaps LIKE ↔ UNLIKE), the
+     count sits beside it, and a signed-out visitor reads the number as plain text rather than
+     pressing a control that always answers 401.
+
+     Only the favourite carries an icon. The sprite sheet has `heart`, which means exactly that;
+     it has nothing that means "repost" — the 2015 design's circular arrows are not in it — and a
+     thumb or a chevron borrowed from elsewhere would say the wrong thing more loudly than no icon
+     says nothing. Cutting a repost glyph into the sheet is its own job. -->
+{#snippet reaction(kind: number, mine: boolean, count: number, key: string, icon: 'heart' | null)}
+    {#if $signedIn}
+        <button
+            type="button"
+            onclick={() => react(kind, !mine)}
+            disabled={reacting}
+            aria-pressed={mine}
+            class="inline-flex items-center gap-1.5 leading-6 disabled:cursor-default {mine ? 'text-ink' : 'hover:text-nav-link-hover'}"
+        >
+            <span><b>{count}</b> {t(key)}</span>
+            {#if icon}
+                <Sprite name={icon} />
+            {/if}
+        </button>
+    {:else}
+        <span class="inline-flex items-center gap-1.5 leading-6">
+            <span><b>{count}</b> {t(key)}</span>
+            {#if icon}
+                <Sprite name={icon} />
+            {/if}
+        </span>
+    {/if}
+{/snippet}
+
 <article class="flex gap-3">
     <!-- A post published under a group wears the GROUP'S BADGE, not its author's head. The row
          still records who wrote it — `authorName` is what a delete checks and what moderation
@@ -288,25 +321,23 @@
                     <b>{post.commentCount}</b> {t('SITE_FEED_COMMENTS')}
                 </button>
 
-                <button
-                    type="button"
-                    onclick={() => react(FEED_REACTION.REPOST, !post.repostedByMe)}
-                    disabled={reacting || !$signedIn}
-                    class="ml-auto disabled:cursor-default {post.repostedByMe ? 'text-ink' : ''}"
-                    aria-pressed={post.repostedByMe}
-                >
-                    <b>{post.repostCount}</b> {t('SITE_FEED_REPOSTS')}
-                </button>
+                <span class="ml-auto">
+                    {@render reaction(
+                        FEED_REACTION.REPOST,
+                        post.repostedByMe,
+                        post.repostCount,
+                        post.repostedByMe ? 'SITE_FEED_UNREPOST' : 'SITE_FEED_REPOSTS',
+                        null,
+                    )}
+                </span>
 
-                <button
-                    type="button"
-                    onclick={() => react(FEED_REACTION.FAVORITE, !post.favoritedByMe)}
-                    disabled={reacting || !$signedIn}
-                    class="disabled:cursor-default {post.favoritedByMe ? 'text-ink' : ''}"
-                    aria-pressed={post.favoritedByMe}
-                >
-                    <b>{post.favoriteCount}</b> {t('SITE_FEED_FAVORITES')}
-                </button>
+                {@render reaction(
+                    FEED_REACTION.FAVORITE,
+                    post.favoritedByMe,
+                    post.favoriteCount,
+                    post.favoritedByMe ? 'SITE_FEED_UNFAVORITE' : 'SITE_FEED_FAVORITES',
+                    'heart',
+                )}
 
                 {#if post.mine}
                     <button type="button" onclick={destroy} disabled={deleting} class="underline">
