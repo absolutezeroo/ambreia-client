@@ -62,6 +62,9 @@
               : t('SITE_FEED_UPDATED_STATUS'),
     );
 
+    // Drawn for this bar, because habbo.com's sprite sheet has nothing that means "repost".
+    const ICON_SHARE = new URL('../../assets/icon_share.png', import.meta.url).href;
+
     let reacting = $state(false);
     let expanding = $state(false);
 
@@ -203,14 +206,22 @@
      count sits beside it, and a signed-out visitor reads the number as plain text rather than
      pressing a control that always answers 401.
 
-     The icon is `like`, the THUMB — the one `PhotoLike` already uses and the hotel's established
-     mark for this. It was a `heart` for a while, which was in the sprite sheet but nowhere in the
-     site: picked because it was available rather than because anything used it.
+     The favourite's icon is `like`, the THUMB — the one `PhotoLike` already uses and the hotel's
+     established mark for this. It was a `heart` for a while, which was in the sprite sheet but
+     nowhere in the site: picked because it was available rather than because anything used it.
 
-     Still no icon on the repost. The sheet has nothing that means it — the 2015 design's circular
-     arrows are not in it — and borrowing a glyph that means something else would say the wrong
-     thing more loudly than no icon says nothing. -->
-{#snippet reaction(kind: number, mine: boolean, count: number, key: string, icon: 'like' | null)}
+     The repost's comes from `src/assets/`, drawn for this bar, because habbo.com's sheet has
+     nothing that means it. So the two icons here have two different sources — one a sprite-sheet
+     cut, one a file — and the branch below is that, not an accident. -->
+{#snippet glyph(icon: 'like' | 'share' | null)}
+    {#if icon === 'like'}
+        <Sprite name="like" />
+    {:else if icon === 'share'}
+        <img src={ICON_SHARE} alt="" class="block" />
+    {/if}
+{/snippet}
+
+{#snippet reaction(kind: number, mine: boolean, count: number, key: string, icon: 'like' | 'share' | null)}
     {#if $signedIn}
         <button
             type="button"
@@ -220,16 +231,12 @@
             class="inline-flex items-center gap-1.5 leading-6 disabled:cursor-default {mine ? 'text-ink' : 'hover:text-nav-link-hover'}"
         >
             <span><b>{count}</b> {t(key)}</span>
-            {#if icon}
-                <Sprite name={icon} />
-            {/if}
+            {@render glyph(icon)}
         </button>
     {:else}
         <span class="inline-flex items-center gap-1.5 leading-6">
             <span><b>{count}</b> {t(key)}</span>
-            {#if icon}
-                <Sprite name={icon} />
-            {/if}
+            {@render glyph(icon)}
         </span>
     {/if}
 {/snippet}
@@ -330,7 +337,7 @@
                         post.repostedByMe,
                         post.repostCount,
                         post.repostedByMe ? 'SITE_FEED_UNREPOST' : 'SITE_FEED_REPOSTS',
-                        null,
+                        'share',
                     )}
                 </span>
 

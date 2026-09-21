@@ -4,18 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#00334c" />
-
-    <!-- PNG, not SVG. The logo is pixel art: tracing it to curves is what turned `favicon.svg`
-         into a single black silhouette, because a vector tracer produces one monochrome path.
-
-         48 is an exact 2x of the 24x24 source, so every pixel stays a square. There is
-         deliberately no 16 and no 32 here: 24 divides into neither, so any file we made at those
-         sizes would have to drop columns and mangle the spiral — a browser downscaling this clean
-         48 with its own resampler does better than we can, and an honest 16x16 would have to be
-         drawn by hand rather than computed. -->
     <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
     <title>Vortex Hotel</title>
   </head>
   <body>

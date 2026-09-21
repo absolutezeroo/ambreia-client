@@ -242,11 +242,12 @@
                             }}
                             class="flex w-full items-center gap-2 px-4 py-1.5 text-left font-condensed text-sm leading-[22px] whitespace-nowrap {groupId === option.id ? 'text-nav-link-active' : 'text-white hover:text-nav-link-hover'}"
                         >
-                            <!-- An 18px slot with the icon centred in it, rather than an 18px
-                                 icon: the guild glyph is 13x11 and stretching it to match the
-                                 user's 18x18 would blur both. The slot is what aligns the
-                                 labels. -->
-                            <span class="flex w-[18px] shrink-0 justify-center">
+                            <!-- A fixed slot with the icon centred in it, rather than a fixed
+                                 icon SIZE: the three glyphs share a height of 18 but not a width
+                                 (user 18, guild 21, share 22), and stretching them to match would
+                                 blur pixel art to buy an alignment the slot gives for free. 22 is
+                                 the widest of them. -->
+                            <span class="flex w-[22px] shrink-0 justify-center">
                                 <img src={option.icon} alt="" class="block" />
                             </span>
                             {option.name}
