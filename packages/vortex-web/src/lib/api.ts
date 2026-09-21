@@ -141,6 +141,7 @@ const ERRORS: Record<string, string> = {
     'feed_parent_not_root': 'SITE_ERROR_FEED_PARENT_NOT_ROOT',
     'feed_group_not_member': 'SITE_ERROR_FEED_GROUP_NOT_MEMBER',
     'feed_post_not_found': 'SITE_ERROR_FEED_POST_NOT_FOUND',
+    'feed_kind_mismatch': 'SITE_ERROR_FEED_KIND_MISMATCH',
 };
 
 export class ApiError extends Error
@@ -339,6 +340,20 @@ export function getPlayerPhotos(uniqueId: string, limit?: number): Promise<IPhot
     const query = limit ? `?limit=${limit}` : '';
 
     return request(`/api/public/users/${encodeURIComponent(uniqueId)}/photos${query}`);
+}
+
+/**
+ * The signed-in player's OWN published photos — with no `ProfileVisible` gate, unlike
+ * `getPlayerPhotos()` above.
+ *
+ * "Mine, for attaching" is not "this player's public gallery": a default player's profile is
+ * private by default, so `getPlayerPhotos($me.uniqueId)` would answer an empty list for a photo
+ * the caller can see perfectly well in their own camera roll. This is what the feed composer's
+ * picker calls instead.
+ */
+export function getMyPhotos(): Promise<IPhotoSummary[]>
+{
+    return request('/api/user/photos');
 }
 
 /** 404 `photo_not_found` for a key that is unknown, unpublished, or whose owner is hiding. */
