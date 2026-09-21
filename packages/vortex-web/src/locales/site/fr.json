@@ -101,6 +101,7 @@
     "SITE_FEED_POST_AS": "Publier un statut",
     "SITE_FEED_WRITE_AS": "Écrire un commentaire",
     "SITE_FEED_POST_AS_ME": "Publier en tant que {{name}}",
+    "SITE_FEED_WRITE_AS_ME": "Écrire en tant que {{name}}",
     "SITE_FEED_TAB_STATUS": "Statut",
     "SITE_FEED_TAB_PHOTOS": "Photos",
     "SITE_FEED_NO_PHOTOS": "Tu n'as pas encore de photo publiée.",

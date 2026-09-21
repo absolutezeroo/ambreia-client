@@ -24,6 +24,11 @@
     let groups = $state<{id: number; name: string}[]>([]);
     let groupId = $state<number | undefined>(undefined);
 
+    // Distinguishes "no photos" from "not fetched yet". Without it the empty state renders for as
+    // long as the request takes, so a player WITH photos is told they have none and then watches
+    // it contradict itself.
+    let photosLoaded = $state(false);
+
     // Loaded when the tab is first opened rather than on mount: most posts are statuses, and a
     // player with three hundred photos should not pay for them to write one line.
     //
@@ -32,27 +37,35 @@
     // an empty list for exactly the player it exists to help. See `GET /api/user/photos`.
     $effect(() =>
     {
-        if(kind !== FEED_KIND.PHOTO || mine.length || !$me?.uniqueId)
+        if(kind !== FEED_KIND.PHOTO || photosLoaded || !$me?.uniqueId)
         {
             return;
         }
 
         let cancelled = false;
 
+        // `photosLoaded` rather than `mine.length` as the already-fetched guard: a player who
+        // genuinely has none would otherwise refetch on every visit to the tab, and the empty
+        // state could never be told apart from a request in flight.
         void getMyPhotos()
             .then((answer) => !cancelled && (mine = answer))
-            .catch(() => undefined);
+            .catch(() => undefined)
+            .finally(() => !cancelled && (photosLoaded = true));
 
         return () => (cancelled = true);
     });
 
     // The groups come off my own profile rather than a route of their own: the profile read
     // already returns them, and the server re-checks membership on publish anyway — this list is
-    // display, not authorisation. Skipped entirely for a comment: `POST AS` is a root post's own
-    // identity, and a reply's title never shows the select.
+    // display, not authorisation.
+    //
+    // A COMMENT gets the menu too. The screenshot this feature is built from captions the comment
+    // form `WRITE AS PRODIIGY ▾`, with the same control as the post form above it — a reply under a
+    // group's identity is a thing the design offers, and `PublishAsync` validates `GroupId` the
+    // same way whether or not `ParentId` is set.
     $effect(() =>
     {
-        if(parentId || !$me?.uniqueId)
+        if(!$me?.uniqueId)
         {
             return;
         }
@@ -109,20 +122,25 @@
     }
 </script>
 
+<!-- `POST AS PRODIIGY ▾` on a post, `WRITE AS PRODIIGY ▾` on a comment — the screenshot's own two
+     captions, over the same control. A player in no group has nothing to choose between, so the
+     band falls back to the plain caption rather than showing a menu of one. -->
 {#snippet identityTitle()}
     {#if groups.length}
         <select bind:value={groupId} class="bg-transparent text-sm">
-            <option value={undefined}>{t('SITE_FEED_POST_AS_ME', {name: $me?.name ?? ''})}</option>
+            <option value={undefined}>
+                {t(parentId ? 'SITE_FEED_WRITE_AS_ME' : 'SITE_FEED_POST_AS_ME', {name: $me?.name ?? ''})}
+            </option>
             {#each groups as group (group.id)}
                 <option value={group.id}>{group.name}</option>
             {/each}
         </select>
     {:else}
-        {t('SITE_FEED_POST_AS')}
+        {t(parentId ? 'SITE_FEED_WRITE_AS' : 'SITE_FEED_POST_AS')}
     {/if}
 {/snippet}
 
-<Panel title={parentId ? t('SITE_FEED_WRITE_AS') : ''} titleSnippet={parentId ? undefined : identityTitle}>
+<Panel titleSnippet={identityTitle}>
     <div class="flex gap-3">
         <Avatar user={$me?.name ?? ''} figure={$me?.figureString ?? ''} headOnly className="hidden shrink-0 xs:block" />
 
