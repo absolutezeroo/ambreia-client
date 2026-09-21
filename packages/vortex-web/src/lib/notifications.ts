@@ -127,6 +127,41 @@ export function markNotificationsRead(): Promise<{read: number}>
 }
 
 /**
+ * Listens for the unread count, live.
+ *
+ * Server-sent events, so the browser owns the reconnection: a dropped connection comes back on
+ * its own, which is most of why this is not a WebSocket. One direction is all it needs — the
+ * hotel tells, the tab listens — and it rides the cookie and the origin the site already has.
+ *
+ * The stream carries the COUNT and not the notification. The list has one shape and one place
+ * that reads it (`getNotifications`), and pushing a second copy of it down here would be a
+ * second shape to keep in step for no gain: the panel refetches when it opens anyway.
+ *
+ * Returns the closer. Calling it ends the connection and stops the browser retrying.
+ */
+export function listenToNotifications(onCount: (unread: number) => void): () => void
+{
+    const source = new EventSource('/api/user/notifications/stream');
+
+    source.onmessage = (event) =>
+    {
+        const unread = Number.parseInt(event.data, 10);
+
+        // A frame that is not a number is ignored rather than passed on as NaN — a proxy that
+        // injects a comment or a keep-alive should not blank the badge.
+        if(Number.isFinite(unread))
+        {
+            onCount(unread);
+        }
+    };
+
+    // No handler for `onerror` on purpose. EventSource retries by itself, and the one thing a
+    // handler here could usefully do — give up — is the one thing that would make a hotel
+    // restart cost every open tab its live count until a reload.
+    return () => source.close();
+}
+
+/**
  * The payload, parsed, or an empty object.
  *
  * Never throws: `data` is written by whichever handler raised the line, and a line that cannot be

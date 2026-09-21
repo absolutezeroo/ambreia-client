@@ -7,10 +7,12 @@
     // no notification centre at all (its notifications are e-mails, see
     // SETTINGS_ENABLE_NOTIFICATION_* in its own locale). So the toggle is the count, until an icon
     // is drawn for it the way icon_share and icon_comment were.
+    import {untrack} from 'svelte';
     import {link} from 'svelte-spa-router';
     import Avatar from './Avatar.svelte';
     import {
         getNotifications,
+        listenToNotifications,
         markNotificationsRead,
         type INotification,
     } from '../lib/notifications.js';
@@ -23,21 +25,34 @@
     let unread = $state(0);
     let items = $state<INotification[]>([]);
 
-    // Fetched once when the header mounts and again whenever the panel is opened. No polling: a
-    // notification that arrives while somebody is reading the site can wait for their next click,
-    // and a timer here would be a request per visitor per interval for a number that is usually
-    // zero.
+    // The count arrives on its own. One SSE connection per signed-in tab, opened when the session
+    // appears and closed when it goes or the component does — no polling, and no request at all
+    // between one notification and the next. The stream sends the current count as its first
+    // frame, so nothing needs fetching to fill the badge either.
+    //
+    // `untrack` is load-bearing and not a precaution. `$effect` subscribes to every `$state` it
+    // READS while it runs, and an earlier version called a loader that read `loading` on its
+    // first line before writing it — so the effect depended on a flag it set itself and re-ran on
+    // its own write. That measured 34,000 requests in six seconds and saturated a CPU core. The
+    // effect must depend on `$signedIn` and on nothing else, which is what this expresses.
     $effect(() =>
     {
-        if($signedIn)
+        const isSignedIn = $signedIn;
+
+        if(!isSignedIn)
         {
-            void load();
+            untrack(() =>
+            {
+                items = [];
+                unread = 0;
+            });
+
+            return;
         }
-        else
-        {
-            items = [];
-            unread = 0;
-        }
+
+        // Returned from the effect, so Svelte closes it when the session changes or the header
+        // unmounts. Without it, signing out and back in would leave a stream per attempt.
+        return listenToNotifications((count) => untrack(() => (unread = count)));
     });
 
     async function load()
@@ -58,10 +73,11 @@
         }
         catch
         {
-            // Silent. The bell is furniture on every page of the site: a hotel that is restarting
-            // must not put an error toast on the header of the shop.
+            // Silent, and the COUNT is left alone. The bell is furniture on every page of the
+            // site, so a hotel that is restarting must not put an error toast on the header of
+            // the shop — and must not blank a badge either: the stream is what fills that, and
+            // zeroing it here would throw away a number this failure knows nothing about.
             items = [];
-            unread = 0;
         }
         finally
         {
