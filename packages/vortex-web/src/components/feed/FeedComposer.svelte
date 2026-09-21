@@ -7,6 +7,7 @@
     import Panel from '../Panel.svelte';
     import Avatar from '../Avatar.svelte';
     import Button from '../Button.svelte';
+    import Sprite from '../Sprite.svelte';
     import {publish, FEED_KIND, type IFeedPost} from '../../lib/feed.js';
     import {getMyPhotos, getProfile, photoUrl, type IPhotoSummary} from '../../lib/api.js';
     import * as notifier from '../../lib/notifier.js';
@@ -32,6 +33,32 @@
     // Two empty boxes to start: the minimum a poll can have, so the form shows what it needs
     // rather than an "add a choice" button over nothing.
     let choices = $state(['', '']);
+
+    let identityOpen = $state(false);
+
+    // The screenshot's three, in its order. A list rather than three hand-written buttons so the
+    // markup below cannot drift from it — the poll tab was missing for exactly that reason once.
+    const TABS = [
+        {kind: FEED_KIND.STATUS, key: 'SITE_FEED_TAB_STATUS'},
+        {kind: FEED_KIND.PHOTO, key: 'SITE_FEED_TAB_PHOTOS'},
+        {kind: FEED_KIND.POLL, key: 'SITE_FEED_TAB_POLL'},
+    ] as const;
+
+    // Me first, then the groups — one list so the menu and the label read off the same thing and
+    // cannot disagree about what is selected.
+    let identities = $derived([
+        {
+            id: undefined as number | undefined,
+            name: t(parentId ? 'SITE_FEED_WRITE_AS_ME' : 'SITE_FEED_POST_AS_ME', {
+                name: $me?.name ?? '',
+            }),
+        },
+        ...groups.map((g) => ({id: g.id as number | undefined, name: g.name})),
+    ]);
+
+    let chosenIdentity = $derived(
+        identities.find((i) => i.id === groupId)?.name ?? identities[0].name,
+    );
 
     // Loaded when the tab is first opened rather than on mount: most posts are statuses, and a
     // player with three hundred photos should not pay for them to write one line.
@@ -143,19 +170,68 @@
     }
 </script>
 
+<!-- Closes on a click anywhere else, like `UserMenu` does. `event.target` is only an Element when
+     the click landed on one — a click on a text node has no `closest` and would throw, and a
+     TypeError in a window listener takes down the only thing that closes the menu. -->
+<svelte:window onclick={(event) =>
+{
+    const target = event.target instanceof Element ? event.target : null;
+
+    if(identityOpen && !target?.closest('[data-identity-menu]'))
+    {
+        identityOpen = false;
+    }
+}} />
+
 <!-- `POST AS PRODIIGY ▾` on a post, `WRITE AS PRODIIGY ▾` on a comment — the screenshot's own two
      captions, over the same control. A player in no group has nothing to choose between, so the
      band falls back to the plain caption rather than showing a menu of one. -->
 {#snippet identityTitle()}
     {#if groups.length}
-        <select bind:value={groupId} class="bg-transparent text-sm">
-            <option value={undefined}>
-                {t(parentId ? 'SITE_FEED_WRITE_AS_ME' : 'SITE_FEED_POST_AS_ME', {name: $me?.name ?? ''})}
-            </option>
-            {#each groups as group (group.id)}
-                <option value={group.id}>{group.name}</option>
-            {/each}
-        </select>
+        <!-- The site's own dropdown vocabulary, not a native `<select>`: the browser's listbox is
+             a white system panel dropped into a dark blue card, and it looked exactly as foreign
+             as it was. Borrowed from `UserMenu.svelte` — the `bg-pill` pastille with its 2px line
+             and `shadow-pill`, the `caret` sprite that turns on open, and the `bg-black/90`
+             rounded panel underneath. Not extracted into a shared component: the user menu's
+             geometry is very particular (70px of header clearance, a pinned avatar) and only the
+             look is shared. -->
+        <span class="relative inline-block align-middle" data-identity-menu>
+            <button
+                type="button"
+                onclick={() => (identityOpen = !identityOpen)}
+                aria-expanded={identityOpen}
+                class="relative block rounded-[3px] border-2 border-pill-line bg-pill py-[3px] pr-3 pl-8 font-condensed text-sm leading-[18px] text-white shadow-pill"
+            >
+                <Sprite
+                    name="caret"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 transition-transform duration-300 {identityOpen ? 'rotate-180' : ''}"
+                />
+                {chosenIdentity}
+            </button>
+
+            <!-- Opens DOWNWARD into the card's own body. `Panel` is `overflow-hidden`, so a panel
+                 that escaped the card upward would be clipped; there is always room below,
+                 because the form is under it. -->
+            <span
+                class="absolute top-full left-0 z-30 mt-1 block min-w-full overflow-hidden rounded-[10px] bg-black/90 transition-[max-height,opacity] duration-200 ease-out"
+                style="max-height:{identityOpen ? '240px' : '0'};opacity:{identityOpen ? 1 : 0}"
+            >
+                <span class="block py-2">
+                    {#each identities as identity (identity.id ?? 0)}
+                        <button
+                            type="button"
+                            onclick={() => {
+                                groupId = identity.id;
+                                identityOpen = false;
+                            }}
+                            class="block w-full px-4 py-1.5 text-left font-condensed text-sm leading-[22px] whitespace-nowrap {groupId === identity.id ? 'text-nav-link-active' : 'text-white hover:text-nav-link-hover'}"
+                        >
+                            {identity.name}
+                        </button>
+                    {/each}
+                </span>
+            </span>
+        </span>
     {:else}
         {t(parentId ? 'SITE_FEED_WRITE_AS' : 'SITE_FEED_POST_AS')}
     {/if}
@@ -174,10 +250,24 @@
         />
 
         <div class="min-w-0 flex-1">
-            <div class="mb-2 flex gap-4 text-sm">
-                <button type="button" class:font-bold={kind === FEED_KIND.STATUS} onclick={() => (kind = FEED_KIND.STATUS)}>{t('SITE_FEED_TAB_STATUS')}</button>
-                <button type="button" class:font-bold={kind === FEED_KIND.PHOTO} onclick={() => (kind = FEED_KIND.PHOTO)}>{t('SITE_FEED_TAB_PHOTOS')}</button>
-                <button type="button" class:font-bold={kind === FEED_KIND.POLL} onclick={() => (kind = FEED_KIND.POLL)}>{t('SITE_FEED_TAB_POLL')}</button>
+            <!-- A real tab strip, in the site's own tab vocabulary rather than three words with
+                 gaps between them: condensed and uppercase like `Tabs.svelte`, the active one in
+                 `text-nav-link-active` over a 2px underline that sits ON the rule, the rest muted
+                 with the same hover. The rule under the row is what makes it read as tabs at all —
+                 without it there is nothing for the active one to be attached to. -->
+            <div class="mb-3 flex gap-6 border-b border-rule">
+                {#each TABS as tab (tab.kind)}
+                    <button
+                        type="button"
+                        onclick={() => (kind = tab.kind)}
+                        aria-current={kind === tab.kind}
+                        class="-mb-px border-b-2 pb-1.5 font-condensed text-sm leading-[22px] uppercase {kind === tab.kind
+                            ? 'border-nav-link-active text-nav-link-active'
+                            : 'border-transparent text-white hover:text-nav-link-hover'}"
+                    >
+                        {t(tab.key)}
+                    </button>
+                {/each}
             </div>
 
             <textarea
