@@ -20,10 +20,63 @@
     import {t} from '../lib/i18n.js';
     import {signedIn} from '../lib/session.js';
 
+    // The doorbell, six frames of it. Imported rather than referenced by path so the bundler
+    // fingerprints them — and because each is about 530 bytes, well under Vite's 4KB inline
+    // threshold, all six become `data:` URIs: the swap below never touches the network and no
+    // frame can flash on its first showing.
+    const FRAMES = [1, 2, 3, 4, 5, 6].map(
+        (n) => new URL(`../assets/icon_doorbell_${n}.png`, import.meta.url).href,
+    );
+
+    /** How long one frame is held. Six of them makes the ring about half a second. */
+    const FRAME_MS = 80;
+
     let open = $state(false);
     let loading = $state(false);
     let unread = $state(0);
     let items = $state<INotification[]>([]);
+
+    // Which frame is showing. 0 is the resting one — the bell hangs still on every page of the
+    // site, and only rings when something arrives.
+    let frame = $state(0);
+    let ringing: ReturnType<typeof setInterval> | null = null;
+
+    /**
+     * Rings once, then goes back to rest.
+     *
+     * A timer, and unapologetically: it runs for half a second per notification, which is not a
+     * polling loop. What it must not do is outlive the component, hence the clear on unmount.
+     */
+    function ring()
+    {
+        if(ringing)
+        {
+            clearInterval(ringing);
+        }
+
+        frame = 0;
+
+        ringing = setInterval(() =>
+        {
+            frame += 1;
+
+            if(frame >= FRAMES.length)
+            {
+                frame = 0;
+
+                clearInterval(ringing!);
+                ringing = null;
+            }
+        }, FRAME_MS);
+    }
+
+    $effect(() => () =>
+    {
+        if(ringing)
+        {
+            clearInterval(ringing);
+        }
+    });
 
     // How many this player has in all, so the panel knows whether there are older ones. Without
     // it the bell showed the twenty most recent and nothing could reach past them.
@@ -56,7 +109,19 @@
 
         // Returned from the effect, so Svelte closes it when the session changes or the header
         // unmounts. Without it, signing out and back in would leave a stream per attempt.
-        return listenToNotifications((count) => untrack(() => (unread = count)));
+        return listenToNotifications((count) =>
+            untrack(() =>
+            {
+                // Rings only when the count went UP. The stream sends the current state as its
+                // first frame and again after a read clears it, and a bell that rang on the way
+                // down would chime at the person who just emptied it.
+                if(count > unread)
+                {
+                    ring();
+                }
+
+                unread = count;
+            }));
     });
 
     async function load()
@@ -181,12 +246,24 @@
         <button type="button" onclick={toggle}
                 aria-expanded={open}
                 aria-label={t('SITE_NOTIF_TITLE')}
-                class="relative z-[201] block rounded-[3px] border-2 border-pill-line bg-pill px-3 py-[5px] font-condensed text-base leading-[22px] text-white uppercase shadow-pill">
-            {t('SITE_NOTIF_TITLE')}
+                class="relative z-[201] flex items-center gap-1.5 rounded-[3px] border-2 border-pill-line bg-pill px-3 py-[5px] font-condensed text-base leading-[22px] text-white uppercase shadow-pill">
+            <!-- The box is pinned at the widest frame's 24px and the image centred in it: frame 3
+                 is 22 wide where the other five are 24, and left to flow the icon would step 1px
+                 sideways twice per ring. The word this replaced is still the control's accessible
+                 name, on `aria-label` above — an icon-only button with none would be unreadable
+                 to a screen reader. -->
+            <!-- Dimmed when there is nothing, full white when there is or while it rings.
+                 `opacity` and not `grayscale`, which would do nothing: the artwork is 142 pixels
+                 of pure #ffffff, measured — zero saturation, so there is no colour to remove. On
+                 this pill, white at half is what reads as grey. -->
+            <span class="flex h-[18px] w-6 items-center justify-center {unread > 0 || frame > 0 ? '' : 'opacity-50'}">
+                <img src={FRAMES[frame]} alt="" class="block" />
+            </span>
+
             {#if unread > 0}
                 <!-- The count only when there is one. A permanent "0" is a control that always
                      looks like it wants something. -->
-                <span class="ml-1.5 inline-block rounded-[3px] bg-danger px-1.5 leading-[18px]">{unread}</span>
+                <span class="inline-block rounded-[3px] bg-danger px-1.5 leading-[18px]">{unread}</span>
             {/if}
         </button>
 
