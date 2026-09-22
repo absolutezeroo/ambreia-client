@@ -10,7 +10,7 @@
     import EmptyResults from '../../components/EmptyResults.svelte';
     import FeedPost from '../../components/feed/FeedPost.svelte';
     import FeedComposer from '../../components/feed/FeedComposer.svelte';
-    import {getFeed, type IFeedPost} from '../../lib/feed.js';
+    import {getFeed, getPost, listenToFeed, type IFeedPost} from '../../lib/feed.js';
     import {t} from '../../lib/i18n.js';
     import {signedIn} from '../../lib/session.js';
     import {querystring, push, link} from 'svelte-spa-router';
@@ -46,6 +46,59 @@
 
         return () => (cancelled = true);
     });
+
+    // A second effect, and unlike the one above it depends on NOTHING — no `tag`, no state read
+    // at all — so it opens one stream for the life of the page and closes it on unmount. Folding
+    // it into the effect above would reopen the connection every time the filter changed.
+    $effect(() => listenToFeed((rootId) => void refresh(rootId)));
+
+    // What somebody else just did.
+    //
+    // The card is refetched rather than patched from the event, because the event carries an id
+    // and the card carries answers about ME: whether I liked it, whether I shared it, whether it
+    // is mine. Only my own fetch can answer those.
+    async function refresh(rootId: number)
+    {
+        const at = posts.findIndex((post) => post.id === rootId);
+
+        if(at < 0)
+        {
+            // A thread I am not showing: a brand-new post, or one under a filter I am not on.
+            // Refetching the page sorts both out — it either arrives at the top or it does not
+            // match the filter and nothing changes.
+            await reload();
+
+            return;
+        }
+
+        try
+        {
+            const fresh = await getPost(rootId);
+
+            // Assigned through the index so the `{#each}` key sees the same identity and only
+            // that one card re-renders.
+            posts[at] = fresh;
+        }
+        catch
+        {
+            // Gone — deleted while somebody was looking at it. Dropping it here beats leaving a
+            // card that answers 404 to every further click.
+            posts = posts.filter((post) => post.id !== rootId);
+        }
+    }
+
+    async function reload()
+    {
+        try
+        {
+            posts = (await getFeed({tag: tag || undefined})).items ?? [];
+        }
+        catch
+        {
+            // Silent: the page already has posts on it, and a failed background refresh must not
+            // empty a feed somebody is reading.
+        }
+    }
 
     function search(event: SubmitEvent)
     {

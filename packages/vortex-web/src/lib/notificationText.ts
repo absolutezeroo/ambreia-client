@@ -15,7 +15,8 @@ export function notificationHref(notification: INotification): string | null
 
     if(kind === NOTIFICATION.FEED_MENTIONED
         || kind === NOTIFICATION.FEED_COMMENTED
-        || kind === NOTIFICATION.FEED_REPOSTED)
+        || kind === NOTIFICATION.FEED_REPOSTED
+        || kind === NOTIFICATION.FEED_FAVOURITED)
     {
         // The feed has no per-post page, so the thread opens in the feed itself. `targetId` is the
         // post that was answered, not the answer — that is the thread worth opening.
@@ -126,6 +127,7 @@ const KEYS: Record<number, string> = {
     [NOTIFICATION.FEED_MENTIONED]: 'SITE_NOTIF_FEED_MENTIONED',
     [NOTIFICATION.FEED_COMMENTED]: 'SITE_NOTIF_FEED_COMMENTED',
     [NOTIFICATION.FEED_REPOSTED]: 'SITE_NOTIF_FEED_REPOSTED',
+    [NOTIFICATION.FEED_FAVOURITED]: 'SITE_NOTIF_FEED_FAVOURITED',
 
     [NOTIFICATION.PASSWORD_CHANGED]: 'SITE_NOTIF_PASSWORD',
     [NOTIFICATION.MFA_CHANGED]: 'SITE_NOTIF_MFA',

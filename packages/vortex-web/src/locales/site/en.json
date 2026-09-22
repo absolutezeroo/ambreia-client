@@ -150,6 +150,7 @@
     "SITE_NOTIF_FEED_MENTIONED": "{{name}} mentioned you.",
     "SITE_NOTIF_FEED_COMMENTED": "{{name}} replied to your post.",
     "SITE_NOTIF_FEED_REPOSTED": "{{name}} shared your post.",
+    "SITE_NOTIF_FEED_FAVOURITED": "{{name}} likes your post.",
     "SITE_NOTIF_PASSWORD": "Your password was changed.",
     "SITE_NOTIF_MFA": "Two-factor authentication was changed on your account.",
     "SITE_NOTIF_NAME": "Your name {{value}} was changed.",

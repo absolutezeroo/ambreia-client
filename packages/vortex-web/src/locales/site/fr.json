@@ -150,6 +150,7 @@
     "SITE_NOTIF_FEED_MENTIONED": "{{name}} t'a mentionné.",
     "SITE_NOTIF_FEED_COMMENTED": "{{name}} a répondu à ton message.",
     "SITE_NOTIF_FEED_REPOSTED": "{{name}} a partagé ton message.",
+    "SITE_NOTIF_FEED_FAVOURITED": "{{name}} aime ton message.",
     "SITE_NOTIF_PASSWORD": "Ton mot de passe a été changé.",
     "SITE_NOTIF_MFA": "L'authentification à deux facteurs a été modifiée sur ton compte.",
     "SITE_NOTIF_NAME": "Ton pseudo {{value}} a été changé.",

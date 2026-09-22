@@ -112,3 +112,39 @@ export function remove(postId: number, code?: string): Promise<unknown>
 
     return request(`/api/user/feed/${postId}${query}`, {method: 'DELETE'});
 }
+
+/**
+ * Listens for threads changing, live.
+ *
+ * `onChanged` is handed the id of the ROOT post that moved — a comment, a like, a share, a vote
+ * or a delete anywhere in that thread all name the root, because a reader's feed is a list of
+ * roots and the root is the card to refresh.
+ *
+ * The stream carries the ID and never the post. A post's `favoritedByMe`, `repostedByMe` and
+ * `mine` are answers about the READER, so one pushed copy would be right for whoever caused the
+ * change and wrong for everybody else watching. Each reader fetches that card for themselves.
+ *
+ * Anonymous, like the feed's other reads: a signed-out visitor watching the page sees it move
+ * too. Returns the closer.
+ */
+export function listenToFeed(onChanged: (rootPostId: number) => void): () => void
+{
+    const source = new EventSource('/api/public/feed/stream');
+
+    source.onmessage = (event) =>
+    {
+        // The opening frame is `ready`, which exists only so the connection has begun before
+        // anything happens on a quiet hotel. Anything that is not a number is ignored the same
+        // way — a proxy's keep-alive must not be read as a post id.
+        const rootId = Number.parseInt(event.data, 10);
+
+        if(Number.isFinite(rootId))
+        {
+            onChanged(rootId);
+        }
+    };
+
+    // No `onerror`: EventSource retries on its own, and giving up is the one thing that would
+    // make a hotel restart cost every open feed its live updates until a reload.
+    return () => source.close();
+}
