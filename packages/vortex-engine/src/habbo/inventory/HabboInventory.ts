@@ -750,9 +750,18 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
      * concrete class. The port had narrowed it, which is what left `requestAddNftsToTrading()`,
      * `running` and `ownUserNftItems` unreachable from the collectibles model.
      */
+    /**
+     * AS3 reads this as `getModel("trading")`, and `getModel()` is what runs the lazy `init()` —
+     * so in Flash the model exists the first time anything asks for it. The port returned the raw
+     * field, which is `undefined` until the player has opened the inventory at least once: every
+     * caller took its `?.` and did nothing, silently. That is why "Trade" in the avatar menu did
+     * nothing at all on a fresh session, and why the server's refusal popped no alert.
+     */
     // AS3: .../src/com/sulake/habbo/inventory/HabboInventory.as::get tradingModel()
     get tradingModel(): TradingModel
     {
+        if(!this._isInitialized) this.init();
+
         return this._tradingModel;
     }
 
@@ -1818,10 +1827,12 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
     /**
 	 * Opens a trade with another user in the room
 	 */
+    // AS3 opens with `if(!isInitialized) init();` — the trade is usually the first thing that ever
+    // asks for a model, so without it the click reached a model that did not exist yet.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/HabboInventory.as::setupTrading()
     setupTrading(userId: number): void
     {
-        this._tradingModel?.requestOpenTrading(userId);
+        this.tradingModel.requestOpenTrading(userId);
     }
 
     // --- ILinkEventTracker ---
@@ -2198,7 +2209,10 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
     // Ten identical AS3 methods, each `tradingModel?.handleMessageEvent(event)`. One here.
     private onTradingMessage = (event: IMessageEvent): void =>
     {
-        this._tradingModel?.handleMessageEvent(event);
+        // Through the getter, as AS3's ten one-liners do (`_inventory.tradingModel`): a refusal
+        // (TradeOpenFailed) can be the first trading message of the session, and on the raw field
+        // it was dropped — which is what swallowed the "trading is disabled here" alert.
+        this.tradingModel.handleMessageEvent(event);
     };
 
     /**
@@ -2211,13 +2225,10 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
      */
     private onTradingOpen = (event: IMessageEvent): void =>
     {
-        if(!this._tradingModel)
-        {
-            ErrorReportStorage.addDebugData('IncomingEvent', 'Trading open - inventory is null!');
-
-            return;
-        }
-
+        // AS3's first guard is `if(!_inventory)` — the inventory component, which here is `this`.
+        // The port tested `_tradingModel` instead and returned on the very case AS3 handles by
+        // creating it: a trade opened by the *other* player, before this one ever opened their
+        // inventory. Reading it through the getter below runs the lazy init AS3 relies on.
         const sessionData = this._sessionDataManager;
         const roomSession = this.roomSession;
 
@@ -2286,7 +2297,7 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
             otherUserCanTrade = swappedCanTrade;
         }
 
-        this._tradingModel.startTrading(
+        this.tradingModel.startTrading(
             userId,
             userName,
             userCanTrade,
