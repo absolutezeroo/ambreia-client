@@ -25,6 +25,10 @@
     let unread = $state(0);
     let items = $state<INotification[]>([]);
 
+    // How many this player has in all, so the panel knows whether there are older ones. Without
+    // it the bell showed the twenty most recent and nothing could reach past them.
+    let total = $state(0);
+
     // The count arrives on its own. One SSE connection per signed-in tab, opened when the session
     // appears and closed when it goes or the component does — no polling, and no request at all
     // between one notification and the next. The stream sends the current count as its first
@@ -70,6 +74,7 @@
 
             items = page.items ?? [];
             unread = page.unread;
+            total = page.total;
         }
         catch
         {
@@ -84,6 +89,43 @@
             loading = false;
         }
     }
+
+    /**
+     * Older notifications, appended.
+     *
+     * Same shape as the feed's, and the same reason for deriving the page from what is held: a
+     * notification can arrive while the panel is open, and a counter would then skip whichever
+     * one the arrival pushed across the boundary.
+     */
+    async function more()
+    {
+        if(loading || items.length >= total)
+        {
+            return;
+        }
+
+        loading = true;
+
+        try
+        {
+            const page = await getNotifications(Math.floor(items.length / PAGE_SIZE) + 1);
+            const held = new Set(items.map((item) => item.id));
+
+            items = [...items, ...(page.items ?? []).filter((item) => !held.has(item.id))];
+            total = page.total;
+        }
+        catch
+        {
+            // Silent, like the first read: the panel is furniture on every page of the site.
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    /** The server's own default page size, applied when the request names none. */
+    const PAGE_SIZE = 20;
 
     async function toggle()
     {
@@ -175,6 +217,18 @@
                 {:else}
                     <li class="px-3 py-1.5 text-white">{t('SITE_NOTIF_EMPTY')}</li>
                 {/each}
+
+                <!-- A plain underlined line rather than a Button: this sits inside a 320px dark
+                     panel of text rows, and a full-width crimson control at the bottom of it
+                     would read as the panel's action rather than as one more row. -->
+                {#if items.length < total}
+                    <li class="px-3 pt-2">
+                        <button type="button" onclick={more} disabled={loading}
+                                class="text-sm text-white underline hover:text-nav-link-hover disabled:no-underline">
+                            {t('SITE_NOTIF_MORE')}
+                        </button>
+                    </li>
+                {/if}
             </ul>
         </div>
     </div>

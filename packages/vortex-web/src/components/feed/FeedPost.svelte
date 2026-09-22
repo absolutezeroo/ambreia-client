@@ -124,6 +124,19 @@
         };
     }
 
+    /**
+     * Keeps the entry-level fields when the server hands the post back.
+     *
+     * `reposter` belongs to the feed ENTRY and not to the post, so every route that answers with
+     * a post — a vote, a reaction, a refetch — answers with it null: none of them knows which
+     * entry asked. Assigning that answer straight over `post` therefore erased the "X shared
+     * this" band the moment its reader liked it.
+     */
+    function keepEntry(answer: IFeedPost): IFeedPost
+    {
+        return {...answer, reposter: post.reposter};
+    }
+
     // Deleting takes the post's comments with it, including other people's, so it asks first —
     // through `ConfirmModal`, which is also what makes the second factor possible here. An account
     // with 2FA is asked for a code, because the server refuses the delete without one.
@@ -140,7 +153,7 @@
 
         try
         {
-            post = await getPost(post.id);
+            post = keepEntry(await getPost(post.id));
         }
         catch(failure)
         {
@@ -166,7 +179,7 @@
             // The server answers with the whole post, counters recomputed, so the card takes its
             // word rather than incrementing locally — which would drift the moment two readers
             // press at once.
-            post = await setReaction(post.id, kind, on);
+            post = keepEntry(await setReaction(post.id, kind, on));
         }
         catch(failure)
         {
@@ -220,6 +233,19 @@
         </span>
     {/if}
 {/snippet}
+
+<!-- A share is the SAME post appearing again under somebody else's name, so the card is the
+     author's card and the sharer goes in a line above it — never in the header, which would
+     attribute the writing to the wrong person.
+
+     Indented by the avatar column's width so the line starts where the card does rather than
+     where the head does; hidden below xs, where there is no avatar column to line up with. -->
+{#if post.reposter}
+    <p class="mb-1 flex items-center gap-1.5 text-sm text-white/70 xs:pl-[72px]">
+        <img src={ICON_SHARE} alt="" class="block" />
+        {t('SITE_FEED_SHARED_BY', {name: post.reposter.name})}
+    </p>
+{/if}
 
 <article class="flex gap-3">
     <!-- A post published under a group wears the GROUP'S BADGE, not its author's head. The row
@@ -292,7 +318,7 @@
             {/if}
 
             {#if post.kind === FEED_KIND.POLL}
-                <FeedPoll {post} onvoted={(updated) => (post = updated)} />
+                <FeedPoll {post} onvoted={(updated) => (post = keepEntry(updated))} />
             {/if}
 
             <!-- The counters bar. A signed-out visitor still reads every number — the two

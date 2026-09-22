@@ -477,6 +477,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/public/feed/stream": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Which thread just changed, as server-sent events. */
+        get: operations["FeedStream"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/public/shop/products": {
         parameters: {
             query?: never;
@@ -1060,6 +1077,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/user/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My notifications, newest first, with the unread count. */
+        get: operations["Notifications"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/user/notifications/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark every unread notification read. */
+        post: operations["NotificationsRead"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/user/notifications/stream": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A live count of unread notifications, as server-sent events. */
+        get: operations["NotificationsStream"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1199,6 +1267,7 @@ export interface components {
             favoritedByMe: boolean;
             mine: boolean;
             comments: components["schemas"]["FeedPost"][];
+            reposter?: components["schemas"]["FeedReposter"];
         };
         /**
          * Format: int32
@@ -1223,6 +1292,12 @@ export interface components {
         FeedReactionRequest: {
             kind: components["schemas"]["FeedReactionKind"];
             on: boolean;
+        };
+        FeedReposter: {
+            name: string;
+            figureString: string;
+            /** Format: date-time */
+            at: string;
         };
         FeedVoteRequest: {
             /** Format: int32 */
@@ -1285,6 +1360,44 @@ export interface components {
         };
         NameSelectResponse: {
             name: string;
+        };
+        Notification: {
+            /** Format: int32 */
+            id: number;
+            kind: components["schemas"]["NotificationKind"];
+            /** Format: date-time */
+            createdAt: string;
+            seen: boolean;
+            actor?: components["schemas"]["NotificationActor"];
+            /** Format: int32 */
+            targetId?: number | null;
+            data?: string | null;
+        };
+        NotificationActor: {
+            /** Format: int32 */
+            id: number;
+            name: string;
+            figureString: string;
+        };
+        /**
+         * Format: int32
+         * @enum {integer}
+         */
+        NotificationKind: 0 | 1 | 2 | 3 | 4 | 5 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 20 | 21 | 22 | 23 | 30 | 31 | 32 | 40 | 41 | 42 | 43 | 44 | 50 | 51 | 52 | 53 | 60 | 61 | 62 | 70 | 71 | 72;
+        NotificationPage: {
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            total: number;
+            /** Format: int32 */
+            unread: number;
+            items: components["schemas"]["Notification"][];
+        };
+        NotificationsReadResponse: {
+            /** Format: int32 */
+            read: number;
         };
         PasswordChangeResponse: {
             /** Format: int32 */
@@ -2393,6 +2506,24 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ApiErrorResponse"];
                 };
+            };
+        };
+    };
+    FeedStream: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -3993,7 +4124,9 @@ export interface operations {
     };
     FeedDelete: {
         parameters: {
-            query?: never;
+            query?: {
+                code?: string;
+            };
             header?: never;
             path: {
                 id: number;
@@ -4009,6 +4142,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EmptyResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
                 };
             };
             /** @description Unauthorized */
@@ -4028,6 +4170,103 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ApiErrorResponse"];
                 };
+            };
+        };
+    };
+    Notifications: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationPage"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    NotificationsRead: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationsReadResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    NotificationsStream: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
