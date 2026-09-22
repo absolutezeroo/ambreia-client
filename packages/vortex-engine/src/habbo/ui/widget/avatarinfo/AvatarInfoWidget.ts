@@ -361,6 +361,26 @@ export class AvatarInfoWidget extends RoomWidgetBase implements IContextMenuPare
     {
         if(this._avatarNameBubbles.has(userData.name)) return;
 
+        // TS-only: both callers gate on `getFriendNames().indexOf(name) > -1`, so a nametag over
+        // one's *own* avatar means the player is in their own friend list — a data fault the AS3
+        // would reproduce identically, and one nothing else in the client would ever surface.
+        // The bubble is placed by `userId`, not by `objectId`, so the pair is worth seeing too:
+        // two bubbles landing on the same avatar means the engine resolved one webId to the
+        // other's room object. AS3 has no counterpart; this is a diagnostic, like reportUnlocatable().
+        const ownUserId = this.container?.sessionDataManager?.userId ?? -1;
+
+        if(userData.webID === ownUserId)
+        {
+            log.warn(
+                `Name bubble for the player's own avatar ("${userData.name}", webId ${userData.webID}, `
+				+ `object ${objectId}): the friend list contains the player themselves.`
+            );
+        }
+        else
+        {
+            log.debug(`Name bubble for "${userData.name}" (webId ${userData.webID}, object ${objectId})`);
+        }
+
         const view = new UserNameView(this);
 
         UserNameView.setup(
