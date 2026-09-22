@@ -6,6 +6,9 @@ import type {IRoomEngineRectangle} from '@habbo/room/RoomEngine';
 import {RoomObjectCategoryEnum} from '@habbo/room/object/RoomObjectCategoryEnum';
 import {RoomWidgetGetObjectLocationMessage} from '../widget/messages/RoomWidgetGetObjectLocationMessage';
 import {RoomWidgetUserLocationUpdateEvent} from '../widget/events/RoomWidgetUserLocationUpdateEvent';
+import {Logger} from '@core/utils/Logger';
+
+const log = Logger.getLogger('habbo.ui.handler.ObjectLocationRequestHandler');
 
 /**
  * Answers "where is this object on screen?" — the one handler whose whole job is a synchronous
@@ -88,6 +91,8 @@ export class ObjectLocationRequestHandler implements IRoomWidgetHandler
                     [rectangle, screenLocation] = this.locate(session.roomId, userData.roomObjectId);
                 }
 
+                this.reportMiss(message, userData, screenLocation, session.roomId);
+
                 break;
             }
 
@@ -141,6 +146,51 @@ export class ObjectLocationRequestHandler implements IRoomWidgetHandler
             },
             {x: screenLocation.x + viewRect.x, y: screenLocation.y + viewRect.y}
         ];
+    }
+
+    // TS-only: rate limit for reportMiss() below — one line per (type, id, cause), not per frame.
+    private static readonly REPORTED_MISSES: Set<string> = new Set();
+
+    /**
+     * Says which half of the lookup came back empty, once per object.
+     *
+     * `AvatarInfoWidget.reportUnlocatable()` can only say "no screenLocation", because that is all
+     * the event carries — and the two causes need opposite fixes. Either the web id is not (or no
+     * longer) in this room's `userDataManager`, which means the view outlived the user data that
+     * created it, or the user *is* known and the engine has nothing on screen for its room object,
+     * which points at the object id or the canvas. AS3 has no counterpart; it never reports either.
+     */
+    // TS-only: diagnostic; the AS3 handler is silent on both cases.
+    private reportMiss(
+        message: RoomWidgetGetObjectLocationMessage,
+        userData: {name: string; roomObjectId: number} | null,
+        screenLocation: {x: number; y: number} | null,
+        roomId: number
+    ): void
+    {
+        if(screenLocation !== null) return;
+
+        const key = `${message.objectType}:${message.objectId}:${userData === null ? 'nodata' : 'noscreen'}`;
+
+        if(ObjectLocationRequestHandler.REPORTED_MISSES.has(key)) return;
+
+        ObjectLocationRequestHandler.REPORTED_MISSES.add(key);
+
+        if(userData === null)
+        {
+            log.warn(
+                `No user data for webId ${message.objectId} (type ${message.objectType}) in room ${roomId}: `
+				+ 'the view asking for this location outlived the user it was made for.'
+            );
+
+            return;
+        }
+
+        log.warn(
+            `"${userData.name}" (webId ${message.objectId}) is in userDataManager with roomObjectId `
+			+ `${userData.roomObjectId}, but room ${roomId} has no screen location for it on canvas `
+			+ `${this._container?.getFirstCanvasId() ?? -1}.`
+        );
     }
 
     // AS3: .../handler/ObjectLocationRequestHandler.as::getProcessedEvents()
