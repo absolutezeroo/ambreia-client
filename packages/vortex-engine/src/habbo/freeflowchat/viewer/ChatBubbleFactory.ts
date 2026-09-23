@@ -412,14 +412,19 @@ export class ChatBubbleFactory implements IGetImageListener, IAvatarImageListene
         return this._chatStyleLibrary;
     }
 
+    // DEVIATION: AS3 disposes every entry but never clears the array (only dispose() does), so
+    //   past 30 every face update re-disposes a list that only grows. `BitmapData.dispose()` and
+    //   `ImageBitmap.close()` are both no-ops the second time, so emptying it here changes nothing
+    //   but the growing walk and the references it kept alive.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/freeflowchat/viewer/ChatBubbleFactory.as::discardOldBitmaps()
-    // AS3 disposes every entry but never clears the array (only dispose() does) — kept as-is.
     private discardOldBitmaps(): void
     {
         for(const bitmap of this._disposableBitmaps)
         {
             bitmap?.close();
         }
+
+        this._disposableBitmaps.length = 0;
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/freeflowchat/viewer/ChatBubbleFactory.as::applySpecialChatContent()

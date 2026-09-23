@@ -1,5 +1,5 @@
 import {Container, Sprite, Texture, Graphics} from 'pixi.js';
-import type {FederatedPointerEvent} from 'pixi.js';
+import type {DestroyOptions, FederatedPointerEvent} from 'pixi.js';
 import type {IHabboFreeFlowChat} from '@habbo/freeflowchat/IHabboFreeFlowChat';
 import type {ChatItem} from '@habbo/freeflowchat/data/ChatItem';
 import {RoomSessionChatEvent} from '@habbo/session/events/RoomSessionChatEvent';
@@ -70,6 +70,13 @@ export class PooledChatBubble extends Container
     // TS-only: Flash carried the links on the TextField itself and reported clicks as TextEvents.
     private _textLayout: IChatTextLayout | null = null;
     private readonly _clipMask: Graphics = new Graphics();
+
+    // TS-only: whether `_faceSprite`'s texture is a crop this bubble made (and must destroy), or
+    // the factory's shared face, which other bubbles are still drawing.
+    private _ownsFaceTexture: boolean = false;
+
+    // TS-only: one measuring context for every bubble; `layoutChatText()` only reads metrics off it.
+    private static _measureCtx: OffscreenCanvasRenderingContext2D | null = null;
 
     private _minHeight: number = -1;
     private _useDesktopMargins: boolean = false;
@@ -218,8 +225,7 @@ export class PooledChatBubble extends Container
 
         const runs = buildChatTextRuns(item.text, userName, style.isAnonymous, isShout, italic, textColor, linkColor, item.links);
 
-        const measureCanvas = new OffscreenCanvas(1, 1);
-        const measureCtx = measureCanvas.getContext('2d')!;
+        const measureCtx = PooledChatBubble._measureCtx ??= new OffscreenCanvas(1, 1).getContext('2d')!;
         const innerWidth = Math.max(1, maxWidth - margins.x - margins.width);
         const layout = layoutChatText(measureCtx, runs, fontFace, fontSize, innerWidth);
         const multiline = layout.lines.length > 1;
@@ -273,6 +279,10 @@ export class PooledChatBubble extends Container
         }
 
         // 7. Face
+        const previousFace = this._ownsFaceTexture ? this._faceSprite.texture : null;
+
+        this._ownsFaceTexture = false;
+
         if(this._face && style.faceOffset)
         {
             let faceBitmap = this._face;
@@ -284,6 +294,7 @@ export class PooledChatBubble extends Container
 
                 cropCtx.drawImage(faceBitmap, 0, faceBitmap.height - contentHeight, faceBitmap.width, contentHeight, 0, 0, faceBitmap.width, contentHeight);
                 faceBitmap = cropCanvas.transferToImageBitmap();
+                this._ownsFaceTexture = true;
             }
 
             this._faceSprite.texture = Texture.from(faceBitmap);
@@ -306,6 +317,8 @@ export class PooledChatBubble extends Container
             this.removeChild(this._faceSprite);
         }
 
+        if(previousFace) PooledChatBubble.destroyOwnedTexture(previousFace);
+
         // 8. Text
         const textCanvas = new OffscreenCanvas(Math.max(1, layout.width), Math.max(1, layout.height));
         const textCtx = textCanvas.getContext('2d')!;
@@ -314,7 +327,11 @@ export class PooledChatBubble extends Container
 
         this._textLayout = layout;
 
+        const previousText = this._textSprite.texture;
+
         this._textSprite.texture = Texture.from(textCanvas.transferToImageBitmap());
+
+        PooledChatBubble.destroyOwnedTexture(previousText);
         this._textSprite.position.set(margins.x, margins.y);
         // AS3 (PooledChatBubble.as:148-155) fades the TextField to 60% for the same `italic`
         // condition the font above already reads - whispers and every system chat type - and
@@ -365,6 +382,40 @@ export class PooledChatBubble extends Container
         }
 
         this._textSprite.mask = null;
+    }
+
+    /**
+     * Frees the two textures a bubble rasterizes for itself: the text, and a cropped face.
+     *
+     * `Texture.from(imageBitmap)` files each texture in Pixi's global `Cache`, keyed by the
+     * bitmap, and only a `destroy()` takes it out again. Replacing them without one kept every
+     * chat line ever shown alive on the GPU, pool or no pool. The shared face and the style's
+     * pointer/emblem are never passed here — other bubbles are drawing them.
+     */
+    // TS-only: Flash's TextField and BitmapData were garbage-collected with the bubble.
+    private static destroyOwnedTexture(texture: Texture): void
+    {
+        if(texture === Texture.EMPTY || texture.destroyed) return;
+
+        const resource: unknown = texture.source.resource;
+
+        texture.destroy(true);
+
+        if(resource instanceof ImageBitmap) resource.close();
+    }
+
+    // TS-only: see destroyOwnedTexture(); a pooled or one-shot bubble takes its textures with it.
+    override destroy(options?: DestroyOptions): void
+    {
+        PooledChatBubble.destroyOwnedTexture(this._textSprite.texture);
+
+        if(this._ownsFaceTexture) PooledChatBubble.destroyOwnedTexture(this._faceSprite.texture);
+
+        this._textSprite.texture = Texture.EMPTY;
+        this._faceSprite.texture = Texture.EMPTY;
+        this._ownsFaceTexture = false;
+
+        super.destroy(options);
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/freeflowchat/viewer/visualization/ChatBubble.as::moveTo()
