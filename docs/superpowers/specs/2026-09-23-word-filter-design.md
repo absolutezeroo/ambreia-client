@@ -98,7 +98,7 @@ notification.
 
 | Column | Type | Notes |
 |---|---|---|
-| `id` | long | |
+| `id` | int | `VortexEntity`'s |
 | `player_id` | int | |
 | `source` | `WordFilterSource` | `RoomChat`, `Messenger`, `RoomInvite`, `Motto`, `Username`, `FeedPost`, … (batch 2 appends) |
 | `word_id` | int | the first word that matched |
@@ -130,7 +130,8 @@ span while leaving everything around it — punctuation, casing of the rest, emo
 1. lower-case (invariant);
 2. accents removed: the character's NFKD decomposition, first character kept (`é → e`, `ﬁ`-style
    ligatures keep their first letter);
-3. leetspeak folded: `4 @ → a`, `3 → e`, `1 ! → i`, `0 → o`, `5 $ → s`, `7 → t`;
+3. leetspeak folded: `4 @ → a`, `3 → e`, `1 → i`, `0 → o`, `5 $ → s`, `7 → t` — not `!`, which
+   would turn `con!` into `coni` and cost it its word boundary;
 4. anything still not `[a-z0-9]` becomes a space.
 
 **Per-word pattern.** The normalised word, with consecutive repeats collapsed (`coon → con`), becomes
@@ -163,6 +164,10 @@ public interface IWordFilter
 {
     // Filters `text` written by `playerId` for `source`, journals any hit, and answers what to do.
     WordFilterResult Apply(string text, WordFilterSource source, int playerId);
+
+    // What Apply would answer, journaling nothing: the name probe (every keystroke) and the
+    // dashboard's try-a-sentence box.
+    WordFilterResult Test(string text);
 
     // The notification text for a refusal, from `word_filter.refused_message`.
     string RefusedMessage { get; }
