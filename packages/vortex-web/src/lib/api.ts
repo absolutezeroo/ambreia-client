@@ -142,6 +142,9 @@ const ERRORS: Record<string, string> = {
     'feed_group_not_member': 'SITE_ERROR_FEED_GROUP_NOT_MEMBER',
     'feed_post_not_found': 'SITE_ERROR_FEED_POST_NOT_FOUND',
     'feed_kind_mismatch': 'SITE_ERROR_FEED_KIND_MISMATCH',
+    // The hotel-wide word filter refused the body or a poll choice. A word it only REPLACES never
+    // reaches here: the post publishes with the word swapped, and the card shows it that way.
+    'feed_word_filtered': 'SITE_ERROR_FEED_WORD_FILTERED',
 };
 
 export class ApiError extends Error

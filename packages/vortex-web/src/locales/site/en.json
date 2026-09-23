@@ -85,6 +85,7 @@
     "SITE_ERROR_FEED_GROUP_NOT_MEMBER": "You are not a member of that group.",
     "SITE_ERROR_FEED_POST_NOT_FOUND": "This post does not exist.",
     "SITE_ERROR_FEED_KIND_MISMATCH": "That doesn't match the tab you're posting from.",
+    "SITE_ERROR_FEED_WORD_FILTERED": "Your message contains a forbidden word.",
     "SITE_PASSWORD_SHOW": "Show the password",
     "SITE_PASSWORD_HIDE": "Hide the password",
     "SITE_PHOTO_PREVIOUS": "Previous photo",

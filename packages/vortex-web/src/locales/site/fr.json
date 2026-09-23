@@ -85,6 +85,7 @@
     "SITE_ERROR_FEED_GROUP_NOT_MEMBER": "Tu ne fais pas partie de ce groupe.",
     "SITE_ERROR_FEED_POST_NOT_FOUND": "Cette publication n'existe pas.",
     "SITE_ERROR_FEED_KIND_MISMATCH": "Ça ne correspond pas à l'onglet depuis lequel tu publies.",
+    "SITE_ERROR_FEED_WORD_FILTERED": "Ton message contient un mot interdit.",
     "SITE_PASSWORD_SHOW": "Afficher le mot de passe",
     "SITE_PASSWORD_HIDE": "Masquer le mot de passe",
     "SITE_PHOTO_PREVIOUS": "Photo précédente",
