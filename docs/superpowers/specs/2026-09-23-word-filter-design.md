@@ -1,7 +1,10 @@
 # The hotel-wide word filter — design
 
 **Date:** 2026-09-23
-**Status:** approved, not yet implemented
+**Status:** batch 1 implemented (emulator merge 1c0c8e23f, vortex-web dad9cea1); batch 2 not started.
+Deviations from this text are recorded in the plan's rulings — notably: doubled letters in a listed
+word are kept (so "ass" does not ban "as"), and a Partial word matches inside one word, never across
+the space between two.
 **Packages:** `../vortex-emulator` (`Vortex.Database`, `Vortex.Primitives`, `Vortex.Observability`,
 `Vortex.Rooms`, `Vortex.Social`, `Vortex.Players`, `Vortex.PacketHandlers`, `Vortex.WebApi`,
 `Vortex.Dashboard.API`, `Vortex.Dashboard.Web`), `packages/vortex-web` (one refusal message)
