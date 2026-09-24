@@ -3,6 +3,7 @@ import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
 import type {IRoomEngine} from '@habbo/room/IRoomEngine';
 import type {ILimitedItemGridOverlayWidget} from '@habbo/window/widgets/ILimitedItemGridOverlayWidget';
 import {ProductContainer} from './ProductContainer';
+import {Logger} from '@core/utils/Logger';
 
 /**
  * A single-product offer's grid item (the common, non-multi/bundle case).
@@ -52,6 +53,9 @@ export class SingleProductContainer extends ProductContainer
 
         const catalog = this.offer.page?.viewer?.catalog ?? null;
         const assetName = (loader as {assetName?: string} | null)?.assetName ?? null;
+
+        // PROBE (throwaway): did the Spaces thumbnail download come back, and into what.
+        Logger.getLogger('habbo.catalog.viewer.SingleProductContainer').warn(`PROBE spaces icon ready: asset=${assetName} catalog=${catalog !== null} target=${this.targetIcon ? `${this.targetIcon.name} ${this.targetIcon.width}x${this.targetIcon.height} disposed=${this.targetIcon.disposed}` : null} inLibrary=${!!catalog?.assets?.getAssetByName(assetName ?? '')}`);
 
         if(catalog === null || assetName === null) return;
 

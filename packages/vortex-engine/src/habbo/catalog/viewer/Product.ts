@@ -242,6 +242,9 @@ export class Product extends ProductGridItem implements IProduct
                         }
                     }
 
+                    // PROBE (throwaway): the Spaces grid thumbnails.
+                    log.warn(`PROBE spaces icon: class=${className} asset=${assetName} target=${target ? (target as {name?: string}).name : null} hasAsset=${this.catalog.assets?.hasAsset(assetName)} callback=${!!onPreviewImageReady}`);
+
                     this.catalog.setImageFromAsset(target, assetName, onPreviewImageReady);
 
                     break;
