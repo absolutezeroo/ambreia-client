@@ -1031,6 +1031,11 @@ export class RoomVisualization extends RoomObjectSpriteVisualization
                         best = dist;
                         bestInfo = `type=${probePlane.type} loc=${probePlane.location} normal=${probePlane.normal}`;
                     }
+
+                    if(probePlane.type === RoomPlane.TYPE_LANDSCAPE && dist < 1)
+                    {
+                        log.warn(`PROBE   landscape candidate dist=${dist.toFixed(4)} loc=${probePlane.location} normal=${probePlane.normal} id=${probePlane.id}`);
+                    }
                 }
 
                 log.warn(`PROBE mask ${maskIdx}: type=${maskType} category=${maskCategory} loc=${maskLoc} nearestPlaneDist=${best.toFixed(4)} ${bestInfo}`);
@@ -1091,6 +1096,14 @@ export class RoomVisualization extends RoomObjectSpriteVisualization
                 }
             }
         }
+
+        // PROBE (throwaway): the landscape planes this room has, and what the masks left them as.
+        log.warn(`PROBE landscape planes=${landscapePlaneIndices.length} active=[${activeLandscapePlanes.join(',')}] ` + landscapePlaneIndices.map((idx) =>
+        {
+            const probePlane = this._planes[idx];
+
+            return `#${idx}{id=${probePlane.id} canBeVisible=${probePlane.canBeVisible} visible=${probePlane.visible} hasTexture=${probePlane.hasTexture} loc=${probePlane.location} normal=${probePlane.normal}}`;
+        }).join(' '));
 
         // Reset visible plane cache if visibility changed
         if(visibilityChanged)
