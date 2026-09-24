@@ -83,9 +83,11 @@ export class BackgroundColorFurniWidget extends RoomWidgetBase
     public open(objectId: number, hue: number, saturation: number, lightness: number): void
     {
         this._objectId = objectId;
-        this._hue = Math.max(hue, 0);
-        this._saturation = Math.max(saturation, 0);
-        this._lightness = Math.max(lightness, 0);
+        // `| 0` is AS3's `int` field coercion: a toner never set has no stuff data, the model answers
+        // NaN, and AS3 stores 0 where a plain number kept NaN and put every knob at x = NaN.
+        this._hue = Math.max(hue, 0) | 0;
+        this._saturation = Math.max(saturation, 0) | 0;
+        this._lightness = Math.max(lightness, 0) | 0;
 
         this.createWindow();
     }
@@ -155,8 +157,8 @@ export class BackgroundColorFurniWidget extends RoomWidgetBase
 
     /**
      * AS3 packs the three 8-bit channels into one int and hands it to `ColorConverter.hslToRGB()`,
-     * then fills a bitmap the size of the swatch. This port paints the window instead of
-     * allocating a BitmapData per slider tick — the swatch is a flat fill either way.
+     * then fills a bitmap the size of the swatch. The port used to set the window's `color`
+     * instead, which a bitmap wrapper never paints — the swatch stayed empty on every tick.
      */
     // AS3: BackgroundColorFurniWidget.as::renderColorPreview()
     private renderColorPreview(): void
@@ -168,8 +170,14 @@ export class BackgroundColorFurniWidget extends RoomWidgetBase
         if(preview === null) return;
 
         const packed = ((this._hue & 0xFF) << 16) + ((this._saturation & 0xFF) << 8) + (this._lightness & 0xFF);
+        const canvas = new OffscreenCanvas(Math.max(1, preview.width), Math.max(1, preview.height));
+        const context = canvas.getContext('2d');
 
-        preview.color = ColorConverter.hslToRGB(packed);
+        if(context === null) return;
+
+        context.fillStyle = '#' + (ColorConverter.hslToRGB(packed) & 0xFFFFFF).toString(16).padStart(6, '0');
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        preview.bitmap = canvas.transferToImageBitmap();
     }
 
     /**
