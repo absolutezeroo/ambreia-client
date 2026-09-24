@@ -1,8 +1,8 @@
 # Photo albums — design
 
 **Date:** 2026-09-24
-**Status:** written, not yet built or tested (branch `feat/word-filter-2` of the emulator; the EF
-migration, `openapi.json` and `pnpm api:types` wait for the first build)
+**Status:** delivered 2026-09-24 — emulator `42492c585` (migration `AddWebAlbums`), merged into
+main with the word filter's batch 2; site `45a75565`
 **Packages:** `../vortex-emulator` (`Vortex.Database`, `Vortex.Primitives`, `Vortex.WebApi`),
 `packages/vortex-web`
 
