@@ -72,6 +72,26 @@ texts, guide-session chat and guide request description. On Refuse, each answers
 refusal the sink already has; where it has none, the text is not saved and the player gets the
 notification.
 
+Decided while building it (branch `feat/word-filter-2`):
+
+- **Keys are strict, like names.** A room tag (a search key), a pet's name and a bot's name (the
+  wired bot actions find a bot by it) refuse on any hit — `WordFilterSourceRules.IsStrict`. Bot
+  *lines* are prose and are only replaced.
+- **Where the refusal goes.** Groups answer `GuildEditFailed` reason 1 (the client's "Invalid Group
+  name"); room ads, catalogue purchases and gifts answer `PurchaseError`; the pet-name check answers
+  code 4 (the client's `catalog.alert.petname.bobba`); a wired chest simply does not get its success
+  reply, so its dialog stays open; a contract answers its usual failed result. Everything else is
+  the bubble alone.
+- **Before anything is debited** — groups, room ads, purchases and gifts filter before the grain.
+- **A purchase's extra parameter:** only its first line (the pet's or bot's name), and never a line of
+  digits only — a group id "455" folds to "ass".
+- **Wired** is filtered in `RoomActionModule.ApplyWiredUpdateAsync`, on the span each box declares
+  as prose (`FurnitureWiredLogic.ProseInStringParam`): the whole text for show-message, kick, mute
+  and write-to-log; the line after the bot's name for the two bot-talk boxes. Every other box's
+  string is a key (a bot name, a trigger keyword, a time zone) and is left alone.
+- **Not filtered:** a room's password, a forum reply's title (the forum ignores it), a gift's
+  receiver name (a lookup key).
+
 **Out, each for a stated reason**
 
 - **Staff-facing text** — call-for-help, web reports, mod tools. Filtering what a player reports
