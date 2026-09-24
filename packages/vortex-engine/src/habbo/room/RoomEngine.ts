@@ -2094,8 +2094,22 @@ export class RoomEngine extends Component implements IRoomEngine,
         this.events.emit('contentLoaded', type, success);
     }
 
-    objectInitialized(roomId: string, objectId: number, category: number): void 
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::objectInitialized()
+    // TODO(AS3): only the wall-item branch is ported. Still owed from the same method: re-applying
+    //   the stuff data through `furniture_data_format` (RoomObjectDataUpdateMessage), dispatching
+    //   REOE_CONTENT_UPDATED, and `addObjectToTileMap()` for any room but "temporary_room".
+    objectInitialized(roomId: string, objectId: number, category: number): void
     {
+        // A window's logic learns its mask type in initialize(), which runs when the furni's content
+        // lands — usually after addObjectWallItem() already asked for the mask and found none. This
+        // is AS3's second chance; without it no window loaded with the room ever cut the wall open.
+        const numericRoomId = parseInt(roomId, 10);
+
+        if(category === RoomObjectCategoryEnum.OBJECT_CATEGORY_WALL && !isNaN(numericRoomId))
+        {
+            this.updateObjectRoomWindow(numericRoomId, objectId);
+        }
+
         this.events.emit('objectInitialized', roomId, objectId, category);
     }
 
@@ -5010,10 +5024,13 @@ export class RoomEngine extends Component implements IRoomEngine,
 
         const model = object.getModelController();
 
-        if(model) 
+        if(model)
         {
             model.setNumber(RoomObjectVariableEnum.FURNITURE_DATA, state);
         }
+
+        // AS3 ends updateObjectWallItem() with this: a window moved by the server re-cuts its hole.
+        this.updateObjectRoomWindow(roomId, id);
 
         return true;
     }

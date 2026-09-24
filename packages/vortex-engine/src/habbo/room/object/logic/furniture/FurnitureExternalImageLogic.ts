@@ -35,11 +35,12 @@ export class FurnitureExternalImageLogic extends FurnitureMultiStateLogic
             return;
         }
 
-        const config = data as { mask?: Array<{ type?: string }> };
+        // AS3 reads `<mask type="…"/>` off the logic XML; the Nitro bundle carries the same value
+        // as `logic.maskType` (see FurnitureLogic.initialize() for the `logic` nesting).
+        const maskType = (data as { logic?: { maskType?: string } }).logic?.maskType;
 
-        if(config.mask && config.mask.length > 0 && config.mask[0].type)
+        if(maskType)
         {
-            const maskType = config.mask[0].type;
             const model = this.object?.getModelController();
 
             if(model)
