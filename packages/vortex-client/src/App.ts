@@ -764,6 +764,12 @@ const LIBRARY_IMAGE_NAMES: ReadonlySet<string> = new Set([
     // already covered by the prefix rule above.
     'icon_hc',
     'minting_token_large',
+
+    // ProductContainer.setAddOnIcon(): the add-on marker on an offer that bundles a badge / chat
+    // style or the ninja effect. Read through the method's parameter, so the literal grep missed
+    // them; without them the null asset threw and took the whole catalog page down with it.
+    'catalog_icon_badge_included',
+    'catalog_icon_ninja_effect_included',
     'stickie_blanco',
     'stickie_close',
     'stickie_remove',
