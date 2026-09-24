@@ -258,7 +258,17 @@ export class SpacesNewCatalogWidget extends ItemGridCatalogWidget
             // a fixed closure, so there is no equivalent stale-list quirk to reproduce - starting
             // a fresh interval over the CURRENT offer list here instead achieves the obviously
             // intended behavior (progressively load every item in the selected category).
-            if(this._useTimer && this._graphicsTimer == null)
+            // The interval init() started runs over the empty list createOfferGroups() left, and
+            // loadItemGridGraphics() only clears a timer once it reaches the end of a NON-empty
+            // list — so it never stops, `_graphicsTimer` is never null, and a `== null` guard here
+            // meant the fresh interval never started: only the direct call's 3 tiles got icons.
+            if(this._graphicsTimer != null)
+            {
+                clearInterval(this._graphicsTimer);
+                this._graphicsTimer = null;
+            }
+
+            if(this._useTimer)
             {
                 this._graphicsTimer = setInterval(() => this.loadItemGridGraphics(loadGraphics), 25);
             }
