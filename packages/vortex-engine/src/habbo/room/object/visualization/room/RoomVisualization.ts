@@ -1011,6 +1011,31 @@ export class RoomVisualization extends RoomObjectSpriteVisualization
 
             if(!maskLoc) continue;
 
+            // PROBE (throwaway): which wall plane each mask is nearest to, and by how much it misses.
+            {
+                let best = Infinity;
+                let bestInfo = '';
+
+                for(const probePlane of this._planes)
+                {
+                    if(probePlane.type !== RoomPlane.TYPE_WALL && probePlane.type !== RoomPlane.TYPE_LANDSCAPE) continue;
+
+                    const probeDiff = Vector3d.dif(maskLoc, probePlane.location as Vector3d);
+
+                    if(!probeDiff) continue;
+
+                    const dist = Math.abs(Vector3d.scalarProjection(probeDiff, probePlane.normal as Vector3d));
+
+                    if(dist < best)
+                    {
+                        best = dist;
+                        bestInfo = `type=${probePlane.type} loc=${probePlane.location} normal=${probePlane.normal}`;
+                    }
+                }
+
+                log.warn(`PROBE mask ${maskIdx}: type=${maskType} category=${maskCategory} loc=${maskLoc} nearestPlaneDist=${best.toFixed(4)} ${bestInfo}`);
+            }
+
             for(let planeIdx = 0; planeIdx < this._planes.length; planeIdx++)
             {
                 const plane = this._planes[planeIdx];
