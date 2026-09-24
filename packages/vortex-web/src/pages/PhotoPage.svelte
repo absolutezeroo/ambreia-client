@@ -28,6 +28,7 @@
     import Sprite from '../components/Sprite.svelte';
     import PhotoLike from '../components/PhotoLike.svelte';
     import EmptyResults from '../components/EmptyResults.svelte';
+    import ProfileHeader from '../components/ProfileHeader.svelte';
     import * as api from '../lib/api.js';
     import type {IPhotoSummary} from '../lib/api.js';
     import {t, formatLongDate} from '../lib/i18n.js';
@@ -136,17 +137,21 @@
 
 <svelte:window onkeydown={onKey} />
 
-<main class="mx-auto max-w-[1200px] px-3 py-6 text-center">
-    {#if photo}
-        <!-- `creation.html` puts `<habbo-profile-header>` INSIDE the small header, as the band the
-             profile page uses, carrying `<h1><small translate="BY"> <span>{{creator_name}}</span>`.
-             DEVIATION: App.svelte renders the small header once for every page, so a page cannot
-             put anything inside it without the shell's help. The line is here instead, at the top of
-             the content, with habbo.com's own `BY` key and the owner's name linking to them. -->
-        <h1 class="mt-0 text-left">
-            <small class="font-condensed text-base">{t('BY')}</small>
-            <a href="/profile/{photo.ownerName}" use:link>{photo.ownerName}</a>
+<!-- `creation.html`: `<habbo-profile-header user="creator_name">` — the profile page's band, in its
+     large-head form, carrying `<h1><small class="creation__header-by" translate="BY"> <span>name`.
+     The whole band links to the owner's profile, which is what the head and the plate do there.
+     `.creation__header-by{font-size:20px}`, and the h1 keeps its case like the profile's. -->
+{#if photo}
+    <ProfileHeader name={photo.ownerName} figure={photo.ownerFigureString}>
+        <h1 class="m-0 normal-case">
+            <small class="text-xl">{t('BY')}</small>
+            <span>{photo.ownerName}</span>
         </h1>
+    </ProfileHeader>
+{/if}
+
+<main class="mx-auto max-w-[1200px] px-3 pb-6 text-center">
+    {#if photo}
 
         <!-- `.creation-content { display:inline-block; margin: 0 69px from 532 }` — the margin is
              what the two 69px arrow columns hang in, via the expander's matching -69px. -->

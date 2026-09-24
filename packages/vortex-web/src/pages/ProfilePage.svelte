@@ -21,6 +21,7 @@
     import EmptyResults from '../components/EmptyResults.svelte';
     import ProfileListModal from '../components/ProfileListModal.svelte';
     import PhotoColumns from '../components/PhotoColumns.svelte';
+    import ProfileHeader from '../components/ProfileHeader.svelte';
     import {me} from '../lib/session.js';
     import type {Snippet} from 'svelte';
     import * as api from '../lib/api.js';
@@ -34,9 +35,6 @@
     // `.profile__card__wrapper--<kind> .profile__card__aligner::before`: a 140px-tall illustration
     // hanging ABOVE each card, which the aligner's own `margin-top:140px` reserves the room for.
     // The four PNGs were already mirrored into src/assets/ and had never been used.
-    // `.profile__header`'s own background — fetched by tools/fetch-assets.mjs like every other
-    // habbo.com bitmap here, and gitignored with them.
-    const HEADER_BAND = new URL('../assets/profile_header.png', import.meta.url).href;
 
     const TEASERS = {
         badges: new URL('../assets/teaser_profile_badges.png', import.meta.url).href,
@@ -194,53 +192,18 @@
     });
 </script>
 
-<!-- `.profile__header`: a room shot behind the avatar, name and motto, `left bottom / 100%` and
-     `image-rendering: pixelated` — it IS pixel art, and smoothing it turns the tiles to mush. The
-     `::before` under it is a 2px gradient, which is what stops the band ending on a hard line.
+<!-- `habbo-profile-header profile="true"`: the whole avatar, the name and the motto.
+     `.profile-header__details h1{text-transform:none}` — the one h1 on the site that keeps its
+     case. It was rendering "ADMIN" where habbo.com renders "Admin". -->
+<ProfileHeader profile name={user?.name ?? wanted} figure={user?.figureString ?? ''}>
+    <h1 class="m-0 normal-case">{user?.name ?? wanted}</h1>
 
-     DEVIATION: habbo.com hangs this on the SMALL HEADER itself
-     (`<habbo-header-small class="profile__header">`), so the room art runs behind the logo and the
-     navigation as one continuous band — `habbo-header-small{background:#069}` is what it replaces.
-     Here the header and the navigation are rendered by `App.svelte` for every route, and reaching
-     up to repaint them from one page would mean a store or prop-drilling through the shell for a
-     background image. The band therefore starts below the navigation. Its own proportions are
-     habbo.com's exactly, which is what puts the avatar, the name and the motto where they belong. -->
-<header class="relative mb-6 w-full bg-[length:100%] bg-[position:left_bottom] bg-no-repeat [image-rendering:pixelated] after:absolute after:-bottom-[2px] after:left-0 after:h-[2px] after:w-full after:bg-gradient-to-b after:from-black/30 after:to-transparent after:content-['']"
-        style="background-image:url({HEADER_BAND})">
-    <!-- `profile-header.html`, and the port had almost none of it:
-         `.profile-header__avatar` reserves 46px and `align-self: flex-start`, while
-         `.profile-header__image` inside it is 104 wide with `margin-left:16px; margin-right:24px`
-         and a `::before` 88px disc at (-16, 24) — so the avatar OVERFLOWS its slot and tucks under
-         the details plate, which reserves 58px of left padding for exactly that.
-
-         `.profile-header__details` is the part that was missing entirely: a translucent black plate
-         (rgba(0,0,0,.5), rounded 3px, 500px wide) holding the name and the motto. Without it the
-         name sat on the room art with nothing behind it.
-
-         And `.profile-header__details h1{text-transform:none}` — this is the one h1 on the site that
-         keeps its case. It was rendering "ADMIN" where habbo.com renders "Admin". -->
-    <!-- `habbo-profile-header{display:flex; align-items:center; height:142px}`, with
-         `padding-left: 90px` from 767 and `130px` from 959. The height and that padding are the
-         whole of the band's proportions — this port had a `py-6` strip about half as tall with the
-         avatar hard against the left edge, which is why it never lined up with habbo.com's. -->
-    <div class="mx-auto flex h-[142px] max-w-[1200px] items-center px-3 md:pl-[90px] lg:pl-[130px]">
-        <div class="w-[46px] shrink-0 self-start">
-            <div class="relative ml-4 mr-6 w-[104px] pt-[5px] before:absolute before:-left-4 before:top-6 before:h-[88px] before:w-[88px] before:rounded-full before:border-2 before:border-pill-line before:bg-pill before:shadow-pill before:content-['']">
-                <Avatar figure={user?.figureString ?? ""} size="m" direction={2} className="relative block" />
-            </div>
-        </div>
-
-        <div class="min-w-0 max-w-[500px] flex-1 self-center rounded-[3px] bg-black/50 py-3 pl-[58px] pr-6 break-all">
-            <h1 class="m-0 normal-case">{user?.name ?? wanted}</h1>
-
-            {#if user?.motto}
-                <!-- `.profile__motto`: Ubuntu Habbo, 14px, one line with an ellipsis, and
-                     habbo.com's own text shadow. -->
-                <div class="truncate text-sm leading-[1.4] [text-shadow:0_1px_rgba(0,0,0,0.3)]">{user.motto}</div>
-            {/if}
-        </div>
-    </div>
-</header>
+    {#if user?.motto}
+        <!-- `.profile__motto`: Ubuntu Habbo, 14px, one line with an ellipsis, and
+             habbo.com's own text shadow. -->
+        <div class="truncate text-sm leading-[1.4] [text-shadow:0_1px_rgba(0,0,0,0.3)]">{user.motto}</div>
+    {/if}
+</ProfileHeader>
 
 <main class="mx-auto max-w-[1200px] px-3">
     {#if error}
