@@ -145,6 +145,14 @@ const ERRORS: Record<string, string> = {
     // The hotel-wide word filter refused the body or a poll choice. A word it only REPLACES never
     // reaches here: the post publishes with the word swapped, and the card shows it that way.
     'feed_word_filtered': 'SITE_ERROR_FEED_WORD_FILTERED',
+    // Photo albums — WebApiEndpoints.Album.cs. Ours too.
+    'album_not_found': 'SITE_ERROR_ALBUM_NOT_FOUND',
+    'album_title_invalid': 'SITE_ERROR_ALBUM_TITLE_INVALID',
+    'album_description_too_long': 'SITE_ERROR_ALBUM_DESCRIPTION_TOO_LONG',
+    'album_empty': 'SITE_ERROR_ALBUM_EMPTY',
+    'album_photo_not_yours': 'SITE_ERROR_ALBUM_PHOTO_NOT_YOURS',
+    'album_full': 'SITE_ERROR_ALBUM_FULL',
+    'album_word_filtered': 'SITE_ERROR_ALBUM_WORD_FILTERED',
 };
 
 export class ApiError extends Error

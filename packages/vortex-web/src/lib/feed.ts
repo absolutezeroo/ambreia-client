@@ -14,6 +14,8 @@ export type IFeedPost = Schemas['FeedPost'];
 export type IFeedPage = Schemas['FeedPage'];
 export type IFeedPoll = Schemas['FeedPoll'];
 export type IFeedPollChoice = Schemas['FeedPollChoice'];
+export type IFeedAlbum = Schemas['FeedAlbum'];
+export type IAlbum = Schemas['Album'];
 
 // The kinds come across as their numbers, which is what the wire carries — see
 // Vortex.Primitives/Feed/FeedPostKind.cs, where they are decided. Naming them here keeps
@@ -22,6 +24,8 @@ export const FEED_KIND = {
     STATUS: 0,
     PHOTO: 1,
     POLL: 2,
+    // Never sent by the composer: `createAlbum()` posts the card. The feed only reads it.
+    ALBUM: 3,
 } as const;
 
 // Vortex.Primitives/Feed/FeedReactionKind.cs decides these numbers, the same way FeedPostKind
@@ -111,6 +115,44 @@ export function remove(postId: number, code?: string): Promise<unknown>
     const query = code ? `?code=${encodeURIComponent(code)}` : '';
 
     return request(`/api/user/feed/${postId}${query}`, {method: 'DELETE'});
+}
+
+// Albums — ../../../vortex-emulator/Vortex.WebApi/Hosting/WebApiEndpoints.Album.cs. Here rather than
+// in a file of their own because an album IS a feed card: it has no delete of its own, and is
+// deleted through `remove(album.feedPostId)` above.
+
+/** One album and its photos. Throws `album_not_found` for an id that is not readable. */
+export function getAlbum(id: number): Promise<IAlbum>
+{
+    return request(`/api/public/albums/${id}`);
+}
+
+/** One player's albums, newest first. */
+export function getPlayerAlbums(uniqueId: string): Promise<IFeedAlbum[]>
+{
+    return request(`/api/public/users/${encodeURIComponent(uniqueId)}/albums`);
+}
+
+/** Create an album out of my own published photos; its card goes into the feed. */
+export function createAlbum(body: {title: string; description: string; photoKeys: string[]}): Promise<IAlbum>
+{
+    return request('/api/user/albums', {method: 'POST', body});
+}
+
+export function editAlbum(id: number, body: {title: string; description: string}): Promise<IAlbum>
+{
+    return request(`/api/user/albums/${id}`, {method: 'PUT', body});
+}
+
+/** Add photos; a photo already in the album is skipped. Brings the card back to the top. */
+export function addAlbumPhotos(id: number, photoKeys: string[]): Promise<IAlbum>
+{
+    return request(`/api/user/albums/${id}/photos`, {method: 'POST', body: {photoKeys}});
+}
+
+export function removeAlbumPhoto(id: number, photoKey: string): Promise<IAlbum>
+{
+    return request(`/api/user/albums/${id}/photos/${encodeURIComponent(photoKey)}`, {method: 'DELETE'});
 }
 
 /**

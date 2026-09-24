@@ -27,6 +27,7 @@
         type IFeedPost,
     } from '../../lib/feed.js';
     import {photoUrl} from '../../lib/api.js';
+    import {link} from 'svelte-spa-router';
     import {groupBadgeUrl, hideOnError} from '../../lib/config.js';
     import {t} from '../../lib/i18n.js';
     import {signedIn} from '../../lib/session.js';
@@ -56,7 +57,9 @@
     // "PRODIIGY published 2 new pictures" / "posted a new poll" / "updated his/her status" — the
     // screenshot's three headings, one per kind.
     let heading = $derived(
-        post.kind === FEED_KIND.PHOTO
+        post.kind === FEED_KIND.ALBUM
+            ? t('SITE_FEED_POSTED_ALBUM')
+            : post.kind === FEED_KIND.PHOTO
             ? t('SITE_FEED_PUBLISHED_PICTURES', {count: String(post.photos?.length ?? 0)})
             : post.kind === FEED_KIND.POLL
               ? t('SITE_FEED_POSTED_POLL')
@@ -282,7 +285,29 @@
 
     <div class="min-w-0 flex-1">
         <Panel title="{post.groupName ?? post.authorName}  {heading}" className={comment ? 'bg-panel-head' : ''}>
-            <p class="mb-3"><FeedBody body={post.body} /></p>
+            <!-- An album's card has no body of its own: it shows the album, and links to its page,
+                 where the rest of the photos and the owner's controls are. -->
+            {#if post.kind === FEED_KIND.ALBUM && post.album}
+                <a href="/community/albums/{post.album.id}" use:link class="mb-3 block hover:border-b-0">
+                    <h3 class="m-0">{post.album.title}</h3>
+
+                    {#if post.album.description}
+                        <p class="mt-1 mb-0 text-white/80">{post.album.description}</p>
+                    {/if}
+
+                    <div class="mt-2 grid grid-cols-4 gap-1">
+                        {#each post.album.photos as photo (photo.key)}
+                            <img src={photoUrl(photo.key)} alt="" class="w-full" loading="lazy" />
+                        {/each}
+                    </div>
+
+                    <span class="mt-1 block text-sm underline">
+                        {t('SITE_ALBUM_PHOTO_COUNT', {count: String(post.album.photoCount)})}
+                    </span>
+                </a>
+            {:else}
+                <p class="mb-3"><FeedBody body={post.body} /></p>
+            {/if}
 
             <!-- One photo shown big, the others as thumbnails under it — not a grid of equals.
                  A grid of four halves every picture to fit the card; a gallery shows the one being
@@ -425,7 +450,7 @@
         onClose={() => (confirming = false)}
         onDone={() => ondeleted?.()}
     >
-        {t('SITE_FEED_DELETE_CONFIRM')}
+        {t(post.kind === FEED_KIND.ALBUM ? 'SITE_ALBUM_DELETE_CONFIRM' : 'SITE_FEED_DELETE_CONFIRM')}
     </ConfirmModal>
 {/if}
 

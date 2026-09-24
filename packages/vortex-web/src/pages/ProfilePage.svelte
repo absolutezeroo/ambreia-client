@@ -25,6 +25,7 @@
     import type {Snippet} from 'svelte';
     import * as api from '../lib/api.js';
     import type {IPlayerProfile, IPhotoSummary} from '../lib/api.js';
+    import {getPlayerAlbums, type IFeedAlbum} from '../lib/feed.js';
     import type {IProfileListKind} from '../components/ProfileListModal.svelte';
     import {loadBadgeTexts, badgeName} from '../lib/badges.js';
     import {badgeUrl, groupBadgeUrl, hideOnError} from '../lib/config.js';
@@ -69,6 +70,7 @@
 
     let profile = $state<IPlayerProfile | null>(null);
     let photos = $state<IPhotoSummary[]>([]);
+    let albums = $state<IFeedAlbum[]>([]);
     let texts = $state({});
     let error = $state('');
     let loading = $state(true);
@@ -150,6 +152,11 @@
                 void api.getPlayerPhotos(found.uniqueId)
                     .then((loaded) => !cancelled && (photos = loaded))
                     .catch(() => !cancelled && (photos = []));
+
+                // Albums the same way, for the same reason.
+                void getPlayerAlbums(found.uniqueId)
+                    .then((loaded) => !cancelled && (albums = loaded))
+                    .catch(() => !cancelled && (albums = []));
 
                 // The badge texts are a second fetch and a big one; the page must not wait on it to
                 // render, so the labels fill in when it lands.
@@ -389,6 +396,28 @@
         <h2 class="mt-0">{t('PROFILE_PHOTOS_TITLE')}</h2>
         <PhotoColumns bind:photos />
         <p class="mt-3"><a href="/community/photos" use:link>{t('PHOTOS_TITLE')}</a></p>
+    </section>
+{/if}
+
+<!-- Albums: ours, not habbo.com's, so the section borrows the photo section's frame above and
+     shows each album as its first photo, its title and its count. Absent when there are none,
+     like the photos. -->
+{#if albums.length}
+    <section class="mx-auto max-w-[1200px] px-3 py-6">
+        <h2 class="mt-0">{t('SITE_ALBUMS_TITLE')}</h2>
+        <ul class="flex flex-wrap">
+            {#each albums as album (album.id)}
+                <li class="w-1/2 pb-3 pr-3 xs:w-1/3 xl:w-1/5">
+                    <a href="/community/albums/{album.id}" use:link class="block hover:border-b-0">
+                        {#if album.photos?.[0]}
+                            <img src={api.photoUrl(album.photos[0].key)} alt="" class="w-full border-[3px] border-card-line" loading="lazy" />
+                        {/if}
+                        <span class="mt-1.5 block overflow-hidden">{album.title}</span>
+                        <span class="block text-sm text-ink">{t('SITE_ALBUM_PHOTO_COUNT', {count: String(album.photoCount)})}</span>
+                    </a>
+                </li>
+            {/each}
+        </ul>
     </section>
 {/if}
 

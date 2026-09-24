@@ -494,6 +494,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/public/albums/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One album and its photos. */
+        get: operations["Album"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/users/{uniqueId}/albums": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One player's albums, newest first. */
+        get: operations["PlayerAlbums"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/public/shop/products": {
         parameters: {
             query?: never;
@@ -1077,6 +1111,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/user/albums": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create an album and post its card to the feed. */
+        post: operations["AlbumCreate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/user/albums/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Rename one of your albums. */
+        put: operations["AlbumEdit"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/user/albums/{id}/photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add photos to one of your albums; its card comes back up. */
+        post: operations["AlbumAddPhotos"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/user/albums/{id}/photos/{photoKey}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Take one photo out of one of your albums. */
+        delete: operations["AlbumRemovePhoto"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/user/notifications": {
         parameters: {
             query?: never;
@@ -1135,6 +1237,33 @@ export interface components {
         AccountEmailResponse: {
             email: string;
             verified: boolean;
+        };
+        Album: {
+            /** Format: int32 */
+            id: number;
+            /** Format: int32 */
+            feedPostId: number;
+            ownerUniqueId: string;
+            ownerName: string;
+            ownerFigureString: string;
+            title: string;
+            description: string;
+            /** Format: date-time */
+            createdAt: string;
+            mine: boolean;
+            photos: components["schemas"]["PhotoSummary"][];
+        };
+        AlbumCreateRequest: {
+            title: string;
+            description?: string | null;
+            photoKeys?: string[] | null;
+        };
+        AlbumEditRequest: {
+            title: string;
+            description?: string | null;
+        };
+        AlbumPhotosRequest: {
+            photoKeys?: string[] | null;
         };
         ApiErrorResponse: {
             error: string;
@@ -1217,6 +1346,15 @@ export interface components {
             readonly isValid: boolean;
         };
         EmptyResponse: Record<string, never>;
+        FeedAlbum: {
+            /** Format: int32 */
+            id: number;
+            title: string;
+            description: string;
+            /** Format: int32 */
+            photoCount: number;
+            photos: components["schemas"]["PhotoSummary"][];
+        };
         FeedPage: {
             /** Format: int32 */
             page: number;
@@ -1268,12 +1406,13 @@ export interface components {
             mine: boolean;
             comments: components["schemas"]["FeedPost"][];
             reposter?: components["schemas"]["FeedReposter"];
+            album?: components["schemas"]["FeedAlbum"];
         };
         /**
          * Format: int32
          * @enum {integer}
          */
-        FeedPostKind: 0 | 1 | 2;
+        FeedPostKind: 0 | 1 | 2 | 3;
         FeedPublishRequest: {
             kind: components["schemas"]["FeedPostKind"];
             body: string;
@@ -2524,6 +2663,59 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    Album: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Album"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    PlayerAlbums: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                uniqueId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeedAlbum"][];
+                };
             };
         };
     };
@@ -4142,6 +4334,213 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EmptyResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    AlbumCreate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AlbumCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Album"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    AlbumEdit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AlbumEditRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Album"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    AlbumAddPhotos: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AlbumPhotosRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Album"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    AlbumRemovePhoto: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+                photoKey: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Album"];
                 };
             };
             /** @description Bad Request */

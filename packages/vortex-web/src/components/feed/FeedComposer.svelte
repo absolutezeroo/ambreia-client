@@ -8,7 +8,7 @@
     import Avatar from '../Avatar.svelte';
     import Button from '../Button.svelte';
     import Sprite from '../Sprite.svelte';
-    import {publish, FEED_KIND, type IFeedPost} from '../../lib/feed.js';
+    import {publish, createAlbum, getPost, FEED_KIND, type IFeedPost} from '../../lib/feed.js';
     import {getMyPhotos, getProfile, photoUrl, type IPhotoSummary} from '../../lib/api.js';
     import * as notifier from '../../lib/notifier.js';
     import {t} from '../../lib/i18n.js';
@@ -36,13 +36,22 @@
 
     let identityOpen = $state(false);
 
-    // The screenshot's three, in its order. A list rather than three hand-written buttons so the
-    // markup below cannot drift from it — the poll tab was missing for exactly that reason once.
-    const TABS = [
+    // The screenshot's three, in its order, and the album after them. A list rather than
+    // hand-written buttons so the markup below cannot drift from it — the poll tab was missing for
+    // exactly that reason once. No album on a comment: an album is a card of its own.
+    let tabs = $derived([
         {kind: FEED_KIND.STATUS, key: 'SITE_FEED_TAB_STATUS'},
         {kind: FEED_KIND.PHOTO, key: 'SITE_FEED_TAB_PHOTOS'},
         {kind: FEED_KIND.POLL, key: 'SITE_FEED_TAB_POLL'},
-    ] as const;
+        ...(parentId ? [] : [{kind: FEED_KIND.ALBUM, key: 'SITE_FEED_TAB_ALBUM'}]),
+    ]);
+
+    // The album's name; its description is the textarea every tab shares.
+    let title = $state('');
+
+    // The server's caps: four photos on a post, a hundred in an album (WebApiAlbumService).
+    let photoCap = $derived(kind === FEED_KIND.ALBUM ? 100 : 4);
+    let picking = $derived(kind === FEED_KIND.PHOTO || kind === FEED_KIND.ALBUM);
 
     // Two 1:1 pixel icons that say which kind of author a row is — a person or a guild. They are
     // different sizes on purpose (18x18 and 13x11) and are NOT stretched to match: each sits at
@@ -76,7 +85,7 @@
     // an empty list for exactly the player it exists to help. See `GET /api/user/photos`.
     $effect(() =>
     {
-        if(kind !== FEED_KIND.PHOTO || photosLoaded || !$me?.uniqueId)
+        if(!picking || photosLoaded || !$me?.uniqueId)
         {
             return;
         }
@@ -122,9 +131,9 @@
     {
         chosen = chosen.includes(key)
             ? chosen.filter((k) => k !== key)
-            // Four is the server's cap; refusing the fifth here rather than letting the request
-            // fail is the difference between a disabled thumbnail and a red toast.
-            : chosen.length < 4
+            // The server's cap; refusing one more here rather than letting the request fail is
+            // the difference between a disabled thumbnail and a red toast.
+            : chosen.length < photoCap
               ? [...chosen, key]
               : chosen;
     }
@@ -135,7 +144,9 @@
     let filledChoices = $derived(choices.map((c) => c.trim()).filter((c) => c.length > 0));
 
     let ready = $derived(
-        kind === FEED_KIND.PHOTO
+        kind === FEED_KIND.ALBUM
+            ? Boolean(title.trim()) && chosen.length > 0
+            : kind === FEED_KIND.PHOTO
             ? chosen.length > 0
             // A poll needs its question AND at least two answers; the server refuses either way,
             // and `PollInvalid` is a worse way to learn it than a disabled button.
@@ -155,15 +166,27 @@
 
         try
         {
-            onpublished(await publish({
-                kind,
-                body,
-                parentId,
-                photoKeys: kind === FEED_KIND.PHOTO ? chosen : undefined,
-                pollChoices: kind === FEED_KIND.POLL ? filledChoices : undefined,
-                groupId,
-            }));
+            if(kind === FEED_KIND.ALBUM)
+            {
+                // The album route answers the album; the feed wants its card, which is one read.
+                const album = await createAlbum({title, description: body, photoKeys: chosen});
+
+                onpublished(await getPost(album.feedPostId));
+            }
+            else
+            {
+                onpublished(await publish({
+                    kind,
+                    body,
+                    parentId,
+                    photoKeys: kind === FEED_KIND.PHOTO ? chosen : undefined,
+                    pollChoices: kind === FEED_KIND.POLL ? filledChoices : undefined,
+                    groupId,
+                }));
+            }
+
             body = '';
+            title = '';
             chosen = [];
             choices = ['', ''];
         }
@@ -280,7 +303,7 @@
                  with the same hover. The rule under the row is what makes it read as tabs at all —
                  without it there is nothing for the active one to be attached to. -->
             <div class="mb-3 flex gap-6 border-b border-rule">
-                {#each TABS as tab (tab.kind)}
+                {#each tabs as tab (tab.kind)}
                     <button
                         type="button"
                         onclick={() => (kind = tab.kind)}
@@ -294,15 +317,27 @@
                 {/each}
             </div>
 
+            {#if kind === FEED_KIND.ALBUM}
+                <input
+                    bind:value={title}
+                    maxlength="60"
+                    placeholder={t('SITE_ALBUM_TITLE_PLACEHOLDER')}
+                    aria-label={t('SITE_ALBUM_TITLE_PLACEHOLDER')}
+                    class="mb-2 w-full rounded-[5px] border-[3px] border-field-line bg-field px-3 py-[5px] text-base leading-[1.2] text-field-ink shadow-field placeholder:text-[#888] focus:border-field-line-focus focus:bg-white focus:outline-none"
+                />
+            {/if}
+
             <textarea
                 bind:value={body}
                 maxlength="500"
                 rows="3"
-                placeholder={t(parentId ? 'SITE_FEED_COMMENT_PLACEHOLDER' : 'SITE_FEED_POST_PLACEHOLDER')}
+                placeholder={t(kind === FEED_KIND.ALBUM
+                    ? 'SITE_ALBUM_DESCRIPTION_PLACEHOLDER'
+                    : parentId ? 'SITE_FEED_COMMENT_PLACEHOLDER' : 'SITE_FEED_POST_PLACEHOLDER')}
                 class="w-full rounded-[5px] border-[3px] border-field-line bg-field px-3 py-[5px] text-base leading-[1.2] text-field-ink shadow-field placeholder:text-[#888] focus:border-field-line-focus focus:bg-white focus:outline-none"
             ></textarea>
 
-            {#if kind === FEED_KIND.PHOTO}
+            {#if picking}
                 <div class="mt-2 grid grid-cols-4 gap-1">
                     {#each mine as photo (photo.key)}
                         <button
