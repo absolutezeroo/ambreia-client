@@ -38,6 +38,8 @@ import {SortableSprite} from './utils/SortableSprite';
 import {ObjectMouseData} from './utils/ObjectMouseData';
 import {RoomCullingMode} from './RoomCullingMode';
 import {RoomObjectUserTypes} from '@habbo/room/object/RoomObjectUserTypes';
+import {RoomObjectVariableEnum} from '@habbo/room/object/RoomObjectVariableEnum';
+import type {IVector3d} from '@room/utils/IVector3d';
 import {RoomObjectSpriteData} from '@room/data/RoomObjectSpriteData';
 import type {IRoomObjectSprite} from '@room/object/visualization/IRoomObjectSprite';
 import {StringUtil} from '@habbo/utils/StringUtil';
@@ -74,6 +76,14 @@ interface IObjectSpriteCache {
      */
     // TS-only: AS3 reads the model in both places; the port caches the answer, which is constant.
     accurateZ: boolean;
+
+    // TS-only: the three below feed the stacking DEVIATION in renderObject().
+    /** A resting object's tile key, height above its floor, and base depth before re-basing. */
+    stackTile: number;
+    stackHeight: number;
+    stackBase: number;
+    /** A ground object's most-forward sprite depth, kept so a cache hit can still report it. */
+    groundFront: number;
     spriteCount: number;
     sprites: SortableSprite[];
 }
@@ -327,18 +337,23 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
     private static readonly STACK_EPSILON: number = 0.02;
 
     /**
-     * Depth an object resting on furniture is pulled forward, per unit of height above its own
-     * floor — enough to outrank the layers of whatever holds it up. The DEVIATION in
-     * {@link renderObject} has the reasoning; this is where the number comes from.
-     *
-     * Measured against the furni pack, not guessed. A support's most-forward layer sits at
-     * `z / -1000 * sqrt(0.5)`, so the lift has to beat `|forward| / stackHeight` for that support:
-     * `hc_exe_table` needs **2.127** and 06751d42 shipped 2.0, which is why one of its nine layers
-     * kept cutting through `classic3_floor2` after the fix that was supposed to have settled it.
-     * `scripts/check-stack-depth.mjs` recomputes this over every furni and fails on that pair.
+     * Depth an object resting on furniture is pulled forward per unit of height, so that within
+     * one tile's stack the higher object draws over the lower. Deliberately tiny: it only orders
+     * the stack against itself. Beating the support's own forward layers is done per tile, by
+     * `_tileGroundFront` — see the DEVIATION in {@link renderObject}.
      */
     // TS-only: see the DEVIATION in renderObject().
-    private static readonly STACK_LIFT: number = 2.5;
+    private static readonly STACK_TIE: number = 0.01;
+
+    /**
+     * Per tile, this frame: the most-forward sprite depth of any object resting on the ground there.
+     * Tile key is `x * 65536 + y`. Cleared at the start of every frame; never reallocated.
+     */
+    // TS-only: see the DEVIATION in renderObject().
+    private _tileGroundFront: Map<number, number> = new Map();
+
+    // TS-only: the resting objects drawn this frame, re-based against `_tileGroundFront` before the sort.
+    private _stackedThisFrame: IObjectSpriteCache[] = [];
 
     /**
      * The floor's own altitude at a tile, excluding anything stacked on it — `RoomEngine` wires this
@@ -964,6 +979,9 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
         // knowing the room loop is slow and knowing which part of it to fix.
         FrameTimings.begin(FRAME_CHANNEL_ROOM_OBJECTS);
 
+        this._tileGroundFront.clear();
+        this._stackedThisFrame.length = 0;
+
         for(let i = 0; i < objectCount; i++)
         {
             const object = this._roomObjectContainer.getRoomObjectWithIndex(i);
@@ -972,6 +990,25 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
             if(object !== null && objectId !== null)
             {
                 spriteIndex += this.renderObject(object, objectId, time, force, spriteIndex);
+            }
+        }
+
+        // A resting object only has to outrank what holds it up, so it is pulled forward to just
+        // ahead of the most-forward sprite on the ground of its own tile - and no further. See the
+        // DEVIATION in renderObject(); it has to wait until every object has reported its tile.
+        for(const stacked of this._stackedThisFrame)
+        {
+            const front = this._tileGroundFront.get(stacked.stackTile);
+
+            if(front === undefined) continue;
+
+            const shift = front - RoomRenderingCanvas.STACK_TIE * stacked.stackHeight - stacked.stackBase;
+
+            if(shift >= 0) continue;
+
+            for(let i = 0; i < stacked.spriteCount; i++)
+            {
+                stacked.sprites[i].z += shift;
             }
         }
 
@@ -1434,17 +1471,31 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
             baseZ += (-screenPos.x) * 1.2e-7;
         }
 
+        // See the DEVIATION below `cache.screenY = screenY` for what these decide.
+        const location = object.getLocation();
+        const floorHeight = this.floorHeightAt?.(Math.round(location.x), Math.round(location.y)) ?? location.z;
+        const onTile = !cache.accurateZ && floorHeight >= 0 && this.floorHeightAt !== null;
+        const stacked = onTile && (location.z - floorHeight) > RoomRenderingCanvas.STACK_EPSILON;
+
         const instanceId = visualization.getInstanceId();
         const updateId = visualization.getUpdateID();
 
+        // A resting object never takes the early-out: its sprites are re-based every frame after
+        // the object loop, against a support that may itself have moved.
         if(!force &&
+            !stacked &&
             cache.initialized &&
             cache.instanceId === instanceId &&
             cache.updateId === updateId &&
             cache.screenX === screenX &&
             cache.screenY === screenY &&
-            cache.screenZ === baseZ) 
+            cache.screenZ === baseZ)
         {
+            if(onTile)
+            {
+                this.recordGroundFront(object, location, cache.groundFront);
+            }
+
             return cache.spriteCount;
         }
 
@@ -1479,16 +1530,23 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
         //   *negative*: -0.707 .. -2.127. Six of its nine layers are therefore still in front of a
         //   clamped 0, and the rug went back under the table it stands on. Clamping cannot reach
         //   them - the offsets it removes are the stacked object's own, and the ones that beat it
-        //   belong to the support. So the object's base depth is pulled forward as well, by
-        //   STACK_LIFT per unit of height above its floor, which is the only term that moves it
-        //   past a layer of something else.
+        //   belong to the support. So the object's base depth is pulled forward as well.
         //
-        //   ponytail: one scalar, and it cannot be universally right - it has to outrank another
-        //   object's layers (which reach +/-5.66) while a tile step is worth only 0.7071. 2.5
-        //   clears `hc_exe_table`'s 2.127 with margin; the price is that a stacked object leaks
-        //   ~3.5 tiles forward against objects on the ground in front of it. Ceiling, and the
-        //   upgrade path: a per-tile stack order instead of one depth scalar.
-        //   `scripts/check-stack-depth.mjs` reports what the constant covers over the whole pack.
+        //   How far is a per-tile question, not a per-height one. It used to be one scalar,
+        //   STACK_LIFT = 2.5 per unit of height: sized for `hc_exe_table`, it pulled every stack
+        //   2.5 depth units forward per unit - a one-unit stack 3.5 tiles, a four-high stack of
+        //   crates fourteen - and drew it over an avatar standing on the tile in front, which sits
+        //   only 0.7071 + 0.01 ahead. Now every object on the ground reports its most-forward
+        //   sprite to `_tileGroundFront` for each tile it covers, and after the object loop a
+        //   resting object is pulled to just ahead of that value on its own tile (STACK_TIE per
+        //   unit of height orders the stack against itself). A plain support (p50 of the pack:
+        //   0.071 forward) now lifts what rests on it by that much instead of by 2.5.
+        //
+        //   ponytail: two ceilings. A support whose front layers already reach past the next tile
+        //   (a quarter of the pack reaches 0.709) takes what rests on it that far too - the same
+        //   distance its own layers go in the AS3. And a resting object is keyed on its own origin
+        //   tile, so it misses a support that covers some other tile under it only if that
+        //   support's footprint does not include the origin.
         // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/room/renderer/_SafeCls_3073.as::renderObject()
         //
         //   A negative floor height is not a floor: `RoomPlaneParser` writes TILE_BLOCKED (-110) and
@@ -1509,18 +1567,11 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
         //   every wall item and only on wall items (AS3 `_SafeCls_90.as::addObjectWallItem()`
         //   l.3297, this port's `RoomEngine.addRoomObjectWallItem()`), and it means "this z is
         //   exact, do not round it to a tile" - which is the same thing as "not on a tile".
-        const location = object.getLocation();
-        const floorHeight = this.floorHeightAt?.(Math.round(location.x), Math.round(location.y)) ?? location.z;
-        const stacked = !cache.accurateZ
-            && floorHeight >= 0
-            && (location.z - floorHeight) > RoomRenderingCanvas.STACK_EPSILON;
-
         if(stacked)
         {
-            baseZ -= RoomRenderingCanvas.STACK_LIFT * (location.z - floorHeight);
+            baseZ -= RoomRenderingCanvas.STACK_TIE * (location.z - floorHeight);
         }
 
-        // After the lift, so the early-out above compares the depth the sprites are actually given.
         cache.screenZ = baseZ;
 
         const spriteCount = visualization.spriteCount;
@@ -1623,9 +1674,9 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
 
         cache.spriteCount = localCount;
 
-        if(localCount < cache.sprites.length) 
+        if(localCount < cache.sprites.length)
         {
-            for(let i = localCount; i < cache.sprites.length; i++) 
+            for(let i = localCount; i < cache.sprites.length; i++)
             {
                 cache.sprites[i].dispose();
             }
@@ -1633,7 +1684,78 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
             cache.sprites.length = localCount;
         }
 
+        if(stacked)
+        {
+            cache.stackTile = RoomRenderingCanvas.tileKey(Math.round(location.x), Math.round(location.y));
+            cache.stackHeight = location.z - floorHeight;
+            cache.stackBase = baseZ;
+            this._stackedThisFrame.push(cache);
+        }
+        else if(onTile)
+        {
+            let front = Infinity;
+
+            for(let i = 0; i < localCount; i++)
+            {
+                const sortable = cache.sprites[i];
+
+                if(sortable.sprite?.spriteType !== RoomObjectSpriteType.ROOM_PLANE && sortable.z < front)
+                {
+                    front = sortable.z;
+                }
+            }
+
+            cache.groundFront = front;
+            this.recordGroundFront(object, location, front);
+        }
+
         return localCount;
+    }
+
+    // TS-only: see the DEVIATION in renderObject().
+    private static tileKey(x: number, y: number): number
+    {
+        return x * 65536 + y;
+    }
+
+    /**
+     * Reports a ground object's most-forward sprite depth on every tile of its footprint, the way
+     * `TileObjectMap` walks it. Anything without a furniture size - an avatar, a pet - covers one.
+     */
+    // TS-only: see the DEVIATION in renderObject().
+    private recordGroundFront(object: IRoomObject, location: IVector3d, front: number): void
+    {
+        if(front === Infinity) return;
+
+        const model = object.getModel();
+        let sizeX = Math.max(1, model.getNumber(RoomObjectVariableEnum.FURNITURE_SIZE_X) || 1);
+        let sizeY = Math.max(1, model.getNumber(RoomObjectVariableEnum.FURNITURE_SIZE_Y) || 1);
+        const direction = object.getDirection();
+        const dir = direction ? Math.trunc((Math.trunc(direction.x + 45) % 360) / 90) : 0;
+
+        if(dir === 1 || dir === 3)
+        {
+            const swap = sizeX;
+            sizeX = sizeY;
+            sizeY = swap;
+        }
+
+        const originX = Math.round(location.x);
+        const originY = Math.round(location.y);
+
+        for(let y = originY; y < originY + sizeY; y++)
+        {
+            for(let x = originX; x < originX + sizeX; x++)
+            {
+                const key = RoomRenderingCanvas.tileKey(x, y);
+                const known = this._tileGroundFront.get(key);
+
+                if(known === undefined || front < known)
+                {
+                    this._tileGroundFront.set(key, front);
+                }
+            }
+        }
     }
 
     /**
@@ -1770,6 +1892,10 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
                 screenY: 0,
                 screenZ: 0,
                 accurateZ: false,
+                stackTile: 0,
+                stackHeight: 0,
+                stackBase: 0,
+                groundFront: Infinity,
                 spriteCount: 0,
                 sprites: []
             };
