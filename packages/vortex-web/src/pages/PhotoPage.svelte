@@ -153,7 +153,10 @@
         <section class="inline-block xs:mx-[69px]">
             <div class="text-left xs:-mx-[69px]">
                 <div class="flex">
-                    <a href={previous ? href(previous) : '#'} use:link
+                    <!-- A dead arrow points at this photo, never at '#': the History-mode router
+                         strips the '#', finds an empty path and throws, which is what every photo
+                         page did while its pool loaded. The arrow is click-proof anyway. -->
+                    <a href={href(previous ?? photo)} use:link
                        class="flex w-[69px] items-center justify-center hover:border-b-0 xs:bg-box xs:hover:bg-[#0d2f4f]
                               {previous ? '' : 'pointer-events-none opacity-0 xs:opacity-20'}"
                        aria-label={t('SITE_PHOTO_PREVIOUS')}>
@@ -163,7 +166,7 @@
                     <img src={api.photoUrl(photo.key)} alt={photo.roomName ?? ''}
                          width="320" height="320" class="block max-w-full" />
 
-                    <a href={next ? href(next) : '#'} use:link
+                    <a href={href(next ?? photo)} use:link
                        class="flex w-[69px] items-center justify-center hover:border-b-0 xs:bg-box xs:hover:bg-[#0d2f4f]
                               {next ? '' : 'pointer-events-none opacity-0 xs:opacity-20'}"
                        aria-label={t('SITE_PHOTO_NEXT')}>

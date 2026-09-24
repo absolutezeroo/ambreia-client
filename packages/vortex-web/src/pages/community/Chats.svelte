@@ -209,7 +209,11 @@
     <ContentAside>
         <div class="flex flex-col gap-6">
             {#if $signedIn}
-                <FeedComposer onpublished={(post) => (posts = [post, ...posts])} />
+                <!-- The live stream can deliver the new card first: an album is two requests
+                     (create, then read the card), and the stream's refresh lands between them. So
+                     the original already on the page is replaced, never doubled — a second entry
+                     with the same key is an each_key_duplicate that takes the page down. -->
+                <FeedComposer onpublished={(post) => (posts = [post, ...posts.filter((p) => p.id !== post.id || p.reposter)])} />
             {/if}
 
             <!-- `bind:` and an index, not `{post}`: a card answers a vote or a reaction with the
