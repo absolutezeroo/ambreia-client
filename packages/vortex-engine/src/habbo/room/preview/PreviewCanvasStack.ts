@@ -39,12 +39,20 @@ export class PreviewCanvasStack
 {
     private static readonly ENTRIES: Map<Container, IPreviewCanvasEntry> = new Map();
 
+    /** Above the chat bubble root's zIndex 1 (RoomEngine.addStageChild()). */
+    private static readonly Z_INDEX: number = 2;
+
     /**
 	 * Adds a canvas to the stack. `window` is the window whose z-order the
 	 * canvas should follow — the wrapper the canvas is drawn inside.
 	 */
     public static register(canvas: Container, window: IWindow): void
     {
+        // RoomEngine.addStageChild() makes the stage sortable and puts the chat bubble root at
+        // zIndex 1; PixiJS sorts by zIndex before child order, so at the default 0 every
+        // setChildIndex() in restack() still left the room's chat bubbles drawn over the preview.
+        // In AS3 the canvas sits inside its window, and windows are above the chat.
+        canvas.zIndex = PreviewCanvasStack.Z_INDEX;
         PreviewCanvasStack.ENTRIES.set(canvas, {canvas, window});
     }
 
