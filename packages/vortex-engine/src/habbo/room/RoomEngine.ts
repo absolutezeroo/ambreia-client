@@ -4971,6 +4971,12 @@ export class RoomEngine extends Component implements IRoomEngine,
             ownerName
         )) return false;
 
+        // AS3 reaches this through its `updateObjectWallItem()` call, which ends by re-emitting the
+        // window mask. The port places the item inside addRoomObjectWallItem() and skips that call,
+        // so a window whose content was already cached — where objectInitialized() never fires —
+        // never told the room to cut its hole.
+        this.updateObjectRoomWindow(roomId, id);
+
         // AS3 dispatches REOE_ADDED for wall items too, and this port did not — so
         // RoomAreaSelectionManager, which explicitly wants category 20, never saw one.
         this.events.emit(
