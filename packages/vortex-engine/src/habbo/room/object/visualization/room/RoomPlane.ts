@@ -520,7 +520,13 @@ export class RoomPlane implements IRoomPlane
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/room/RoomPlane.as::set id()
     set id(value: string)
     {
-        this._id = value;
+        // Without the reset a live wallpaper/floor/landscape change kept drawing the cached texture
+        // of the old id; only a room re-entry, which builds the planes afresh, showed the new one.
+        if(value !== this._id)
+        {
+            this.resetTextureCache();
+            this._id = value;
+        }
     }
 
     private _uniqueId: number;
