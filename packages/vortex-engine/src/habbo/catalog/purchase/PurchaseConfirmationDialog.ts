@@ -4,6 +4,7 @@ import {MintTokenPurchaseOffer} from '@habbo/catalog/collectibles/tabs/MintToken
 import {NftStorePurchaseOffer} from '@habbo/catalog/collectibles/tabs/NftStorePurchaseOffer';
 import type {IWindow} from '@core/window/IWindow';
 import type {IWindowContainer} from '@core/window/IWindowContainer';
+import type {IIterable} from '@core/window/utils/IIterable';
 import type {IItemListWindow} from '@core/window/components/IItemListWindow';
 import type {IItemGridWindow} from '@core/window/components/IItemGridWindow';
 import type {IBitmapWrapperWindow} from '@core/window/components/IBitmapWrapperWindow';
@@ -1284,13 +1285,19 @@ export class PurchaseConfirmationDialog implements IDisposable, IGetImageListene
         if(enabled) window.enable();
         else window.disable();
 
-        const children = (window as unknown as {iterator?: IWindow[]}).iterator;
+        // `iterator` is a method returning an IIterator here, not the AS3 Proxy array — iterating
+        // it with for...of threw "is not iterable" on every gift-wrap change.
+        const iterable = window as unknown as Partial<IIterable>;
 
-        if(children === undefined) return;
+        if(typeof iterable.iterator !== 'function') return;
 
-        for(const child of children)
+        const iterator = iterable.iterator();
+
+        if(iterator === null) return;
+
+        for(let child = iterator.next(); child !== null; child = iterator.next())
         {
-            if(child != null) this.enableWindow(child, enabled);
+            this.enableWindow(child, enabled);
         }
     }
 
