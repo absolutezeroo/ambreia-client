@@ -2622,6 +2622,18 @@ export class RoomEngine extends Component implements IRoomEngine,
 
                 break;
             case 0:
+                // DEVIATION: AS3's visualization factory hands a `room` object the shared
+                //   RoomVisualizationData (RoomObjectVisualizationFactory.as l.300). This port's
+                //   factory has no `room` branch — it builds that data in RoomEngine, with the
+                //   canvas textures only RoomEngine has — so createVisualizationForObject() attaches
+                //   it by hand for the live room. The temporary room here was never given it: its
+                //   planes had no rasterizer, and the Spaces previews drew flat walls and no view.
+                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::getGenericRoomObjectImage()
+                if(this._roomVisualizationData !== null)
+                {
+                    object.getVisualization()?.initialize(this._roomVisualizationData);
+                }
+
                 this.initializeRoomForGettingImage(object, param);
         }
 
