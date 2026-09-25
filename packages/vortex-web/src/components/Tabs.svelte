@@ -24,7 +24,9 @@
     // active on every child route.
     function isActive(tab: ITab): boolean
     {
-        return tab.strict ? $location === tab.path : $location.startsWith(tab.path);
+        if(tab.strict) return $location === tab.path;
+
+        return $location.startsWith(tab.path) || (!!tab.alternativePath && $location.startsWith(tab.alternativePath));
     }
 
     const active = $derived(tabs.find(isActive) ?? tabs[0] ?? null);

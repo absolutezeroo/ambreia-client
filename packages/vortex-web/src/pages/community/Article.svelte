@@ -111,7 +111,7 @@
                  `body` and `related` off a value it has not proved is there. -->
             {:else if !detail || !article}
                 <h1>{error || t('EMPTY_RESULTS_TEXT')}</h1>
-                <p><a href="/community" use:link>{t('NEWS_TITLE')}</a></p>
+                <p><a href="/community/category" use:link>{t('NEWS_TITLE')}</a></p>
             {:else}
                 <!-- The hero: `.news-header--single`, the story over the left third of a 300px plate
                      from 767px; below that the two stack and the plate drops to 200px. -->

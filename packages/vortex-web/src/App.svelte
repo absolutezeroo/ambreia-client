@@ -8,6 +8,7 @@
     // bounce a signed-in visitor off a guarded page for as long as the probe was in flight.
     import {onMount} from 'svelte';
     import Router, {location, querystring, replace} from 'svelte-spa-router';
+    import type {ConditionsFailedEvent} from 'svelte-spa-router';
     import HeaderSmall from './components/HeaderSmall.svelte';
     import HeaderLarge from './components/HeaderLarge.svelte';
     import LoginModal from './components/LoginModal.svelte';
@@ -46,6 +47,12 @@
 
     const large = $derived($location === '/' && !$signedIn);
 
+    // A failed guard goes home; a `redirect()` route in lib/routes.ts names where it goes instead.
+    function onConditionsFailed(event: ConditionsFailedEvent)
+    {
+        replace((event.detail.userData as {redirect?: string} | undefined)?.redirect ?? '/');
+    }
+
     onMount(async () =>
     {
         await refresh();
@@ -81,7 +88,7 @@
              header, a navigation and a footer in the page and the document grows past one screen,
              the page scrolls, and the site reappears from under an overlay that stayed at the top.
              The client itself is rendered ABOVE this branch, so hiding the chrome never unmounts it. -->
-        <Router {routes} on:conditionsFailed={() => replace('/')} />
+        <Router {routes} on:conditionsFailed={onConditionsFailed} />
     {:else}
     <!-- No outage strip. habbo.com never puts one across the top of the site: when the hotel is
          not open it renders `habbo-hotel-closed` in the two places that need the hotel — the client
@@ -103,7 +110,7 @@
     </div>
 
     <div class="w-full flex-[1_0_auto] overflow-hidden bg-gradient-to-br from-page-top to-page">
-        <Router {routes} on:conditionsFailed={() => replace('/')} />
+        <Router {routes} on:conditionsFailed={onConditionsFailed} />
     </div>
 
     <Footer />

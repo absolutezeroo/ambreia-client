@@ -47,6 +47,14 @@ function open(load: IAsyncComponent)
     return wrap({asyncComponent: load});
 }
 
+// habbo.com's `$urlRouterProvider.when(from, to)`: the URL itself changes, so the target's tab lights
+// up. The condition always fails and App.svelte's `conditionsFailed` handler follows `redirect`;
+// the component is never rendered.
+function redirect(to: string)
+{
+    return wrap({asyncComponent: () => import('../pages/NotFoundPage.svelte'), conditions: [() => false], userData: {redirect: to}});
+}
+
 export const routes = {
     '/': HomePage,
     '/messaging': guarded(() => import('../pages/MessagingPage.svelte')),
@@ -55,7 +63,8 @@ export const routes = {
     '/hotel': guarded(() => import('../pages/HotelPage.svelte')),
 
     // community — `community/community.html` + one state per tab.
-    '/community': open(() => import('../pages/community/News.svelte')),
+    // `t.when("/community", "/community/photos")` — the section lands on photos, not news.
+    '/community': redirect('/community/photos'),
     '/community/category': open(() => import('../pages/community/News.svelte')),
     '/community/category/:category': open(() => import('../pages/community/News.svelte')),
     '/community/photos': open(() => import('../pages/community/Photos.svelte')),

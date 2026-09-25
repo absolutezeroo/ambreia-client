@@ -23,6 +23,8 @@
 export interface ITab
 {
     path: string;
+    // habbo.com's `alternative-path`: a second prefix that also lights the tab.
+    alternativePath?: string;
     translationKey: string;
     strict?: boolean;
 }
@@ -45,9 +47,10 @@ export const COMMUNITY_TABS: ITab[] = [
     // 2015-era dashboard; habbo.com's own community section has no social feed at all. Its label
     // and every string on its page are ours, in src/locales/site/.
     {path: '/community/chats', translationKey: 'SITE_FEED_TAB'},
-    // habbo.com's news tab matches /community/category AND /community/article — the article page
-    // keeps the tab lit.
-    {path: '/community', translationKey: 'COMMUNITY_NEWS_TAB'},
+    // `<habbo-tab path="/community/category" alternative-path="/community/article">`. It used to be
+    // `/community`, which every other tab's path starts with — so news stayed lit on all of them.
+    // The alternative is `/article` here because that is the article state's own url.
+    {path: '/community/category', alternativePath: '/article', translationKey: 'COMMUNITY_NEWS_TAB'},
 ];
 
 export const SHOP_TABS: ITab[] = [
