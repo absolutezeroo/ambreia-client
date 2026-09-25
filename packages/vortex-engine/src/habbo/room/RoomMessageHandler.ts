@@ -499,13 +499,10 @@ export class RoomMessageHandler implements IRoomMessageHandler
 
         const parser = propertyEvent.parser as RoomPropertyMessageEventParser;
 
-        if(parser === null)
+        if(parser === null) 
         {
             return;
         }
-
-        // PROBE (throwaway): the room decoration applied from the inventory never showed.
-        log.warn(`PROBE roomProperty room=${this._currentRoomId} floor=${parser.floorType} wall=${parser.wallType} landscape=${parser.landscapeType}`);
 
         this._roomCreator.updateObjectRoom(
             this._currentRoomId,

@@ -179,9 +179,6 @@ export class RoomPlane implements IRoomPlane
 
     private _rasterizer: IPlaneRasterizer | null = null;
 
-    // PROBE (throwaway): last landscape state logged, so the probe only speaks on a change.
-    private _probeLastState: string = '';
-
     /**
      * The room's shared door/window artwork, or null before `RoomVisualization` hands it over.
      *
@@ -697,13 +694,6 @@ export class RoomPlane implements IRoomPlane
 
             if(cosAngle > -0.001)
             {
-                // PROBE (throwaway): a landscape that could be visible, culled as back-facing.
-                if(this._type === RoomPlane.TYPE_LANDSCAPE && this._canBeVisible && this._probeLastState !== 'culled')
-                {
-                    this._probeLastState = 'culled';
-                    log.warn(`PROBE landscape culled #${this._uniqueId} loc=${this._location} normal=${this._normal} cos=${cosAngle.toFixed(3)} directionAxis=${geometry.directionAxis}`);
-                }
-
                 if(this._isVisible)
                 {
                     this._isVisible = false;
@@ -1333,18 +1323,6 @@ export class RoomPlane implements IRoomPlane
 
         // Try textured rendering first
         const textureBitmapData = this.getTexture(geometry, time);
-
-        // PROBE (throwaway): does a landscape plane that got this far get anything to draw.
-        if(this._type === RoomPlane.TYPE_LANDSCAPE)
-        {
-            const probeState = `id=${this._id} rasterizer=${this._rasterizer !== null} hasTexture=${this._hasTexture} bitmap=${textureBitmapData?.bitmap ? `${textureBitmapData.bitmap.width}x${textureBitmapData.bitmap.height}` : null} size=${this._width}x${this._height} bitmapMasks=${this._bitmapMasks.length}`;
-
-            if(probeState !== this._probeLastState)
-            {
-                this._probeLastState = probeState;
-                log.warn(`PROBE landscape render #${this._uniqueId} loc=${this._location} normal=${this._normal} ${probeState}`);
-            }
-        }
 
         if(textureBitmapData?.bitmap)
         {

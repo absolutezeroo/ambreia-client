@@ -1011,36 +1011,6 @@ export class RoomVisualization extends RoomObjectSpriteVisualization
 
             if(!maskLoc) continue;
 
-            // PROBE (throwaway): which wall plane each mask is nearest to, and by how much it misses.
-            {
-                let best = Infinity;
-                let bestInfo = '';
-
-                for(const probePlane of this._planes)
-                {
-                    if(probePlane.type !== RoomPlane.TYPE_WALL && probePlane.type !== RoomPlane.TYPE_LANDSCAPE) continue;
-
-                    const probeDiff = Vector3d.dif(maskLoc, probePlane.location as Vector3d);
-
-                    if(!probeDiff) continue;
-
-                    const dist = Math.abs(Vector3d.scalarProjection(probeDiff, probePlane.normal as Vector3d));
-
-                    if(dist < best)
-                    {
-                        best = dist;
-                        bestInfo = `type=${probePlane.type} loc=${probePlane.location} normal=${probePlane.normal}`;
-                    }
-
-                    if(probePlane.type === RoomPlane.TYPE_LANDSCAPE && dist < 1)
-                    {
-                        log.warn(`PROBE   landscape candidate dist=${dist.toFixed(4)} loc=${probePlane.location} normal=${probePlane.normal} id=${probePlane.id}`);
-                    }
-                }
-
-                log.warn(`PROBE mask ${maskIdx}: type=${maskType} category=${maskCategory} loc=${maskLoc} nearestPlaneDist=${best.toFixed(4)} ${bestInfo}`);
-            }
-
             for(let planeIdx = 0; planeIdx < this._planes.length; planeIdx++)
             {
                 const plane = this._planes[planeIdx];
@@ -1096,14 +1066,6 @@ export class RoomVisualization extends RoomObjectSpriteVisualization
                 }
             }
         }
-
-        // PROBE (throwaway): the landscape planes this room has, and what the masks left them as.
-        log.warn(`PROBE landscape planes=${landscapePlaneIndices.length} active=[${activeLandscapePlanes.join(',')}] ` + landscapePlaneIndices.map((idx) =>
-        {
-            const probePlane = this._planes[idx];
-
-            return `#${idx}{id=${probePlane.id} canBeVisible=${probePlane.canBeVisible} visible=${probePlane.visible} hasTexture=${probePlane.hasTexture} loc=${probePlane.location} normal=${probePlane.normal}}`;
-        }).join(' '));
 
         // Reset visible plane cache if visibility changed
         if(visibilityChanged)

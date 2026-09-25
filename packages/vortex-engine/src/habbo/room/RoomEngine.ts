@@ -5202,9 +5202,6 @@ export class RoomEngine extends Component implements IRoomEngine,
         {
             const model = wallItem.getModel();
 
-            // PROBE (throwaway): does this wall item know it is a window, and where does it hang.
-            log.warn(`PROBE wallItem ${id} type=${wallItem.getType()} usesMask=${model?.getNumber(RoomObjectVariableEnum.FURNITURE_USES_PLANE_MASK)} maskType=${model?.getString(RoomObjectVariableEnum.FURNITURE_PLANE_MASK_TYPE)} loc=${wallItem.getLocation()} visible=${visible} hasRoom=${this.getObjectRoom(roomId) !== null}`);
-
             if(model !== null && model.getNumber(RoomObjectVariableEnum.FURNITURE_USES_PLANE_MASK) > 0)
             {
                 message = visible
