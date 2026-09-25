@@ -54,13 +54,8 @@
         // (pages/community/Fansites.svelte), not an editorial one. Neither is /habbo-nft, for the
         // same reason plus a worse one: its entry here said the hotel had no wallet, which was true
         // when it was written and became the site's most visible wrong sentence the day the chain
-        // was deployed. It is pages/HabboNft.svelte now.
-        '/forgot': {
-            title: 'Mot de passe oublie',
-            blocks: [
-                ['Pas encore disponible', 'L\'emulateur n\'expose pas de route de reinitialisation : le web API sert la connexion, l\'inscription, les avatars et le ticket SSO, rien de plus. Contacte l\'equipe pour un changement manuel.'],
-            ],
-        },
+        // was deployed. It is pages/HabboNft.svelte now. /forgot is gone for the same reason: it
+        // said password reset did not exist, and it does — components/ClaimPasswordModal.svelte.
     };
 
     // `$location` is any route the router lands on, so the lookup is a miss by default — `/help` is

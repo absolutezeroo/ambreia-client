@@ -21,6 +21,7 @@
     import {push, link} from 'svelte-spa-router';
     import Button from './Button.svelte';
     import Field from './Field.svelte';
+    import ClaimPasswordModal from './ClaimPasswordModal.svelte';
     import * as api from '../lib/api.js';
     import {refresh} from '../lib/session.js';
     import {t} from '../lib/i18n.js';
@@ -37,6 +38,7 @@
     let mfa = $state(false);
     let busy = $state(false);
     let error = $state('');
+    let claimOpen = $state(false);
 
     async function submit(event: SubmitEvent): Promise<void>
     {
@@ -129,8 +131,10 @@
         </div>
 
         {#if !compact}
+            <!-- `<habbo-claim-password>`: a link that opens its own modal, over the login one — it
+                 used to route to a /forgot page saying the feature did not exist. -->
             <p class="mt-3 text-center">
-                <a href="/forgot" use:link onclick={() => onDone?.()}>{t('LOGIN_FORGOT_LABEL')}</a>
+                <small><a href="/" onclick={(event) => { event.preventDefault(); claimOpen = true; }}>{t('LOGIN_FORGOT_LABEL')}</a></small>
             </p>
 
             <!-- `.login-form__register`: a <small>, not a heading. -->
@@ -140,3 +144,7 @@
         {/if}
     </form>
 </div>
+
+{#if claimOpen}
+    <ClaimPasswordModal onClose={() => (claimOpen = false)} />
+{/if}

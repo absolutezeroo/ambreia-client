@@ -59,6 +59,8 @@ export const routes = {
     '/': HomePage,
     '/messaging': guarded(() => import('../pages/MessagingPage.svelte')),
     '/registration': open(() => import('../pages/RegisterPage.svelte')),
+    // habbo.com's `resetPassword` state: where the forgotten-password mail's link lands.
+    '/reset-password/:token': open(() => import('../pages/ResetPasswordPage.svelte')),
 
     '/hotel': guarded(() => import('../pages/HotelPage.svelte')),
 
@@ -145,7 +147,6 @@ export const routes = {
     '/terms': open(() => import('../pages/StaticPage.svelte')),
     '/privacy': open(() => import('../pages/StaticPage.svelte')),
     '/staff': open(() => import('../pages/StaticPage.svelte')),
-    '/forgot': open(() => import('../pages/StaticPage.svelte')),
 
     '*': NotFoundPage,
 };

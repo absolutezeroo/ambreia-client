@@ -110,6 +110,11 @@ const ERRORS: Record<string, string> = {
     // `needsMfa` catches the second factor. The wording is here for the path that forgets to.
     'safetylock.required': 'SITE_ERROR_SAFETY_REQUIRED',
     'pocket.auth.password_too_short': 'ERROR_PASSWORD_MIN_LENGTH',
+    // The forgotten-password pair. habbo.com says ERROR_SERVER for any failure to send, and
+    // "no mail server" is one; the expired link has its own key (the page shows it as a toast,
+    // because the wording carries markup).
+    'pocket.auth.mail_unavailable': 'ERROR_SERVER',
+    'pocket.auth.reset_expired': 'ERROR_PASSWORD_RESET_EXPIRED',
     'pocket.auth.wrong_password': 'ERROR_INCORRECT_PASSWORD',
     'pocket.auth.no_avatars': 'SITE_ERROR_NO_AVATARS',
     'pocket.auth.name_taken': 'ERROR_FIELD_NAME_TAKEN',
@@ -637,6 +642,23 @@ export function changePassword(
     return request('/api/public/authentication/password', {
         method: 'POST',
         body: {currentPassword, newPassword, ...(code ? {code} : {})},
+    });
+}
+
+// habbo.com's `passwordReset.send`: mails a link if an account uses the address. The answer is the
+// same either way, so it says nothing about which addresses have accounts.
+export function forgotPasswordSend(email: string): Promise<{email: string}>
+{
+    return request('/api/public/forgotPassword/send', {method: 'POST', body: {email}});
+}
+
+// habbo.com's `passwordReset.changePassword`, with the token the mailed link carried. Like a normal
+// change, it ends every session the account had.
+export function forgotPasswordChange(token: string, password: string): Promise<IEmptyResponse>
+{
+    return request('/api/public/forgotPassword/changePassword', {
+        method: 'POST',
+        body: {token, password},
     });
 }
 
