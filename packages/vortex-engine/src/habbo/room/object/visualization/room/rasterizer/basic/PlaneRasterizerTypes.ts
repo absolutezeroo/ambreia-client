@@ -27,6 +27,8 @@ export interface IAssetPlane
 {
     id?: string;
     visualizations?: IAssetPlaneVisualization[];
+    /** Landscape planes only: the bundle's key for AS3's `<animatedVisualization>`. */
+    animatedVisualization?: IAssetPlaneVisualization[];
 }
 
 export interface IAssetPlaneVisualization
@@ -43,9 +45,6 @@ export interface IAssetPlaneVisualizationLayer
     color?: number;
     offset?: number;
     align?: string;
-
-    /** Layer type: 'visualization' (default) or 'animation' (for landscape animation layers) */
-    type?: string;
 
     /** Animation items for animation layers */
     items?: IAssetPlaneAnimationItem[];

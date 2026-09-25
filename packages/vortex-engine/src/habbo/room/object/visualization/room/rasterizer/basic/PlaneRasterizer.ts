@@ -45,6 +45,12 @@ export class PlaneRasterizer implements IPlaneRasterizer
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/room/object/visualization/room/rasterizer/basic/PlaneRasterizer.as::_data
     private _data: IAssetPlaneVisualizationData | null = null;
 
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/room/rasterizer/basic/PlaneRasterizer.as::get assetCollection()
+    protected get assetCollection(): Map<string, HTMLCanvasElement> | null
+    {
+        return this._assetTextures;
+    }
+
     // AS3: .../src/com/sulake/habbo/room/object/visualization/room/rasterizer/basic/PlaneRasterizer.as::get data()
     protected get data(): IAssetPlaneVisualizationData | null
     {

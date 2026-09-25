@@ -138,7 +138,10 @@ export class LandscapeRasterizer extends PlaneRasterizer
             if(planeData.id === undefined) continue;
 
             const id = planeData.id;
-            const visualizations = planeData.visualizations ?? [];
+            // AS3 reads `<animatedVisualization>`, and so does the bundle: `animatedVisualization`.
+            // Reading `visualizations` (the floor/wall key) left every landscape plane empty, so the
+            // rasterizer drew nothing and no window ever showed its view.
+            const visualizations = planeData.animatedVisualization ?? [];
             const landscapePlane = new LandscapePlane();
 
             for(const visData of visualizations)
@@ -164,11 +167,13 @@ export class LandscapeRasterizer extends PlaneRasterizer
                     {
                         const layerData = layers[layerIndex] as IAssetPlaneVisualizationLayer;
 
-                        if(layerData.type === 'animation')
+                        // AS3 tells `<visualizationLayer>` from `<animationLayer>` by element name. The
+                        // bundle flattens both into `allLayers` with no type field; only an
+                        // animation layer carries `items`.
+                        if(layerData.items !== undefined)
                         {
-                            // Animation layer
-                            const items = this.parseAnimationItems(layerData.items ?? []);
-                            vis.setAnimationLayer(layerIndex, items, null);
+                            const items = this.parseAnimationItems(layerData.items);
+                            vis.setAnimationLayer(layerIndex, items, this.assetCollection);
                         }
                         else
                         {
