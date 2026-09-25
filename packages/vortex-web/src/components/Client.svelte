@@ -222,8 +222,12 @@
 
         <!-- `.client__fullscreen { padding-left: 6px; padding-right: 6px }` narrows the row's shared
              `padding: 6px 12px` to a square around the icon. -->
+        <!-- `flex` stands for `.client__fullscreen__icon { display: block }`: left inline, the icon
+             sat in a 24px line box (the page's 16px × 1.5), the button grew to 38px, and the row
+             stretched the close button with it — so its 30px arrow head stopped short of the
+             bottom edge. Blockified, the button is habbo.com's 30px and the arrow spans it. -->
         <button type="button" onclick={toggleFullscreen}
-                class="rounded-l-none rounded-r-[5px] border-2 border-[#ffea00] bg-[#ffb900] px-1.5 py-1.5 text-black shadow-btn hover:border-b-2 hover:border-[#fffd70] hover:bg-[#ffd400] active:translate-y-[2px] active:border-[#ffce37] active:bg-[#f89400] active:shadow-btn-active"
+                class="flex rounded-l-none rounded-r-[5px] border-2 border-[#ffea00] bg-[#ffb900] px-1.5 py-1.5 text-black shadow-btn hover:border-b-2 hover:border-[#fffd70] hover:bg-[#ffd400] active:translate-y-[2px] active:border-[#ffce37] active:bg-[#f89400] active:shadow-btn-active"
                 title={t(fullscreen ? 'SITE_CLIENT_FULLSCREEN_EXIT' : 'SITE_CLIENT_FULLSCREEN')}>
             <Sprite name={fullscreen ? 'fullscreenBack' : 'fullscreen'} />
         </button>
