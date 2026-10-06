@@ -17,9 +17,6 @@ export class UiHelpBubbleIconEnum
     // AS3: .../widget/uihelpbubbles/UiHelpBubbleIconEnum.as::FRIENDS_BAR_FIND_FRIENDS
     public static readonly FRIENDS_BAR_FIND_FRIENDS: string = 'icon_find_friends';
 
-    // AS3: .../widget/uihelpbubbles/UiHelpBubbleIconEnum.as::BOTTOM_BAR_BUILDERS_CLUB
-    public static readonly BOTTOM_BAR_BUILDERS_CLUB: string = 'HTIE_ICON_BUILDER';
-
     // AS3: .../widget/uihelpbubbles/UiHelpBubbleIconEnum.as::BOTTOM_BAR_HOME
     public static readonly BOTTOM_BAR_HOME: string = 'HTIE_ICON_HOME';
 

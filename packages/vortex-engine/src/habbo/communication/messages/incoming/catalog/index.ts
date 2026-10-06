@@ -6,8 +6,6 @@ export * from './CatalogPublishedMessageEvent';
 export * from './GiftWrappingConfigurationEvent';
 export * from './BundleDiscountRuleset';
 export * from './BundleDiscountRulesetMessageEvent';
-export * from './BuildersClubSubscriptionStatusMessageEvent';
-export * from './BuildersClubFurniCountMessageEvent';
 export * from './ClubGiftInfoEvent';
 export * from './NodeData';
 export * from './CatalogLocalizationData';

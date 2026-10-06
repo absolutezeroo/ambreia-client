@@ -59,12 +59,6 @@ export class HabboCatalogUtils implements IGetImageListener
         this._catalog = catalog;
     }
 
-    // AS3: .../src/com/sulake/habbo/catalog/HabboCatalogUtils.as::buildersClub()
-    static buildersClub(layoutCode: string): boolean
-    {
-        return layoutCode.indexOf('builders_club') === 0 || layoutCode.indexOf('loyalty_bc') === 0;
-    }
-
     // AS3: .../src/com/sulake/habbo/catalog/HabboCatalogUtils.as::replaceCenteredImage()
     static replaceCenteredImage(target: IBitmapWrapperWindow, source: ImageBitmap, rect: {width: number; height: number} | null = null): void
     {
@@ -283,8 +277,6 @@ export class HabboCatalogUtils implements IGetImageListener
             container.removeChild(existing);
             existing.dispose();
         }
-
-        if(this._catalog!.catalogType === 'BUILDERS_CLUB') return null;
 
         const priceBox = this.createWindow('priceDisplayWidget')!;
 

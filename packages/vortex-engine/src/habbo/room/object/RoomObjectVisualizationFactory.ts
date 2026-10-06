@@ -52,9 +52,6 @@ import {
 } from './visualization/furniture/FurnitureGuildIsometricBadgeVisualization';
 import {FurnitureRoomBillboardVisualization} from './visualization/furniture/FurnitureRoomBillboardVisualization';
 import {FurnitureRoomBackgroundVisualization} from './visualization/furniture/FurnitureRoomBackgroundVisualization';
-import {
-    FurnitureBuilderPlaceholderVisualization
-} from './visualization/furniture/FurnitureBuilderPlaceholderVisualization';
 import {FurnitureExternalImageVisualization} from './visualization/furniture/FurnitureExternalImageVisualization';
 import {FurnitureYoutubeVisualization} from './visualization/furniture/FurnitureYoutubeVisualization';
 import {FurnitureMannequinVisualization} from './visualization/furniture/FurnitureMannequinVisualization';
@@ -291,9 +288,6 @@ export class RoomObjectVisualizationFactory implements IRoomObjectVisualizationF
 
             case RoomObjectVisualizationEnum.FURNITURE_BG:
                 return new FurnitureRoomBackgroundVisualization();
-
-            case RoomObjectVisualizationEnum.FURNITURE_BUILDER_PLACEHOLDER:
-                return new FurnitureBuilderPlaceholderVisualization();
 
             case RoomObjectVisualizationEnum.FURNITURE_EXTERNAL_IMAGE:
                 return new FurnitureExternalImageVisualization();

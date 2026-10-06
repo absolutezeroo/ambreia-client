@@ -22,7 +22,6 @@ export class CatalogWidgetName
     static readonly SPECIAL_INFO: string = 'specialInfoWidget';
     static readonly WARNING: string = 'warningWidget';
     static readonly FIRST_PRODUCT_AUTO_SELECTOR: string = 'firstProductAutoSelectorWidget';
-    static readonly BUILDER: string = 'builderWidget';
     static readonly SOLD_LTD_ITEMS: string = 'soldLtdItemsWidget';
     static readonly MAD_MONEY: string = 'madMoneyWidget';
     static readonly ADD_ON_BADGE_VIEW: string = 'addOnBadgeViewWidget';
@@ -59,7 +58,4 @@ export class CatalogWidgetName
     static readonly PET_PREVIEW: string = 'petPreviewWidget';
     static readonly BUNDLE_PURCHASE_EXTRA_INFO: string = 'bundlePurchaseExtraInfoWidget';
     static readonly USER_BADGE_SELECTOR: string = 'userBadgeSelectorWidget';
-    static readonly BUILDER_SUBSCRIPTION: string = 'builderSubscriptionWidget';
-    static readonly BUILDER_ADDONS: string = 'builderAddonsWidget';
-    static readonly BUILDER_LOYALTY: string = 'builderLoyaltyWidget';
 }

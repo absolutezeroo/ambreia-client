@@ -26,7 +26,6 @@ import type {IFurnitureData} from '@habbo/session/furniture/IFurnitureData';
 import type {ILimitedItemPreviewOverlayWidget} from '@habbo/window/widgets/ILimitedItemPreviewOverlayWidget';
 import type {IRarityItemPreviewOverlayWidget} from '@habbo/window/widgets/IRarityItemPreviewOverlayWidget';
 import type {IBadgeImageWidget} from '@habbo/window/widgets/IBadgeImageWidget';
-import {BuilderClubUtils} from '@habbo/utils/BuilderClubUtils';
 import {FriendlyTime} from '@habbo/utils/FriendlyTime';
 import {RoomObjectVariableEnum} from '@habbo/room/object/RoomObjectVariableEnum';
 import {RoomWidgetFurniActionMessage} from '../messages/RoomWidgetFurniActionMessage';
@@ -40,9 +39,6 @@ const log = Logger.getLogger('habbo.ui.widget.infostand.InfoStandFurniView');
 
 export class InfoStandFurniView
 {
-    // AS3: sources/win63_version/habbo/ui/widget/infostand/InfoStandFurniView.as::const_389
-    private static readonly OWNER_BC_MARKER = -12345678;
-
     private static readonly PICKUP_MODE_NONE = 0;
     private static readonly PICKUP_MODE_EJECT = 1;
     private static readonly PICKUP_MODE_PICKUP = 2;
@@ -58,7 +54,6 @@ export class InfoStandFurniView
     // AS3: .../src/com/sulake/habbo/ui/widget/infostand/InfoStandFurniView.as::_habboTracking
     protected _habboTracking: IHabboTracking | null;
     protected _catalogButton: IWindow | null = null; // var_350
-    protected _bcPlaceButton: IWindow | null = null; // var_2510
     protected _rentButton: IWindow | null = null; // var_356
     protected _extendButton: IWindow | null = null; // var_348
     protected _buyoutButton: IWindow | null = null; // var_344
@@ -165,8 +160,11 @@ export class InfoStandFurniView
         this._catalogButton = this._infoBorder?.findChildByTag('catalog') ?? null;
         this._catalogButton?.addEventListener(WindowMouseEvent.CLICK, this.onCatalogButtonClicked);
 
-        this._bcPlaceButton = this._infoBorder?.findChildByName('bc_place_button') ?? null;
-        this._bcPlaceButton?.addEventListener(WindowMouseEvent.CLICK, this.onBcPlaceMoreButtonClicked);
+        // AS3 wires `bc_place_button` to the Builders Club "place more" flow; the RPG fork removed
+        // the Builders Club, so the button the layout still carries is only kept hidden.
+        const bcPlaceButton = this._infoBorder?.findChildByName('bc_place_button') ?? null;
+
+        if(bcPlaceButton) bcPlaceButton.visible = false;
 
         this._rentButton = this._infoBorder?.findChildByName('rent_button') ?? null;
         this._rentButton?.addEventListener(WindowMouseEvent.CLICK, this.onRentButtonClicked);
@@ -445,26 +443,18 @@ export class InfoStandFurniView
         const ownerLink = ownerRegion?.findChildByName('owner_link') ?? null;
         const bcwIcon = ownerRegion?.findChildByName('bcw_icon') ?? null;
 
-        if(this._ownerId !== InfoStandFurniView.OWNER_BC_MARKER)
-        {
-            if(ownerNameText) ownerNameText.text = ownerName;
+        // AS3 shows the Builders Club title and `bcw_icon` instead for a Builders Club item; the
+        // RPG fork removed the Builders Club.
+        if(ownerNameText) ownerNameText.text = ownerName;
 
-            if(ownerRegion)
-            {
-                ownerRegion.toolTipCaption = this._widget.localizations?.getLocalization('infostand.profile.link.tooltip', '') ?? '';
-                ownerRegion.toolTipDelay = 100;
-            }
-
-            if(ownerLink) ownerLink.visible = true;
-            if(bcwIcon) bcwIcon.visible = false;
-        }
-        else
+        if(ownerRegion)
         {
-            if(ownerNameText) ownerNameText.text = '${builder.catalog.title}';
-            if(ownerRegion) ownerRegion.toolTipCaption = '';
-            if(ownerLink) ownerLink.visible = false;
-            if(bcwIcon) bcwIcon.visible = true;
+            ownerRegion.toolTipCaption = this._widget.localizations?.getLocalization('infostand.profile.link.tooltip', '') ?? '';
+            ownerRegion.toolTipDelay = 100;
         }
+
+        if(ownerLink) ownerLink.visible = true;
+        if(bcwIcon) bcwIcon.visible = false;
 
         this.showWindow('owner_region', true);
         this.showWindow('owner_spacer', true);
@@ -560,34 +550,14 @@ export class InfoStandFurniView
         }
     };
 
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandFurniView.as::onBcPlaceMoreButtonClicked()
-    protected onBcPlaceMoreButtonClicked = (_event: WindowMouseEvent): void =>
-    {
-        this._widget.requestItemToMover();
-    };
-
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandFurniView.as::onOwnerRegion()
     protected onOwnerRegion = (event: WindowMouseEvent): void =>
     {
         if(event.type === WindowMouseEvent.CLICK)
         {
-            if(this._ownerId === InfoStandFurniView.OWNER_BC_MARKER)
-            {
-                if(this._widget.furniData?.availableForBuildersClub && this._widget.furniData.purchaseOfferId >= 0)
-                {
-                    this._catalog?.openCatalogPageByOfferId(this._widget.furniData.purchaseOfferId, 'BUILDERS_CLUB');
-                }
-                else
-                {
-                    this.container?.catalog?.toggleBuilderCatalog();
-                }
-            }
-            else
-            {
-                this._widget.messageListener?.processWidgetMessage(
-                    new RoomWidgetOpenProfileMessage('RWOPEM_OPEN_USER_PROFILE', this._ownerId, 'infoStand_furniView')
-                );
-            }
+            this._widget.messageListener?.processWidgetMessage(
+                new RoomWidgetOpenProfileMessage('RWOPEM_OPEN_USER_PROFILE', this._ownerId, 'infoStand_furniView')
+            );
         }
 
         if(event.type === WindowMouseEvent.OUT || event.type === WindowMouseEvent.OVER)
@@ -663,23 +633,12 @@ export class InfoStandFurniView
         // deliberately untinted skin the view colours per furni provenance. Leaving it unset
         // renders the panel white, which is what the element description's 0xffffff colour
         // default gives.
+        // (AS3 has two more colours, for the Builders Club and wired-temporary id ranges; the RPG
+        // fork removed both.)
         if(this._infoBorder)
         {
-            if(BuilderClubUtils.isBuilderClubId(event.id))
-            {
-                this._infoBorder.color = 3349504;
-                this.spacerColor = 4283710744;
-            }
-            else if(BuilderClubUtils.isTempId(event.id))
-            {
-                this._infoBorder.color = 1321796;
-                this.spacerColor = 4281289835;
-            }
-            else
-            {
-                this._infoBorder.color = 4013373;
-                this.spacerColor = 4281545523;
-            }
+            this._infoBorder.color = 4013373;
+            this.spacerColor = 4281545523;
         }
 
         const roomSession = this.container?.roomSession;
@@ -690,10 +649,7 @@ export class InfoStandFurniView
         this.furniImage = event.image as ImageBitmap | null;
         this.expiration = event.expiration;
         this.isNft = event.isNft;
-        this.setOwnerInfo(
-            BuilderClubUtils.isBuilderClubId(event.id) ? InfoStandFurniView.OWNER_BC_MARKER : event.ownerId,
-            event.ownerName
-        );
+        this.setOwnerInfo(event.ownerId, event.ownerName);
 
         let showMove = false;
         let showRotate = false;
@@ -745,8 +701,7 @@ export class InfoStandFurniView
             event.purchaseOfferId >= 0,
             event.rentOfferId >= 0,
             event.purchaseCouldBeUsedForBuyout,
-            event.rentCouldBeUsedForBuyout,
-            event.bcOfferId >= 0 && event.availableForBuildersClub && (this._catalog?.canPlaceWithBC() ?? false)
+            event.rentCouldBeUsedForBuyout
         );
         this.showLimitedItem((event.stuffData?.uniqueSerialNumber ?? 0) > 0, event.stuffData);
         this.showRarityItem((event.stuffData?.rarityLevel ?? -1) >= 0, event.stuffData);
@@ -987,23 +942,16 @@ export class InfoStandFurniView
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandFurniView.as::updatePurchaseButtonVisibility()
     private updatePurchaseButtonVisibility(
         isOwner: boolean, hasExpiration: boolean, hasPurchaseOffer: boolean, hasRentOffer: boolean,
-        purchaseCouldBeBuyout: boolean, rentCouldBeBuyout: boolean, canBcPlaceMore: boolean
+        purchaseCouldBeBuyout: boolean, rentCouldBeBuyout: boolean
     ): void
     {
         const isRented = isOwner && hasExpiration;
         const showExtend = isRented && rentCouldBeBuyout;
         const showBuyout = isRented && purchaseCouldBeBuyout;
         const showCatalog = !isRented && hasPurchaseOffer;
-        const showBcPlaceMore = canBcPlaceMore && (this._widget.config?.getBoolean('infostand.place_more.enabled') ?? false);
         const showRent = !isRented && hasRentOffer;
 
         let anyVisible = false;
-
-        if(this._bcPlaceButton)
-        {
-            this._bcPlaceButton.visible = showBcPlaceMore;
-            anyVisible = anyVisible || showBcPlaceMore;
-        }
 
         if(this._catalogButton)
         {

@@ -95,16 +95,15 @@ export class FurnitureOffer implements IPurchasableOffer
     /**
      * AS3: FurnitureOffer.as::get isRentOffer()
      *
-     * With no resolved id, a furni that *can* be rented is treated as a rent offer — except on a
-     * Builders Club page, where placement is free and renting is meaningless.
+     * With no resolved id, a furni that *can* be rented is treated as a rent offer. (AS3 excepts a
+     * Builders Club page; the RPG fork removed the Builders Club.)
      */
     // AS3: FurnitureOffer.as::get isRentOffer()
     get isRentOffer(): boolean
     {
         if(this._resolvedOfferId > -1) return this._resolvedAsRentOffer;
 
-        return (this._furniData?.rentOfferId ?? -1) > -1
-            && !(this._page != null && this._page.isBuilderPage);
+        return (this._furniData?.rentOfferId ?? -1) > -1;
     }
 
     /** AS3 builds this key from the furni id, not from the product code. */

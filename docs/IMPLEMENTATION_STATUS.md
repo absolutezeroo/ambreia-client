@@ -36,6 +36,7 @@ Le derby est conservé : il fait partie de la pêche. Section remplie au fil des
 | Feature | Tâche | Commit |
 |---------|-------|--------|
 | Wired : éditeur (`roomevents/`), variables et Variable FX (rendu + logique + messages), coffres (logiques, visualisations, widget), échanges wired (`inventory/wired_trading/`), mouvements wired, tous les messages `userdefinedroomevents`. Les types de furni `furniture_furnichest`/`furniture_coinschest` retombent sur `FurnitureLogic`/`AnimatedFurnitureVisualization`. `visualization/stacked/` est conservé (porte la bulle habbicon). | Tâche 2 | Tâche 2 |
+| Builders Club : catalogue `BUILDERS_CLUB` (`CatalogType.BUILDER`, 4 widgets `Builder*`, abonnement/compteur de furni, en-tête orange, recherche `bcOfferId`), placement direct (`PlaceObjectFromCatalog` 3849 / `PlaceWallItemFromCatalog` 2740, `BCPlacementWarning` 2458, « placer encore » de l'infostand), messages `BuildersClubSubscriptionStatus` 1893 / `BuildersClubFurniCount` 2378 / `BuildersClubQueryFurniCount` 1739, `BuilderClubUtils` (plages d'id BC et temp), `FurnitureBuilderPlaceholderVisualization`, icône de toolbar `BUILDER`, `:pickallbc`/`:bcfloor`, panneau « salle verrouillée » des réglages. Gardés : le Club HC (`catalog/clubcenter/`) et l'éditeur de plan de sol — `BCFloorPlanEditor` est l'éditeur standard (nom AS3 conservé), seul son verrou d'enregistrement BC part (enregistrer : staff uniquement). `hiddenByBc` reste lu sur le fil (`RoomSettingsData`). | Tâche 3 | Tâche 3 |
 
 ## Snapshot
 

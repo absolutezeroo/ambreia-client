@@ -32,7 +32,7 @@ export interface IPlanPoint
 export class FloorPlanCache
 {
     /**
-     * The largest plan a room may have without the Builders Club perk, as `(width - 1) * (height - 1)`.
+     * The largest plan a room may have without the `BUILDER_AT_WORK` perk, as `(width - 1) * (height - 1)`.
      *
      * AS3 declares the constant and then writes the literal `3025` in `checkSizeLimits()` anyway;
      * both are kept so the constant is not silently doing nothing.
@@ -441,7 +441,7 @@ export class FloorPlanCache
      * AS3: FloorPlanCache.as::checkSizeLimits()
      *
      * The area rule is `(w - 1) * (h - 1)`, not `w * h` — the outermost row and column are the wall
-     * band, not floor. The Builders Club perk lifts the area limit but never the 64-per-axis one.
+     * band, not floor. The `BUILDER_AT_WORK` perk lifts the area limit but never the 64-per-axis one.
      */
     // AS3: FloorPlanCache.as::checkSizeLimits()
     private checkSizeLimits(width: number, height: number): boolean

@@ -455,9 +455,6 @@ export class RoomSettingsCtrl
         if(tab4) tab4.addEventListener(WindowMouseEvent.CLICK, this._onTabClick);
         if(tab5) tab5.addEventListener(WindowMouseEvent.CLICK, this._onTabClick);
 
-        const buildersBtn = win.findChildByName('builders_faq_button');
-        if(buildersBtn) buildersBtn.addEventListener(WindowMouseEvent.CLICK, this._onBuildersClubFaqClick);
-
         const doormodePwEl = win.findChildByName('doormode_password');
         if(doormodePwEl)
         {
@@ -729,13 +726,12 @@ export class RoomSettingsCtrl
                 doormodeSel.setSelected(this._window.findChildByName(doormodeEl));
             }
 
+            // AS3 shows `doormode_override_info` (a room locked by an expired Builders Club, with a
+            // FAQ button) while `hiddenByBc` is set and the viewer is not staff. The RPG fork removed
+            // the Builders Club, so the panel stays hidden; `hiddenByBc` is still read off the wire.
             const overrideInfo = this._window.findChildByName('doormode_override_info');
 
-            if(overrideInfo)
-            {
-                overrideInfo.visible = data.hiddenByBc &&
-                    !((this._navigator.sessionData as unknown as { hasSecurity?(level: number): boolean })?.hasSecurity?.(4) ?? false);
-            }
+            if(overrideInfo) overrideInfo.visible = false;
 
             this._changePasswordField(data.doorMode === 2);
         }
@@ -1425,13 +1421,5 @@ export class RoomSettingsCtrl
         if(infoRegion === null) return;
 
         this._navigator.send(new UnbanUserFromRoomMessageComposer(infoRegion.id, this._flatId));
-    };
-
-    private _onBuildersClubFaqClick = (_event: WindowEvent): void =>
-    {
-        if(!this._navigator) return;
-
-        const wm = this._navigator.windowManager as unknown as { context?: { createLinkEvent?(link: string): void } } | null;
-        wm?.context?.createLinkEvent?.('habbopages/builders-club/faq');
     };
 }

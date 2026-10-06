@@ -21,7 +21,6 @@ import {textureToBitmap} from '@habbo/avatar/AvatarImageSnapshot';
 import {Vector3d} from '@room/utils/Vector3d';
 import {Logger} from '@core/utils/Logger';
 import type {HabboCatalog} from '../HabboCatalog';
-import {HabboCatalogUtils} from '../HabboCatalogUtils';
 import type {IPurchasableOffer} from '../IPurchasableOffer';
 import {Offer} from '../viewer/Offer';
 import {CatalogProductImages} from '../viewer/CatalogProductImages';
@@ -291,7 +290,7 @@ export class PurchaseConfirmationDialog implements IDisposable, IGetImageListene
                 ? (parseInt(offer.product.extraParam, 10) || 0)
                 : 0;
         }
-        else if(offer instanceof ClubBuyOfferData || HabboCatalogUtils.buildersClub(offer.localizationId))
+        else if(offer instanceof ClubBuyOfferData)
         {
             this._productType = 'h';
         }

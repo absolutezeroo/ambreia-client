@@ -22,7 +22,6 @@ import type {IFurniDataListener} from '@habbo/session/furniture/IFurniDataListen
 import type {IProductDataListener} from '@habbo/session/product/IProductDataListener';
 import type {IAvatarRenderManager} from '@habbo/avatar/IAvatarRenderManager';
 import type {IRoomEngine} from '@habbo/room/IRoomEngine';
-import type {IUpdateReceiver} from '@core/runtime/IContext';
 import {RoomPreviewer} from '@habbo/room/preview/RoomPreviewer';
 import type {IWindow} from '@core/window/IWindow';
 import type {IWindowContainer} from '@core/window/IWindowContainer';
@@ -145,17 +144,6 @@ import {CatalogPublishedMessageEvent} from '@habbo/communication/messages/incomi
 import type {CatalogPublishedMessageEventParser} from '@habbo/communication/messages/parser/catalog/CatalogPublishedMessageEventParser';
 import type {GiftWrappingConfigurationEventParser} from '@habbo/communication/messages/parser/catalog/GiftWrappingConfigurationEventParser';
 import {GiftWrappingConfiguration} from './purchase/GiftWrappingConfiguration';
-import {BuildersClubQueryFurniCountMessageComposer} from '@habbo/communication/messages/outgoing/catalog/BuildersClubQueryFurniCountMessageComposer';
-import {BuildersClubFurniCountMessageEvent} from '@habbo/communication/messages/incoming/catalog/BuildersClubFurniCountMessageEvent';
-import type {
-    BuildersClubFurniCountMessageParser
-} from '@habbo/communication/messages/parser/catalog/BuildersClubFurniCountMessageParser';
-import {
-    BuildersClubSubscriptionStatusMessageEvent
-} from '@habbo/communication/messages/incoming/catalog/BuildersClubSubscriptionStatusMessageEvent';
-import type {
-    BuildersClubSubscriptionStatusMessageParser
-} from '@habbo/communication/messages/parser/catalog/BuildersClubSubscriptionStatusMessageParser';
 import {PurchaseOKMessageEvent} from '@habbo/communication/messages/incoming/catalog/PurchaseOKMessageEvent';
 import type {PurchaseOKMessageEventParser} from '@habbo/communication/messages/parser/catalog/PurchaseOKMessageEventParser';
 import {PurchaseErrorMessageEvent} from '@habbo/communication/messages/incoming/catalog/PurchaseErrorMessageEvent';
@@ -238,7 +226,6 @@ import {Offer} from './viewer/Offer';
 import {ClubBuyOfferData} from './club/ClubBuyOfferData';
 import {Product} from './viewer/Product';
 import {CatalogWindowState} from './CatalogWindowState';
-import {BuilderFurniPlaceableStatus} from './enum/BuilderFurniPlaceableStatus';
 import {CatalogType} from './enum/CatalogType';
 import {HabboCatalogTrackingEvent} from './enum/HabboCatalogTrackingEvent';
 import {CatalogSearchEntry} from './search/CatalogSearchEntry';
@@ -256,13 +243,10 @@ import {VideoOfferManager} from './VideoOfferManager';
 import {NftStorePurchaseMessageEvent} from '@habbo/communication/messages/incoming/collectibles/NftStorePurchaseMessageEvent';
 import {NftStorePurchaseMessageParser} from '@habbo/communication/messages/parser/collectibles/NftStorePurchaseMessageParser';
 import type {IVideoOfferManager} from './IVideoOfferManager';
-import {PlaceObjectFromCatalogComposer} from '@habbo/communication/messages/outgoing/catalog/PlaceObjectFromCatalogComposer';
-import {PlaceWallItemFromCatalogComposer} from '@habbo/communication/messages/outgoing/catalog/PlaceWallItemFromCatalogComposer';
 import {FurnitureCategory} from '@habbo/inventory/enum/FurnitureCategory';
 import {PlaceObjectMessageComposer} from '@habbo/communication/messages/outgoing/room/engine/PlaceObjectMessageComposer';
 import type {IDragAndDropDoneReceiver} from './viewer/IDragAndDropDoneReceiver';
 import {CatalogWidgetRoomChangedEvent} from './viewer/widgets/events/CatalogWidgetRoomChangedEvent';
-import {CatalogWidgetBuilderSubscriptionUpdatedEvent} from './viewer/widgets/events/CatalogWidgetBuilderSubscriptionUpdatedEvent';
 import {RoomEngineObjectEvent} from '@habbo/room/events/RoomEngineObjectEvent';
 import type {RoomEngineObjectPlacedEvent} from '@habbo/room/events/RoomEngineObjectPlacedEvent';
 import type {RoomEngineObjectPlacedOnUserEvent} from '@habbo/room/events/RoomEngineObjectPlacedOnUserEvent';
@@ -277,7 +261,6 @@ import type {IRoomObjectController} from '@room/object/IRoomObjectController';
 import type {IUserData} from '@habbo/session';
 import {HabboCatalogUtils} from './HabboCatalogUtils';
 import {WindowToggle} from '@habbo/utils/WindowToggle';
-import {FriendlyTime} from '@habbo/utils/FriendlyTime';
 import {CatalogUserEvent} from '@habbo/catalog/event/CatalogUserEvent';
 import {MintTokenPurchaseOffer} from '@habbo/catalog/collectibles/tabs/MintTokenPurchaseOffer';
 import {NftStorePurchaseOffer} from '@habbo/catalog/collectibles/tabs/NftStorePurchaseOffer';
@@ -298,7 +281,7 @@ const log = Logger.getLogger('habbo.catalog.HabboCatalog');
  *
  * @see sources/win63_version/habbo/catalog/HabboCatalog.as
  */
-export class HabboCatalog extends Component implements IHabboCatalog, ILinkEventTracker, IFurniDataListener, IProductDataListener, IUpdateReceiver
+export class HabboCatalog extends Component implements IHabboCatalog, ILinkEventTracker, IFurniDataListener, IProductDataListener
 {
     // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::_communication
     private _communication: IHabboCommunicationManager | null = null;
@@ -395,8 +378,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
     private _searchEntriesDirty: boolean = true;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::_SafeStr_6916 (search-index stale flag)
     private _searchIndexStale: boolean = true;
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::_pagesVisibleInBuilderMode
-    private _pagesVisibleInBuilderMode: Map<string, boolean> | null = null;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::_SafeStr_7748 (product data ready flag)
     private _productDataReady: boolean = false;
     private _catalogViewer: CatalogViewer | null = null;
@@ -675,12 +656,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         return this.getProperty('image.library.catalogue.url');
     }
 
-    // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::get buildersClubEnabled()
-    get buildersClubEnabled(): boolean 
-    {
-        return this.getBoolean('builders.club.enabled');
-    }
-
     /**
      * The collectibles hub, built in the constructor above.
      *
@@ -704,10 +679,11 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         return this._frontPageItems;
     }
 
+    // DEVIATION: AS3 also answers false in the Builders Club catalog; the RPG fork has only NORMAL.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::get multiplePurchaseEnabled()
     get multiplePurchaseEnabled(): boolean 
     {
-        return this.getBoolean('catalog.multiple.purchase.enabled') && this._catalogType !== CatalogType.BUILDER;
+        return this.getBoolean('catalog.multiple.purchase.enabled');
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::get bundleDiscountRuleset()
@@ -719,10 +695,11 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::refreshFurniData()
     private _furniDataNeedsRefresh: boolean = false;
 
+    // DEVIATION: AS3 answers false in the Builders Club catalog; the RPG fork has only NORMAL.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::get bundleDiscountEnabled()
     get bundleDiscountEnabled(): boolean 
     {
-        return this._catalogType !== CatalogType.BUILDER;
+        return true;
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::get bundleDiscountRuleset()
@@ -1120,7 +1097,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         this._furnitureDataCache = this._sessionDataManager?.getFurniData(this) ?? null;
         this._newItemsNotificationEnabled = this.isNewItemsNotificationEnabled();
         this._searchIndexStale = true;
-        this._pagesVisibleInBuilderMode = null;
     }
 
     /**
@@ -1399,15 +1375,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
     private _placingFurni: boolean = false;
 
     /**
-     * AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::_SafeStr_9457
-     *
-     * Name DERIVED: obfuscated in every tree. Remembers `requestSelectedItemToMover()`'s
-     * `placeMany` argument so the Builders Club branch can immediately re-arm the mover for the
-     * next copy instead of closing the catalog.
-     */
-    private _placeManyInMover: boolean = false;
-
-    /**
      * AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::_SafeStr_4676
      *
      * Name DERIVED: obfuscated in every tree. The ghost furni already standing in the room while
@@ -1468,7 +1435,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
             this.hideMainWindow();
 
             this._placingFurni = true;
-            this._placeManyInMover = placeMany;
         }
     }
 
@@ -1509,7 +1475,7 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
 
     /**
      * Tells the open page its room context changed, so widgets gated on being in a room (the place
-     * button, the Builders Club placement status) re-evaluate.
+     * button) re-evaluate.
      */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::dispatchRoomChangedToCatalogPage()
     private dispatchRoomChangedToCatalogPage(state: CatalogWindowState | null): void
@@ -1528,20 +1494,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         for(const state of this._catalogStates.values())
         {
             this.dispatchRoomChangedToCatalogPage(state);
-        }
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::dispatchBuilderSubscriptionUpdatedToCatalogPages()
-    private dispatchBuilderSubscriptionUpdatedToCatalogPages(): void
-    {
-        if(this._catalogStates == null) return;
-
-        for(const state of this._catalogStates.values())
-        {
-            if(state != null && state.catalogViewer != null && state.catalogViewer.currentPage != null)
-            {
-                state.catalogViewer.currentPage.dispatchWidgetEvent(new CatalogWidgetBuilderSubscriptionUpdatedEvent());
-            }
         }
     }
 
@@ -1608,8 +1560,8 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
             this._offerInFurniPlacing
         );
 
-        // Captured before the callback, as AS3 does: the Builders Club branch below can re-arm the
-        // mover, and `requestSelectedItemToMover()` overwrites `_offerPlacingCallbackReceiver`.
+        // Captured before the callback, as AS3 does (its Builders Club branch, removed in the RPG
+        // fork, re-armed the mover through `requestSelectedItemToMover()`).
         // AS3 passes null as the second argument here; this port's interface types it `string`.
         const receiver = this._offerPlacingCallbackReceiver;
 
@@ -1674,56 +1626,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
                 }
 
                 break;
-            case CatalogType.BUILDER:
-            {
-                // A Builders Club placement is a *purchase*: nothing is drawn locally, the server
-                // is asked to place it and the real object arrives from the room engine. That is
-                // why this branch has no addObjectFurniture()/half-alpha ghost.
-                let pageId = this._offerInFurniPlacing.page?.pageId ?? CatalogNavigator.DUMMY_PAGE_ID_FOR_OFFER_SEARCH;
-
-                // A search-result offer reports the dummy page id; resolve it back to a real page
-                // through the offer, since the server keys the purchase by page.
-                if(pageId === CatalogNavigator.DUMMY_PAGE_ID_FOR_OFFER_SEARCH)
-                {
-                    const nodes = this.currentCatalogNavigator?.getNodesByOfferId(this._offerInFurniPlacing.offerId, true) ?? null;
-
-                    if(nodes != null && nodes.length > 0) pageId = nodes[0].pageId;
-                }
-
-                if(category === RoomObjectCategoryEnum.OBJECT_CATEGORY_FURNITURE)
-                {
-                    this.connection?.send(new PlaceObjectFromCatalogComposer(
-                        pageId,
-                        this._offerInFurniPlacing.offerId,
-                        product?.extraParam ?? '',
-                        event.x,
-                        event.y,
-                        event.direction
-                    ));
-                }
-                else if(category === RoomObjectCategoryEnum.OBJECT_CATEGORY_WALL)
-                {
-                    this.connection?.send(new PlaceWallItemFromCatalogComposer(
-                        pageId,
-                        this._offerInFurniPlacing.offerId,
-                        product?.extraParam ?? '',
-                        event.wallLocation
-                    ));
-                }
-
-                // Place-many re-arms the mover with the same offer instead of closing: that is what
-                // lets a builder lay out a whole row without reopening the catalog between items.
-                if(this._placeManyInMover)
-                {
-                    this.requestSelectedItemToMover(receiver, this._offerInFurniPlacing, true);
-
-                    break;
-                }
-
-                this.toggleBuilderCatalog();
-
-                break;
-            }
         }
     };
 
@@ -1755,25 +1657,15 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
     };
 
     /**
-     * Any room object was clicked.
-     *
-     * Two unrelated jobs share the handler in AS3. The first is the reason it is registered at
-     * all: a Builders Club member's BUILDERS_CLUB index is built lazily on the first click in the
-     * room, so the "place from catalog" path finds a ready navigator instead of an empty one. The
-     * second only fires for an avatar, and raises `CATALOG_USER_SELECTED` for whoever wants it.
+     * Any room object was clicked. Only an avatar matters: it raises `CATALOG_USER_SELECTED` for
+     * whoever wants it.
      */
+    // DEVIATION: AS3 first builds the BUILDERS_CLUB index lazily on the first click in the room
+    //   (when `builders.club.enabled`). The RPG fork removed the Builders Club.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::onObjectSelected()
     private onObjectSelected = (event: RoomEngineObjectEvent): void =>
     {
         if(event == null) return;
-
-        if(this.buildersClubEnabled && (!this._initialized || !this.getCatalogNavigator(CatalogType.BUILDER)?.initialized))
-        {
-            // AS3 calls the no-arg `init()`, whose default resolves to "NORMAL"; this port made the
-            // parameter required, so the default is written out.
-            this.init('NORMAL');
-            this.refreshCatalogIndex(CatalogType.BUILDER);
-        }
 
         if(event.type !== RoomEngineObjectEvent.REOE_SELECTED || event.category !== RoomObjectCategoryEnum.OBJECT_CATEGORY_USER) return;
 
@@ -2027,7 +1919,7 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
 
         state.mainContainer.caption = busy
             ? '${generic.loading}'
-            : (catalogType === 'NORMAL' ? '${catalog.title}' : '${builder.catalog.title}');
+            : '${catalog.title}';
 
         const mask = state.mainContainer.findChildByName('search_waiting_for_results_mask');
 
@@ -2195,14 +2087,11 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         this.connection?.send(new RecycleItemsMessageComposer(items));
     }
 
+    // DEVIATION: AS3 first forces "NORMAL" for anyone who is neither staff nor has the Builders Club
+    //   enabled. The RPG fork removed the Builders Club, so "NORMAL" is the only type there is.
     // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::toggleCatalog()
     public toggleCatalog(catalogType: string, forceOpen: boolean = false, showMainWindow: boolean = true): void 
     {
-        if(!this._sessionDataManager?.hasSecurity(5) && !this.buildersClubEnabled) 
-        {
-            catalogType = 'NORMAL';
-        }
-
         this.cancelFurniInMover();
 
         // AS3 gates on the states, not on a window: init() is what builds them.
@@ -2280,7 +2169,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         }
 
         this.refreshCatalogWindowChrome(catalogType, this._mainWindow);
-        this.refreshBuilderStatus();
 
         if(catalogTypeChanged && this.currentCatalogNavigator != null) 
         {
@@ -2560,10 +2448,12 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
 
     /**
      * Five independent gates, all of which AS3 packs into one expression: the config flag, being in
-     * a room at all, the page allowing drags, having the rights to place here (ownership in NORMAL,
-     * Builders Club status in BUILDERS_CLUB), and the offer being a single placeable object —
-     * bundles, multi-offers, effects (`e`) and Habbicons (`h`) are not draggable.
+     * a room at all, the page allowing drags, having the rights to place here (room ownership, or
+     * group-room rights), and the offer being a single placeable object — bundles, multi-offers,
+     * effects (`e`) and Habbicons (`h`) are not draggable.
      */
+    // DEVIATION: AS3 also accepts a BUILDERS_CLUB catalog whose Builders Club placement status allows
+    //   it. The RPG fork removed the Builders Club, so only the NORMAL rights test remains.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::isDraggable()
     public isDraggable(offer: IPurchasableOffer): boolean
     {
@@ -2574,8 +2464,7 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         if(currentPage !== null && !currentPage.allowDragging) return false;
 
         const allowedHere = this._catalogType === 'NORMAL'
-            ? this._roomSession.isRoomOwner || (this._roomSession.isGuildRoom && this._roomSession.roomControllerLevel >= 2)
-            : this._catalogType === CatalogType.BUILDER && this.getBuilderFurniPlaceableStatusForOffer(offer) === BuilderFurniPlaceableStatus.PLACEABLE;
+            && (this._roomSession.isRoomOwner || (this._roomSession.isGuildRoom && this._roomSession.roomControllerLevel >= 2));
 
         if(!allowedHere) return false;
 
@@ -2584,165 +2473,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
             && offer.product !== null
             && offer.product.productType !== 'e'
             && offer.product.productType !== 'h';
-    }
-
-    // AS3: HabboCatalog.as::_builderFurniLimit / get builderFurniLimit()
-    private _builderFurniLimit: number = 0;
-    // AS3: HabboCatalog.as::_builderMaxFurniLimit / get builderMaxFurniLimit()
-    private _builderMaxFurniLimit: number = 0;
-    // AS3: HabboCatalog.as::_SafeStr_8644 / get builderFurniCount()
-    private _builderFurniCount: number = -1;
-    // AS3: HabboCatalog.as::_SafeStr_7775 / get builderSecondsLeft()
-    private _builderSecondsLeft: number = 0;
-    // AS3: HabboCatalog.as::_SafeStr_8610 / get builderSecondsLeftWithGrace()
-    private _builderSecondsLeftWithGrace: number = 0;
-    // AS3: HabboCatalog.as::_builderMembershipUpdateTime
-    private _builderMembershipUpdateTime: number = 0;
-    // AS3: HabboCatalog.as::_builderMembershipDisplayUpdateTime
-    private _builderMembershipDisplayUpdateTime: number = 0;
-    // AS3: HabboCatalog.as::_SafeStr_7526
-    // Name DERIVED: obfuscated in every tree. Last refresh's answer to "paid time left?", kept so
-    // `refreshBuilderStatus()` can edge-detect the drop into grace.
-    private _builderIsMember: boolean = false;
-    // AS3: HabboCatalog.as::_SafeStr_7889
-    // Name DERIVED, same reason - the "grace time left?" half of the same pair.
-    private _builderIsInGrace: boolean = false;
-
-    // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::get builderFurniLimit()
-    get builderFurniLimit(): number
-    {
-        return this._builderFurniLimit;
-    }
-
-    // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::get builderMaxFurniLimit()
-    get builderMaxFurniLimit(): number
-    {
-        return this._builderMaxFurniLimit;
-    }
-
-    // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::get builderFurniCount()
-    get builderFurniCount(): number
-    {
-        return this._builderFurniCount;
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::get builderSecondsLeft()
-    get builderSecondsLeft(): number
-    {
-        return this._builderSecondsLeft - (HabboCatalog.getTimer() - this._builderMembershipUpdateTime) / 1000;
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::get builderSecondsLeftWithGrace()
-    get builderSecondsLeftWithGrace(): number
-    {
-        return this._builderSecondsLeftWithGrace - (HabboCatalog.getTimer() - this._builderMembershipUpdateTime) / 1000;
-    }
-
-    // AS3: flash.utils.getTimer() - TS-only helper, no HabboCatalog.as member of this name; used by
-    // builderSecondsLeft/builderSecondsLeftWithGrace exactly like SSOTicketMessageComposer.ts's own
-    // getTimer() helper.
-    private static getTimer(): number
-    {
-        if(typeof performance !== 'undefined')
-        {
-            return Math.floor(performance.now());
-        }
-
-        return Date.now();
-    }
-
-    // AS3: HabboCatalog.as::onBuildersClubSubscriptionStatus()
-    private onBuildersClubSubscriptionStatus(event: IMessageEvent): void
-    {
-        const parser = event.parser as BuildersClubSubscriptionStatusMessageParser | null;
-
-        if(!parser) return;
-
-        this._builderFurniLimit = parser.furniLimit;
-        this._builderMaxFurniLimit = parser.maxFurniLimit;
-        this._builderSecondsLeft = parser.secondsLeft;
-        this._builderMembershipUpdateTime = HabboCatalog.getTimer();
-        this._builderSecondsLeftWithGrace = parser.secondsLeftWithGrace;
-
-        this.dispatchBuilderSubscriptionUpdatedToCatalogPages();
-        this.refreshBuilderStatus();
-    }
-
-    // AS3: HabboCatalog.as::onBuildersClubFurniCount()
-    private onBuildersClubFurniCount(event: IMessageEvent): void
-    {
-        const parser = event.parser as BuildersClubFurniCountMessageParser | null;
-
-        if(!parser) return;
-
-        this._builderFurniCount = parser.furniCount;
-
-        this.dispatchBuilderSubscriptionUpdatedToCatalogPages();
-        this.refreshBuilderStatus();
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::getBuilderFurniPlaceableStatusForOffer()
-    public getBuilderFurniPlaceableStatusForOffer(_offer: IPurchasableOffer | null): number
-    {
-        if(_offer == null) return BuilderFurniPlaceableStatus.MISSING_OFFER;
-
-        if(this._builderFurniCount < 0 || this._builderFurniCount >= this._builderFurniLimit)
-        {
-            return BuilderFurniPlaceableStatus.FURNI_LIMIT_REACHED;
-        }
-
-        if(this._roomSession == null) return BuilderFurniPlaceableStatus.NOT_IN_ROOM;
-
-        return this.getBuilderFurniPlaceableStatus();
-    }
-
-    /**
-     * The last branch only applies once the membership has run out: a lapsed builder may keep
-     * decorating, but not while anyone else is watching. Moderators and the builder's own avatar
-     * do not count as onlookers.
-     */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::getBuilderFurniPlaceableStatus()
-    public getBuilderFurniPlaceableStatus(): number
-    {
-        if(this._roomSession == null) return BuilderFurniPlaceableStatus.NOT_IN_ROOM;
-
-        if(!this._roomSession.isRoomOwner && this._roomSession.isGuildRoom &&
-            !this.getBoolean('builders.club.furniture.placement.group.room.enabled'))
-        {
-            return BuilderFurniPlaceableStatus.GUILD_ROOM;
-        }
-
-        if(this._roomSession.roomControllerLevel < 3)
-        {
-            return BuilderFurniPlaceableStatus.NOT_ROOM_OWNER_OR_GROUP_ADMIN;
-        }
-
-        if(this.builderSecondsLeft <= 0 && this._roomEngine != null)
-        {
-            const roomId = this._roomSession.roomId;
-            const userCount = this._roomEngine.getRoomObjectCount(roomId, RoomObjectCategoryEnum.OBJECT_CATEGORY_USER);
-
-            for(let i = 0; i < userCount; i++)
-            {
-                const object = this._roomEngine.getRoomObjectWithIndex(roomId, i, RoomObjectCategoryEnum.OBJECT_CATEGORY_USER);
-
-                if(object === null) continue;
-
-                // AS3 looks the user up by the room object's *id*, through getUserDataByIndex() —
-                // the room index and the object id are the same number for avatars.
-                const userData = this._roomSession.userDataManager.getUserDataByIndex(object.getId());
-
-                if(userData != null
-                    && userData.type === 1
-                    && userData.roomObjectId !== this._roomSession.ownUserRoomId
-                    && !userData.isModerator)
-                {
-                    return 6;
-                }
-            }
-        }
-
-        return 0;
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::onRoomSessionEvent()
@@ -2769,7 +2499,7 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         }
 
         // AS3 runs this for *both* cases, outside the switch: entering or leaving a room changes
-        // what the open page may offer (placement, Builders Club status), and `isDraggable()` reads
+        // what the open page may offer (placement), and `isDraggable()` reads
         // the same session state.
         this.dispatchRoomChangedToCatalogPages();
     };
@@ -3159,18 +2889,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
 
                 break;
 
-            case 'warehouse':
-                if(parts.length > 2)
-                {
-                    this.openCatalogPage(parts[2], CatalogType.BUILDER);
-
-                    break;
-                }
-
-                this.toggleCatalog(CatalogType.BUILDER, true);
-
-                break;
-
             case 'club_buy':
                 this.openClubCenter();
 
@@ -3362,12 +3080,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         this._rentConfirmationWindow.show(furniData, buyout, objectId, stripId, fromCatalogue);
     }
 
-    // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::toggleBuilderCatalog()
-    public toggleBuilderCatalog(): void 
-    {
-        this.toggleCatalog(CatalogType.BUILDER);
-    }
-
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::getCatalogNavigator()
     public getCatalogNavigator(catalogType: string): ICatalogNavigator | null 
     {
@@ -3377,19 +3089,13 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
     /**
 	 * Whether the given catalog type uses the tab-less catalog window.
 	 *
-	 * The Builders Club catalog always does, whatever the config says — it has no
-	 * tabs to show. Honouring that needs one window per type, which is why this
-	 * parameter and CatalogWindowState arrived together: with a shared window, the
-	 * BUILDERS_CLUB navigator's constructor hid `tab_context` in the window NORMAL
-	 * was also using, and NORMAL lost its tabs for good.
-	 *
-	 * @param catalogType - The catalog type ("NORMAL", "BUILDERS_CLUB", ...)
+	 * @param _catalogType - The catalog type ("NORMAL")
 	 */
+    // DEVIATION: AS3 always answers true for the Builders Club catalog, whatever the config says;
+    //   the RPG fork removed it, so only the config decides.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::useNonTabbedCatalog()
-    public useNonTabbedCatalog(catalogType: string): boolean
+    public useNonTabbedCatalog(_catalogType: string): boolean
     {
-        if(catalogType === CatalogType.BUILDER) return true;
-
         return this.getBoolean('client.desktop.use.non.tabbed.catalog');
     }
 
@@ -3491,12 +3197,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         const key = this.getProperty(`activitypoint.name.${activityPointType}`);
 
         return this._localization?.getLocalization(key, key) ?? key;
-    }
-
-    // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::canPlaceWithBC()
-    public canPlaceWithBC(): boolean 
-    {
-        return false;
     }
 
     override dispose(): void 
@@ -3636,8 +3336,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         this.addMessageEvent(new ProductOfferMessageEvent(this.onProductOffer));
         this.addMessageEvent(new LimitedEditionSoldOutMessageEvent(this.onLimitedEditionSoldOut));
         this.addMessageEvent(new GiftReceiverNotFoundMessageEvent(this.onGiftReceiverNotFound));
-        this.addMessageEvent(new BuildersClubSubscriptionStatusMessageEvent(this.onBuildersClubSubscriptionStatus.bind(this)));
-        this.addMessageEvent(new BuildersClubFurniCountMessageEvent(this.onBuildersClubFurniCount.bind(this)));
         this.addMessageEvent(new ScrSendUserInfoEvent(this.onSubscriptionInfo.bind(this)));
         this.addMessageEvent(new LtdRaffleEnteredMessageEvent(this.onLtdRaffleEntered.bind(this)));
         this.addMessageEvent(new SnowWarGameTokensMessageEvent(this.onSnowWarGameTokenOffer.bind(this)));
@@ -3700,36 +3398,10 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
 
         this._furnitureDataCache = this._sessionDataManager?.getFurniData(this) ?? null;
 
-        // AS3 registers this at the top of initComponent (HabboCatalog.as:446); the position in
-        // the method does not matter, only that the receiver exists before the first membership
-        // packet lands.
-        this.registerUpdateReceiver(this, 1);
-    }
-
-    /**
-     * Ticks the Builders Club countdown while it is close to running out.
-     *
-     * The 500 ms gate and the +/-200 s window are both AS3's: outside that window the header text
-     * cannot visibly change from one second to the next, so re-running the whole
-     * `registerParameter()` + chrome pass every frame would be pure cost. Inside it, this is what
-     * makes the membership expire live rather than at the next catalog open.
-     *
-     * AS3 also calls `roomPreviewer.updatePreviewRoomView()` from here. This port drives that off
-     * the room engine's own object events instead (see `RoomPreviewer`'s class note), so the tick
-     * carries only the builder half.
-     */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::update()
-    update(_delta: number): void
-    {
-        if(HabboCatalog.getTimer() - this._builderMembershipDisplayUpdateTime <= 500) return;
-
-        const secondsLeft = this.builderSecondsLeft;
-        const secondsLeftWithGrace = this.builderSecondsLeftWithGrace;
-
-        if((secondsLeft > -3 && secondsLeft < 200) || (secondsLeftWithGrace > -3 && secondsLeftWithGrace < 200))
-        {
-            this.refreshBuilderStatus();
-        }
+        // AS3 also registers itself as an update receiver (HabboCatalog.as:446) for `update()`,
+        // which ticks the Builders Club countdown (and the room previewer, which this port drives
+        // off room-engine events instead). The RPG fork removed the Builders Club, so there is
+        // nothing left to tick.
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::initializeRoomPreviewer()
@@ -3781,7 +3453,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         this.initBundleDiscounts();
         this._initialized = true;
         this.events.emit(CatalogEvent.CATALOG_INITIALIZED, new CatalogEvent(CatalogEvent.CATALOG_INITIALIZED));
-        this.connection?.send(new BuildersClubQueryFurniCountMessageComposer());
 
         return true;
     }
@@ -3896,104 +3567,36 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
     }
 
     /**
-     * Repaints one catalog window's title bar for the mode it is showing.
-     *
-     * Both catalog types are built from the same layout, so every one of these six values is a
-     * per-mode override rather than a default: NORMAL keeps the blue chrome the XML ships,
-     * BUILDERS_CLUB the orange one. This used to be inlined in `toggleCatalog()`, which meant a
-     * freshly built BUILDERS_CLUB window wore NORMAL's colours until the first toggle - AS3 calls
-     * it from `createMainWindow()` too, and now so does this.
+     * Repaints the catalog window's title bar. AS3 calls it from `createMainWindow()` and
+     * `toggleCatalog()`, and so does this.
      */
+    // DEVIATION: AS3 paints per mode — NORMAL the blue chrome below, BUILDERS_CLUB an orange one with
+    //   `builder.mode.header` shown instead of `catalog.mode.header`. The RPG fork removed the
+    //   Builders Club, so only the NORMAL values remain (the layout still carries the builder header,
+    //   which stays hidden).
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::refreshCatalogWindowChrome()
-    private refreshCatalogWindowChrome(catalogType: string, container: IWindowContainer | null): void
+    private refreshCatalogWindowChrome(_catalogType: string, container: IWindowContainer | null): void
     {
         if(container == null) return;
 
-        const isNormal = catalogType === 'NORMAL';
-
-        container.color = isNormal ? 4296112 : 16758076;
-        container.caption = isNormal ? '${catalog.title}' : '${builder.catalog.title}';
+        container.color = 4296112;
+        container.caption = '${catalog.title}';
 
         const border = container.findChildByName('catalog.header.background.border');
 
-        if(border != null) border.color = isNormal ? 4281819765 : 4283320388;
+        if(border != null) border.color = 4281819765;
 
         const body = container.findChildByName('catalog.header.background.body');
 
-        if(body != null) body.color = isNormal ? 4279123794 : 4281149220;
+        if(body != null) body.color = 4279123794;
 
         const catalogHeader = container.findChildByName('catalog.mode.header');
 
-        if(catalogHeader != null) catalogHeader.visible = isNormal;
+        if(catalogHeader != null) catalogHeader.visible = true;
 
         const builderHeader = container.findChildByName('builder.mode.header');
 
-        if(builderHeader != null) builderHeader.visible = catalogType === CatalogType.BUILDER;
-    }
-
-    /**
-     * Recomputes the Builders Club header text and raises the two membership-transition events.
-     *
-     * The transitions are edge-detected against the *previous* call, which is why the two flags
-     * are fields: "in grace" is the pass where the paid time has run out but the grace time has
-     * not, and "expired" the pass where both have. Both are read from the same server snapshot
-     * (`onBuildersClubMembership()`), aged by the wall clock since it arrived.
-     *
-     * Everything after that is `registerParameter()`: the three `builder.header.*` keys are
-     * printed by the window chrome, not by this method, so refreshing them plus the chrome pass at
-     * the end is what actually redraws the header.
-     */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::refreshBuilderStatus()
-    private refreshBuilderStatus(): void
-    {
-        const secondsLeft = this.builderSecondsLeft;
-        const secondsLeftWithGrace = this.builderSecondsLeftWithGrace;
-
-        if(this._builderIsMember && secondsLeft <= 0 && secondsLeftWithGrace > 0)
-        {
-            this.events.emit(
-                CatalogEvent.CATALOG_BUILDER_MEMBERSHIP_IN_GRACE,
-                new CatalogEvent(CatalogEvent.CATALOG_BUILDER_MEMBERSHIP_IN_GRACE)
-            );
-        }
-        else if(this._builderIsInGrace && secondsLeftWithGrace <= 0)
-        {
-            this.events.emit(
-                CatalogEvent.CATALOG_BUILDER_MEMBERSHIP_EXPIRED,
-                new CatalogEvent(CatalogEvent.CATALOG_BUILDER_MEMBERSHIP_EXPIRED)
-            );
-        }
-
-        this._builderIsMember = secondsLeft > 0;
-        this._builderIsInGrace = secondsLeftWithGrace > 0;
-
-        const localization = this._localization;
-
-        if(localization === null) return;
-
-        const statusKey = 'builder.header.status.' + (this._builderIsMember ? 'member' : (this._builderIsInGrace ? 'grace' : 'trial'));
-        const status = localization.getLocalization(statusKey);
-
-        localization.registerParameter('builder.header.title', 'bcstatus', status);
-
-        // A member sees their paid time, someone in grace their grace time, and a trial user the
-        // status word itself - AS3 reuses `status` as the duration in that third case.
-        const duration = this._builderIsMember
-            ? FriendlyTime.getFriendlyTime(localization, secondsLeft)
-            : (this._builderIsInGrace ? FriendlyTime.getFriendlyTime(localization, secondsLeftWithGrace) : status);
-
-        localization.registerParameter('builder.header.status.membership', 'duration', `<font color="#ff8d00"><b>${duration}</b></font>`);
-        localization.registerParameter('builder.header.status.limit', 'count', `<font color="#ff8d00"><b>${this._builderFurniCount}</b></font>`);
-        localization.registerParameter('builder.header.status.limit', 'limit', `<font color="#ff8d00"><b>${this._builderFurniLimit}</b></font>`);
-
-        this._builderMembershipDisplayUpdateTime = HabboCatalog.getTimer();
-
-        if(this._catalogStates == null) return;
-
-        for(const state of this._catalogStates.values())
-        {
-            this.refreshCatalogWindowChrome(state.catalogType ?? '', state.mainContainer);
-        }
+        if(builderHeader != null) builderHeader.visible = false;
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::onSearchInputEvent()
@@ -4054,11 +3657,9 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
      * The 400 cap is AS3's own — a two-letter query can match most of the furni table, and the grid
      * has to render every result it is handed.
      *
-     * `excludedFromDynamic` and `availableForBuildersClub` do opposite jobs here: the normal catalog
-     * hides furni marked out of the dynamic listing, while the Builders Club catalog shows *only*
-     * what it may place. A Builders Club furni whose offer resolves to nothing still contributes its
-     * furni line to the navigator filter, which is how a whole line stays findable when no single
-     * item of it is purchasable.
+     * The normal catalog hides furni marked `excludedFromDynamic`. (AS3's Builders Club catalog also
+     * filled `furniLines` from furni whose offer resolved to nothing; the RPG fork removed it, so
+     * that list always reaches the navigator empty.)
      */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::performSearch()
     private performSearch(query: string): void
@@ -4090,8 +3691,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         {
             const furniData = entry.furniData;
 
-            if(this._catalogType === CatalogType.BUILDER && !furniData.availableForBuildersClub) continue;
-
             if(this._catalogType === CatalogType.NORMAL && furniData.excludedFromDynamic) continue;
 
             if(!HabboCatalog.matchesSearchEntry(entry, needle)) continue;
@@ -4108,12 +3707,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
 
                     if(offers.length >= HabboCatalog.SEARCH_RESULT_LIMIT) break;
                 }
-            }
-            else if(this._catalogType === CatalogType.BUILDER && furniData.furniLine !== '')
-            {
-                const furniLine = HabboCatalog.normalizeSearchText(furniData.furniLine);
-
-                if(furniLine.length > 0 && furniLines.indexOf(furniLine) < 0) furniLines.push(furniLine);
             }
         }
 
@@ -4173,8 +3766,9 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
     /**
      * AS3: .../HabboCatalog.as::createSearchResultOffer()
      *
-     * Returns null when no offer of the furni is reachable from the current navigator — that is the
-     * signal the caller uses to fall back to the furni line instead.
+     * Returns null when no offer of the furni is reachable from the current navigator; the caller
+     * then skips it. (AS3 also resolves `bcOfferId` in the Builders Club catalog; the RPG fork
+     * removed it.)
      */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::createSearchResultOffer()
     private createSearchResultOffer(entry: CatalogSearchEntry): FurnitureOffer | null
@@ -4184,14 +3778,7 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         let offerId = -1;
         let isRentOffer = false;
 
-        if(this._catalogType === CatalogType.BUILDER)
-        {
-            if(furniData.bcOfferId !== -1 && navigator?.getNodesByOfferId(furniData.bcOfferId, true) != null)
-            {
-                offerId = furniData.bcOfferId;
-            }
-        }
-        else if(furniData.purchaseOfferId !== -1
+        if(furniData.purchaseOfferId !== -1
             && navigator?.getNodesByOfferId(furniData.purchaseOfferId, true) != null)
         {
             offerId = furniData.purchaseOfferId;
@@ -4240,8 +3827,9 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
     }
 
     /**
-     * Builders Club furni (`bc_` prefix) never appears among the *results*, only among the furni
-     * lines fed to the navigator — the placement widget is how they are reached.
+     * Builders Club furni (`bc_` prefix) never appears among the *results*. AS3 reached them through
+     * the Builders Club catalog, which the RPG fork removed; the furni data can still list them, so
+     * the filter stays.
      */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::isExcludedFromFurnitureSearchResults()
     private static isExcludedFromFurnitureSearchResults(furniData: IFurnitureData): boolean
@@ -4304,25 +3892,21 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
     };
 
     /**
-	 * Builds both catalog types' state up front, as AS3 does — the Builders Club
-	 * window exists from init(), it is not made on first use.
+	 * Builds the catalog's state up front, as AS3 does.
 	 */
+    // DEVIATION: AS3 also builds the BUILDERS_CLUB state here; the RPG fork removed the Builders Club.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::createCatalogWindowStates()
     private createCatalogWindowStates(): void
     {
         this._catalogStates = new Map();
         this._catalogNavigators = new Map();
         this.createCatalogWindowState('NORMAL');
-        this.createCatalogWindowState(CatalogType.BUILDER);
     }
 
     /**
 	 * Builds one catalog type's window, navigator and viewer, and files them.
-	 *
-	 * Each type gets its *own* main window. That is what lets the navigator
-	 * constructor hide `tab_context` for BUILDERS_CLUB without taking NORMAL's
-	 * tabs with it — sharing one window between both is what made the per-type
-	 * answer unusable before.
+	 * Each type gets its *own* main window. (AS3 also makes the BUILDERS_CLUB
+	 * window 15px taller; the RPG fork removed the Builders Club.)
 	 *
 	 * @param catalogType - The catalog type to build
 	 */
@@ -4336,11 +3920,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         const state = new CatalogWindowState(catalogType);
 
         state.mainContainer = this.createMainWindow(catalogType);
-
-        if(catalogType === CatalogType.BUILDER)
-        {
-            state.mainContainer.height += 15;
-        }
 
         state.catalogNavigator = new CatalogNavigator(this, state.mainContainer, catalogType);
         state.catalogViewer = new CatalogViewer(
@@ -4534,9 +4113,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
             case HabboToolbarIconEnum.CATALOGUE:
                 this.toggleCatalog('NORMAL');
                 break;
-            case HabboToolbarIconEnum.BUILDER:
-                this.toggleCatalog(CatalogType.BUILDER);
-                break;
         }
     };
 
@@ -4575,7 +4151,7 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
             default:
                 // Four conditions, and all four are needed: something new to show, the hotel's
                 // notification switch on, the auto-open not separately disabled, and the NORMAL
-                // catalog — the Builders Club index never opens on new additions.
+                // catalog.
                 if(this._newAdditionsAvailable
                     && this._newItemsNotificationEnabled
                     && !this.newAdditionsPageOpenDisabled
@@ -4626,9 +4202,8 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
 
         // Resolve the state the *response* belongs to, not the active one. A page for
         // the type the user is no longer looking at still renders into its own viewer;
-        // dropping it (`parser.catalogType !== this._catalogType`) meant switching to
-        // Builders Club showed whatever NORMAL had left behind, because the page that
-        // was in flight when the switch happened was thrown away.
+        // dropping it (`parser.catalogType !== this._catalogType`) threw away the page that
+        // was in flight when the type switched.
         const state = this.getCatalogState(parser.catalogType);
 
         if(state == null || state.catalogViewer == null) return;
@@ -4662,7 +4237,7 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
                 );
             });
 
-            if(products.length === 0 && !HabboCatalogUtils.buildersClub(offerData.localizationId)) continue;
+            if(products.length === 0) continue;
 
             const offer = new Offer(
                 offerData.offerId,

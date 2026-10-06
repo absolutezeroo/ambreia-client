@@ -44,9 +44,8 @@ export class CatalogViewer implements ICatalogViewer
     /**
 	 * The catalog type this viewer belongs to.
 	 *
-	 * Read by CatalogPage to decide whether it is a Builders Club page, to pick
-	 * the widgets it builds, and by LocalizationCatalogWidget to find the right
-	 * navigator.
+	 * Read by CatalogPage to pick the widgets it builds, and by
+	 * LocalizationCatalogWidget to find the right navigator.
 	 */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/viewer/CatalogViewer.as::get catalogType()
     get catalogType(): string | null

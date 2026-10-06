@@ -107,7 +107,6 @@ import {Vector3d} from '@room/utils/Vector3d';
 import type {IUserData} from '@habbo/session/IUserData';
 import type {InfoStandWidget} from '@habbo/ui/widget/infostand/InfoStandWidget';
 import type {ISelectedBadge} from '@habbo/communication/messages/parser/users/HabboUserBadgesMessageParser';
-import {BuilderClubUtils} from '@habbo/utils/BuilderClubUtils';
 
 const log = Logger.getLogger('habbo.ui.handler.InfoStandWidgetHandler');
 
@@ -1293,40 +1292,13 @@ export class InfoStandWidgetHandler implements IRoomWidgetHandler, IGetImageList
         }
     }
 
+    // DEVIATION: AS3 first asks for confirmation when the item is a Builders Club item that is not
+    //   in the warehouse (picking it up loses it). The RPG fork removed the Builders Club, so every
+    //   pickup goes straight through, as AS3 does for any non-BC item.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/InfoStandWidgetHandler.as::pickupObjectWithConfirmation()
     private pickupObjectWithConfirmation(furniId: number, furniCategory: number): void 
     {
-        const container = this._container;
-
-        if(!container?.roomEngine) return;
-
-        // Picking up a Builder's Club item that is not in the warehouse loses it — the rental is
-        // returned and the item is gone — so that one case asks first. A BC item that *is* in the
-        // warehouse, and everything that is not a BC item at all, goes straight through.
-        const isBuildersClubPickup = BuilderClubUtils.isBuilderClubId(furniId)
-            && (container.catalog?.buildersClubEnabled ?? false);
-
-        if(isBuildersClubPickup && !(this._widget?.furniData.availableForBuildersClub ?? false))
-        {
-            container.windowManager?.confirm(
-                '${generic.alert.title}',
-                '${room.confirm.not_in_warehouse}',
-                0,
-                (dialog: {dispose(): void}, event: WindowEvent): void =>
-                {
-                    dialog.dispose();
-
-                    if(event.type === 'WE_OK')
-                    {
-                        container.roomEngine?.modifyRoomObject(furniId, furniCategory, RoomObjectOperationEnum.OBJECT_PICKUP);
-                    }
-                }
-            );
-
-            return;
-        }
-
-        container.roomEngine.modifyRoomObject(furniId, furniCategory, RoomObjectOperationEnum.OBJECT_PICKUP);
+        this._container?.roomEngine?.modifyRoomObject(furniId, furniCategory, RoomObjectOperationEnum.OBJECT_PICKUP);
     }
 
     /**
@@ -1860,12 +1832,10 @@ export class InfoStandWidgetHandler implements IRoomWidgetHandler, IGetImageList
                 event.isNft = furnitureData.className.indexOf('nft_') === 0;
                 event.description = furnitureData.description;
                 event.purchaseOfferId = furnitureData.purchaseOfferId;
-                event.bcOfferId = furnitureData.bcOfferId;
                 event.tradeable = furnitureData.tradeable;
                 event.purchaseCouldBeUsedForBuyout = furnitureData.purchaseCouldBeUsedForBuyout;
                 event.rentOfferId = furnitureData.rentOfferId;
                 event.rentCouldBeUsedForBuyout = furnitureData.rentCouldBeUsedForBuyout;
-                event.availableForBuildersClub = furnitureData.availableForBuildersClub;
                 event.classId = typeId;
             }
         }

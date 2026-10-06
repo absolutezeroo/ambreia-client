@@ -93,13 +93,6 @@ export class PurchaseCatalogWidget extends CatalogWidget
     {
         if(!super.init()) return false;
 
-        if(this._catalog!.catalogType === 'BUILDERS_CLUB')
-        {
-            this.window.visible = false;
-
-            return true;
-        }
-
         this.attachWidgetView(CatalogWidgetName.PURCHASE);
         this.window.findChildByName('selection_information')!.visible = true;
         this.window.findChildByName('default_buttons')!.visible = false;

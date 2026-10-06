@@ -35,8 +35,6 @@ export interface IFurnitureData
     readonly adUrl: string;
     // AS3: sources/win63_version/habbo/session/furniture/class_1800.as::get purchaseOfferId()
     readonly purchaseOfferId: number;
-    // AS3: sources/win63_version/habbo/session/furniture/class_1800.as::get bcOfferId()
-    readonly bcOfferId: number;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/furniture/_SafeCls_2302.as::get tradeable()
     readonly tradeable: boolean;
     // AS3: sources/win63_version/habbo/session/furniture/class_1800.as::get rentOfferId()
@@ -49,8 +47,6 @@ export interface IFurnitureData
     readonly purchaseCouldBeUsedForBuyout: boolean;
     // AS3: sources/win63_version/habbo/session/furniture/class_1800.as::get rentCouldBeUsedForBuyout()
     readonly rentCouldBeUsedForBuyout: boolean;
-    // AS3: sources/win63_version/habbo/session/furniture/class_1800.as::get availableForBuildersClub()
-    readonly availableForBuildersClub: boolean;
     // AS3: sources/win63_version/habbo/session/furniture/class_1800.as::get canStandOn()
     readonly canStandOn: boolean;
     // AS3: sources/win63_version/habbo/session/furniture/class_1800.as::get canSitOn()

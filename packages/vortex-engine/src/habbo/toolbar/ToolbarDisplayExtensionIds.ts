@@ -44,9 +44,6 @@ export class ToolbarDisplayExtensionIds
     // AS3: .../src/com/sulake/habbo/toolbar/ToolbarDisplayExtensionIds.as::VIDEO_OFFERS
     public static readonly VIDEO_OFFERS: string = 'video_offers';
 
-    // AS3: .../src/com/sulake/habbo/toolbar/ToolbarDisplayExtensionIds.as::BUILDER
-    public static readonly BUILDER: string = 'builder';
-
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/toolbar/ToolbarDisplayExtensionIds.as::SETTINGS
     public static readonly SETTINGS: string = 'settings';
 

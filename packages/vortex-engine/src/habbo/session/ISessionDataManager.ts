@@ -132,12 +132,6 @@ export interface ISessionDataManager extends IDisposable
     // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::get mysteryKeyColor()
     readonly mysteryKeyColor: string;
 
-    // Builders club
-    readonly buildersClubSecondsLeft: number;
-    readonly buildersClubFurniLimit: number;
-    readonly buildersClubMaxFurniLimit: number;
-    readonly buildersClubSecondsLeftWithGrace: number | null;
-
     // Perks
     // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::get perksReady()
     readonly perksReady: boolean;
@@ -306,9 +300,6 @@ export interface ISessionDataManager extends IDisposable
 
     // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::ejectPets()
     ejectPets(roomId: number): void;
-
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::pickAllBuilderFurniture()
-    pickAllBuilderFurniture(roomId: number): void;
 
     // Credit vault & rewards
     // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::getCreditVaultStatus()

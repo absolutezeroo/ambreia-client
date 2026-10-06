@@ -39,9 +39,6 @@ export class PageLocalization implements IPageLocalization
         // AS3 sets LAYOUTS_TEXT_FIELDS["frontpage4"] twice - the camera1-style entry above is
         // immediately overwritten by this one, matching the real, order-dependent AS3 behavior.
         ['frontpage4', ['ctlg_txt1', 'ctlg_txt2']],
-        ['builders_club_frontpage', ['ctlg_description']],
-        ['builders_club_addons', ['ctlg_description']],
-        ['builders_club_loyalty', ['ctlg_description']],
     ]);
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/viewer/PageLocalization.as::LAYOUT_LINKS

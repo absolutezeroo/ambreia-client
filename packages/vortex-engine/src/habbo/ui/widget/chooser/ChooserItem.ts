@@ -1,10 +1,5 @@
-import {BuilderClubUtils} from '@habbo/utils/BuilderClubUtils';
-
 /**
  * One row of a chooser: a room object reduced to what the list needs.
- *
- * `owner` is not a plain field — two id ranges override it, so a Builders Club or wired-temporary
- * item reports its provenance instead of whoever placed it.
  *
  * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/chooser/ChooserItem.as
  */
@@ -64,14 +59,11 @@ export class ChooserItem
         return this._type;
     }
 
+    // DEVIATION: AS3 overrides the owner for two id ranges ("Builders Club", "Temp (Wired)"). The RPG
+    //   fork removed the Builders Club and wired, so neither range is ever issued.
     // AS3: .../widget/chooser/ChooserItem.as::get owner()
-    // The two labels are hardcoded English in AS3 too — not localisation keys.
     get owner(): string | null
     {
-        if(BuilderClubUtils.isBuilderClubId(this._id)) return 'Builders Club';
-
-        if(BuilderClubUtils.isTempId(this._id)) return 'Temp (Wired)';
-
         return this._owner;
     }
 

@@ -51,8 +51,6 @@ export interface IHabboCatalog
     readonly tradingActive: boolean;
     // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::get imageGalleryHost()
     readonly imageGalleryHost: string;
-    // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::get buildersClubEnabled()
-    readonly buildersClubEnabled: boolean;
     // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::get catalogType()
     readonly catalogType: string;
     // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::get collectorHub()
@@ -69,10 +67,6 @@ export interface IHabboCatalog
     readonly avatarEditor: unknown;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::get notifications()
     readonly notifications: IHabboNotifications | null;
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::get builderSecondsLeft()
-    readonly builderSecondsLeft: number;
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::get builderSecondsLeftWithGrace()
-    readonly builderSecondsLeftWithGrace: number;
 
     // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::getSeasonalCurrencyActivityPointType()
     getSeasonalCurrencyActivityPointType(): number;
@@ -185,8 +179,6 @@ export interface IHabboCatalog
     displayProductIcon(productType: string, classId: number, target: unknown): void;
     // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::openRentConfirmationWindow()
     openRentConfirmationWindow(data: unknown, isWallItem: boolean, extraParam?: number, price?: number, rent?: boolean): void;
-    // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::toggleBuilderCatalog()
-    toggleBuilderCatalog(): void;
     // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::getCatalogNavigator()
     getCatalogNavigator(catalogType: string): ICatalogNavigator | null;
     // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::getOfferCenter()
@@ -195,6 +187,4 @@ export interface IHabboCatalog
     itemAddedToInventory(classId: number, itemId: number, category: number): void;
     // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::getActivityPointName()
     getActivityPointName(activityPointType: number): string;
-    // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::canPlaceWithBC()
-    canPlaceWithBC(): boolean;
 }

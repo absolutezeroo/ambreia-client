@@ -65,7 +65,6 @@ import type {IRoomObjectVisualizationFactory} from '@room/object/IRoomObjectVisu
 import type {RoomRenderingCanvas} from './renderer/RoomRenderingCanvas';
 import type {IStuffData} from './object/data/IStuffData';
 import type {IGetImageListener} from './IGetImageListener';
-import {BuilderClubUtils} from '@habbo/utils/BuilderClubUtils';
 import {HabboToolbarIconEnum} from '@habbo/toolbar/HabboToolbarIconEnum';
 import {ImageResult} from './ImageResult';
 import type {ISelectedRoomObjectData} from './ISelectedRoomObjectData';
@@ -749,7 +748,7 @@ export class RoomEngine extends Component implements IRoomEngine,
                 true // Required dependency
             ),
             // AS3: _SafeCls_90.as:434 — RoomEngine takes IIDHabboWindowManager so that
-            // RoomMessageHandler can raise the pick-up / builders-club placement confirms.
+            // RoomMessageHandler can raise the pick-up confirm.
             new ComponentDependency(
                 IID_HabboWindowManager,
                 (windowManager: IHabboWindowManager | null) =>
@@ -4767,10 +4766,10 @@ export class RoomEngine extends Component implements IRoomEngine,
      * The "furni flies into your inventory" animation.
      *
      * Four things have to hold before it plays, and each rules out a case where it would be wrong:
-     * the picker is the local player (someone else's pickup goes into *their* inventory), the id is
-     * neither a Builders Club nor a wired temp id (those objects have no inventory item behind
-     * them), the object is still on screen, and its own model does not ask to be picked up
-     * silently.
+     * the picker is the local player (someone else's pickup goes into *their* inventory), the object
+     * is still on screen, and its own model does not ask to be picked up silently. (AS3 also skips
+     * the Builders Club and wired-temporary id ranges, which have no inventory item behind them; the
+     * RPG fork removed both.)
      *
      * Where this necessarily differs from AS3: `getFurnitureIcon()` there returns a BitmapData that
      * is readable on the spot, while this port's `ImageResult` converts a Texture to an ImageBitmap
@@ -4787,7 +4786,6 @@ export class RoomEngine extends Component implements IRoomEngine,
 
         if(toolbar === null || this._sessionDataManager === null) return;
         if(pickerId !== this._sessionDataManager.userId) return;
-        if(BuilderClubUtils.isBuilderClubId(id) || BuilderClubUtils.isTempId(id)) return;
 
         const object = this.getRoomObject(roomId, id, RoomObjectCategoryEnum.OBJECT_CATEGORY_FURNITURE);
 
@@ -5186,7 +5184,6 @@ export class RoomEngine extends Component implements IRoomEngine,
 
         if(toolbar === null || this._sessionDataManager === null) return;
         if(pickerId !== this._sessionDataManager.userId) return;
-        if(BuilderClubUtils.isBuilderClubId(id) || BuilderClubUtils.isTempId(id)) return;
 
         const object = this.getRoomObject(roomId, id, RoomObjectCategoryEnum.OBJECT_CATEGORY_WALL);
 

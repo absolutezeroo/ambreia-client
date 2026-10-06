@@ -72,22 +72,19 @@ export class FurniProductContainer extends ProductContainer
      * AS3: FurniProductContainer.as::activate()
      *
      * Asks for whichever offer actually applies. The order matters: an explicit offer id wins, then
-     * the rent offer unless this is a Builders Club page (where renting makes no sense), then the
-     * purchase offer.
+     * the rent offer, then the purchase offer. (AS3 also skips the rent offer on a Builders Club
+     * page; the RPG fork removed the Builders Club.)
      */
     // AS3: FurniProductContainer.as::activate()
     override activate(): void
     {
         super.activate();
 
-        const isBuilderPage = this._offer != null && this._offer.page != null
-            && this._offer.page.isBuilderPage;
-
         if(this._offer != null && this._offer.offerId > -1)
         {
             this.catalog?.sendGetProductOffer(this._offer.offerId);
         }
-        else if(this._furniData.rentOfferId > -1 && !isBuilderPage)
+        else if(this._furniData.rentOfferId > -1)
         {
             this.catalog?.sendGetProductOffer(this._furniData.rentOfferId);
         }

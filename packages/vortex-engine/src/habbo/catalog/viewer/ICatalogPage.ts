@@ -65,7 +65,4 @@ export interface ICatalogPage
 
     // AS3: sources/win63_version/habbo/catalog/viewer/class_2044.as::get mode()
     readonly mode: number;
-
-    // AS3: sources/win63_version/habbo/catalog/viewer/class_2044.as::get isBuilderPage()
-    readonly isBuilderPage: boolean;
 }

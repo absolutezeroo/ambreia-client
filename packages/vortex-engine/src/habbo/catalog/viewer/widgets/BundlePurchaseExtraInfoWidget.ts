@@ -74,13 +74,6 @@ export class BundlePurchaseExtraInfoWidget extends CatalogWidget
 
     override init(): boolean
     {
-        if(this.page.isBuilderPage)
-        {
-            this.window.visible = false;
-
-            return true;
-        }
-
         if(!this._catalog!.multiplePurchaseEnabled)
         {
             return true;

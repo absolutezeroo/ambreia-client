@@ -330,7 +330,6 @@ export class FurnitureDataParser
             this.childString(values, 'buyout') === '1',
             this.childNumber(values, 'rentofferid', 0),
             this.childString(values, 'rentbuyout') === '1',
-            this.childString(values, 'bc') === '1',
             this.childString(values, 'customparams'),
             this.childNumber(values, 'specialtype', 0),
             this.childString(values, 'canstandon') === '1',
@@ -338,7 +337,6 @@ export class FurnitureDataParser
             this.childString(values, 'canlayon') === '1',
             this.childString(values, 'excludeddynamic') === '1',
             this.childString(values, 'furniline'),
-            this.childNumber(values, 'bcofferid', 0),
             this.childString(values, 'tradeable') === '1',
             this.furniDataCategory(item, values),
             this.childString(values, 'canputstuffon') === '1',
@@ -386,7 +384,6 @@ export class FurnitureDataParser
             this.childString(values, 'buyout') === '1',
             this.childNumber(values, 'rentofferid', 0),
             this.childString(values, 'rentbuyout') === '1',
-            this.childString(values, 'bc') === '1',
             null,
             this.childNumber(values, 'specialtype', 0),
             false,
@@ -394,7 +391,6 @@ export class FurnitureDataParser
             false,
             this.childString(values, 'excludeddynamic') === '1',
             this.childString(values, 'furniline'),
-            this.childNumber(values, 'bcofferid', 0),
             this.childString(values, 'tradeable') === '1',
             this.furniDataCategory(item, values),
             // A wall item is never stacked on and has no stacking height; AS3 passes both as
@@ -458,7 +454,6 @@ export class FurnitureDataParser
             this.getRawBoolean(item, 'buyout'),
             this.getRawNumber(item, 0, 'rentofferid'),
             this.getRawBoolean(item, 'rentbuyout'),
-            this.getRawBoolean(item, 'bc'),
             this.getRawString(item, 'customparams'),
             this.getRawNumber(item, 0, 'specialtype'),
             this.getRawBoolean(item, 'canstandon'),
@@ -466,7 +461,6 @@ export class FurnitureDataParser
             this.getRawBoolean(item, 'canlayon'),
             this.getRawBoolean(item, 'excludeddynamic'),
             this.getRawString(item, 'furniline'),
-            this.getRawNumber(item, 0, 'bcofferid'),
             this.getRawBoolean(item, 'tradeable'),
             this.getRawString(item, 'category'),
             this.getRawBoolean(item, 'canputstuffon'),
@@ -499,7 +493,6 @@ export class FurnitureDataParser
             this.getRawBoolean(item, 'buyout'),
             this.getRawNumber(item, 0, 'rentofferid'),
             this.getRawBoolean(item, 'rentbuyout'),
-            this.getRawBoolean(item, 'bc'),
             null,
             this.getRawNumber(item, 0, 'specialtype'),
             false,
@@ -507,7 +500,6 @@ export class FurnitureDataParser
             false,
             this.getRawBoolean(item, 'excludeddynamic'),
             this.getRawString(item, 'furniline'),
-            this.getRawNumber(item, 0, 'bcofferid'),
             this.getRawBoolean(item, 'tradeable'),
             this.getRawString(item, 'category'),
             false,
@@ -586,7 +578,6 @@ export class FurnitureDataParser
                     values[12] === 'true',
                     parseInt(values[13], 10),
                     values[14] === 'true',
-                    values[17] === 'true',
                     values[15],
                     parseInt(values[16], 10),
                     canStandOn,
@@ -594,9 +585,7 @@ export class FurnitureDataParser
                     canLayOn,
                     excludedFromDynamic,
                     '',
-                    -1,
-                    // The legacy Lingo format predates furniLine/bcOfferId/tradeable - none of the
-                    // three are encoded in it, same reasoning as the -1 bcOfferId above.
+                    // The legacy Lingo format predates furniLine/tradeable - neither is encoded in it.
                     false
                 );
 

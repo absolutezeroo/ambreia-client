@@ -21,7 +21,6 @@ export {FurniturePlane} from './FurniturePlane';
 export {FurniturePosterVisualization} from './FurniturePosterVisualization';
 export {FurnitureStickieVisualization} from './FurnitureStickieVisualization';
 export {FurnitureQueueTileVisualization} from './FurnitureQueueTileVisualization';
-export {FurnitureBuilderPlaceholderVisualization} from './FurnitureBuilderPlaceholderVisualization';
 export {FurnitureGiftWrappedVisualization} from './FurnitureGiftWrappedVisualization';
 
 // Specialized - animated

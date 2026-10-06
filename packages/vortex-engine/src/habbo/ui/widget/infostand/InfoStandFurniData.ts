@@ -22,8 +22,6 @@ export class InfoStandFurniData
     public classId: number = 0;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandFurniData.as::get purchaseOfferId()
     public purchaseOfferId: number = -1;
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandFurniData.as::get bcOfferId()
-    public bcOfferId: number = -1;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandFurniData.as::get extraParam()
     public extraParam: string = '';
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandFurniData.as::get stuffData()
@@ -36,8 +34,6 @@ export class InfoStandFurniData
     public ownerName: string = '';
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandFurniData.as::get rentOfferId()
     public rentOfferId: number = -1;
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandFurniData.as::get availableForBuildersClub()
-    public availableForBuildersClub: boolean = false;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandFurniData.as::get tradeable()
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandFurniData.as::set tradeable()
     public tradeable: boolean = false;
@@ -57,9 +53,7 @@ export class InfoStandFurniData
         this.ownerName = event.ownerName;
         this.ownerId = event.ownerId;
         this.rentOfferId = event.rentOfferId;
-        this.availableForBuildersClub = event.availableForBuildersClub;
         this.classId = event.classId;
-        this.bcOfferId = event.bcOfferId;
         this.tradeable = event.tradeable;
     }
 }

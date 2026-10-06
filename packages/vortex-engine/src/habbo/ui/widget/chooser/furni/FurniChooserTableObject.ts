@@ -1,6 +1,5 @@
 import type {ITableObject} from '@habbo/window/utils/tableview/ITableObject';
 import {TableCell} from '@habbo/window/utils/tableview/TableCell';
-import {BuilderClubUtils} from '@habbo/utils/BuilderClubUtils';
 import type {ChooserItem} from '../ChooserItem';
 import {FurniView} from './FurniView';
 
@@ -38,10 +37,9 @@ export class FurniChooserTableObject implements ITableObject
     }
 
     /**
-     * The owner column re-tests the two id ranges that `ChooserItem.owner` already handles, and
-     * shows "-" for them — so a Builders Club item reads "Builders Club" nowhere in this table
-     * even though the item would report it. The name and id cells are selectable; the owner cell
-     * is only selectable when it is a real name.
+     * The name and id cells are selectable; the owner cell is only selectable when it is a real
+     * name. (AS3 also shows "-" for the Builders Club and wired-temporary id ranges; the RPG fork
+     * removed both.)
      *
      * AS3 returns **null** for an unknown column; this port's `ITableObject` declares the return
      * non-null and `TableRowView` passes the cell straight on, so the default returns an empty
@@ -56,9 +54,7 @@ export class FurniChooserTableObject implements ITableObject
                 return new TableCell(TableCell.TYPE_TEXT, this._chooserItem.name, false, true);
 
             case FurniView.COLUMN_FURNI_OWNER:
-                if(this._chooserItem.owner === null
-                    || BuilderClubUtils.isBuilderClubId(this._chooserItem.id)
-                    || BuilderClubUtils.isTempId(this._chooserItem.id))
+                if(this._chooserItem.owner === null)
                 {
                     return new TableCell(TableCell.TYPE_TEXT, FurniChooserTableObject.OWNERLESS_PLACEHOLDER);
                 }

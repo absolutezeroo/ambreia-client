@@ -15,10 +15,6 @@ export class CatalogEvent
     static readonly CATALOG_NEW_ITEMS_HIDE: string = 'CATALOG_NEW_ITEMS_HIDE';
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/event/CatalogEvent.as::CATALOG_USER_SELECTED
     static readonly CATALOG_USER_SELECTED: string = 'CATALOG_USER_SELECTED';
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/event/CatalogEvent.as::CATALOG_BUILDER_MEMBERSHIP_EXPIRED
-    static readonly CATALOG_BUILDER_MEMBERSHIP_EXPIRED: string = 'CATALOG_BUILDER_MEMBERSHIP_EXPIRED';
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/event/CatalogEvent.as::CATALOG_BUILDER_MEMBERSHIP_IN_GRACE
-    static readonly CATALOG_BUILDER_MEMBERSHIP_IN_GRACE: string = 'CATALOG_BUILDER_MEMBERSHIP_IN_GRACE';
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/event/CatalogEvent.as::CATALOG_INVISIBLE_PAGE_VISITED
     static readonly CATALOG_INVISIBLE_PAGE_VISITED: string = 'CATALOG_INVISIBLE_PAGE_VISITED';
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/event/CatalogEvent.as::COLLECTIBLES_CLAIM_WAIT

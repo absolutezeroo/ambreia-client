@@ -25,7 +25,6 @@ export {ItemsStateUpdateMessageEvent} from './ItemsStateUpdateMessageEvent';
 export {ItemDataUpdateMessageEvent} from './ItemDataUpdateMessageEvent';
 export {AreaHideMessageEvent} from './AreaHideMessageEvent';
 export {ObjectRemoveConfirmMessageEvent} from './ObjectRemoveConfirmMessageEvent';
-export {BCPlacementWarningMessageEvent} from './BCPlacementWarningMessageEvent';
 export {SpecialRoomEffectMessageEvent} from './SpecialRoomEffectMessageEvent';
 export {UsersMessageEvent} from './UsersMessageEvent';
 export {UserUpdateMessageEvent} from './UserUpdateMessageEvent';

@@ -276,8 +276,6 @@ import {
     BundleDiscountRulesetMessageEvent,
     CatalogPublishedMessageEvent,
     GiftWrappingConfigurationEvent,
-    BuildersClubFurniCountMessageEvent,
-    BuildersClubSubscriptionStatusMessageEvent,
     CatalogIndexMessageEvent,
     CatalogPageMessageEvent,
     CatalogPageWithEarliestExpiryMessageEvent,
@@ -394,7 +392,6 @@ import {
 // Incoming Events - Room Engine
 import {
     AreaHideMessageEvent,
-    BCPlacementWarningMessageEvent,
     DiceValueMessageEvent,
     FloorHeightMapMessageEvent,
     FurnitureAliasesMessageEvent,
@@ -1283,7 +1280,6 @@ import {CommunityGoalVoteMessageComposer, GetPromoArticlesComposer,} from './mes
 
 // Outgoing Composers - Catalog
 import {
-    BuildersClubQueryFurniCountMessageComposer,
     CheckGiftableMessageComposer,
     GetBonusRareInfoMessageComposer,
     GetBundleDiscountRulesetComposer,
@@ -1306,8 +1302,6 @@ import {
     PurchaseRoomAdMessageComposer,
     RoomAdPurchaseInitiatedMessageComposer,
     GetSellablePetPalettesComposer,
-    PlaceObjectFromCatalogComposer,
-    PlaceWallItemFromCatalogComposer,
     PurchaseBasicMembershipExtensionComposer,
     PurchaseFromCatalogComposer,
     PurchaseMintTokensMessageComposer,
@@ -1821,10 +1815,6 @@ export class HabboMessages implements IMessageConfiguration
         this._events.set(3840, CancelMysteryBoxWaitMessageEvent);
         this._events.set(353, GotMysteryBoxPrizeMessageEvent);
 
-        // === CATALOG ===
-        this._events.set(1893, BuildersClubSubscriptionStatusMessageEvent);
-        this._events.set(2378, BuildersClubFurniCountMessageEvent);
-
         // === HANDSHAKE (continued) ===
         this._events.set(2313, IsFirstLoginOfDayMessageEvent);
 
@@ -1895,7 +1885,6 @@ export class HabboMessages implements IMessageConfiguration
         this._events.set(540, ItemDataUpdateMessageEvent);
         this._events.set(1131, AreaHideMessageEvent);
         this._events.set(3643, ObjectRemoveConfirmMessageEvent);
-        this._events.set(2458, BCPlacementWarningMessageEvent);
         this._events.set(536, SpecialRoomEffectMessageEvent);
         // Header verified (_SafeCls_2131 -> parser _SafeCls_2309). The extra Integer is now
         // identified: AS3 reads `badgesRank` after `isModerator` on the userType==1 branch, and
@@ -3278,11 +3267,6 @@ export class HabboMessages implements IMessageConfiguration
         this._composers.set(2093, GetCatalogPageComposer);
         this._composers.set(1692, GetProductOfferComposer);
         this._composers.set(1706, PurchaseFromCatalogComposer);
-        // Builders-club direct placement (_composers[3849] = _SafeCls_1996,
-        // _composers[2740] = _SafeCls_1748 in the WIN63 registry).
-        this._composers.set(3849, PlaceObjectFromCatalogComposer);
-        this._composers.set(2740, PlaceWallItemFromCatalogComposer);
-        this._composers.set(1739, BuildersClubQueryFurniCountMessageComposer);
         this._composers.set(2779, RedeemVoucherMessageComposer);
         this._composers.set(667, GetClubOffersMessageComposer);
         this._composers.set(2441, PurchaseVipMembershipExtensionComposer);

@@ -6,7 +6,7 @@ import {RequestedPage} from './navigation/RequestedPage';
 /**
  * Everything the catalog owns once per catalog type.
  *
- * `HabboCatalog` keeps one of these per type ("NORMAL", "BUILDERS_CLUB") and
+ * `HabboCatalog` keeps one of these per type (only "NORMAL" in the RPG fork) and
  * re-points its own flat `_mainWindow`/`_catalogViewer` fields at the active
  * one — AS3 holds the same flat fields and does the same re-pointing in
  * `setActiveCatalogState()`, so the flat fields are not a shortcut, the missing

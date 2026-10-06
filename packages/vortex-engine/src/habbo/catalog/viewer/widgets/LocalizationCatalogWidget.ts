@@ -289,9 +289,7 @@ export class LocalizationCatalogWidget extends CatalogWidget
         {
             headerIcon.assetUri = this.page.mode === 1
                 ? 'common_small_pen'
-                : (this._catalog!.catalogType === 'BUILDERS_CLUB'
-                    ? `${this._catalog!.imageGalleryHost}icon_193.png`
-                    : `${this._catalog!.imageGalleryHost}${node.iconName}.png`);
+                : `${this._catalog!.imageGalleryHost}${node.iconName}.png`;
         }
     }
 

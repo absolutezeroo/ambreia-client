@@ -279,14 +279,12 @@ export class ItemGridCatalogWidget extends CatalogWidget implements IItemGrid, I
                     }
                 }
 
+                // (AS3 also lets a white `bc_` Builders Club variant replace its group's head; the
+                // RPG fork removed the Builders Club.)
                 if(!groupIndexByBaseName.has(baseName)) 
                 {
                     groupIndexByBaseName.set(baseName, groupedOffers.length);
                     groupedOffers.push(offer);
-                }
-                else if(baseName.indexOf('bc_') === 0 && (lastColour === 16777215 || lastColour === 16777214)) 
-                {
-                    groupedOffers[groupIndexByBaseName.get(baseName)!] = offer;
                 }
             }
         }
@@ -381,7 +379,7 @@ export class ItemGridCatalogWidget extends CatalogWidget implements IItemGrid, I
 
         let template: IWindow;
 
-        if(hasPrice && this._catalogType !== 'BUILDERS_CLUB') 
+        if(hasPrice) 
         {
             template = (container.offer.priceInCredits > 0 && container.offer.priceInActivityPoints > 0)
                 ? this._gridItemWithPriceMulti!
@@ -397,7 +395,7 @@ export class ItemGridCatalogWidget extends CatalogWidget implements IItemGrid, I
         this._itemGrid!.addGridItem(view);
         gridItem.view = view;
 
-        if(this._catalogType !== 'BUILDERS_CLUB' && container instanceof ProductContainer) 
+        if(container instanceof ProductContainer) 
         {
             container.createCurrencyIndicators(this.page.viewer.catalog as HabboCatalog);
         }

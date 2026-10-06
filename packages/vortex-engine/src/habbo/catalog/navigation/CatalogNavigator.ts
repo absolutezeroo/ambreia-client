@@ -416,7 +416,8 @@ export class CatalogNavigator implements ICatalogNavigator
      * Narrows the navigator tree to what a search matched.
      *
      * Three inputs, because a page can qualify three different ways: `needle` is the normalised
-     * query, `furniLines` the Builders Club furni lines the results belong to, and `pageIds` the
+     * query, `furniLines` the furni lines the results belong to (only ever filled by AS3's Builders
+     * Club catalog, which the RPG fork removed, so always empty here), and `pageIds` the
      * pages that actually contain a matching offer — the last is what `HabboCatalog` fills in as it
      * walks the results, and it is why a page whose *name* says nothing still shows up.
      */

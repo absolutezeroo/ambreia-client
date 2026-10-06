@@ -42,8 +42,6 @@ export class RoomWidgetFurniInfoUpdateEvent extends RoomWidgetUpdateEvent
     // and shows a phantom purchase button; -1 means no offer.
     // AS3: .../src/com/sulake/habbo/ui/widget/events/RoomWidgetFurniInfoUpdateEvent.as::get purchaseOfferId()
     public purchaseOfferId: number = -1;
-    // AS3: .../src/com/sulake/habbo/ui/widget/events/RoomWidgetFurniInfoUpdateEvent.as::get bcOfferId()
-    public bcOfferId: number = -1;
     // AS3: .../src/com/sulake/habbo/ui/widget/events/RoomWidgetFurniInfoUpdateEvent.as::get extraParam()
     public extraParam: string = '';
     // AS3: .../src/com/sulake/habbo/ui/widget/events/RoomWidgetFurniInfoUpdateEvent.as::get isOwner()
@@ -67,8 +65,6 @@ export class RoomWidgetFurniInfoUpdateEvent extends RoomWidgetUpdateEvent
     public purchaseCouldBeUsedForBuyout: boolean = false;
     // AS3: .../src/com/sulake/habbo/ui/widget/events/RoomWidgetFurniInfoUpdateEvent.as::get rentCouldBeUsedForBuyout()
     public rentCouldBeUsedForBuyout: boolean = false;
-    // AS3: .../src/com/sulake/habbo/ui/widget/events/RoomWidgetFurniInfoUpdateEvent.as::get availableForBuildersClub()
-    public availableForBuildersClub: boolean = false;
     // AS3: .../src/com/sulake/habbo/ui/widget/events/RoomWidgetFurniInfoUpdateEvent.as::get isNft()
     public isNft: boolean = false;
 

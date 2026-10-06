@@ -35,12 +35,6 @@ import {
 import type {
     RoomVisualizationSettingsEventParser
 } from '@habbo/communication/messages/parser/room/engine/RoomVisualizationSettingsEventParser';
-import {
-    BuildersClubSubscriptionStatusMessageEvent
-} from '@habbo/communication/messages/incoming/catalog/BuildersClubSubscriptionStatusMessageEvent';
-import type {
-    BuildersClubSubscriptionStatusMessageParser
-} from '@habbo/communication/messages/parser/catalog/BuildersClubSubscriptionStatusMessageParser';
 import {PerkAllowancesMessageEvent} from '@habbo/communication/messages/incoming/perk/PerkAllowancesMessageEvent';
 import type {
     PerkAllowancesMessageEventParser
@@ -63,9 +57,11 @@ import {PerkType} from '../../../communication/enum/PerkType';
 const log = Logger.getLogger('habbo.window.utils.floorplaneditor.BCFloorPlanEditor');
 
 /**
- * BCFloorPlanEditor — the Builders Club floor plan editor.
+ * BCFloorPlanEditor — the room floor plan editor. The AS3 name is kept; the fork removed the
+ * Builders Club itself (subscription status, countdown), so only the staff half of the save gate
+ * remains — see {@link canSave}.
  *
- * Owns the window, the six subscriptions that fill it and the three pieces that draw it: the
+ * Owns the window, the five subscriptions that fill it and the three pieces that draw it: the
  * {@link FloorPlanCache} data model, the {@link HeightMapEditor} you draw on and the
  * {@link FloorPlanPreviewer} that shows the result. It is an update receiver so the preview can
  * refresh on a timer rather than on every stroke.
@@ -91,7 +87,7 @@ export class BCFloorPlanEditor implements IUpdateReceiver, IDisposable
     // AS3: BCFloorPlanEditor.as::floor_plan_editor_export_import
     private static readonly EXPORT_IMPORT_LAYOUT: string = 'floor_plan_export_import_xml';
 
-    /** The security level that may save regardless of Builders Club time left. */
+    /** The security level that may save. */
     // AS3: BCFloorPlanEditor.as::onBcCountdownTimerEvent() (hasSecurity(4))
     private static readonly SECURITY_LEVEL_STAFF: number = 4;
 
@@ -109,9 +105,6 @@ export class BCFloorPlanEditor implements IUpdateReceiver, IDisposable
 
     // AS3: BCFloorPlanEditor.as::_roomVisualizationSettingsMessageEvent
     private _roomVisualizationSettingsMessageEvent: IMessageEvent | null = null;
-
-    // AS3: BCFloorPlanEditor.as::_buildersClubSubscriptionStatusMessageEvent
-    private _buildersClubSubscriptionStatusMessageEvent: IMessageEvent | null = null;
 
     // AS3: BCFloorPlanEditor.as::_perkAllowancesMessageEvent
     private _perkAllowancesMessageEvent: IMessageEvent | null = null;
@@ -153,12 +146,6 @@ export class BCFloorPlanEditor implements IUpdateReceiver, IDisposable
     // AS3: BCFloorPlanEditor.as::_msSinceLastPreviewUpdate
     private _msSinceLastPreviewUpdate: number = 0;
 
-    // AS3: BCFloorPlanEditor.as::_bcSecondsLeft
-    private _bcSecondsLeft: number = 0;
-
-    // TS-only: AS3 uses a `flash.utils.Timer`; this is its handle.
-    private _bcSecondsCountdownTimer: ReturnType<typeof setInterval> | null = null;
-
     // AS3: BCFloorPlanEditor.as::_largeFloorPlansAllowed
     private _largeFloorPlansAllowed: boolean = false;
 
@@ -186,12 +173,9 @@ export class BCFloorPlanEditor implements IUpdateReceiver, IDisposable
             this._occupiedTilesMessageEvent = new RoomOccupiedTilesMessageEvent(this.onOccupiedTiles);
             this._roomVisualizationSettingsMessageEvent =
                 new RoomVisualizationSettingsEvent(this.onRoomVisualizationSettings);
-            this._buildersClubSubscriptionStatusMessageEvent =
-                new BuildersClubSubscriptionStatusMessageEvent(this.onBcStatus);
             this._perkAllowancesMessageEvent = new PerkAllowancesMessageEvent(this.onPerkAllowances);
 
             communication.addHabboConnectionMessageEvent(this._floorHeightMapMessageEvent);
-            communication.addHabboConnectionMessageEvent(this._buildersClubSubscriptionStatusMessageEvent);
             communication.addHabboConnectionMessageEvent(this._entryTileDataMessageEvent);
             communication.addHabboConnectionMessageEvent(this._occupiedTilesMessageEvent);
             communication.addHabboConnectionMessageEvent(this._roomVisualizationSettingsMessageEvent);
@@ -229,40 +213,15 @@ export class BCFloorPlanEditor implements IUpdateReceiver, IDisposable
         }
     }
 
-    /** True while the player may save — Builders Club time left, or staff. */
+    /** True while the player may save — staff only. */
+    // DEVIATION: AS3 also allows saving while Builders Club time is left (`_bcSecondsLeft`, fed by
+    //   BuildersClubSubscriptionStatus and ticked down by a 10s timer). The RPG fork removed the
+    //   Builders Club, so that half of the gate, its subscription and its timer are gone.
     // AS3: BCFloorPlanEditor.as::onBcCountdownTimerEvent() / ImportExportDialog.as::set visible()
     get canSave(): boolean
     {
-        return this._bcSecondsLeft > 0
-            || (this._windowManager?.sessionDataManager?.hasSecurity(BCFloorPlanEditor.SECURITY_LEVEL_STAFF) ?? false);
+        return this._windowManager?.sessionDataManager?.hasSecurity(BCFloorPlanEditor.SECURITY_LEVEL_STAFF) ?? false;
     }
-
-    // AS3: BCFloorPlanEditor.as::onBcStatus()
-    private onBcStatus = (event: IMessageEvent): void =>
-    {
-        const parser = event.parser as BuildersClubSubscriptionStatusMessageParser | null;
-
-        if(parser === null) return;
-
-        this._bcSecondsLeft = parser.secondsLeft;
-
-        if(this._bcSecondsCountdownTimer === null)
-        {
-            this._bcSecondsCountdownTimer = setInterval(this.onBcCountdownTimerEvent, 10000);
-        }
-    };
-
-    /** Ticks the remaining subscription down and greys Save out the moment it runs out. */
-    // AS3: BCFloorPlanEditor.as::onBcCountdownTimerEvent()
-    private onBcCountdownTimerEvent = (): void =>
-    {
-        this._bcSecondsLeft -= 10;
-
-        if(this._editorWindow === null || !this._editorWindow.visible) return;
-
-        if(this.canSave) this._editorWindow.findChildByName('save')?.enable();
-        else this._editorWindow.findChildByName('save')?.disable();
-    };
 
     // AS3: BCFloorPlanEditor.as::set visible()
     set visible(value: boolean)
@@ -946,12 +905,6 @@ export class BCFloorPlanEditor implements IUpdateReceiver, IDisposable
         return this._wallThickness;
     }
 
-    // AS3: BCFloorPlanEditor.as::get bcSecondsLeft()
-    get bcSecondsLeft(): number
-    {
-        return this._bcSecondsLeft;
-    }
-
     // AS3: BCFloorPlanEditor.as::get disposed()
     get disposed(): boolean
     {
@@ -971,20 +924,12 @@ export class BCFloorPlanEditor implements IUpdateReceiver, IDisposable
             if(this._entryTileDataMessageEvent !== null) communication.removeHabboConnectionMessageEvent(this._entryTileDataMessageEvent);
             if(this._occupiedTilesMessageEvent !== null) communication.removeHabboConnectionMessageEvent(this._occupiedTilesMessageEvent);
             if(this._roomVisualizationSettingsMessageEvent !== null) communication.removeHabboConnectionMessageEvent(this._roomVisualizationSettingsMessageEvent);
-            if(this._buildersClubSubscriptionStatusMessageEvent !== null) communication.removeHabboConnectionMessageEvent(this._buildersClubSubscriptionStatusMessageEvent);
             if(this._perkAllowancesMessageEvent !== null) communication.removeHabboConnectionMessageEvent(this._perkAllowancesMessageEvent);
 
             this._floorHeightMapMessageEvent = null;
             this._entryTileDataMessageEvent = null;
             this._occupiedTilesMessageEvent = null;
             this._roomVisualizationSettingsMessageEvent = null;
-        }
-
-        // TS-only: AS3's Timer is garbage-collected with the object; an interval is not.
-        if(this._bcSecondsCountdownTimer !== null)
-        {
-            clearInterval(this._bcSecondsCountdownTimer);
-            this._bcSecondsCountdownTimer = null;
         }
 
         const roomEngine = this._windowManager?.roomEngine ?? null;

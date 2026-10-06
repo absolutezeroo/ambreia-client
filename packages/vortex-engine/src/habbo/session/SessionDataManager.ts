@@ -68,11 +68,6 @@ import {AvatarEffectsMessageEvent} from '../communication/messages/incoming/inve
 // Events - Mystery Box
 import {MysteryBoxKeysMessageEvent} from '../communication/messages/incoming/mysterybox/MysteryBoxKeysMessageEvent';
 
-// Events - Catalog
-import {
-    BuildersClubSubscriptionStatusMessageEvent
-} from '../communication/messages/incoming/catalog/BuildersClubSubscriptionStatusMessageEvent';
-
 // Events - Users
 import {InClientLinkMessageEvent} from '../communication/messages/incoming/users/InClientLinkMessageEvent';
 import {EmailStatusResultEvent} from '../communication/messages/incoming/users/EmailStatusResultEvent';
@@ -132,9 +127,6 @@ import type {
 import type {
     MysteryBoxKeysMessageParser
 } from '../communication/messages/parser/mysterybox/MysteryBoxKeysMessageParser';
-import type {
-    BuildersClubSubscriptionStatusMessageParser
-} from '../communication/messages/parser/catalog/BuildersClubSubscriptionStatusMessageParser';
 import type {InClientLinkMessageParser} from '../communication/messages/parser/users/InClientLinkMessageParser';
 import type {EmailStatusResultParser} from '../communication/messages/parser/users/EmailStatusResultParser';
 import type {
@@ -627,35 +619,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
     get mysteryBoxColor(): string
     {
         return this._mysteryBoxColor;
-    }
-
-    // Builders Club
-    private _buildersClubSecondsLeft: number = 0;
-
-    get buildersClubSecondsLeft(): number
-    {
-        return this._buildersClubSecondsLeft;
-    }
-
-    private _buildersClubFurniLimit: number = 0;
-
-    get buildersClubFurniLimit(): number
-    {
-        return this._buildersClubFurniLimit;
-    }
-
-    private _buildersClubMaxFurniLimit: number = 0;
-
-    get buildersClubMaxFurniLimit(): number
-    {
-        return this._buildersClubMaxFurniLimit;
-    }
-
-    private _buildersClubSecondsLeftWithGrace: number | null = null;
-
-    get buildersClubSecondsLeftWithGrace(): number | null
-    {
-        return this._buildersClubSecondsLeftWithGrace;
     }
 
     get motto(): string
@@ -1374,17 +1337,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
     }
 
     /**
-	 * Pick up all builder club furniture via special chat command.
-	 *
-	 * @see sources/win63_version/habbo/session/SessionDataManager.as pickAllBuilderFurniture()
-	 */
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::pickAllBuilderFurniture()
-    pickAllBuilderFurniture(roomId: number): void
-    {
-        this.confirmRoomCommand(roomId, '${room.confirm.pick_all_bc}', ':pickallbc');
-    }
-
-    /**
 	 * Request credit vault status from server.
 	 *
 	 * @see sources/win63_version/habbo/session/SessionDataManager.as getCreditVaultStatus()
@@ -1759,9 +1711,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
         // Mystery box events
         this.addMessageEvent(new MysteryBoxKeysMessageEvent(this.onMysteryBoxKeys.bind(this)));
 
-        // Catalog events
-        this.addMessageEvent(new BuildersClubSubscriptionStatusMessageEvent(this.onBuildersClubStatus.bind(this)));
-
         // Users events
         this.addMessageEvent(new InClientLinkMessageEvent(this.onInClientLink.bind(this)));
 
@@ -2038,22 +1987,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
         this.context.createLinkEvent(parser.link);
 
         log.debug('InClientLink: ' + parser.link);
-    }
-
-    private onBuildersClubStatus(event: IMessageEvent): void
-    {
-        if(!event) return;
-
-        const parser = event.parser as BuildersClubSubscriptionStatusMessageParser;
-
-        if(!parser) return;
-
-        this._buildersClubSecondsLeft = parser.secondsLeft;
-        this._buildersClubFurniLimit = parser.furniLimit;
-        this._buildersClubMaxFurniLimit = parser.maxFurniLimit;
-        this._buildersClubSecondsLeftWithGrace = parser.secondsLeftWithGrace;
-
-        log.debug(`Builders club: ${this._buildersClubSecondsLeft}s left, furni ${this._buildersClubFurniLimit}/${this._buildersClubMaxFurniLimit}`);
     }
 
     /**

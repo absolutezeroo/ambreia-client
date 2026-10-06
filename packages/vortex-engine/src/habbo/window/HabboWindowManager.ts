@@ -1134,8 +1134,8 @@ export class HabboWindowManager extends Component implements IHabboWindowManager
     }
 
     /**
-     * Opens the Builders Club floor plan editor, building it if the configuration arrived too late
-     * for `onConfigurationComplete()` to have done so.
+     * Opens the floor plan editor (`BCFloorPlanEditor`, AS3's name), building it if the
+     * configuration arrived too late for `onConfigurationComplete()` to have done so.
      *
      * Reached from the room-info window's button and from the `:floorplan` chat command, both of
      * which already called this while it was an empty stub.

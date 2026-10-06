@@ -39,13 +39,11 @@ export class FurnitureData implements IFurnitureData
     private _purchaseCouldBeUsedForBuyout: boolean;
     // AS3: .../src/com/sulake/habbo/session/furniture/FurnitureData.as::_rentCouldBeUsedForBuyout
     private _rentCouldBeUsedForBuyout: boolean;
-    private _availableForBuildersClub: boolean;
     private _canStandOn: boolean;
     private _canSitOn: boolean;
     private _canLayOn: boolean;
     private _excludedFromDynamic: boolean;
     private _furniLine: string;
-    private _bcOfferId: number;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/furniture/FurnitureData.as::get tradeable()
     private _tradeable: boolean;
 
@@ -69,7 +67,6 @@ export class FurnitureData implements IFurnitureData
         purchaseCouldBeUsedForBuyout: boolean,
         rentOfferId: number,
         rentCouldBeUsedForBuyout: boolean,
-        availableForBuildersClub: boolean,
         customParams: string | null,
         category: number,
         canStandOn: boolean,
@@ -77,8 +74,6 @@ export class FurnitureData implements IFurnitureData
         canLayOn: boolean,
         excludedFromDynamic: boolean,
         furniLine: string,
-        // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/furniture/FurnitureData.as::bcOfferId
-        bcOfferId: number,
         // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/furniture/FurnitureData.as::tradeable
         tradeable: boolean = false,
         // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/furniture/FurnitureData.as::furniDataCategory
@@ -109,7 +104,6 @@ export class FurnitureData implements IFurnitureData
         this._purchaseCouldBeUsedForBuyout = purchaseCouldBeUsedForBuyout;
         this._rentOfferId = rentOfferId;
         this._rentCouldBeUsedForBuyout = rentCouldBeUsedForBuyout;
-        this._availableForBuildersClub = availableForBuildersClub;
         this._customParams = customParams;
         this._category = category;
         this._canStandOn = canStandOn;
@@ -117,7 +111,6 @@ export class FurnitureData implements IFurnitureData
         this._canLayOn = canLayOn;
         this._excludedFromDynamic = excludedFromDynamic;
         this._furniLine = furniLine;
-        this._bcOfferId = bcOfferId;
         this._tradeable = tradeable;
         this._furniDataCategory = furniDataCategory;
         this._canPutStuffOn = canPutStuffOn;
@@ -279,12 +272,6 @@ export class FurnitureData implements IFurnitureData
         return this._purchaseOfferId;
     }
 
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/furniture/FurnitureData.as::get bcOfferId()
-    get bcOfferId(): number
-    {
-        return this._bcOfferId;
-    }
-
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/furniture/FurnitureData.as::get tradeable()
     get tradeable(): boolean
     {
@@ -319,12 +306,6 @@ export class FurnitureData implements IFurnitureData
     get rentCouldBeUsedForBuyout(): boolean
     {
         return this._rentCouldBeUsedForBuyout;
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/furniture/FurnitureData.as::get availableForBuildersClub()
-    get availableForBuildersClub(): boolean
-    {
-        return this._availableForBuildersClub;
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/furniture/FurnitureData.as::get canStandOn()

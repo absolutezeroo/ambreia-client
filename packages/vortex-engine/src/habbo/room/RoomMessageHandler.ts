@@ -49,10 +49,6 @@ import type {AreaHideMessageParser} from '../communication/messages/parser/room/
 import {ObjectRemoveConfirmMessageEvent} from '../communication/messages/incoming/room/engine/ObjectRemoveConfirmMessageEvent';
 import type {ObjectRemoveConfirmMessageParser} from '../communication/messages/parser/room/engine/ObjectRemoveConfirmMessageParser';
 import {PickupObjectMessageComposer} from '../communication/messages/outgoing/room/engine/PickupObjectMessageComposer';
-import {BCPlacementWarningMessageEvent} from '../communication/messages/incoming/room/engine/BCPlacementWarningMessageEvent';
-import {BCPlacementWarningMessageParser} from '../communication/messages/parser/room/engine/BCPlacementWarningMessageParser';
-import {PlaceObjectFromCatalogComposer} from '../communication/messages/outgoing/catalog/PlaceObjectFromCatalogComposer';
-import {PlaceWallItemFromCatalogComposer} from '../communication/messages/outgoing/catalog/PlaceWallItemFromCatalogComposer';
 import {SpecialRoomEffectMessageEvent} from '../communication/messages/incoming/room/engine/SpecialRoomEffectMessageEvent';
 import type {SpecialRoomEffectMessageParser} from '../communication/messages/parser/room/engine/SpecialRoomEffectMessageParser';
 import {RoomRotatingEffect} from '@room/utils/RoomRotatingEffect';
@@ -294,7 +290,6 @@ export class RoomMessageHandler implements IRoomMessageHandler
             connection.addMessageEvent(new ShoutMessageEvent(this.onChat.bind(this)));
             connection.addMessageEvent(new IgnoreResultMessageEvent(this.onIgnoreResult.bind(this)));
             connection.addMessageEvent(new ObjectRemoveConfirmMessageEvent(this.onObjectRemoveConfirm.bind(this)));
-            connection.addMessageEvent(new BCPlacementWarningMessageEvent(this.onBCPlacementWarning.bind(this)));
             connection.addMessageEvent(new SpecialRoomEffectMessageEvent(this.onSpecialRoomEvent.bind(this)));
             connection.addMessageEvent(new PetExperienceEvent(this.onPetExperience.bind(this)));
             connection.addMessageEvent(new PetFigureUpdateEvent(this.onPetFigureUpdate.bind(this)));
@@ -1263,57 +1258,6 @@ export class RoomMessageHandler implements IRoomMessageHandler
         };
 
         setTimeout(tick, RoomMessageHandler.DISCO_TICK_MS);
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_1984.as::onBCPlacementWarning()
-    onBCPlacementWarning(event: IMessageEvent): void
-    {
-        const warningEvent = event as BCPlacementWarningMessageEvent;
-
-        if(warningEvent === null)
-        {
-            return;
-        }
-
-        const parser = warningEvent.getParser() as BCPlacementWarningMessageParser;
-
-        if(parser === null)
-        {
-            return;
-        }
-
-        const windowManager = this._roomCreator?.windowManager ?? null;
-
-        if(windowManager === null)
-        {
-            return;
-        }
-
-        // AS3 tests only against the floor code and treats every other value as a wall placement —
-        // it never compares against the wall constant. Preserved verbatim.
-        const composer = parser.typeCode === BCPlacementWarningMessageParser.TYPE_CODE_FLOOR
-            ? new PlaceObjectFromCatalogComposer(
-                parser.pageId, parser.offerId, parser.extraParam, parser.x, parser.y, parser.direction, true
-            )
-            : new PlaceWallItemFromCatalogComposer(
-                parser.pageId, parser.offerId, parser.extraParam, parser.wallLocation, true
-            );
-
-        // The confirm text is fixed here, unlike onObjectRemoveConfirm where the server supplies it.
-        windowManager.confirm(
-            '${generic.alert.title}',
-            '${room.confirm.hide_room}',
-            0,
-            (dialog: IDisposable, windowEvent: WindowEvent): void =>
-            {
-                dialog.dispose();
-
-                if(windowEvent.type === WindowEvent.WE_OK)
-                {
-                    event.connection?.send(composer);
-                }
-            }
-        );
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_1984.as::onObjectRemoveConfirm()

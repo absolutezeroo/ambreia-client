@@ -158,6 +158,8 @@ export class BottomBarLeft implements ILinkEventTracker
         this.iconVisibility(HabboToolbarIconEnum.getIconName('HTIE_ICON_INVENTORY') ?? '', false);
         // The wired-menu icon: its enum entry is gone with wired (RPG fork), the layout child is not yet.
         this.iconVisibility('WIRED_MENU', false);
+        // Same for the Builders Club icon (RPG fork).
+        this.iconVisibility('BUILDER', false);
 
         const gamesEnabled = toolbar.getBoolean('games_icon_enabled');
 
@@ -380,7 +382,7 @@ export class BottomBarLeft implements ILinkEventTracker
      *
      * In AS3, this groups all TOGGLE-tagged children and sets their visibility
      * based on the state's visibility tag (VISIBLE_ROOM, VISIBLE_HOTEL, etc.)
-     * with additional rules for specific icons (QUESTS, STORIES, BUILDER, etc.)
+     * with additional rules for specific icons (QUESTS, STORIES, etc.)
      *
      * @param state Toolbar state identifier
      * @see sources/win63_version/habbo/toolbar/BottomBarLeft.as setToolbarState()
@@ -463,9 +465,11 @@ export class BottomBarLeft implements ILinkEventTracker
             {
                 child.visible = child.visible && this._toolbar!.getBoolean('toolbar.stories.enabled');
             }
-            else if(child.name === 'BUILDER' && !this._collapsed) 
+            else if(child.name === 'BUILDER')
             {
-                child.visible = child.visible && this._toolbar!.getBoolean('builders.club.enabled');
+                // AS3 shows it while `builders.club.enabled`; the RPG fork removed the Builders
+                // Club. The icon is still in the shipped layout until it is cleaned.
+                child.visible = false;
             }
             else if(child.name === 'GAMES') 
             {
@@ -1051,7 +1055,6 @@ export class BottomBarLeft implements ILinkEventTracker
             case 'HTIE_ICON_GAMES': return 'icons_toolbar_games';
             case 'HTIE_ICON_STORIES': return 'icons_toolbar_stories';
             case 'HTIE_ICON_RECEPTION': return 'icons_toolbar_reception';
-            case 'HTIE_ICON_BUILDER': return 'icons_toolbar_builder';
             case 'HTIE_ICON_CAMERA': return 'icons_toolbar_camera';
             default: return null;
         }

@@ -57,17 +57,10 @@ export class TotalPriceCatalogWidget extends CatalogWidget
         super.dispose();
     }
 
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/viewer/widgets/TotalPriceWidget.as::init()
     override init(): boolean
     {
         if(!super.init()) return false;
-
-        // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/viewer/widgets/TotalPriceWidget.as::init()
-        if(this.page.isBuilderPage)
-        {
-            this.window.visible = false;
-
-            return true;
-        }
 
         this.attachWidgetView(CatalogWidgetName.TOTAL_PRICE);
         this.window.visible = false;

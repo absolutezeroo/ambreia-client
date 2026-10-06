@@ -5,8 +5,9 @@ import {RoomWidgetRoomObjectUpdateEvent} from './RoomWidgetRoomObjectUpdateEvent
  * `REOE_PLACED`, carrying where it landed and who started the drag.
  *
  * `placementSource` is the interesting field: the same event reaches every widget, and each one
- * acts only on its own string (`info_stand`, `catalog`, …). That is how the Builder's Club
- * place-from-infostand flow tells its own drop apart from a catalog purchase being placed.
+ * acts only on its own string (`info_stand`, `catalog`, …). In AS3 that is how the Builders Club
+ * place-from-infostand flow told its own drop apart from a catalog purchase being placed; the RPG
+ * fork removed that flow, so nothing listens for this event any more.
  *
  * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/events/RoomWidgetRoomObjectPlaceEvent.as
  */

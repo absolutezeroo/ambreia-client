@@ -713,7 +713,7 @@ export class HabboToolbar extends Component implements IHabboToolbar
 	 * Also sends an event log to the server for tracking.
 	 *
 	 * Emitting the click *is* the whole method: in AS3 too, a separate module subscribes and
-	 * decides what to open. CATALOGUE and BUILDER reach HabboCatalog, ACHIEVEMENTS the quest
+	 * decides what to open. CATALOGUE reaches HabboCatalog, ACHIEVEMENTS the quest
 	 * engine, NAVIGATOR/ROOMINFO/HOME the navigator, INVENTORY the inventory, MEMENU/GAMES the
 	 * me-menu controller, and the landing view listens for its own.
 	 *

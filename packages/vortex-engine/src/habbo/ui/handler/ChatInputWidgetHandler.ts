@@ -595,11 +595,6 @@ export class ChatInputWidgetHandler implements IRoomWidgetHandler
 
                 return true;
 
-            case ':pickallbc':
-                sessionData?.pickAllBuilderFurniture(session.roomId);
-
-                return true;
-
             case ':resetscores':
                 sessionData?.resetScores(session.roomId);
 
@@ -655,7 +650,6 @@ export class ChatInputWidgetHandler implements IRoomWidgetHandler
             // server drops the save (`UpdateFloorProperties` is accept-and-drop on the emulator),
             // so the plan loads and draws but does not persist.
             case ':floor':
-            case ':bcfloor':
                 if(session.roomControllerLevel >= 3) container.windowManager?.displayFloorPlanEditor();
 
                 return true;
