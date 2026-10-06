@@ -1,5 +1,4 @@
 export * from './SubmitRoomToCompetitionMessageComposer';
-
 export * from './ForwardToACompetitionRoomMessageComposer';
 export * from './ForwardToRandomCompetitionRoomMessageComposer';
 export * from './GetIsUserPartOfCompetitionMessageComposer';

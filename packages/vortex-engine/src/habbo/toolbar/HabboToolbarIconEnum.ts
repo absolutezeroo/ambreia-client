@@ -61,7 +61,6 @@ export class HabboToolbarIconEnum
         ['HTIE_ICON_RECEPTION', 'RECEPTION'],
         ['HTIE_ICON_HOME', 'HOME'],
         ['HTIE_ICON_GUIDE', 'GUIDE'],
-
     ]);
 
     /**

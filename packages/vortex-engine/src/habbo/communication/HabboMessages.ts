@@ -569,7 +569,6 @@ import {
     UpdateForumSettingsMessageComposer,
     UpdateThreadMessageComposer,
 } from './messages/outgoing/groupforums';
-
 import {UpdateFigureDataMessageComposer} from './messages/outgoing/avatar/UpdateFigureDataMessageComposer';
 import {CheckUserNameResultMessageEvent} from './messages/incoming/help/CheckUserNameResultMessageEvent';
 import {
@@ -967,7 +966,6 @@ import {
     GetGuildFurniContextMenuInfoMessageComposer,
     GetItemDataMessageComposer,
     GetRentableSpaceConfigMessageComposer,
-
     OpenPetPackageMessageComposer,
     PresentOpenMessageComposer,
     RemoveItemMessageComposer,
@@ -2347,7 +2345,6 @@ export class HabboMessages implements IMessageConfiguration
         // would have been accepted and handled as a *claim* rather than a change. ChangeUserName
         // is 1703; the emulator agrees. Latent until now: nothing constructs this composer yet.
         this._composers.set(1703, ChangeUserNameMessageComposer);
-
         this._composers.set(2985, ToggleStaffPickMessageComposer);
         this._composers.set(3214, GetPopularRoomTagsMessageComposer);
         this._composers.set(1903, MyFriendsRoomsSearchMessageComposer);

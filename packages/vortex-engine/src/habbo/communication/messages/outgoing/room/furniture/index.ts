@@ -22,7 +22,6 @@ export * from './GetItemDataMessageComposer';
 export * from './SetItemDataMessageComposer';
 export * from './RemoveItemMessageComposer';
 export * from './SetRoomBackgroundColorDataMessageComposer';
-
 export * from './SetMannequinFigureMessageComposer';
 export * from './SetMannequinNameMessageComposer';
 export * from './SetObjectDataMessageComposer';

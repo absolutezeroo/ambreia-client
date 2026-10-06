@@ -305,9 +305,9 @@ export class RoomInfoViewCtrl
         }
     }
 
-    // DEVIATION: AS3 shows the room's score (`rating_cont`) and the vote link (`rating_region`, while
-    //   the viewer can vote); the RPG fork removed room voting, so both stay hidden until Task 10
-    //   drops them from the layout.
+    // DEVIATION: AS3 shows the vote link (`rating_region`) while the viewer can vote; the RPG fork
+    //   removed room voting, so it stays hidden until Task 10 drops it from the layout. The score
+    //   (`rating_cont`) is kept.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/navigator/inroom/RoomInfoViewCtrl.as::refreshRoomDetails()
     private _refreshRoomDetails(roomData: GuestRoomData): void
     {
@@ -349,7 +349,7 @@ export class RoomInfoViewCtrl
         }
 
         this._find('rating_region').visible = false;
-        this._find('rating_cont').visible = false;
+        (this._find('rating_txt') as unknown as ITextWindow).text = '' + this._navigator.data.currentRoomRating;
 
         this._find('ranking_cont').visible = roomData.ranking > 0;
         (this._find('ranking_txt') as unknown as ITextWindow).text = '' + roomData.ranking;

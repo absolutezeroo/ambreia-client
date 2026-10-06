@@ -47,10 +47,8 @@ export class RoomEngineToWidgetEvent extends RoomEngineObjectEvent
     public static readonly REQUEST_BACKGROUND_COLOR = 'RETWE_REQUEST_BACKGROUND_COLOR';
     // AS3: .../src/com/sulake/habbo/room/events/RoomEngineToWidgetEvent.as::REQUEST_AREA_HIDE
     public static readonly REQUEST_AREA_HIDE = 'RETWE_REQUEST_AREA_HIDE';
-
     // AS3: .../src/com/sulake/habbo/room/events/RoomEngineToWidgetEvent.as::REQUEST_EFFECTBOX_OPEN_DIALOG
     public static readonly REQUEST_EFFECTBOX_OPEN_DIALOG = 'RETWE_REQUEST_EFFECTBOX_OPEN_DIALOG';
-
     // AS3: .../src/com/sulake/habbo/room/events/RoomEngineToWidgetEvent.as::REQUEST_ACHIEVEMENT_RESOLUTION_ENGRAVING
     public static readonly REQUEST_ACHIEVEMENT_RESOLUTION_ENGRAVING = 'RETWE_REQUEST_ACHIEVEMENT_RESOLUTION_ENGRAVING';
     // AS3: .../src/com/sulake/habbo/room/events/RoomEngineToWidgetEvent.as::REQUEST_ACHIEVEMENT_RESOLUTION_FAILED

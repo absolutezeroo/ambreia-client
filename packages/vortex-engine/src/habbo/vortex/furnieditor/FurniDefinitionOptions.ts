@@ -194,8 +194,7 @@ export const FURNI_CATEGORY_OPTIONS: readonly IFurniOption[] = [
     {value: 5, label: 'PostIt'},
     {value: 6, label: 'Poster'},
     {value: 7, label: 'SoundSet'},
-    // The emulator's song-disc category; the RPG fork removed jukebox music, the value stays.
-    {value: 8, label: 'MusicDisc'},
+    {value: 8, label: 'TraxSong'},
     {value: 9, label: 'Present'},
     {value: 10, label: 'EcotronBox'},
     {value: 11, label: 'Trophy'},

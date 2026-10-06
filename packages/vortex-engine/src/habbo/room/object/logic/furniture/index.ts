@@ -35,7 +35,6 @@ export {FurnitureMannequinLogic} from './FurnitureMannequinLogic';
 export {FurnitureMonsterplantSeedLogic} from './FurnitureMonsterplantSeedLogic';
 export {FurnitureMultiHeightLogic} from './FurnitureMultiHeightLogic';
 export {FurnitureMultiStateLogic} from './FurnitureMultiStateLogic';
-
 export {FurnitureOneWayDoorLogic} from './FurnitureOneWayDoorLogic';
 export {FurniturePetCustomizationLogic} from './FurniturePetCustomizationLogic';
 export {FurniturePetProductLogic} from './FurniturePetProductLogic';

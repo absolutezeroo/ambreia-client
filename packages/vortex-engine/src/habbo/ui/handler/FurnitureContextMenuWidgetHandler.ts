@@ -102,10 +102,6 @@ export class FurnitureContextMenuWidgetHandler implements IRoomWidgetHandler
     // AS3: FurnitureContextMenuWidgetHandler.as::_SafeStr_7268 (request timestamp, -1 = none)
     private _pendingPurchasableClothingTime: number = -1;
 
-    // DEVIATION: AS3 builds the mystery-box toolbar tracker here (`_SafeStr_6714`); the RPG fork
-    //   removed mystery boxes, so the handler has nothing to construct.
-    // AS3: FurnitureContextMenuWidgetHandler.as::FurnitureContextMenuWidgetHandler()
-
     // AS3: FurnitureContextMenuWidgetHandler.as::get disposed()
     public get disposed(): boolean
     {
@@ -569,6 +565,8 @@ export class FurnitureContextMenuWidgetHandler implements IRoomWidgetHandler
         this._widget.showEffectBoxOpenDialog(object);
     }
 
+    // DEVIATION: AS3 also disposes the mystery-box toolbar tracker (`_SafeStr_6714`, built in its
+    //   constructor); the RPG fork removed mystery boxes.
     // AS3: FurnitureContextMenuWidgetHandler.as::dispose()
     public dispose(): void
     {

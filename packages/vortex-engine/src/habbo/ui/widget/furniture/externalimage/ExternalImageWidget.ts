@@ -25,7 +25,6 @@ import {RoomObjectCategoryEnum} from '@habbo/room/object/RoomObjectCategoryEnum'
 import {RoomObjectVariableEnum} from '@habbo/room/object/RoomObjectVariableEnum';
 import {GetExtendedProfileMessageComposer} from '@habbo/communication/messages/outgoing/users/GetExtendedProfileMessageComposer';
 import {AlertDialogCaption} from '@habbo/window/utils/AlertDialogCaption';
-import {HabboToolbarEvent} from '@habbo/toolbar/events/HabboToolbarEvent';
 import {HabboWebTools} from '@habbo/utils/HabboWebTools';
 import {StringUtil} from '@habbo/utils/StringUtil';
 import {Logger} from '@core/utils/Logger';
@@ -457,9 +456,17 @@ export class ExternalImageWidget extends RoomWidgetBase
      * The single gate on the whole widget: an unset or "disabled" image base switches photos off
      * hotel-wide, and the window is never even cleared.
      */
+    // DEVIATION: AS3 always shows `makeOwnButton`, which on a photo poster opens the in-client
+    //   camera; the RPG fork removed photos, so the button is hidden for a photo poster (a selfie
+    //   still sends you to the web).
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/furniture/externalimage/ExternalImageWidget.as::show()
     private show(furniData: string | null): void
     {
+        if(this._makeOwnButton !== null)
+        {
+            this._makeOwnButton.visible = this.getType() !== ExternalImageWidget.TYPE_PHOTO_POSTER;
+        }
+
         if(this.ownHandler?.storiesImageUrlBase === 'disabled') return;
 
         this.clearImage();
@@ -955,6 +962,8 @@ export class ExternalImageWidget extends RoomWidgetBase
      * One procedure for the whole window. The resize branch runs for events on the window itself;
      * everything below it is keyed on the clicked child's name.
      */
+    // DEVIATION: AS3's `makeOwnButton` raises CAMERA_TOGGLE for a photo poster; the RPG fork removed
+    //   photos, and that button is hidden for a photo poster.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/furniture/externalimage/ExternalImageWidget.as::onWindowEvent()
     private onWindowEvent = (event: WindowEvent, target: IWindow): void =>
     {
@@ -993,21 +1002,9 @@ export class ExternalImageWidget extends RoomWidgetBase
             }
 
             case 'makeOwnButton':
-                // Three different destinations: a photo poster opens the in-client camera, and a
-                // selfie goes to the web — to the SPA route when `spaweb` is on, otherwise through
-                // the legacy game link.
-                if(this.getType() === ExternalImageWidget.TYPE_PHOTO_POSTER)
-                {
-                    const toolbarEvent = new HabboToolbarEvent(HabboToolbarEvent.CAMERA_TOGGLE);
-
-                    // The port already names this launch origin after this very widget — EIW.
-                    toolbarEvent.iconName = HabboToolbarEvent.CAMERA_LAUNCH_ORIGIN_EIW_MAKE_OWN;
-                    this.ownHandler?.container?.toolbar?.toolbarEvents.emit(toolbarEvent.type, toolbarEvent);
-                    this.hide();
-
-                    break;
-                }
-
+                // A selfie goes to the web — to the SPA route when `spaweb` is on, otherwise through
+                // the legacy game link. AS3's photo-poster branch (the in-client camera) is gone with
+                // photos; `show()` hides the button for a photo poster.
                 if(this._roomUI?.getInteger('spaweb', 0) === 1)
                 {
                     HabboWebTools.openPage('/stories/cards/selfie/edit');

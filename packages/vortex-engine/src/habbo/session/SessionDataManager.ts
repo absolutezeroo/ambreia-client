@@ -121,7 +121,6 @@ import type {
     AvatarEffectsMessageParser,
     IAvatarEffect
 } from '../communication/messages/parser/inventory/AvatarEffectsMessageParser';
-
 import type {InClientLinkMessageParser} from '../communication/messages/parser/users/InClientLinkMessageParser';
 import type {EmailStatusResultParser} from '../communication/messages/parser/users/EmailStatusResultParser';
 import type {
@@ -168,7 +167,6 @@ import {
 // Session events
 import {UserNameUpdateEvent} from './events/UserNameUpdateEvent';
 import {SessionDataPreferencesEvent} from './events/SessionDataPreferencesEvent';
-
 import {SessionDataToWidgetEvent} from './events/SessionDataToWidgetEvent';
 
 // Sub-managers
@@ -200,7 +198,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
     private _messageEvents: IMessageEvent[] = [];
     private _customData: string = '';
     private _directMail: boolean = false;
-
     private _nftChatStyleIds: Set<number> = new Set();
     private _purchasableChatStyleIds: Set<number> = new Set();
     // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::_roomSessionManager
@@ -1659,10 +1656,10 @@ export class SessionDataManager extends Component implements ISessionDataManager
 
     /**
 	 * Register message event handlers
-	 *
-	 * AS3 also listens for the mystery-box keys and stores the box and key colours behind two
-	 * getters; the RPG fork removed mystery boxes.
 	 */
+    // DEVIATION: AS3 also listens for the mystery-box keys (its handler stores the
+    //   box and key colours behind two getters); the RPG fork removed mystery boxes.
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/SessionDataManager.as::initComponent()
     private registerMessageEvents(): void
     {
         // User data events

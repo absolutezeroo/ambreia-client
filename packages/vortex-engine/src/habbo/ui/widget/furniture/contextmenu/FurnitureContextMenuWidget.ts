@@ -34,7 +34,6 @@ import {MonsterPlantSeedContextMenuView} from './MonsterPlantSeedContextMenuView
 import {MonsterPlantSeedConfirmationView} from './MonsterPlantSeedConfirmationView';
 import {PurchasableClothingConfirmationView} from './PurchasableClothingConfirmationView';
 import {EffectBoxOpenDialogView} from '@habbo/ui/widget/furniture/effectbox/EffectBoxOpenDialogView';
-
 import {
     GuildFurnitureContextMenuView
 } from '@habbo/ui/widget/furniture/guildfurnicontextmenu/GuildFurnitureContextMenuView';

@@ -134,12 +134,6 @@ export class InfoStandWidgetHandler implements IRoomWidgetHandler, IGetImageList
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/InfoStandWidgetHandler.as::_cachedPetImages
     private _cachedPetImages: Map<string, ImageBitmap | null> | null = new Map();
 
-    // DEVIATION: AS3 takes the music controller and listens for its now-playing and song-info
-    //   events, turning them into the song updates the jukebox and song-disk views read
-    //   (`_musicController`, `onNowPlayingChanged()`, `onSongInfoReceivedEvent()`). The RPG fork
-    //   removed jukebox music, so the handler takes nothing.
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/InfoStandWidgetHandler.as::InfoStandWidgetHandler()
-
     private _disposed: boolean = false;
 
     // AS3: .../src/com/sulake/habbo/ui/handler/InfoStandWidgetHandler.as::get disposed()
@@ -294,6 +288,9 @@ export class InfoStandWidgetHandler implements IRoomWidgetHandler, IGetImageList
         return this._container?.config?.getBoolean('activity.point.display.enabled') ?? false;
     }
 
+    // DEVIATION: AS3's handler takes the music controller in its constructor and listens for its
+    //   now-playing and song-info events (`onNowPlayingChanged()`, `onSongInfoReceivedEvent()`),
+    //   which it unregisters here; the RPG fork removed jukebox music, so there is nothing to drop.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/InfoStandWidgetHandler.as::dispose()
     // AS3 walks _cachedPetImages and calls BitmapData.dispose() on each entry before
     // dropping the map; ImageBitmap.close() is this port's equivalent (same convention as

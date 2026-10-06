@@ -61,9 +61,7 @@ import {FurnitureMonsterplantSeedLogic} from './object/logic/furniture/Furniture
 import {FurniturePurchasableClothingLogic} from './object/logic/furniture/FurniturePurchasableClothingLogic';
 import {FurnitureRoomBackgroundColorLogic} from './object/logic/furniture/FurnitureRoomBackgroundColorLogic';
 import {FurnitureAreaHideLogic} from './object/logic/furniture/FurnitureAreaHideLogic';
-
 import {FurnitureEffectBoxLogic} from './object/logic/furniture/FurnitureEffectBoxLogic';
-
 import {FurnitureAchievementResolutionLogic} from './object/logic/furniture/FurnitureAchievementResolutionLogic';
 import {FurnitureLovelockLogic} from './object/logic/furniture/FurnitureLovelockLogic';
 import {FurnitureWildwestWantedLogic} from './object/logic/furniture/FurnitureWildwestWantedLogic';
@@ -146,8 +144,6 @@ export class RoomObjectFactory implements IRoomObjectFactory
 
     // DEVIATION: AS3 also maps `game_snowball` / `game_snowsplash` onto the snow-war logics; the RPG
     //   fork removed Snow War, so both types fall back to null like any unknown type.
-    // DEVIATION: AS3 also maps the mystery-box and mystery-trophy furniture types onto their logics;
-    //   the RPG fork removed mystery boxes, so both fall back to null like any unknown type.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/RoomObjectFactory.as::createRoomObjectLogic()
     // The case order mirrors the AS3 switch. AS3 has no default branch: an unknown type leaves the
     // class null and the method returns null, so the object simply gets no event handler.
@@ -417,6 +413,16 @@ export class RoomObjectFactory implements IRoomObjectFactory
 
             case RoomObjectLogicEnum.FURNITURE_AREA_HIDE:
                 LogicClass = FurnitureAreaHideLogic;
+
+                break;
+
+            // DEVIATION: AS3 builds FurnitureMysterboxLogic / FurnitureMysteryTrophyLogic here. The RPG
+            //   fork removed mystery boxes, but furnidata still names these two types, so they get those
+            //   logics' common ancestor, FurnitureLogic: a plain furni that can still be clicked, moved
+            //   and picked up.
+            case RoomObjectLogicEnum.FURNITURE_MYSTERYBOX:
+            case RoomObjectLogicEnum.FURNITURE_MYSTERYTROPHY:
+                LogicClass = FurnitureLogic;
 
                 break;
 

@@ -1382,7 +1382,6 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
                     desktop.createWidget('RWE_FRIEND_FURNI_CONFIRM');
                     // AS3: RoomUI.as:968
                     desktop.createWidget('RWE_CUSTOM_STACK_HEIGHT');
-
                     desktop.createWidget('RWE_ROOM_LINK');
                     // AS3: RoomUI.as:978 — the crafting table.
                     desktop.createWidget('RWE_CRAFTING');
@@ -1405,7 +1404,6 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
                     // AS3: RoomUI.as:957 — "what furniture is in this room".
                     desktop.createWidget('RWE_FURNI_CHOOSER');
                     desktop.createWidget('RWE_USER_CHOOSER');
-
                     // AS3: RoomUI.as:967 — no window of its own; the handler follows the link the
                     // clicked furni carries.
                     desktop.createWidget('RWE_INTERNAL_LINK');

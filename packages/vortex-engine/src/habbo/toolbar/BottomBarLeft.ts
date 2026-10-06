@@ -1019,7 +1019,6 @@ export class BottomBarLeft implements ILinkEventTracker
             case 'HTIE_ICON_PROGRESSION': return 'icons_toolbar_progression';
             case 'HTIE_ICON_STORIES': return 'icons_toolbar_stories';
             case 'HTIE_ICON_RECEPTION': return 'icons_toolbar_reception';
-
             default: return null;
         }
     }

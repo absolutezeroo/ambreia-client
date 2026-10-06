@@ -13,7 +13,6 @@ import type {Container, Ticker} from 'pixi.js';
 import {Sprite, Texture} from 'pixi.js';
 import {Component, ComponentDependency, type IContext, type IUpdateReceiver} from '@core/runtime';
 import {Vortex} from '../../Vortex';
-
 import type {IAssetLibrary} from '@core/assets/IAssetLibrary';
 import type {IConnection} from '@core/communication/connection/IConnection';
 import type {IRoomEngine} from './IRoomEngine';
@@ -5770,11 +5769,6 @@ export class RoomEngine extends Component implements IRoomEngine,
         canvas.useMask = useMask;
     }
 
-    // DEVIATION: AS3 builds the camera's render request here (`RenderRoomMessageComposer`, or the
-    //   thumbnail one), from SpriteDataCollector's furni, plane and modifier data. The RPG fork
-    //   removed photos and the room-thumbnail camera, so the member is gone with its composers.
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::getRenderRoomMessage()
-
     /**
 	 * Captures the room canvas for the camera.
 	 *
@@ -8628,6 +8622,7 @@ export class RoomEngine extends Component implements IRoomEngine,
     //   RPG fork removed jukebox music.
     // DEVIATION: AS3 also forwards the mystery-box and mystery-trophy open-dialog requests; the RPG
     //   fork removed mystery boxes.
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_1821.as::handleObjectWidgetRequestEvent()
     private handleObjectWidgetRequestEvent(event: RoomObjectWidgetRequestEvent, roomId: number): void
     {
         const objectId = event.objectId;
@@ -8695,7 +8690,6 @@ export class RoomEngine extends Component implements IRoomEngine,
             case RoomObjectWidgetRequestEvent.ROWRE_BACKGROUND_COLOR:
                 this.emitToWidget(RoomEngineToWidgetEvent.REQUEST_BACKGROUND_COLOR, roomId, objectId, category);
                 break;
-
             // AS3: _SafeCls_1821.as:1530-1531. No widget behind this one — the handler follows the
             // link itself, which is why it is wired here with nothing else to port.
             case RoomObjectWidgetRequestEvent.ROWRE_INTERNAL_LINK:

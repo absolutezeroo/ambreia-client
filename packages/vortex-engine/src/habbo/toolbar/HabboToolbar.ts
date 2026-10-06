@@ -712,7 +712,6 @@ export class HabboToolbar extends Component implements IHabboToolbar
 	 * engine, NAVIGATOR/ROOMINFO/HOME the navigator, INVENTORY the inventory, MEMENU the
 	 * me-menu controller, and the landing view listens for its own.
 	 *
-
 	 * Icons whose module does not exist at all — GUIDE, STORIES, RECEPTION — still emit; nothing
 	 * listens, which is also what happens in AS3 on a hotel where those features are off.
 	 *

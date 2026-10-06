@@ -63,7 +63,6 @@ import {CraftingWidget} from './widget/crafting/CraftingWidget';
 // Vortex-only: the fishing widget lives under src/vortex/, not in the ported tree.
 import {FishingSpotWidget} from '@habbo/vortex/fishing/ui/FishingSpotWidget';
 import type {FishingSpotWidgetHandler} from '@habbo/vortex/fishing/ui/FishingSpotWidgetHandler';
-
 import {YoutubeDisplayWidget} from './widget/furniture/video/YoutubeDisplayWidget';
 import {VimeoDisplayWidget} from './widget/furniture/video/VimeoDisplayWidget';
 
@@ -318,7 +317,6 @@ export class RoomWidgetFactory implements IRoomWidgetFactory
                     handler, this._roomUI.windowManager, this._roomUI.assets,
                     this._roomUI.localization, this._roomUI.habboGroupsManager, this._roomUI.catalog
                 );
-
             case 'RWE_YOUTUBE':
                 return new YoutubeDisplayWidget(
                     handler, this._roomUI.windowManager, this._roomUI.assets,

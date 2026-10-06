@@ -259,6 +259,20 @@ export class NavigatorData
         return this._visibleEventCategories;
     }
 
+    private _currentRoomRating: number = 0;
+
+    // AS3: .../src/com/sulake/habbo/navigator/domain/NavigatorData.as::get currentRoomRating()
+    get currentRoomRating(): number
+    {
+        return this._currentRoomRating;
+    }
+
+    // AS3: .../src/com/sulake/habbo/navigator/domain/NavigatorData.as::set currentRoomRating()
+    set currentRoomRating(value: number)
+    {
+        this._currentRoomRating = value;
+    }
+
     private _currentRoomIsStaffPick: boolean = false;
 
     // AS3: .../src/com/sulake/habbo/navigator/domain/NavigatorData.as::get currentRoomIsStaffPick()

@@ -84,7 +84,6 @@ import {FishingSpotWidgetHandler} from '@habbo/vortex/fishing/ui/FishingSpotWidg
 import {YoutubeDisplayWidgetHandler} from './handler/YoutubeDisplayWidgetHandler';
 import {VimeoDisplayWidgetHandler} from './handler/VimeoDisplayWidgetHandler';
 import {ChatInputWidgetHandler} from './handler/ChatInputWidgetHandler';
-
 import {FurnitureTrophyWidgetHandler} from './handler/FurnitureTrophyWidgetHandler';
 import {FurnitureStickieWidgetHandler} from './handler/FurnitureStickieWidgetHandler';
 import {SpamWallPostItWidgetHandler} from './handler/SpamWallPostItWidgetHandler';
@@ -1221,7 +1220,6 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
             case 'RWE_CHAT_INPUT_WIDGET':
                 handler = new ChatInputWidgetHandler();
                 break;
-
             case 'RWE_EFFECTS':
                 // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as:848
                 handler = new EffectsWidgetHandler();

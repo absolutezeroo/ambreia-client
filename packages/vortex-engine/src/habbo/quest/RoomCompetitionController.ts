@@ -17,7 +17,6 @@ import {
 import {
     SubmitRoomToCompetitionMessageComposer
 } from '@habbo/communication/messages/outgoing/competition/SubmitRoomToCompetitionMessageComposer';
-
 import {
     GetTalentTrackMessageComposer
 } from '@habbo/communication/messages/outgoing/talent/GetTalentTrackMessageComposer';
@@ -158,14 +157,14 @@ export class RoomCompetitionController implements IDisposable, IGetImageListener
      * participant list, which is the only thing the info line's target depends on here.
      */
     // DEVIATION: AS3 wires the action button to `onVote()`, which sends the room vote, and shows it
-    //   while votes remain; the RPG fork removed room voting (plan decision 4: competitions stay,
-    //   only the vote goes), so the button stays hidden in vote mode.
+    //   while votes remain, with its `button_info_txt` caption while voting is allowed; the RPG
+    //   fork removed room voting (plan decision 4: competitions stay, only the vote goes), so both
+    //   stay hidden in vote mode.
     // AS3: .../src/com/sulake/habbo/quest/RoomCompetitionController.as::onCompetitionVotingInfo()
     onCompetitionVotingInfo(parser: CompetitionVotingInfoMessageEventParser): void
     {
         this._votesRemaining = parser.votesRemaining;
 
-        const isVotingAllowed = parser.isVotingAllowedForUser;
         const resultCode = parser.resultCode;
 
         this.refreshContent(parser.goalId, false, parser.goalCode, resultCode.toString());
@@ -177,7 +176,7 @@ export class RoomCompetitionController implements IDisposable, IGetImageListener
 
         const buttonInfo = this.getButtonInfoText();
 
-        if(buttonInfo !== null) buttonInfo.visible = isVotingAllowed;
+        if(buttonInfo !== null) buttonInfo.visible = false;
     }
 
     /**
