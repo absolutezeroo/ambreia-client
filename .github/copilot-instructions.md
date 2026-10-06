@@ -249,13 +249,6 @@ rest of the method, the callee it assigns through, and whoever is supposed to be
 
 ## Communication rules (`core/communication/`, `habbo/communication/`)
 
----
-paths:
-  - "**/communication/**"
----
-
-# Wire protocol / communication rules
-
 You are editing wire-protocol code (`core/communication/`, `habbo/communication/`).
 
 1. Read `docs/CLIENT-SERVER-ARCHITECTURE.md` in full for the system you are touching (handshake/encryption, or the specific composer/parser's request-response flow) before changing anything here.
@@ -268,14 +261,6 @@ You are editing wire-protocol code (`core/communication/`, `habbo/communication/
 
 ## Window/UI rules (`core/window/`, `habbo/window/`, `**/widgets/**`)
 
----
-paths:
-  - "**/window/**"
-  - "**/widgets/**"
----
-
-# UI / window system rules
-
 You are editing the ported Flash UI/window system (`core/window/`, `habbo/window/`, `habbo/*/widgets/`, client `window/`).
 
 1. See `docs/PATTERNS.md` → "UI Window (ported from Flash)" and "Component Lifecycle" for the expected class shape. Quick shape reminder: UI Windows are ported from the AS3 `IWindow`/`IFrameWindow` hierarchy using PixiJS + the XML layouts described in rule 3.
@@ -286,13 +271,6 @@ You are editing the ported Flash UI/window system (`core/window/`, `habbo/window
 6. **Text alignment is `auto_size`, and it is a string.** `<var key="auto_size" value="center" type="String"/>` — the values are `left` / `center` / `right` / `none`, not a boolean, and 492 shipped layouts use `center`. `TextSkinRenderer` shifts the line by `(maxWidth - textWidth) / 2`. There is no `align` attribute, which is what makes this easy to miss: do not hand-place a label's x to fake centring, because the glyph width changes with the font and with the text.
 
 ## Room engine rules (`room/`, `habbo/room/`)
-
----
-paths:
-  - "**/room/**"
----
-
-# Room engine rules
 
 `room/` (generic engine primitives: `data`, `events`, `object`, `renderer`, `utils`) and `habbo/room/` (Habbo-specific room game logic) are different layers — do not confuse them.
 
