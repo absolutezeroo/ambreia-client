@@ -45,8 +45,6 @@ export class CatalogWidgetName
 
     // Not ported yet - listed so future work registers its case via this constant instead of a
     // raw string literal (see this session's roadmap in docs/IMPLEMENTATION_STATUS.md).
-    static readonly SONG_DISK_PRODUCT_VIEW: string = 'songDiskProductViewWidget';
-    static readonly TRAX_PREVIEW: string = 'traxPreviewWidget';
     static readonly ROOM_PREVIEW: string = 'roomPreviewWidget';
     static readonly TROPHY: string = 'trophyWidget';
     static readonly PETS: string = 'petsWidget';

@@ -168,8 +168,8 @@ export class HabboSoundBase implements IHabboSound
 
     /**
      * Inverted in AS3 — `finished` returns `!_complete`, so it is *true* while the sound is
-     * still playing and *false* once the complete event has fired. Ported as written: the
-     * Trax sequencer reads it, and flipping it here would change what that code sees.
+     * still playing and *false* once the complete event has fired. Ported as written:
+     * AS3's song sequencer read it this way, and flipping it would diverge from the source.
      */
     // AS3: .../sound/HabboSoundBase.as::get finished()
     get finished(): boolean

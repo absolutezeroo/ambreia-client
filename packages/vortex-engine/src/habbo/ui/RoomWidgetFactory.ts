@@ -3,9 +3,8 @@
  *
  * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/RoomWidgetFactory.as
  *
- * All 45 of the AS3 factory's `RWE_*` cases are constructed here as of 2026-08-27 — the six that
- * used to fall through to the default stub log (camera, room-thumbnail camera, crafting, the
- * playlist editor, YouTube and Vimeo) each needed a whole subsystem, and each of those landed.
+ * Every AS3 factory `RWE_*` case is constructed here, except the three whose feature the RPG fork
+ * removed: the photo camera, the room-thumbnail camera and the jukebox playlist editor.
  * The two ids `RoomUI` creates that have no case are the two AS3 has no case for either:
  * "RWE_LOCATION_WIDGET" and "RWE_INTERNAL_LINK" are handler-only, with no window.
  * "RWE_CHAT_WIDGET" used to be handled here and is gone. The 2026 client replaced the
@@ -64,11 +63,9 @@ import {CraftingWidget} from './widget/crafting/CraftingWidget';
 // Vortex-only: the fishing widget lives under src/vortex/, not in the ported tree.
 import {FishingSpotWidget} from '@habbo/vortex/fishing/ui/FishingSpotWidget';
 import type {FishingSpotWidgetHandler} from '@habbo/vortex/fishing/ui/FishingSpotWidgetHandler';
-import {CameraWidget} from './widget/camera/CameraWidget';
-import {RoomThumbnailCameraWidget} from './widget/camera/RoomThumbnailCameraWidget';
+
 import {YoutubeDisplayWidget} from './widget/furniture/video/YoutubeDisplayWidget';
 import {VimeoDisplayWidget} from './widget/furniture/video/VimeoDisplayWidget';
-import {PlayListEditorWidget} from './widget/playlisteditor/PlayListEditorWidget';
 
 const log = Logger.getLogger('habbo.ui.RoomWidgetFactory');
 
@@ -321,16 +318,7 @@ export class RoomWidgetFactory implements IRoomWidgetFactory
                     handler, this._roomUI.windowManager, this._roomUI.assets,
                     this._roomUI.localization, this._roomUI.habboGroupsManager, this._roomUI.catalog
                 );
-            // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/RoomWidgetFactory.as:133-134
-            case 'RWE_CAMERA':
-                return new CameraWidget(
-                    handler, this._roomUI.windowManager, this._roomUI.assets, this._roomUI.localization, this._roomUI
-                );
-            // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/RoomWidgetFactory.as:163-164
-            case 'RWE_ROOM_THUMBNAIL_CAMERA':
-                return new RoomThumbnailCameraWidget(
-                    handler, this._roomUI.windowManager, this._roomUI.assets, this._roomUI.localization, this._roomUI
-                );
+
             case 'RWE_YOUTUBE':
                 return new YoutubeDisplayWidget(
                     handler, this._roomUI.windowManager, this._roomUI.assets,
@@ -374,26 +362,6 @@ export class RoomWidgetFactory implements IRoomWidgetFactory
                 }
 
                 return widget;
-            }
-            case 'RWE_PLAYLIST_EDITOR_WIDGET':
-            {
-                // The editor is driven entirely by the music controller — with no sound manager
-                // there is nothing for it to read a playlist from, so it is not built at all
-                // rather than opened empty.
-                const soundManager = this._roomUI.soundManager;
-
-                if(soundManager === null)
-                {
-                    log.warn('RWE_PLAYLIST_EDITOR_WIDGET requested before the sound manager resolved');
-
-                    return null;
-                }
-
-                return new PlayListEditorWidget(
-                    handler, this._roomUI.windowManager, soundManager,
-                    this._roomUI.assets, this._roomUI.localization, this._roomUI.config,
-                    this._roomUI.catalog
-                );
             }
             default:
                 log.debug(`Widget creation requested: ${type} (stub — returning null)`);

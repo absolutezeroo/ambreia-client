@@ -922,7 +922,7 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
             ),
             // AS3: HabboInventory.as:179 — IIDHabboSoundManager, declared with no third
             // argument, i.e. required. VortexMain attaches it, so it cannot deadlock. The trade
-            // window's tooltip is what reads it, to name a Trax disc.
+            // window took it to name a song disc, which the RPG fork removed with jukebox music.
             new ComponentDependency(
                 IID_HabboSoundManager,
                 (soundManager: IHabboSoundManager | null) =>

@@ -21,7 +21,6 @@ import type {SelectedRoomObjectData} from './utils/SelectedRoomObjectData';
 import type {IRoomAreaSelectionManager} from './IRoomAreaSelectionManager';
 import type {RoomPlaneParser} from './object/RoomPlaneParser';
 import type {IRoomEngineRectangle} from './RoomEngine';
-import type {RenderRoomMessageComposer} from '@habbo/communication/messages/outgoing/camera/RenderRoomMessageComposer';
 
 export interface IRoomEngine extends IDisposable {
     // Event emitter
@@ -698,20 +697,6 @@ export interface IRoomEngine extends IDisposable {
      */
     // AS3: .../src/com/sulake/habbo/room/IRoomEngine.as::getRoomCanvasScale()
     getRoomCanvasScale(roomId: number, canvasId?: number): number;
-
-    /**
-	 * Builds the camera's render request for a viewport. `thumbnail` selects the thumbnail
-	 * composer, which packs in its constructor.
-	 */
-    // AS3: .../src/com/sulake/habbo/room/IRoomEngine.as::getRenderRoomMessage()
-    getRenderRoomMessage(
-        viewPort: IRoomEngineRectangle,
-        backgroundColor: number,
-        thumbnail?: boolean,
-        includeOwnUser?: boolean,
-        skipVisibilityChecking?: boolean,
-        canvasId?: number
-    ): RenderRoomMessageComposer | null;
 
     /**
 	 * Captures the room canvas. See the implementation for why this returns an `ImageBitmap`

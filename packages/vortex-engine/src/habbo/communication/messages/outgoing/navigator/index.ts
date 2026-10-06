@@ -12,7 +12,7 @@ export * from './CanCreateRoomMessageComposer';
 export * from './GetUserFlatCatsMessageComposer';
 export * from './GetUserEventCatsMessageComposer';
 export * from './UpdateHomeRoomMessageComposer';
-export * from './RateFlatMessageComposer';
+
 export * from './ToggleStaffPickMessageComposer';
 export * from './GetPopularRoomTagsMessageComposer';
 export * from './MyFriendsRoomsSearchMessageComposer';

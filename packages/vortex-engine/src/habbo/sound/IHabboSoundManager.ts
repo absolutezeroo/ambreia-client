@@ -1,10 +1,10 @@
 import type EventEmitter from 'eventemitter3';
-import type {IHabboMusicController} from './IHabboMusicController';
 import type {IHabboSound} from './IHabboSound';
 
 /**
- * The sound manager: three volume channels (generic effects, Trax music, furniture), the
- * effect cache behind `playSound()`, and ownership of the music controller.
+ * The sound manager: three volume channels (generic effects, music, furniture) and the
+ * effect cache behind `playSound()`. AS3 also hands out the music controller and loads songs;
+ * the RPG fork removed jukebox music, so `musicController` and the song loader are gone.
  *
  * The class name is recovered from `PRODUCTION-201601012205-226667486`
  * (`IHabboSoundManager`); WIN63 has it as `_SafeCls_95` with every member readable.
@@ -35,9 +35,6 @@ export interface IHabboSoundManager
     // AS3: .../sound/_SafeCls_95.as::set furniVolume()
     set furniVolume(value: number);
 
-    // AS3: .../sound/_SafeCls_95.as::get musicController()
-    get musicController(): IHabboMusicController | null;
-
     // AS3: .../sound/_SafeCls_95.as::playSound()
     playSound(soundId: string, loops?: number): void;
 
@@ -46,9 +43,6 @@ export interface IHabboSoundManager
 
     // AS3: .../sound/_SafeCls_95.as::playSoundAtPitch()
     playSoundAtPitch(soundId: string, pitch: number): IHabboSound | null;
-
-    // AS3: .../sound/_SafeCls_95.as::loadTraxSong()
-    loadTraxSong(songId: number, songData: string): IHabboSound | null;
 
     // AS3: .../sound/_SafeCls_95.as::mute()
     mute(muted: boolean): void;

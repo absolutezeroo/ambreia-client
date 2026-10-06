@@ -210,6 +210,8 @@ export class MeMenuSoundSettingsView implements IMeMenuView
      * anything at the top level of the layout can act as the back button. The three items are then
      * built against their containers, and the current volumes are requested.
      */
+    // DEVIATION: AS3 shows the `trax_volume_container` row; the RPG fork removed jukebox music, so
+    //   the row is hidden until Task 10 drops it from the layout.
     // AS3: .../soundsettings/MeMenuSoundSettingsView.as::createWindow()
     private createWindow(name: string): void
     {
@@ -251,6 +253,8 @@ export class MeMenuSoundSettingsView implements IMeMenuView
         this._traxVolumeItem = new MeMenuSoundSettingsItem(
             this, MeMenuSoundSettingsItem.TYPE_TRAX_VOLUME, this.traxVolumeContainer
         );
+
+        if(this.traxVolumeContainer) this.traxVolumeContainer.visible = false;
 
         widget.messageListener?.processWidgetMessage(
             new RoomWidgetGetSettingsMessage(RoomWidgetGetSettingsMessage.GET_SETTINGS)

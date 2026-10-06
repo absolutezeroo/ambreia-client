@@ -65,9 +65,6 @@ import {
 import {FigureSetIdsMessageEvent} from '../communication/messages/incoming/inventory/FigureSetIdsMessageEvent';
 import {AvatarEffectsMessageEvent} from '../communication/messages/incoming/inventory/AvatarEffectsMessageEvent';
 
-// Events - Mystery Box
-import {MysteryBoxKeysMessageEvent} from '../communication/messages/incoming/mysterybox/MysteryBoxKeysMessageEvent';
-
 // Events - Users
 import {InClientLinkMessageEvent} from '../communication/messages/incoming/users/InClientLinkMessageEvent';
 import {EmailStatusResultEvent} from '../communication/messages/incoming/users/EmailStatusResultEvent';
@@ -124,9 +121,7 @@ import type {
     AvatarEffectsMessageParser,
     IAvatarEffect
 } from '../communication/messages/parser/inventory/AvatarEffectsMessageParser';
-import type {
-    MysteryBoxKeysMessageParser
-} from '../communication/messages/parser/mysterybox/MysteryBoxKeysMessageParser';
+
 import type {InClientLinkMessageParser} from '../communication/messages/parser/users/InClientLinkMessageParser';
 import type {EmailStatusResultParser} from '../communication/messages/parser/users/EmailStatusResultParser';
 import type {
@@ -173,7 +168,7 @@ import {
 // Session events
 import {UserNameUpdateEvent} from './events/UserNameUpdateEvent';
 import {SessionDataPreferencesEvent} from './events/SessionDataPreferencesEvent';
-import {MysteryBoxKeysUpdateEvent} from './events/MysteryBoxKeysUpdateEvent';
+
 import {SessionDataToWidgetEvent} from './events/SessionDataToWidgetEvent';
 
 // Sub-managers
@@ -205,7 +200,7 @@ export class SessionDataManager extends Component implements ISessionDataManager
     private _messageEvents: IMessageEvent[] = [];
     private _customData: string = '';
     private _directMail: boolean = false;
-    private _mysteryBoxKeyColor: string = '';
+
     private _nftChatStyleIds: Set<number> = new Set();
     private _purchasableChatStyleIds: Set<number> = new Set();
     // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::_roomSessionManager
@@ -611,16 +606,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
         return this._avatarEffects;
     }
 
-    // Mystery Box
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::_mysteryBoxColor
-    private _mysteryBoxColor: string = '';
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::get mysteryBoxColor()
-    get mysteryBoxColor(): string
-    {
-        return this._mysteryBoxColor;
-    }
-
     get motto(): string
     {
         return this._customData;
@@ -681,12 +666,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
     get safetyLocked(): boolean
     {
         return this._accountSafetyLocked;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::get mysteryKeyColor()
-    get mysteryKeyColor(): string
-    {
-        return this._mysteryBoxKeyColor;
     }
 
     // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::get perksReady()
@@ -1680,6 +1659,9 @@ export class SessionDataManager extends Component implements ISessionDataManager
 
     /**
 	 * Register message event handlers
+	 *
+	 * AS3 also listens for the mystery-box keys and stores the box and key colours behind two
+	 * getters; the RPG fork removed mystery boxes.
 	 */
     private registerMessageEvents(): void
     {
@@ -1707,9 +1689,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
         this.addMessageEvent(new AchievementsScoreMessageEvent(this.onAchievementsScore.bind(this)));
         this.addMessageEvent(new FigureSetIdsMessageEvent(this.onFigureSetIds.bind(this)));
         this.addMessageEvent(new AvatarEffectsMessageEvent(this.onAvatarEffects.bind(this)));
-
-        // Mystery box events
-        this.addMessageEvent(new MysteryBoxKeysMessageEvent(this.onMysteryBoxKeys.bind(this)));
 
         // Users events
         this.addMessageEvent(new InClientLinkMessageEvent(this.onInClientLink.bind(this)));
@@ -1955,26 +1934,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
         this._avatarEffects = [...parser.effects];
 
         log.debug(`Avatar effects: ${this._avatarEffects.length}`);
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::onMysteryBoxKeys()
-    private onMysteryBoxKeys(event: IMessageEvent): void
-    {
-        if(!event) return;
-
-        const parser = event.parser as MysteryBoxKeysMessageParser;
-
-        if(!parser) return;
-
-        this._mysteryBoxColor = parser.boxColor;
-        this._mysteryBoxKeyColor = parser.keyColor;
-
-        this.events.emit(
-            MysteryBoxKeysUpdateEvent.MYSTERY_BOX_KEYS_UPDATE,
-            new MysteryBoxKeysUpdateEvent(this._mysteryBoxColor, this._mysteryBoxKeyColor)
-        );
-
-        log.debug(`Mystery box: color=${this._mysteryBoxColor}, keyColor=${this._mysteryBoxKeyColor}`);
     }
 
     // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::onInClientLink()

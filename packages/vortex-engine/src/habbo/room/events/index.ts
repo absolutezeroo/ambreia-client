@@ -13,7 +13,6 @@ export {RoomEngineObjectPlaySoundEvent} from './RoomEngineObjectPlaySoundEvent';
 export {RoomEngineObjectSamplePlaybackEvent} from './RoomEngineObjectSamplePlaybackEvent';
 export {RoomEngineRoomAdEvent} from './RoomEngineRoomAdEvent';
 export {RoomEngineRoomColorEvent} from './RoomEngineRoomColorEvent';
-export {RoomEngineSoundMachineEvent} from './RoomEngineSoundMachineEvent';
 export {RoomEngineToWidgetEvent} from './RoomEngineToWidgetEvent';
 export {RoomEngineUseProductEvent} from './RoomEngineUseProductEvent';
 export {RoomEngineZoomEvent} from './RoomEngineZoomEvent';

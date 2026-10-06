@@ -7,7 +7,7 @@
  *
  * **No coins are given; you get a drum solo instead.** Donating resets the amount to 1, disables
  * the button, and plays 68 stock sounds 250ms apart — purchase chimes, pixel chimes and a cuckoo
- * clock — a little over 17 seconds. Halfway through, a notification asks whether this is Trax. When
+ * clock — a little over 17 seconds. Halfway through, a notification asks whether this counts as music. When
  * the last sound has played the button re-enables and tool 3 is marked complete.
  *
  * The volume is clamped into 0.4..0.6 for the duration so the sequence is neither inaudible nor

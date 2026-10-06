@@ -96,7 +96,6 @@ import {
     RoomEventCancelMessageEvent,
     RoomEventMessageEvent,
     RoomInfoUpdatedMessageEvent,
-    RoomRatingMessageEvent,
     UserEventCatsMessageEvent,
     UserFlatCatsMessageEvent,
 } from '../communication/messages/incoming/navigator';
@@ -120,7 +119,6 @@ import type {
     PopularRoomTagsResultMessageParser,
     RoomEventMessageParser,
     RoomInfoUpdatedMessageParser,
-    RoomRatingMessageParser,
     UserEventCatsMessageParser,
     UserFlatCatsMessageParser,
 } from '../communication/messages/parser/navigator';
@@ -167,6 +165,9 @@ export class IncomingMessages
         this._messageEvents = [];
     }
 
+    // DEVIATION: AS3 also listens for RoomRatingEvent (`onRoomRating()`), storing the room's score
+    //   and whether the viewer may vote. The RPG fork removed room voting; the server still sends
+    //   the message (with CanRate false), and HabboMessages keeps it registered so it parses.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/navigator/_SafeCls_2208.as::addMessageListeners()
     private addMessageListeners(): void
     {
@@ -219,7 +220,6 @@ export class IncomingMessages
         // Room info
         this.addMessageEvent(new GetGuestRoomResultMessageEvent(this.onGetGuestRoomResult.bind(this)));
         this.addMessageEvent(new RoomInfoUpdatedMessageEvent(this.onRoomInfoUpdated.bind(this)));
-        this.addMessageEvent(new RoomRatingMessageEvent(this.onRoomRating.bind(this)));
 
         // Search results
         this.addMessageEvent(new GuestRoomSearchResultMessageEvent(this.onGuestRoomSearchResult.bind(this)));
@@ -484,21 +484,6 @@ export class IncomingMessages
         // The message says "this room changed", not what changed: AS3 answers it by asking for
         // the room again. Without that, a settings edit left the navigator showing the old data.
         this._navigator.send(new GetGuestRoomMessageComposer(parser.flatId, false, false));
-    }
-
-    // AS3: .../src/com/sulake/habbo/navigator/_SafeCls_1951.as::onRoomRating()
-    private onRoomRating(event: IMessageEvent): void
-    {
-        if(!event) return;
-
-        const parser = event.parser as RoomRatingMessageParser;
-
-        if(!parser) return;
-
-        this.data.currentRoomRating = parser.rating;
-        this.data.canRate = parser.canRate;
-
-        log.debug(`Room rating: ${parser.rating}, canRate=${parser.canRate}`);
     }
 
     // AS3: .../src/com/sulake/habbo/navigator/_SafeCls_1951.as::onGuestRoomSearchResult()

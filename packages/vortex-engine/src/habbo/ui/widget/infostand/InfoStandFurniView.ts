@@ -94,27 +94,14 @@ export class InfoStandFurniView
         return this._window;
     }
 
-    /**
-     * TS-only: the layout each subclass builds from. AS3 has no such seam — InfoStandJukeboxView
-     * and InfoStandSongDiskView each override the whole of createWindow() just to swap
-     * `getAssetByName("furni_view")` for their own layout, then repeat the same ~50 lines of
-     * child lookups verbatim. All three layouts declare the same children, so the override point
-     * is the asset name rather than three copies of the body.
-     */
-    // TS-only: no AS3 counterpart; the override point the two song views build their layout from.
-    protected get layoutName(): string
-    {
-        return 'furni_view';
-    }
-
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandFurniView.as::createWindow()
     protected createWindow(name: string): void
     {
-        const window = this._widget.windowManager.buildWidgetLayout(this.layoutName) as IItemListWindow | null;
+        const window = this._widget.windowManager.buildWidgetLayout('furni_view') as IItemListWindow | null;
 
         if(!window)
         {
-            throw new Error(`Failed to construct window from layout: ${this.layoutName}`);
+            throw new Error('Failed to construct window from layout: furni_view');
         }
 
         this._window = window;
@@ -605,6 +592,8 @@ export class InfoStandFurniView
     // DEVIATION: AS3 shows the `nft_indicator` row (with `icon_nft`) for an `nft_` furni through
     //   `set isNft()`; the RPG fork removed NFT, so the row is only collapsed here until Task 10
     //   removes it from the XML.
+    // DEVIATION: AS3 also shows `use` to a room controller for an RWEIEP_JUKEBOX furni; the RPG
+    //   fork removed jukebox music.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandFurniView.as::update()
     public update(event: RoomWidgetFurniInfoUpdateEvent): void
     {
@@ -666,7 +655,6 @@ export class InfoStandFurniView
 
             if(!isPlayTestMode && (
                 (event.usagePolicy === 1 && isController)
-				|| (event.extraParam === 'RWEIEP_JUKEBOX' && isController)
 				|| (event.extraParam === 'RWEIEP_USABLE_PRODUCT' && isController)
             ))
             {

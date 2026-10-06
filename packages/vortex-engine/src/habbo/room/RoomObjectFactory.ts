@@ -36,10 +36,7 @@ import {FurnitureWindowLogic} from './object/logic/furniture/FurnitureWindowLogi
 import {FurnitureRoomDimmerLogic} from './object/logic/furniture/FurnitureRoomDimmerLogic';
 import {RoomTileCursorLogic} from './object/logic/room/RoomTileCursorLogic';
 import {SelectionArrowLogic} from './object/logic/room/SelectionArrowLogic';
-import {FurnitureSoundMachineLogic} from './object/logic/furniture/FurnitureSoundMachineLogic';
-import {FurnitureJukeboxLogic} from './object/logic/furniture/FurnitureJukeboxLogic';
 import {FurnitureCrackableLogic} from './object/logic/furniture/FurnitureCrackableLogic';
-import {FurnitureSongDiskLogic} from './object/logic/furniture/FurnitureSongDiskLogic';
 import {FurniturePushableLogic} from './object/logic/furniture/FurniturePushableLogic';
 import {FurnitureClothingChangeLogic} from './object/logic/furniture/FurnitureClothingChangeLogic';
 import {FurnitureCounterClockLogic} from './object/logic/furniture/FurnitureCounterClockLogic';
@@ -64,9 +61,9 @@ import {FurnitureMonsterplantSeedLogic} from './object/logic/furniture/Furniture
 import {FurniturePurchasableClothingLogic} from './object/logic/furniture/FurniturePurchasableClothingLogic';
 import {FurnitureRoomBackgroundColorLogic} from './object/logic/furniture/FurnitureRoomBackgroundColorLogic';
 import {FurnitureAreaHideLogic} from './object/logic/furniture/FurnitureAreaHideLogic';
-import {FurnitureMysterboxLogic} from './object/logic/furniture/FurnitureMysterboxLogic';
+
 import {FurnitureEffectBoxLogic} from './object/logic/furniture/FurnitureEffectBoxLogic';
-import {FurnitureMysteryTrophyLogic} from './object/logic/furniture/FurnitureMysteryTrophyLogic';
+
 import {FurnitureAchievementResolutionLogic} from './object/logic/furniture/FurnitureAchievementResolutionLogic';
 import {FurnitureLovelockLogic} from './object/logic/furniture/FurnitureLovelockLogic';
 import {FurnitureWildwestWantedLogic} from './object/logic/furniture/FurnitureWildwestWantedLogic';
@@ -149,6 +146,8 @@ export class RoomObjectFactory implements IRoomObjectFactory
 
     // DEVIATION: AS3 also maps `game_snowball` / `game_snowsplash` onto the snow-war logics; the RPG
     //   fork removed Snow War, so both types fall back to null like any unknown type.
+    // DEVIATION: AS3 also maps the mystery-box and mystery-trophy furniture types onto their logics;
+    //   the RPG fork removed mystery boxes, so both fall back to null like any unknown type.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/RoomObjectFactory.as::createRoomObjectLogic()
     // The case order mirrors the AS3 switch. AS3 has no default branch: an unknown type leaves the
     // class null and the method returns null, so the object simply gets no event handler.
@@ -280,13 +279,12 @@ export class RoomObjectFactory implements IRoomObjectFactory
 
                 break;
 
+            // DEVIATION: AS3 builds the sound-machine / jukebox furniture logics here. The RPG
+            //   fork removed jukebox music, but furnidata can still name these two types, so they get
+            //   those logics' own base, FurnitureMultiStateLogic: a furni that still toggles its state.
             case RoomObjectLogicEnum.FURNITURE_SOUND_MACHINE:
-                LogicClass = FurnitureSoundMachineLogic;
-
-                break;
-
             case RoomObjectLogicEnum.FURNITURE_JUKEBOX:
-                LogicClass = FurnitureJukeboxLogic;
+                LogicClass = FurnitureMultiStateLogic;
 
                 break;
 
@@ -295,8 +293,10 @@ export class RoomObjectFactory implements IRoomObjectFactory
 
                 break;
 
+            // DEVIATION: AS3 builds the song-disk furniture logic here; the RPG fork removed jukebox music,
+            //   so a song disk is a plain furni (its logic's own base).
             case RoomObjectLogicEnum.FURNITURE_SONG_DISK:
-                LogicClass = FurnitureSongDiskLogic;
+                LogicClass = FurnitureLogic;
 
                 break;
 
@@ -420,18 +420,8 @@ export class RoomObjectFactory implements IRoomObjectFactory
 
                 break;
 
-            case RoomObjectLogicEnum.FURNITURE_MYSTERYBOX:
-                LogicClass = FurnitureMysterboxLogic;
-
-                break;
-
             case RoomObjectLogicEnum.FURNITURE_EFFECTBOX:
                 LogicClass = FurnitureEffectBoxLogic;
-
-                break;
-
-            case RoomObjectLogicEnum.FURNITURE_MYSTERYTROPHY:
-                LogicClass = FurnitureMysteryTrophyLogic;
 
                 break;
 

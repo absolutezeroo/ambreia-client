@@ -56,9 +56,9 @@ export const RoomObjectLogicEnum = {
     FURNITURE_PURCHASABLE_CLOTHING: 'furniture_purchasable_clothing',
     FURNITURE_BACKGROUND_COLOR: 'furniture_background_color',
     FURNITURE_AREA_HIDE: 'furniture_area_hide',
-    FURNITURE_MYSTERYBOX: 'furniture_mysterybox',
+
     FURNITURE_EFFECTBOX: 'furniture_effectbox',
-    FURNITURE_MYSTERYTROPHY: 'furniture_mysterytrophy',
+
     FURNITURE_ACHIEVEMENT_RESOLUTION: 'furniture_achievement_resolution',
     FURNITURE_LOVELOCK_ENGRAVING: 'furniture_lovelock',
     FURNITURE_WILD_WEST_WANTED_ENGRAVING: 'furniture_wildwest_wanted',

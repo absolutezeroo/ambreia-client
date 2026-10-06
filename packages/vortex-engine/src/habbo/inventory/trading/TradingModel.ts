@@ -91,9 +91,8 @@ const log = Logger.getLogger('habbo.inventory.trading.TradingModel');
  * The state of one trade, and the only place that talks to the server about it. It owns the
  * `TradingView` it drives, as AS3 does.
  *
- * One edge is still unported, marked where it belongs: the Trax song title in the view's hover
- * tooltip. AS3 also carries an NFT half of both item lists, which the RPG fork removed; the silver
- * fee that prices such a trade is kept.
+ * AS3 also carries an NFT half of both item lists, which the RPG fork removed; the silver fee
+ * that prices such a trade is kept.
  *
  * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/trading/TradingModel.as
  */

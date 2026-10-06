@@ -15,14 +15,6 @@ export class RoomObjectFurnitureActionEvent extends RoomObjectEvent
     public static readonly ROFCAE_USE_HABBOWHEEL = 'ROFCAE_USE_HABBOWHEEL';
     public static readonly ROFCAE_STICKIE = 'ROFCAE_STICKIE';
     public static readonly ROFCAE_ENTER_ONEWAYDOOR = 'ROFCAE_ENTER_ONEWAYDOOR';
-    public static readonly ROFCAE_SOUND_MACHINE_INIT = 'ROFCAE_SOUND_MACHINE_INIT';
-    public static readonly ROFCAE_SOUND_MACHINE_START = 'ROFCAE_SOUND_MACHINE_START';
-    public static readonly ROFCAE_SOUND_MACHINE_STOP = 'ROFCAE_SOUND_MACHINE_STOP';
-    public static readonly ROFCAE_SOUND_MACHINE_DISPOSE = 'ROFCAE_SOUND_MACHINE_DISPOSE';
-    public static readonly ROFCAE_JUKEBOX_INIT = 'ROFCAE_JUKEBOX_INIT';
-    public static readonly ROFCAE_JUKEBOX_START = 'ROFCAE_JUKEBOX_START';
-    public static readonly ROFCAE_JUKEBOX_MACHINE_STOP = 'ROFCAE_JUKEBOX_MACHINE_STOP';
-    public static readonly ROFCAE_JUKEBOX_DISPOSE = 'ROFCAE_JUKEBOX_DISPOSE';
     public static readonly ROFCAE_MOUSE_BUTTON = 'ROFCAE_MOUSE_BUTTON';
     public static readonly ROFCAE_MOUSE_ARROW = 'ROFCAE_MOUSE_ARROW';
 

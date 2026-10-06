@@ -3,7 +3,7 @@
  *
  * @see source_as_win63/habbo/room/events/RoomEngineObjectSamplePlaybackEvent.as
  *
- * Event dispatched for sample playback from room objects (sound machine, jukebox).
+ * Event dispatched for sample playback from room objects (furni that play a sound sample).
  */
 import {RoomEngineObjectEvent} from './RoomEngineObjectEvent';
 

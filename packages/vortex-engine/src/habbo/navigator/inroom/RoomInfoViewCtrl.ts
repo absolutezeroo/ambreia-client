@@ -305,6 +305,10 @@ export class RoomInfoViewCtrl
         }
     }
 
+    // DEVIATION: AS3 shows the room's score (`rating_cont`) and the vote link (`rating_region`, while
+    //   the viewer can vote); the RPG fork removed room voting, so both stay hidden until Task 10
+    //   drops them from the layout.
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/navigator/inroom/RoomInfoViewCtrl.as::refreshRoomDetails()
     private _refreshRoomDetails(roomData: GuestRoomData): void
     {
         if(this._window === null || !this._navigator) return;
@@ -344,16 +348,8 @@ export class RoomInfoViewCtrl
             descEl.visible = true;
         }
 
-        this._find('rating_region').visible = this._navigator.data.canRate;
-        (this._find('rating_txt') as unknown as ITextWindow).text = '' + this._navigator.data.currentRoomRating;
-
-        const ratingTxt = this._window.findChildByName('rating_txt');
-        const ratingRegion = this._window.findChildByName('rating_region');
-
-        if(ratingTxt !== null && ratingRegion !== null)
-        {
-            ratingRegion.x = ratingTxt.x + ratingTxt.width + 5;
-        }
+        this._find('rating_region').visible = false;
+        this._find('rating_cont').visible = false;
 
         this._find('ranking_cont').visible = roomData.ranking > 0;
         (this._find('ranking_txt') as unknown as ITextWindow).text = '' + roomData.ranking;
@@ -417,6 +413,10 @@ export class RoomInfoViewCtrl
         }
     }
 
+    // DEVIATION: AS3 shows `add_thumbnail_region` to whoever can edit the room, opening the room
+    //   thumbnail camera (`onAddRoomThumbnail()`); the RPG fork removed photos and that camera, so
+    //   the region stays hidden until Task 10 drops it from the layout.
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/navigator/inroom/RoomInfoViewCtrl.as::prepareWindow()
     private _prepareWindow(): void
     {
         this._visible = true;
@@ -548,15 +548,7 @@ export class RoomInfoViewCtrl
         {
             const addThumbRegion = win.findChildByName('add_thumbnail_region');
 
-            if(addThumbRegion !== null)
-            {
-                addThumbRegion.visible = this._navigator.data.canEditRoomSettings;
-
-                if(this._navigator.data.canEditRoomSettings)
-                {
-                    addThumbRegion.addEventListener(WindowMouseEvent.CLICK, this._onAddRoomThumbnail);
-                }
-            }
+            if(addThumbRegion !== null) addThumbRegion.visible = false;
 
             // The picture itself, which this half of the method had been missing: the layout ships
             // `thumbnail_image` already pointing at `newnavigator_default_room`, so a panel with no
@@ -819,27 +811,6 @@ export class RoomInfoViewCtrl
         }
 
         this._navigator.trackGoogle('roomInfo', 'embedSrc');
-    };
-
-    private _onAddRoomThumbnail = (_event: WindowEvent): void =>
-    {
-        if(!this._navigator) return;
-
-        const ctx = (this._navigator.windowManager as unknown as { context?: { createLinkEvent(link: string): void } })?.context;
-
-        ctx?.createLinkEvent('roomThumbnailCamera/open');
-        this.close();
-
-        // Evict the picture before the camera replaces it. The url does not change when a new
-        // thumbnail is taken — it is the room's id — so without this the panel keeps serving the
-        // cached copy of the old one and the camera looks like it did nothing.
-        const flatId = this._navigator.data.enteredGuestRoom?.flatId ?? 0;
-
-        this._navigator.windowManager?.resourceManager?.removeAsset(
-            this._navigator.getProperty('navigator.thumbnail.url_base') + flatId + '.png'
-        );
-
-        this._navigator.trackGoogle('roomInfo', 'addThumbnail');
     };
 
     private _onEmbedInfoClick = (_event: WindowEvent): void =>

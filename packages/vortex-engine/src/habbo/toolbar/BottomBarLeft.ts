@@ -6,7 +6,6 @@ import type {IWindow} from '@core/window/IWindow';
 import type {IWindowContainer} from '@core/window/IWindowContainer';
 import {WindowEvent} from '@core/window/events/WindowEvent';
 import type {ILinkEventTracker} from '@core/runtime/events/ILinkEventTracker';
-import {PerkType} from '@habbo/communication/enum/PerkType';
 import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
 import type {IStaticBitmapWrapperWindow} from '@core/window/components/IStaticBitmapWrapperWindow';
 import type {IBitmapWrapperWindow} from '@core/window/components/IBitmapWrapperWindow';
@@ -422,16 +421,6 @@ export class BottomBarLeft implements ILinkEventTracker
                 break;
         }
 
-        // Determine if we're in a room-like state (for CAMERA / WIRED_MENU)
-        const isRoomState = state === 'HTE_STATE_ROOM_VIEW'
-            || state === 'HETE_STATE_NOOB_HOME'
-            || state === 'HTE_STATE_NOOB_NOT_HOME'
-            || (this._collapsed && (
-                this._lastState === 'HTE_STATE_ROOM_VIEW'
-                || this._lastState === 'HETE_STATE_NOOB_HOME'
-                || this._lastState === 'HTE_STATE_NOOB_NOT_HOME'
-            ));
-
         // Set visibility of each TOGGLE child based on its tags
         for(const child of toggleChildren) 
         {
@@ -458,15 +447,10 @@ export class BottomBarLeft implements ILinkEventTracker
             }
             else if(child.name === 'CAMERA')
             {
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/toolbar/BottomBarLeft.as::setToolbarState()
-                // `_loc2_.visible &&= _loc4_ && _loc5_ == "bottom-icons" && _loc6_` - a compound AND,
-                // preserving the by-tag visibility set above. A plain `=` overwrites it instead,
-                // which happens to coincide with AS3 for every current tag on CAMERA
-                // (TOGGLE/VISIBLE_ROOM/VISIBLE_COLLAPSED/VISIBLE_NOOB) but would diverge the moment
-                // a tag changes.
-                const cameraPosition = this._toolbar!.getProperty('camera.launch.ui.position');
-                const cameraAllowed = this._toolbar!.sessionDataManager?.isPerkAllowed?.(PerkType.CAMERA) ?? false;
-                child.visible = child.visible && isRoomState && cameraPosition === 'bottom-icons' && cameraAllowed;
+                // AS3 shows it in a room when the camera launches from `bottom-icons` and the CAMERA
+                // perk is granted; the RPG fork removed photos. The icon is still in the shipped
+                // layout until it is cleaned.
+                child.visible = false;
             }
             else if(child.name === 'WIRED_MENU')
             {
@@ -1035,7 +1019,7 @@ export class BottomBarLeft implements ILinkEventTracker
             case 'HTIE_ICON_PROGRESSION': return 'icons_toolbar_progression';
             case 'HTIE_ICON_STORIES': return 'icons_toolbar_stories';
             case 'HTIE_ICON_RECEPTION': return 'icons_toolbar_reception';
-            case 'HTIE_ICON_CAMERA': return 'icons_toolbar_camera';
+
             default: return null;
         }
     }

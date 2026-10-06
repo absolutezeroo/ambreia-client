@@ -150,7 +150,7 @@ export class MeMenuSoundSettingsView
 	 *
 	 * @param genericVolume UI volume (-1 to keep current)
 	 * @param furniVolume Furni volume (-1 to keep current)
-	 * @param traxVolume Trax volume (-1 to keep current)
+	 * @param traxVolume Music volume (-1 to keep current)
 	 * @param persist If true, persist the volume. If false, just preview.
 	 */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/toolbar/memenu/soundsettings/MeMenuSoundSettingsView.as::saveVolume()
@@ -158,7 +158,7 @@ export class MeMenuSoundSettingsView
     {
         const effectiveFurni = furniVolume !== -1 ? furniVolume : this._furniVolume;
         const effectiveGeneric = genericVolume !== -1 ? genericVolume : this._genericVolume;
-        const effectiveTrax = traxVolume !== -1 ? traxVolume : this._traxVolume;
+        const effectiveMusic = traxVolume !== -1 ? traxVolume : this._traxVolume;
 
         if(persist)
         {
@@ -166,15 +166,15 @@ export class MeMenuSoundSettingsView
 
             this._genericVolume = effectiveGeneric;
             this._furniVolume = effectiveFurni;
-            this._traxVolume = effectiveTrax;
+            this._traxVolume = effectiveMusic;
 
             // In AS3: widget.toolbar.soundManager.furniVolume = effectiveFurni
             // In AS3: widget.toolbar.soundManager.genericVolume = effectiveGeneric
-            // In AS3: widget.toolbar.soundManager.traxVolume = effectiveTrax
+            // In AS3: widget.toolbar.soundManager.traxVolume = effectiveMusic
         }
         else
         {
-            // In AS3: widget.toolbar.soundManager.previewVolume(effectiveGeneric, effectiveFurni, effectiveTrax)
+            // In AS3: widget.toolbar.soundManager.previewVolume(effectiveGeneric, effectiveFurni, effectiveMusic)
         }
     }
 

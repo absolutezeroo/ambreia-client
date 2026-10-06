@@ -1,5 +1,5 @@
 /**
- * One playable sound instance — a generic effect, a pitched sample, or a whole Trax song.
+ * One playable sound instance — a generic effect or a pitched sample.
  *
  * The class name is recovered from `PRODUCTION-201601012205-226667486`, where this
  * interface is unobfuscated as `IHabboSound`; WIN63 has it as `_SafeCls_2097` but keeps

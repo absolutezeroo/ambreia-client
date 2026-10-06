@@ -396,8 +396,8 @@ export class WindowComposite
          * `effectiveClip` when it lands outside, so the rendered result elsewhere is unchanged.
          *
          * Without it, collapsing a container by shrinking its height left its own-context
-         * descendants on screen — how the mystery-box tracker kept its `${mysterybox.tracker.link}`
-         * FAQ link visible after being minimised to 25px. That link is params 193: no
+         * descendants on screen — how the (since removed) mystery-box tracker kept its FAQ link
+         * visible after being minimised to 25px. That link is params 193: no
          * USE_PARENT_GRAPHIC_CONTEXT, no FORCE_CLIPPING, so the draw clip lets it straight through.
          */
         if(base === null && inheritedVisibleRegion !== null)

@@ -507,12 +507,6 @@ export class LegacyNavigator implements IHabboTransitionalNavigator
         this._roomInfoViewCtrl?.toggle();
     }
 
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/navigator/transitional/LegacyNavigator.as::canRateRoom()
-    canRateRoom(): boolean
-    {
-        return this._oldNavigator?.canRateRoom() ?? false;
-    }
-
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/navigator/transitional/LegacyNavigator.as::isRoomFavorite()
     isRoomFavorite(roomId: number): boolean
     {

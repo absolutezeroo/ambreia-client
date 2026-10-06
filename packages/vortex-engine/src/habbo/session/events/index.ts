@@ -3,7 +3,7 @@
 
 export {BadgeImageReadyEvent} from './BadgeImageReadyEvent';
 export {FurniIconImageReadyEvent} from './FurniIconImageReadyEvent';
-export {MysteryBoxKeysUpdateEvent} from './MysteryBoxKeysUpdateEvent';
+
 export {PerksUpdatedEvent} from './PerksUpdatedEvent';
 export {RoomSessionChatEvent} from './RoomSessionChatEvent';
 export {RoomSessionConfirmPetBreedingEvent} from './RoomSessionConfirmPetBreedingEvent';

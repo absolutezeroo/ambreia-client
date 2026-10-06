@@ -17,9 +17,7 @@ import {
 import {
     SubmitRoomToCompetitionMessageComposer
 } from '@habbo/communication/messages/outgoing/competition/SubmitRoomToCompetitionMessageComposer';
-import {
-    VoteForRoomMessageComposer
-} from '@habbo/communication/messages/outgoing/competition/VoteForRoomMessageComposer';
+
 import {
     GetTalentTrackMessageComposer
 } from '@habbo/communication/messages/outgoing/talent/GetTalentTrackMessageComposer';
@@ -159,6 +157,9 @@ export class RoomCompetitionController implements IDisposable, IGetImageListener
      * Vote mode. `resultCode === 1` means the viewer has a talent track to open instead of a
      * participant list, which is the only thing the info line's target depends on here.
      */
+    // DEVIATION: AS3 wires the action button to `onVote()`, which sends the room vote, and shows it
+    //   while votes remain; the RPG fork removed room voting (plan decision 4: competitions stay,
+    //   only the vote goes), so the button stays hidden in vote mode.
     // AS3: .../src/com/sulake/habbo/quest/RoomCompetitionController.as::onCompetitionVotingInfo()
     onCompetitionVotingInfo(parser: CompetitionVotingInfoMessageEventParser): void
     {
@@ -172,11 +173,7 @@ export class RoomCompetitionController implements IDisposable, IGetImageListener
 
         const actionButton = this.getActionButton();
 
-        if(actionButton !== null)
-        {
-            actionButton.procedure = this.onVote;
-            actionButton.visible = this._votesRemaining > 0 && isVotingAllowed;
-        }
+        if(actionButton !== null) actionButton.visible = false;
 
         const buttonInfo = this.getButtonInfoText();
 
@@ -668,14 +665,6 @@ export class RoomCompetitionController implements IDisposable, IGetImageListener
         if(event.type !== WindowMouseEvent.CLICK) return;
 
         this._engine?.send(new SubmitRoomToCompetitionMessageComposer(this._goalCode, 3));
-    };
-
-    // AS3: .../src/com/sulake/habbo/quest/RoomCompetitionController.as::onVote()
-    private onVote = (event: WindowEvent): void =>
-    {
-        if(event.type !== WindowMouseEvent.CLICK) return;
-
-        this._engine?.send(new VoteForRoomMessageComposer(this._goalCode));
     };
 
     /**

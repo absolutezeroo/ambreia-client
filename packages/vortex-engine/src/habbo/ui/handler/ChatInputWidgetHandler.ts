@@ -32,7 +32,6 @@ import type {RoomChatInputWidget} from '@habbo/ui/widget/chatinput/RoomChatInput
 import {RoomSessionChatEvent} from '@habbo/session/events/RoomSessionChatEvent';
 import {AvatarExpressionEnum} from '@habbo/ui/widget/enums/AvatarExpressionEnum';
 import {RoomEngineZoomEvent} from '@habbo/room/events/RoomEngineZoomEvent';
-import {HabboToolbarEvent} from '@habbo/toolbar/events/HabboToolbarEvent';
 import {HabboWebTools} from '@habbo/utils/HabboWebTools';
 import {RoomShakingEffect} from '@room/utils/RoomShakingEffect';
 import type {IRoomObjectSpriteVisualization} from '@room/object/visualization/IRoomObjectSpriteVisualization';
@@ -47,7 +46,6 @@ import {RoomCullingMode} from '@habbo/room/renderer/RoomCullingMode';
 import {FriendBarResizeEvent} from '@habbo/friendbar/events/FriendBarResizeEvent';
 import {HideRoomWidgetEvent} from '@habbo/ui/widget/events/HideRoomWidgetEvent';
 import {SessionDataToWidgetEvent} from '@habbo/session/events/SessionDataToWidgetEvent';
-import {PerkType} from '../../communication/enum/PerkType';
 
 const log = Logger.getLogger('habbo.ui.handler.ChatInputWidgetHandler');
 
@@ -279,6 +277,8 @@ export class ChatInputWidgetHandler implements IRoomWidgetHandler
      * `text` is the whole line after the `x` substitution; `parts` is the raw split, needed by the
      * one command (`:uc hotel`) that reads a third word.
      */
+    // DEVIATION: AS3 also handles `:cam` / `:camera`, opening the photo camera; the RPG fork removed
+    //   photos, so the line is ordinary chat.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/ChatInputWidgetHandler.as::processWidgetMessage()
     private handleSlashCommand(command: string, argument: string, text: string, parts: string[]): boolean
     {
@@ -727,18 +727,6 @@ export class ChatInputWidgetHandler implements IRoomWidgetHandler
                         RoomEngineZoomEvent.ROOM_ZOOM,
                         new RoomEngineZoomEvent(roomEngine.activeRoomId, -1, true)
                     );
-                }
-
-                return true;
-
-            case ':cam':
-            case ':camera':
-                if(sessionData?.isPerkAllowed(PerkType.CAMERA))
-                {
-                    const event = new HabboToolbarEvent(HabboToolbarEvent.CAMERA_TOGGLE);
-
-                    event.iconName = 'chatCameraCommand';
-                    container.toolbar?.toolbarEvents.emit(HabboToolbarEvent.CAMERA_TOGGLE, event);
                 }
 
                 return true;

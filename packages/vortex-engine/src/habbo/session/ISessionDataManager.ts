@@ -126,12 +126,6 @@ export interface ISessionDataManager extends IDisposable
     readonly boundFurnitureNames: string[];
     readonly avatarEffects: IAvatarEffect[];
 
-    // Mystery box
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::get mysteryBoxColor()
-    readonly mysteryBoxColor: string;
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::get mysteryKeyColor()
-    readonly mysteryKeyColor: string;
-
     // Perks
     // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::get perksReady()
     readonly perksReady: boolean;

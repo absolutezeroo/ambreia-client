@@ -22,7 +22,6 @@ import {MoveTo} from '@core/window/motion/MoveTo';
 import {Queue} from '@core/window/motion/Queue';
 import {Callback} from '@core/window/motion/Callback';
 import {Motions} from '@core/window/motion/Motions';
-import {HabboToolbarEvent} from '@habbo/toolbar/events/HabboToolbarEvent';
 import {RoomWidgetZoomToggleMessage} from '@habbo/ui/widget/messages/RoomWidgetZoomToggleMessage';
 import {RoomToolsCtrlBase} from './RoomToolsCtrlBase';
 import {RoomToolsHistory} from './RoomToolsHistory';
@@ -517,6 +516,8 @@ export class RoomToolsToolbarCtrl extends RoomToolsCtrlBase
         return (roomEngine as unknown as Component | null) ?? null;
     }
 
+    // DEVIATION: AS3's `button_camera` raises CAMERA_TOGGLE and `button_like` rates the room; the
+    //   RPG fork removed photos and room voting, and keeps both buttons hidden.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/roomtools/RoomToolsToolbarCtrl.as::onWindowEvent()
     private onWindowEvent = (event: WindowEvent, target: IWindow): void => 
     {
@@ -578,20 +579,9 @@ export class RoomToolsToolbarCtrl extends RoomToolsCtrlBase
                 break;
             }
 
-            case 'button_like':
-                this.handler?.rateRoom();
-                this._window?.findChildByName('button_like')?.disable();
-                break;
             case 'button_share':
                 this.onShareClick();
                 break;
-            case 'button_camera': {
-                const cameraEvent = new HabboToolbarEvent(HabboToolbarEvent.CAMERA_TOGGLE);
-
-                cameraEvent.iconName = HabboToolbarEvent.CAMERA_LAUNCH_ORIGIN_ROOM_TOOL;
-                this.handler?.container?.toolbar?.toolbarEvents.emit(HabboToolbarEvent.CAMERA_TOGGLE, cameraEvent);
-                break;
-            }
         }
     };
 

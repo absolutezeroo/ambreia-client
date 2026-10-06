@@ -67,7 +67,6 @@ import {
     GetSecondsUntilMessageComposer,
     RoomCompetitionInitMessageComposer,
     SubmitRoomToCompetitionMessageComposer,
-    VoteForRoomMessageComposer,
 } from './messages/outgoing/competition';
 import {GetInterstitialMessageComposer} from './messages/outgoing/advertisement/GetInterstitialMessageComposer';
 import {FriendRequestQuestCompleteMessageComposer} from './messages/outgoing/quest/FriendRequestQuestCompleteMessageComposer';
@@ -212,14 +211,6 @@ import {
     TradingYouAreNotAllowedEvent,
     UnseenItemsMessageEvent,
 } from './messages/incoming/inventory';
-
-// Incoming Events - Mystery Box
-import {
-    CancelMysteryBoxWaitMessageEvent,
-    GotMysteryBoxPrizeMessageEvent,
-    MysteryBoxKeysMessageEvent,
-    ShowMysteryBoxWaitMessageEvent,
-} from './messages/incoming/mysterybox';
 
 // Incoming Events - Catalog
 import {RemainingMutePeriodMessageEvent} from './messages/incoming/room/session/RemainingMutePeriodMessageEvent';
@@ -553,7 +544,6 @@ import {
     TryPhoneNumberMessageComposer
 } from './messages/outgoing/preferences/TryPhoneNumberMessageComposer';
 import {VerifyCodeMessageComposer} from './messages/outgoing/preferences/VerifyCodeMessageComposer';
-import {TraxSongInfoMessageEvent} from './messages/incoming/sound/TraxSongInfoMessageEvent';
 import {
     ForumDataMessageEvent,
     ForumThreadsMessageEvent,
@@ -579,69 +569,7 @@ import {
     UpdateForumSettingsMessageComposer,
     UpdateThreadMessageComposer,
 } from './messages/outgoing/groupforums';
-import {OfficialSongIdMessageEvent} from './messages/incoming/sound/OfficialSongIdMessageEvent';
-import {NowPlayingMessageEvent} from './messages/incoming/sound/NowPlayingMessageEvent';
-import {
-    JukeboxSongDisksMessageEvent
-} from './messages/incoming/sound/JukeboxSongDisksMessageEvent';
-import {
-    JukeboxPlayListFullMessageEvent
-} from './messages/incoming/sound/JukeboxPlayListFullMessageEvent';
-import {InitCameraMessageEvent} from './messages/incoming/camera/InitCameraMessageEvent';
-import {
-    CameraStorageUrlMessageEvent
-} from './messages/incoming/camera/CameraStorageUrlMessageEvent';
-import {
-    CameraPublishStatusMessageEvent
-} from './messages/incoming/camera/CameraPublishStatusMessageEvent';
-import {
-    CameraPurchaseOKMessageEvent
-} from './messages/incoming/camera/CameraPurchaseOKMessageEvent';
-import {
-    ThumbnailStatusMessageEvent
-} from './messages/incoming/camera/ThumbnailStatusMessageEvent';
-import {
-    CompetitionStatusMessageEvent
-} from './messages/incoming/camera/CompetitionStatusMessageEvent';
-import {RenderRoomMessageComposer} from './messages/outgoing/camera/RenderRoomMessageComposer';
-import {
-    RenderRoomThumbnailMessageComposer
-} from './messages/outgoing/camera/RenderRoomThumbnailMessageComposer';
-import {PublishPhotoMessageComposer} from './messages/outgoing/camera/PublishPhotoMessageComposer';
-import {
-    PurchasePhotoMessageComposer
-} from './messages/outgoing/camera/PurchasePhotoMessageComposer';
-import {
-    PhotoCompetitionMessageComposer
-} from './messages/outgoing/camera/PhotoCompetitionMessageComposer';
-import {
-    RequestCameraConfigurationMessageComposer
-} from './messages/outgoing/camera/RequestCameraConfigurationMessageComposer';
-import {PlayListMessageEvent} from './messages/incoming/sound/PlayListMessageEvent';
-import {
-    PlayListSongAddedMessageEvent
-} from './messages/incoming/sound/PlayListSongAddedMessageEvent';
-import {
-    GetNowPlayingMessageComposer
-} from './messages/outgoing/sound/GetNowPlayingMessageComposer';
-import {
-    GetSoundMachinePlayListMessageComposer
-} from './messages/outgoing/sound/GetSoundMachinePlayListMessageComposer';
-import {
-    UserSongDisksInventoryMessageEvent
-} from './messages/incoming/sound/UserSongDisksInventoryMessageEvent';
-import {GetSongInfoMessageComposer} from './messages/outgoing/sound/GetSongInfoMessageComposer';
-import {AddJukeboxDiskComposer} from './messages/outgoing/sound/AddJukeboxDiskComposer';
-import {RemoveJukeboxDiskComposer} from './messages/outgoing/sound/RemoveJukeboxDiskComposer';
-import {
-    GetOfficialSongIdMessageComposer
-} from './messages/outgoing/sound/GetOfficialSongIdMessageComposer';
-import {
-    GetUserSongDisksMessageComposer
-} from './messages/outgoing/sound/GetUserSongDisksMessageComposer';
-import {
-    GetJukeboxPlayListMessageComposer
-} from './messages/outgoing/sound/GetJukeboxPlayListMessageComposer';
+
 import {UpdateFigureDataMessageComposer} from './messages/outgoing/avatar/UpdateFigureDataMessageComposer';
 import {CheckUserNameResultMessageEvent} from './messages/incoming/help/CheckUserNameResultMessageEvent';
 import {
@@ -874,7 +802,6 @@ import {
     MyRoomRightsSearchMessageComposer,
     MyRoomsSearchMessageComposer,
     PopularRoomsSearchMessageComposer,
-    RateFlatMessageComposer,
     RemoveOwnRoomRightsRoomMessageComposer,
     RoomAdEventTabAdClickedComposer,
     RoomAdEventTabViewedComposer,
@@ -1031,9 +958,6 @@ import {
     SetSoundSettingsComposer,
 } from './messages/outgoing/sound';
 
-// Outgoing Composers - Mystery Box
-import {MysteryBoxWaitingCanceledMessageComposer} from './messages/outgoing/mysterybox';
-
 // Outgoing Composers - Room Furniture
 import {
     ConfigureRentableSpaceMessageComposer,
@@ -1043,7 +967,7 @@ import {
     GetGuildFurniContextMenuInfoMessageComposer,
     GetItemDataMessageComposer,
     GetRentableSpaceConfigMessageComposer,
-    OpenMysteryTrophyMessageComposer,
+
     OpenPetPackageMessageComposer,
     PresentOpenMessageComposer,
     RemoveItemMessageComposer,
@@ -1590,44 +1514,8 @@ export class HabboMessages implements IMessageConfiguration
         this._events.set(956, PostThreadMessageEvent);
         this._events.set(1146, UpdateThreadMessageEvent);
 
-        // === SOUND (Trax) ===
-        // The song-metadata answer and your song-disk inventory, `_events[2278]`/`_events[1930]`
-        // in WIN63's registry. `HabboMusicController` subscribes both; the metadata one is what
-        // names a Trax disc anywhere it is shown.
-        this._events.set(2278, TraxSongInfoMessageEvent);
-        this._events.set(1930, UserSongDisksInventoryMessageEvent);
-        // `_events[3050]` in WIN63's registry — the official-song-code lookup's answer. Explicitly
-        // NOT 2264: that is win63_version's id for this event, and the 2026 registry reassigned
-        // 2264 to WeeklyCompetitiveFriendsLeaderboardEvent. See the event class's own note.
-        this._events.set(3050, OfficialSongIdMessageEvent);
-        // The room play lists, `_events[398]/[2257]/[949]/[1242]/[2785]` in WIN63's registry:
-        // what a jukebox is playing, the discs in it, its "no room left" refusal, and a sound
-        // machine's list plus its single-song addition.
-        this._events.set(398, NowPlayingMessageEvent);
-        this._events.set(2257, JukeboxSongDisksMessageEvent);
-        this._events.set(949, JukeboxPlayListFullMessageEvent);
-        this._events.set(1242, PlayListMessageEvent);
-        this._events.set(2785, PlayListSongAddedMessageEvent);
-
-        // === CAMERA ===
-        // The photo pipeline, `_events[2768]/[2176]/[203]/[3907]/[1325]/[2622]` in WIN63's
-        // registry: the camera's prices, where the render can be fetched, and the outcomes of
-        // publishing, buying, rendering a thumbnail and entering the competition.
-        this._events.set(2768, InitCameraMessageEvent);
-        this._events.set(2176, CameraStorageUrlMessageEvent);
-        this._events.set(203, CameraPublishStatusMessageEvent);
-        this._events.set(3907, CameraPurchaseOKMessageEvent);
-        this._events.set(1325, ThumbnailStatusMessageEvent);
-        this._events.set(2622, CompetitionStatusMessageEvent);
-
         // === INVENTORY - UNSEEN ===
         this._events.set(3059, UnseenItemsMessageEvent);
-
-        // === MYSTERY BOX ===
-        this._events.set(1389, MysteryBoxKeysMessageEvent);
-        this._events.set(691, ShowMysteryBoxWaitMessageEvent);
-        this._events.set(3840, CancelMysteryBoxWaitMessageEvent);
-        this._events.set(353, GotMysteryBoxPrizeMessageEvent);
 
         // === HANDSHAKE (continued) ===
         this._events.set(2313, IsFirstLoginOfDayMessageEvent);
@@ -2459,7 +2347,7 @@ export class HabboMessages implements IMessageConfiguration
         // would have been accepted and handled as a *claim* rather than a change. ChangeUserName
         // is 1703; the emulator agrees. Latent until now: nothing constructs this composer yet.
         this._composers.set(1703, ChangeUserNameMessageComposer);
-        this._composers.set(407, RateFlatMessageComposer);
+
         this._composers.set(2985, ToggleStaffPickMessageComposer);
         this._composers.set(3214, GetPopularRoomTagsMessageComposer);
         this._composers.set(1903, MyFriendsRoomsSearchMessageComposer);
@@ -2604,12 +2492,7 @@ export class HabboMessages implements IMessageConfiguration
         // The special-items display's pair: ask, then claim. Its result is 431, already registered.
         this._composers.set(2668, HasClaimedProductComposer);
         this._composers.set(145, ClaimProductComposer);
-        // AS3: MysteryTrophyOpenDialogView.as::onMouseClick() "ok"
-        this._composers.set(2242, OpenMysteryTrophyMessageComposer);
 
-        // === MYSTERY BOX ===
-        // AS3: MysteryBoxOpenDialogView.as::waitWindowProcedure() cancel_button
-        this._composers.set(1063, MysteryBoxWaitingCanceledMessageComposer);
         this._composers.set(826, GetGuildFurniContextMenuInfoMessageComposer);
         // Vortex-custom (not in official AS3 dumps): vortex-client commit f3bba54 "feat(rentablespace):
         // add config message, compositors and updated display widget"
@@ -2790,18 +2673,6 @@ export class HabboMessages implements IMessageConfiguration
         // === CAMPAIGN ===
         this._composers.set(3643, OpenCampaignCalendarDoorComposer);
         this._composers.set(3863, OpenCampaignCalendarDoorAsStaffComposer);
-
-        // === CAMERA ===
-        // Headers read from WIN63's own registry (habbo/communication/_SafeCls_2046.as,
-        // _composers[3332]/[1985]/[375]/[753]/[2707]/[3010]) and corroborated by vortex-emulator
-        // Vortex.Revisions/Revision20260701/Headers.cs. 3332 is also a *server→client* header
-        // there (the loot-box result); the two tables are independent, so that is not a collision.
-        this._composers.set(3332, RenderRoomMessageComposer);
-        this._composers.set(1985, RenderRoomThumbnailMessageComposer);
-        this._composers.set(375, PublishPhotoMessageComposer);
-        this._composers.set(753, PurchasePhotoMessageComposer);
-        this._composers.set(2707, PhotoCompetitionMessageComposer);
-        this._composers.set(3010, RequestCameraConfigurationMessageComposer);
 
         // === ADVERTISEMENT ===
         // NOTE: GetInterstitialMessageComposer had ID 3698 in win63 source, but that conflicts
@@ -3094,7 +2965,6 @@ export class HabboMessages implements IMessageConfiguration
         this._composers.set(1814, GetSecondsUntilMessageComposer);
         this._composers.set(1477, RoomCompetitionInitMessageComposer);
         this._composers.set(2612, SubmitRoomToCompetitionMessageComposer);
-        this._composers.set(2615, VoteForRoomMessageComposer);
 
         this._composers.set(1369, GetInterstitialMessageComposer);
         this._composers.set(3074, FriendRequestQuestCompleteMessageComposer);
@@ -3173,25 +3043,6 @@ export class HabboMessages implements IMessageConfiguration
         // sends the single-item composer when exactly one item survives its filter.
         this._composers.set(3370, AddItemsToTradeComposer);
         this._composers.set(2717, SilverFeeMessageComposer);
-
-        // === SOUND (Trax) ===
-        // `_composers[3130]`/`[1685]`/`[1281]` in WIN63's registry. 3130 carries the whole pending
-        // song-info queue at once; the other two have no payload.
-        this._composers.set(3130, GetSongInfoMessageComposer);
-        this._composers.set(1685, GetUserSongDisksMessageComposer);
-        this._composers.set(1281, GetJukeboxPlayListMessageComposer);
-        // `_composers[1637]`/`[2003]`/`[1723]` in WIN63's registry: put a disc in a jukebox slot,
-        // take one out, and resolve an official song code to its numeric id. The first two are the
-        // playlist editor's, which has no port yet; the third is sent by
-        // SongDiskProductViewCatalogWidget. Arity checked against each obfuscated class before
-        // registering — `_SafeCls_3368(int,int)`, `_SafeCls_3444(int)`, `_SafeCls_2775(String)`.
-        this._composers.set(1637, AddJukeboxDiskComposer);
-        this._composers.set(2003, RemoveJukeboxDiskComposer);
-        this._composers.set(1723, GetOfficialSongIdMessageComposer);
-        // `_composers[3707]`/`[3633]`: the jukebox's now-playing request (which is what fetches
-        // its list) and the sound machine's list request. Neither carries a payload.
-        this._composers.set(3707, GetNowPlayingMessageComposer);
-        this._composers.set(3633, GetSoundMachinePlayListMessageComposer);
 
         // === INVENTORY - VAULT / REWARD ===
         // GiveStarGemToUserMessageComposer removed 2026-09-03, the same way

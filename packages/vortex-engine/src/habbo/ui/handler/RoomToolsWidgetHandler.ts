@@ -17,7 +17,7 @@ import type {RoomWidgetMessage} from '@habbo/ui/widget/messages/RoomWidgetMessag
 import type {RoomWidgetUpdateEvent} from '@habbo/ui/widget/events/RoomWidgetUpdateEvent';
 import {GetGuestRoomResultMessageEvent} from '@habbo/communication/messages/incoming/navigator/GetGuestRoomResultMessageEvent';
 import type {GetGuestRoomResultMessageParser} from '@habbo/communication/messages/parser/navigator/GetGuestRoomResultMessageParser';
-import {RateFlatMessageComposer} from '@habbo/communication/messages/outgoing/navigator/RateFlatMessageComposer';
+
 import type {RoomToolsWidget} from '@habbo/ui/widget/roomtools/RoomToolsWidget';
 import {SessionDataPreferencesEvent} from '@habbo/session/events/SessionDataPreferencesEvent';
 
@@ -190,15 +190,7 @@ export class RoomToolsWidgetHandler implements IRoomWidgetHandler
         }
     }
 
+    // DEVIATION: AS3 also has `rateRoom()` (sends RateFlatMessageComposer) and `get canRate()` (asks
+    //   the navigator) behind the room tools' like button; the RPG fork removed room voting.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/RoomToolsWidgetHandler.as::rateRoom()
-    public rateRoom(): void
-    {
-        this._container?.connection?.send(new RateFlatMessageComposer(1));
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/RoomToolsWidgetHandler.as::get canRate()
-    public get canRate(): boolean
-    {
-        return this._navigatorRef?.canRateRoom() ?? false;
-    }
 }

@@ -34,9 +34,7 @@ import {MonsterPlantSeedContextMenuView} from './MonsterPlantSeedContextMenuView
 import {MonsterPlantSeedConfirmationView} from './MonsterPlantSeedConfirmationView';
 import {PurchasableClothingConfirmationView} from './PurchasableClothingConfirmationView';
 import {EffectBoxOpenDialogView} from '@habbo/ui/widget/furniture/effectbox/EffectBoxOpenDialogView';
-import {MysteryBoxContextMenuView} from '@habbo/ui/widget/furniture/mysterybox/MysteryBoxContextMenuView';
-import {MysteryBoxOpenDialogView} from '@habbo/ui/widget/furniture/mysterybox/MysteryBoxOpenDialogView';
-import {MysteryTrophyOpenDialogView} from '@habbo/ui/widget/furniture/mysterytrophy/MysteryTrophyOpenDialogView';
+
 import {
     GuildFurnitureContextMenuView
 } from '@habbo/ui/widget/furniture/guildfurnicontextmenu/GuildFurnitureContextMenuView';
@@ -46,7 +44,7 @@ const log = Logger.getLogger('habbo.ui.widget.furniture.contextmenu.FurnitureCon
 
 export class FurnitureContextMenuWidget extends RoomWidgetBase implements IContextMenuParentWidget, IUpdateReceiver
 {
-    // AS3: FurnitureContextMenuWidget.as::showMysteryBoxContextMenu() etc. — the update priority.
+    // AS3: FurnitureContextMenuWidget.as::showFriendFurnitureContextMenu() etc. — the update priority.
     private static readonly UPDATE_RECEIVER_PRIORITY: number = 10;
 
     // AS3: FurnitureContextMenuWidget.as::_SafeStr_4550 (the active view)
@@ -57,9 +55,6 @@ export class FurnitureContextMenuWidget extends RoomWidgetBase implements IConte
 
     // AS3: FurnitureContextMenuWidget.as::_SafeStr_5789
     private _guildFurnitureContextMenuView: GuildFurnitureContextMenuView | null = null;
-
-    // AS3: FurnitureContextMenuWidget.as::_SafeStr_5601
-    private _mysteryBoxContextMenuView: MysteryBoxContextMenuView | null = null;
 
     // AS3: FurnitureContextMenuWidget.as::_SafeStr_5807
     private _friendFurniContextMenuView: FriendFurniContextMenuView | null = null;
@@ -82,12 +77,6 @@ export class FurnitureContextMenuWidget extends RoomWidgetBase implements IConte
     // AS3: FurnitureContextMenuWidget.as::_SafeStr_6094
     private _effectBoxOpenDialogView: EffectBoxOpenDialogView | null = null;
 
-    // AS3: FurnitureContextMenuWidget.as::_SafeStr_6960
-    private _mysteryBoxOpenDialogView: MysteryBoxOpenDialogView | null = null;
-
-    // AS3: FurnitureContextMenuWidget.as::_SafeStr_5901
-    private _mysteryTrophyOpenDialogView: MysteryTrophyOpenDialogView | null = null;
-
     // AS3: FurnitureContextMenuWidget.as::_catalog
     private _catalog: IHabboCatalog | null;
 
@@ -97,6 +86,8 @@ export class FurnitureContextMenuWidget extends RoomWidgetBase implements IConte
      */
     private _updateRegistered: boolean = false;
 
+    // DEVIATION: AS3 also builds the mystery-box context menu, the mystery-box open dialog and the
+    //   mystery-trophy dialog, with a `show*` method for each; the RPG fork removed mystery boxes.
     // AS3: FurnitureContextMenuWidget.as::FurnitureContextMenuWidget()
     constructor(
         handler: IRoomWidgetHandler,
@@ -112,7 +103,6 @@ export class FurnitureContextMenuWidget extends RoomWidgetBase implements IConte
         this._catalog = catalog;
 
         this._guildFurnitureContextMenuView = new GuildFurnitureContextMenuView(this, groupsManager, windowManager);
-        this._mysteryBoxContextMenuView = new MysteryBoxContextMenuView(this);
         this._friendFurniContextMenuView = new FriendFurniContextMenuView(this);
         this._genericUsableContextMenuView = new GenericUsableFurnitureContextMenuView(this);
         this._randomTeleportContextMenuView = new RandomTeleportContextMenuView(this);
@@ -120,8 +110,6 @@ export class FurnitureContextMenuWidget extends RoomWidgetBase implements IConte
         this._monsterPlantSeedConfirmationView = new MonsterPlantSeedConfirmationView(this);
         this._purchasableClothingConfirmationView = new PurchasableClothingConfirmationView(this);
         this._effectBoxOpenDialogView = new EffectBoxOpenDialogView(this);
-        this._mysteryBoxOpenDialogView = new MysteryBoxOpenDialogView(this);
-        this._mysteryTrophyOpenDialogView = new MysteryTrophyOpenDialogView(this);
 
         this.handler.widget = this;
 
@@ -204,32 +192,6 @@ export class FurnitureContextMenuWidget extends RoomWidgetBase implements IConte
         this._activeView = this._guildFurnitureContextMenuView;
 
         FurnitureContextInfoView.setup(this._activeView, object, guildName);
-
-        this.registerUpdateReceiver();
-    }
-
-    /**
-     * The caption flips between "Open box" and "Use key" on ownership, which is also what decides
-     * which half of the flow the click starts.
-     */
-    // AS3: FurnitureContextMenuWidget.as::showMysteryBoxContextMenu()
-    public showMysteryBoxContextMenu(object: IRoomObject): void
-    {
-        this._selectedObject = object;
-
-        if(this._activeView !== null) this.removeView(this._activeView, false);
-
-        if(this._mysteryBoxContextMenuView === null)
-        {
-            this._mysteryBoxContextMenuView = new MysteryBoxContextMenuView(this);
-        }
-
-        this._mysteryBoxContextMenuView.isOwnerMode = this.container?.isOwnerOfFurniture(object) ?? false;
-        this._mysteryBoxContextMenuView.show();
-
-        this._activeView = this._mysteryBoxContextMenuView;
-
-        FurnitureContextInfoView.setup(this._activeView, object);
 
         this.registerUpdateReceiver();
     }
@@ -370,35 +332,6 @@ export class FurnitureContextMenuWidget extends RoomWidgetBase implements IConte
         this.registerUpdateReceiver();
     }
 
-    /**
-     * Not a bubble — this one goes straight out on the wire and waits for the server to say which
-     * dialog to show, so the context menu is dismissed first and nothing takes its place.
-     */
-    // AS3: FurnitureContextMenuWidget.as::showMysteryBoxOpenDialog()
-    public showMysteryBoxOpenDialog(object: IRoomObject): void
-    {
-        this._selectedObject = object;
-
-        if(this._activeView !== null) this.removeView(this._activeView, false);
-
-        this._mysteryBoxOpenDialogView?.startOpenFlow(object);
-    }
-
-    // AS3: FurnitureContextMenuWidget.as::showMysteryTrophyOpenDialog()
-    public showMysteryTrophyOpenDialog(object: IRoomObject): void
-    {
-        this._selectedObject = object;
-
-        if(this._activeView !== null) this.removeView(this._activeView, false);
-
-        if(this._mysteryTrophyOpenDialogView === null)
-        {
-            this._mysteryTrophyOpenDialogView = new MysteryTrophyOpenDialogView(this);
-        }
-
-        this._mysteryTrophyOpenDialogView.open(object.getId());
-    }
-
     // AS3: FurnitureContextMenuWidget.as::removeView()
     public removeView(view: ContextInfoView | null, animate: boolean): void
     {
@@ -509,9 +442,6 @@ export class FurnitureContextMenuWidget extends RoomWidgetBase implements IConte
         this._monsterPlantSeedConfirmationView?.dispose();
         this._monsterPlantSeedConfirmationView = null;
 
-        this._mysteryBoxContextMenuView?.dispose();
-        this._mysteryBoxContextMenuView = null;
-
         this._friendFurniContextMenuView?.dispose();
         this._friendFurniContextMenuView = null;
 
@@ -520,12 +450,6 @@ export class FurnitureContextMenuWidget extends RoomWidgetBase implements IConte
 
         this._effectBoxOpenDialogView?.dispose();
         this._effectBoxOpenDialogView = null;
-
-        this._mysteryBoxOpenDialogView?.dispose();
-        this._mysteryBoxOpenDialogView = null;
-
-        this._mysteryTrophyOpenDialogView?.dispose();
-        this._mysteryTrophyOpenDialogView = null;
 
         this._purchasableClothingConfirmationView?.dispose();
         this._purchasableClothingConfirmationView = null;

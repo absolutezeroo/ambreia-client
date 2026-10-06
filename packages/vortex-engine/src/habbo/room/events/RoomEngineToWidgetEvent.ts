@@ -37,8 +37,6 @@ export class RoomEngineToWidgetEvent extends RoomEngineObjectEvent
     public static readonly REMOVE_DIMMER = 'RETWE_REMOVE_DIMMER';
     // AS3: .../src/com/sulake/habbo/room/events/RoomEngineToWidgetEvent.as::REQUEST_CLOTHING_CHANGE
     public static readonly REQUEST_CLOTHING_CHANGE = 'RETWE_REQUEST_CLOTHING_CHANGE';
-    // AS3: .../src/com/sulake/habbo/room/events/RoomEngineToWidgetEvent.as::REQUEST_PLAYLIST_EDITOR
-    public static readonly REQUEST_PLAYLIST_EDITOR = 'RETWE_REQUEST_PLAYLIST_EDITOR';
     // AS3: .../src/com/sulake/habbo/room/events/RoomEngineToWidgetEvent.as::REQUEST_MANNEQUIN
     public static readonly REQUEST_MANNEQUIN = 'RETWE_REQUEST_MANNEQUIN';
     // AS3: .../src/com/sulake/habbo/room/events/RoomEngineToWidgetEvent.as::REQUEST_MONSTERPLANT_SEED_PLANT_CONFIRMATION_DIALOG
@@ -49,12 +47,10 @@ export class RoomEngineToWidgetEvent extends RoomEngineObjectEvent
     public static readonly REQUEST_BACKGROUND_COLOR = 'RETWE_REQUEST_BACKGROUND_COLOR';
     // AS3: .../src/com/sulake/habbo/room/events/RoomEngineToWidgetEvent.as::REQUEST_AREA_HIDE
     public static readonly REQUEST_AREA_HIDE = 'RETWE_REQUEST_AREA_HIDE';
-    // AS3: .../src/com/sulake/habbo/room/events/RoomEngineToWidgetEvent.as::REQUEST_MYSTERYBOX_OPEN_DIALOG
-    public static readonly REQUEST_MYSTERYBOX_OPEN_DIALOG = 'RETWE_REQUEST_MYSTERYBOX_OPEN_DIALOG';
+
     // AS3: .../src/com/sulake/habbo/room/events/RoomEngineToWidgetEvent.as::REQUEST_EFFECTBOX_OPEN_DIALOG
     public static readonly REQUEST_EFFECTBOX_OPEN_DIALOG = 'RETWE_REQUEST_EFFECTBOX_OPEN_DIALOG';
-    // AS3: .../src/com/sulake/habbo/room/events/RoomEngineToWidgetEvent.as::REQUEST_MYSTERYTROPHY_OPEN_DIALOG
-    public static readonly REQUEST_MYSTERYTROPHY_OPEN_DIALOG = 'RETWE_REQUEST_MYSTERYTROPHY_OPEN_DIALOG';
+
     // AS3: .../src/com/sulake/habbo/room/events/RoomEngineToWidgetEvent.as::REQUEST_ACHIEVEMENT_RESOLUTION_ENGRAVING
     public static readonly REQUEST_ACHIEVEMENT_RESOLUTION_ENGRAVING = 'RETWE_REQUEST_ACHIEVEMENT_RESOLUTION_ENGRAVING';
     // AS3: .../src/com/sulake/habbo/room/events/RoomEngineToWidgetEvent.as::REQUEST_ACHIEVEMENT_RESOLUTION_FAILED

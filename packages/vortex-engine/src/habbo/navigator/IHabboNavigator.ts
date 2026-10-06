@@ -141,12 +141,6 @@ export interface IHabboNavigator
     toggleRoomInfoVisibility(): void;
 
     /**
-	 * Check if the current room can be rated
-	 */
-    // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/navigator/IHabboNavigator.as::canRateRoom()
-    canRateRoom(): boolean;
-
-    /**
 	 * Check if a room is in favourites
 	 * @param roomId The room ID
 	 */

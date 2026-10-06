@@ -13,11 +13,7 @@ import type {Container, Ticker} from 'pixi.js';
 import {Sprite, Texture} from 'pixi.js';
 import {Component, ComponentDependency, type IContext, type IUpdateReceiver} from '@core/runtime';
 import {Vortex} from '../../Vortex';
-import {SpriteDataCollector} from './utils/SpriteDataCollector';
-import {RenderRoomMessageComposer} from '@habbo/communication/messages/outgoing/camera/RenderRoomMessageComposer';
-import {
-    RenderRoomThumbnailMessageComposer
-} from '@habbo/communication/messages/outgoing/camera/RenderRoomThumbnailMessageComposer';
+
 import type {IAssetLibrary} from '@core/assets/IAssetLibrary';
 import type {IConnection} from '@core/communication/connection/IConnection';
 import type {IRoomEngine} from './IRoomEngine';
@@ -5774,55 +5770,10 @@ export class RoomEngine extends Component implements IRoomEngine,
         canvas.useMask = useMask;
     }
 
-    /**
-	 * Builds the camera's render request for the given viewport.
-	 *
-	 * `thumbnail` selects {@link RenderRoomThumbnailMessageComposer}, which packs in its constructor
-	 * instead of on demand — the only difference between the two.
-	 */
+    // DEVIATION: AS3 builds the camera's render request here (`RenderRoomMessageComposer`, or the
+    //   thumbnail one), from SpriteDataCollector's furni, plane and modifier data. The RPG fork
+    //   removed photos and the room-thumbnail camera, so the member is gone with its composers.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::getRenderRoomMessage()
-    getRenderRoomMessage(
-        viewPort: IRoomEngineRectangle,
-        backgroundColor: number,
-        thumbnail: boolean = false,
-        includeOwnUser: boolean = true,
-        skipVisibilityChecking: boolean = false,
-        canvasId: number = -1
-    ): RenderRoomMessageComposer | null
-    {
-        const canvas = canvasId > -1
-            ? this.getRenderingCanvas(this._activeRoomId, canvasId)
-            : this.getRenderingCanvas(this._activeRoomId);
-
-        if(!canvas) return null;
-
-        if(skipVisibilityChecking) canvas.skipSpriteVisibilityChecking();
-
-        // AS3 excludes the player's own avatar by id when `includeOwnUser` is false — that is how
-        // the room thumbnail is taken without the owner standing in it.
-        let skipObjectId = -1;
-
-        if(!includeOwnUser)
-        {
-            skipObjectId = this._roomSessionManager?.getSession(this._activeRoomId)?.ownUserRoomId ?? -1;
-        }
-
-        const collector = new SpriteDataCollector();
-        const sprites = collector.getFurniData(viewPort, canvas, this, skipObjectId);
-        const modifiers = collector.getRoomRenderingModifiers();
-        const planes = collector.getRoomPlanes(viewPort, canvas, this, backgroundColor);
-
-        if(skipVisibilityChecking) canvas.resumeSpriteVisibilityChecking();
-
-        const topSecurityLevel = this._sessionDataManager?.topSecurityLevel ?? 0;
-
-        if(thumbnail)
-        {
-            return new RenderRoomThumbnailMessageComposer(planes, sprites, modifiers, this._activeRoomId, topSecurityLevel);
-        }
-
-        return new RenderRoomMessageComposer(planes, sprites, modifiers, this._activeRoomId, topSecurityLevel);
-    }
 
     /**
 	 * Captures the room canvas for the camera.
@@ -8673,6 +8624,10 @@ export class RoomEngine extends Component implements IRoomEngine,
         );
     }
 
+    // DEVIATION: AS3 also forwards ROWRE_JUKEBOX_PLAYLIST_EDITOR (`_SafeCls_1821.as:1473-1478`); the
+    //   RPG fork removed jukebox music.
+    // DEVIATION: AS3 also forwards the mystery-box and mystery-trophy open-dialog requests; the RPG
+    //   fork removed mystery boxes.
     private handleObjectWidgetRequestEvent(event: RoomObjectWidgetRequestEvent, roomId: number): void
     {
         const objectId = event.objectId;
@@ -8740,12 +8695,7 @@ export class RoomEngine extends Component implements IRoomEngine,
             case RoomObjectWidgetRequestEvent.ROWRE_BACKGROUND_COLOR:
                 this.emitToWidget(RoomEngineToWidgetEvent.REQUEST_BACKGROUND_COLOR, roomId, objectId, category);
                 break;
-            case RoomObjectWidgetRequestEvent.ROWRE_MYSTERYBOX_OPEN_DIALOG:
-                this.emitToWidget(RoomEngineToWidgetEvent.REQUEST_MYSTERYBOX_OPEN_DIALOG, roomId, objectId, category);
-                break;
-            case RoomObjectWidgetRequestEvent.ROWRE_MYSTERYTROPHY_OPEN_DIALOG:
-                this.emitToWidget(RoomEngineToWidgetEvent.REQUEST_MYSTERYTROPHY_OPEN_DIALOG, roomId, objectId, category);
-                break;
+
             // AS3: _SafeCls_1821.as:1530-1531. No widget behind this one — the handler follows the
             // link itself, which is why it is wired here with nothing else to port.
             case RoomObjectWidgetRequestEvent.ROWRE_INTERNAL_LINK:
@@ -8802,10 +8752,6 @@ export class RoomEngine extends Component implements IRoomEngine,
                     RoomEngineToWidgetEvent.REQUEST_PURCHASABLE_CLOTHING_CONFIRMATION_DIALOG,
                     roomId, objectId, category
                 );
-                break;
-            // AS3: _SafeCls_1821.as:1473-1478
-            case RoomObjectWidgetRequestEvent.ROWRE_PLAYLIST_EDITOR:
-                this.emitToWidget(RoomEngineToWidgetEvent.REQUEST_PLAYLIST_EDITOR, roomId, objectId, category);
                 break;
             case RoomObjectWidgetRequestEvent.ROWRE_MANNEQUIN:
                 this.emitToWidget(RoomEngineToWidgetEvent.REQUEST_MANNEQUIN, roomId, objectId, category);

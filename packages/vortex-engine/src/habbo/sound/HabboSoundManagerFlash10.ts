@@ -1,7 +1,6 @@
 import type EventEmitter from 'eventemitter3';
 import {Component, type IContext} from '@core/runtime';
 import type {IAssetLibrary} from '@core/assets';
-import type {IUpdateReceiver} from '@core/runtime/IContext';
 import type {IConnection} from '@core/communication/connection/IConnection';
 import type {IMessageEvent} from '@core/communication/messages/IMessageEvent';
 import {Logger} from '@core/utils/Logger';
@@ -21,14 +20,7 @@ import {IID_RoomEngine} from '@iid/IIDRoomEngine';
 import {IID_HabboNotifications} from '@iid/IIDHabboNotifications';
 
 import type {IHabboSoundManager} from './IHabboSoundManager';
-import type {IHabboMusicController} from './IHabboMusicController';
-import {TraxSampleManager} from './music/TraxSampleManager';
 import {FurniSamplePlaybackManager} from './furni/FurniSamplePlaybackManager';
-import {TraxSequencer} from './trax/TraxSequencer';
-import {TraxSongLoadEvent} from './events/TraxSongLoadEvent';
-import {TraxData} from './trax/TraxData';
-import {OrderedMap} from '@core/utils/OrderedMap';
-import {HabboMusicController} from './music/HabboMusicController';
 import type {IHabboSound} from './IHabboSound';
 import {HabboSoundBase} from './HabboSoundBase';
 import {HabboSoundWithPitch} from './HabboSoundWithPitch';
@@ -39,8 +31,8 @@ const log = Logger.getLogger('habbo.sound.HabboSoundManagerFlash10');
  * HabboSoundManagerFlash10
  *
  * The sound manager. Three volume channels, a cache of generic effects keyed by sound id,
- * and — once ported — ownership of the music controller, the Trax sample manager and the
- * furniture sample player.
+ * and ownership of the furniture sample player. AS3 also owns the music controller and the
+ * song-sample manager; the RPG fork removed jukebox music, so both are gone.
  *
  * Two things about it are easy to misread:
  *
@@ -53,8 +45,11 @@ const log = Logger.getLogger('habbo.sound.HabboSoundManagerFlash10');
  *
  * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/sound/HabboSoundManagerFlash10.as
  */
-export class HabboSoundManagerFlash10 extends Component implements IHabboSoundManager, IUpdateReceiver
+export class HabboSoundManagerFlash10 extends Component implements IHabboSoundManager
 {
+    // DEVIATION: AS3 also listens for the song-download completion and registers itself as an
+    //   update receiver, whose `update()` only drives the song-sample decoder and the song download
+    //   queue. The RPG fork removed jukebox music, so neither is registered.
     // AS3: .../sound/HabboSoundManagerFlash10.as::HabboSoundManagerFlash10()
     constructor(context: IContext, flags: number = 0, assetLibrary: IAssetLibrary | null = null, queueDependencies: boolean = true)
     {
@@ -75,9 +70,6 @@ export class HabboSoundManagerFlash10 extends Component implements IHabboSoundMa
                 this.onNotificationsReady(notifications);
             });
         }
-
-        this.events.on(TraxSongLoadEvent.TRAX_LOAD_COMPLETE, this._onTraxLoadComplete);
-        this.registerUpdateReceiver(this, 1);
 
         log.debug('Sound manager 10 init');
     }
@@ -112,48 +104,8 @@ export class HabboSoundManagerFlash10 extends Component implements IHabboSoundMa
     // AS3: .../sound/HabboSoundManagerFlash10.as::_SafeStr_5953
     private _lastPlayedAt: Map<string, number> = new Map();
 
-    // AS3: .../sound/HabboSoundManagerFlash10.as::_SafeStr_5008
-    private _musicController: IHabboMusicController | null = null;
-
-    // AS3: .../sound/HabboSoundManagerFlash10.as::_SafeStr_6112
-    private _loadingSongId: number = -1;
-
-    // AS3: .../sound/HabboSoundManagerFlash10.as::_traxSampleManager
-    private _traxSampleManager: TraxSampleManager | null = null;
-
     // AS3: .../sound/HabboSoundManagerFlash10.as::_furniSamplePlaybackManager
     private _furniSamplePlaybackManager: FurniSamplePlaybackManager | null = null;
-
-    // AS3: .../sound/HabboSoundManagerFlash10.as::_downloadingSong
-    // Name DERIVED (`_SafeStr_5349`): the one song whose samples are being fetched right now.
-    private _downloadingSong: TraxSequencer | null = null;
-
-    // AS3: .../sound/HabboSoundManagerFlash10.as::_queuedSongs
-    // Name DERIVED (`_SafeStr_6944`): songs built while that download is in flight.
-    private _queuedSongs: OrderedMap<number, TraxSequencer> = new OrderedMap<number, TraxSequencer>();
-
-    /**
-     * A sample of the song currently downloading failed.
-     *
-     * AS3 only drops the download slot — the half-loaded sequencer is left unready and is never
-     * retried. Freeing the slot is what matters: `update()` calls `loadNextSong()` every frame,
-     * so the next queued song starts on the following tick instead of waiting forever behind a
-     * download that will never complete.
-     */
-    // AS3: .../sound/HabboSoundManagerFlash10.as::onSampleLoadError()
-    private onSampleLoadError = (): void =>
-    {
-        log.warn(`A Trax sample failed to download; song ${this._loadingSongId} stays unready`);
-
-        this._loadingSongId = -1;
-        this._downloadingSong = null;
-    };
-
-    // TS-only: bound listener, kept so `dispose()` unregisters the same reference.
-    private readonly _onTraxLoadComplete = (event: TraxSongLoadEvent): void =>
-    {
-        this.onTraxLoadComplete(event);
-    };
 
     // AS3: .../sound/HabboSoundManagerFlash10.as::_SafeStr_9792
     private _muted: boolean = false;
@@ -166,12 +118,6 @@ export class HabboSoundManagerFlash10 extends Component implements IHabboSoundMa
     {
         this.onRoomEngineObjectPlaySound(event);
     };
-
-    // AS3: .../sound/HabboSoundManagerFlash10.as::get musicController()
-    get musicController(): IHabboMusicController | null
-    {
-        return this._musicController;
-    }
 
     // AS3: .../sound/HabboSoundManagerFlash10.as::get genericVolume()
     get genericVolume(): number
@@ -217,12 +163,6 @@ export class HabboSoundManagerFlash10 extends Component implements IHabboSoundMa
     previewVolume(generic: number, furni: number, trax: number): void
     {
         this.updateVolumeSetting(generic, furni, trax);
-    }
-
-    // AS3: .../sound/HabboSoundManagerFlash10.as::get loadingSongId()
-    get loadingSongId(): number
-    {
-        return this._loadingSongId;
     }
 
     /**
@@ -301,155 +241,6 @@ export class HabboSoundManagerFlash10 extends Component implements IHabboSoundMa
         this.updateVolumeSetting(this._genericVolume, this._furniVolume, this._traxVolume);
     }
 
-    /**
-     * AS3: .../sound/HabboSoundManagerFlash10.as::loadTraxSong()
-     *
-     * One song downloads at a time: while `_downloadingSong` is set, every other song is built
-     * without starting its downloads and parked in `_queuedSongs` instead. A song whose samples
-     * are all cached comes back ready and plays immediately.
-     */
-    // AS3: .../src/com/sulake/habbo/sound/HabboSoundManagerFlash10.as::loadTraxSong()
-    loadTraxSong(songId: number, songData: string): IHabboSound | null
-    {
-        if(this._downloadingSong !== null) return this.addTraxSongForDownload(songId, songData);
-
-        const sequencer = this.createTraxInstance(songId, songData);
-
-        if(!sequencer.ready)
-        {
-            this._downloadingSong = sequencer;
-            this._loadingSongId = songId;
-        }
-
-        return sequencer;
-    }
-
-    // AS3: .../sound/HabboSoundManagerFlash10.as::addTraxSongForDownload()
-    // `false` is the flag that says "do not start the downloads" — that is the whole difference.
-    private addTraxSongForDownload(songId: number, songData: string): IHabboSound
-    {
-        const sequencer = this.createTraxInstance(songId, songData, false);
-
-        if(!sequencer.ready) this._queuedSongs.add(songId, sequencer);
-
-        return sequencer;
-    }
-
-    // AS3: .../sound/HabboSoundManagerFlash10.as::createTraxInstance()
-    private createTraxInstance(songId: number, songData: string, startDownloads: boolean = true): TraxSequencer
-    {
-        const sequencer = new TraxSequencer(
-            songId,
-            new TraxData(songData),
-            this._traxSampleManager?.traxSamples ?? new OrderedMap(),
-            this.events
-        );
-
-        sequencer.volume = this._genericVolume;
-        this.validateSampleAvailability(sequencer, startDownloads);
-
-        return sequencer;
-    }
-
-    /**
-     * AS3: .../sound/HabboSoundManagerFlash10.as::validateSampleAvailability()
-     *
-     * A song is ready only when *every* sample it names is already decoded; one missing sample
-     * makes the whole song wait, which is why the sequencer refuses to start rather than playing
-     * a song with holes in it.
-     */
-    // AS3: .../src/com/sulake/habbo/sound/HabboSoundManagerFlash10.as::validateSampleAvailability()
-    private validateSampleAvailability(sequencer: TraxSequencer, startDownloads: boolean): void
-    {
-        const sampleIds = sequencer.traxData?.getSampleIds() ?? [];
-        let missing = false;
-
-        for(const sampleId of sampleIds)
-        {
-            if(this._traxSampleManager?.traxSamples.getValue(sampleId) != null) continue;
-
-            if(startDownloads) this._traxSampleManager?.loadSample(sampleId);
-
-            missing = true;
-        }
-
-        sequencer.ready = !missing;
-    }
-
-    // AS3: .../sound/HabboSoundManagerFlash10.as::notifyPlayedSong()
-    // Called from HabboMusicController when a track starts, exactly as in AS3.
-    notifyPlayedSong(songName: string, songAuthor: string): void
-    {
-        this._notifications?.addSongPlayingNotification(songName, songAuthor);
-    }
-
-    /**
-     * The song whose samples were downloading is complete.
-     *
-     * AS3 marks the sequencer ready and tells the music controller, then frees the download slot
-     * so `loadNextSong()` can take the next queued song on the following tick. Note it returns
-     * *before* freeing the slot when there is no music controller — that early return is AS3's,
-     * and it is what makes the queue stall while the controller is still coming up.
-     */
-    // AS3: .../sound/HabboSoundManagerFlash10.as::onTraxLoadComplete()
-    private onTraxLoadComplete(event: TraxSongLoadEvent): void
-    {
-        if(event == null) return;
-        if(this._downloadingSong === null) return;
-
-        this._downloadingSong.ready = true;
-
-        if(this._musicController === null) return;
-
-        this._musicController.onSongLoaded(event.id);
-
-        this._downloadingSong = null;
-        this._loadingSongId = -1;
-    }
-
-    /**
-     * Starts the next queued song, if the single download slot is free.
-     *
-     * A song whose samples all turned out to be cached comes back ready from
-     * `validateSampleAvailability()` and is announced immediately — it never occupies the slot.
-     */
-    // AS3: .../sound/HabboSoundManagerFlash10.as::loadNextSong()
-    private loadNextSong(): void
-    {
-        if(this._downloadingSong !== null || this._queuedSongs.length === 0) return;
-
-        const songId = this._queuedSongs.getKey(0);
-
-        if(songId === null) return;
-
-        const sequencer = this._queuedSongs.remove(songId);
-
-        if(sequencer === null || sequencer.disposed) return;
-
-        this.validateSampleAvailability(sequencer, true);
-
-        if(sequencer.ready)
-        {
-            this.events.emit(
-                TraxSongLoadEvent.TRAX_LOAD_COMPLETE,
-                new TraxSongLoadEvent(TraxSongLoadEvent.TRAX_LOAD_COMPLETE, songId)
-            );
-
-            return;
-        }
-
-        this._downloadingSong = sequencer;
-        this._loadingSongId = songId;
-    }
-
-    // AS3: .../sound/HabboSoundManagerFlash10.as::update()
-    // The sample manager decodes on this tick, under its own time budget.
-    update(delta: number): void
-    {
-        this._traxSampleManager?.update(delta);
-        this.loadNextSong();
-    }
-
     // AS3: .../sound/HabboSoundManagerFlash10.as::get events()
     override get events(): EventEmitter
     {
@@ -516,30 +307,19 @@ export class HabboSoundManagerFlash10 extends Component implements IHabboSoundMa
     }
 
     /**
-     * Runs once, when both the connection and the room engine are up — the guard is AS3's
-     * and is what makes the three `queueInterface` callbacks safe to fire in any order.
+     * Runs once, when both the connection and the room engine are up — the guard is what makes
+     * the three `queueInterface` callbacks safe to fire in any order.
      */
+    // DEVIATION: AS3 builds the music controller and the song-sample manager here too, and its
+    //   run-once guard is "the music controller exists". The RPG fork removed jukebox music, so the
+    //   furniture sample player — built in the same call — is the guard instead.
     // AS3: .../sound/HabboSoundManagerFlash10.as::init()
     private init(): void
     {
-        if(this._connection === null || this._roomEngine === null || this._musicController !== null)
+        if(this._connection === null || this._roomEngine === null || this._furniSamplePlaybackManager !== null)
         {
             return;
         }
-
-        // AS3: HabboSoundManagerFlash10.as:423 — the controller takes the manager, the manager's
-        // own event bus, the *room engine's* bus (it listens for the jukebox and sound-machine
-        // room events on that one) and the connection.
-        this._musicController = new HabboMusicController(
-            this,
-            this.events,
-            this._roomEngine.events,
-            this._connection
-        );
-
-        // AS3: HabboSoundManagerFlash10.as:424 — the sample manager, with the callback it calls
-        // when a download fails.
-        this._traxSampleManager = new TraxSampleManager(this, this.onSampleLoadError);
 
         // AS3: HabboSoundManagerFlash10.as:425 — the furniture sample player, on the room
         // engine's own event bus.
@@ -551,12 +331,6 @@ export class HabboSoundManagerFlash10 extends Component implements IHabboSoundMa
 
         this._connection.addMessageEvent(this._accountPreferencesEvent);
         this._connection.send(new GetSoundSettingsComposer());
-    }
-
-    // AS3: .../sound/HabboSoundManagerFlash10.as::setMusicController()
-    protected setMusicController(musicController: IHabboMusicController | null): void
-    {
-        this._musicController = musicController;
     }
 
     // AS3: .../sound/HabboSoundManagerFlash10.as::storeVolumeSetting()
@@ -573,6 +347,8 @@ export class HabboSoundManagerFlash10 extends Component implements IHabboSoundMa
      * The single point where the three volumes change. Muting zeroes all three without
      * touching what was stored, so unmuting restores them.
      */
+    // DEVIATION: AS3 also pushes the trax volume to the music controller; the RPG fork removed
+    //   jukebox music, so the trax channel is only stored (the server still persists it).
     // AS3: .../sound/HabboSoundManagerFlash10.as::updateVolumeSetting()
     private updateVolumeSetting(generic: number, furni: number, trax: number): void
     {
@@ -582,7 +358,6 @@ export class HabboSoundManagerFlash10 extends Component implements IHabboSoundMa
             this._furniVolume = 0;
             this._traxVolume = 0;
 
-            this._musicController?.updateVolume(0);
             this._furniSamplePlaybackManager?.updateVolume(0);
 
             return;
@@ -592,7 +367,6 @@ export class HabboSoundManagerFlash10 extends Component implements IHabboSoundMa
         this._furniVolume = furni;
         this._traxVolume = trax;
 
-        this._musicController?.updateVolume(trax);
         this._furniSamplePlaybackManager?.updateVolume(furni);
     }
 
@@ -726,22 +500,6 @@ export class HabboSoundManagerFlash10 extends Component implements IHabboSoundMa
 
         this._accountPreferencesEvent = null;
         this._connection = null;
-
-        this.events.off(TraxSongLoadEvent.TRAX_LOAD_COMPLETE, this._onTraxLoadComplete);
-
-        if(this._musicController !== null)
-        {
-            this._musicController.dispose();
-            this._musicController = null;
-        }
-
-        // AS3: HabboSoundManagerFlash10.as:134/149 — the sample manager and the furni player are
-        // disposed here too, in that order.
-        if(this._traxSampleManager !== null)
-        {
-            this._traxSampleManager.dispose();
-            this._traxSampleManager = null;
-        }
 
         if(this._furniSamplePlaybackManager !== null)
         {

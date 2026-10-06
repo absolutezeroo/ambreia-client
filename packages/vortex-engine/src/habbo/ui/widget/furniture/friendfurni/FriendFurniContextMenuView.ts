@@ -95,7 +95,7 @@ export class FriendFurniContextMenuView extends FurnitureContextInfoView
     /**
      * Tints the minimise icon on hover. AS3 inherits this from `ContextInfoView`; this port
      * folded that method into a private `onMinimizedProc` on the *minimised* bubble, so the
-     * normal window's copy lives here — the same shape `MysteryBoxContextMenuView` uses.
+     * normal window's copy lives here.
      */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/contextmenu/ContextInfoView.as::onMinimizeHover()
     private onMinimizeHover = (event: WindowEvent, window: IWindow): void =>

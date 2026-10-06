@@ -76,7 +76,6 @@ import {AvatarInfoWidgetHandler} from './handler/AvatarInfoWidgetHandler';
 import type {AvatarInfoWidget} from './widget/avatarinfo/AvatarInfoWidget';
 import {CustomUserNotificationWidgetHandler} from './handler/CustomUserNotificationWidgetHandler';
 import {RentableSpaceWidgetHandler} from './handler/RentableSpaceWidgetHandler';
-import {PlayListEditorWidgetHandler} from './handler/PlayListEditorWidgetHandler';
 import {CraftingWidgetHandler} from './handler/CraftingWidgetHandler';
 // Vortex-only: the fishing handler lives under src/vortex/, not in the ported tree.
 import type {HabboFishing} from '@habbo/vortex/fishing/HabboFishing';
@@ -85,8 +84,7 @@ import {FishingSpotWidgetHandler} from '@habbo/vortex/fishing/ui/FishingSpotWidg
 import {YoutubeDisplayWidgetHandler} from './handler/YoutubeDisplayWidgetHandler';
 import {VimeoDisplayWidgetHandler} from './handler/VimeoDisplayWidgetHandler';
 import {ChatInputWidgetHandler} from './handler/ChatInputWidgetHandler';
-import {CameraWidgetHandler} from './handler/CameraWidgetHandler';
-import {RoomThumbnailCameraWidgetHandler} from './handler/RoomThumbnailCameraWidgetHandler';
+
 import {FurnitureTrophyWidgetHandler} from './handler/FurnitureTrophyWidgetHandler';
 import {FurnitureStickieWidgetHandler} from './handler/FurnitureStickieWidgetHandler';
 import {SpamWallPostItWidgetHandler} from './handler/SpamWallPostItWidgetHandler';
@@ -155,10 +153,11 @@ const log = Logger.getLogger('habbo.ui.RoomDesktop');
 
 export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IRoomWidgetHandlerContainer 
 {
+    // DEVIATION: AS3's list also holds the photo camera; the RPG fork removed photos.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomUI.as:71 (var_4627)
     private static readonly REUSABLE_WIDGET_TYPES = new Set([
         'RWE_INFOSTAND', 'RWE_CHAT_INPUT_WIDGET', 'RWE_ME_MENU',
-        'RWE_EXTERNAL_IMAGE', 'RWE_CAMERA', 'RWE_ROOM_TOOLS', 'RWE_FURNITURE_CONTEXT_MENU',
+        'RWE_EXTERNAL_IMAGE', 'RWE_ROOM_TOOLS', 'RWE_FURNITURE_CONTEXT_MENU',
     ]);
 
     public static readonly ROOM_VIEW_CREATED = 'ROOM_VIEW_CREATED';
@@ -1187,10 +1186,10 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
      *
      * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::createWidget()
      *
-     * Builds the handler, then hands it to RoomWidgetFactory. The widget types missing here are
-     * the same six RoomWidgetFactory.ts's header enumerates (camera, crafting, playlist editor,
-     * youtube, vimeo, room-thumbnail camera) — each blocked on an unported subsystem.
+     * Builds the handler, then hands it to RoomWidgetFactory.
      */
+    // DEVIATION: AS3 also builds the handlers for the photo camera, the room-thumbnail camera and
+    //   the jukebox playlist editor; the RPG fork removed photos and jukebox music.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::createWidget()
     public createWidget(type: string): void 
     {
@@ -1206,10 +1205,9 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
         switch(type) 
         {
             case 'RWE_INFOSTAND':
-                // AS3: `new InfoStandWidgetHandler(_soundManager.musicController)` — the handler
-                // turns NPE_SONG_CHANGED / SIR_TRAX_SONG_INFO_RECEIVED into the song updates the
-                // jukebox and song-disk views read.
-                handler = new InfoStandWidgetHandler(this._soundManager?.musicController ?? null);
+                // DEVIATION: AS3 passes `_soundManager.musicController`, for the jukebox and song-disk
+                //   views; the RPG fork removed jukebox music.
+                handler = new InfoStandWidgetHandler();
                 break;
             case 'RWE_ROOM_TOOLS': {
                 // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as:885-890
@@ -1223,14 +1221,7 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
             case 'RWE_CHAT_INPUT_WIDGET':
                 handler = new ChatInputWidgetHandler();
                 break;
-            case 'RWE_CAMERA':
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::createWidget()
-                handler = new CameraWidgetHandler(this);
-                break;
-            case 'RWE_ROOM_THUMBNAIL_CAMERA':
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::createWidget()
-                handler = new RoomThumbnailCameraWidgetHandler(this);
-                break;
+
             case 'RWE_EFFECTS':
                 // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as:848
                 handler = new EffectsWidgetHandler();
@@ -1249,15 +1240,6 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
                 // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as:870
                 handler = new CustomUserNotificationWidgetHandler();
                 break;
-            case 'RWE_PLAYLIST_EDITOR_WIDGET': {
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as:837-841
-                const playListHandler = new PlayListEditorWidgetHandler();
-
-                playListHandler.connection = this._connection;
-                handler = playListHandler;
-
-                break;
-            }
             case 'RWE_CRAFTING':
                 // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as:921-922
                 handler = new CraftingWidgetHandler(this);
@@ -1776,14 +1758,6 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
             case RoomEngineToWidgetEvent.REQUEST_TEASER:
                 this.processWidgetMessage(new RoomWidgetFurniToWidgetMessage(
                     RoomWidgetFurniToWidgetMessage.WIDGET_MESSAGE_REQUEST_TEASER_WIDGET,
-                    event.objectId, event.category, event.roomId
-                ));
-
-                return;
-            // AS3: RoomDesktop.as::processRoomObjectEvent() "RETWE_REQUEST_PLAYLIST_EDITOR" (line 1281)
-            case RoomEngineToWidgetEvent.REQUEST_PLAYLIST_EDITOR:
-                this.processWidgetMessage(new RoomWidgetFurniToWidgetMessage(
-                    RoomWidgetFurniToWidgetMessage.WIDGET_MESSAGE_REQUEST_PLAYLIST_EDITOR_WIDGET,
                     event.objectId, event.category, event.roomId
                 ));
 

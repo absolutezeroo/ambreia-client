@@ -17,7 +17,7 @@ export * from './help';
 export * from './inventory';
 export * from './landingview';
 export * from './moderation';
-export * from './mysterybox';
+
 export * from './navigator';
 export * from './perk';
 export * from './preferences';

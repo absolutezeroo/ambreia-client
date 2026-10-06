@@ -3,13 +3,12 @@
  *
  * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/FurnitureContextMenuWidgetHandler.as
  *
- * Two responsibilities that look unrelated but are not: it turns room-engine events into calls on
- * the widget's `show*` methods, and it owns the mystery-box toolbar tracker — which lives here
- * rather than in the widget because it must survive with the handler for as long as the room does.
- * `set widget()` is what creates it, so the tracker appears the moment the widget is constructed.
+ * It turns room-engine events into calls on the widget's `show*` methods. AS3 also owns the
+ * mystery-box toolbar tracker here and routes the mystery-box / mystery-trophy flows; the RPG fork
+ * removed mystery boxes.
  *
- * Ported for the mystery-box / mystery-trophy, guild-furni, purchasable-clothing and monsterplant
- * flows, including every request AS3 subscribes to.
+ * Ported for the guild-furni, purchasable-clothing and monsterplant flows, including every other
+ * request AS3 subscribes to.
  *
  * **Purchasable clothing arrives by two different routes and they are not interchangeable.** A
  * context menu (`RETWE_OPEN_FURNI_CONTEXT_MENU` carrying `PURCHASABLE_CLOTHING`) opens the generic
@@ -50,7 +49,6 @@ import {
 import {RoomObjectVariableEnum} from '@habbo/room/object/RoomObjectVariableEnum';
 import type {IRoomWidgetHandlerContainer} from '@habbo/ui/IRoomWidgetHandlerContainer';
 import type {FurnitureContextMenuWidget} from '@habbo/ui/widget/furniture/contextmenu/FurnitureContextMenuWidget';
-import {MysteryBoxToolbarExtension} from '@habbo/ui/widget/furniture/mysterybox/MysteryBoxToolbarExtension';
 
 export class FurnitureContextMenuWidgetHandler implements IRoomWidgetHandler
 {
@@ -70,8 +68,6 @@ export class FurnitureContextMenuWidgetHandler implements IRoomWidgetHandler
 
     private static readonly CONTEXT_MENU_MONSTERPLANT_SEED: string = 'MONSTERPLANT_SEED';
 
-    private static readonly CONTEXT_MENU_MYSTERY_BOX: string = 'MYSTERY_BOX';
-
     private static readonly CONTEXT_MENU_RANDOM_TELEPORT: string = 'RANDOM_TELEPORT';
 
     private static readonly CONTEXT_MENU_PURCHASABLE_CLOTHING: string = 'PURCHASABLE_CLOTHING';
@@ -87,9 +83,6 @@ export class FurnitureContextMenuWidgetHandler implements IRoomWidgetHandler
 
     // AS3: FurnitureContextMenuWidgetHandler.as::_SafeStr_4568 (the connection)
     private _connection: IConnection | null = null;
-
-    // AS3: FurnitureContextMenuWidgetHandler.as::_SafeStr_6714 (the mystery box tracker)
-    private _mysteryBoxToolbarExtension: MysteryBoxToolbarExtension | null = null;
 
     // AS3: FurnitureContextMenuWidgetHandler.as::_pendingPurchasableClothingFurniName
     private _pendingPurchasableClothingFurniName: string | null = null;
@@ -109,11 +102,9 @@ export class FurnitureContextMenuWidgetHandler implements IRoomWidgetHandler
     // AS3: FurnitureContextMenuWidgetHandler.as::_SafeStr_7268 (request timestamp, -1 = none)
     private _pendingPurchasableClothingTime: number = -1;
 
+    // DEVIATION: AS3 builds the mystery-box toolbar tracker here (`_SafeStr_6714`); the RPG fork
+    //   removed mystery boxes, so the handler has nothing to construct.
     // AS3: FurnitureContextMenuWidgetHandler.as::FurnitureContextMenuWidgetHandler()
-    constructor()
-    {
-        this._mysteryBoxToolbarExtension = new MysteryBoxToolbarExtension(this);
-    }
 
     // AS3: FurnitureContextMenuWidgetHandler.as::get disposed()
     public get disposed(): boolean
@@ -145,6 +136,8 @@ export class FurnitureContextMenuWidgetHandler implements IRoomWidgetHandler
         return this._container;
     }
 
+    // DEVIATION: AS3 also subscribes to the mystery-box and mystery-trophy open-dialog requests;
+    //   the RPG fork removed mystery boxes.
     // AS3: FurnitureContextMenuWidgetHandler.as::set container()
     public set container(value: IRoomWidgetHandlerContainer | null)
     {
@@ -168,11 +161,11 @@ export class FurnitureContextMenuWidgetHandler implements IRoomWidgetHandler
             this.onPurchasableClothingConfirmationDialogRequested,
             this
         );
-        events.on(RoomEngineToWidgetEvent.REQUEST_MYSTERYBOX_OPEN_DIALOG, this.onMysteryBoxOpenDialogRequested, this);
         events.on(RoomEngineToWidgetEvent.REQUEST_EFFECTBOX_OPEN_DIALOG, this.onEffectBoxOpenDialogRequested, this);
-        events.on(RoomEngineToWidgetEvent.REQUEST_MYSTERYTROPHY_OPEN_DIALOG, this.onMysteryTrophyOpenDialogRequested, this);
     }
 
+    // DEVIATION: AS3 also unsubscribes the mystery-box and mystery-trophy requests; the RPG fork
+    //   removed mystery boxes.
     // AS3: FurnitureContextMenuWidgetHandler.as::unsetContainer()
     private unsetContainer(): void
     {
@@ -190,27 +183,18 @@ export class FurnitureContextMenuWidgetHandler implements IRoomWidgetHandler
                 this.onPurchasableClothingConfirmationDialogRequested,
                 this
             );
-            events.off(RoomEngineToWidgetEvent.REQUEST_MYSTERYBOX_OPEN_DIALOG, this.onMysteryBoxOpenDialogRequested, this);
             events.off(RoomEngineToWidgetEvent.REQUEST_EFFECTBOX_OPEN_DIALOG, this.onEffectBoxOpenDialogRequested, this);
-            events.off(RoomEngineToWidgetEvent.REQUEST_MYSTERYTROPHY_OPEN_DIALOG, this.onMysteryTrophyOpenDialogRequested, this);
         }
 
         this._container = null;
     }
 
-    /**
-     * The widget hands itself over as soon as it is built, and that is the tracker's cue: AS3
-     * creates the toolbar window here, gated on the hotel having the feature switched on.
-     */
+    // DEVIATION: AS3 also creates the mystery-box toolbar tracker's window here, gated on the
+    //   tracker's config switch; the RPG fork removed mystery boxes.
     // AS3: FurnitureContextMenuWidgetHandler.as::set widget()
     public set widget(value: FurnitureContextMenuWidget | null)
     {
         this._widget = value;
-
-        if(this._container?.config?.getBoolean('mysterybox.tracker.active'))
-        {
-            this._mysteryBoxToolbarExtension?.createWindow();
-        }
     }
 
     // AS3: FurnitureContextMenuWidgetHandler.as::get widget()
@@ -292,6 +276,8 @@ export class FurnitureContextMenuWidgetHandler implements IRoomWidgetHandler
             {id: number; category: number; localizedName: string; customParams: string} | null;
     }
 
+    // DEVIATION: AS3 also routes the MYSTERY_BOX context menu to the mystery-box bubble; the RPG
+    //   fork removed mystery boxes.
     // AS3: FurnitureContextMenuWidgetHandler.as::processEvent()
     public processEvent(event: unknown): void
     {
@@ -310,9 +296,6 @@ export class FurnitureContextMenuWidgetHandler implements IRoomWidgetHandler
             case RoomEngineToWidgetEvent.REQUEST_OPEN_FURNI_CONTEXT_MENU:
                 switch(widgetEvent.contextMenu)
                 {
-                    case FurnitureContextMenuWidgetHandler.CONTEXT_MENU_MYSTERY_BOX:
-                        this._widget.showMysteryBoxContextMenu(object);
-                        break;
                     case FurnitureContextMenuWidgetHandler.CONTEXT_MENU_FRIEND_FURNITURE:
                         this._widget.showFriendFurnitureContextMenu(object);
                         break;
@@ -533,22 +516,6 @@ export class FurnitureContextMenuWidgetHandler implements IRoomWidgetHandler
     }
 
     /**
-     * No owner check, unlike every other dialog request below it in AS3 — anyone who used the box
-     * gets the dialog, because the non-owner is exactly the person putting a key in.
-     */
-    // AS3: FurnitureContextMenuWidgetHandler.as::onMysteryBoxOpenDialogRequested()
-    private onMysteryBoxOpenDialogRequested(event: RoomEngineToWidgetEvent): void
-    {
-        if(this._widget === null) return;
-
-        const object = this.getRoomObject(event.objectId);
-
-        if(object === null) return;
-
-        this._widget.showMysteryBoxOpenDialog(object);
-    }
-
-    /**
      * The seed's other way in. Its context bubble reaches `showPlantSeedConfirmationDialog()`
      * through the Use button, but a double click skips the bubble entirely: the logic raises
      * ROWRE_MONSTERPLANT_SEED_PLANT_CONFIRMATION_DIALOG and the room engine forwards it here.
@@ -587,7 +554,7 @@ export class FurnitureContextMenuWidgetHandler implements IRoomWidgetHandler
         this._widget.showPurchasableClothingConfirmationDialog(object);
     }
 
-    /** Owner-only, unlike the mystery box: an effect box is opened by whoever owns it. */
+    /** Owner-only: an effect box is opened by whoever owns it. */
     // AS3: FurnitureContextMenuWidgetHandler.as::onEffectBoxOpenDialogRequested()
     private onEffectBoxOpenDialogRequested(event: RoomEngineToWidgetEvent): void
     {
@@ -602,30 +569,10 @@ export class FurnitureContextMenuWidgetHandler implements IRoomWidgetHandler
         this._widget.showEffectBoxOpenDialog(object);
     }
 
-    // AS3: FurnitureContextMenuWidgetHandler.as::onMysteryTrophyOpenDialogRequested()
-    private onMysteryTrophyOpenDialogRequested(event: RoomEngineToWidgetEvent): void
-    {
-        if(this._widget === null) return;
-
-        const object = this.getRoomObject(event.objectId);
-
-        if(object === null) return;
-
-        if(!this._container?.isOwnerOfFurniture(object)) return;
-
-        this._widget.showMysteryTrophyOpenDialog(object);
-    }
-
     // AS3: FurnitureContextMenuWidgetHandler.as::dispose()
     public dispose(): void
     {
         if(this._disposed) return;
-
-        if(this._mysteryBoxToolbarExtension !== null)
-        {
-            this._mysteryBoxToolbarExtension.dispose();
-            this._mysteryBoxToolbarExtension = null;
-        }
 
         this.unsetContainer();
 

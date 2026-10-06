@@ -12,7 +12,6 @@ import type {ICatalogWidget} from './widgets/ICatalogWidget';
 import {ItemGridCatalogWidget} from './widgets/ItemGridCatalogWidget';
 import {SimplePriceCatalogWidget} from './widgets/SimplePriceCatalogWidget';
 import {ProductViewCatalogWidget} from './widgets/ProductViewCatalogWidget';
-import {SongDiskProductViewCatalogWidget} from './widgets/SongDiskProductViewCatalogWidget';
 import {PurchaseCatalogWidget} from './widgets/PurchaseCatalogWidget';
 import {LocalizationCatalogWidget} from './widgets/LocalizationCatalogWidget';
 import {SpinnerCatalogWidget} from './widgets/SpinnerCatalogWidget';
@@ -24,7 +23,6 @@ import {TextInputCatalogWidget} from './widgets/TextInputCatalogWidget';
 import {FirstProductSelectorCatalogWidget} from './widgets/FirstProductSelectorCatalogWidget';
 import {SingleViewCatalogWidget} from './widgets/SingleViewCatalogWidget';
 import {RoomPreviewCatalogWidget} from './widgets/RoomPreviewCatalogWidget';
-import {TraxPreviewCatalogWidget} from './widgets/TraxPreviewCatalogWidget';
 import {TrophyCatalogWidget} from './widgets/TrophyCatalogWidget';
 import {UserBadgeSelectorCatalogWidget} from './widgets/UserBadgeSelectorCatalogWidget';
 import {SoldLtdItemsCatalogWidget} from './widgets/SoldLtdItemsCatalogWidget';
@@ -370,6 +368,8 @@ export class CatalogPage implements ICatalogPage
 
     // All 48 of the AS3 switch's cases are ported. Like AS3 it has no default arm, so a layout
     // naming a widget that does not exist is silently skipped rather than throwing.
+    // DEVIATION: AS3 also builds `songDiskProductViewWidget` and `traxPreviewWidget`; the RPG fork
+    //   removed jukebox music, so a layout naming either leaves that slot inert.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/viewer/CatalogPage.as::createWidget()
     private createWidget(window: IWindowContainer): void
     {
@@ -392,9 +392,6 @@ export class CatalogPage implements ICatalogPage
                 break;
             case CatalogWidgetName.PRODUCT_VIEW:
                 this._widgets.push(new ProductViewCatalogWidget(window, this._catalog!));
-                break;
-            case CatalogWidgetName.SONG_DISK_PRODUCT_VIEW:
-                this._widgets.push(new SongDiskProductViewCatalogWidget(window, this._catalog!));
                 break;
             case CatalogWidgetName.SINGLE_VIEW:
                 this._widgets.push(new SingleViewCatalogWidget(window, this._catalog!));
@@ -428,9 +425,6 @@ export class CatalogPage implements ICatalogPage
                 break;
             case CatalogWidgetName.USER_BADGE_SELECTOR:
                 this._widgets.push(new UserBadgeSelectorCatalogWidget(window, this._catalog!));
-                break;
-            case CatalogWidgetName.TRAX_PREVIEW:
-                this._widgets.push(new TraxPreviewCatalogWidget(window, this._catalog!.soundManager));
                 break;
             case CatalogWidgetName.ROOM_PREVIEW:
                 this._widgets.push(new RoomPreviewCatalogWidget(window));

@@ -161,7 +161,7 @@ export class FurniSamplePlaybackManager
     /**
      * AS3: .../FurniSamplePlaybackManager.as::loadSample() + onSampleLoadComplete() + ioErrorHandler()
      *
-     * The same URL template the Trax samples use, with `%typeid%` replaced. AS3 splits this across
+     * The dynamic-download samples URL template, with `%typeid%` replaced. AS3 splits this across
      * a `Sound.load()` and two listeners; one round trip here.
      */
     private async loadSample(sampleId: number, objectId: number): Promise<void>
@@ -209,7 +209,7 @@ export class FurniSamplePlaybackManager
     /**
      * AS3: .../FurniSamplePlaybackManager.as::dispose()
      *
-     * **AS3 never sets `_disposed`** here either — the same slip as `TraxSample.dispose()`, and
+     * **AS3 never sets `_disposed`** here either — a slip AS3 makes in its sample classes too, and
      * with the same consequence: `disposed` keeps answering false. Kept, because the flag is read
      * inside its own load callback (`onSampleLoadComplete`), so setting it would change behaviour
      * rather than merely tidy it.

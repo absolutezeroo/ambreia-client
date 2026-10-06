@@ -5,10 +5,11 @@
  * @see sources/win63_version/habbo/ui/widget/infostand/InfoStandWidget.as
  *
  * Container for all infostand sub-views (furni/user/pet/bot/rentable-bot/
- * jukebox/crackable-furni/song-disk). Furni, user, and bot views are fully
+ * crackable-furni; AS3's jukebox and song-disk views are gone with the RPG
+ * fork's removal of jukebox music). Furni, user, and bot views are fully
  * ported (user/bot at Phase 1 identity-only scope — see InfoStandUserView.ts's
- * header for what's deferred). Pet/rentable-bot/jukebox/crackable-furni/
- * song-disk are still inert stubs — this class still constructs and wires all
+ * header for what's deferred). Pet/rentable-bot/crackable-furni
+ * are still inert stubs — this class still constructs and wires all
  * of them to match AS3's structure, so `selectView()`/`hideChildren()`
  * naturally no-op for the stubbed ones (their `window` is always `null`, so
  * `mainContainer.getChildByName(...)` never finds them).
@@ -42,9 +43,6 @@ import {InfoStandUserView} from './InfoStandUserView';
 import {InfoStandPetView} from './InfoStandPetView';
 import {InfoStandBotView} from './InfoStandBotView';
 import {InfoStandRentableBotView} from './InfoStandRentableBotView';
-import {RoomWidgetSongUpdateEvent} from '@habbo/ui/widget/events/RoomWidgetSongUpdateEvent';
-import {InfoStandJukeboxView} from './InfoStandJukeboxView';
-import {InfoStandSongDiskView} from './InfoStandSongDiskView';
 import {InfoStandFurniData} from './InfoStandFurniData';
 import {InfoStandUserData} from './InfoStandUserData';
 import {InfoStandPetData} from './InfoStandPetData';
@@ -61,9 +59,7 @@ export class InfoStandWidget extends RoomWidgetBase
         PET: 'infostand_pet_view',
         BOT: 'infostand_bot_view',
         RENTABLE_BOT: 'infostand_rentable_bot_view',
-        JUKEBOX: 'infostand_jukebox_view',
         CRACKABLE_FURNI: 'infostand_crackable_furni_view',
-        SONGDISK: 'infostand_songdisk_view',
     } as const;
 
     // AS3: .../src/com/sulake/habbo/ui/widget/infostand/InfoStandWidget.as::InfoStandWidget() — `new Timer(3000)`
@@ -82,9 +78,7 @@ export class InfoStandWidget extends RoomWidgetBase
     private readonly _petView: InfoStandPetView;
     private readonly _botView: InfoStandBotView;
     private readonly _rentableBotView: InfoStandRentableBotView;
-    private readonly _jukeboxView: InfoStandJukeboxView;
     private readonly _crackableFurniView: InfoStandCrackableFurniView;
-    private readonly _songDiskView: InfoStandSongDiskView;
 
     private readonly _userData: InfoStandUserData;
     private readonly _furniData: InfoStandFurniData;
@@ -95,6 +89,8 @@ export class InfoStandWidget extends RoomWidgetBase
     // AS3: .../src/com/sulake/habbo/ui/widget/infostand/InfoStandWidget.as::_config
     private readonly _config: IHabboConfigurationManager | null;
 
+    // DEVIATION: AS3 also builds the jukebox and song-disk views (`infostand_jukebox_view`,
+    //   `infostand_songdisk_view`); the RPG fork removed jukebox music.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandWidget.as::InfoStandWidget()
     constructor(
         handler: IRoomWidgetHandler,
@@ -113,9 +109,7 @@ export class InfoStandWidget extends RoomWidgetBase
         this._petView = new InfoStandPetView(this, InfoStandWidget.VIEW_NAME.PET, catalog);
         this._botView = new InfoStandBotView(this, InfoStandWidget.VIEW_NAME.BOT);
         this._rentableBotView = new InfoStandRentableBotView(this, InfoStandWidget.VIEW_NAME.RENTABLE_BOT);
-        this._jukeboxView = new InfoStandJukeboxView(this, InfoStandWidget.VIEW_NAME.JUKEBOX, catalog);
         this._crackableFurniView = new InfoStandCrackableFurniView(this, InfoStandWidget.VIEW_NAME.CRACKABLE_FURNI, catalog);
-        this._songDiskView = new InfoStandSongDiskView(this, InfoStandWidget.VIEW_NAME.SONGDISK, catalog);
         this._userData = new InfoStandUserData();
         this._furniData = new InfoStandFurniData();
         this._petData = new InfoStandPetData();
@@ -250,9 +244,7 @@ export class InfoStandWidget extends RoomWidgetBase
         this._botView.dispose();
         this._rentableBotView.dispose();
         this._petView.dispose();
-        this._jukeboxView.dispose();
         this._crackableFurniView.dispose();
-        this._songDiskView.dispose();
         this.stopUpdateTimer();
         super.dispose();
     }
@@ -260,6 +252,8 @@ export class InfoStandWidget extends RoomWidgetBase
     // DEVIATION: AS3 also listens for OBJECT_PLACED (`onRoomObjectPlaced()`), the Builders Club
     //   place-from-infostand drop, and re-arms it through `requestItemToMover()`. The RPG fork
     //   removed the Builders Club, so both are gone.
+    // DEVIATION: AS3 also listens for the two song updates (`onSongUpdate()`); the RPG fork removed
+    //   jukebox music.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandWidget.as::registerUpdateEvents()
     public override registerUpdateEvents(dispatcher: EventEmitter): void
     {
@@ -278,13 +272,12 @@ export class InfoStandWidget extends RoomWidgetBase
         dispatcher.on(RoomWidgetPetCommandsUpdateEvent.PET_COMMANDS, this.onPetCommands);
         dispatcher.on(RoomWidgetPetCommandsUpdateEvent.OPEN_PET_TRAINING, this.onOpenPetTraining);
         dispatcher.on(RoomWidgetPetCommandsUpdateEvent.CLOSE_PET_TRAINING, this.onClosePetTraining);
-        dispatcher.on(RoomWidgetSongUpdateEvent.SONG_PLAYING_CHANGED, this.onSongUpdate);
-        dispatcher.on(RoomWidgetSongUpdateEvent.SONG_DATA_RECEIVED, this.onSongUpdate);
         dispatcher.on(RoomWidgetPetFigureUpdateEvent.PET_FIGURE_UPDATE, this.onPetFigureUpdate);
 
         super.registerUpdateEvents(dispatcher);
     }
 
+    // DEVIATION: AS3 also unregisters the two song updates; the RPG fork removed jukebox music.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandWidget.as::unregisterUpdateEvents()
     public override unregisterUpdateEvents(dispatcher: EventEmitter): void
     {
@@ -302,8 +295,6 @@ export class InfoStandWidget extends RoomWidgetBase
         dispatcher.off(RoomWidgetPetCommandsUpdateEvent.PET_COMMANDS, this.onPetCommands);
         dispatcher.off(RoomWidgetPetCommandsUpdateEvent.OPEN_PET_TRAINING, this.onOpenPetTraining);
         dispatcher.off(RoomWidgetPetCommandsUpdateEvent.CLOSE_PET_TRAINING, this.onClosePetTraining);
-        dispatcher.off(RoomWidgetSongUpdateEvent.SONG_PLAYING_CHANGED, this.onSongUpdate);
-        dispatcher.off(RoomWidgetSongUpdateEvent.SONG_DATA_RECEIVED, this.onSongUpdate);
         dispatcher.off(RoomWidgetPetFigureUpdateEvent.PET_FIGURE_UPDATE, this.onPetFigureUpdate);
     }
 
@@ -518,22 +509,14 @@ export class InfoStandWidget extends RoomWidgetBase
         this.stopUpdateTimer();
     };
 
+    // DEVIATION: AS3 first routes RWEIEP_JUKEBOX / RWEIEP_SONGDISK* to the jukebox and song-disk
+    //   views; the RPG fork removed jukebox music, so those furni fall through to the furni view.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandWidget.as::onFurniInfo()
     private onFurniInfo = (event: RoomWidgetFurniInfoUpdateEvent): void =>
     {
         this._furniData.setData(event);
 
-        if(event.extraParam === RoomWidgetInfostandExtraParamEnum.INFOSTAND_EXTRAPARAM_JUKEBOX)
-        {
-            this._jukeboxView.update(event);
-            this.selectView(InfoStandWidget.VIEW_NAME.JUKEBOX);
-        }
-        else if(event.extraParam.indexOf(RoomWidgetInfostandExtraParamEnum.INFOSTAND_EXTRAPARAM_SONGDISK) !== -1)
-        {
-            this._songDiskView.update(event);
-            this.selectView(InfoStandWidget.VIEW_NAME.SONGDISK);
-        }
-        else if(event.extraParam.indexOf(RoomWidgetInfostandExtraParamEnum.INFOSTAND_EXTRAPARAM_CRACKABLE_FURNI) !== -1)
+        if(event.extraParam.indexOf(RoomWidgetInfostandExtraParamEnum.INFOSTAND_EXTRAPARAM_CRACKABLE_FURNI) !== -1)
         {
             this._crackableFurniView.update(event);
             this.selectView(InfoStandWidget.VIEW_NAME.CRACKABLE_FURNI);
@@ -731,14 +714,6 @@ export class InfoStandWidget extends RoomWidgetBase
         {
             this.close();
         }
-    };
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandWidget.as::onSongUpdate()
-    // Both views are told unconditionally; each ignores an id that is not the song it is showing.
-    private onSongUpdate = (event: RoomWidgetSongUpdateEvent): void =>
-    {
-        this._jukeboxView.updateSongInfo(event);
-        this._songDiskView.updateSongInfo(event);
     };
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandWidget.as::close()

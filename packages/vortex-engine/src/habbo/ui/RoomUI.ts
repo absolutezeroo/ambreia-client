@@ -86,7 +86,6 @@ import {RoomEngineToWidgetEvent} from '@habbo/room/events/RoomEngineToWidgetEven
 import {RoomEngineUseProductEvent} from '@habbo/room/events/RoomEngineUseProductEvent';
 import {RoomEngineRoomAdEvent} from '@habbo/room/events/RoomEngineRoomAdEvent';
 import {RoomEngineAreaHideStateWidgetEvent} from '@habbo/room/events/RoomEngineAreaHideStateWidgetEvent';
-import {RoomEngineSoundMachineEvent} from '@habbo/room/events/RoomEngineSoundMachineEvent';
 import {RoomEngineRoomColorEvent} from '@habbo/room/events/RoomEngineRoomColorEvent';
 import {RoomEngineZoomEvent} from '@habbo/room/events/RoomEngineZoomEvent';
 import {RoomEngineDimmerStateEvent} from '@habbo/room/events/RoomEngineDimmerStateEvent';
@@ -174,11 +173,13 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
      * emitter with no throw and no log. It was hand-written and had drifted to 15 of AS3's 43
      * entries, which left eleven engine→widget routes dead while every other file involved looked
      * correctly wired — clothing change (the fball_gate report), presents, the dimmer, the
-     * mannequin, area hide, room link, internal link, the high-score display, the playlist
-     * editor's jukebox-dispose, the friend-furni engraving and REOE_PLACED. Keep it a transcription
-     * of the AS3 table, not a list of what is currently consumed: a handler's
-     * `getProcessedEvents()` can only be honoured for a type that arrives here first.
+     * mannequin, area hide, room link, internal link, the high-score display, the friend-furni
+     * engraving and REOE_PLACED. Keep it a transcription of the AS3 table, not a list of what is
+     * currently consumed: a handler's `getProcessedEvents()` can only be honoured for a type that
+     * arrives here first.
      */
+    // DEVIATION: AS3's table also carries RETWE_REQUEST_PLAYLIST_EDITOR and the jukebox-dispose
+    //   room event; the RPG fork removed jukebox music.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomUI.as::get dependencies()
     private static readonly ROOM_OBJECT_ENGINE_EVENTS: readonly string[] = [
         RoomEngineObjectEvent.REOE_SELECTED,
@@ -213,7 +214,6 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
         RoomEngineRoomAdEvent.TOOLTIP_HIDE,
         RoomEngineToWidgetEvent.REMOVE_DIMMER,
         RoomEngineToWidgetEvent.REQUEST_CLOTHING_CHANGE,
-        RoomEngineToWidgetEvent.REQUEST_PLAYLIST_EDITOR,
         RoomEngineToWidgetEvent.REQUEST_MANNEQUIN,
         RoomEngineToWidgetEvent.REQUEST_BACKGROUND_COLOR,
         RoomEngineToWidgetEvent.REQUEST_AREA_HIDE,
@@ -223,7 +223,6 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
         // bubbles.
         RoomEngineUseProductEvent.USE_PRODUCT_FROM_INVENTORY,
         RoomEngineUseProductEvent.USE_PRODUCT_FROM_ROOM,
-        RoomEngineSoundMachineEvent.JUKEBOX_DISPOSE,
         RoomEngineToWidgetEvent.REQUEST_ACHIEVEMENT_RESOLUTION_ENGRAVING,
         RoomEngineToWidgetEvent.REQUEST_BADGE_DISPLAY_ENGRAVING,
         RoomEngineToWidgetEvent.REQUEST_ACHIEVEMENT_RESOLUTION_FAILED,
@@ -1304,6 +1303,8 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
     /**
      * Handles major room engine events (initialized, disposed, color, zoom).
      */
+    // DEVIATION: AS3 also creates RWE_PLAYLIST_EDITOR_WIDGET, the photo camera and the
+    //   room-thumbnail camera on REE_INITIALIZED; the RPG fork removed jukebox music and photos.
     // AS3: .../src/com/sulake/habbo/ui/RoomUI.as::roomEventHandler()
     private roomEventHandler(event: RoomEngineEvent): void 
     {
@@ -1381,8 +1382,7 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
                     desktop.createWidget('RWE_FRIEND_FURNI_CONFIRM');
                     // AS3: RoomUI.as:968
                     desktop.createWidget('RWE_CUSTOM_STACK_HEIGHT');
-                    // AS3: RoomUI.as:976 — the "set this shot as the room thumbnail" camera.
-                    desktop.createWidget('RWE_ROOM_THUMBNAIL_CAMERA');
+
                     desktop.createWidget('RWE_ROOM_LINK');
                     // AS3: RoomUI.as:978 — the crafting table.
                     desktop.createWidget('RWE_CRAFTING');
@@ -1405,10 +1405,7 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
                     // AS3: RoomUI.as:957 — "what furniture is in this room".
                     desktop.createWidget('RWE_FURNI_CHOOSER');
                     desktop.createWidget('RWE_USER_CHOOSER');
-                    // AS3: RoomUI.as:959 — the Trax playlist editor.
-                    desktop.createWidget('RWE_PLAYLIST_EDITOR_WIDGET');
-                    // AS3: RoomUI.as:962 — the in-room photo camera.
-                    desktop.createWidget('RWE_CAMERA');
+
                     // AS3: RoomUI.as:967 — no window of its own; the handler follows the link the
                     // clicked furni carries.
                     desktop.createWidget('RWE_INTERNAL_LINK');

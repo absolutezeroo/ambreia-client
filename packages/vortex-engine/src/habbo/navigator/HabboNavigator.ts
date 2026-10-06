@@ -700,12 +700,6 @@ export class HabboNavigator extends Component implements IHabboNavigator, ILinkE
         return this._newNavigator?.legacyWrapper?.roomInfoViewCtrl ?? null;
     }
 
-    // AS3: .../src/com/sulake/habbo/navigator/HabboNavigator.as::canRateRoom()
-    canRateRoom(): boolean 
-    {
-        return this._data.canRate;
-    }
-
     // AS3: .../src/com/sulake/habbo/navigator/HabboNavigator.as::isRoomFavorite()
     isRoomFavorite(roomId: number): boolean 
     {

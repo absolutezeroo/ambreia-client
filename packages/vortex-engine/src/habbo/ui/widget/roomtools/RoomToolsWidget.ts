@@ -15,13 +15,11 @@ import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 import type {IAssetLibrary} from '@core/assets/IAssetLibrary';
 import type {RoomUI} from '@habbo/ui/RoomUI';
 import type {GuestRoomData} from '@habbo/communication/messages/incoming/navigator/GuestRoomData';
-import {StringUtil} from '@habbo/utils/StringUtil';
 import type {RoomToolsWidgetHandler} from '@habbo/ui/handler/RoomToolsWidgetHandler';
 import type {IHabboFreeFlowChat} from '@habbo/freeflowchat/IHabboFreeFlowChat';
 import {RoomToolsInfoCtrl} from './RoomToolsInfoCtrl';
 import {RoomToolsToolbarCtrl} from './RoomToolsToolbarCtrl';
 import {RoomVisitHistory} from './RoomVisitHistory';
-import {PerkType} from '../../../communication/enum/PerkType';
 
 export class RoomToolsWidget extends RoomWidgetBase
 {
@@ -51,13 +49,12 @@ export class RoomToolsWidget extends RoomWidgetBase
         this._toolbarCtrl.updateRoomHistoryButtons();
         this._toolbarCtrl.setChatHistoryButton(this._freeFlowChat !== null);
 
-        const cameraLaunchPosition = roomUI.getProperty('camera.launch.ui.position');
-
-        this._toolbarCtrl.setCameraButton(
-            (this.handler.sessionDataManager?.isPerkAllowed(PerkType.CAMERA) ?? false)
-			&& (StringUtil.isBlank(cameraLaunchPosition) || cameraLaunchPosition === 'room-menu')
-        );
-        this._toolbarCtrl.setLikeButton(this.handler.canRate);
+        // AS3 shows the camera button for the CAMERA perk when the camera launches from the room
+        // menu; the RPG fork removed photos. The button is still in the shipped layout.
+        this._toolbarCtrl.setCameraButton(false);
+        // AS3 shows the like button while the navigator says the room can be rated; the RPG fork
+        // removed room voting. The button is still in the shipped layout.
+        this._toolbarCtrl.setLikeButton(false);
 
         // AS3 shows this button when the room's wired has achievements (`roomEvents.achievementsInRoom`)
         // and follows its updates. The RPG fork removed wired, so there are never any.
@@ -96,12 +93,12 @@ export class RoomToolsWidget extends RoomWidgetBase
         RoomToolsWidget.ROOM_VISIT_HISTORY.updateRoomName(data.flatId, data.roomName);
     }
 
+    // DEVIATION: AS3 also refreshes the like button from the navigator's `canRate`; the RPG fork
+    //   removed room voting, so it stays hidden.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/roomtools/RoomToolsWidget.as::storeRoomData()
     public storeRoomData(data: GuestRoomData): void
     {
         RoomToolsWidget.ROOM_VISIT_HISTORY.onRoomEntered(data.flatId, data.roomName);
-
-        this._toolbarCtrl?.setLikeButton(this.handler.canRate);
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/roomtools/RoomToolsWidget.as::showRoomInfo()

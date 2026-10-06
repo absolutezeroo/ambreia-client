@@ -712,35 +712,24 @@ export class HabboToolbar extends Component implements IHabboToolbar
 	 * engine, NAVIGATOR/ROOMINFO/HOME the navigator, INVENTORY the inventory, MEMENU the
 	 * me-menu controller, and the landing view listens for its own.
 	 *
-	 * CAMERA is the one icon that does not emit a click at all: AS3 raises `CAMERA_TOGGLE`
-	 * instead, carrying where the camera was launched from, because the camera is opened by the
-	 * room UI rather than by a window-owning module.
-	 *
+
 	 * Icons whose module does not exist at all — GUIDE, STORIES, RECEPTION — still emit; nothing
 	 * listens, which is also what happens in AS3 on a hotel where those features are off.
 	 *
 	 * @param iconName Icon name to toggle
 	 * @see source_as_win63/habbo/toolbar/HabboToolbar.as toggleWindowVisibility()
 	 */
+    // DEVIATION: AS3 raises CAMERA_TOGGLE instead of a click for the CAMERA icon; the RPG fork
+    //   removed photos (and hides that icon), so every icon emits a click.
     // AS3: .../src/com/sulake/habbo/toolbar/HabboToolbar.as::toggleWindowVisibility()
     toggleWindowVisibility(iconName: string): void
     {
         const iconId = (HabboToolbarIconEnum as unknown as Record<string, string>)[iconName];
+        const clickEvent = new HabboToolbarEvent(HabboToolbarEvent.TOOLBAR_CLICK);
 
-        if(iconId === HabboToolbarIconEnum.CAMERA)
-        {
-            const cameraEvent = new HabboToolbarEvent(HabboToolbarEvent.CAMERA_TOGGLE);
-            cameraEvent.iconName = HabboToolbarEvent.CAMERA_LAUNCH_ORIGIN_TOOLBAR;
-
-            this._toolbarEvents.emit(HabboToolbarEvent.CAMERA_TOGGLE, cameraEvent);
-        }
-        else
-        {
-            const clickEvent = new HabboToolbarEvent(HabboToolbarEvent.TOOLBAR_CLICK);
-            clickEvent.iconId = iconId;
-            clickEvent.iconName = iconName;
-            this._toolbarEvents.emit(HabboToolbarEvent.TOOLBAR_CLICK, clickEvent);
-        }
+        clickEvent.iconId = iconId;
+        clickEvent.iconName = iconName;
+        this._toolbarEvents.emit(HabboToolbarEvent.TOOLBAR_CLICK, clickEvent);
 
         // Send tracking event
         if(this._communication?.connection)

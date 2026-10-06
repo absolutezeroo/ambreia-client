@@ -85,6 +85,8 @@ export class SoundSettingsView
     }
 
     /** Every direct child gets the click handler; only `back_btn` does anything with it. */
+    // DEVIATION: AS3 shows the `trax_volume_container` row; the RPG fork removed jukebox music, so
+    //   the row is hidden until Task 10 drops it from the layout.
     // AS3: .../SoundSettingsView.as::createWindow()
     private createWindow(): void
     {
@@ -111,6 +113,8 @@ export class SoundSettingsView
         this._uiVolumeItem = new SoundSettingsItem(this, SoundSettingsItem.TYPE_UI_VOLUME, this.uiVolumeContainer);
         this._furniVolumeItem = new SoundSettingsItem(this, SoundSettingsItem.TYPE_FURNI_VOLUME, this.furniVolumeContainer);
         this._traxVolumeItem = new SoundSettingsItem(this, SoundSettingsItem.TYPE_TRAX_VOLUME, this.traxVolumeContainer);
+
+        if(this.traxVolumeContainer) this.traxVolumeContainer.visible = false;
 
         this.updateSettings();
     }
