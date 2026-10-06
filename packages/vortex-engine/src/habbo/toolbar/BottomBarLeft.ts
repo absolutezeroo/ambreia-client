@@ -275,20 +275,6 @@ export class BottomBarLeft implements ILinkEventTracker
         this._unseenDailyTasksCount = value;
     }
 
-    // AS3: .../src/com/sulake/habbo/toolbar/BottomBarLeft.as::_SafeStr_9944
-    private _unseenRewardTrackRewardsCount: number = 0;
-
-    /**
-     * Raised by `qe_urtrcue`, which `RewardTrackController` dispatches whenever the number of
-     * unclaimed rewards changes. `unseenProgMenuCount` below sums this with achievements and daily
-     * tasks into the single badge the progression icon carries.
-     */
-    // AS3: .../src/com/sulake/habbo/toolbar/BottomBarLeft.as::set unseenRewardTrackRewardsCount()
-    set unseenRewardTrackRewardsCount(value: number)
-    {
-        this._unseenRewardTrackRewardsCount = value;
-    }
-
     private _unseenMiniMailMessageCount: number = 0;
 
     /**
@@ -339,15 +325,16 @@ export class BottomBarLeft implements ILinkEventTracker
     }
 
     /**
-     * The progression icon's badge: achievements + daily tasks + reward track.
+     * The progression icon's badge: achievements + daily tasks.
      *
      * The achievement count is summed into **both** this and `unseenMeMenuCount` above, so a new
      * achievement badges two icons at once. That is AS3's, not a duplication slip.
      */
+    // DEVIATION: AS3 also adds the unseen reward-track rewards; the RPG fork removed the Reward track.
     // AS3: .../src/com/sulake/habbo/toolbar/BottomBarLeft.as::get unseenProgMenuCount()
     get unseenProgMenuCount(): number
     {
-        return this._unseenAchievementCount + this._unseenDailyTasksCount + this._unseenRewardTrackRewardsCount;
+        return this._unseenAchievementCount + this._unseenDailyTasksCount;
     }
 
     /**

@@ -4,8 +4,6 @@ import {CollectiblesController} from './collectibles/CollectiblesController';
 import {IID_CollectiblesController} from '@iid/IIDCollectiblesController';
 import {EarningsController} from './earnings/EarningsController';
 import {IID_VaultController} from '@iid/IIDVaultController';
-import {HabbiconController} from './habbicons/HabbiconController';
-import {IID_HabbiconController} from '@iid/IIDHabbiconController';
 import {Logger} from '@core/utils/Logger';
 import type {IConnection} from '@core/communication/connection/IConnection';
 import type {IAssetLibrary} from '@core/assets/IAssetLibrary';
@@ -419,9 +417,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         this._collectorHub = new CollectiblesController(context, 0, assetLibrary);
         context.attachComponent(this._collectorHub, [IID_CollectiblesController]);
 
-        this._habbiconController = new HabbiconController(context, 0, assetLibrary);
-        context.attachComponent(this._habbiconController, [IID_HabbiconController]);
-
         // AS3 attaches this from the same constructor (HabboCatalog.as:455). It registers a link
         // tracker for `special_items_display/<set>` and builds nothing until one arrives.
         this._specialItemsController = new SpecialItemsController(context, 0, assetLibrary);
@@ -430,9 +425,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::_SafeStr_8506
     private _specialItemsController: SpecialItemsController | null = null;
-
-    // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::_habbiconController
-    private _habbiconController: HabbiconController | null = null;
 
     // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::_SafeStr_8735 (name derived: the vault)
     private _earningsController: EarningsController | null = null;
@@ -1736,6 +1728,8 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
      * The gifting and LTD-raffle sub-flows are still missing from the dialog itself — see its own
      * file header.
      */
+    // DEVIATION: AS3 first refuses an already-owned habbicon offer (`isHabbiconOfferOwned()` →
+    //   `showHabbiconAlreadyOwnedAlert()`); the RPG fork removed Habbicons.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::showPurchaseConfirmation()
     showPurchaseConfirmation(
         offer: IPurchasableOffer,
@@ -1759,14 +1753,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         }
 
         log.debug(`buy: ${[quantity, offer.offerId, extraParam]}`);
-
-        // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::showPurchaseConfirmation()
-        if(this.isHabbiconOfferOwned(offer))
-        {
-            this.showHabbiconAlreadyOwnedAlert();
-
-            return;
-        }
 
         // The balance is tested against what the user is about to spend, not the
         // unit price: buying 10 of a 5-credit offer costs 50. AS3 recomputes both
@@ -2450,7 +2436,7 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
      * Five independent gates, all of which AS3 packs into one expression: the config flag, being in
      * a room at all, the page allowing drags, having the rights to place here (room ownership, or
      * group-room rights), and the offer being a single placeable object — bundles, multi-offers,
-     * effects (`e`) and Habbicons (`h`) are not draggable.
+     * effects (`e`) and club (`h`) offers are not draggable.
      */
     // DEVIATION: AS3 also accepts a BUILDERS_CLUB catalog whose Builders Club placement status allows
     //   it. The RPG fork removed the Builders Club, so only the NORMAL rights test remains.
@@ -2757,47 +2743,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         );
     }
 
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::showHabbiconAlreadyOwnedAlert()
-    public showHabbiconAlreadyOwnedAlert(): void
-    {
-        this._windowManager?.alert(
-            '${catalog.alert.purchaseerror.title}',
-            '${habbicon.catalog.already_owned}',
-            0,
-            this.alertDialogEventProcessor
-        );
-    }
-
-    /**
-	 * A habbicon offer carries the habbicon id in `extraParam` — as a string, hence the parse.
-	 */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::isHabbiconOfferOwned()
-    public isHabbiconOfferOwned(offer: IPurchasableOffer | null): boolean
-    {
-        if(!this.getBoolean('habbicons.enabled')
-            || offer === null
-            || offer.product === null
-            || offer.product.productType !== 'habbicon'
-            || this._habbiconController === null)
-        {
-            return false;
-        }
-
-        return this.isHabbiconOwned(parseInt(offer.product.extraParam, 10) || 0);
-    }
-
-    /**
-	 * "Owned" here means the controller has *an entry* for it, whatever its state — a claimable
-	 * reward counts, which is what stops the catalog offering it for sale a second time.
-	 */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::isHabbiconOwned()
-    public isHabbiconOwned(id: number): boolean
-    {
-        if(!this.getBoolean('habbicons.enabled') || this._habbiconController === null) return false;
-
-        return this._habbiconController.tryGetOwnedHabbicon(id) !== null;
-    }
-
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::showNotEnoughActivityPointsAlert()
     public showNotEnoughActivityPointsAlert(activityPointType: number): void
     {
@@ -2865,6 +2810,8 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         return 'catalog/';
     }
 
+    // DEVIATION: AS3 also forwards `catalog/habbicons` to `habbicons/open` when `habbicons.enabled`;
+    //   the RPG fork removed Habbicons, so that link now falls to the unknown-type warning.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::linkReceived()
     public linkReceived(link: string): void
     {
@@ -2891,14 +2838,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
 
             case 'club_buy':
                 this.openClubCenter();
-
-                break;
-
-            case 'habbicons':
-                if(this.getBoolean('habbicons.enabled'))
-                {
-                    this.context.createLinkEvent('habbicons/open');
-                }
 
                 break;
 

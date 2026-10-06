@@ -91,7 +91,6 @@ import {RoomObjectAvatarPlayerValueUpdateMessage} from './messages/RoomObjectAva
 import {RoomObjectAvatarExpressionUpdateMessage} from './messages/RoomObjectAvatarExpressionUpdateMessage';
 import {RoomObjectAvatarPlayingGameMessage} from './messages/RoomObjectAvatarPlayingGameMessage';
 import {RoomObjectAvatarGuideStatusUpdateMessage} from './messages/RoomObjectAvatarGuideStatusUpdateMessage';
-import {RoomObjectAvatarHabbiconUpdateMessage} from './messages/RoomObjectAvatarHabbiconUpdateMessage';
 import {RoomObjectAvatarCarryObjectUpdateMessage} from './messages/RoomObjectAvatarCarryObjectUpdateMessage';
 import {RoomObjectAvatarSignUpdateMessage} from './messages/RoomObjectAvatarSignUpdateMessage';
 import {RoomObjectAvatarOwnMessage} from './messages/RoomObjectAvatarOwnMessage';
@@ -5373,6 +5372,8 @@ export class RoomEngine extends Component implements IRoomEngine,
      * carry-object branch never armed its own timers; and `userIsBlocked()` was not consulted at
      * all. The 13 messages below are all ported and all handled by `AvatarLogic.processUpdateMessage()`.
      */
+    // DEVIATION: AS3 also maps `figure_habbicon` to the habbicon update message; the RPG fork removed
+    //   Habbicons, so that action now takes the no-message warning.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::updateObjectUserAction()
     updateObjectUserAction(
         roomId: number,
@@ -5439,9 +5440,6 @@ export class RoomEngine extends Component implements IRoomEngine,
                 break;
             case RoomObjectVariableEnum.AVATAR_GUIDE_STATUS:
                 message = new RoomObjectAvatarGuideStatusUpdateMessage(value);
-                break;
-            case RoomObjectVariableEnum.AVATAR_HABBICON:
-                message = new RoomObjectAvatarHabbiconUpdateMessage(value);
                 break;
             default:
                 log.warn(`updateObjectUserAction: no update message for "${action}"`);

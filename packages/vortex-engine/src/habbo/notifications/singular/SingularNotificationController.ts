@@ -467,6 +467,10 @@ export class SingularNotificationController implements IUpdateReceiver
 	 * An unconfigured or malformed condition is visible — the active-list property is the opt-in,
 	 * the condition only narrows it. `reward_track_incomplete` is the only kind AS3 implements.
 	 */
+    // DEVIATION: AS3 answers `reward_track_incomplete` from the reward-track controller (UNAVAILABLE
+    //   while the track is unknown, which retries, then HIDDEN or VISIBLE). The RPG fork removed the
+    //   Reward track, so no track can ever arrive and the condition answers HIDDEN at once — the same
+    //   end result as AS3 exhausting its retries, without the timers.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/notifications/singular/SingularNotificationController.as::getNewFeatureConditionState()
     private getNewFeatureConditionState(key: string): number
     {
@@ -480,16 +484,7 @@ export class SingularNotificationController implements IUpdateReceiver
 
         if(parts[0] === SingularNotificationController.NEW_FEATURE_CONDITION_REWARD_TRACK_INCOMPLETE)
         {
-            const rewardTrack = this._notifications?.rewardTrack ?? null;
-
-            if(rewardTrack === null || !rewardTrack.hasRewardTrack(parts[1]))
-            {
-                return SingularNotificationController.NEW_FEATURE_CONDITION_STATE_UNAVAILABLE;
-            }
-
-            return rewardTrack.isRewardTrackComplete(parts[1])
-                ? SingularNotificationController.NEW_FEATURE_CONDITION_STATE_HIDDEN
-                : SingularNotificationController.NEW_FEATURE_CONDITION_STATE_VISIBLE;
+            return SingularNotificationController.NEW_FEATURE_CONDITION_STATE_HIDDEN;
         }
 
         return SingularNotificationController.NEW_FEATURE_CONDITION_STATE_VISIBLE;

@@ -13,10 +13,6 @@ import type {IIlluminaInputHandler} from '@habbo/window/widgets/IIlluminaInputHa
 import type {IAvatarImageWidget} from '@habbo/window/widgets/IAvatarImageWidget';
 import type {IBadgeImageWidget} from '@habbo/window/widgets/IBadgeImageWidget';
 import {ChatBubbleMessage} from '@habbo/window/widgets/ChatBubbleMessage';
-import {MessengerHabbiconPicker} from './habbicons/MessengerHabbiconPicker';
-import {
-    SendHabbiconMessageComposer
-} from '@habbo/communication/messages/outgoing/habbicons/SendHabbiconMessageComposer';
 
 import {
     FollowFriendMessageComposer
@@ -122,6 +118,8 @@ export class MainView implements IDisposable, IIlluminaInputHandler
         [14, '${messenger.error.recipient_im_unavailable}']
     ]);
 
+    // DEVIATION: AS3 shows the `habbicon_button` that opens the habbicon picker; the RPG fork
+    //   removed Habbicons, so the button is hidden.
     // AS3: .../messenger/MainView.as::MainView()
     constructor(messenger: HabboMessenger)
     {
@@ -150,6 +148,12 @@ export class MainView implements IDisposable, IIlluminaInputHandler
 
             return;
         }
+
+        // The RPG fork removed Habbicons; the layout still ships the picker's button until Task 10
+        // of the M0 cleanup takes it out of the zip.
+        const habbiconButton = frame.findChildByName('habbicon_button');
+
+        if(habbiconButton !== null) habbiconButton.visible = false;
 
         const close = frame.findChildByName('header_button_close');
 
@@ -260,9 +264,6 @@ export class MainView implements IDisposable, IIlluminaInputHandler
     /** Client-side id stamped on an outgoing message until the server echoes it back. */
     // AS3: .../messenger/MainView.as::_SafeStr_6222
     private _nextClientMessageId: number = 1;
-
-    // AS3: .../messenger/MainView.as::_SafeStr_4825 (the habbicon picker; derived name)
-    private _habbiconPicker: MessengerHabbiconPicker | null = null;
 
     // AS3: .../messenger/MainView.as::_awaitConfirmationEntries
     private _awaitConfirmationEntries: Map<number, ChatEntry> = new Map<number, ChatEntry>();
@@ -388,21 +389,21 @@ export class MainView implements IDisposable, IIlluminaInputHandler
         }
     }
 
+    // DEVIATION: AS3 also hides the habbicon picker; the RPG fork removed Habbicons.
     // AS3: .../messenger/MainView.as::hide()
     hide(): void
     {
-        this.hideHabbiconPicker();
-
         if(this._window !== null)
         {
             (this._window as unknown as IWindow).visible = false;
         }
     }
 
+    // DEVIATION: AS3 hides the habbicon picker here, the only transient selector the messenger
+    //   has; the RPG fork removed Habbicons, so nothing is left to hide.
     // AS3: .../messenger/MainView.as::hideTransientSelectors()
     hideTransientSelectors(): void
     {
-        this.hideHabbiconPicker();
     }
 
     /**
@@ -1614,6 +1615,8 @@ export class MainView implements IDisposable, IIlluminaInputHandler
         return false;
     }
 
+    // DEVIATION: AS3 also handles WME_CLICK_AWAY, to close the habbicon picker; the RPG fork
+    //   removed Habbicons.
     // AS3: .../messenger/MainView.as::messengerWindowProcedure()
     private _windowProcedure = (event: WindowEvent, window: IWindow): void =>
     {
@@ -1641,20 +1644,14 @@ export class MainView implements IDisposable, IIlluminaInputHandler
             case 'WME_CLICK':
                 this.onWindowClick(window);
                 break;
-
-            case 'WME_CLICK_AWAY':
-                this.hideHabbiconPickerIfOutside(event.related ?? null);
-                break;
         }
     };
 
+    // DEVIATION: AS3 also toggles the habbicon picker on `habbicon_button` and closes it on any
+    //   other click; the RPG fork removed Habbicons.
     // AS3: .../messenger/MainView.as::messengerWindowProcedure() (WME_CLICK branch)
     private onWindowClick(window: IWindow): void
     {
-        // AS3 tracks whether the click was one that should also dismiss the habbicon
-        // picker; only the picker's own button opts out.
-        let dismissesPicker = true;
-
         switch(window.name)
         {
             case 'avatar_click_region':
@@ -1695,19 +1692,9 @@ export class MainView implements IDisposable, IIlluminaInputHandler
                 this._messenger?.reportUser(this._selectedChatId);
                 break;
 
-            case 'habbicon_button':
-                this.toggleHabbiconPicker();
-                dismissesPicker = false;
-                break;
-
             case 'header_button_close':
                 this.hide();
                 break;
-        }
-
-        if(dismissesPicker)
-        {
-            this.hideHabbiconPickerIfOutside(window);
         }
     }
 
@@ -1772,162 +1759,11 @@ export class MainView implements IDisposable, IIlluminaInputHandler
         }
     }
 
-    /** The habbicon button, used both as a click target and as an anchor for the picker. */
-    // AS3: .../messenger/MainView.as::get habbiconButton()
-    private get habbiconButton(): IWindow | null
-    {
-        return this._frame?.findChildByName('habbicon_button') ?? null;
-    }
-
     // AS3: .../messenger/MainView.as::get inputWidget()
     private get inputWidget(): IWidgetWindow | null
     {
         return this._frame?.findChildByName('input_widget') as IWidgetWindow | null ?? null;
     }
-
-    /**
-     * Opens or closes the habbicon picker. Positioning only happens on the way open, because the
-     * anchor is measured against the current window geometry.
-     */
-    // AS3: .../messenger/MainView.as::toggleHabbiconPicker()
-    private toggleHabbiconPicker(): void
-    {
-        this.ensureHabbiconPicker();
-
-        if(this._habbiconPicker === null) return;
-
-        if(this._habbiconPicker.visible)
-        {
-            this._habbiconPicker.hide();
-
-            return;
-        }
-
-        this._habbiconPicker.show();
-        this.positionHabbiconPicker();
-    }
-
-    /**
-     * Built on first use, not with the console: the picker reads the whole owned/shop set out of
-     * the habbicon controller, and there is no reason to pay for that until the button is pressed.
-     */
-    // AS3: .../messenger/MainView.as::ensureHabbiconPicker()
-    private ensureHabbiconPicker(): void
-    {
-        if(this._habbiconPicker !== null || this._messenger === null || this._window === null) return;
-
-        const window = this._messenger.getXmlWindow('messenger_habbicon_picker') as IWindowContainer | null;
-
-        if(window === null)
-        {
-            log.warn('ensureHabbiconPicker: the "messenger_habbicon_picker" layout is missing - the button does nothing.');
-
-            return;
-        }
-
-        this._window.addChild(window);
-
-        this._habbiconPicker = new MessengerHabbiconPicker(
-            window,
-            this._messenger.habbiconController,
-            this._messenger.localization,
-            this._messenger.windowManager,
-            this.onHabbiconSelected
-        );
-    }
-
-    /**
-     * Left-aligned with the habbicon button, sitting just above the input row — both measured
-     * globally and then rebased onto the console window, which is the picker's parent.
-     */
-    // AS3: .../messenger/MainView.as::positionHabbiconPicker()
-    private positionHabbiconPicker(): void
-    {
-        const picker = this._habbiconPicker;
-        const button = this.habbiconButton;
-        const input = this.inputWidget;
-
-        if(picker === null || picker.window === null || button === null || input === null
-            || this._window === null)
-        {
-            return;
-        }
-
-        // AS3 allocates a `flash.geom.Rectangle`/`Point`; this port's `getGlobalRectangle()` takes
-        // a structural out-param, as `HabbiconPopupController` does.
-        const buttonRect = {x: 0, y: 0, width: 0, height: 0};
-        const inputRect = {x: 0, y: 0, width: 0, height: 0};
-        const origin = {x: 0, y: 0};
-
-        button.getGlobalRectangle(buttonRect);
-        (input as unknown as IWindow).getGlobalRectangle(inputRect);
-        this._window.getGlobalPosition(origin);
-
-        picker.setPosition(
-            buttonRect.x - origin.x,
-            inputRect.y - origin.y - picker.window.height - 4
-        );
-    }
-
-    /**
-     * Hides the picker if it is showing.
-     */
-    // AS3: .../messenger/MainView.as::hideHabbiconPicker()
-    private hideHabbiconPicker(): void
-    {
-        this._habbiconPicker?.hide();
-    }
-
-    /**
-     * Hides the picker when a click lands outside both it and its button. The button is excluded
-     * so that a click on it reaches `toggleHabbiconPicker()` as a toggle rather than being eaten
-     * as a dismiss and immediately reopened.
-     */
-    // AS3: .../messenger/MainView.as::hideHabbiconPickerIfOutside()
-    private hideHabbiconPickerIfOutside(window: IWindow | null): void
-    {
-        if(this._habbiconPicker !== null && this._habbiconPicker.visible
-            && !MainView.isWindowInTree(window, this.habbiconButton)
-            && !this._habbiconPicker.containsWindow(window))
-        {
-            this._habbiconPicker.hide();
-        }
-    }
-
-    /**
-     * A picked habbicon travels the same road as a typed message: composer, optimistic local
-     * record under a client id, send sound if the conversation was empty. The extra step is
-     * `noteHabbiconUsed()`, which is what feeds the picker's "recently used" band.
-     */
-    // AS3: .../messenger/MainView.as::onHabbiconSelected()
-    private onHabbiconSelected = (habbiconId: number, _keepOpen: boolean): void =>
-    {
-        if(this._selectedChatId === -1 || habbiconId <= 0 || this._messenger === null) return;
-
-        const clientMessageId = this._nextClientMessageId;
-
-        this._nextClientMessageId += 1;
-
-        this._messenger.send(new SendHabbiconMessageComposer(this._selectedChatId, habbiconId, clientMessageId));
-
-        this.playSendSoundIfConversationIsEmpty();
-
-        const session = this._messenger.sessionDataManager;
-
-        this.recordChatMessage(
-            this._selectedChatId,
-            ChatBubbleMessage.habbicon(habbiconId),
-            false,
-            0,
-            session?.userId ?? 0,
-            session?.userName ?? '',
-            session?.figure ?? '',
-            '',
-            clientMessageId
-        );
-
-        this._messenger.habbiconController?.noteHabbiconUsed(habbiconId);
-    };
 
     // AS3: .../messenger/MainView.as::dispose()
     dispose(): void
@@ -1936,9 +1772,6 @@ export class MainView implements IDisposable, IIlluminaInputHandler
         {
             return;
         }
-
-        this._habbiconPicker?.dispose();
-        this._habbiconPicker = null;
 
         this._conversation = null;
         this._avatarList = null;

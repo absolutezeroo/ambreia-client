@@ -139,12 +139,15 @@ export class PurchaseCatalogWidget extends CatalogWidget
         return !(this._extraParamRequired && this._additionalParameters === '');
     }
 
+    // DEVIATION: AS3 also refuses an already-owned habbicon offer; the RPG fork removed Habbicons.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/viewer/widgets/PurchaseCatalogWidget.as::get canPurchaseSelectedOffer()
     private get canPurchaseSelectedOffer(): boolean
     {
-        return this.extraParamRequirementsMet && !this._catalog!.isHabbiconOfferOwned(this._offer);
+        return this.extraParamRequirementsMet;
     }
 
+    // DEVIATION: AS3 captions an already-owned habbicon offer `${generic.owned}`; the RPG fork
+    //   removed Habbicons.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/viewer/widgets/PurchaseCatalogWidget.as::updatePurchaseLabel()
     private updatePurchaseLabel(): void
     {
@@ -152,14 +155,7 @@ export class PurchaseCatalogWidget extends CatalogWidget
 
         if(label == null) return;
 
-        if(this._catalog!.isHabbiconOfferOwned(this._offer))
-        {
-            label.caption = '${generic.owned}';
-        }
-        else
-        {
-            RentUtils.updateBuyCaption(this._offer, label);
-        }
+        RentUtils.updateBuyCaption(this._offer, label);
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/viewer/widgets/PurchaseCatalogWidget.as::onSelectProduct()
@@ -256,18 +252,11 @@ export class PurchaseCatalogWidget extends CatalogWidget
         this.enableGiftButton(this._offer != null && this._offer.giftable && this.canPurchaseSelectedOffer && this._quantity === 1);
     };
 
+    // DEVIATION: AS3 first refuses an already-owned habbicon offer; the RPG fork removed Habbicons.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/viewer/widgets/PurchaseCatalogWidget.as::onPurchase()
     private onPurchase = (event: WindowMouseEvent, isGift: boolean = false): void =>
     {
         if(this._offer == null) return;
-
-        // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/viewer/widgets/PurchaseCatalogWidget.as::onPurchase()
-        if(this._catalog!.isHabbiconOfferOwned(this._offer))
-        {
-            this._catalog!.showHabbiconAlreadyOwnedAlert();
-
-            return;
-        }
 
         if(!this._catalog!.verifyClubLevel(this._offer.clubLevel))
         {
@@ -322,18 +311,12 @@ export class PurchaseCatalogWidget extends CatalogWidget
         this._catalog?.tracking?.trackEventLog('Catalog', 'click', 'client.buy_as_gift.clicked');
     };
 
+    // DEVIATION: AS3 first refuses an already-owned habbicon offer; the RPG fork removed Habbicons.
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/viewer/widgets/PurchaseCatalogWidget.as::initPurchase()
     private initPurchase = (_event: CatalogWidgetInitPurchaseEvent): void =>
     {
         if(this._offer != null)
         {
-            // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/viewer/widgets/PurchaseCatalogWidget.as::initPurchase()
-            if(this._catalog!.isHabbiconOfferOwned(this._offer))
-            {
-                this._catalog!.showHabbiconAlreadyOwnedAlert();
-
-                return;
-            }
-
             this._catalog!.showPurchaseConfirmation(this._offer, this.page.pageId, this._additionalParameters, this._quantity, this._previewStuffData, null);
         }
     };

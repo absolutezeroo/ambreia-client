@@ -2,8 +2,9 @@
  * Downscaling that halves repeatedly instead of resizing once.
  *
  * A single `drawImage` from 4x to 1x samples four source pixels per destination pixel and throws
- * the rest away; halving three times averages all sixteen. The difference is visible on habbicon
- * previews, which are drawn at 0.5x.
+ * the rest away; halving three times averages all sixteen. The difference was visible on habbicon
+ * previews, drawn at 0.5x — its only user until the RPG fork removed Habbicons; kept as the AS3
+ * utility it ports.
  *
  * **The class name is unrecoverable from any tree** — `_SafeCls_2871` in the primary, `class_2495`
  * in `win63_version`, absent from PRODUCTION. The *method* name is real in both obfuscated trees;
@@ -11,7 +12,7 @@
  *
  * `AvatarImage` carries its own private copy of the same algorithm, written before this file
  * existed. Left alone: it is private, correct, and merging the two is a refactor of the avatar
- * pipeline, not of habbicons.
+ * pipeline.
  *
  * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/utils/_SafeCls_2871.as
  */
@@ -20,7 +21,7 @@ export class BitmapDataUtils
     /**
 	 * AS3 fills the new bitmap with opaque white before drawing; on a canvas the equivalent is simply
 	 * not clearing, and `drawImage` composites over transparent black. The alpha channel survives
-	 * either way, which is what the habbicon sheets need.
+	 * either way.
 	 */
     // AS3: _SafeCls_2871.as::resizeBitmapData()
     private static resizeBitmap(source: ImageBitmap, scale: number): ImageBitmap

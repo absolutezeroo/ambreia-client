@@ -166,8 +166,7 @@ export class NewModerationTool extends Component
     /**
      * AS3 subscribes its three events in the constructor, where `addMessageEvent()` short-circuits
      * on a still-null communication manager and the subscriptions are silently lost. They are built
-     * in `initComponent()` here instead — the first point at which the manager exists — as
-     * `RewardTrackController` already does for the same reason.
+     * in `initComponent()` here instead — the first point at which the manager exists.
      */
     // AS3: _SafeCls_1981.as::_SafeCls_1981()
     constructor(context: IContext, flags: number = 0, assetLibrary: IAssetLibrary | null = null)

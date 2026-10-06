@@ -44,9 +44,6 @@ export const ProductTypeEnum = {
 
     // AS3: _SafeCls_1784.as::PRODUCT_TYPE_CHAT_STYLE
     PRODUCT_TYPE_CHAT_STYLE: 'chat_style',
-
-    // AS3: _SafeCls_1784.as::PRODUCT_TYPE_HABBICON
-    PRODUCT_TYPE_HABBICON: 'habbicon',
 } as const;
 
 export type ProductTypeEnumValue = typeof ProductTypeEnum[keyof typeof ProductTypeEnum];

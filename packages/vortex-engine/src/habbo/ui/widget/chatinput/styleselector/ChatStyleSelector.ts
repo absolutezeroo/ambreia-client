@@ -337,6 +337,8 @@ export class ChatStyleSelector implements IDisposable
         return this._chatInputView?.widget?.windowManager.buildWidgetLayout(assetName) ?? null;
     }
 
+    // DEVIATION: AS3 also hides the habbicon selector when this menu opens; the RPG fork removed
+    //   Habbicons.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/chatinput/styleselector/ChatStyleSelector.as::windowProc()
     // WIN63-202607011411-782849652 (primary source) leaves the popup open after picking a
     // style - only font-size selection, re-clicking the toggle, or a click-away close it.
@@ -364,8 +366,6 @@ export class ChatStyleSelector implements IDisposable
 
             if(menuContainer) menuContainer.visible = nextVisible;
             if(this._gridView?.window) this._gridView.window.visible = nextVisible;
-
-            if(nextVisible) this._chatInputView?.hideHabbiconSelector();
 
             this.alignMenuToSelector();
         }

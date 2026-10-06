@@ -464,49 +464,6 @@ import {
     BotSkillListUpdateEvent
 } from './messages/incoming/room/bot';
 
-import {
-    UserHabbiconsMessageEvent
-} from './messages/incoming/habbicons/UserHabbiconsMessageEvent';
-import {
-    UserHabbiconStatusChangedMessageEvent
-} from './messages/incoming/habbicons/UserHabbiconStatusChangedMessageEvent';
-import {
-    HabbiconShopDataMessageEvent
-} from './messages/incoming/habbicons/HabbiconShopDataMessageEvent';
-import {
-    HabbiconInfoMessageEvent
-} from './messages/incoming/habbicons/HabbiconInfoMessageEvent';
-import {
-    RoomUseHabbiconMessageEvent
-} from './messages/incoming/habbicons/RoomUseHabbiconMessageEvent';
-import {
-    GetHabbiconShopDataMessageComposer
-} from './messages/outgoing/habbicons/GetHabbiconShopDataMessageComposer';
-import {
-    GetHabbiconInfoMessageComposer
-} from './messages/outgoing/habbicons/GetHabbiconInfoMessageComposer';
-import {
-    BuyHabbiconMessageComposer
-} from './messages/outgoing/habbicons/BuyHabbiconMessageComposer';
-import {
-    BuyHabbiconCollectionMessageComposer
-} from './messages/outgoing/habbicons/BuyHabbiconCollectionMessageComposer';
-import {
-    ClaimHabbiconMessageComposer
-} from './messages/outgoing/habbicons/ClaimHabbiconMessageComposer';
-import {
-    FavoriteHabbiconMessageComposer
-} from './messages/outgoing/habbicons/FavoriteHabbiconMessageComposer';
-import {
-    UnfavoriteHabbiconMessageComposer
-} from './messages/outgoing/habbicons/UnfavoriteHabbiconMessageComposer';
-import {
-    SendHabbiconMessageComposer
-} from './messages/outgoing/habbicons/SendHabbiconMessageComposer';
-import {
-    TriggerHabbiconMessageComposer
-} from './messages/outgoing/habbicons/TriggerHabbiconMessageComposer';
-
 // Outgoing Composers - Youtube display furni
 import {
     GetYoutubeDisplayStatusMessageComposer
@@ -551,16 +508,6 @@ import {
 import {
     GetSeasonalCalendarDailyComposer
 } from './messages/outgoing/catalog/GetSeasonalCalendarDailyComposer';
-import {
-    ClaimRewardTrackPrizeMessageComposer,
-    PurchaseRewardTrackPremiumMessageComposer
-} from './messages/outgoing/quest';
-import {
-    RewardTrackClaimResultMessageEvent,
-    RewardTrackPremiumPurchaseResultMessageEvent,
-    RewardTrackProgressMessageEvent,
-    RewardTracksMessageEvent
-} from './messages/incoming/quest';
 import {
     SeasonalCalendarDailyOfferMessageEvent
 } from './messages/incoming/catalog/SeasonalCalendarDailyOfferMessageEvent';
@@ -2038,17 +1985,6 @@ export class HabboMessages implements IMessageConfiguration
         this._events.set(2984, IncomeRewardClaimResponseMessageEvent);
         this._events.set(1914, IncomeRewardNotificationMessageEvent);
 
-        // === HABBICONS ===
-        // Ids from WIN63's registry alone. vortex-emulator has no habbicon header of any kind, so
-        // for once there is nothing to corroborate against and every name here is derived from the
-        // controller's use of it — flagged as such at each declaration. Nothing on the server side
-        // will ever send these; the client half is complete regardless.
-        this._events.set(3728, UserHabbiconsMessageEvent);
-        this._events.set(2019, UserHabbiconStatusChangedMessageEvent);
-        this._events.set(3765, HabbiconShopDataMessageEvent);
-        this._events.set(3714, HabbiconInfoMessageEvent);
-        this._events.set(1547, RoomUseHabbiconMessageEvent);
-
         this._events.set(431, ClaimProductResultMessageEvent);
 
         // === USERS ===
@@ -2325,10 +2261,6 @@ export class HabboMessages implements IMessageConfiguration
         this._events.set(425, CraftingRecipeMessageEvent);
         this._events.set(2999, CraftingResultMessageEvent);
         this._events.set(3282, CraftingRecipesAvailableMessageEvent);
-        this._events.set(3794, RewardTracksMessageEvent);
-        this._events.set(522, RewardTrackClaimResultMessageEvent);
-        this._events.set(58, RewardTrackPremiumPurchaseResultMessageEvent);
-        this._events.set(2017, RewardTrackProgressMessageEvent);
         this._events.set(1028, CampaignCalendarDataMessageEvent);
         this._events.set(2164, CampaignCalendarDoorOpenedMessageEvent);
 
@@ -3513,40 +3445,16 @@ export class HabboMessages implements IMessageConfiguration
         this._composers.set(3417, IncomeRewardStatusMessageComposer);
         this._composers.set(809, IncomeRewardClaimMessageComposer);
 
-        // === HABBICONS ===
-        // See the incoming block above: registry-only ids, derived names.
-        this._composers.set(272, GetHabbiconShopDataMessageComposer);
-        this._composers.set(1494, GetHabbiconInfoMessageComposer);
-        this._composers.set(3980, BuyHabbiconMessageComposer);
-        this._composers.set(3036, BuyHabbiconCollectionMessageComposer);
-        this._composers.set(662, ClaimHabbiconMessageComposer);
-        this._composers.set(1808, FavoriteHabbiconMessageComposer);
-        this._composers.set(75, UnfavoriteHabbiconMessageComposer);
-        // Posts a habbicon into a messenger conversation — the habbicon twin of
-        // SendMsgMessageComposer. Name derived, same reason as the six above.
-        this._composers.set(1163, SendHabbiconMessageComposer);
-        // Triggers a habbicon bubble over your own avatar, sent by the chat-input selector.
-        // AS3: _SafeCls_2046.as::_composers[1176] = _SafeCls_3701, one int. Name derived — the
-        // emulator has no habbicon header at all, so there is nothing to corroborate against.
-        this._composers.set(1176, TriggerHabbiconMessageComposer);
-
         // === BADGE LEADERBOARD ===
         // Both ids come from WIN63's own registry (1225 -> _SafeCls_3493, 2503 -> _SafeCls_3446).
         // The emulator has no header for either, so the names are derived — flagged at each
-        // declaration, same as the habbicon set above.
+        // declaration.
         this._composers.set(1225, GetBadgeLeaderboardMessageComposer);
 
         // === SEASONAL CALENDAR ===
         // Both ids from WIN63's own registry (1012 -> _SafeCls_3869, 1641 -> _SafeCls_2647), names
         // recovered from win63_version's own filenames and corroborated by the emulator's table.
         this._composers.set(1012, GetSeasonalCalendarDailyComposer);
-
-        // === REWARD TRACK ===
-        // Six ids, all from WIN63's own registry. The reward track postdates win63_version and the
-        // emulator has no header for any of them, so every name here is derived from the
-        // unobfuscated handler or call site — flagged as such at each declaration.
-        this._composers.set(1376, ClaimRewardTrackPrizeMessageComposer);
-        this._composers.set(1789, PurchaseRewardTrackPremiumMessageComposer);
 
         // === NUX ===
         this._composers.set(2048, NewUserExperienceScriptProceedComposer);

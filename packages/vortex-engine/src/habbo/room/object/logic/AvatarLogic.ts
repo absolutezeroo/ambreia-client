@@ -25,8 +25,6 @@ import {AvatarAction} from '@habbo/avatar/enum/AvatarAction';
 import {RoomObjectAvatarSleepUpdateMessage} from '../../messages/RoomObjectAvatarSleepUpdateMessage';
 import {RoomObjectAvatarEffectUpdateMessage} from '../../messages/RoomObjectAvatarEffectUpdateMessage';
 import {RoomObjectAvatarCarryObjectUpdateMessage} from '../../messages/RoomObjectAvatarCarryObjectUpdateMessage';
-import {RoomObjectAvatarHabbiconUpdateMessage} from '../../messages/RoomObjectAvatarHabbiconUpdateMessage';
-import {HabbiconAssetManager} from '@habbo/habbicons/assets/HabbiconAssetManager';
 import {RoomObjectAvatarUseObjectUpdateMessage} from '../../messages/RoomObjectAvatarUseObjectUpdateMessage';
 import {RoomObjectAvatarSignUpdateMessage} from '../../messages/RoomObjectAvatarSignUpdateMessage';
 import {RoomObjectAvatarFigureUpdateMessage} from '../../messages/RoomObjectAvatarFigureUpdateMessage';
@@ -64,22 +62,6 @@ export class AvatarLogic extends MovingObjectLogic
     // AS3: .../src/com/sulake/habbo/room/object/logic/AvatarLogic.as::CARRY_ITEM_EMPTY_HAND_ANIMATION_LENGTH
     private static readonly CARRY_ITEM_EMPTY_HAND_ANIMATION_LENGTH = 1500;
 
-    // AS3: .../src/com/sulake/habbo/room/object/logic/AvatarLogic.as::SPINNING_DUCK_HABBICON_NAME
-    private static readonly SPINNING_DUCK_HABBICON_NAME = 'duck_spinning';
-    // AS3: .../src/com/sulake/habbo/room/object/logic/AvatarLogic.as::HABBICON_SPIN_DURATION_MS
-    private static readonly HABBICON_SPIN_DURATION_MS = 3200;
-    // AS3: .../src/com/sulake/habbo/room/object/logic/AvatarLogic.as::HABBICON_SPIN_STEP_MS
-    private static readonly HABBICON_SPIN_STEP_MS = 100;
-    // AS3: .../src/com/sulake/habbo/room/object/logic/AvatarLogic.as::HABBICON_SPIN_STEP_DEGREES
-    private static readonly HABBICON_SPIN_STEP_DEGREES = -45;
-
-    /**
-     * How long a triggered Habbicon stays on the avatar. AS3 spells the 6000 inline at its one use
-     * and gives it no constant, so this one is DERIVED — the four above are real names.
-     */
-    // AS3: .../src/com/sulake/habbo/room/object/logic/AvatarLogic.as::processUpdateMessage()
-    private static readonly HABBICON_VISIBLE_MS = 6000;
-
     // Selection state
     // AS3: .../src/com/sulake/habbo/room/object/logic/AvatarLogic.as::_selected
     private _selected = false;
@@ -97,18 +79,6 @@ export class AvatarLogic extends MovingObjectLogic
     private _expressionEndTime = 0;
     private _signEndTime = 0;
     private _playerValueEndTime = 0;
-
-    // Habbicon state. All four are obfuscated in AS3 (`_SafeStr_7460`, `_SafeStr_7797`,
-    // `_SafeStr_7404`, `_SafeStr_7233`) and recovered in no tree, so the names are DERIVED from
-    // what each one is compared against.
-    // AS3: .../src/com/sulake/habbo/room/object/logic/AvatarLogic.as::_SafeStr_7460
-    private _habbiconEndTime = 0;
-    // AS3: .../src/com/sulake/habbo/room/object/logic/AvatarLogic.as::_SafeStr_7797
-    private _habbiconSpinStartTime = 0;
-    // AS3: .../src/com/sulake/habbo/room/object/logic/AvatarLogic.as::_SafeStr_7404
-    private _habbiconSpinEndTime = 0;
-    // AS3: .../src/com/sulake/habbo/room/object/logic/AvatarLogic.as::_SafeStr_7233
-    private _habbiconSpinOffset = 0;
 
     // Carry object state
     private _carryObjectStartTime = 0;
@@ -155,6 +125,9 @@ export class AvatarLogic extends MovingObjectLogic
         this._lastLocation = null;
     }
 
+    // DEVIATION: AS3 also handles the habbicon update message (shows the habbicon for 6000ms, and
+    //   spins the avatar for `duck_spinning`); the RPG fork removed Habbicons.
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/logic/AvatarLogic.as::processUpdateMessage()
     override processUpdateMessage(message: RoomObjectUpdateMessage): void
     {
         if(message === null || this.object === null)
@@ -274,24 +247,6 @@ export class AvatarLogic extends MovingObjectLogic
         {
             model.setNumber('figure_number_value', message.value);
             this._playerValueEndTime = Date.now() + 3000;
-            return;
-        }
-
-        // Habbicon
-        if(message instanceof RoomObjectAvatarHabbiconUpdateMessage)
-        {
-            // One `now` for all four writes, exactly as AS3 takes one `getTimer()`: the trigger
-            // sequence is what the visualization compares to decide a Habbicon is *new*, so it has
-            // to be the same value the spin animation starts from.
-            const triggeredAt = Date.now();
-
-            model.setNumber('figure_habbicon', message.habbiconId);
-            model.setNumber('figure_habbicon_trigger_sequence', triggeredAt);
-
-            this._habbiconEndTime = triggeredAt + AvatarLogic.HABBICON_VISIBLE_MS;
-
-            this.updateHabbiconSpinForHabbicon(message.habbiconId, triggeredAt, model);
-
             return;
         }
 
@@ -595,6 +550,8 @@ export class AvatarLogic extends MovingObjectLogic
         model.setNumber('figure_effect', effect);
     }
 
+    // DEVIATION: AS3 also times the habbicon out and advances its spin; the RPG fork removed
+    //   Habbicons.
     // AS3: .../src/com/sulake/habbo/room/object/logic/AvatarLogic.as::updateActions()
     private updateActions(time: number, model: IRoomObjectModelController): void
     {
@@ -706,86 +663,6 @@ export class AvatarLogic extends MovingObjectLogic
             model.setNumber('figure_number_value', 0);
             this._playerValueEndTime = 0;
         }
-
-        // Habbicon timeout
-        if(this._habbiconEndTime > 0 && now > this._habbiconEndTime)
-        {
-            model.setNumber('figure_habbicon', 0);
-            model.setNumber('figure_habbicon_trigger_sequence', 0);
-            this.clearHabbiconSpin(model);
-            this._habbiconEndTime = 0;
-        }
-
-        // Outside the branch above on purpose, as in AS3: the spin has its own, shorter window
-        // (3200ms against the bubble's 6000), so it has to stop while the bubble is still up.
-        this.updateHabbiconSpin(now, model);
-    }
-
-    /**
-     * Starts the spin for the one Habbicon that spins, and stops any spin for every other.
-     *
-     * The test is on the Habbicon's *name*, not its id: the id is content the hotel numbers, and
-     * `duck_spinning` is the code the client's own texts use.
-     */
-    // AS3: .../src/com/sulake/habbo/room/object/logic/AvatarLogic.as::updateHabbiconSpinForHabbicon()
-    private updateHabbiconSpinForHabbicon(
-        habbiconId: number,
-        triggeredAt: number,
-        model: IRoomObjectModelController
-    ): void
-    {
-        if(HabbiconAssetManager.getHabbiconNameKey(habbiconId) === AvatarLogic.SPINNING_DUCK_HABBICON_NAME)
-        {
-            this._habbiconSpinStartTime = triggeredAt;
-            this._habbiconSpinEndTime = triggeredAt + AvatarLogic.HABBICON_SPIN_DURATION_MS;
-
-            this.setHabbiconSpinOffset(0, model);
-
-            return;
-        }
-
-        this.clearHabbiconSpin(model);
-    }
-
-    /** Advances the spin one -45° step per 100ms, wrapping at a full turn. */
-    // AS3: .../src/com/sulake/habbo/room/object/logic/AvatarLogic.as::updateHabbiconSpin()
-    private updateHabbiconSpin(now: number, model: IRoomObjectModelController): void
-    {
-        if(this._habbiconSpinEndTime <= 0) return;
-
-        if(now >= this._habbiconSpinEndTime)
-        {
-            this.clearHabbiconSpin(model);
-
-            return;
-        }
-
-        // `int(...)` in AS3 truncates toward zero. The elapsed time is never negative here, so
-        // `Math.floor` and truncation agree, but the step count is what must be integral before the
-        // multiply - rounding after it would land between two frames.
-        const steps = Math.floor((now - this._habbiconSpinStartTime) / AvatarLogic.HABBICON_SPIN_STEP_MS);
-
-        this.setHabbiconSpinOffset((steps * AvatarLogic.HABBICON_SPIN_STEP_DEGREES) % 360, model);
-    }
-
-    /** Writes the angle only when it actually changed, so a still Habbicon costs no model writes. */
-    // AS3: .../src/com/sulake/habbo/room/object/logic/AvatarLogic.as::setHabbiconSpinOffset()
-    private setHabbiconSpinOffset(offset: number, model: IRoomObjectModelController): void
-    {
-        if(this._habbiconSpinOffset === offset) return;
-
-        this._habbiconSpinOffset = offset;
-
-        model.setNumber('figure_habbicon_spin_offset', offset);
-    }
-
-    // AS3: .../src/com/sulake/habbo/room/object/logic/AvatarLogic.as::clearHabbiconSpin()
-    private clearHabbiconSpin(model: IRoomObjectModelController): void
-    {
-        this._habbiconSpinStartTime = 0;
-        this._habbiconSpinEndTime = 0;
-
-        this.setHabbiconSpinOffset(0, model);
     }
 
     // AS3: .../src/com/sulake/habbo/room/object/logic/AvatarLogic.as::getTalkingPauseInterval()

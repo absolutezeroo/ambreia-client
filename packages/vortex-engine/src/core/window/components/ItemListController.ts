@@ -125,8 +125,8 @@ export class ItemListController extends WindowController implements IItemListWin
         // HORIZONTAL bit, so the grid's width collapsed onto its content:
         // 486 -> 50 after the first tile. `resolveColumnForNextItem()` then
         // tests `column.right + item.width <= _width` against that collapsed
-        // width and never opens a second column, which is how every habbicon
-        // grid rendered as one vertical strip.
+        // width and never opens a second column, which is how every grid of
+        // this kind rendered as one vertical strip.
         if(this._type === 51)
         {
             containerWin.setParamFlag(0x400000, this._resizeOnItemUpdate);

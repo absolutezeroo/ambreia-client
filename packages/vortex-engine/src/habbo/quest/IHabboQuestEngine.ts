@@ -1,5 +1,4 @@
 import type {ILinkEventTracker} from '@core/runtime';
-import type {IRewardTrackController} from './rewardtrack/IRewardTrackController';
 
 /**
  * Interface for the Habbo Quest Engine
@@ -21,13 +20,6 @@ export interface IHabboQuestEngine extends ILinkEventTracker
 	 */
     // AS3: .../src/com/sulake/habbo/quest/HabboQuestEngine.as::showAchievements()
     showAchievements(): void;
-
-    /**
-	 * The reward-track controller, which owns the tracks the server sent and the one currently
-	 * selected. The toolbar needs it to open the active track rather than a hardcoded id.
-	 */
-    // AS3: .../src/com/sulake/habbo/quest/HabboQuestEngine.as::get rewardTrack()
-    readonly rewardTrack: IRewardTrackController | null;
 
     /**
 	 * Show the quests panel

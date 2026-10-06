@@ -13,8 +13,8 @@
  * stranded half-drawn and the tooltips dead beside it. It cost the Fish-O-Pedia, whose species
  * previews are the same sprites the catch bubble borrowed.
  *
- * So: copy at every call site that passes a library asset. `RewardTrackController` and
- * `HabboFishing` are the two that do.
+ * So: copy at every call site that passes a library asset. `HabboFishing` does (the reward track
+ * did too, before the RPG fork removed it).
  *
  * @param source The library asset, or null.
  * @returns A private copy the notification may close, or null.

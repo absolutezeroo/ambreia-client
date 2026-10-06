@@ -521,8 +521,8 @@ export class BadgeLeaderboardController extends Component
 
     /**
      * AS3 calls `bitmap.dispose()`; the bitmap here is one this class made through
-     * `focusUserFace()` and nothing else holds it, so closing it is right — unlike the habbicon
-     * tiles, which share the asset manager's cache.
+     * `focusUserFace()` and nothing else holds it, so closing it is right — unlike a tile drawn
+     * from a shared asset cache.
      */
     // AS3: BadgeLeaderboardController.as::clearFaceBitmap()
     private static clearFaceBitmap(canvas: IBitmapWrapperWindow | null): void

@@ -3,8 +3,9 @@ import type {BottomBarLeft} from '../BottomBarLeft';
 import {AbstractSubMenuController} from '../abstractsubmenu/AbstractSubMenuController';
 
 /**
- * The "Progression" bottom-bar popup: achievements, quests, daily tasks,
- * badge leaderboards, and the reward-track introduction.
+ * The "Progression" bottom-bar popup: achievements, quests, daily tasks and
+ * badge leaderboards. (AS3 also has the reward-track introduction; the RPG fork
+ * removed the Reward track.)
  *
  * This is the toolbar's real entry point into the achievements panel — clicking
  * the PROGRESSION bottom-bar icon opens this menu, and its "achievements" region
@@ -16,10 +17,16 @@ import {AbstractSubMenuController} from '../abstractsubmenu/AbstractSubMenuContr
  */
 export class ProgMenuController extends AbstractSubMenuController
 {
+    // DEVIATION: AS3 leaves the `introduction` (reward track) region visible; the RPG fork removed
+    //   the Reward track, so it is hidden until Task 10 of the M0 cleanup drops it from the layout.
     // AS3: ProgMenuController.as::ProgMenuController()
     constructor(toolbar: HabboToolbar, toolbarView: BottomBarLeft)
     {
         super(toolbar, toolbarView, 'prog_menu_view_xml', 'HTIE_ICON_PROGRESSION');
+
+        const introduction = this.window?.findChildByName('introduction');
+
+        if(introduction !== null && introduction !== undefined) introduction.visible = false;
 
         if(toolbar.getBoolean('toolbar.hide.quests'))
         {
@@ -32,6 +39,8 @@ export class ProgMenuController extends AbstractSubMenuController
         }
     }
 
+    // DEVIATION: AS3 also opens the reward track from the `introduction` region; the RPG fork
+    //   removed the Reward track.
     // AS3: ProgMenuController.as::onSubMenuItemClick()
     protected override onSubMenuItemClick(itemName: string): void
     {
@@ -49,20 +58,6 @@ export class ProgMenuController extends AbstractSubMenuController
                 // not worth a whole new port file for a single fixed-argument call site.
                 this.toolbar?.context.createLinkEvent('badge_leaderboard/0/-1/0');
                 break;
-            case 'introduction':
-            {
-                // DEVIATION: AS3 sends the literal `reward_track/open/introduction`, because that
-                //   build shipped exactly one, permanent track named `introduction`. The protocol
-                //   has always carried a list (`RewardTracksMessageEvent` sends `tracks[]`) and
-                //   every other layer is already id-driven, so this opens whichever season is in
-                //   progress instead. With a single track configured the result is identical.
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/toolbar/progmenu/ProgMenuController.as::onSubMenuItemClick()
-                const trackId = this.toolbar?.questEngine?.rewardTrack?.activeTrackId ?? null;
-
-                if(trackId !== null) this.toolbar?.context.createLinkEvent(`reward_track/open/${trackId}`);
-
-                break;
-            }
             case 'quests':
                 this.toolbar?.questEngine?.showQuests();
                 break;
@@ -107,14 +102,5 @@ export class ProgMenuController extends AbstractSubMenuController
     set unseenDailyTaskCount(value: number)
     {
         this.setUnseenItemCount('dailytasks', value);
-    }
-
-    /**
-	 * Set the unseen reward-track-rewards count badge.
-	 */
-    // AS3: ProgMenuController.as::set unseenRewardTrackRewardsCount()
-    set unseenRewardTrackRewardsCount(value: number)
-    {
-        this.setUnseenItemCount('introduction', value);
     }
 }

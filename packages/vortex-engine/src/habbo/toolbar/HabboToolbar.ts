@@ -11,7 +11,6 @@ import {IID_HabboCatalog} from '@iid/IIDHabboCatalog';
 import {IID_HabboQuestEngine} from '@iid/IIDHabboQuestEngine';
 import {UnseenAchievementsCountUpdateEvent} from '@habbo/quest/events/UnseenAchievementsCountUpdateEvent';
 import {UnseenDailyTasksCountUpdateEvent} from '@habbo/quest/events/UnseenDailyTasksCountUpdateEvent';
-import {UnseenRewardTrackRewardsCountUpdateEvent} from '@habbo/quest/events/UnseenRewardTrackRewardsCountUpdateEvent';
 import {IID_HabboNavigator} from '@iid/IIDHabboNavigator';
 import {IID_HabboNewNavigator} from '@iid/IIDHabboNewNavigator';
 import {IID_HabboSoundManager} from '@iid/IIDHabboSoundManager';
@@ -475,8 +474,8 @@ export class HabboToolbar extends Component implements IHabboToolbar
                     this._questEngine = engine;
                 },
                 false,
-                // AS3 attaches three listeners to this dependency, and all three have a source
-                // here: achievements, daily tasks, and the reward track.
+                // AS3 attaches three listeners to this dependency: achievements, daily tasks, and
+                // the reward track. The RPG fork removed the reward track, so two remain.
                 [
                     {
                         type: UnseenAchievementsCountUpdateEvent.TYPE,
@@ -485,10 +484,6 @@ export class HabboToolbar extends Component implements IHabboToolbar
                     {
                         type: UnseenDailyTasksCountUpdateEvent.TYPE,
                         callback: this.onUnseenDailyTasksCountUpdate.bind(this) as unknown as (...args: unknown[]) => void
-                    },
-                    {
-                        type: UnseenRewardTrackRewardsCountUpdateEvent.TYPE,
-                        callback: this.onUnseenRewardTrackRewardsCountUpdate.bind(this) as unknown as (...args: unknown[]) => void
                     }
                 ]
             ),
@@ -896,27 +891,6 @@ export class HabboToolbar extends Component implements IHabboToolbar
         bar.unseenDailyTasksCount = event.count;
 
         if(bar.progmenu !== null) bar.progmenu.unseenDailyTaskCount = event.count;
-
-        this.setUnseenItemCount(HabboToolbarIconEnum.PROGRESSION, bar.unseenProgMenuCount);
-    }
-
-    /**
-     * The reward track has unclaimed rewards.
-     *
-     * The count lands in two places on purpose: on the bar, where it is summed with achievements
-     * and daily tasks into the one badge the progression icon shows, and on the prog menu, which
-     * shows it again against its own row.
-     */
-    // AS3: HabboToolbar.as::onUnseenRewardTrackRewardsCountUpdate()
-    private onUnseenRewardTrackRewardsCountUpdate(event: UnseenRewardTrackRewardsCountUpdateEvent): void
-    {
-        const bar = this.bottomBarLeft;
-
-        if(bar === null) return;
-
-        bar.unseenRewardTrackRewardsCount = event.count;
-
-        if(bar.progmenu !== null) bar.progmenu.unseenRewardTrackRewardsCount = event.count;
 
         this.setUnseenItemCount(HabboToolbarIconEnum.PROGRESSION, bar.unseenProgMenuCount);
     }

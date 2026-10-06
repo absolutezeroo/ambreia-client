@@ -45,15 +45,6 @@ export const RoomObjectVariableEnum = {
     AVATAR_JUMPING_POWER: 'figure_jumping_power',
     // AS3: .../src/com/sulake/habbo/room/object/RoomObjectVariableEnum.as::AVATAR_ALPHA_MULTIPLIER
     AVATAR_ALPHA_MULTIPLIER: 'figure_alpha_multiplier',
-    // Both constants are obfuscated in every tree that has them (`_SafeStr_11385` and
-    // `_SafeStr_10720`) and postdate the 2016 build, so the names here are DERIVED from their
-    // values — the neighbouring `AVATAR_HABBICON_SPIN_OFFSET` kept its real name and sets the shape.
-    // AS3: .../src/com/sulake/habbo/room/object/RoomObjectVariableEnum.as::_SafeStr_11385
-    AVATAR_HABBICON: 'figure_habbicon',
-    // AS3: .../src/com/sulake/habbo/room/object/RoomObjectVariableEnum.as::_SafeStr_10720
-    AVATAR_HABBICON_TRIGGER_SEQUENCE: 'figure_habbicon_trigger_sequence',
-    // AS3: .../src/com/sulake/habbo/room/object/RoomObjectVariableEnum.as::AVATAR_HABBICON_SPIN_OFFSET
-    AVATAR_HABBICON_SPIN_OFFSET: 'figure_habbicon_spin_offset',
     AVATAR_WIRED_VARIABLE_HOLDER_HIGHLIGHT: 'figure_highlight_variable_holder',
     AVATAR_CAN_STAND_UP: 'figure_can_stand_up',
     AVATAR_VERTICAL_OFFSET: 'figure_vertical_offset',

@@ -87,7 +87,7 @@ export class BadgeLeaderboardDataServer
 
     /**
      * AS3 reads `flash.utils.getTimer()`; `performance.now()` is this port's monotonic clock, as
-     * `HabboClubCenter` and `HabbiconPopupController` already use it.
+     * `HabboClubCenter` already uses it.
      */
     // AS3: BadgeLeaderboardDataServer.as::getTimer()
     private static getTimer(): number

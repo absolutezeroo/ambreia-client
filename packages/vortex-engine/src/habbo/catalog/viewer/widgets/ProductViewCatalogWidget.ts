@@ -36,7 +36,6 @@ import type {CatalogWidgetEvent} from './events/CatalogWidgetEvent';
 import {CatalogWidgetName} from './CatalogWidgetName';
 import {CatalogWidget} from './CatalogWidget';
 import {PreviewCanvasStack} from '@habbo/room/preview/PreviewCanvasStack';
-import {HabbiconAssetManager} from '@habbo/habbicons/assets/HabbiconAssetManager';
 
 const log = Logger.getLogger('habbo.catalog.viewer.widgets.ProductViewCatalogWidget');
 
@@ -255,7 +254,6 @@ export class ProductViewCatalogWidget extends CatalogWidget implements IGetImage
         this.events.off(SetRoomPreviewerStuffDataEvent.CWE_SET_PREVIEWER_STUFFDATA, this.onStuffDataSet);
         this.events.off(CatalogWidgetSpinnerEvent.VALUE_CHANGED, this.onSpinnerEvent);
         this.events.off('TOTAL_PRICE_WIDGET_INITIALIZED', this.onTotalPriceWidgetInitialized);
-        HabbiconAssetManager.removeEventListener(HabbiconAssetManager.ASSETS_LOADED, this.onHabbiconAssetsLoaded);
         this._rotateAvatarLeftButton?.removeEventListener(WindowMouseEvent.CLICK, this.onRotateAvatarLeft);
         this._rotateAvatarLeftButton = null;
         this._rotateAvatarRightButton?.removeEventListener(WindowMouseEvent.CLICK, this.onRotateAvatarRight);
@@ -1213,6 +1211,9 @@ export class ProductViewCatalogWidget extends CatalogWidget implements IGetImage
         }
     }
 
+    // DEVIATION: AS3 also previews a `habbicon` product from the habbicon spritesheet (with a grey
+    //   placeholder and `onHabbiconAssetsLoaded()` until it loads); the RPG fork removed Habbicons.
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/viewer/widgets/ProductViewCatalogWidget.as::onPreviewProduct()
     private renderProductPreview(offer: IPurchasableOffer): {mode: number; canRotate: boolean}
     {
         const product = offer.product;
@@ -1248,24 +1249,6 @@ export class ProductViewCatalogWidget extends CatalogWidget implements IGetImage
                 break;
             case 'e':
                 return this.renderEffectPreview(product, roomPreviewer);
-            case 'habbicon':
-            {
-                let bitmap = HabbiconAssetManager.getPreviewBitmap(parseInt(product.extraParam, 10) || 0, false);
-
-                if(bitmap === null)
-                {
-                    // Nothing to request — the manager loads once for the client — so subscribe and
-                    // show AS3's plain 40x40 0x8F8F8F square until it arrives.
-                    HabbiconAssetManager.addEventListener(
-                        HabbiconAssetManager.ASSETS_LOADED, this.onHabbiconAssetsLoaded
-                    );
-                    bitmap = ProductViewCatalogWidget.createHabbiconPlaceholder();
-                }
-
-                this.setPreviewImage(bitmap);
-
-                return {mode: ProductViewCatalogWidget.PREVIEW_MODE_NONE, canRotate: false};
-            }
             case 'h':
                 break;
             default:
@@ -1339,7 +1322,7 @@ export class ProductViewCatalogWidget extends CatalogWidget implements IGetImage
      * DEVIATION: Flash composites this into a `BitmapData`. There is none in the engine — the shim
      *   under `onBoardingHcUi/display/` belongs to the client, which the engine may not import
      *   (`.claude/rules/20-architecture.md` #3) — so it composites into an `OffscreenCanvas` and
-     *   hands the result over as an `ImageBitmap`, the same way `HabbiconBubble` does.
+     *   hands the result over as an `ImageBitmap`.
      */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/viewer/widgets/ProductViewCatalogWidget.as::onPreviewProduct() ("e" branch, no-canvas path)
     private renderEffectPreviewFallback(product: IProduct, figure: string | null): {mode: number; canRotate: boolean}
@@ -1525,34 +1508,6 @@ export class ProductViewCatalogWidget extends CatalogWidget implements IGetImage
             frame.x, frame.y, frame.width, frame.height,
             x, y, frame.width, frame.height
         );
-    }
-
-    /**
-	 * Re-runs the whole preview for the offer still on screen. The habbicon branch is the only
-	 * caller: it is the one product type whose picture can arrive after the offer was selected.
-	 */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/viewer/widgets/ProductViewCatalogWidget.as::onHabbiconAssetsLoaded()
-    private onHabbiconAssetsLoaded = (): void =>
-    {
-        HabbiconAssetManager.removeEventListener(HabbiconAssetManager.ASSETS_LOADED, this.onHabbiconAssetsLoaded);
-
-        if(this.disposed || this._lastSelectEvent === null) return;
-
-        this.onPreviewProduct(this._lastSelectEvent);
-    };
-
-    // TS-only: Flash fills a BitmapData in its constructor; this port needs a canvas.
-    private static createHabbiconPlaceholder(): ImageBitmap | null
-    {
-        const canvas = new OffscreenCanvas(40, 40);
-        const context = canvas.getContext('2d');
-
-        if(context === null) return null;
-
-        context.fillStyle = '#8f8f8f';
-        context.fillRect(0, 0, 40, 40);
-
-        return canvas.transferToImageBitmap();
     }
 
     private renderBotPreview(product: IProduct): void

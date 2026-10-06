@@ -7,13 +7,14 @@ import {WindowEvent} from '@core/window/events/WindowEvent';
 import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
 import type {IWindow} from '@core/window/IWindow';
 import type {IWindowContainer} from '@core/window/IWindowContainer';
-import {HabbiconProgressBarView} from '@habbo/catalog/habbicons/HabbiconProgressBarView';
 import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 
 import type {FishSpeciesDefinition} from '../definitions/FishSpeciesDefinition';
 import {seasonForDate} from '../definitions/FishingSeason';
 import type {HabboFishing} from '../HabboFishing';
+
+import {ProgressBarView} from './ProgressBarView';
 
 const log = Logger.getLogger('habbo.vortex.fishing.ui.FishopediaHubView');
 
@@ -121,15 +122,16 @@ const KEY_ANY_TIME = 'vortex.fishing.book.any_time';
  *
  * NOT ported from AS3 — fishing is an Origins feature written in Lingo, and Origins has no such
  * window: its Fish-O-Pedia is the two-page book that {@link FishingPediaView} reproduces. This is a
- * second face for the same data, laid out in the Habbicon album's visual language, and the layout
- * `vortex_fishopedia_hub_xml` carries the note explaining which of the two is authoritative.
+ * second face for the same data, laid out in the visual language of an emoticon album the RPG fork
+ * removed, and the layout `vortex_fishopedia_hub_xml` carries the note explaining which of the two
+ * is authoritative.
  *
  * **It computes nothing and stores nothing.** Species, zones, rod tiers and the hour mask come from
  * `FishingDefinitions`; level, XP, rod quality and the purse from `HabboFishing.playerState`;
  * whether a species is caught is `getRecord()` answering non-null. Reopening the window rebuilds
  * every list from those, so a catch that lands while it is shut is simply there next time.
  *
- * **The progress bars are `HabbiconProgressBarView`.** That class is generic — it finds `progress`,
+ * **The progress bars are `ProgressBarView`.** That class is generic — it finds `progress`,
  * `fill` and `highlight` by name inside whatever container it is handed — and this layout uses those
  * names because it was derived from the album's. `setRatio(r, false)` snaps and renders on the spot,
  * so no frame loop is wired: nothing here animates, and a bar that is never updated is therefore
@@ -157,7 +159,7 @@ export class FishopediaHubView
      *
      * A template left in the list is a phantom row that no data ever fills, and the first rebuild
      * would push real rows below it. Removing it means every clone is a row the list has never
-     * owned — the same discipline `HabbiconSetRailView` documents.
+     * owned — the same discipline that album's set rail followed.
      */
     // TS-only: Vortex-only view.
     private _zoneRowTemplate: IWindowContainer | null = null;
@@ -181,14 +183,14 @@ export class FishopediaHubView
     private _emptyTileTemplate: IWindowContainer | null = null;
 
     // TS-only: Vortex-only view.
-    private _xpBar: HabbiconProgressBarView | null = null;
+    private _xpBar: ProgressBarView | null = null;
 
     // TS-only: Vortex-only view.
-    private _zoneBar: HabbiconProgressBarView | null = null;
+    private _zoneBar: ProgressBarView | null = null;
 
     /** The bars belonging to live zone rows, disposed with them on every rebuild. */
     // TS-only: Vortex-only view.
-    private _zoneRowBars: HabbiconProgressBarView[] = [];
+    private _zoneRowBars: ProgressBarView[] = [];
 
     // TS-only: Vortex-only view.
     private _tab: number = TAB_FISH;
@@ -326,8 +328,8 @@ export class FishopediaHubView
     // TS-only: Vortex-only view.
     private bindBars(): void
     {
-        this._xpBar = new HabbiconProgressBarView(this.child('xp_progress_bar') as IWindowContainer | null);
-        this._zoneBar = new HabbiconProgressBarView(this.child('zone_progress_bar') as IWindowContainer | null);
+        this._xpBar = new ProgressBarView(this.child('xp_progress_bar') as IWindowContainer | null);
+        this._zoneBar = new ProgressBarView(this.child('zone_progress_bar') as IWindowContainer | null);
     }
 
     // TS-only: Vortex-only view.
@@ -477,7 +479,7 @@ export class FishopediaHubView
 
             if(!locked)
             {
-                const bar = new HabbiconProgressBarView(
+                const bar = new ProgressBarView(
                     row.findChildByName('zone_row_progress_bar') as IWindowContainer | null
                 );
 

@@ -13,7 +13,6 @@ export {RoomObjectAvatarBlockedUpdateMessage} from './RoomObjectAvatarBlockedUpd
 export {RoomObjectAvatarFlatControlUpdateMessage} from './RoomObjectAvatarFlatControlUpdateMessage';
 export {RoomObjectAvatarGestureUpdateMessage} from './RoomObjectAvatarGestureUpdateMessage';
 export {RoomObjectAvatarGuideStatusUpdateMessage} from './RoomObjectAvatarGuideStatusUpdateMessage';
-export {RoomObjectAvatarHabbiconUpdateMessage} from './RoomObjectAvatarHabbiconUpdateMessage';
 export {RoomObjectAvatarMutedUpdateMessage} from './RoomObjectAvatarMutedUpdateMessage';
 export {RoomObjectAvatarOwnMessage} from './RoomObjectAvatarOwnMessage';
 export {RoomObjectAvatarPetGestureUpdateMessage} from './RoomObjectAvatarPetGestureUpdateMessage';

@@ -5,7 +5,13 @@ import {AnimatedScalar} from '@habbo/window/utils/AnimatedScalar';
 import {AnimatedColor} from '@habbo/window/utils/AnimatedColor';
 
 /**
- * The progress bar under every set, and under the album header.
+ * The Fish-O-Pedia hub's progress bar. It finds `progress`, `fill` and `highlight` by name inside
+ * the container it is handed.
+ *
+ * **Renamed in the RPG fork.** AS3's class is the habbicon album's bar (under every set, and under
+ * the album header). The fork removed that album, and the fishing hub — whose layout was derived
+ * from it and keeps its child names — is the bar's only remaining user, so the class moved here
+ * under a neutral name. The member traces below still point at the AS3 file it ports.
  *
  * **It keeps its own clock.** `_elapsed` accumulates the frame deltas handed to `update()` rather
  * than reading a wall clock, so a bar that stops being updated freezes rather than jumping forward
@@ -17,7 +23,7 @@ import {AnimatedColor} from '@habbo/window/utils/AnimatedColor';
  *
  * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/habbicons/HabbiconProgressBarView.as
  */
-export class HabbiconProgressBarView implements IDisposable
+export class ProgressBarView implements IDisposable
 {
     // AS3: HabbiconProgressBarView.as::ACCELERATION_PER_MS
     private static readonly ACCELERATION_PER_MS: number = 0.00001;
@@ -77,13 +83,13 @@ export class HabbiconProgressBarView implements IDisposable
         this._maxWidth = container?.width ?? 0;
 
         this._ratio = new AnimatedScalar(
-            HabbiconProgressBarView.ACCELERATION_PER_MS,
-            HabbiconProgressBarView.MAX_SPEED_PER_MS,
-            HabbiconProgressBarView.SNAP_EPSILON
+            ProgressBarView.ACCELERATION_PER_MS,
+            ProgressBarView.MAX_SPEED_PER_MS,
+            ProgressBarView.SNAP_EPSILON
         );
 
-        this._fillColor = new AnimatedColor(HabbiconProgressBarView.FILL_COLOR_TRANSITION_MS);
-        this._fillColor.snapTo(HabbiconProgressBarView.INCOMPLETE_COLOR, this._elapsed);
+        this._fillColor = new AnimatedColor(ProgressBarView.FILL_COLOR_TRANSITION_MS);
+        this._fillColor.snapTo(ProgressBarView.INCOMPLETE_COLOR, this._elapsed);
 
         this.render();
     }
@@ -131,9 +137,9 @@ export class HabbiconProgressBarView implements IDisposable
         if(this._progress === null || this._fill === null || this._highlight === null) return;
 
         const width = Math.max(0, Math.min(this._maxWidth, Math.round(this._maxWidth * (this._ratio?.value ?? 0))));
-        const overshoot = width >= this._maxWidth - HabbiconProgressBarView.CAP_OVERSHOOT
+        const overshoot = width >= this._maxWidth - ProgressBarView.CAP_OVERSHOOT
             ? this._maxWidth
-            : width + HabbiconProgressBarView.CAP_OVERSHOOT;
+            : width + ProgressBarView.CAP_OVERSHOOT;
 
         this._progress.width = width;
         (this._progress as unknown as IWindow).visible = width > 0;
@@ -148,8 +154,8 @@ export class HabbiconProgressBarView implements IDisposable
     private syncCompletionColor(animate: boolean): void
     {
         const color = (this._ratio?.value ?? 0) >= 1
-            ? HabbiconProgressBarView.COMPLETE_COLOR
-            : HabbiconProgressBarView.INCOMPLETE_COLOR;
+            ? ProgressBarView.COMPLETE_COLOR
+            : ProgressBarView.INCOMPLETE_COLOR;
 
         if(animate)
         {

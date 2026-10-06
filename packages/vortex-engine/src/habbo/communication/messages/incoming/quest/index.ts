@@ -13,7 +13,3 @@ export * from './QuestDailyMessageEvent';
 export * from './QuestMessageEvent';
 export * from './QuestsMessageEvent';
 export * from './SeasonalQuestsMessageEvent';
-export {RewardTrackClaimResultMessageEvent} from './RewardTrackClaimResultMessageEvent';
-export {RewardTrackPremiumPurchaseResultMessageEvent} from './RewardTrackPremiumPurchaseResultMessageEvent';
-export {RewardTrackProgressMessageEvent} from './RewardTrackProgressMessageEvent';
-export {RewardTracksMessageEvent} from './RewardTracksMessageEvent';

@@ -7,8 +7,6 @@ import {IID_HabboFriendList} from '@iid/IIDHabboFriendList';
 import {IID_RoomEngine} from '@iid/IIDRoomEngine';
 import {IID_HabboCatalog} from '@iid/IIDHabboCatalog';
 import type {IHabboCatalog} from '@habbo/catalog/IHabboCatalog';
-import {IID_RewardTrackController} from '@iid/IIDRewardTrackController';
-import type {IRewardTrackController} from '@habbo/quest/rewardtrack/IRewardTrackController';
 import {IID_HabboToolbar} from '@iid/IIDHabboToolbar';
 import {IID_HabboWindowManager} from '@iid/IIDHabboWindowManager';
 import {IID_HabboHelp} from '@iid/IIDHabboHelp';
@@ -76,8 +74,6 @@ export class HabboNotifications extends Component implements IHabboNotifications
     // AS3: .../src/com/sulake/habbo/notifications/HabboNotifications.as::_catalog
     private _catalog: IHabboCatalog | null = null;
 
-    // AS3: .../src/com/sulake/habbo/notifications/HabboNotifications.as::_rewardTrack
-    private _rewardTrack: IRewardTrackController | null = null;
     private _toolbar: IHabboToolbar | null = null;
     // AS3: .../src/com/sulake/habbo/notifications/HabboNotifications.as::_windowManager
     private _windowManager: IHabboWindowManager | null = null;
@@ -174,12 +170,6 @@ export class HabboNotifications extends Component implements IHabboNotifications
     get assetLibrary(): IAssetLibrary | null
     {
         return this.assets;
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/notifications/HabboNotifications.as::get rewardTrack()
-    get rewardTrack(): IRewardTrackController | null
-    {
-        return this._rewardTrack;
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/notifications/HabboNotifications.as::get catalog()
@@ -346,14 +336,6 @@ export class HabboNotifications extends Component implements IHabboNotifications
                 (toolbar: IHabboToolbar | null) =>
                 {
                     this._toolbar = toolbar;
-                },
-                false
-            ),
-            new ComponentDependency(
-                IID_RewardTrackController,
-                (rewardTrack: IRewardTrackController | null) =>
-                {
-                    this._rewardTrack = rewardTrack;
                 },
                 false
             ),

@@ -24,8 +24,6 @@ import {IID_SessionDataManager} from '@iid/IIDSessionDataManager';
 import {IID_HabboTracking} from '@iid/IIDHabboTracking';
 import {IID_HabboHelp} from '@iid/IIDHabboHelp';
 import {IID_HabboSoundManager} from '@iid/IIDHabboSoundManager';
-import {IID_HabbiconController} from '@iid/IIDHabbiconController';
-import type {IHabbiconController} from '@habbo/catalog/habbicons/IHabbiconController';
 
 import {MessengerInitEvent} from '@habbo/communication/messages/incoming/friendlist/MessengerInitEvent';
 import {NewConsoleMessageEvent} from '@habbo/communication/messages/incoming/friendlist/NewConsoleMessageEvent';
@@ -134,19 +132,6 @@ export class HabboMessenger extends Component implements IHabboMessenger, ILinkE
     // AS3: .../messenger/HabboMessenger.as::_soundManager
     private _soundManager: IHabboSoundManager | null = null;
 
-    // AS3: .../messenger/HabboMessenger.as::_habbiconController
-    private _habbiconController: IHabbiconController | null = null;
-
-    /**
-     * Optional in AS3 too: the controller is attached by `HabboCatalog`, so a client booted
-     * without a catalog simply has no habbicon picker rather than a locked messenger.
-     */
-    // AS3: .../messenger/HabboMessenger.as::get habbiconController()
-    get habbiconController(): IHabbiconController | null
-    {
-        return this._habbiconController;
-    }
-
     /**
      * The console window. Built on `MessengerInit`, not in the constructor — every
      * delegation below guards on it because AS3 does.
@@ -173,6 +158,7 @@ export class HabboMessenger extends Component implements IHabboMessenger, ILinkE
      * log — the hole that kept the friend bar from ever building — and nothing here needs
      * either of them to exist before the console does.
      */
+    // DEVIATION: AS3 also takes the optional habbicon controller; the RPG fork removed Habbicons.
     // AS3: .../messenger/HabboMessenger.as::get dependencies()
     protected override get dependencies(): Array<ComponentDependency<unknown>>
     {
@@ -208,10 +194,6 @@ export class HabboMessenger extends Component implements IHabboMessenger, ILinkE
             new ComponentDependency(IID_HabboSoundManager, (soundManager: IHabboSoundManager | null) =>
             {
                 this._soundManager = soundManager;
-            }, false),
-            new ComponentDependency(IID_HabbiconController, (habbiconController: IHabbiconController | null) =>
-            {
-                this._habbiconController = habbiconController;
             }, false)
         ] as Array<ComponentDependency<unknown>>;
     }

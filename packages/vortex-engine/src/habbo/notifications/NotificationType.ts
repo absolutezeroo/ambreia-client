@@ -23,9 +23,6 @@ export class NotificationType
     public static readonly ACHIEVEMENT_RECEIVED: string = 'achievement';
     // AS3: .../src/com/sulake/habbo/notifications/NotificationType.as::BADGE_RECEIVED
     public static readonly BADGE_RECEIVED: string = 'badge_received';
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/notifications/NotificationType.as::_SafeStr_10817
-    // AS3 name unrecoverable (obfuscated in every tree) - derived from its value.
-    public static readonly HABBICON_RECEIVED: string = 'habbicon_received';
     // AS3: .../src/com/sulake/habbo/notifications/NotificationType.as::INFO
     public static readonly INFO: string = 'info';
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/notifications/NotificationType.as::RECYCLER_FINISHED
