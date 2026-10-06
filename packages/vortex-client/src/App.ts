@@ -671,7 +671,6 @@ declare global
  *
  * - dimmer_slider_*: BackgroundColorWidgetSlider's track and thumb.
  * - stickie_*: StickieFurniWidget's blank note, close and delete buttons.
- * - icon_nft: InfoStandFurniView's NFT marker.
  * - thumb_up: ExtraInfoPromoItem in the catalog's bundle purchase display.
  * - the friend list block: every bitmap HabboFriendList.getButtonImage() resolves, which is
  *   every `*_png` field of `binaryData/HabboFriendListCom.as` — that file is the authority,
@@ -719,9 +718,6 @@ const LIBRARY_IMAGE_NAMES: ReadonlySet<string> = new Set([
     // minus what was already listed. Twenty names came back: each of them had
     // a PNG shipping, a call site reading it, and no library entry, so each
     // rendered nothing at all. The infostand's house icon is what exposed them.
-    'breed_pets_preview_bg',
-    'camera_fx_slider_bottom_active',
-    'camera_fx_slider_button',
     'dimmer_color_button',
     'dimmer_color_frame',
     'dimmer_color_selected',
@@ -742,22 +738,11 @@ const LIBRARY_IMAGE_NAMES: ReadonlySet<string> = new Set([
 
     'dimmer_slider_base',
     'dimmer_slider_button',
-    'icon_nft',
 
-    // The photo lab's two filter-type tabs. Invisible to the prescribed grep for the same reason
-    // as the chat tray above: `CameraPhotoLab.createTypeButton(type, iconAssetName)` resolves the
-    // name through its parameter, so no literal sits inside the `getAssetByName()` call. Both are
-    // declared in `binaryData/HabboWindowManagerCom.as` and ship as PNGs; without them each tab
-    // drew its frame and nothing inside it. `camera_icon_frame` is the third of the family and is
-    // deliberately absent — AS3 builds two tabs, not three.
-    'camera_icon_colorfilter',
-    'camera_icon_compositefilter',
-
-    // HabboCatalog.getSubscriptionProductIcon() / getMintTokenProductIcon(): the two icons every
-    // subscription and mint-token product renders with. `fx_icon_*` (its third sibling) is
-    // already covered by the prefix rule above.
+    // HabboCatalog.getSubscriptionProductIcon(): the icon every subscription product renders
+    // with. `fx_icon_*` (its sibling) is already covered by the prefix rule above. The RPG fork
+    // removed the mint-token products, and with them `minting_token_large`.
     'icon_hc',
-    'minting_token_large',
 
     // ProductContainer.setAddOnIcon(): the add-on marker on an offer that bundles a badge / chat
     // style or the ninja effect. Read through the method's parameter, so the literal grep missed
