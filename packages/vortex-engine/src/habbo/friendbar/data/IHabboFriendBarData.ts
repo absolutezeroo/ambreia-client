@@ -72,12 +72,6 @@ export interface IHabboFriendBarData
     // AS3: .../data/_SafeCls_1720.as::openUserTextSearch()
     openUserTextSearch(): void;
 
-    // AS3: .../data/_SafeCls_1720.as::sendGameTabTracking()
-    sendGameTabTracking(action: string): void;
-
-    // AS3: .../data/_SafeCls_1720.as::sendGameButtonTracking()
-    sendGameButtonTracking(action: string): void;
-
     // AS3: .../data/_SafeCls_1720.as::toggleFriendList()
     toggleFriendList(): void;
 

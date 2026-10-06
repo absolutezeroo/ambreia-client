@@ -17,7 +17,6 @@ import type {Token} from './tokens/Token';
 import {RoomEventToken} from './tokens/RoomEventToken';
 import {AchievementToken} from './tokens/AchievementToken';
 import {QuestToken} from './tokens/QuestToken';
-import {GameToken} from './tokens/GameToken';
 
 const log = Logger.getLogger('habbo.friendbar.tabs.NewFriendEntityTab');
 
@@ -110,9 +109,6 @@ export class NewFriendEntityTab extends Tab
     // AS3: .../view/tabs/NewFriendEntityTab.as::BTN_GAME
     protected static readonly BTN_GAME: string = 'btn_game';
 
-    // AS3: .../view/tabs/NewFriendEntityTab.as::GAME_ICON
-    protected static readonly GAME_ICON: string = 'icon_game';
-
     // AS3: .../view/tabs/NewFriendEntityTab.as::BTN_MESSENGER
     protected static readonly BTN_MESSENGER: string = 'btn_chat';
 
@@ -144,9 +140,6 @@ export class NewFriendEntityTab extends Tab
 
     // AS3: .../view/tabs/NewFriendEntityTab.as::TOKEN_ICON_TAG_MESSAGE
     private static readonly TOKEN_ICON_TAG_MESSAGE: string = 'icon_tag_message';
-
-    // AS3: .../view/tabs/NewFriendEntityTab.as::TOKEN_ICON_TAG_GAME
-    private static readonly TOKEN_ICON_TAG_GAME: string = 'icon_tag_game';
 
     /** Recycled tabs. **Name derived**; obfuscated in every tree. */
     // AS3: .../view/tabs/NewFriendEntityTab.as::_TAB_POOL
@@ -226,13 +219,6 @@ export class NewFriendEntityTab extends Tab
     // AS3: .../view/tabs/NewFriendEntityTab.as::_SafeStr_4733
     protected _tokens: Token[] | null = null;
 
-    // AS3: .../view/tabs/NewFriendEntityTab.as::_isInGame
-    protected _isInGame: boolean = false;
-
-    /** The game code from the "playing" badge. **Name derived**. */
-    // AS3: .../view/tabs/NewFriendEntityTab.as::_gameName
-    protected _gameName: string = '';
-
     /** True while a redraw is parked on the avatar renderer. **Name derived**. */
     // AS3: .../view/tabs/NewFriendEntityTab.as::_waitingForAvatarRenderer
     private _waitingForAvatarRenderer: boolean = false;
@@ -262,8 +248,6 @@ export class NewFriendEntityTab extends Tab
         }
 
         this._friend = null;
-        this._isInGame = false;
-        this._gameName = '';
         this._recycled = true;
 
         NewFriendEntityTab.TAB_POOL.push(this);
@@ -271,8 +255,10 @@ export class NewFriendEntityTab extends Tab
 
     /**
      * Builds the opened slot: real name (when the friend has one), one row per
-     * notification, then the action buttons — visit or game, never both.
+     * notification, then the action buttons.
      */
+    // DEVIATION: AS3 swaps the visit button for a game button while the friend is playing a
+    //   game-center game; the RPG fork removed Snow War and the games manager, so it stays hidden.
     // AS3: .../view/tabs/NewFriendEntityTab.as::select()
     override select(animate: boolean): void
     {
@@ -349,50 +335,26 @@ export class NewFriendEntityTab extends Tab
 
                 controls.getChildByName(NewFriendEntityTab.MESSAGE)?.addEventListener(WindowMouseEvent.CLICK, this.onButtonClick);
 
-                if(!this._isInGame)
+                // The game button stays hidden: see the DEVIATION on select().
+                const gameButton = controls.getChildByName(NewFriendEntityTab.BTN_GAME);
+
+                if(gameButton !== null)
                 {
-                    const gameButton = controls.getChildByName(NewFriendEntityTab.BTN_GAME);
-
-                    if(gameButton !== null)
-                    {
-                        gameButton.visible = false;
-                    }
-
-                    const visitButton = controls.getChildByName(NewFriendEntityTab.VISIT);
-
-                    if(visitButton !== null)
-                    {
-                        if(this._friend.allowFollow)
-                        {
-                            visitButton.visible = true;
-                            visitButton.addEventListener(WindowMouseEvent.CLICK, this.onButtonClick);
-                        }
-                        else
-                        {
-                            visitButton.visible = false;
-                        }
-                    }
+                    gameButton.visible = false;
                 }
-                else
-                {
-                    const visitButton = controls.getChildByName(NewFriendEntityTab.VISIT);
 
-                    if(visitButton !== null)
+                const visitButton = controls.getChildByName(NewFriendEntityTab.VISIT);
+
+                if(visitButton !== null)
+                {
+                    if(this._friend.allowFollow)
+                    {
+                        visitButton.visible = true;
+                        visitButton.addEventListener(WindowMouseEvent.CLICK, this.onButtonClick);
+                    }
+                    else
                     {
                         visitButton.visible = false;
-                    }
-
-                    const gameButton = controls.getChildByName(NewFriendEntityTab.BTN_GAME);
-
-                    if(gameButton !== null)
-                    {
-                        const gameLabel = Tab.localization?.getLocalization(`gamecenter.${this._gameName}.name`) ?? '';
-
-                        Tab.localization?.registerParameter('friend.bar.game', 'game', gameLabel);
-                        Tab.localization?.registerParameter('friend.bar.game.tip', 'game', gameLabel);
-
-                        gameButton.visible = true;
-                        gameButton.addEventListener(WindowMouseEvent.CLICK, this.onButtonClick);
                     }
                 }
 
@@ -718,6 +680,8 @@ export class NewFriendEntityTab extends Tab
         }
     }
 
+    // DEVIATION: AS3 also handles the game button / game icon; the RPG fork
+    //   removed Snow War and the games manager.
     // AS3: .../view/tabs/NewFriendEntityTab.as::onButtonClick()
     private onButtonClick = (event: WindowEvent): void =>
     {
@@ -766,19 +730,6 @@ export class NewFriendEntityTab extends Tab
 
                 break;
 
-            case NewFriendEntityTab.BTN_GAME:
-            case NewFriendEntityTab.GAME_ICON:
-                // AS3 guards the whole branch on `GAMES` — no games component, nothing happens at
-                // all, not even the tracking.
-                if(Tab.games)
-                {
-                    this.deselect(true);
-                    Tab.games.initGameDirectoryConnection();
-                    Tab.data?.sendGameButtonTracking(this._gameName);
-                }
-
-                break;
-
             case NewFriendEntityTab.BTN_MESSENGER:
                 if(Tab.data !== null && this._friend !== null)
                 {
@@ -808,6 +759,9 @@ export class NewFriendEntityTab extends Tab
      * is open is closed and reopened around the change so the piece list is rebuilt —
      * the token vector is stashed across that close so `deselect()` cannot consume it.
      */
+    // DEVIATION: AS3 hangs a "playing" game token on the tab (and drops it on FINISHED_GAME); the
+    //   RPG fork removed Snow War and the games manager, so both types are ignored rather than
+    //   falling through to the unknown-type throw.
     // AS3: .../view/tabs/NewFriendEntityTab.as::addNotificationToken()
     addNotificationToken(notification: IFriendNotification): void
     {
@@ -859,25 +813,9 @@ export class NewFriendEntityTab extends Tab
                 iconTag = NewFriendEntityTab.TOKEN_ICON_TAG_NOTIFY;
                 break;
 
+            // Ignored: see the DEVIATION on addNotificationToken().
             case FriendNotification.TYPE_PLAYING_GAME:
-                token = new GameToken(this._friend!, notification);
-
-                if(token.iconElement !== null)
-                {
-                    token.iconElement.name = NewFriendEntityTab.GAME_ICON;
-                    token.iconElement.addEventListener(WindowMouseEvent.CLICK, this.onMouseClickEvent);
-                }
-
-                iconTag = NewFriendEntityTab.TOKEN_ICON_TAG_GAME;
-                this._isInGame = true;
-                this._gameName = token.notification?.message ?? '';
-                break;
-
-            // Finishing a game removes the "playing" badge rather than adding one.
             case FriendNotification.TYPE_FINISHED_GAME:
-                this.removeNotificationToken(FriendNotification.TYPE_PLAYING_GAME, true);
-                this._isInGame = false;
-
                 return;
 
             default:

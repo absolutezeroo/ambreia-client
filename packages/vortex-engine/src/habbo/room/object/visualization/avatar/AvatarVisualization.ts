@@ -42,7 +42,6 @@ import {FloatingIdleZ} from './additions/FloatingIdleZ';
 import {MutedBubble} from './additions/MutedBubble';
 import {TypingBubble} from './additions/TypingBubble';
 import {GuideStatusBubble} from './additions/GuideStatusBubble';
-import {GameClickTarget} from './additions/GameClickTarget';
 import {NumberBubble} from './additions/NumberBubble';
 import {ExpressionAdditionFactory} from './additions/ExpressionAdditionFactory';
 
@@ -124,9 +123,6 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
 
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/room/object/visualization/avatar/AvatarVisualization.as::ADDITION_ID_NUMBER_BUBBLE
     private static readonly ADDITION_ID_NUMBER_BUBBLE: number = 4;
-
-    // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/room/object/visualization/avatar/AvatarVisualization.as::ADDITION_ID_GAME_CLICK_TARGET
-    private static readonly ADDITION_ID_GAME_CLICK_TARGET: number = 5;
 
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/room/object/visualization/avatar/AvatarVisualization.as::ADDITION_ID_MUTED_BUBBLE
     private static readonly ADDITION_ID_MUTED_BUBBLE: number = 6;
@@ -824,6 +820,8 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
      */
     // DEVIATION: AS3 also reads the habbicon, its trigger sequence and its spin offset off the model
     //   and keeps the stacked-additions bubble in step; the RPG fork removed Habbicons.
+    // DEVIATION: AS3 also adds a `GameClickTarget` addition while `figure_is_playing_game` is set
+    //   (snow-war arena only); the RPG fork removed Snow War and the games manager.
     // AS3: .../src/com/sulake/habbo/room/object/visualization/avatar/AvatarVisualization.as::updateModel()
     private updateModel(model: IRoomObjectModel, scale: number, isFullUpdate: boolean): boolean 
     {
@@ -1077,27 +1075,6 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
                 {
                     this.removeAddition(AvatarVisualization.ADDITION_ID_GUIDE_STATUS_BUBBLE);
                     changed = true;
-                }
-            }
-
-            // Game click target addition
-            boolValue = model.getNumber(RoomObjectVariableEnum.AVATAR_IS_PLAYING_GAME) > 0;
-            const gameAddition = this.getAddition(AvatarVisualization.ADDITION_ID_GAME_CLICK_TARGET) as GameClickTarget | null;
-
-            if(boolValue) 
-            {
-                if(!gameAddition) 
-                {
-                    this.addAddition(new GameClickTarget(AvatarVisualization.ADDITION_ID_GAME_CLICK_TARGET));
-                }
-
-                changed = true;
-            }
-            else 
-            {
-                if(gameAddition) 
-                {
-                    this.removeAddition(AvatarVisualization.ADDITION_ID_GAME_CLICK_TARGET);
                 }
             }
 

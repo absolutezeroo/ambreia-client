@@ -18,7 +18,6 @@ import {
     CompostPlantComposer,
     CreditFurniRedeemMessageComposer,
     DanceMessageComposer,
-    Game2GameChatMessageComposer,
     GetPetCommandsComposer,
     HarvestPetComposer,
     KickUserMessageComposer,
@@ -526,17 +525,12 @@ export class RoomSession implements IRoomSession
         this._userDataManager.dispose();
     }
 
+    // DEVIATION: in a game session AS3 sends the line as snow-war game chat (composer 3083) instead;
+    //   the RPG fork removed Snow War and the games manager, which was the only game-session owner.
     // AS3: .../src/com/sulake/habbo/session/RoomSession.as::sendChatMessage()
     sendChatMessage(message: string, styleId: number = 0): void
     {
         if(this._connection === null) return;
-
-        if(this._isGameSession)
-        {
-            this._connection.send(new Game2GameChatMessageComposer(message));
-
-            return;
-        }
 
         // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/RoomSession.as::sendChatMessage()
         message = message.replace(/&#[0-9]+;/g, '');

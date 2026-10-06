@@ -1,6 +1,4 @@
-import type {IRoomSession} from '@habbo/session/IRoomSession';
-import {RoomSessionChatEvent} from '@habbo/session/events/RoomSessionChatEvent';
-import {GameChatEvent} from '@habbo/game/events/GameChatEvent';
+import type {RoomSessionChatEvent} from '@habbo/session/events/RoomSessionChatEvent';
 import type {IHabboFreeFlowChat} from '../IHabboFreeFlowChat';
 import {ChatItem} from './ChatItem';
 
@@ -16,24 +14,19 @@ import {ChatItem} from './ChatItem';
  */
 export class ChatEventHandler
 {
-    // AS3: .../src/com/sulake/habbo/freeflowchat/data/ChatEventHandler.as::CHAT_STYLE_SNOWWAR_RED
-    public static readonly CHAT_STYLE_SNOWWAR_RED: number = 120;
-    // AS3: .../src/com/sulake/habbo/freeflowchat/data/ChatEventHandler.as::CHAT_STYLE_SNOWWAR_BLUE
-    public static readonly CHAT_STYLE_SNOWWAR_BLUE: number = 121;
-
     private _freeFlowChat: IHabboFreeFlowChat | null;
     private _lastTimeStamp: number = 0;
     private _timeStampCollisionCount: number = 0;
     private _onRoomChatBound: (event: RoomSessionChatEvent) => void;
-    // TS-only: AS3 subscribes a method reference; the port needs a stable bound one to unsubscribe.
-    private _onGameChatBound: (event: GameChatEvent) => void;
 
+    // DEVIATION: AS3 also subscribes `gameEventHandler()` to the games manager's `gce_game_chat` bus
+    //   (snow-war chat, styles 120/121); the RPG fork removed Snow War and the games manager.
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/freeflowchat/data/ChatEventHandler.as::ChatEventHandler()
     constructor(freeFlowChat: IHabboFreeFlowChat)
     {
         this._freeFlowChat = freeFlowChat;
 
         this._onRoomChatBound = this.onRoomChat.bind(this);
-        this._onGameChatBound = this.gameEventHandler.bind(this);
 
         // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/freeflowchat/data/ChatEventHandler.as::ChatEventHandler()
         // AS3 dereferences roomSessionManager here with no null check, because HabboFreeFlowChat
@@ -44,11 +37,6 @@ export class ChatEventHandler
             'RSCE_CHAT_EVENT',
             this._onRoomChatBound
         );
-
-        // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/freeflowchat/data/ChatEventHandler.as::ChatEventHandler()
-        // Guarded exactly as AS3 guards it: the games component is optional and attaches after this
-        // one, so `gameManager` can legitimately be null here and there is simply no game chat.
-        this._freeFlowChat.gameManager?.events.on(GameChatEvent.GAME_CHAT, this._onGameChatBound);
     }
 
     // AS3: .../src/com/sulake/habbo/freeflowchat/data/ChatEventHandler.as::get disposed()
@@ -72,8 +60,6 @@ export class ChatEventHandler
                 this._onRoomChatBound
             );
         }
-
-        this._freeFlowChat?.gameManager?.events.off(GameChatEvent.GAME_CHAT, this._onGameChatBound);
 
         this._freeFlowChat = null;
     }
@@ -118,45 +104,5 @@ export class ChatEventHandler
         );
 
         this._lastTimeStamp = now;
-    }
-
-    /**
-     * A snow-war line. It has no room session and no room object behind it — the speaker is a game
-     * object — so the bubble is given its identity directly: a forced screen x (the team's side of
-     * the arena), colour, figure and name, and a chat style picked from the team.
-     *
-     * The `null` session is AS3's own: `new RoomSessionChatEvent("RSCE_CHAT_EVENT", null, …)`. The
-     * port's constructor types it non-null because every other caller has one, and nothing on this
-     * path reads it — `ChatItem` takes the fields it needs off the event and stops there.
-     */
-    // AS3: .../src/com/sulake/habbo/freeflowchat/data/ChatEventHandler.as::gameEventHandler()
-    private gameEventHandler(event: GameChatEvent): void
-    {
-        if(!this._freeFlowChat) return;
-
-        const styleId = event.teamId === 1
-            ? ChatEventHandler.CHAT_STYLE_SNOWWAR_BLUE
-            : ChatEventHandler.CHAT_STYLE_SNOWWAR_RED;
-        const chatEvent = new RoomSessionChatEvent(
-            RoomSessionChatEvent.RSCE_CHAT_EVENT,
-            null as unknown as IRoomSession,
-            event.userId,
-            event.message,
-            0,
-            styleId
-        );
-
-        this._freeFlowChat.insertChat(
-            new ChatItem(
-                chatEvent,
-                Math.floor(performance.now()),
-                null,
-                0,
-                event.locX,
-                event.color,
-                event.figure,
-                event.name
-            )
-        );
     }
 }

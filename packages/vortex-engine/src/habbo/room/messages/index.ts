@@ -17,7 +17,6 @@ export {RoomObjectAvatarMutedUpdateMessage} from './RoomObjectAvatarMutedUpdateM
 export {RoomObjectAvatarOwnMessage} from './RoomObjectAvatarOwnMessage';
 export {RoomObjectAvatarPetGestureUpdateMessage} from './RoomObjectAvatarPetGestureUpdateMessage';
 export {RoomObjectAvatarPlayerValueUpdateMessage} from './RoomObjectAvatarPlayerValueUpdateMessage';
-export {RoomObjectAvatarPlayingGameMessage} from './RoomObjectAvatarPlayingGameMessage';
 export {RoomObjectAvatarPostureUpdateMessage} from './RoomObjectAvatarPostureUpdateMessage';
 export {RoomObjectAvatarSelectedMessage} from './RoomObjectAvatarSelectedMessage';
 export {RoomObjectAvatarSignUpdateMessage} from './RoomObjectAvatarSignUpdateMessage';

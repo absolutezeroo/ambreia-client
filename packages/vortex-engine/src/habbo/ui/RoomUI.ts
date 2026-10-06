@@ -30,9 +30,7 @@ import {IID_HabboFriendBarView} from '@iid/IIDHabboFriendBarView';
 import {IID_HabboFishing} from '@iid/IIDHabboFishing';
 import {IID_HabboSoundManager} from '@iid/IIDHabboSoundManager';
 import {IID_HabboQuestEngine} from '@iid/IIDHabboQuestEngine';
-import {IID_HabboGameManager} from '@iid/IIDHabboGameManager';
 import {IID_HabboAdManager} from '@iid/IIDHabboAdManager';
-import type {IHabboGameManager} from '@habbo/game/IHabboGameManager';
 import type {IAdManager} from '@habbo/advertisement/IAdManager';
 import type {IHabboQuestEngine} from '@habbo/quest/IHabboQuestEngine';
 import {IID_HabboMessenger} from '@iid/IIDHabboMessenger';
@@ -329,9 +327,6 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
     // Needed by the me-menu's achievements button.
     private _questEngine: IHabboQuestEngine | null = null;
 
-    // AS3: .../src/com/sulake/habbo/ui/RoomUI.as::_gameManager
-    private _gameManager: IHabboGameManager | null = null;
-
     // AS3: .../src/com/sulake/habbo/ui/RoomUI.as::_adManager
     private _adManager: IAdManager | null = null;
 
@@ -512,6 +507,8 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
     // DEVIATION: AS3 also takes the habbicon controller and, when `habbicons.enabled`, listens for
     //   ROOM_USE_HABBICON to push a triggered habbicon onto the avatar (`onRoomUseHabbicon()`). The
     //   RPG fork removed Habbicons.
+    // DEVIATION: AS3 also takes the optional games manager (handed to every desktop); the RPG fork
+    //   removed Snow War and the games manager.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomUI.as::get dependencies()
     protected override get dependencies(): Array<ComponentDependency<any>> 
     {
@@ -711,22 +708,8 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
              * friend bar from ever building — and the room UI must come up whether or not sound
              * and the console are present.
              */
-            // Both optional, as AS3 declares them. The game manager drives snowwar's in-room UI;
-            // the ad manager only ever answers `RoomDesktop.requestInterstitial()`.
-            // AS3: .../src/com/sulake/habbo/ui/RoomUI.as::dependencies (IIDHabboGameManager)
-            new ComponentDependency(
-                IID_HabboGameManager,
-                (gameManager: IHabboGameManager | null) =>
-                {
-                    this._gameManager = gameManager;
-
-                    for(const desktop of this._desktops.values())
-                    {
-                        desktop.gameManager = gameManager;
-                    }
-                },
-                false
-            ),
+            // Optional, as AS3 declares it: the ad manager only ever answers
+            // `RoomDesktop.requestInterstitial()`.
             // AS3: .../src/com/sulake/habbo/ui/RoomUI.as::dependencies (IIDHabboAdManager)
             new ComponentDependency(
                 IID_HabboAdManager,
@@ -923,6 +906,8 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
     /**
      * Creates a RoomDesktop for the given session.
      */
+    // DEVIATION: AS3 also hands the desktop its games manager; the RPG fork removed Snow War and the
+    //   games manager.
     // AS3: .../src/com/sulake/habbo/ui/RoomUI.as::createDesktop()
     public createDesktop(session: IRoomSession): IRoomDesktop 
     {
@@ -964,7 +949,6 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
         desktop.freeFlowChat = this._freeFlowChat;
         desktop.navigator = this._navigator;
         desktop.communicationManager = this._communicationManager;
-        desktop.gameManager = this._gameManager;
         desktop.adManager = this._adManager;
 
         // Set the layout

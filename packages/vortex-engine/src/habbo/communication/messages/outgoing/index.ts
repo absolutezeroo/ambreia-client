@@ -6,7 +6,6 @@ export * from './advertisement';
 export * from './campaign';
 export * from './competition';
 export * from './friendlist';
-export * from './game';
 export * from './handshake';
 export * from './help';
 export * from './catalog';

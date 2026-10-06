@@ -42,8 +42,6 @@ import {IID_RoomManager} from '@iid/IIDRoomManager';
 import {IID_RoomRendererFactory} from '@iid/IIDRoomRendererFactory';
 import {IID_RoomSessionManager} from '@iid/IIDRoomSessionManager';
 import type {IRoomSessionManager} from '@habbo/session/IRoomSessionManager';
-import {IID_HabboGameManager} from '@iid/IIDHabboGameManager';
-import type {IHabboGameManager} from '@habbo/game/IHabboGameManager';
 import type {IRoomSession} from '@habbo/session/IRoomSession';
 import {RoomObjectCategoryEnum} from './object/RoomObjectCategoryEnum';
 import {RoomObjectOperationEnum} from './object/RoomObjectOperationEnum';
@@ -89,7 +87,6 @@ import {RoomObjectAvatarUseObjectUpdateMessage} from './messages/RoomObjectAvata
 import {RoomObjectAvatarExperienceUpdateMessage} from './messages/RoomObjectAvatarExperienceUpdateMessage';
 import {RoomObjectAvatarPlayerValueUpdateMessage} from './messages/RoomObjectAvatarPlayerValueUpdateMessage';
 import {RoomObjectAvatarExpressionUpdateMessage} from './messages/RoomObjectAvatarExpressionUpdateMessage';
-import {RoomObjectAvatarPlayingGameMessage} from './messages/RoomObjectAvatarPlayingGameMessage';
 import {RoomObjectAvatarGuideStatusUpdateMessage} from './messages/RoomObjectAvatarGuideStatusUpdateMessage';
 import {RoomObjectAvatarCarryObjectUpdateMessage} from './messages/RoomObjectAvatarCarryObjectUpdateMessage';
 import {RoomObjectAvatarSignUpdateMessage} from './messages/RoomObjectAvatarSignUpdateMessage';
@@ -194,7 +191,6 @@ import {RoomObjectRoomColorUpdateMessage} from './messages/RoomObjectRoomColorUp
 import {RoomEngineRoomColorEvent} from './events/RoomEngineRoomColorEvent';
 import {LegacyStuffData} from './object/data/LegacyStuffData';
 import {RoomObjectUpdateMessage} from '@room/messages/RoomObjectUpdateMessage';
-import {RoomObjectLogicEnum} from './object/RoomObjectLogicEnum';
 import {RoomObjectRoomUpdateMessage} from './messages/RoomObjectRoomUpdateMessage';
 import {RoomObjectRoomPlaneVisibilityUpdateMessage} from './messages/RoomObjectRoomPlaneVisibilityUpdateMessage';
 import {RoomObjectRoomPlanePropertyUpdateMessage} from './messages/RoomObjectRoomPlanePropertyUpdateMessage';
@@ -841,42 +837,32 @@ export class RoomEngine extends Component implements IRoomEngine,
                 },
                 false // Optional - needed to resolve isDecorateMode from the active room session
             ),
-            new ComponentDependency(
-                IID_HabboGameManager,
-                (manager: IHabboGameManager | null) =>
-                {
-                    this._gameManager = manager;
-                },
-                false // Optional - only read in game mode, to route clicks into the snow-war engine
-            ),
         ];
     }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::_gameManager
-    private _gameManager: IHabboGameManager | null = null;
 
     /** Null in a hotel with no ad subsystem, which is why every use of it is guarded. */
     // AS3: .../src/com/sulake/habbo/room/_SafeCls_90.as::_adManager
     private _adManager: IAdManager | null = null;
 
     /**
-     * A click on an avatar, in game mode: a snow-war throw at that player. Outside game mode AS3
-     * does nothing here — the avatar's own selection happens on the way in, in the caller.
+     * A click on an avatar. Outside game mode AS3 does nothing here — the avatar's own selection
+     * happens on the way in, in the caller.
      */
+    // DEVIATION: in game mode AS3 hands the click to the games manager (`gameEngine.handleClickOnHuman()`,
+    //   a snow-war throw); the RPG fork removed Snow War and the games manager, so nothing is left.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_1821.as::handleClickOnAvatar()
-    private handleClickOnAvatar(objectId: number, event: RoomObjectMouseEvent): void
+    private handleClickOnAvatar(_objectId: number, _event: RoomObjectMouseEvent): void
     {
-        if(this.isDecorateMode) return;
-
-        if(this.isGameMode) this.gameEngine?.handleClickOnHuman(objectId, event.altKey, event.shiftKey);
     }
 
     /**
      * The pointer entering an avatar, in game mode: the tile cursor is moved onto that avatar's own
-     * tile so the aim marker follows the target, and the engine is told who is under the pointer.
+     * tile so the aim marker follows the target.
      */
+    // DEVIATION: AS3 then tells the games manager who is under the pointer
+    //   (`gameEngine.handleMouseOverOnHuman()`); the RPG fork removed Snow War and the games manager.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_1821.as::handleMouseEnterAvatar()
-    private handleMouseEnterAvatar(objectId: number, event: RoomObjectMouseEvent): void
+    private handleMouseEnterAvatar(objectId: number, _event: RoomObjectMouseEvent): void
     {
         if(this.isDecorateMode) return;
 
@@ -901,14 +887,6 @@ export class RoomEngine extends Component implements IRoomEngine,
                 );
             }
         }
-
-        this.gameEngine?.handleMouseOverOnHuman(objectId, event.altKey, event.shiftKey);
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_87.as::get gameEngine()
-    get gameEngine(): IHabboGameManager | null
-    {
-        return this._gameManager;
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::get useOffsetScrolling()
@@ -1223,80 +1201,6 @@ export class RoomEngine extends Component implements IRoomEngine,
     protected addObjectToTileMap(roomId: number, object: IRoomObject): void
     {
         this.getRoomInstanceData(roomId)?.tileObjectMap?.addRoomObject(object);
-    }
-
-    /**
-     * The SnowWar half of the engine: the four calls `GameArenaView` drives every frame while a
-     * game is running.
-     *
-     * A snowball is an ordinary room object of category 201 and type `game_snowball`; the splash it
-     * leaves behind is category 202, `game_snowsplash`. Nothing else in the client creates objects
-     * of either category, which is why `addObjectUpdateCategory(202)` has to be called before the
-     * first splash — an update category the room manager does not know about is not ticked.
-     *
-     * `SnowballLogic`, `SnowSplashLogic` and their two visualizations landed on 2026-09-01, so
-     * `createRoomObject()` answers both types and these four methods are live end to end.
-     */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::addObjectSnowWar()
-    addObjectSnowWar(roomId: number, objectId: number, location: IVector3d, category: number): boolean
-    {
-        let type: string | null = null;
-
-        if(category === 201) type = RoomObjectLogicEnum.SNOWBALL;
-        else if(category === 202) type = RoomObjectLogicEnum.SNOW_SPLASH;
-
-        const object = this.createObjectSnowWar(roomId, objectId, type, category);
-
-        if(!object) return false;
-
-        object.getEventHandler()?.processUpdateMessage(new RoomObjectUpdateMessage(location, null));
-
-        return true;
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::addObjectSnowSplash()
-    addObjectSnowSplash(roomId: number, objectId: number, location: IVector3d): boolean
-    {
-        this._roomManager?.addObjectUpdateCategory(202);
-
-        const object = this.createObjectSnowWar(roomId, objectId, RoomObjectLogicEnum.SNOW_SPLASH, 202);
-
-        if(!object) return false;
-
-        object.getEventHandler()?.processUpdateMessage(new RoomObjectUpdateMessage(location, null));
-
-        return true;
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::updateObjectSnowWar()
-    updateObjectSnowWar(roomId: number, objectId: number, location: IVector3d, category: number): boolean
-    {
-        const object = this.getRoomObject(roomId, objectId, category) as IRoomObjectController | null;
-
-        object?.getEventHandler()?.processUpdateMessage(new RoomObjectUpdateMessage(location, null));
-
-        return true;
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::disposeObjectSnowWar()
-    disposeObjectSnowWar(roomId: number, objectId: number, category: number): void
-    {
-        this.disposeRoomObject(roomId, objectId, category);
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::createObjectSnowWar()
-    private createObjectSnowWar(
-        roomId: number,
-        objectId: number,
-        type: string | null,
-        category: number
-    ): IRoomObjectController | null
-    {
-        if(type === null) return null;
-
-        const room = this._roomManager?.getRoom(this.getRoomIdentifier(roomId)) ?? null;
-
-        return (room?.createRoomObject(objectId, type, category) ?? null) as IRoomObjectController | null;
     }
 
     // DEVIATION: the hook AS3 leaves for a subclass to supply its own event handler. This port
@@ -1779,7 +1683,7 @@ export class RoomEngine extends Component implements IRoomEngine,
     private _playerUnderCursor: number = -1;
 
     /**
-	 * The user the pointer is over, in game mode only — the snowwar HUD reads it. Outside game
+	 * The user the pointer is over, in game mode only — AS3's game HUD reads it. Outside game
 	 * mode it stays -1, because `requestMouseCursor()` only ever writes it under `isGameMode`.
 	 */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::get playerUnderCursor()
@@ -5255,8 +5159,7 @@ export class RoomEngine extends Component implements IRoomEngine,
         // A pet's room object is NOT typed 'pet': that literal is only the user-type name, and no
         // asset library is called 'pet'. AS3 replaces it with the pet's real content type, resolved
         // from the first token of its figure. Without this the object was created as type 'pet',
-        // which RoomContentLoader.hasInternalContent() does not recognise (it knows only 'user',
-        // 'game_snowball', 'game_snowsplash'), so RoomManager fell through to resolving logic and
+        // which RoomContentLoader.hasInternalContent() does not recognise, so RoomManager fell through to resolving logic and
         // visualization off a non-existent bundle and defaulted to FurnitureLogic +
         // FurnitureVisualization. FurnitureLogic ignores RoomObjectAvatarFigureUpdateMessage, so
         // the figure below was dropped on the floor, the model kept no pet_type/pet_palette_index/
@@ -5373,6 +5276,8 @@ export class RoomEngine extends Component implements IRoomEngine,
      */
     // DEVIATION: AS3 also maps `figure_habbicon` to the habbicon update message; the RPG fork removed
     //   Habbicons, so that action now takes the no-message warning.
+    // DEVIATION: AS3 also maps `figure_is_playing_game` (set only by the snow-war arena) onto
+    //   `RoomObjectAvatarPlayingGameMessage`; the RPG fork removed Snow War and the games manager.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::updateObjectUserAction()
     updateObjectUserAction(
         roomId: number,
@@ -5433,9 +5338,6 @@ export class RoomEngine extends Component implements IRoomEngine,
                 break;
             case RoomObjectVariableEnum.AVATAR_EXPRESSION:
                 message = new RoomObjectAvatarExpressionUpdateMessage(value);
-                break;
-            case RoomObjectVariableEnum.AVATAR_IS_PLAYING_GAME:
-                message = new RoomObjectAvatarPlayingGameMessage(value !== 0);
                 break;
             case RoomObjectVariableEnum.AVATAR_GUIDE_STATUS:
                 message = new RoomObjectAvatarGuideStatusUpdateMessage(value);
@@ -8492,8 +8394,9 @@ export class RoomEngine extends Component implements IRoomEngine,
 
                     if(this._toolbar !== null)
                     {
-                        if(event.clickUrl === 'NAVIGATOR_GAMES') this._toolbar.toggleWindowVisibility('GAMES');
-                        else if(event.clickUrl) this.context?.createLinkEvent(event.clickUrl);
+                        // DEVIATION: AS3 first maps the `NAVIGATOR_GAMES` click url onto the toolbar's games
+                        //   window; the RPG fork removed Snow War and the games icon, so it is an ordinary link.
+                        if(event.clickUrl) this.context?.createLinkEvent(event.clickUrl);
                     }
 
                     engineType = RoomEngineRoomAdEvent.FURNI_CLICK;
@@ -9126,28 +9029,18 @@ export class RoomEngine extends Component implements IRoomEngine,
             {
                 // AS3: _SafeCls_1821.as::handleClickOnTile() — in decorate mode the floor is not a
                 // walk target at all: clicks belong to the furniture being arranged. A spectator
-                // clicks nothing either, and in game mode the click is a snow-war action rather
-                // than a walk: onto the player under the cursor if there is one, otherwise at the
-                // tile.
+                // clicks nothing either, and in game mode the click is a game action rather than a
+                // walk.
+                // DEVIATION: AS3 hands that game-mode click to the games manager
+                //   (`handleClickOnHuman()` on the player under the cursor, else `handleClickOnTile()`);
+                //   the RPG fork removed Snow War and the games manager, so it is only swallowed.
                 if(this.isDecorateMode) return;
 
                 const session = this._roomSessionManager?.getSession(this._activeRoomId) ?? null;
 
                 if(session !== null && session.isSpectatorMode) return;
 
-                if(this.isGameMode)
-                {
-                    if(this._playerUnderCursor >= 0)
-                    {
-                        this.gameEngine?.handleClickOnHuman(this._playerUnderCursor, event.altKey, event.shiftKey);
-                    }
-                    else
-                    {
-                        this.gameEngine?.handleClickOnTile(event);
-                    }
-
-                    return;
-                }
+                if(this.isGameMode) return;
 
                 // The second of `isMoveBlocked()`'s two AS3 read sites — the area selector holds it
                 // for the length of a drag, and without this the click that ends the drag also

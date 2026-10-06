@@ -6,7 +6,6 @@ import type {IRoomSession} from '@habbo/session/IRoomSession';
 import type {IRoomEngine} from '@habbo/room/IRoomEngine';
 import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';
 import type {IAvatarRenderManager} from '@habbo/avatar/IAvatarRenderManager';
-import type {IHabboGameManager} from '@habbo/game/IHabboGameManager';
 import type {IChatStyleLibrary} from '@habbo/freeflowchat/style/IChatStyleLibrary';
 import type {IVector3d} from '@room/utils/IVector3d';
 import type {IPoint} from '@room/utils/IRoomGeometry';
@@ -88,13 +87,6 @@ export interface IHabboFreeFlowChat
 	 */
     // AS3: .../src/com/sulake/habbo/freeflowchat/HabboFreeFlowChat.as::get sessionDataManager()
     readonly sessionDataManager: ISessionDataManager | null;
-
-    /**
-	 * The games component, for the one thing chat needs from it: the `gce_game_chat` bus that
-	 * snow-war lines arrive on. Null until `habbo/game` attaches, which is after this component.
-	 */
-    // AS3: .../src/com/sulake/habbo/freeflowchat/HabboFreeFlowChat.as::get gameManager()
-    readonly gameManager: IHabboGameManager | null;
 
     /**
 	 * Asset library used to load chat style catalog/bitmap assets.

@@ -14,7 +14,6 @@ import {Logger} from '@core/utils/Logger';
 import type {IAvatarImageListener} from '@habbo/avatar/IAvatarImageListener';
 import type {IHabboFriendList} from '@habbo/friendlist/IHabboFriendList';
 import type {IHabboToolbar} from '@habbo/toolbar/IHabboToolbar';
-import type {IHabboGameManager} from '@habbo/game/IHabboGameManager';
 import {HabboFaceFocuser} from '@habbo/utils/HabboFaceFocuser';
 import {SessionDataPreferencesEvent} from '@habbo/session/events/SessionDataPreferencesEvent';
 import {RoomEnterEffect} from '@room/utils/RoomEnterEffect';
@@ -22,7 +21,6 @@ import {RoomEnterEffect} from '@room/utils/RoomEnterEffect';
 import {IID_HabboFriendList} from '@iid/IIDHabboFriendList';
 import {IID_HabboFriendBarData} from '@iid/IIDHabboFriendBarData';
 import {IID_HabboToolbar} from '@iid/IIDHabboToolbar';
-import {IID_HabboGameManager} from '@iid/IIDHabboGameManager';
 
 import type {IHabboFriendBarData} from '../data/IHabboFriendBarData';
 import {FriendBarUpdateEvent} from '../events/FriendBarUpdateEvent';
@@ -179,9 +177,6 @@ export class HabboFriendBarView extends AbstractView implements IHabboFriendBarV
     // AS3: .../view/HabboFriendBarView.as::_toolbar
     private _toolbar: IHabboToolbar | null = null;
 
-    // AS3: .../view/HabboFriendBarView.as::_gameManager
-    private _gameManager: IHabboGameManager | null = null;
-
     // AS3: .../view/HabboFriendBarView.as::_SafeStr_4564
     private _window: IWindowContainer | null = null;
 
@@ -290,6 +285,8 @@ export class HabboFriendBarView extends AbstractView implements IHabboFriendBarV
     // AS3: .../view/HabboFriendBarView.as::_notifyMessengerOnStartup
     private _notifyMessengerOnStartup: boolean = false;
 
+    // DEVIATION: AS3 also takes the optional games manager; the RPG fork removed Snow War and the
+    //   games manager.
     // AS3: .../view/HabboFriendBarView.as::get dependencies()
     protected override get dependencies(): Array<ComponentDependency<unknown>>
     {
@@ -308,13 +305,7 @@ export class HabboFriendBarView extends AbstractView implements IHabboFriendBarV
             new ComponentDependency(IID_HabboToolbar, (toolbar: IHabboToolbar | null) =>
             {
                 this._toolbar = toolbar;
-            }, true),
-            // Optional: `habbo/game` attaches after the friend bar, and a hard dependency on an
-            // IID nothing provides yet locks the component forever with no log.
-            new ComponentDependency(IID_HabboGameManager, (manager: IHabboGameManager | null) =>
-            {
-                this._gameManager = manager;
-            }, false)
+            }, true)
         ] as Array<ComponentDependency<unknown>>;
     }
 
@@ -607,6 +598,8 @@ export class HabboFriendBarView extends AbstractView implements IHabboFriendBarV
      * Builds the bar. The `Tab`/`Token` statics are filled here, before the first slot
      * exists — every slot reads its collaborators off them.
      */
+    // DEVIATION: AS3 also hands the games manager to `Tab.GAMES` / `Token.GAMES`; the RPG fork
+    //   removed Snow War and the games manager.
     // AS3: .../view/HabboFriendBarView.as::buildUserInterface()
     private buildUserInterface(): void
     {
@@ -616,7 +609,6 @@ export class HabboFriendBarView extends AbstractView implements IHabboFriendBarV
         }
 
         Tab.data = this._friendBarData;
-        Tab.games = this._gameManager;
         Tab.friends = this._friendList;
         Tab.view = this;
         Tab.assets = this.assets;
@@ -628,7 +620,6 @@ export class HabboFriendBarView extends AbstractView implements IHabboFriendBarV
 
         Token.WINDOWING = this._windowManager;
         Token.ASSETS = this.assets;
-        Token.GAMES = this._gameManager;
 
         const window = this._windowManager.buildWidgetLayout(HabboFriendBarView.MAIN_WINDOW_RESOURCE, 1) as IWindowContainer | null;
 

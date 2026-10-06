@@ -93,19 +93,6 @@ import {RoomAdPurchaseInitiatedMessageComposer} from '@habbo/communication/messa
 import {AssetLoaderEvent} from '@core/assets/loaders/AssetLoaderEvent';
 import {LtdRaffleResultMessageEvent} from '@habbo/communication/messages/incoming/catalog/LtdRaffleResultMessageEvent';
 import {LtdRaffleEnteredMessageEvent} from '@habbo/communication/messages/incoming/catalog/LtdRaffleEnteredMessageEvent';
-import {
-    SnowWarGameTokensMessageEvent
-} from '@habbo/communication/messages/incoming/catalog/SnowWarGameTokensMessageEvent';
-import type {
-    SnowWarGameTokensMessageParser
-} from '@habbo/communication/messages/parser/catalog/SnowWarGameTokensMessageParser';
-import {
-    GetSnowWarGameTokensOfferComposer
-} from '@habbo/communication/messages/outgoing/catalog/GetSnowWarGameTokensOfferComposer';
-import {
-    PurchaseSnowWarGameTokensOfferComposer
-} from '@habbo/communication/messages/outgoing/catalog/PurchaseSnowWarGameTokensOfferComposer';
-import {GameTokensOffer} from '@habbo/catalog/viewer/GameTokensOffer';
 import type {LtdRaffleResultMessageParser} from '@habbo/communication/messages/parser/catalog/LtdRaffleResultMessageParser';
 import {SilverBalanceMessageEvent} from '@habbo/communication/messages/incoming/inventory/purse/SilverBalanceMessageEvent';
 import {EmeraldBalanceMessageEvent} from '@habbo/communication/messages/incoming/inventory/purse/EmeraldBalanceMessageEvent';
@@ -1647,6 +1634,8 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
      */
     // DEVIATION: AS3 first refuses an already-owned habbicon offer (`isHabbiconOfferOwned()` →
     //   `showHabbiconAlreadyOwnedAlert()`); the RPG fork removed Habbicons.
+    // DEVIATION: AS3 also lets a snow-war token bundle (`GameTokensOffer`) skip both balance tests
+    //   and reach the generic dialog; the RPG fork removed Snow War.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::showPurchaseConfirmation()
     showPurchaseConfirmation(
         offer: IPurchasableOffer,
@@ -1685,20 +1674,14 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
             priceInActivityPoints = this._utils.calculateBundlePrice(true, offer.priceInActivityPoints, quantity);
         }
 
-        // A snow-war token bundle skips both balance tests. It is priced in credits *and* in
-        // activity points, and the player is expected to have one or the other — testing both
-        // would reject a purchase they can afford.
-        const isGameTokens = offer instanceof GameTokensOffer;
-
-        if(!isGameTokens && priceInCredits > 0 && priceInCredits > this._purse.credits)
+        if(priceInCredits > 0 && priceInCredits > this._purse.credits)
         {
             this.showNotEnoughCreditsAlert();
 
             return;
         }
 
-        if(!isGameTokens
-            && priceInActivityPoints > 0
+        if(priceInActivityPoints > 0
             && priceInActivityPoints > this._purse.getActivityPointsForType(offer.activityPointType))
         {
             this.showNotEnoughActivityPointsAlert(offer.activityPointType);
@@ -1710,13 +1693,11 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         // AS3 splits here: furniture-shaped offers get the generic dialog, a ClubBuyOfferData goes
         // to the club buy controller instead. Note a gift always takes the generic path, even for a
         // club offer — that is why _purchaseWillBeGift is part of the first test, not a separate one.
-        // AS3 admits five offer classes. GameTokensOffer is not a catalog offer at all — it comes
-        // from the snow-war lobby — and was reaching neither branch, and so doing nothing, until it
-        // was listed here. The other two, MintTokenPurchaseOffer and NftStorePurchaseOffer, came
-        // from the collectibles shop, which the RPG fork removed.
+        // AS3 admits five offer classes. The other three came from features the RPG fork removed:
+        // GameTokensOffer from the snow-war lobby, MintTokenPurchaseOffer and NftStorePurchaseOffer
+        // from the collectibles shop.
         if(offer instanceof Offer
-            || this._purchaseWillBeGift
-            || offer instanceof GameTokensOffer)
+            || this._purchaseWillBeGift)
         {
             if(this._purchaseConfirmationDialog == null || this._purchaseConfirmationDialog.disposed)
             {
@@ -2770,98 +2751,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         return this.getInteger('new.identity', 0) > 0;
     }
 
-    /**
-     * Opens the confirmation for one of the three snow-war token bundles, or asks the server for
-     * them if they are not cached yet.
-     *
-     * The else-branch is the lazy fetch, and it is *only* an else: a bundle that has not arrived
-     * produces a request and nothing visible, so the player's first click loads the offers and the
-     * second one buys. AS3 does not re-open the dialog when the answer lands either.
-     */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::buySnowWarTokensOffer()
-    public buySnowWarTokensOffer(localizationId: string): void
-    {
-        const offer = this._snowWarTokenOffers.get(localizationId) ?? null;
-
-        if(offer !== null)
-        {
-            this.showPurchaseConfirmation(offer, -1, offer.localizationId);
-
-            return;
-        }
-
-        this._communication?.connection?.send(new GetSnowWarGameTokensOfferComposer());
-    }
-
-    /**
-     * Sends the purchase for one snow-war token bundle.
-     *
-     * The sibling of `buySnowWarTokensOffer()` above and not a duplicate of it: that one *offers*
-     * the bundle, this one buys it, and unlike that one it does nothing at all when the bundle is
-     * not cached — there is no id to send.
-     */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::purchaseGameTokensOffer()
-    public purchaseGameTokensOffer(localizationId: string): void
-    {
-        const offer = this._snowWarTokenOffers.get(localizationId) ?? null;
-
-        if(offer === null) return;
-
-        this._communication?.connection?.send(new PurchaseSnowWarGameTokensOfferComposer(offer.offerId));
-    }
-
-    /**
-     * The three token bundles, by their localization id.
-     *
-     * AS3 holds them in three separate fields and repeats the same three-way `if` chain at each of
-     * its three use sites. A map keyed by the same ids says it once — `disposeSnowWarTokens()` is
-     * a `clear()`, and neither reader has to know how many there are.
-     */
-    // AS3: HabboCatalog.as::_SafeStr_5588 / _SafeStr_5482 / _SafeStr_5548
-    private _snowWarTokenOffers: Map<string, GameTokensOffer> = new Map();
-
-    // AS3: the three literals HabboCatalog.as compares against in onSnowWarGameTokenOffer(),
-    // buySnowWarTokensOffer() and purchaseGameTokensOffer().
-    private static readonly SNOW_WAR_TOKEN_IDS: readonly string[] = [
-        'GET_SNOWWAR_TOKENS', 'GET_SNOWWAR_TOKENS2', 'GET_SNOWWAR_TOKENS3',
-    ];
-
-    /**
-     * The token bundles have arrived. The list replaces whatever was cached rather than merging
-     * into it, so a bundle the server stops offering disappears.
-     */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::onSnowWarGameTokenOffer()
-    private onSnowWarGameTokenOffer(event: IMessageEvent): void
-    {
-        const parser = event?.parser as SnowWarGameTokensMessageParser | null;
-
-        if(parser == null) return;
-
-        this.disposeSnowWarTokens();
-
-        for(const offer of parser.offers)
-        {
-            // AS3 only keeps the three it knows the ids of; anything else on the wire is ignored.
-            if(!HabboCatalog.SNOW_WAR_TOKEN_IDS.includes(offer.localizationId)) continue;
-
-            this._snowWarTokenOffers.set(offer.localizationId, new GameTokensOffer(
-                offer.offerId,
-                offer.localizationId,
-                offer.priceInCredits,
-                offer.priceInActivityPoints,
-                offer.activityPointType
-            ));
-        }
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::disposeSnowWarTokens()
-    private disposeSnowWarTokens(): void
-    {
-        for(const offer of this._snowWarTokenOffers.values()) offer.dispose();
-
-        this._snowWarTokenOffers.clear();
-    }
-
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::showVipBenefits()
     // AS3 also lazily calls init() first if _utils is still null - this port's _utils is always
     // constructed eagerly in the field initializer, so that guard has nothing to do here.
@@ -3142,6 +3031,9 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         super.dispose();
     }
 
+    // DEVIATION: AS3 also subscribes its snow-war token-bundle handler (message 904); the
+    //   RPG fork removed Snow War.
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::initComponent()
     protected override initComponent(): void
     {
         // sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as
@@ -3165,7 +3057,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         this.addMessageEvent(new GiftReceiverNotFoundMessageEvent(this.onGiftReceiverNotFound));
         this.addMessageEvent(new ScrSendUserInfoEvent(this.onSubscriptionInfo.bind(this)));
         this.addMessageEvent(new LtdRaffleEnteredMessageEvent(this.onLtdRaffleEntered.bind(this)));
-        this.addMessageEvent(new SnowWarGameTokensMessageEvent(this.onSnowWarGameTokenOffer.bind(this)));
         this.addMessageEvent(new PurchaseOKMessageEvent(this.onPurchaseOK.bind(this)));
         this.addMessageEvent(new PurchaseErrorMessageEvent(this.onPurchaseError.bind(this)));
         this.addMessageEvent(new PurchaseNotAllowedMessageEvent(this.onPurchaseNotAllowed.bind(this)));

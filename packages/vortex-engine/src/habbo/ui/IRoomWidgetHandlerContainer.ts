@@ -29,7 +29,6 @@ import type {IHabboFurniEditor} from '@habbo/vortex/furnieditor/IHabboFurniEdito
 import type {IHabboFreeFlowChat} from '@habbo/freeflowchat/IHabboFreeFlowChat';
 import type {IHabboSoundManager} from '@habbo/sound/IHabboSoundManager';
 import type {IHabboQuestEngine} from '@habbo/quest/IHabboQuestEngine';
-import type {IHabboGameManager} from '@habbo/game/IHabboGameManager';
 import type {IHabboAvatarEditor} from '@habbo/avatar/IHabboAvatarEditor';
 import type {IHabboMessenger} from '@habbo/messenger/IHabboMessenger';
 import type {IRoomWidgetFactory} from './IRoomWidgetFactory';
@@ -77,9 +76,6 @@ export interface IRoomWidgetHandlerContainer
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/IRoomWidgetHandlerContainer.as::get questEngine()
     // The me-menu's achievements button is its only consumer here.
     readonly questEngine: IHabboQuestEngine | null;
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/IRoomWidgetHandlerContainer.as::get gameManager()
-    // The `:csmm` staff command is its only consumer here.
-    readonly gameManager: IHabboGameManager | null;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/IRoomWidgetHandlerContainer.as::get soundManager()
     // The me-menu's settings tab reads and writes the three volumes through this.
     readonly soundManager: IHabboSoundManager | null;

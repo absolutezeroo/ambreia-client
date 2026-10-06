@@ -40,8 +40,6 @@ import {IID_HabboQuestEngine} from '@iid/IIDHabboQuestEngine';
 import {IID_HabboHelp} from '@iid/IIDHabboHelp';
 import {IID_HabboAvatarEditor} from '@iid/IIDHabboAvatarEditor';
 import type {IHabboAvatarEditor} from '@habbo/avatar/IHabboAvatarEditor';
-import {IID_HabboGameManager} from '@iid/IIDHabboGameManager';
-import type {IHabboGameManager} from '@habbo/game/IHabboGameManager';
 import {HabboToolbarEvent} from '@habbo/toolbar/events/HabboToolbarEvent';
 import {HabboToolbarEnum} from '@habbo/toolbar/HabboToolbarEnum';
 import {Logger} from '@core/utils/Logger';
@@ -159,13 +157,6 @@ export class HabboLandingView extends AbstractView implements IHabboLandingView
         return this._avatarEditor;
     }
 
-    // `IHabboGameManager` is ported; `HabboGameManager` itself is not yet, so nothing ever
-    // provides this IID and the callback does not run. AS3 stores this dependency but never reads
-    // it anywhere in HabboLandingView.as either (no getter, no internal usage) - kept for DI
-    // parity only.
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/friendbar/landingview/HabboLandingView.as::_gameManager
-    private _gameManager: IHabboGameManager | null = null;
-
     // AS3: .../src/com/sulake/habbo/friendbar/landingview/HabboLandingView.as::_errorLayout
     private _errorLayout: IWindow | null = null;
 
@@ -240,6 +231,9 @@ export class HabboLandingView extends AbstractView implements IHabboLandingView
         return this._tracking;
     }
 
+    // DEVIATION: AS3 also takes the games manager (stored and never read);
+    //   the RPG fork removed Snow War and the games manager.
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/friendbar/landingview/HabboLandingView.as::get dependencies()
     protected override get dependencies(): Array<ComponentDependency<any>>
     {
         return [
@@ -317,14 +311,6 @@ export class HabboLandingView extends AbstractView implements IHabboLandingView
                 (avatarEditor: unknown) =>
                 {
                     this._avatarEditor = (avatarEditor as IHabboAvatarEditor | null) ?? null;
-                },
-                false
-            ),
-            new ComponentDependency(
-                IID_HabboGameManager,
-                (gameManager: IHabboGameManager | null) =>
-                {
-                    this._gameManager = gameManager;
                 },
                 false
             ),
@@ -562,7 +548,6 @@ export class HabboLandingView extends AbstractView implements IHabboLandingView
         this._questEngine = null;
         this._habboHelp = null;
         this._avatarEditor = null;
-        this._gameManager = null;
 
         super.dispose();
     }
@@ -680,6 +665,9 @@ export class HabboLandingView extends AbstractView implements IHabboLandingView
 	 *
 	 * @see sources/win63_version/habbo/friendbar/landingview/HabboLandingView.as onToolbarClick()
 	 */
+    // DEVIATION: AS3 also steps the landing view aside on `HTIE_ICON_GAMES` when `game.center.enabled`;
+    //   the RPG fork removed Snow War, the games manager and the games icon.
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/friendbar/landingview/HabboLandingView.as::onToolbarClick()
     private onToolbarClick = (event: HabboToolbarEvent): void =>
     {
         switch(event.iconId)
@@ -699,17 +687,6 @@ export class HabboLandingView extends AbstractView implements IHabboLandingView
                     this.send(new QuitMessageComposer());
                     this._roomSessionManager.disposeSession(activeRoomId);
                 }
-
-                break;
-            }
-
-            // The games icon opens the game centre over the landing view, so the landing view
-            // steps aside — but only when the centre is actually on. With
-            // `game.center.enabled` false the icon may still be in the toolbar (that is gated
-            // by its own `games_icon_enabled`) and clicking it must leave the view alone.
-            case 'HTIE_ICON_GAMES':
-            {
-                if(this.getBoolean('game.center.enabled')) this.disable();
 
                 break;
             }

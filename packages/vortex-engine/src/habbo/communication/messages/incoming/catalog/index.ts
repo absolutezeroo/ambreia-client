@@ -37,6 +37,5 @@ export * from './TargetedOfferNotFoundMessageEvent';
 export * from './LtdRaffleEnteredMessageEvent';
 export * from './LtdRaffleResultMessageEvent';
 export {SeasonalCalendarDailyOfferMessageEvent} from './SeasonalCalendarDailyOfferMessageEvent';
-export * from './SnowWarGameTokensMessageEvent';
 export * from './OfferRewardDeliveredMessageEvent';
 export * from './HasClaimedProductResponseMessageEvent';

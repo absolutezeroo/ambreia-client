@@ -29,9 +29,6 @@ export class HabboToolbarIconEnum
     // AS3: .../src/com/sulake/habbo/toolbar/HabboToolbarIconEnum.as::MEMENU
     public static readonly MEMENU: string = 'HTIE_ICON_MEMENU';
 
-    // AS3: .../src/com/sulake/habbo/toolbar/HabboToolbarIconEnum.as::GAMES
-    public static readonly GAMES: string = 'HTIE_ICON_GAMES';
-
     // AS3: .../src/com/sulake/habbo/toolbar/HabboToolbarIconEnum.as::STORIES
     public static readonly STORIES: string = 'HTIE_ICON_STORIES';
 
@@ -63,7 +60,6 @@ export class HabboToolbarIconEnum
         ['HTIE_ICON_PROGRESSION', 'PROGRESSION'],
         ['HTIE_ICON_ACHIEVEMENTS', 'ACHIEVEMENTS'],
         ['HTIE_ICON_MEMENU', 'MEMENU'],
-        ['HTIE_ICON_GAMES', 'GAMES'],
         ['HTIE_ICON_STORIES', 'STORIES'],
         ['HTIE_ICON_RECEPTION', 'RECEPTION'],
         ['HTIE_ICON_HOME', 'HOME'],

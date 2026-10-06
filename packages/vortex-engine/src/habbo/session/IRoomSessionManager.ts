@@ -73,7 +73,7 @@ export interface IRoomSessionManager
     disposeSession(roomId: number, disposeEngine?: boolean): void;
 
     /**
-	 * Start a game session (for SnowWar etc.)
+	 * Start a game session (AS3: the snow-war arena; no caller in the RPG fork)
 	 */
     // AS3: .../src/com/sulake/habbo/session/IRoomSessionManager.as::startGameSession()
     startGameSession(): void;

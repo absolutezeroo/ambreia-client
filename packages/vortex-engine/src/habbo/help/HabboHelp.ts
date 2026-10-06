@@ -36,15 +36,6 @@ import type {IHabboSoundManager} from '@habbo/sound/IHabboSoundManager';
 import {IID_HabboFriendList} from '@iid/IIDHabboFriendList';
 import {IID_HabboFreeFlowChat} from '@iid/IIDHabboFreeFlowChat';
 import {UsersMessageEvent} from '@habbo/communication/messages/incoming/room/engine/UsersMessageEvent';
-import {
-    Game2StageStartingMessageEvent
-} from '@habbo/communication/messages/incoming/game/snowwar/arena/Game2StageStartingMessageEvent';
-import type {
-    Game2StageStartingMessageEventParser
-} from '@habbo/communication/messages/parser/game/snowwar/arena/Game2StageStartingMessageEventParser';
-import {
-    HumanGameObjectData
-} from '@habbo/communication/messages/parser/game/snowwar/data/HumanGameObjectData';
 import {RoomEntryInfoMessageEvent} from '@habbo/communication/messages/incoming/room/engine/RoomEntryInfoMessageEvent';
 import {RoomReadyMessageEvent} from '@habbo/communication/messages/incoming/room/session/RoomReadyMessageEvent';
 import {GetGuestRoomResultMessageEvent} from '@habbo/communication/messages/incoming/navigator/GetGuestRoomResultMessageEvent';
@@ -1306,34 +1297,6 @@ export class HabboHelp extends Component implements IHabboHelp, ILinkEventTracke
     }
 
     /**
-     * Registers everyone in a snow-war arena so they can be reported from inside a game.
-     *
-     * The arena is not a room and has no id, so it is registered as room -1 under the name
-     * "SnowStorm" — and the *real* room's id and name are read out first and put back afterwards,
-     * because the registry holds one current room and the player is still in theirs.
-     */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/help/HabboHelp.as::onGameStageStarting()
-    private onGameStageStarting(event: IMessageEvent): void
-    {
-        const parser = event.parser as Game2StageStartingMessageEventParser | null;
-        const gameObjects = parser?.gameObjects?.gameObjects ?? [];
-        const roomId = this._userRegistry.roomId;
-        const roomName = this._userRegistry.roomName;
-
-        this._userRegistry.registerRoom(-1, 'SnowStorm');
-
-        for(const gameObject of gameObjects)
-        {
-            if(!(gameObject instanceof HumanGameObjectData)) continue;
-            if(gameObject.userId === this.ownUserId) continue;
-
-            this._userRegistry.registerUser(gameObject.userId, gameObject.name, gameObject.figure);
-        }
-
-        this._userRegistry.registerRoom(roomId, roomName);
-    }
-
-    /**
 	 * Register the room being entered, before its name is known
 	 */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/help/HabboHelp.as::onRoomReady()
@@ -1507,8 +1470,10 @@ export class HabboHelp extends Component implements IHabboHelp, ILinkEventTracke
     {
         // AS3 registers these six in initComponent() itself, ahead of the sub-managers, because
         // they feed the CFH registries the report flow reads back.
+        // DEVIATION: the sixth, `onGameStageStarting()`, registered the players of a snow-war arena
+        //   as reportable users; the RPG fork removed Snow War, so five remain.
+        // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/help/HabboHelp.as::onGameStageStarting()
         this.addMessageEvent(new UsersMessageEvent(this.onUsers.bind(this)));
-        this.addMessageEvent(new Game2StageStartingMessageEvent(this.onGameStageStarting.bind(this)));
         this.addMessageEvent(new RoomReadyMessageEvent(this.onRoomReady.bind(this)));
         this.addMessageEvent(new GetGuestRoomResultMessageEvent(this.onGuestRoomResult.bind(this)));
         this.addMessageEvent(new RoomEntryInfoMessageEvent(this.onRoomEnter.bind(this)));

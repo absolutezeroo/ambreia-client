@@ -31,7 +31,6 @@ import {RoomObjectAvatarFigureUpdateMessage} from '../../messages/RoomObjectAvat
 import {RoomObjectAvatarSelectedMessage} from '../../messages/RoomObjectAvatarSelectedMessage';
 import {RoomObjectAvatarDirectionUpdateMessage} from '../../messages/RoomObjectAvatarDirectionUpdateMessage';
 import {RoomObjectAvatarMutedUpdateMessage} from '../../messages/RoomObjectAvatarMutedUpdateMessage';
-import {RoomObjectAvatarPlayingGameMessage} from '../../messages/RoomObjectAvatarPlayingGameMessage';
 import {RoomObjectAvatarPlayerValueUpdateMessage} from '../../messages/RoomObjectAvatarPlayerValueUpdateMessage';
 import {RoomObjectAvatarBlockedUpdateMessage} from '../../messages/RoomObjectAvatarBlockedUpdateMessage';
 import {RoomObjectAvatarFlatControlUpdateMessage} from '../../messages/RoomObjectAvatarFlatControlUpdateMessage';
@@ -127,6 +126,8 @@ export class AvatarLogic extends MovingObjectLogic
 
     // DEVIATION: AS3 also handles the habbicon update message (shows the habbicon for 6000ms, and
     //   spins the avatar for `duck_spinning`); the RPG fork removed Habbicons.
+    // DEVIATION: AS3 also stores `RoomObjectAvatarPlayingGameMessage` as `figure_is_playing_game`
+    //   (snow-war arena only); the RPG fork removed Snow War and the games manager.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/logic/AvatarLogic.as::processUpdateMessage()
     override processUpdateMessage(message: RoomObjectUpdateMessage): void
     {
@@ -187,13 +188,6 @@ export class AvatarLogic extends MovingObjectLogic
         if(message instanceof RoomObjectAvatarMutedUpdateMessage)
         {
             model.setNumber('figure_is_muted', message.isMuted ? 1 : 0);
-            return;
-        }
-
-        // Playing game state
-        if(message instanceof RoomObjectAvatarPlayingGameMessage)
-        {
-            model.setNumber('figure_is_playing_game', message.isPlayingGame ? 1 : 0);
             return;
         }
 

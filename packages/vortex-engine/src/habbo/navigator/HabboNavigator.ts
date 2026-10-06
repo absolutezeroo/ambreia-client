@@ -1258,6 +1258,9 @@ export class HabboNavigator extends Component implements IHabboNavigator, ILinkE
      * @param event The toolbar event
      * @see sources/win63_version/habbo/navigator/HabboNavigator.as onHabboToolbarEvent()
      */
+    // DEVIATION: AS3 also closes the navigator on the games icon when `game.center.enabled`; the RPG
+    //   fork removed Snow War, the games manager and the games icon.
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/navigator/HabboNavigator.as::onHabboToolbarEvent()
     private onHabboToolbarEvent = (event: HabboToolbarEvent): void => 
     {
         if(event.type !== HabboToolbarEvent.TOOLBAR_CLICK) return;
@@ -1269,12 +1272,6 @@ export class HabboNavigator extends Component implements IHabboNavigator, ILinkE
                 break;
             case HabboToolbarIconEnum.NAVIGATOR_ME_TAB:
                 this.showOwnRooms();
-                break;
-            case HabboToolbarIconEnum.GAMES:
-                if(this.getBoolean('game.center.enabled')) 
-                {
-                    this.closeNavigator();
-                }
                 break;
             case HabboToolbarIconEnum.HOME:
                 this.goToHomeRoom();

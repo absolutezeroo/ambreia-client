@@ -12,8 +12,6 @@ export const RoomObjectCategoryEnum = {
     OBJECT_CATEGORY_WALL: 20,
     OBJECT_CATEGORY_USER: 100,
     OBJECT_CATEGORY_CURSOR: 200,
-    SNOWBALL: 201,
-    SNOW_SPLASH: 202,
 } as const;
 
 export type RoomObjectCategory = typeof RoomObjectCategoryEnum[keyof typeof RoomObjectCategoryEnum];

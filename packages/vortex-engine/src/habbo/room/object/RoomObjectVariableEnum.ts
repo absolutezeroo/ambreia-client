@@ -48,7 +48,6 @@ export const RoomObjectVariableEnum = {
     AVATAR_WIRED_VARIABLE_HOLDER_HIGHLIGHT: 'figure_highlight_variable_holder',
     AVATAR_CAN_STAND_UP: 'figure_can_stand_up',
     AVATAR_VERTICAL_OFFSET: 'figure_vertical_offset',
-    AVATAR_IS_PLAYING_GAME: 'figure_is_playing_game',
     AVATAR_IS_MUTED: 'figure_is_muted',
     AVATAR_GUIDE_STATUS: 'figure_guide_status',
     HEAD_DIRECTION: 'head_direction',

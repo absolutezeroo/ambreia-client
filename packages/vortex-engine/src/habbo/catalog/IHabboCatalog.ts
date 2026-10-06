@@ -168,8 +168,6 @@ export interface IHabboCatalog
     // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::verifyClubLevel()
     verifyClubLevel(clubLevel?: number): boolean;
     giftReceiver: string;
-    // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::buySnowWarTokensOffer()
-    buySnowWarTokensOffer(localizationId: string): void;
     // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::showVipBenefits()
     showVipBenefits(): void;
     // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::displayProductIcon()

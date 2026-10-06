@@ -55,8 +55,4 @@ export const RoomObjectVisualizationEnum = {
     FURNITURE_BADGE_DISPLAY: 'furniture_badge_display',
     FURNITURE_YOUTUBE: 'furniture_youtube',
     FURNITURE_EXTERNAL_IMAGE: 'furniture_external_image',
-
-    // Game objects (deferred)
-    GAME_SNOWBALL: 'game_snowball',
-    GAME_SNOWSPLASH: 'game_snowsplash',
 } as const;

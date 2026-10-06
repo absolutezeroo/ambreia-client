@@ -96,8 +96,4 @@ export const RoomObjectLogicEnum = {
     PET: 'pet',
     ROOM_TILE_CURSOR: 'tile_cursor',
     SELECTION_ARROW: 'selection_arrow',
-
-    // Game objects
-    SNOWBALL: 'game_snowball',
-    SNOW_SPLASH: 'game_snowsplash',
 } as const;

@@ -84,8 +84,6 @@ import {FurnitureVimeoLogic} from './object/logic/furniture/FurnitureVimeoLogic'
 import {FurnitureCraftingGizmoLogic} from './object/logic/furniture/FurnitureCraftingGizmoLogic';
 // Vortex-only: the fishing spot's logic lives under src/vortex/, not in the ported tree.
 import {FurnitureFishingSignLogic} from '@habbo/vortex/fishing/room/FurnitureFishingSignLogic';
-import {SnowballLogic} from './object/logic/game/SnowballLogic';
-import {SnowSplashLogic} from './object/logic/game/SnowSplashLogic';
 import {FurnitureFishingSpotLogic} from '@habbo/vortex/fishing/room/FurnitureFishingSpotLogic';
 
 type LogicConstructor = new () => IRoomObjectEventHandler;
@@ -149,6 +147,8 @@ export class RoomObjectFactory implements IRoomObjectFactory
         }
     }
 
+    // DEVIATION: AS3 also maps `game_snowball` / `game_snowsplash` onto the snow-war logics; the RPG
+    //   fork removed Snow War, so both types fall back to null like any unknown type.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/RoomObjectFactory.as::createRoomObjectLogic()
     // The case order mirrors the AS3 switch. AS3 has no default branch: an unknown type leaves the
     // class null and the method returns null, so the object simply gets no event handler.
@@ -528,19 +528,6 @@ export class RoomObjectFactory implements IRoomObjectFactory
             case RoomObjectLogicEnum.FURNITURE_NFT_CREDIT:
             case RoomObjectLogicEnum.FURNITURE_NFT_REWARD_BOX:
                 LogicClass = FurnitureLogic;
-
-                break;
-
-            // Neither derives from FurnitureLogic: a snowball is a `MovingObjectLogic` (the room
-            // interpolates between the positions the simulation pushes) and its splash is a bare
-            // `ObjectLogicBase` that never moves at all.
-            case RoomObjectLogicEnum.SNOWBALL:
-                LogicClass = SnowballLogic;
-
-                break;
-
-            case RoomObjectLogicEnum.SNOW_SPLASH:
-                LogicClass = SnowSplashLogic;
 
                 break;
 

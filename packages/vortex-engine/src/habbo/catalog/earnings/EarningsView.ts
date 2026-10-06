@@ -82,6 +82,8 @@ export class EarningsView implements IDisposable
 	 * `wiredchest` unconditionally — it is revealed again only if a status message actually reports
 	 * something in it.
 	 */
+    // DEVIATION: AS3 hides the `snowstorm_container` row only while `games_icon_enabled` is off; the
+    //   RPG fork removed Snow War, so it is always hidden (still in the shipped layout until cleaned).
     // AS3: EarningsView.as::EarningsView()
     constructor(controller: EarningsController, windowManager: IHabboWindowManager | null)
     {
@@ -108,12 +110,10 @@ export class EarningsView implements IDisposable
 
         if(list === null) return;
 
-        if(!controller.getBoolean('games_icon_enabled'))
-        {
-            const snowstorm = list.findChildByName('snowstorm_container');
+        // Always hidden: see the DEVIATION on the constructor.
+        const snowstorm = list.findChildByName('snowstorm_container');
 
-            if(snowstorm !== null) snowstorm.visible = false;
-        }
+        if(snowstorm !== null) snowstorm.visible = false;
 
         if(!controller.getBoolean('wired.game_earnings'))
         {

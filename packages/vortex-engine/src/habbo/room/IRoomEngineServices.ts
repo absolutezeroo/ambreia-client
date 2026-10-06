@@ -21,7 +21,6 @@ import type {IRoomSessionManager} from '@habbo/session/IRoomSessionManager';
 import type {ISessionDataManager} from '@habbo/session/ISessionDataManager';
 import type {IHabboToolbar} from '@habbo/toolbar/IHabboToolbar';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
-import type {IHabboGameManager} from '@habbo/game/IHabboGameManager';
 
 export interface IRoomEngineServices
 {
@@ -130,9 +129,6 @@ export interface IRoomEngineServices
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_87.as::get windowManager()
     readonly windowManager: IHabboWindowManager | null;
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_87.as::get gameEngine()
-    readonly gameEngine: IHabboGameManager | null;
 
     /**
 	 * Asks the ad manager for a billboard's picture.

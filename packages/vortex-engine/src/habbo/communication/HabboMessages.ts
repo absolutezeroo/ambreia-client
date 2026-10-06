@@ -235,7 +235,6 @@ import {
     RoomAdPurchaseInfoMessageEvent,
     LtdRaffleResultMessageEvent,
     LtdRaffleEnteredMessageEvent,
-    SnowWarGameTokensMessageEvent,
     TargetedOfferMessageEvent,
     TargetedOfferNotFoundMessageEvent,
     BundleDiscountRulesetMessageEvent,
@@ -490,82 +489,6 @@ import {MarkCatalogNewAdditionsPageOpenedComposer} from './messages/outgoing/cat
 import {
     ClaimProductResultMessageEvent
 } from './messages/incoming/notifications/ClaimProductResultMessageEvent';
-import {
-    GetSnowWarGameTokensOfferComposer
-} from './messages/outgoing/catalog/GetSnowWarGameTokensOfferComposer';
-import {
-    PurchaseSnowWarGameTokensOfferComposer
-} from './messages/outgoing/catalog/PurchaseSnowWarGameTokensOfferComposer';
-import {
-    Game2ExitGameMessageComposer,
-    Game2LoadStageReadyMessageComposer,
-    Game2PlayAgainMessageComposer
-} from './messages/outgoing/game/arena';
-import {
-    Game2CheckGameDirectoryStatusMessageComposer,
-    Game2GetAccountGameStatusMessageComposer,
-    Game2LeaveGameMessageComposer,
-    Game2QuickJoinGameMessageComposer,
-    Game2StartSnowWarMessageComposer
-} from './messages/outgoing/game/directory';
-import {
-    Game2MakeSnowballMessageComposer,
-    Game2RequestFullStatusUpdateMessageComposer,
-    Game2SetUserMoveTargetMessageComposer,
-    Game2ThrowSnowballAtHumanMessageComposer,
-    Game2ThrowSnowballAtPositionMessageComposer
-} from './messages/outgoing/game/ingame';
-import {
-    Game2AccountGameStatusMessageEvent,
-    Game2GameCancelledMessageEvent,
-    Game2GameCreatedMessageEvent,
-    Game2GameDirectoryStatusMessageEvent,
-    Game2GameLongDataMessageEvent,
-    Game2GameStartedMessageEvent,
-    Game2InArenaQueueMessageEvent,
-    Game2JoiningGameFailedMessageEvent,
-    Game2StartCounterMessageEvent,
-    Game2StartingGameFailedMessageEvent,
-    Game2StopCounterMessageEvent,
-    Game2UserBlockedMessageEvent,
-    Game2UserJoinedGameMessageEvent,
-    Game2UserLeftGameMessageEvent
-} from './messages/incoming/game/directory';
-import {
-    Game2ArenaEnteredMessageEvent,
-    Game2EnterArenaFailedMessageEvent,
-    Game2EnterArenaMessageEvent,
-    Game2GameChatFromPlayerMessageEvent,
-    Game2GameEndingMessageEvent,
-    Game2GameRejoinMessageEvent,
-    Game2PlayerExitedGameArenaMessageEvent,
-    Game2PlayerRematchesMessageEvent,
-    Game2StageEndingMessageEvent,
-    Game2StageLoadMessageEvent,
-    Game2StageRunningMessageEvent,
-    Game2StageStartingMessageEvent,
-    Game2StageStillLoadingMessageEvent
-} from './messages/incoming/game/snowwar/arena';
-import {
-    Game2FullGameStatusMessageEvent,
-    Game2GameStatusMessageEvent
-} from './messages/incoming/game/snowwar/ingame';
-import {
-    Game2FriendsLeaderboardEvent,
-    Game2TotalGroupLeaderboardEvent,
-    Game2TotalLeaderboardEvent,
-    Game2WeeklyFriendsLeaderboardEvent,
-    Game2WeeklyGroupLeaderboardEvent,
-    Game2WeeklyLeaderboardEvent
-} from './messages/incoming/game/score';
-import {
-    Game2GetFriendsLeaderboardComposer,
-    Game2GetTotalGroupLeaderboardComposer,
-    Game2GetTotalLeaderboardComposer,
-    Game2GetWeeklyFriendsLeaderboardComposer,
-    Game2GetWeeklyGroupLeaderboardComposer,
-    Game2GetWeeklyLeaderboardComposer
-} from './messages/outgoing/game/score';
 import {ClaimDailyTaskComposer} from './messages/outgoing/quest/ClaimDailyTaskComposer';
 
 // Incoming Events - Poll
@@ -1003,7 +926,6 @@ import {ClickCharacterComposer} from './messages/outgoing/room/ClickCharacterCom
 import {
     CancelTypingMessageComposer,
     ChatMessageComposer,
-    Game2GameChatMessageComposer,
     SetChatPreferencesMessageComposer,
     ShoutMessageComposer,
     StartTypingMessageComposer,
@@ -1982,11 +1904,8 @@ export class HabboMessages implements IMessageConfiguration
         // for all but 1172, which has no constant there at all - hence the derived name on
         // RoomMuteAllMessageEvent.
         // 2051 (FlatAccessible) is registered above, with the room/session events.
-        // 2902 is `Game2GameStartedMessageEvent`, registered with the other snow-war events
-        // below. It used to be a second port of the same AS3 class (`_SafeCls_3582`) under the
-        // emulator's name, in `incoming/navigator/`, with a parser of its own and no subscriber
-        // — and while that duplicate held the id, the snow-war handler's own event class would
-        // have been rejected by MessageRegistry as unknown. Both files were removed.
+        // 2902 was the snow-war `GameStarted` event; the RPG fork removed Snow War, so it is not
+        // registered.
         // The spam-wall post-it pair. Headers read from WIN63's own registry
         // (_SafeStr_4546[2816] and _composers[2684]) and corroborated by vortex-emulator
         // (RequestSpamWallPostItMessageComposer = 2816, AddSpamWallPostItMessageEvent = 2684).
@@ -2210,52 +2129,6 @@ export class HabboMessages implements IMessageConfiguration
         this._events.set(1028, CampaignCalendarDataMessageEvent);
         this._events.set(2164, CampaignCalendarDoorOpenedMessageEvent);
 
-        // === SNOW WAR (habbo/game) ===
-        // The 32 replies `SnowWarIncomingMessages` subscribes to. Every id is WIN63's own registry
-        // (`_SafeStr_4546[...]` in _SafeCls_2046.as); the emulator corroborates about half and has
-        // no constant for the rest, which is why the class names come from win63_version's readable
-        // filenames rather than from Headers.cs. Two more the handler needs — `RoomEntryInfo` (2914)
-        // and `ScrSendUserInfo` (1097) — are registered elsewhere and shared.
-        // The emulator's snow-war handlers are empty stubs, so none of these arrive yet.
-        this._events.set(3251, Game2GameDirectoryStatusMessageEvent);
-        this._events.set(683, Game2AccountGameStatusMessageEvent);
-        this._events.set(413, Game2GameCreatedMessageEvent);
-        this._events.set(3539, Game2GameLongDataMessageEvent);
-        this._events.set(2902, Game2GameStartedMessageEvent);
-        this._events.set(3352, Game2UserJoinedGameMessageEvent);
-        this._events.set(606, Game2UserLeftGameMessageEvent);
-        this._events.set(1145, Game2UserBlockedMessageEvent);
-        this._events.set(2756, Game2InArenaQueueMessageEvent);
-        this._events.set(2008, Game2StartCounterMessageEvent);
-        this._events.set(2747, Game2StopCounterMessageEvent);
-        this._events.set(2334, Game2GameCancelledMessageEvent);
-        this._events.set(493, Game2JoiningGameFailedMessageEvent);
-        this._events.set(1140, Game2StartingGameFailedMessageEvent);
-
-        this._events.set(620, Game2EnterArenaMessageEvent);
-        this._events.set(2668, Game2EnterArenaFailedMessageEvent);
-        this._events.set(3354, Game2ArenaEnteredMessageEvent);
-        this._events.set(755, Game2StageLoadMessageEvent);
-        this._events.set(2571, Game2StageStillLoadingMessageEvent);
-        this._events.set(3295, Game2StageStartingMessageEvent);
-        this._events.set(3695, Game2StageRunningMessageEvent);
-        this._events.set(2182, Game2StageEndingMessageEvent);
-        this._events.set(3446, Game2GameEndingMessageEvent);
-        this._events.set(1376, Game2GameRejoinMessageEvent);
-        this._events.set(1301, Game2PlayerExitedGameArenaMessageEvent);
-        this._events.set(1742, Game2PlayerRematchesMessageEvent);
-        this._events.set(2010, Game2GameChatFromPlayerMessageEvent);
-
-        this._events.set(1739, Game2FullGameStatusMessageEvent);
-        this._events.set(498, Game2GameStatusMessageEvent);
-
-        this._events.set(2272, Game2FriendsLeaderboardEvent);
-        this._events.set(733, Game2TotalLeaderboardEvent);
-        this._events.set(2417, Game2TotalGroupLeaderboardEvent);
-        this._events.set(273, Game2WeeklyLeaderboardEvent);
-        this._events.set(2802, Game2WeeklyFriendsLeaderboardEvent);
-        this._events.set(2876, Game2WeeklyGroupLeaderboardEvent);
-
         // === ADVERTISEMENT ===
         this._events.set(3898, InterstitialMessageEvent);
         // AS3: header corrected 2247 -> 2396 (_SafeCls_3880, onRoomAdError,
@@ -2382,8 +2255,6 @@ export class HabboMessages implements IMessageConfiguration
         // The limited-edition raffle: entered (the dialog starts its "raffling..." animation) and
         // then drawn. Both read by HabboCatalog.
         this._events.set(2901, LtdRaffleEnteredMessageEvent);
-        // The snow-war token bundles, read by HabboCatalog.
-        this._events.set(904, SnowWarGameTokensMessageEvent);
         this._events.set(3526, LtdRaffleResultMessageEvent);
         this._events.set(2129, RemainingMutePeriodMessageEvent);
         // The badge-point limits table, read by HabboInventory into the localization manager.
@@ -2527,9 +2398,6 @@ export class HabboMessages implements IMessageConfiguration
      */
     private registerComposers(): void
     {
-        // Snow-war token bundles: ask, then buy.
-        this._composers.set(2447, GetSnowWarGameTokensOfferComposer);
-        this._composers.set(3243, PurchaseSnowWarGameTokensOfferComposer);
         // === HANDSHAKE ===
         this._composers.set(4000, ClientHelloMessageComposer);
         this._composers.set(2022, InitDiffieHandshakeMessageComposer);
@@ -2984,8 +2852,7 @@ export class HabboMessages implements IMessageConfiguration
 
         // === SOUND ===
         this._composers.set(541, GetSoundSettingsComposer);
-        // Mannequin (widget/furniture/mannequin) — 606 is also a *server*-side id for
-        // Game2UserLeftGame in the emulator, which is a different direction and so not a clash.
+        // Mannequin (widget/furniture/mannequin).
         this._composers.set(3318, FriendFurniConfirmLockMessageComposer);
         this._composers.set(3045, SetCustomStackingHeightMessageComposer);
         this._composers.set(3637, RedeemPurchasableClothingMessageComposer);
@@ -3033,7 +2900,6 @@ export class HabboMessages implements IMessageConfiguration
         this._composers.set(1697, WhisperMessageComposer);
         this._composers.set(2106, StartTypingMessageComposer);
         this._composers.set(2718, CancelTypingMessageComposer);
-        this._composers.set(3083, Game2GameChatMessageComposer);
 
         // === INVENTORY ===
         this._composers.set(41, RequestFurniInventoryComposer);
@@ -3379,35 +3245,6 @@ export class HabboMessages implements IMessageConfiguration
         this._composers.set(1302, GetCraftingRecipesAvailableComposer);
         this._composers.set(3274, CraftComposer);
         this._composers.set(323, CraftSecretComposer);
-
-        // === SNOW WAR (habbo/game) ===
-        // Every id below is WIN63's own registry (`_composers[...] = ...` in _SafeCls_2046.as) and
-        // every one is corroborated by the emulator's Headers.cs. Three of the five classes in the
-        // directory group are obfuscated in the primary tree — 1506, 1847 and 2109 — and their
-        // names come from win63_version's readable filenames; the emulator carries the same
-        // recovery, including the note that 2109 and 1506 had been swapped, which sent every named
-        // arena join into the quick-join handler.
-        // The emulator's snow-war handlers are empty stubs, so these reach a server that accepts
-        // and drops them. That is a server gap, not a reason to leave the client unable to speak.
-        this._composers.set(1115, Game2CheckGameDirectoryStatusMessageComposer);
-        this._composers.set(3377, Game2GetAccountGameStatusMessageComposer);
-        this._composers.set(2109, Game2StartSnowWarMessageComposer);
-        this._composers.set(1506, Game2QuickJoinGameMessageComposer);
-        this._composers.set(1847, Game2LeaveGameMessageComposer);
-        this._composers.set(1320, Game2LoadStageReadyMessageComposer);
-        this._composers.set(3510, Game2ExitGameMessageComposer);
-        this._composers.set(855, Game2PlayAgainMessageComposer);
-        this._composers.set(172, Game2SetUserMoveTargetMessageComposer);
-        this._composers.set(2604, Game2MakeSnowballMessageComposer);
-        this._composers.set(3738, Game2ThrowSnowballAtHumanMessageComposer);
-        this._composers.set(2567, Game2ThrowSnowballAtPositionMessageComposer);
-        this._composers.set(3147, Game2RequestFullStatusUpdateMessageComposer);
-        this._composers.set(3467, Game2GetFriendsLeaderboardComposer);
-        this._composers.set(3383, Game2GetTotalLeaderboardComposer);
-        this._composers.set(1479, Game2GetTotalGroupLeaderboardComposer);
-        this._composers.set(1741, Game2GetWeeklyLeaderboardComposer);
-        this._composers.set(3867, Game2GetWeeklyFriendsLeaderboardComposer);
-        this._composers.set(1480, Game2GetWeeklyGroupLeaderboardComposer);
 
         // === VORTEX-SPECIFIC (no AS3 backing) ===
         // See the matching note in registerEvents() for why these headers sit at 8000+.

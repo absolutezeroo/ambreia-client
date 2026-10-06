@@ -131,12 +131,6 @@ export class HabboFriendBarData extends Component implements IHabboFriendBarData
     // AS3: .../data/HabboFriendBarData.as::TRACKING_EVENT_ACTION_FIND_FRIENDS
     private static readonly TRACKING_EVENT_ACTION_FIND_FRIENDS: string = 'find_friends_btn_click';
 
-    // AS3: .../data/HabboFriendBarData.as::TRACKING_EVENT_ACTION_PLAY_SNOWSTORM_TAB
-    static readonly TRACKING_EVENT_ACTION_PLAY_SNOWSTORM_TAB: string = 'play_snowstorm_tab_click';
-
-    // AS3: .../data/HabboFriendBarData.as::TRACKING_EVENT_ACTION_PLAY_SNOWSTORM_BUTTON
-    static readonly TRACKING_EVENT_ACTION_PLAY_SNOWSTORM_BUTTON: string = 'play_snowstorm_btn_click';
-
     /** **Name derived** from its value; obfuscated in every tree. */
     // AS3: .../data/HabboFriendBarData.as::TRACKING_EVENT_CATEGORY_TOOLBAR
     private static readonly TRACKING_EVENT_CATEGORY_TOOLBAR: string = 'Toolbar';
@@ -464,18 +458,6 @@ export class HabboFriendBarData extends Component implements IHabboFriendBarData
         {
             this._habboFriendListComponent.close();
         }
-    }
-
-    // AS3: .../data/HabboFriendBarData.as::sendGameTabTracking()
-    sendGameTabTracking(extra: string): void
-    {
-        this.sendEventLogTracking(HabboFriendBarData.TRACKING_EVENT_ACTION_PLAY_SNOWSTORM_TAB, extra);
-    }
-
-    // AS3: .../data/HabboFriendBarData.as::sendGameButtonTracking()
-    sendGameButtonTracking(extra: string): void
-    {
-        this.sendEventLogTracking(HabboFriendBarData.TRACKING_EVENT_ACTION_PLAY_SNOWSTORM_BUTTON, extra);
     }
 
     /**

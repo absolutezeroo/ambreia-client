@@ -19,8 +19,8 @@ import {AvatarEditorIdEnum} from '@habbo/avatar/enum/AvatarEditorIdEnum';
  *
  * The automatic trigger is wired now: a friend walking into the room gets one from
  * `AvatarInfoWidgetHandler`'s RSUDUE arm, and `updatePeerUserView()` drops it again in favour of the
- * full menu on click. `showGamePlayerName()` is reachable end-to-end too, on AS3's own path:
- * `SnowWarEngine` -> `IRoomUI` -> `RoomDesktop` -> here.
+ * full menu on click. `showGamePlayerName()` keeps AS3's path (`IRoomUI` -> `RoomDesktop` -> here),
+ * but its only AS3 caller was the snow-war engine, which the RPG fork removed.
  *
  * Every AS3 sibling view is ported now, the two conditional stand-ins for the own-avatar menu
  * included: DecorateModeView (`isUserDecorating`) and NewUserHelpView (`RoomEnterEffect.isRunning()`).
@@ -390,7 +390,8 @@ export class AvatarInfoWidget extends RoomWidgetBase implements IContextMenuPare
 
     /**
      * The avatar-name bubble shown over a game NPC/player — the end of the chain
-     * `SnowWarEngine` -> `RoomUI.showGamePlayerName()` -> `RoomDesktop` -> here.
+     * `RoomUI.showGamePlayerName()` -> `RoomDesktop` -> here (AS3's caller, the snow-war engine,
+     * was removed in the RPG fork).
      */
     // AS3: AvatarInfoWidget.as::showGamePlayerName()
     public showGamePlayerName(objectId: number, name: string, color: number, fadeDelayMs: number): void

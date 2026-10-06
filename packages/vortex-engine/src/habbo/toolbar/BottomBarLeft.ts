@@ -160,17 +160,9 @@ export class BottomBarLeft implements ILinkEventTracker
         this.iconVisibility('WIRED_MENU', false);
         // Same for the Builders Club icon (RPG fork).
         this.iconVisibility('BUILDER', false);
-
-        const gamesEnabled = toolbar.getBoolean('games_icon_enabled');
-
-        if(gamesEnabled) 
-        {
-            this.iconVisibility(HabboToolbarIconEnum.getIconName('HTIE_ICON_GAMES') ?? '', true);
-        }
-        else 
-        {
-            this.iconVisibility(HabboToolbarIconEnum.getIconName('HTIE_ICON_GAMES') ?? '', false);
-        }
+        // And the games icon: AS3 shows it while `games_icon_enabled`; the RPG fork removed Snow War
+        // and the games manager.
+        this.iconVisibility('GAMES', false);
 
         // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/toolbar/BottomBarLeft.as
         // (constructor) - the "new items" badge overlaid on the catalog icon, shown/hidden by
@@ -458,9 +450,11 @@ export class BottomBarLeft implements ILinkEventTracker
                 // Club. The icon is still in the shipped layout until it is cleaned.
                 child.visible = false;
             }
-            else if(child.name === 'GAMES') 
+            else if(child.name === 'GAMES')
             {
-                child.visible = child.visible && this._toolbar!.getBoolean('games_icon_enabled');
+                // AS3 shows it while `games_icon_enabled`; the RPG fork removed Snow War and the
+                // games manager. The icon is still in the shipped layout until it is cleaned.
+                child.visible = false;
             }
             else if(child.name === 'CAMERA')
             {
@@ -1039,7 +1033,6 @@ export class BottomBarLeft implements ILinkEventTracker
             case 'HTIE_ICON_MEMENU': return 'MEMENU';
             case 'HTIE_ICON_NAVIGATOR': return 'icons_toolbar_navigator';
             case 'HTIE_ICON_PROGRESSION': return 'icons_toolbar_progression';
-            case 'HTIE_ICON_GAMES': return 'icons_toolbar_games';
             case 'HTIE_ICON_STORIES': return 'icons_toolbar_stories';
             case 'HTIE_ICON_RECEPTION': return 'icons_toolbar_reception';
             case 'HTIE_ICON_CAMERA': return 'icons_toolbar_camera';

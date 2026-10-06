@@ -263,8 +263,8 @@ export class PurchaseConfirmationDialog implements IDisposable, IGetImageListene
         }
         else
         {
-            // AS3's remaining class is GameTokensOffer (snow-war tokens), which has no port; every
-            // other offer returns here in AS3 too.
+            // AS3's remaining class is GameTokensOffer (snow-war tokens), removed with Snow War in
+            // the RPG fork; every other offer returns here in AS3 too.
             log.warn(`Unsupported offer class for the purchase confirmation: ${offer.localizationId}`);
 
             return;

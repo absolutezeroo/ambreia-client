@@ -18,7 +18,6 @@ export {IID_HabboFriendBar} from './IIDHabboFriendBar';
 export {IID_HabboFriendBarData} from './IIDHabboFriendBarData';
 export {IID_HabboFriendBarView} from './IIDHabboFriendBarView';
 export {IID_HabboFriendList} from './IIDHabboFriendList';
-export {IID_HabboGameManager} from './IIDHabboGameManager';
 export {IID_HabboGroupForumController} from './IIDHabboGroupForumController';
 export {IID_HabboGroupsManager} from './IIDHabboGroupsManager';
 export {IID_HabboHelp} from './IIDHabboHelp';

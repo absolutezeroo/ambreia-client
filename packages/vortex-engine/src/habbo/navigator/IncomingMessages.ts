@@ -8,12 +8,6 @@ import {Logger} from '@core/utils/Logger';
 
 // Message events
 import {UserObjectMessageEvent} from '../communication/messages/incoming/handshake/UserObjectMessageEvent';
-// The navigator and the snow-war handler both subscribe to 2902, as AS3 does — this used to be a
-// second port of the same class (`_SafeCls_3582`) under the emulator's `GameStarted` name, which
-// left the real one unable to register.
-import {
-    Game2GameStartedMessageEvent
-} from '../communication/messages/incoming/game/directory/Game2GameStartedMessageEvent';
 import {
     NoOwnedRoomsAlertMessageEvent,
     NoSuchFlatMessageEvent,
@@ -188,7 +182,6 @@ export class IncomingMessages
         // left the info/settings/filter windows open over it, and why HC, event-mod and
         // room-picker state never reached NavigatorData.
         this.addMessageEvent(new FlatAccessibleMessageEvent(this.onDoorOpened.bind(this)));
-        this.addMessageEvent(new Game2GameStartedMessageEvent(this.onGameStarted.bind(this)));
         this.addMessageEvent(new RoomMuteAllMessageEvent(this.onMuteAllEvent.bind(this)));
         this.addMessageEvent(new NoOwnedRoomsAlertMessageEvent(this.onNoOwnedRoomsAlert.bind(this)));
         this.addMessageEvent(new NoSuchFlatMessageEvent(this.onNoSuchFlat.bind(this)));
@@ -684,7 +677,7 @@ export class IncomingMessages
         // `_SafeCls_2208` on the new navigator — and both refresh their own controller. This port
         // merged them into one class, so it has to reach both: `mainViewCtrl` is the legacy
         // window, `transitionalNavigator.mainViewCtrl` the `FakeMainViewCtrl` that forwards to the
-        // new navigator. Same pairing at `onRoomSettingsSaved()` and `onGameStarted()`.
+        // new navigator. Same pairing at `onRoomSettingsSaved()`.
         this._navigator.mainViewCtrl?.reloadRoomList(5);
         this._navigator.transitionalNavigator?.mainViewCtrl?.reloadRoomList(5);
         this._navigator.goToMainView();
@@ -1168,12 +1161,9 @@ export class IncomingMessages
         }
     }
 
+    // DEVIATION: AS3 also closes both navigators when a snow-war game starts (header 2902); the RPG
+    //   fork removed Snow War, so that message is neither registered nor subscribed.
     // AS3: .../_SafeCls_1951.as::onGameStarted()
-    private onGameStarted(_event: IMessageEvent): void
-    {
-        this._navigator.mainViewCtrl?.close();
-        this._navigator.transitionalNavigator?.mainViewCtrl?.close();
-    }
 
     /** Redraws the room-info buttons so the mute-all button flips with the new state. */
     // AS3: .../_SafeCls_1951.as::onMuteAllEvent()

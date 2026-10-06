@@ -10,7 +10,6 @@ import {HabboInventory} from '@habbo/inventory/HabboInventory';
 import {HabboCatalog} from '@habbo/catalog/HabboCatalog';
 import {HabboClubCenter} from '@habbo/catalog/clubcenter/HabboClubCenter';
 import {HabboFishing} from '@habbo/vortex/fishing/HabboFishing';
-import {HabboGameManager} from '@habbo/game/HabboGameManager';
 import {HabboDiscordManager} from '@habbo/discord/HabboDiscordManager';
 import {HabboFurniEditor} from '@habbo/vortex/furnieditor/HabboFurniEditor';
 import type {IHabboFurniEditor} from '@habbo/vortex/furnieditor/IHabboFurniEditor';
@@ -96,7 +95,6 @@ import {IID_HabboModeration} from '@iid/IIDHabboModeration';
 import {IID_HabboClubCenter} from '@iid/IIDHabboClubCenter';
 import {IID_HabboFurniEditor} from '@iid/IIDHabboFurniEditor';
 import {IID_HabboFishing} from '@iid/IIDHabboFishing';
-import {IID_HabboGameManager} from '@iid/IIDHabboGameManager';
 import {IID_HabboDiscordManager} from '@iid/IIDHabboDiscordManager';
 import {IID_HabboTracking} from '@iid/IIDHabboTracking';
 import {IID_HabboFriendBar} from '@iid/IIDHabboFriendBar';
@@ -358,7 +356,6 @@ export class VortexMain implements IVortexMain
 
     private _furniEditor: HabboFurniEditor | null = null;
     private _fishing: HabboFishing | null = null;
-    private _gameManager: HabboGameManager | null = null;
 
     /**
      * The Vortex furni editor (staff tool, not from AS3). Null until prepareCore() has run.
@@ -912,16 +909,6 @@ export class VortexMain implements IVortexMain
         // error. Every other component on this list that draws anything is given the same one.
         this._fishing = new HabboFishing(ctx, 0, this._assets);
         ctx.attachComponent(this._fishing, [IID_HabboFishing]);
-
-        // The games component, and through it Snow War. It is attached late for the same reason
-        // the others are: its constructor builds `SnowWarEngine`, which is a Component of its own
-        // and immediately queues fourteen interfaces — the window manager, the room engine, the
-        // toolbar and the rest all have to exist first.
-        // The asset library matters here as much as it does for fishing: every snow-war window is
-        // `WindowUtils.createWindow()` over `assets.getAssetByName()`, and without one the games
-        // window, the lobby, the arena HUD and the leaderboard all build nothing, silently.
-        this._gameManager = new HabboGameManager(ctx, 0, this._assets);
-        ctx.attachComponent(this._gameManager, [IID_HabboGameManager]);
 
         // 12s. Discord Rich Presence. AS3 attaches this from its own SWF bootstrap
         // (`HabboDiscordManagerBootstrap`, listed in `HabboDiscordCom.requiredClasses`), which this

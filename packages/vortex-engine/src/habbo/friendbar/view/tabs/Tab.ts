@@ -3,7 +3,6 @@ import type {IWindowContainer} from '@core/window/IWindowContainer';
 import type {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
 import type {IAvatarRenderManager} from '@habbo/avatar/IAvatarRenderManager';
 import type {IHabboFriendList} from '@habbo/friendlist/IHabboFriendList';
-import type {IHabboGameManager} from '@habbo/game/IHabboGameManager';
 import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';
 import type {IHabboTracking} from '@habbo/tracking/IHabboTracking';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
@@ -48,9 +47,6 @@ export class Tab implements ITab
 
     // AS3: .../view/tabs/Tab.as::FRIENDS
     static friends: IHabboFriendList | null = null;
-
-    // AS3: .../view/tabs/Tab.as::GAMES
-    static games: IHabboGameManager | null = null;
 
     // AS3: .../view/tabs/Tab.as::VIEW
     static view: IHabboFriendBarView | null = null;

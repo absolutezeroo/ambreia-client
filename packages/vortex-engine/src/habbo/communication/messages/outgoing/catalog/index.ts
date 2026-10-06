@@ -29,7 +29,5 @@ export * from './ShopTargetedOfferViewedComposer';
 export * from './GetHabboClubExtendOfferMessageComposer';
 export {GetSeasonalCalendarDailyComposer} from './GetSeasonalCalendarDailyComposer';
 export {MarkCatalogNewAdditionsPageOpenedComposer} from './MarkCatalogNewAdditionsPageOpenedComposer';
-export * from './GetSnowWarGameTokensOfferComposer';
-export * from './PurchaseSnowWarGameTokensOfferComposer';
 export * from './ClaimProductComposer';
 export * from './HasClaimedProductComposer';

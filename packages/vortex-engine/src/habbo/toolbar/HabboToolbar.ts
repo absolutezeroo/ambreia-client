@@ -709,7 +709,7 @@ export class HabboToolbar extends Component implements IHabboToolbar
 	 *
 	 * Emitting the click *is* the whole method: in AS3 too, a separate module subscribes and
 	 * decides what to open. CATALOGUE reaches HabboCatalog, ACHIEVEMENTS the quest
-	 * engine, NAVIGATOR/ROOMINFO/HOME the navigator, INVENTORY the inventory, MEMENU/GAMES the
+	 * engine, NAVIGATOR/ROOMINFO/HOME the navigator, INVENTORY the inventory, MEMENU the
 	 * me-menu controller, and the landing view listens for its own.
 	 *
 	 * CAMERA is the one icon that does not emit a click at all: AS3 raises `CAMERA_TOGGLE`

@@ -4,7 +4,6 @@ export {ExpressionAddition} from './ExpressionAddition';
 export {ExpressionAdditionFactory} from './ExpressionAdditionFactory';
 export {FloatingHeart} from './FloatingHeart';
 export {FloatingIdleZ} from './FloatingIdleZ';
-export {GameClickTarget} from './GameClickTarget';
 export {GuideStatusBubble} from './GuideStatusBubble';
 export {MutedBubble} from './MutedBubble';
 export {NumberBubble} from './NumberBubble';
