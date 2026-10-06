@@ -17,7 +17,7 @@
  * previews (bots, pets) assumed the wrapper would centre for them, and it does not.
  *
  * `offsetX`/`offsetY` nudge the centred image, which is the shape AS3 writes at the call sites that
- * take one — `snowwar/utils/WindowUtils.setElementImage()` adds them to the centring term.
+ * take one: the offsets are added to the centring term.
  *
  * TS-only in the sense that AS3 has no such shared function — it inlines these lines per call site.
  */
