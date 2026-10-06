@@ -30,13 +30,14 @@ export class UiHelpBubbleWidgetHandler implements IRoomWidgetHandler
 
     /**
      * Returns **"RWE_ROOM_POLL"**, not "RWE_UI_HELP_BUBBLE". That is AS3's own copy-paste, kept
-     * verbatim — `PollWidgetHandler` and `FriendRequestWidgetHandler` return the same string.
+     * verbatim — `FriendRequestWidgetHandler` returns the same string, and so did AS3's poll widget
+     * handler, which the RPG fork removed with polls.
      *
      * It is harmless because `type` is only used to route `RETWE_OPEN_WIDGET`/`RETWE_CLOSE_WIDGET`
      * to a single handler, and this one's `processEvent()` is empty; the widget itself is filed
      * under the name passed to `createWidget()`, which *is* "RWE_UI_HELP_BUBBLE". Correcting it
-     * would be a behaviour change, not a port — a poll open/close event would stop reaching a
-     * handler that currently receives and ignores it.
+     * would be a behaviour change, not a port — an open/close event aimed at "RWE_ROOM_POLL" would
+     * stop reaching a handler that currently receives and ignores it.
      */
     // AS3: .../handler/UiHelpBubbleWidgetHandler.as::get type()
     get type(): string
@@ -58,9 +59,9 @@ export class UiHelpBubbleWidgetHandler implements IRoomWidgetHandler
     }
 
     /**
-     * `RWPM_ANSWER` is the **same string** `RoomWidgetPollMessage.ANSWER` uses, so both handlers
-     * are called for it and each is disambiguated only by its own cast failing. The cast below is
-     * therefore load-bearing, not defensive.
+     * `RWPM_ANSWER` is the **same string** AS3's poll answer message uses, so in AS3 both handlers
+     * are called for it and each is disambiguated only by its own cast failing. The RPG fork
+     * removed polls, so this handler is now the only one; the cast below stays as AS3 wrote it.
      */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/UiHelpBubbleWidgetHandler.as::getWidgetMessages()
     getWidgetMessages(): string[] | null

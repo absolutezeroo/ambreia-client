@@ -157,16 +157,6 @@ export interface IRoomSession
     // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::sendUpdateClothingChangeFurniture()
     sendUpdateClothingChangeFurniture(objectId: number, gender: string, figure: string): void;
 
-    // Poll methods
-    // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::sendPollStartMessage()
-    sendPollStartMessage(pollId: number): void;
-
-    // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::sendPollRejectMessage()
-    sendPollRejectMessage(pollId: number): void;
-
-    // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::sendPollAnswerMessage()
-    sendPollAnswerMessage(pollId: number, questionId: number, answers: string[]): void;
-
     // Tracking methods
     // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::sendConversionPoint()
     sendConversionPoint(category: string, pointType: string, action: string, extraString?: string | null, extraInt?: number): void;

@@ -46,10 +46,8 @@ import {DoorbellWidget} from './widget/doorbell/DoorbellWidget';
 import {RoomQueueWidget} from './widget/roomqueue/RoomQueueWidget';
 import {LoadingBarWidget} from './widget/loadingbar/LoadingBarWidget';
 import {AreaHideFurniWidget} from './widget/furniture/areahide/AreaHideFurniWidget';
-import {PollWidget} from './widget/poll/PollWidget';
 import {FriendRequestWidget} from './widget/friendrequest/FriendRequestWidget';
 import {HighScoreDisplayWidget} from './widget/furniture/highscore/HighScoreDisplayWidget';
-import {WordQuizWidget} from './widget/wordquiz/WordQuizWidget';
 import {ExternalImageWidget} from './widget/furniture/externalimage/ExternalImageWidget';
 import {UiHelpBubblesWidget} from './widget/uihelpbubbles/UiHelpBubblesWidget';
 import {MeMenuWidget} from './widget/memenu/MeMenuWidget';
@@ -79,6 +77,8 @@ export class RoomWidgetFactory implements IRoomWidgetFactory
         this._roomUI = roomUI;
     }
 
+    // DEVIATION: AS3 also builds the poll widget (RWE_ROOM_POLL) and the word-quiz widget
+    //   (RWE_WORD_QUIZZ); the RPG fork removed polls and the word quiz.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/RoomWidgetFactory.as::createWidget()
     public createWidget(type: string, handler: IRoomWidgetHandler): unknown | null
     {
@@ -180,11 +180,6 @@ export class RoomWidgetFactory implements IRoomWidgetFactory
                     // once as the plain Component this widget reads config and the stage off.
                     this._roomUI
                 );
-            // AS3: RoomWidgetFactory.as::createWidget() "RWE_WORD_QUIZZ"
-            case 'RWE_WORD_QUIZZ':
-                return new WordQuizWidget(
-                    handler, this._roomUI.windowManager, this._roomUI.assets, this._roomUI.localization
-                );
             // AS3: RoomWidgetFactory.as::createWidget() "RWE_HIGH_SCORE_DISPLAY"
             case 'RWE_HIGH_SCORE_DISPLAY':
                 return new HighScoreDisplayWidget(
@@ -198,11 +193,6 @@ export class RoomWidgetFactory implements IRoomWidgetFactory
                     this._roomUI.assets,
                     this._roomUI.localization,
                     this._roomUI
-                );
-            // AS3: RoomWidgetFactory.as::createWidget() "RWE_ROOM_POLL"
-            case 'RWE_ROOM_POLL':
-                return new PollWidget(
-                    handler, this._roomUI.windowManager, this._roomUI.assets, this._roomUI.localization
                 );
             // AS3: RoomWidgetFactory.as::createWidget() "RWE_AREA_HIDE"
             case 'RWE_AREA_HIDE':

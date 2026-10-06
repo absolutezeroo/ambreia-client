@@ -12,7 +12,6 @@ export {HabboHotelViewEvent} from './HabboHotelViewEvent';
 export {NoobnessLevelEnum} from './NoobnessLevelEnum';
 export {PerkType} from './PerkType';
 export {PlatformType} from './PlatformType';
-export {PollQuestionType} from './PollQuestionType';
 export {TradeOfferState} from './TradeOfferState';
 
 // Types
@@ -26,5 +25,4 @@ export type {HabboHotelViewEventType} from './HabboHotelViewEvent';
 export type {NoobnessLevelType} from './NoobnessLevelEnum';
 export type {PerkTypeValue} from './PerkType';
 export type {PlatformTypeValue} from './PlatformType';
-export type {PollQuestionTypeValue} from './PollQuestionType';
 export type {TradeOfferStateType} from './TradeOfferState';

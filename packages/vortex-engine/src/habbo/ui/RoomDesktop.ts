@@ -113,11 +113,9 @@ import type {IHabboMessenger} from '@habbo/messenger/IHabboMessenger';
 import {ExternalImageWidgetHandler} from './handler/ExternalImageWidgetHandler';
 import {UiHelpBubbleWidgetHandler} from './handler/UiHelpBubbleWidgetHandler';
 import {MeMenuWidgetHandler} from './handler/MeMenuWidgetHandler';
-import {PollWidgetHandler} from './handler/PollWidgetHandler';
 import {ObjectLocationRequestHandler} from './handler/ObjectLocationRequestHandler';
 import {FriendRequestWidgetHandler} from './handler/FriendRequestWidgetHandler';
 import {HighScoreDisplayWidgetHandler} from './handler/HighScoreDisplayWidgetHandler';
-import {WordQuizWidgetHandler} from './handler/WordQuizWidgetHandler';
 import {UserChooserWidgetHandler} from './handler/UserChooserWidgetHandler';
 import {FurniChooserWidgetHandler} from './handler/FurniChooserWidgetHandler';
 import {FurnitureBadgeDisplayWidgetHandler} from './handler/FurnitureBadgeDisplayWidgetHandler';
@@ -1189,6 +1187,8 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
      */
     // DEVIATION: AS3 also builds the handlers for the photo camera, the room-thumbnail camera and
     //   the jukebox playlist editor; the RPG fork removed photos and jukebox music.
+    // DEVIATION: AS3 also builds the RWE_ROOM_POLL and RWE_WORD_QUIZZ handlers; the RPG fork removed
+    //   polls and the word quiz.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::createWidget()
     public createWidget(type: string): void 
     {
@@ -1299,10 +1299,6 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
             case 'RWE_USER_CHOOSER':
                 handler = new UserChooserWidgetHandler();
                 break;
-            // AS3: RoomDesktop.as:813-815 "RWE_WORD_QUIZZ"
-            case 'RWE_WORD_QUIZZ':
-                handler = new WordQuizWidgetHandler();
-                break;
             // AS3: RoomDesktop.as:883-885 "RWE_HIGH_SCORE_DISPLAY"
             case 'RWE_HIGH_SCORE_DISPLAY':
                 handler = new HighScoreDisplayWidgetHandler();
@@ -1315,10 +1311,6 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
             // handler answers a message synchronously and is the whole feature.
             case 'RWE_LOCATION_WIDGET':
                 handler = new ObjectLocationRequestHandler();
-                break;
-            // AS3: RoomDesktop.as:810-812 "RWE_ROOM_POLL"
-            case 'RWE_ROOM_POLL':
-                handler = new PollWidgetHandler();
                 break;
             // AS3: RoomDesktop.as:912-914 "RWE_EXTERNAL_IMAGE"
             case 'RWE_EXTERNAL_IMAGE':

@@ -49,10 +49,6 @@ export const RoomWidgetEnum = {
     // AS3: RoomWidgetEnum.as::ROOM_QUEUE
     ROOM_QUEUE: "RWE_ROOM_QUEUE",
 
-    /** Derived name — `_SafeStr_10689`; named from its own value, which is all it has. */
-    // AS3: RoomWidgetEnum.as::_SafeStr_10689
-    ROOM_POLL: "RWE_ROOM_POLL",
-
     // AS3: RoomWidgetEnum.as::USER_CHOOSER
     USER_CHOOSER: "RWE_USER_CHOOSER",
 
@@ -142,10 +138,6 @@ export const RoomWidgetEnum = {
 
     // AS3: RoomWidgetEnum.as::EXTERNAL_IMAGE
     EXTERNAL_IMAGE: "RWE_EXTERNAL_IMAGE",
-
-    /** Derived name — `_SafeStr_10572`; named from its own value, which is all it has. */
-    // AS3: RoomWidgetEnum.as::_SafeStr_10572
-    WORD_QUIZZ: "RWE_WORD_QUIZZ",
 
     /** Derived name — `_SafeStr_11391`; named from its own value, which is all it has. */
     // AS3: RoomWidgetEnum.as::_SafeStr_11391

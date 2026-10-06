@@ -25,14 +25,12 @@ import {SingleViewCatalogWidget} from './widgets/SingleViewCatalogWidget';
 import {RoomPreviewCatalogWidget} from './widgets/RoomPreviewCatalogWidget';
 import {TrophyCatalogWidget} from './widgets/TrophyCatalogWidget';
 import {UserBadgeSelectorCatalogWidget} from './widgets/UserBadgeSelectorCatalogWidget';
-import {SoldLtdItemsCatalogWidget} from './widgets/SoldLtdItemsCatalogWidget';
 import {MadMoneyCatalogWidget} from './widgets/MadMoneyCatalogWidget';
 import {AddOnBadgeViewCatalogWidget} from './widgets/AddOnBadgeViewCatalogWidget';
 import {FeaturedItemsCatalogWidget} from './widgets/FeaturedItemsCatalogWidget';
 import {ColourGridCatalogWidget} from './widgets/ColourGridCatalogWidget';
 import {BundleGridViewCatalogWidget} from './widgets/BundleGridViewCatalogWidget';
 import {ActivityPointDisplayCatalogWidget} from './widgets/ActivityPointDisplayCatalogWidget';
-import {RedeemItemCodeCatalogWidget} from './widgets/RedeemItemCodeCatalogWidget';
 import {SpacesNewCatalogWidget} from './widgets/SpacesNewCatalogWidget';
 import {BundlePurchaseExtraInfoWidget} from './widgets/BundlePurchaseExtraInfoWidget';
 import {ClubBuyCatalogWidget} from './widgets/ClubBuyCatalogWidget';
@@ -370,6 +368,12 @@ export class CatalogPage implements ICatalogPage
     // naming a widget that does not exist is silently skipped rather than throwing.
     // DEVIATION: AS3 also builds `songDiskProductViewWidget` and `traxPreviewWidget`; the RPG fork
     //   removed jukebox music, so a layout naming either leaves that slot inert.
+    // DEVIATION: AS3 builds the sold-out LTD banner widget on `soldLtdItemsWidget` (which hid its
+    //   slot until a sold-out limited offer was selected, then hid the purchase widget); the RPG
+    //   fork removed LTD sales, so the slot is only hidden and the purchase widget always stays.
+    // DEVIATION: AS3 builds the voucher-code widget on `redeemItemCodeWidget`; the RPG fork removed
+    //   vouchers, so the slot (its code field and redeem button are inline in the front-page
+    //   layouts) is hidden.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/viewer/CatalogPage.as::createWidget()
     private createWidget(window: IWindowContainer): void
     {
@@ -430,7 +434,7 @@ export class CatalogPage implements ICatalogPage
                 this._widgets.push(new RoomPreviewCatalogWidget(window));
                 break;
             case CatalogWidgetName.SOLD_LTD_ITEMS:
-                this._widgets.push(new SoldLtdItemsCatalogWidget(window, this._catalog!));
+                window.visible = false;
                 break;
             case CatalogWidgetName.MAD_MONEY:
                 this._widgets.push(new MadMoneyCatalogWidget(window));
@@ -451,7 +455,7 @@ export class CatalogPage implements ICatalogPage
                 this._widgets.push(new ActivityPointDisplayCatalogWidget(window));
                 break;
             case CatalogWidgetName.REDEEM_ITEM_CODE:
-                this._widgets.push(new RedeemItemCodeCatalogWidget(window));
+                window.visible = false;
                 break;
             case CatalogWidgetName.SPACES_NEW:
                 this._widgets.push(new SpacesNewCatalogWidget(

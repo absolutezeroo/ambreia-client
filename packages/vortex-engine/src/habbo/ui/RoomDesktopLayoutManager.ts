@@ -126,6 +126,8 @@ export class RoomDesktopLayoutManager
     /**
 	 * Gets the widget container for a given widget name.
 	 */
+    // DEVIATION: AS3 also files RWE_WORD_QUIZZ under `background_widgets`; the RPG fork removed the
+    //   word quiz.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/_SafeCls_2850.as::getWidgetContainer()
     private getWidgetContainer(name: string, window: IWindow): IWindowContainer | null
     {
@@ -133,9 +135,9 @@ export class RoomDesktopLayoutManager
 
         // By *name*, not by tag: `room_desktop_layout_xml` declares this one container as
         // `name="background_widgets"` with no tags at all, and AS3 looks it up accordingly
-        // (`getChildByName`). Searching by tag matched nothing, so both widgets that land here
-        // were refused a container — "No container found for widget: RWE_HIGH_SCORE_DISPLAY".
-        if(name === 'RWE_HIGH_SCORE_DISPLAY' || name === 'RWE_WORD_QUIZZ')
+        // (`getChildByName`). Searching by tag matched nothing, so the widget that lands here was
+        // refused a container — "No container found for widget: RWE_HIGH_SCORE_DISPLAY".
+        if(name === 'RWE_HIGH_SCORE_DISPLAY')
         {
             return this._layoutContainer.getChildByName('background_widgets') as IWindowContainer | null;
         }

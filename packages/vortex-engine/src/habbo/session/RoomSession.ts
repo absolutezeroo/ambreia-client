@@ -41,7 +41,6 @@ import {
     UseProductForPetComposer,
     WhisperMessageComposer,
 } from '../communication/messages/outgoing/room';
-import {PollAnswerComposer, PollRejectComposer, PollStartComposer,} from '../communication/messages/outgoing/poll';
 import {VisitUserMessageComposer,} from '../communication/messages/outgoing/friendlist';
 import {EventLogMessageComposer,} from '../communication/messages/outgoing';
 import {NewUserExperienceScriptProceedComposer,} from '../communication/messages/outgoing/handshake';
@@ -698,30 +697,6 @@ export class RoomSession implements IRoomSession
         if(this._connection === null) return;
 
         this._connection.send(new UpdateClothingChangeFurnitureComposer(objectId, gender, figure));
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::sendPollStartMessage()
-    sendPollStartMessage(pollId: number): void
-    {
-        if(this._connection === null) return;
-
-        this._connection.send(new PollStartComposer(pollId));
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::sendPollRejectMessage()
-    sendPollRejectMessage(pollId: number): void
-    {
-        if(this._connection === null) return;
-
-        this._connection.send(new PollRejectComposer(pollId));
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::sendPollAnswerMessage()
-    sendPollAnswerMessage(pollId: number, questionId: number, answers: string[]): void
-    {
-        if(this._connection === null) return;
-
-        this._connection.send(new PollAnswerComposer(pollId, questionId, answers));
     }
 
     // AS3: .../src/com/sulake/habbo/session/RoomSession.as::sendConversionPoint()

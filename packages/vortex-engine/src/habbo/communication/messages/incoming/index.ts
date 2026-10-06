@@ -22,7 +22,6 @@ export * from './perk';
 export * from './preferences';
 export * from './newnavigator';
 export * from './notifications';
-export * from './poll';
 export * from './quest';
 export * from './room';
 export * from './tracking';

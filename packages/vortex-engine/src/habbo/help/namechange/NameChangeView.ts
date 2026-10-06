@@ -31,7 +31,7 @@ export class NameChangeView
      *
      * Kept as the same dotted string because the contract is the page's, not ours: a page written
      * for the Flash client keeps working, and one that defines nothing simply never gets called.
-     * Same treatment as `MallOfferExternalInterfaceHelper`.
+     * Same treatment as `PageBridge`.
      */
     // AS3: .../NameChangeView.as::NAME_UPDATE_FUNCTION
     private static readonly NAME_UPDATE_FUNCTION: string = 'FlashExternalInterface.updateName';
@@ -522,7 +522,7 @@ export class NameChangeView
      *
      * Walks the dotted path on `window` and calls it if it resolves to a function — inert when the
      * host page defines nothing, which is the normal case for a standalone client. Same mechanism
-     * as `MallOfferExternalInterfaceHelper.callPage()`.
+     * as `PageBridge.call()`.
      */
     // AS3: .../NameChangeView.as::showConfirmationView() (its ExternalInterface tail)
     private notifyPage(name: string): void

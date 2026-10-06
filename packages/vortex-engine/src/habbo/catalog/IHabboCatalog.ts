@@ -68,8 +68,6 @@ export interface IHabboCatalog
     // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::getSeasonalCurrencyActivityPointType()
     getSeasonalCurrencyActivityPointType(): number;
 
-    // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::redeemVoucher()
-    redeemVoucher(voucher: string): void;
     // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::loadCatalogPage()
     loadCatalogPage(pageId: number, offerId: number, catalogType: string): void;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::sendGetProductOffer()

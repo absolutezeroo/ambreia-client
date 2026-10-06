@@ -219,10 +219,6 @@ import {
     LimitedEditionSoldOutMessageEvent,
     GiftReceiverNotFoundMessageEvent,
     RoomAdPurchaseInfoMessageEvent,
-    LtdRaffleResultMessageEvent,
-    LtdRaffleEnteredMessageEvent,
-    TargetedOfferMessageEvent,
-    TargetedOfferNotFoundMessageEvent,
     BundleDiscountRulesetMessageEvent,
     CatalogPublishedMessageEvent,
     GiftWrappingConfigurationEvent,
@@ -241,8 +237,6 @@ import {
     RecyclerPrizesMessageEvent,
     RecyclerStatusMessageEvent,
     SellablePetPalettesMessageEvent,
-    VoucherRedeemErrorMessageEvent,
-    VoucherRedeemOkMessageEvent,
 } from './messages/incoming/catalog';
 
 // Incoming Events - Marketplace
@@ -475,16 +469,6 @@ import {
     ClaimProductResultMessageEvent
 } from './messages/incoming/notifications/ClaimProductResultMessageEvent';
 import {ClaimDailyTaskComposer} from './messages/outgoing/quest/ClaimDailyTaskComposer';
-
-// Incoming Events - Poll
-import {
-    PollContentsEvent,
-    PollErrorEvent,
-    PollOfferEvent,
-    QuestionAnsweredEvent,
-    QuestionEvent,
-    QuestionFinishedEvent,
-} from './messages/incoming/poll';
 
 // Onboarding (new user flow) — the starter-room pick and the figure save. Imported by path: the
 // nux/ barrels are generated and do not list these yet.
@@ -1000,9 +984,6 @@ import {
     UseProductForPetComposer,
 } from './messages/outgoing/room/pet';
 
-// Outgoing Composers - Poll
-import {PollAnswerComposer, PollRejectComposer, PollStartComposer,} from './messages/outgoing/poll';
-
 // Outgoing Composers - Landing View
 import {CommunityGoalVoteMessageComposer, GetPromoArticlesComposer,} from './messages/outgoing/landingview';
 
@@ -1023,10 +1004,6 @@ import {
     GetRecyclerPrizesMessageComposer,
     GetRecyclerStatusMessageComposer,
     GetRoomAdsPurchaseInfoMessageComposer,
-    GetNextTargetedOfferComposer,
-    SetTargetedOfferStateComposer,
-    PurchaseTargetedOfferComposer,
-    ShopTargetedOfferViewedComposer,
     PurchaseRoomAdMessageComposer,
     RoomAdPurchaseInitiatedMessageComposer,
     GetSellablePetPalettesComposer,
@@ -1035,7 +1012,6 @@ import {
     PurchaseProductAsGiftMessageComposer,
     PurchaseVipMembershipExtensionComposer,
     RecycleItemsMessageComposer,
-    RedeemVoucherMessageComposer,
     SelectClubGiftComposer,
 } from './messages/outgoing/catalog';
 
@@ -2065,14 +2041,6 @@ export class HabboMessages implements IMessageConfiguration
         // an unrelated, unported message.
         this._events.set(1740, RoomMessageNotificationMessageEvent);
 
-        // === POLL / WORD QUIZ ===
-        this._events.set(579, PollOfferEvent);
-        this._events.set(969, PollErrorEvent);
-        this._events.set(1297, PollContentsEvent);
-        this._events.set(2157, QuestionEvent);
-        this._events.set(1659, QuestionAnsweredEvent);
-        this._events.set(2108, QuestionFinishedEvent);
-
         // === ERROR ===
         this._events.set(1107, ErrorReportEvent);
 
@@ -2103,12 +2071,7 @@ export class HabboMessages implements IMessageConfiguration
         this._events.set(2735, GiftReceiverNotFoundMessageEvent);
         // The room list a room ad can point at (`_events[3787]`), read by RoomAdsCatalogWidget.
         this._events.set(3787, RoomAdPurchaseInfoMessageEvent);
-        // The targeted-offer pair (`_events[2155]`/`_events[2013]`), read by OfferController.
         // The mute countdown, read by RoomChatHandler.
-        // The limited-edition raffle: entered (the dialog starts its "raffling..." animation) and
-        // then drawn. Both read by HabboCatalog.
-        this._events.set(2901, LtdRaffleEnteredMessageEvent);
-        this._events.set(3526, LtdRaffleResultMessageEvent);
         this._events.set(2129, RemainingMutePeriodMessageEvent);
         // The badge-point limits table, read by HabboInventory into the localization manager.
         this._events.set(3510, BadgePointLimitsMessageEvent);
@@ -2117,8 +2080,6 @@ export class HabboMessages implements IMessageConfiguration
         // The two wallet currencies, read by HabboCatalog into the purse.
         this._events.set(3727, SilverBalanceMessageEvent);
         this._events.set(583, EmeraldBalanceMessageEvent);
-        this._events.set(2155, TargetedOfferMessageEvent);
-        this._events.set(2013, TargetedOfferNotFoundMessageEvent);
         this._events.set(1073, BundleDiscountRulesetMessageEvent);
         this._events.set(1369, GiftWrappingConfigurationEvent);
         this._events.set(773, CatalogPublishedMessageEvent);
@@ -2131,8 +2092,6 @@ export class HabboMessages implements IMessageConfiguration
         this._events.set(1029, PurchaseErrorMessageEvent);
         this._events.set(2493, PurchaseNotAllowedMessageEvent);
         this._events.set(1038, NotEnoughBalanceMessageEvent);
-        this._events.set(1771, VoucherRedeemOkMessageEvent);
-        this._events.set(133, VoucherRedeemErrorMessageEvent);
         this._events.set(419, HabboClubOffersMessageEvent);
         this._events.set(3689, HabboClubExtendOfferMessageEvent);
         this._events.set(2442, MarketPlaceOffersEvent);
@@ -2521,11 +2480,6 @@ export class HabboMessages implements IMessageConfiguration
         this._composers.set(1101, PassCarryItemMessageComposer);
         this._composers.set(1545, DropCarryItemMessageComposer);
 
-        // === POLL ===
-        this._composers.set(743, PollStartComposer);
-        this._composers.set(1088, PollRejectComposer);
-        this._composers.set(3386, PollAnswerComposer);
-
         // === NOTIFICATIONS ===
         this._composers.set(3163, GetMOTDMessageComposer);
 
@@ -2781,7 +2735,6 @@ export class HabboMessages implements IMessageConfiguration
         this._composers.set(2093, GetCatalogPageComposer);
         this._composers.set(1692, GetProductOfferComposer);
         this._composers.set(1706, PurchaseFromCatalogComposer);
-        this._composers.set(2779, RedeemVoucherMessageComposer);
         this._composers.set(667, GetClubOffersMessageComposer);
         this._composers.set(2441, PurchaseVipMembershipExtensionComposer);
         this._composers.set(3561, PurchaseBasicMembershipExtensionComposer);
@@ -2795,10 +2748,6 @@ export class HabboMessages implements IMessageConfiguration
         // Targeted offers. 848 is from WIN63's registry and the emulator does NOT match it - it
         // listens on a 9004 placeholder its own comment admits is unresolved, so the request
         // currently reaches nothing. The registry is the authority; the emulator needs the fix.
-        this._composers.set(848, GetNextTargetedOfferComposer);
-        this._composers.set(2874, SetTargetedOfferStateComposer);
-        this._composers.set(2497, PurchaseTargetedOfferComposer);
-        this._composers.set(3046, ShopTargetedOfferViewedComposer);
         this._composers.set(2928, PurchaseRoomAdMessageComposer);
         this._composers.set(3607, RoomAdPurchaseInitiatedMessageComposer);
         this._composers.set(2909, PurchaseProductAsGiftMessageComposer);

@@ -91,9 +91,6 @@ import {GetRoomAdsPurchaseInfoMessageComposer} from '@habbo/communication/messag
 import {PurchaseRoomAdMessageComposer} from '@habbo/communication/messages/outgoing/catalog/PurchaseRoomAdMessageComposer';
 import {RoomAdPurchaseInitiatedMessageComposer} from '@habbo/communication/messages/outgoing/catalog/RoomAdPurchaseInitiatedMessageComposer';
 import {AssetLoaderEvent} from '@core/assets/loaders/AssetLoaderEvent';
-import {LtdRaffleResultMessageEvent} from '@habbo/communication/messages/incoming/catalog/LtdRaffleResultMessageEvent';
-import {LtdRaffleEnteredMessageEvent} from '@habbo/communication/messages/incoming/catalog/LtdRaffleEnteredMessageEvent';
-import type {LtdRaffleResultMessageParser} from '@habbo/communication/messages/parser/catalog/LtdRaffleResultMessageParser';
 import {SilverBalanceMessageEvent} from '@habbo/communication/messages/incoming/inventory/purse/SilverBalanceMessageEvent';
 import {EmeraldBalanceMessageEvent} from '@habbo/communication/messages/incoming/inventory/purse/EmeraldBalanceMessageEvent';
 import type {SilverBalanceMessageParser} from '@habbo/communication/messages/parser/inventory/purse/SilverBalanceMessageParser';
@@ -133,11 +130,6 @@ import type {PurchaseNotAllowedMessageEventParser} from '@habbo/communication/me
 import {NotEnoughBalanceMessageEvent} from '@habbo/communication/messages/incoming/catalog/NotEnoughBalanceMessageEvent';
 import type {NotEnoughBalanceMessageEventParser} from '@habbo/communication/messages/parser/catalog/NotEnoughBalanceMessageEventParser';
 import {CatalogFurniPurchaseEvent} from './navigation/events/CatalogFurniPurchaseEvent';
-import {RedeemVoucherMessageComposer} from '@habbo/communication/messages/outgoing/catalog/RedeemVoucherMessageComposer';
-import {VoucherRedeemOkMessageEvent} from '@habbo/communication/messages/incoming/catalog/VoucherRedeemOkMessageEvent';
-import type {VoucherRedeemOkMessageEventParser} from '@habbo/communication/messages/parser/catalog/VoucherRedeemOkMessageEventParser';
-import {VoucherRedeemErrorMessageEvent} from '@habbo/communication/messages/incoming/catalog/VoucherRedeemErrorMessageEvent';
-import type {VoucherRedeemErrorMessageEventParser} from '@habbo/communication/messages/parser/catalog/VoucherRedeemErrorMessageEventParser';
 import {GetClubOffersMessageComposer} from '@habbo/communication/messages/outgoing/catalog/GetClubOffersMessageComposer';
 import {HabboClubOffersMessageEvent} from '@habbo/communication/messages/incoming/catalog/HabboClubOffersMessageEvent';
 import type {HabboClubOffersMessageEventParser} from '@habbo/communication/messages/parser/catalog/HabboClubOffersMessageEventParser';
@@ -217,7 +209,6 @@ import {IID_SpecialItemsController} from '@iid/IIDSpecialItemsController';
 import {PlacedObjectPurchaseData} from './purchase/PlacedObjectPurchaseData';
 import {RentConfirmationWindow} from './purchase/RentConfirmationWindow';
 import {RoomAdPurchaseData} from './purchase/RoomAdPurchaseData';
-import {OfferController} from './targetedoffers/OfferController';
 import {VideoOfferManager} from './VideoOfferManager';
 import type {IVideoOfferManager} from './IVideoOfferManager';
 import {FurnitureCategory} from '@habbo/inventory/enum/FurnitureCategory';
@@ -487,15 +478,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
     {
         return this._toolbar;
     }
-
-    /**
-     * AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::_SafeStr_7106
-     *
-     * Field name DERIVED: obfuscated in every tree. The targeted-offer controller, which has no
-     * accessor — it is built in `initComponent()` and disposed here, and drives itself from there.
-     */
-    // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::_SafeStr_7106
-    private _offerController: OfferController | null = null;
 
     /** Derived name — `_SafeStr_6636`, the object `get videoOffers()` returns. */
     // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::_SafeStr_6636
@@ -1629,8 +1611,7 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
      * (the pet widgets render a real pet portrait) hands it over, and the dialog uses it instead
      * of rendering its own preview.
      *
-     * The gifting and LTD-raffle sub-flows are still missing from the dialog itself — see its own
-     * file header.
+     * The gifting sub-flow is still missing from the dialog itself — see its own file header.
      */
     // DEVIATION: AS3 first refuses an already-owned habbicon offer (`isHabbiconOfferOwned()` →
     //   `showHabbiconAlreadyOwnedAlert()`); the RPG fork removed Habbicons.
@@ -1766,12 +1747,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         {
             searchContainer.visible = visible;
         }
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::redeemVoucher()
-    public redeemVoucher(voucher: string): void
-    {
-        this.connection?.send(new RedeemVoucherMessageComposer(voucher));
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::loadCatalogPage()
@@ -2987,13 +2962,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
 
         this._utils.dispose();
 
-        // AS3: .../HabboCatalog.as::dispose() — right after _utils, before super.dispose().
-        if(this._offerController != null)
-        {
-            this._offerController.dispose();
-            this._offerController = null;
-        }
-
         if(this._videoOfferManager != null)
         {
             this._videoOfferManager.dispose();
@@ -3033,6 +3001,12 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
 
     // DEVIATION: AS3 also subscribes its snow-war token-bundle handler (message 904); the
     //   RPG fork removed Snow War.
+    // DEVIATION: AS3 also subscribes its two LTD-raffle handlers (2901 entered, 3526 result); the
+    //   RPG fork removed LTD raffles.
+    // DEVIATION: AS3 also subscribes its two code-redemption handlers (1771 ok, 133 error); the RPG
+    //   fork removed vouchers.
+    // DEVIATION: AS3 also builds the targeted-offer `OfferController` here (and disposes it in
+    //   `dispose()`); the RPG fork removed targeted offers and the Habbo Mall offer.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::initComponent()
     protected override initComponent(): void
     {
@@ -3045,7 +3019,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         // nothing. The message itself is ported and seven other modules subscribe to it for the
         // work they really do on a room exit.
         this.addMessageEvent(new CreditBalanceEvent(this.onCreditBalance.bind(this)));
-        this.addMessageEvent(new LtdRaffleResultMessageEvent(this.onLtdRaffleResult.bind(this)));
         this.addMessageEvent(new SilverBalanceMessageEvent(this.onSilverBalance.bind(this)));
         this.addMessageEvent(new EmeraldBalanceMessageEvent(this.onEmeraldBalance.bind(this)));
         this.addMessageEvent(new ActivityPointsMessageEvent(this.onActivityPoints.bind(this)));
@@ -3056,13 +3029,10 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         this.addMessageEvent(new LimitedEditionSoldOutMessageEvent(this.onLimitedEditionSoldOut));
         this.addMessageEvent(new GiftReceiverNotFoundMessageEvent(this.onGiftReceiverNotFound));
         this.addMessageEvent(new ScrSendUserInfoEvent(this.onSubscriptionInfo.bind(this)));
-        this.addMessageEvent(new LtdRaffleEnteredMessageEvent(this.onLtdRaffleEntered.bind(this)));
         this.addMessageEvent(new PurchaseOKMessageEvent(this.onPurchaseOK.bind(this)));
         this.addMessageEvent(new PurchaseErrorMessageEvent(this.onPurchaseError.bind(this)));
         this.addMessageEvent(new PurchaseNotAllowedMessageEvent(this.onPurchaseNotAllowed.bind(this)));
         this.addMessageEvent(new NotEnoughBalanceMessageEvent(this.onNotEnoughBalance.bind(this)));
-        this.addMessageEvent(new VoucherRedeemOkMessageEvent(this.onVoucherRedeemOk.bind(this)));
-        this.addMessageEvent(new VoucherRedeemErrorMessageEvent(this.onVoucherRedeemError.bind(this)));
         this.addMessageEvent(new HabboClubOffersMessageEvent(this.onHabboClubOffers.bind(this)));
         this.addMessageEvent(new HabboClubExtendOfferMessageEvent(this.onHabboClubExtendOffer.bind(this)));
         this.addMessageEvent(new ClubGiftInfoEvent(this.onClubGiftInfo.bind(this)));
@@ -3105,12 +3075,8 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::initComponent()
         this._sessionDataManager?.loadProductData(this);
 
-        // AS3: HabboCatalog.as::initComponent() — immediately before the OfferController below.
+        // AS3: HabboCatalog.as::initComponent() — just before AS3 builds its OfferController.
         this._videoOfferManager = new VideoOfferManager(this);
-
-        // Must come after loadProductData(): the controller registers itself as a products-ready
-        // listener in its own constructor, and that is what triggers its first server request.
-        this._offerController = new OfferController(this);
 
         this._furnitureDataCache = this._sessionDataManager?.getFurniData(this) ?? null;
 
@@ -4044,45 +4010,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
     }
 
     /**
-     * The server accepted the entry into a limited-edition raffle.
-     *
-     * The parser's `className` goes unread, in AS3 too: the dialog already knows which product it
-     * is showing, so all this does is switch its panel over to the "raffling..." animation.
-     */
-    // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::onLtdRaffleEntered()
-    private onLtdRaffleEntered(_event: IMessageEvent): void
-    {
-        this._purchaseConfirmationDialog?.ltdRaffleStarted();
-    }
-
-    /**
-     * The raffle the player entered has been drawn.
-     *
-     * Tears down the purchase dialog whether they won or lost — `ltdRaffleEnded()` first, so the
-     * countdown stops before the window goes — and leaves a notification behind, since the dialog
-     * that would have shown the result is the thing being closed.
-     */
-    // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::onLtdRaffleResult()
-    private onLtdRaffleResult(event: IMessageEvent): void
-    {
-        if(this._purchaseConfirmationDialog != null)
-        {
-            this._purchaseConfirmationDialog.ltdRaffleEnded();
-            this._purchaseConfirmationDialog.dispose();
-            this._purchaseConfirmationDialog = null;
-        }
-
-        const parser = event?.parser as LtdRaffleResultMessageParser | null;
-
-        if(parser == null) return;
-
-        // `hasWon` is `resultCode === 0`; zero is the win, not the failure.
-        const key = `notification.raffle.${parser.hasWon ? 'won' : 'lost'}`;
-
-        this._notifications?.addItem(this._localization?.getLocalization(key, key) ?? key, 'ltd');
-    }
-
-    /**
      * The two wallet currencies, emeralds and silver, each its own message and each one int.
      *
      * Note what they do *not* do, next to `onCreditBalance()` above: no `updatePurse()` and no
@@ -4319,43 +4246,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         }
 
         this._purchaseConfirmationDialog?.notEnoughCredits();
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::onVoucherRedeemOk()
-    private onVoucherRedeemOk(event: IMessageEvent): void
-    {
-        if(!event) return;
-
-        const parser = event.parser as VoucherRedeemOkMessageEventParser | null;
-
-        if(!parser) return;
-
-        let description = '${catalog.alert.voucherredeem.ok.description}';
-
-        if(parser.productName !== '')
-        {
-            const key = 'catalog.alert.voucherredeem.ok.description.furni';
-
-            this._localization?.registerParameter(key, 'productName', parser.productName);
-            this._localization?.registerParameter(key, 'productDescription', parser.productDescription);
-            description = `\${${key}}`;
-        }
-
-        this._windowManager?.alert('${catalog.alert.voucherredeem.ok.title}', description, 0, this.alertDialogEventProcessor);
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::onVoucherRedeemError()
-    private onVoucherRedeemError(event: IMessageEvent): void
-    {
-        if(!event) return;
-
-        const parser = event.parser as VoucherRedeemErrorMessageEventParser | null;
-
-        if(!parser) return;
-
-        const description = `\${catalog.alert.voucherredeem.error.description.${parser.errorCode}}`;
-
-        this._windowManager?.alert('${catalog.alert.voucherredeem.error.title}', description, 0, this.alertDialogEventProcessor);
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::onHabboClubOffers()

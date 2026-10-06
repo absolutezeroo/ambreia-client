@@ -34,9 +34,9 @@ export class FriendRequestWidgetHandler implements IRoomWidgetHandler
 
     /**
      * AS3 returns `"RWE_ROOM_POLL"` here, which is not this widget's type — a copy-paste it
-     * shares with `PollWidgetHandler` and `UiHelpBubbleWidgetHandler`. Kept, because `type` is
-     * only read to match an open/close-widget event's target, and changing it would make this
-     * handler answer one it never answers in the client.
+     * shares with `UiHelpBubbleWidgetHandler` and AS3's poll widget handler (removed with polls in
+     * the RPG fork). Kept, because `type` is only read to match an open/close-widget event's
+     * target, and changing it would make this handler answer one it never answers in the client.
      */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/FriendRequestWidgetHandler.as::get type()
     get type(): string

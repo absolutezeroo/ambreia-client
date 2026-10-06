@@ -6,8 +6,8 @@
  * properties under the *same dotted names*, because the contract is the page's — a page written
  * for the Flash client keeps working, and one that defines nothing leaves every call inert.
  *
- * The same technique `MallOfferExternalInterfaceHelper` already uses; it is shared here because
- * `SupersonicProvider` and `SponsorPayProvider` publish eleven callbacks between them.
+ * Shared here because `SupersonicProvider` and `SponsorPayProvider` publish eleven callbacks
+ * between them.
  *
  * TS-only: no AS3 counterpart — AS3 has ExternalInterface.
  */

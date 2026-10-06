@@ -24,9 +24,7 @@ import {RoomDataHandler} from './handler/RoomDataHandler';
 import {RoomChatHandler} from './handler/RoomChatHandler';
 import {RoomUsersHandler} from './handler/RoomUsersHandler';
 import {GenericErrorHandler} from './handler/GenericErrorHandler';
-import {PollHandler} from './handler/PollHandler';
 import {RoomDimmerPresetsHandler} from './handler/RoomDimmerPresetsHandler';
-import {WordQuizHandler} from './handler/WordQuizHandler';
 import {PresentHandler} from './handler/PresentHandler';
 import {PetPackageHandler} from './handler/PetPackageHandler';
 import {AvatarEffectsHandler} from './handler/AvatarEffectsHandler';
@@ -470,6 +468,8 @@ export class RoomSessionManager extends Component implements IRoomSessionManager
         this.executePendingSessionRequest();
     }
 
+    // DEVIATION: AS3 also creates the poll and word-quiz session handlers; the RPG fork removed
+    //   polls and the word quiz.
     // AS3: .../src/com/sulake/habbo/session/RoomSessionManager.as::createHandlers()
     private createHandlers(): void
     {
@@ -490,8 +490,6 @@ export class RoomSessionManager extends Component implements IRoomSessionManager
         this._handlers.push(new RoomDataHandler(connection, this));
         this._handlers.push(new PresentHandler(connection, this));
         this._handlers.push(new GenericErrorHandler(connection, this));
-        this._handlers.push(new PollHandler(connection, this));
-        this._handlers.push(new WordQuizHandler(connection, this));
         this._handlers.push(new RoomDimmerPresetsHandler(connection, this));
         this._handlers.push(new PetPackageHandler(connection, this));
 

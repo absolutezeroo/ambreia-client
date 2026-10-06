@@ -123,7 +123,8 @@ export interface ITextWindow extends IWindow, IScrollableWindow
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/core/window/components/ITextWindow.as::get htmlText()
     // Declared on AS3's ITextWindow (lines 37 and 107) and implemented by this port's
     // TextController all along — the interface simply never exposed it, so a caster to
-    // ITextWindow could not reach it. PollOfferDialog is the first ported caller that needs it.
+    // ITextWindow could not reach it. PollOfferDialog (since removed with polls in the RPG fork) was
+    // the first ported caller that needed it.
     htmlText: string;
     // AS3: .../src/com/sulake/core/window/components/TextController.as::get textColor()
     textColor: number;

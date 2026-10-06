@@ -79,7 +79,6 @@ import {RoomSessionEvent} from '@habbo/session/events/RoomSessionEvent';
 import {RoomSessionErrorMessageEvent} from '@habbo/session/events/RoomSessionErrorMessageEvent';
 import {RoomSessionDoorbellEvent} from '@habbo/session/events/RoomSessionDoorbellEvent';
 import {RoomSessionQueueEvent} from '@habbo/session/events/RoomSessionQueueEvent';
-import {RoomSessionPollEvent} from '@habbo/session/events/RoomSessionPollEvent';
 import {RoomEngineEvent} from '@habbo/room/events/RoomEngineEvent';
 import {RoomEngineObjectEvent} from '@habbo/room/events/RoomEngineObjectEvent';
 import {RoomEngineToWidgetEvent} from '@habbo/room/events/RoomEngineToWidgetEvent';
@@ -131,6 +130,8 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
         'RSEME_BOT_NAME_NOT_ACCEPTED',
     ];
 
+    // DEVIATION: AS3's table also carries the three poll events (RSPE_POLL_*) and the three word-quiz
+    //   question events (RWPUW_*); the RPG fork removed polls and the word quiz.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomUI.as — the entries of the
     // same listener table whose callback is roomSessionEventHandler, in the source's own order.
     //
@@ -149,14 +150,6 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
         'RSOPPE_OPEN_PET_PACKAGE_REQUESTED',
         'RSOPPE_OPEN_PET_PACKAGE_RESULT',
         RoomSessionQueueEvent.QUEUE_STATUS,
-        RoomSessionPollEvent.CONTENT,
-        RoomSessionPollEvent.ERROR,
-        RoomSessionPollEvent.OFFER,
-        // The three question events keep AS3's `RWPUW_` prefix and its two typos
-        // ("QUESION", "FINSIHED") — they are matched literally on both sides.
-        'RWPUW_QUESTION_ANSWERED',
-        'RWPUW_QUESION_FINSIHED',
-        'RWPUW_NEW_QUESTION',
         'RSDPE_PRESETS',
         'RSFRE_FRIEND_REQUEST',
         'RSDE_DANCE',
@@ -1305,6 +1298,8 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
      */
     // DEVIATION: AS3 also creates RWE_PLAYLIST_EDITOR_WIDGET, the photo camera and the
     //   room-thumbnail camera on REE_INITIALIZED; the RPG fork removed jukebox music and photos.
+    // DEVIATION: AS3 also creates RWE_ROOM_POLL and RWE_WORD_QUIZZ there; the RPG fork removed polls
+    //   and the word quiz.
     // AS3: .../src/com/sulake/habbo/ui/RoomUI.as::roomEventHandler()
     private roomEventHandler(event: RoomEngineEvent): void 
     {
@@ -1394,8 +1389,6 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
                     desktop.createWidget('RWE_CLOTHING_CHANGE');
                     // AS3: RoomUI.as:966 — the scoreboard bubble over a high-score furni.
                     desktop.createWidget('RWE_HIGH_SCORE_DISPLAY');
-                    // AS3: RoomUI.as:974 — the room-wide like/dislike quiz.
-                    desktop.createWidget('RWE_WORD_QUIZZ');
                     // AS3: RoomUI.as:958 — "who is in this room". AS3 passes the widget's previous
                     // state here so a chooser left open reopens itself after a room change; this
                     // port has no cross-room widget cache yet, so it always starts closed.
@@ -1411,8 +1404,6 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
                     desktop.createWidget('RWE_CONVERSION_TRACKING');
                     // AS3: RoomUI.as:955 — the area-hide configuration window.
                     desktop.createWidget('RWE_AREA_HIDE');
-                    // AS3: RoomUI.as:945 — the survey offer and questionnaire.
-                    desktop.createWidget('RWE_ROOM_POLL');
                     // AS3: RoomUI.as:972 — the photo / selfie wall item, full size.
                     desktop.createWidget('RWE_EXTERNAL_IMAGE');
                     // AS3: RoomUI.as:973 — the guided-tour help bubbles. Order matters: the widget
