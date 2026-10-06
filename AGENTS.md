@@ -189,6 +189,10 @@ Data flow: `Engine emits event → Client display class listens and updates`
 6. **Update `docs/IMPLEMENTATION_STATUS.md`** after every significant implementation
 7. **Performance**: `Set`/`Map` for lookups, no allocations in render loops, cache textures, viewport culling (see `docs/STYLEGUIDE.md` Performance section and `docs/PATTERNS.md` section 0)
 8. **Full port**: ALL AS3 files are ported — both logic AND display. Flash XML layouts/skins ship as XML, verbatim. No ENGINE/VIEW distinction
+   **Exception du fork RPG :** ce dépôt est le client du RPG Habbo
+   (spec : `vortex-rpg-emulator/docs/superpowers/specs/2026-10-05-habbo-rpg-design.md`).
+   Les features listées en section 7 de la spec (« Retiré ») sont supprimées volontairement et ne
+   doivent pas être re-portées. Tout le reste suit toujours la règle du port complet.
 9. **Managers**: DI Component with IID registration, one `I<Manager>` interface per manager (see `docs/PATTERNS.md` → Manager template)
 
 ## AS3 traceability
@@ -324,6 +328,13 @@ rest of the method, the callee it assigns through, and whoever is supposed to be
 
 ## Communication rules (`core/communication/`, `habbo/communication/`)
 
+---
+paths:
+  - "**/communication/**"
+---
+
+# Wire protocol / communication rules
+
 You are editing wire-protocol code (`core/communication/`, `habbo/communication/`).
 
 1. Read `docs/CLIENT-SERVER-ARCHITECTURE.md` in full for the system you are touching (handshake/encryption, or the specific composer/parser's request-response flow) before changing anything here.
@@ -354,6 +365,13 @@ You are editing the ported Flash UI/window system (`core/window/`, `habbo/window
 6. **Text alignment is `auto_size`, and it is a string.** `<var key="auto_size" value="center" type="String"/>` — the values are `left` / `center` / `right` / `none`, not a boolean, and 492 shipped layouts use `center`. `TextSkinRenderer` shifts the line by `(maxWidth - textWidth) / 2`. There is no `align` attribute, which is what makes this easy to miss: do not hand-place a label's x to fake centring, because the glyph width changes with the font and with the text.
 
 ## Room engine rules (`room/`, `habbo/room/`)
+
+---
+paths:
+  - "**/room/**"
+---
+
+# Room engine rules
 
 `room/` (generic engine primitives: `data`, `events`, `object`, `renderer`, `utils`) and `habbo/room/` (Habbo-specific room game logic) are different layers — do not confuse them.
 
