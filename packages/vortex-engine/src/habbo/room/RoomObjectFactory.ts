@@ -57,7 +57,6 @@ import {FurnitureVoteCounterLogic} from './object/logic/furniture/FurnitureVoteC
 import {FurnitureVoteMajorityLogic} from './object/logic/furniture/FurnitureVoteMajorityLogic';
 import {FurnitureSoundBlockLogic} from './object/logic/furniture/FurnitureSoundBlockLogic';
 import {FurnitureRandomTeleportLogic} from './object/logic/furniture/FurnitureRandomTeleportLogic';
-import {FurnitureMonsterplantSeedLogic} from './object/logic/furniture/FurnitureMonsterplantSeedLogic';
 import {FurniturePurchasableClothingLogic} from './object/logic/furniture/FurniturePurchasableClothingLogic';
 import {FurnitureRoomBackgroundColorLogic} from './object/logic/furniture/FurnitureRoomBackgroundColorLogic';
 import {FurnitureAreaHideLogic} from './object/logic/furniture/FurnitureAreaHideLogic';
@@ -396,8 +395,11 @@ export class RoomObjectFactory implements IRoomObjectFactory
 
                 break;
 
+            // DEVIATION: AS3 builds the monsterplant seed logic here. The RPG fork removed
+            //   monsterplants, but furnidata can still name this type, so it gets that logic's own
+            //   base, FurnitureMultiStateLogic: a furni that still toggles its state.
             case RoomObjectLogicEnum.FURNITURE_MONSTERPLANT_SEED:
-                LogicClass = FurnitureMonsterplantSeedLogic;
+                LogicClass = FurnitureMultiStateLogic;
 
                 break;
 

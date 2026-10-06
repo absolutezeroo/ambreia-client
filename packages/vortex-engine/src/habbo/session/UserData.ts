@@ -14,6 +14,9 @@ export const UserDataType = {
 /**
  * Room user data
  * Based on AS3 com.sulake.habbo.session.UserData
+ *
+ * The RPG fork removed pet breeding and monsterplants: AS3's rarityLevel, canBreed, canHarvest,
+ * canRevive and hasBreedingPermission are not ported.
  */
 export class UserData implements IUserData
 {
@@ -244,20 +247,6 @@ export class UserData implements IUserData
         this._petLevel = value;
     }
 
-    private _rarityLevel: number = 0;
-
-    // AS3: .../src/com/sulake/habbo/session/UserData.as::get rarityLevel()
-    get rarityLevel(): number
-    {
-        return this._rarityLevel;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/UserData.as::set rarityLevel()
-    set rarityLevel(value: number)
-    {
-        this._rarityLevel = value;
-    }
-
     private _hasSaddle: boolean = false;
 
     // AS3: .../src/com/sulake/habbo/session/UserData.as::get hasSaddle()
@@ -286,63 +275,6 @@ export class UserData implements IUserData
         this._isRiding = value;
     }
 
-    private _canBreed: boolean = false;
-
-    // AS3: .../src/com/sulake/habbo/session/UserData.as::get canBreed()
-    get canBreed(): boolean
-    {
-        return this._canBreed;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/UserData.as::set canBreed()
-    set canBreed(value: boolean)
-    {
-        this._canBreed = value;
-    }
-
-    private _canHarvest: boolean = false;
-
-    // AS3: .../src/com/sulake/habbo/session/UserData.as::get canHarvest()
-    get canHarvest(): boolean
-    {
-        return this._canHarvest;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/UserData.as::set canHarvest()
-    set canHarvest(value: boolean)
-    {
-        this._canHarvest = value;
-    }
-
-    private _canRevive: boolean = false;
-
-    // AS3: .../src/com/sulake/habbo/session/UserData.as::get canRevive()
-    get canRevive(): boolean
-    {
-        return this._canRevive;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/UserData.as::set canRevive()
-    set canRevive(value: boolean)
-    {
-        this._canRevive = value;
-    }
-
-    private _hasBreedingPermission: boolean = false;
-
-    // AS3: .../src/com/sulake/habbo/session/UserData.as::get hasBreedingPermission()
-    get hasBreedingPermission(): boolean
-    {
-        return this._hasBreedingPermission;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/UserData.as::set hasBreedingPermission()
-    set hasBreedingPermission(value: boolean)
-    {
-        this._hasBreedingPermission = value;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/UserData.as::_botSkills
     private _botSkills: number[] = [];
 
     // AS3: .../src/com/sulake/habbo/session/UserData.as::get botSkills()

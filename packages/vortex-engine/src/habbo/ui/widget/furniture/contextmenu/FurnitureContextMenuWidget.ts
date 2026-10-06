@@ -7,7 +7,8 @@
  * "active view", so only one bubble can be on screen at a time. `_activeView` is that slot; the
  * per-frame `update()` is registered only while something occupies it.
  *
- * All eleven sub-views are ported and built here, as AS3 does.
+ * The sub-views are built here, as AS3 does — less the mystery-box ones and the two
+ * monsterplant-seed views (bubble and plant confirmation), which the RPG fork removed.
  */
 import {Logger} from '@core/utils/Logger';
 import type {IAssetLibrary} from '@core/assets/IAssetLibrary';
@@ -30,8 +31,6 @@ import type {IContextMenuParentWidget} from '@habbo/ui/widget/contextmenu/IConte
 import {FriendFurniContextMenuView} from '@habbo/ui/widget/furniture/friendfurni/FriendFurniContextMenuView';
 import {GenericUsableFurnitureContextMenuView} from './GenericUsableFurnitureContextMenuView';
 import {RandomTeleportContextMenuView} from './RandomTeleportContextMenuView';
-import {MonsterPlantSeedContextMenuView} from './MonsterPlantSeedContextMenuView';
-import {MonsterPlantSeedConfirmationView} from './MonsterPlantSeedConfirmationView';
 import {PurchasableClothingConfirmationView} from './PurchasableClothingConfirmationView';
 import {EffectBoxOpenDialogView} from '@habbo/ui/widget/furniture/effectbox/EffectBoxOpenDialogView';
 import {
@@ -64,12 +63,6 @@ export class FurnitureContextMenuWidget extends RoomWidgetBase implements IConte
     // AS3: FurnitureContextMenuWidget.as::_SafeStr_6679
     private _randomTeleportContextMenuView: RandomTeleportContextMenuView | null = null;
 
-    // AS3: FurnitureContextMenuWidget.as::_SafeStr_6908
-    private _monsterPlantSeedContextMenuView: MonsterPlantSeedContextMenuView | null = null;
-
-    // AS3: FurnitureContextMenuWidget.as::_SafeStr_5512
-    private _monsterPlantSeedConfirmationView: MonsterPlantSeedConfirmationView | null = null;
-
     // AS3: FurnitureContextMenuWidget.as::_SafeStr_6070
     private _purchasableClothingConfirmationView: PurchasableClothingConfirmationView | null = null;
 
@@ -87,6 +80,9 @@ export class FurnitureContextMenuWidget extends RoomWidgetBase implements IConte
 
     // DEVIATION: AS3 also builds the mystery-box context menu, the mystery-box open dialog and the
     //   mystery-trophy dialog, with a `show*` method for each; the RPG fork removed mystery boxes.
+    // DEVIATION: AS3 also builds the monsterplant-seed bubble and plant confirmation, with
+    //   showMonsterPlantSeedContextMenu() / showPlantSeedConfirmationDialog(); the RPG fork removed
+    //   monsterplants.
     // AS3: FurnitureContextMenuWidget.as::FurnitureContextMenuWidget()
     constructor(
         handler: IRoomWidgetHandler,
@@ -105,8 +101,6 @@ export class FurnitureContextMenuWidget extends RoomWidgetBase implements IConte
         this._friendFurniContextMenuView = new FriendFurniContextMenuView(this);
         this._genericUsableContextMenuView = new GenericUsableFurnitureContextMenuView(this);
         this._randomTeleportContextMenuView = new RandomTeleportContextMenuView(this);
-        this._monsterPlantSeedContextMenuView = new MonsterPlantSeedContextMenuView(this);
-        this._monsterPlantSeedConfirmationView = new MonsterPlantSeedConfirmationView(this);
         this._purchasableClothingConfirmationView = new PurchasableClothingConfirmationView(this);
         this._effectBoxOpenDialogView = new EffectBoxOpenDialogView(this);
 
@@ -195,28 +189,6 @@ export class FurnitureContextMenuWidget extends RoomWidgetBase implements IConte
         this.registerUpdateReceiver();
     }
 
-    /** Owner-gated by the handler, not here — AS3 checks before calling. */
-    // AS3: FurnitureContextMenuWidget.as::showMonsterPlantSeedContextMenu()
-    public showMonsterPlantSeedContextMenu(object: IRoomObject, category: number): void
-    {
-        this._selectedObject = object;
-
-        if(this._activeView !== null) this.removeView(this._activeView, false);
-
-        if(this._monsterPlantSeedContextMenuView === null)
-        {
-            this._monsterPlantSeedContextMenuView = new MonsterPlantSeedContextMenuView(this);
-        }
-
-        this._monsterPlantSeedContextMenuView.objectCategory = category;
-
-        this._activeView = this._monsterPlantSeedContextMenuView;
-
-        FurnitureContextInfoView.setup(this._activeView, object);
-
-        this.registerUpdateReceiver();
-    }
-
     // AS3: FurnitureContextMenuWidget.as::showEffectBoxOpenDialog()
     public showEffectBoxOpenDialog(object: IRoomObject): void
     {
@@ -245,25 +217,6 @@ export class FurnitureContextMenuWidget extends RoomWidgetBase implements IConte
         }
 
         this._purchasableClothingConfirmationView.open(object.getId());
-    }
-
-    /**
-     * Not a bubble: the confirmation is its own window, so the active view is dismissed and
-     * nothing replaces it.
-     */
-    // AS3: FurnitureContextMenuWidget.as::showPlantSeedConfirmationDialog()
-    public showPlantSeedConfirmationDialog(object: IRoomObject): void
-    {
-        this._selectedObject = object;
-
-        if(this._activeView !== null) this.removeView(this._activeView, false);
-
-        if(this._monsterPlantSeedConfirmationView === null)
-        {
-            this._monsterPlantSeedConfirmationView = new MonsterPlantSeedConfirmationView(this);
-        }
-
-        this._monsterPlantSeedConfirmationView.open(object.getId());
     }
 
     // AS3: FurnitureContextMenuWidget.as::showUsableFurnitureContextMenu()
@@ -361,6 +314,8 @@ export class FurnitureContextMenuWidget extends RoomWidgetBase implements IConte
         this._activeView.update(this.handler.getObjectRectangle(objectId), screenLocation, time);
     }
 
+    // DEVIATION: AS3 also closes the monsterplant-seed plant confirmation
+    //   (removePlantSeedConfirmationView()); the RPG fork removed monsterplants.
     // AS3: FurnitureContextMenuWidget.as::onRoomObjectRemoved()
     private onRoomObjectRemoved(event: RoomEngineObjectEvent): void
     {
@@ -369,20 +324,9 @@ export class FurnitureContextMenuWidget extends RoomWidgetBase implements IConte
         if(this._selectedObject !== null && this._selectedObject.getId() === event.objectId)
         {
             this.removeView(this._activeView, false);
-            this.removePlantSeedConfirmationView();
             this.removeUpdateReceiver();
             this._selectedObject = null;
         }
-    }
-
-    /**
-     * The seed confirmation is a window, not a bubble, so `removeView()` does not reach it — it
-     * has to be closed by name when the furni it belongs to leaves the room.
-     */
-    // AS3: FurnitureContextMenuWidget.as::removePlantSeedConfirmationView()
-    private removePlantSeedConfirmationView(): void
-    {
-        this._monsterPlantSeedConfirmationView?.close();
     }
 
     private registerUpdateReceiver(): void
@@ -427,19 +371,13 @@ export class FurnitureContextMenuWidget extends RoomWidgetBase implements IConte
         this.removeUpdateReceiver();
         this.removeView(this._activeView, false);
 
-        // AS3 disposes all eleven sub-views here; the port used to drop only three of them, so
-        // the other eight kept their windows and listeners for the life of the page.
+        // AS3 disposes every sub-view here; the port used to drop only three of them, so the
+        // others kept their windows and listeners for the life of the page.
         this._guildFurnitureContextMenuView?.dispose();
         this._guildFurnitureContextMenuView = null;
 
         this._randomTeleportContextMenuView?.dispose();
         this._randomTeleportContextMenuView = null;
-
-        this._monsterPlantSeedContextMenuView?.dispose();
-        this._monsterPlantSeedContextMenuView = null;
-
-        this._monsterPlantSeedConfirmationView?.dispose();
-        this._monsterPlantSeedConfirmationView = null;
 
         this._friendFurniContextMenuView?.dispose();
         this._friendFurniContextMenuView = null;

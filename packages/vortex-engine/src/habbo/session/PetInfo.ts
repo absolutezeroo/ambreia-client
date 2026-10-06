@@ -4,6 +4,10 @@ import type {IPetInfo} from './IPetInfo';
  * Pet info implementation
  *
  * @see source_as_win63/habbo/session/PetInfo.as
+ *
+ * The RPG fork removed pet breeding and monsterplants: AS3's canBreed, canHarvest, canRevive,
+ * rarityLevel, hasBreedingPermission and the three monsterplant timers (maxWellBeingSeconds,
+ * remainingWellBeingSeconds, remainingGrowingSeconds) are not ported. Energy and nutrition stay.
  */
 export class PetInfo implements IPetInfo
 {
@@ -232,62 +236,6 @@ export class PetInfo implements IPetInfo
         this._isRiding = value;
     }
 
-    private _canBreed: boolean = false;
-
-    // AS3: .../src/com/sulake/habbo/session/PetInfo.as::get canBreed()
-    get canBreed(): boolean
-    {
-        return this._canBreed;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/PetInfo.as::set canBreed()
-    set canBreed(value: boolean)
-    {
-        this._canBreed = value;
-    }
-
-    private _canHarvest: boolean = false;
-
-    // AS3: .../src/com/sulake/habbo/session/PetInfo.as::get canHarvest()
-    get canHarvest(): boolean
-    {
-        return this._canHarvest;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/PetInfo.as::set canHarvest()
-    set canHarvest(value: boolean)
-    {
-        this._canHarvest = value;
-    }
-
-    private _canRevive: boolean = false;
-
-    // AS3: .../src/com/sulake/habbo/session/PetInfo.as::get canRevive()
-    get canRevive(): boolean
-    {
-        return this._canRevive;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/PetInfo.as::set canRevive()
-    set canRevive(value: boolean)
-    {
-        this._canRevive = value;
-    }
-
-    private _rarityLevel: number = 0;
-
-    // AS3: .../src/com/sulake/habbo/session/PetInfo.as::get rarityLevel()
-    get rarityLevel(): number
-    {
-        return this._rarityLevel;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/PetInfo.as::set rarityLevel()
-    set rarityLevel(value: number)
-    {
-        this._rarityLevel = value;
-    }
-
     private _skillTresholds: number[] = [];
 
     // AS3: .../src/com/sulake/habbo/session/PetInfo.as::get skillTresholds()
@@ -314,62 +262,6 @@ export class PetInfo implements IPetInfo
     set accessRights(value: number)
     {
         this._accessRights = value;
-    }
-
-    private _maxWellBeingSeconds: number = 0;
-
-    // AS3: .../src/com/sulake/habbo/session/PetInfo.as::get maxWellBeingSeconds()
-    get maxWellBeingSeconds(): number
-    {
-        return this._maxWellBeingSeconds;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/PetInfo.as::set maxWellBeingSeconds()
-    set maxWellBeingSeconds(value: number)
-    {
-        this._maxWellBeingSeconds = value;
-    }
-
-    private _remainingWellBeingSeconds: number = 0;
-
-    // AS3: .../src/com/sulake/habbo/session/PetInfo.as::get remainingWellBeingSeconds()
-    get remainingWellBeingSeconds(): number
-    {
-        return this._remainingWellBeingSeconds;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/PetInfo.as::set remainingWellBeingSeconds()
-    set remainingWellBeingSeconds(value: number)
-    {
-        this._remainingWellBeingSeconds = value;
-    }
-
-    private _remainingGrowingSeconds: number = 0;
-
-    // AS3: .../src/com/sulake/habbo/session/PetInfo.as::get remainingGrowingSeconds()
-    get remainingGrowingSeconds(): number
-    {
-        return this._remainingGrowingSeconds;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/PetInfo.as::set remainingGrowingSeconds()
-    set remainingGrowingSeconds(value: number)
-    {
-        this._remainingGrowingSeconds = value;
-    }
-
-    private _hasBreedingPermission: boolean = false;
-
-    // AS3: .../src/com/sulake/habbo/session/PetInfo.as::get hasBreedingPermission()
-    get hasBreedingPermission(): boolean
-    {
-        return this._hasBreedingPermission;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/PetInfo.as::set hasBreedingPermission()
-    set hasBreedingPermission(value: boolean)
-    {
-        this._hasBreedingPermission = value;
     }
 
     private _adultLevel: number = 0;

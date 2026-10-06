@@ -5,6 +5,9 @@
  *
  * Populated from RoomWidgetPetInfoUpdateEvent and read by PetMenuView/OwnPetMenuView to
  * decide which buttons the bubble offers. The sibling of AvatarInfoData for pets.
+ *
+ * The RPG fork removed pet breeding and monsterplants: AS3's canBreed, canHarvest, canRevive,
+ * hasBreedingPermission and the three monsterplant timers are not ported.
  */
 import type {RoomWidgetPetInfoUpdateEvent} from '../events/RoomWidgetPetInfoUpdateEvent';
 
@@ -76,32 +79,11 @@ export class PetInfoData
     // AS3: PetInfoData.as::isRiding
     public isRiding: boolean = false;
 
-    // AS3: PetInfoData.as::canBreed
-    public canBreed: boolean = false;
-
-    // AS3: PetInfoData.as::canHarvest
-    public canHarvest: boolean = false;
-
-    // AS3: PetInfoData.as::canRevive
-    public canRevive: boolean = false;
-
     // AS3: PetInfoData.as::skillTresholds
     public skillTresholds: number[] = [];
 
     // AS3: PetInfoData.as::accessRights
     public accessRights: number = 0;
-
-    // AS3: PetInfoData.as::maxWellBeingSeconds
-    public maxWellBeingSeconds: number = 0;
-
-    // AS3: PetInfoData.as::remainingWellBeingSeconds
-    public remainingWellBeingSeconds: number = 0;
-
-    // AS3: PetInfoData.as::remainingGrowingSeconds
-    public remainingGrowingSeconds: number = 0;
-
-    // AS3: PetInfoData.as::hasBreedingPermission
-    public hasBreedingPermission: boolean = false;
 
     // AS3: PetInfoData.as::populate()
     public populate(event: RoomWidgetPetInfoUpdateEvent): void
@@ -128,14 +110,7 @@ export class PetInfoData
         this.petType = event.petType;
         this.hasFreeSaddle = event.hasFreeSaddle;
         this.isRiding = event.isRiding;
-        this.canBreed = event.canBreed;
-        this.canRevive = event.canRevive;
-        this.canHarvest = event.canHarvest;
         this.skillTresholds = event.skillTresholds;
         this.accessRights = event.accessRights;
-        this.maxWellBeingSeconds = event.maxWellBeingSeconds;
-        this.remainingWellBeingSeconds = event.remainingWellBeingSeconds;
-        this.remainingGrowingSeconds = event.remainingGrowingSeconds;
-        this.hasBreedingPermission = event.hasBreedingPermission;
     }
 }

@@ -15,11 +15,9 @@ import {
     ChangePostureMessageComposer,
     ChangeQueueMessageComposer,
     ChatMessageComposer,
-    CompostPlantComposer,
     CreditFurniRedeemMessageComposer,
     DanceMessageComposer,
     GetPetCommandsComposer,
-    HarvestPetComposer,
     KickUserMessageComposer,
     LetUserInMessageComposer,
     MountPetComposer,
@@ -37,11 +35,9 @@ import {
     ShoutMessageComposer,
     SignMessageComposer,
     StartTypingMessageComposer,
-    TogglePetBreedingPermissionComposer,
     TogglePetRidingPermissionComposer,
     UnmuteUserMessageComposer,
     UpdateClothingChangeFurnitureComposer,
-    UseFurnitureMessageComposer,
     UseProductForPetComposer,
     WhisperMessageComposer,
 } from '../communication/messages/outgoing/room';
@@ -896,38 +892,6 @@ export class RoomSession implements IRoomSession
         if(this._connection === null) return;
 
         this._connection.send(new UseProductForPetComposer(petId, productId));
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::plantSeed()
-    plantSeed(itemId: number): void
-    {
-        if(this._connection === null) return;
-
-        this._connection.send(new UseFurnitureMessageComposer(itemId));
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::harvestPet()
-    harvestPet(petId: number): void
-    {
-        if(this._connection === null) return;
-
-        this._connection.send(new HarvestPetComposer(petId));
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::togglePetBreedingPermission()
-    togglePetBreedingPermission(petId: number): void
-    {
-        if(this._connection === null) return;
-
-        this._connection.send(new TogglePetBreedingPermissionComposer(petId));
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::compostPlant()
-    compostPlant(petId: number): void
-    {
-        if(this._connection === null) return;
-
-        this._connection.send(new CompostPlantComposer(petId));
     }
 
     // AS3: .../src/com/sulake/habbo/session/RoomSession.as::changeQueue()

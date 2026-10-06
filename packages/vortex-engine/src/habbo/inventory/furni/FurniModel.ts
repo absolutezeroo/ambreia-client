@@ -801,6 +801,8 @@ export class FurniModel implements IFurniModel
     }
 
     // DEVIATION: AS3 also tells the collectibles hub an item arrived; the RPG fork removed it.
+    // DEVIATION: AS3 also sends a non-groupable monsterplant seed down the groupable path, to stack
+    //   seeds by rarity; the RPG fork removed monsterplants, so a seed is an ordinary furni here.
     // AS3: .../src/com/sulake/habbo/inventory/furni/FurniModel.as::addOrUpdateItem()
     addOrUpdateItem(item: FurnitureItem, isInitializing: boolean): {
         groupItem: GroupItem;
@@ -810,11 +812,10 @@ export class FurniModel implements IFurniModel
         let result: { groupItem: GroupItem; isNewGroup: boolean };
 
         // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/furni/FurniModel.as::addOrUpdateItem()
-        // Non-groupable items get their own group, except monsterplant seeds and the two chest
-        // categories — AS3 sends those down the groupable path even when not groupable, because
+        // Non-groupable items get their own group, except the two chest categories — AS3 sends
+        // those down the groupable path even when not groupable, because
         // addOrUpdateGroupableItem() has a chest-specific matching rule.
         if(!item.groupable
-            && item.category !== FurnitureCategory.MONSTERPLANT_SEED
             && item.category !== FurnitureCategory.FURNI_CHEST
             && item.category !== FurnitureCategory.COINS_CHEST)
         {
@@ -1390,6 +1391,8 @@ export class FurniModel implements IFurniModel
         return {groupItem, isNewGroup: true};
     }
 
+    // DEVIATION: AS3 first stacks monsterplant seeds by rarity level; the RPG fork removed
+    //   monsterplants.
     // AS3: .../src/com/sulake/habbo/inventory/furni/FurniModel.as::addOrUpdateGroupableItem()
     private addOrUpdateGroupableItem(item: FurnitureItem, isInitializing: boolean): {
         groupItem: GroupItem;
@@ -1404,22 +1407,12 @@ export class FurniModel implements IFurniModel
         {
             if(groupItem.type === item.type && groupItem.isWallItem === item.isWallItem)
             {
-                // MONSTERPLANT_SEED - match by rarity level
-                if(item.category === FurnitureCategory.MONSTERPLANT_SEED)
-                {
-                    if(groupItem.stuffData?.rarityLevel === item.stuffData?.rarityLevel)
-                    {
-                        existingGroup = groupItem;
-
-                        break;
-                    }
-                }
                 // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/furni/FurniModel.as::addOrUpdateGroupableItem()
                 // Chests only stack while both are empty and unnamed; anything else keeps its own
                 // group. Without this branch they fell through to the match-by-type default and
                 // every chest of a type collapsed into one pile regardless of contents or name.
                 // AS3 deliberately does not break here — the last matching chest wins.
-                else if(item.category === FurnitureCategory.FURNI_CHEST
+                if(item.category === FurnitureCategory.FURNI_CHEST
                     || item.category === FurnitureCategory.COINS_CHEST)
                 {
                     if(groupItem.stuffData?.contentsCount === 0

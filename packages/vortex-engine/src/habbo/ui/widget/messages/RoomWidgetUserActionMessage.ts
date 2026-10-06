@@ -16,6 +16,10 @@
  * Note RESPECT_PET's value has a leading space (" RWUAM_RESPECT_PET"). That is not a typo here:
  * it is in the AS3 verbatim, and InfoStandWidgetHandler's switch matches the same spaced literal,
  * so the two agree. Do not "fix" it without changing both.
+ *
+ * The RPG fork removed pet breeding, monsterplants and the pet supplements: AS3's
+ * TOGGLE_PET_BREEDING_PERMISSION, REQUEST_BREED_PET, HARVEST_PET, REVIVE_PET, COMPOST_PLANT,
+ * TREAT_PET, GIVE_WATER_TO_PET and GIVE_LIGHT_TO_PET are not ported.
  */
 import {RoomWidgetMessage} from './RoomWidgetMessage';
 
@@ -69,8 +73,6 @@ export class RoomWidgetUserActionMessage extends RoomWidgetMessage
     public static readonly MOUNT_PET: string = 'RWUAM_MOUNT_PET';
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/messages/RoomWidgetUserActionMessage.as::TOGGLE_PET_RIDING_PERMISSION
     public static readonly TOGGLE_PET_RIDING_PERMISSION: string = 'RWUAM_TOGGLE_PET_RIDING_PERMISSION';
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/messages/RoomWidgetUserActionMessage.as::TOGGLE_PET_BREEDING_PERMISSION
-    public static readonly TOGGLE_PET_BREEDING_PERMISSION: string = 'RWUAM_TOGGLE_PET_BREEDING_PERMISSION';
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/messages/RoomWidgetUserActionMessage.as::DISMOUNT_PET
     public static readonly DISMOUNT_PET: string = 'RWUAM_DISMOUNT_PET';
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/messages/RoomWidgetUserActionMessage.as::SADDLE_OFF
@@ -82,8 +84,6 @@ export class RoomWidgetUserActionMessage extends RoomWidgetMessage
     // The leading space is AS3's, verbatim — see the class header.
     public static readonly RESPECT_PET: string = ' RWUAM_RESPECT_PET';
 
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/messages/RoomWidgetUserActionMessage.as::TREAT_PET
-    public static readonly TREAT_PET: string = 'RWUAM_TREAT_PET';
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/messages/RoomWidgetUserActionMessage.as::REQUEST_PET_UPDATE
     public static readonly REQUEST_PET_UPDATE: string = 'RWUAM_REQUEST_PET_UPDATE';
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/messages/RoomWidgetUserActionMessage.as::START_NAME_CHANGE
@@ -93,18 +93,6 @@ export class RoomWidgetUserActionMessage extends RoomWidgetMessage
     public static readonly DROP_CARRY_ITEM: string = 'RWUAM_DROP_CARRY_ITEM';
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/messages/RoomWidgetUserActionMessage.as::GIVE_CARRY_ITEM_TO_PET
     public static readonly GIVE_CARRY_ITEM_TO_PET: string = 'RWUAM_GIVE_CARRY_ITEM_TO_PET';
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/messages/RoomWidgetUserActionMessage.as::GIVE_WATER_TO_PET
-    public static readonly GIVE_WATER_TO_PET: string = 'RWUAM_GIVE_WATER_TO_PET';
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/messages/RoomWidgetUserActionMessage.as::GIVE_LIGHT_TO_PET
-    public static readonly GIVE_LIGHT_TO_PET: string = 'RWUAM_GIVE_LIGHT_TO_PET';
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/messages/RoomWidgetUserActionMessage.as::REQUEST_BREED_PET
-    public static readonly REQUEST_BREED_PET: string = 'RWUAM_REQUEST_BREED_PET';
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/messages/RoomWidgetUserActionMessage.as::HARVEST_PET
-    public static readonly HARVEST_PET: string = 'RWUAM_HARVEST_PET';
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/messages/RoomWidgetUserActionMessage.as::REVIVE_PET
-    public static readonly REVIVE_PET: string = 'RWUAM_REVIVE_PET';
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/messages/RoomWidgetUserActionMessage.as::COMPOST_PLANT
-    public static readonly COMPOST_PLANT: string = 'RWUAM_COMPOST_PLANT';
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/messages/RoomWidgetUserActionMessage.as::GET_BOT_INFO
     public static readonly GET_BOT_INFO: string = 'RWUAM_GET_BOT_INFO';
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/messages/RoomWidgetUserActionMessage.as::REPORT_CFH_OTHER

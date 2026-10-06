@@ -3,12 +3,13 @@
  *
  * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/avatarinfo/UseProductConfirmationView.as
  *
- * The frame layout depends on the product family (plain / monsterplant / rebreed / fertilize) and
- * its content is one of seven `use_product_controller_*` layouts. The preview is not the pet as it
+ * The content is one of four `use_product_controller_*` layouts. The preview is not the pet as it
  * is now: it is the pet re-rendered *with the product applied* — a shampoo swaps the palette to the
- * product's colour tag for the pet's own breed, a custom part swaps that layer's part, a saddle
- * merges the product's parts over the pet's remaining ones, and the monsterplant products keep the
- * pet's parts but pick a growth posture.
+ * product's colour tag for the pet's own breed, a custom part swaps that layer's part, and a saddle
+ * merges the product's parts over the pet's remaining ones.
+ *
+ * The RPG fork removed monsterplants: AS3's three monsterplant products (revive / rebreed /
+ * fertilize), their frames, controllers and growth-posture preview are not ported.
  *
  * AS3 adaptation: BitmapData.copyPixels() → OffscreenCanvas drawImage.
  */
@@ -48,12 +49,6 @@ export class UseProductConfirmationView implements IDisposable, IGetImageListene
 
     private static readonly PRODUCT_PAGE_SADDLE: number = 3;
 
-    private static readonly PRODUCT_PAGE_REVIVE: number = 4;
-
-    private static readonly PRODUCT_PAGE_REBREED: number = 5;
-
-    private static readonly PRODUCT_PAGE_FERTILIZE: number = 6;
-
     // Furniture categories, as in UseProductView (AS3 writes them as `category - 13` offsets).
     private static readonly CATEGORY_SHAMPOO: number = 13;
 
@@ -63,18 +58,9 @@ export class UseProductConfirmationView implements IDisposable, IGetImageListene
 
     private static readonly CATEGORY_SADDLE: number = 16;
 
-    private static readonly CATEGORY_REVIVE: number = 20;
-
-    private static readonly CATEGORY_REBREED: number = 21;
-
-    private static readonly CATEGORY_FERTILIZE: number = 22;
-
     private static readonly PREVIEW_DIRECTION: number = 90;
 
     private static readonly PREVIEW_SCALE: number = 64;
-
-    // Below this level a revived monsterplant is shown mid-growth (`grw<level>`) rather than `std`.
-    private static readonly MONSTERPLANT_GROWN_LEVEL: number = 7;
 
     // AS3: UseProductConfirmationView.as::_window
     private _window: IFrameWindow | null = null;
@@ -119,6 +105,8 @@ export class UseProductConfirmationView implements IDisposable, IGetImageListene
         return this._targetRoomObjectId;
     }
 
+    // DEVIATION: AS3 also maps the three monsterplant potion categories (20-22) to their pages —
+    //   the RPG fork removed monsterplants, so they fall to the unsupported-category warning.
     // AS3: UseProductConfirmationView.as::open()
     // `objectId` is a room object id when the product is already placed, and a furniture *type*
     // id when it is still in the inventory — in the latter case the id sent on to the server is
@@ -166,15 +154,6 @@ export class UseProductConfirmationView implements IDisposable, IGetImageListene
             case UseProductConfirmationView.CATEGORY_SADDLE:
                 page = UseProductConfirmationView.PRODUCT_PAGE_SADDLE;
                 break;
-            case UseProductConfirmationView.CATEGORY_REVIVE:
-                page = UseProductConfirmationView.PRODUCT_PAGE_REVIVE;
-                break;
-            case UseProductConfirmationView.CATEGORY_REBREED:
-                page = UseProductConfirmationView.PRODUCT_PAGE_REBREED;
-                break;
-            case UseProductConfirmationView.CATEGORY_FERTILIZE:
-                page = UseProductConfirmationView.PRODUCT_PAGE_FERTILIZE;
-                break;
             default:
                 logger.warn(`[UseProductConfirmationView.open()] Unsupported furniture category: ${this._furnitureData.category}`);
         }
@@ -188,6 +167,9 @@ export class UseProductConfirmationView implements IDisposable, IGetImageListene
         }
     }
 
+    // DEVIATION: AS3 also registers the monsterplant title/name/rarity/description and revive
+    //   parameters and picks one of three monsterplant frames — the RPG fork removed
+    //   monsterplants, so the plain frame is always used.
     // AS3: UseProductConfirmationView.as::setWindowContent()
     private setWindowContent(page: number): void
     {
@@ -198,33 +180,10 @@ export class UseProductConfirmationView implements IDisposable, IGetImageListene
         if(!pet || !furnitureData) return;
 
         localizations?.registerParameter('useproduct.widget.title', 'name', pet.name);
-        localizations?.registerParameter('useproduct.widget.title.monsterplant', 'name', pet.name);
-        localizations?.registerParameter('useproduct.widget.title.monsterplant_rebreed', 'name', pet.name);
-        localizations?.registerParameter('useproduct.widget.title.monsterplant_fertilize', 'name', pet.name);
-        localizations?.registerParameter('useproduct.widget.monsterplant.plant.name', 'name', pet.name);
-        localizations?.registerParameter('useproduct.widget.monsterplant.plant.raritylevel', 'level', pet.rarityLevel.toString());
-        localizations?.registerParameter('useproduct.widget.monsterplant.plant.description', 'name', pet.ownerName);
 
         if(!this._window)
         {
-            let frameName: string;
-
-            switch(page)
-            {
-                case UseProductConfirmationView.PRODUCT_PAGE_REVIVE:
-                    frameName = 'use_product_widget_frame_monsterplant_xml';
-                    break;
-                case UseProductConfirmationView.PRODUCT_PAGE_REBREED:
-                    frameName = 'use_product_widget_frame_monsterplant_rebreed_xml';
-                    break;
-                case UseProductConfirmationView.PRODUCT_PAGE_FERTILIZE:
-                    frameName = 'use_product_widget_frame_monsterplant_fertilize_xml';
-                    break;
-                default:
-                    frameName = 'use_product_widget_frame_xml';
-            }
-
-            this._window = this._windowManager.buildWidgetLayout(frameName) as IFrameWindow | null;
+            this._window = this._windowManager.buildWidgetLayout('use_product_widget_frame_xml') as IFrameWindow | null;
 
             if(!this._window) return;
 
@@ -235,7 +194,6 @@ export class UseProductConfirmationView implements IDisposable, IGetImageListene
         localizations?.registerParameter('useproduct.widget.text.custompart', 'productName', furnitureData.localizedName);
         localizations?.registerParameter('useproduct.widget.text.custompartshampoo', 'productName', furnitureData.localizedName);
         localizations?.registerParameter('useproduct.widget.text.shampoo', 'productName', furnitureData.localizedName);
-        localizations?.registerParameter('useproduct.widget.text.revive_monsterplant', 'productName', furnitureData.localizedName);
 
         // The frame ships with a placeholder child; it is swapped for the product's own controller.
         this._window.content.removeChildAt(0);
@@ -264,6 +222,8 @@ export class UseProductConfirmationView implements IDisposable, IGetImageListene
         this._window.invalidate();
     }
 
+    // DEVIATION: AS3 also builds the three monsterplant controllers — the RPG fork removed
+    //   monsterplants.
     // AS3: UseProductConfirmationView.as::createWindow()
     private createWindow(page: number): IWindow | null
     {
@@ -283,15 +243,6 @@ export class UseProductConfirmationView implements IDisposable, IGetImageListene
             case UseProductConfirmationView.PRODUCT_PAGE_SADDLE:
                 assetName = 'use_product_controller_saddle_xml';
                 break;
-            case UseProductConfirmationView.PRODUCT_PAGE_REVIVE:
-                assetName = 'use_product_controller_revive_monsterplant_xml';
-                break;
-            case UseProductConfirmationView.PRODUCT_PAGE_REBREED:
-                assetName = 'use_product_controller_rebreed_monsterplant_xml';
-                break;
-            case UseProductConfirmationView.PRODUCT_PAGE_FERTILIZE:
-                assetName = 'use_product_controller_fertilize_monsterplant_xml';
-                break;
             default:
                 // AS3 throws; the port logs and leaves the frame empty (see setWindowContent()).
                 logger.warn(`Invalid type for Use Product View content creation: ${page}`);
@@ -302,6 +253,8 @@ export class UseProductConfirmationView implements IDisposable, IGetImageListene
         return this._windowManager.buildWidgetLayout(assetName);
     }
 
+    // DEVIATION: AS3 also previews the three monsterplant products in their revived growth
+    //   posture — the RPG fork removed monsterplants.
     // AS3: UseProductConfirmationView.as::resolvePreviewImage()
     private resolvePreviewImage(furnitureData: IFurnitureData | null): ImageBitmap | null
     {
@@ -435,31 +388,6 @@ export class UseProductConfirmationView implements IDisposable, IGetImageListene
                 result = roomEngine.getPetImage(
                     figureData.typeId, figureData.paletteId, figureData.color,
                     new Vector3d(UseProductConfirmationView.PREVIEW_DIRECTION), UseProductConfirmationView.PREVIEW_SCALE, this, true, 0, customParts
-                );
-                break;
-            }
-            case UseProductConfirmationView.CATEGORY_REVIVE:
-            case UseProductConfirmationView.CATEGORY_REBREED:
-            case UseProductConfirmationView.CATEGORY_FERTILIZE:
-            {
-                // A dead plant would render as `rip`; the preview shows what it will look like
-                // once revived, which is its growth stage for its level.
-                let posture: string | null = 'rip';
-                const roomObject = this.getRoomUserObject(pet.roomObjectId);
-
-                if(roomObject)
-                {
-                    posture = roomObject.getModel().getString('figure_posture');
-
-                    if(posture === 'rip')
-                    {
-                        posture = pet.petLevel < UseProductConfirmationView.MONSTERPLANT_GROWN_LEVEL ? `grw${pet.petLevel}` : 'std';
-                    }
-                }
-
-                result = roomEngine.getPetImage(
-                    figureData.typeId, figureData.paletteId, figureData.color,
-                    new Vector3d(UseProductConfirmationView.PREVIEW_DIRECTION), UseProductConfirmationView.PREVIEW_SCALE, this, true, 0, figureData.customParts, posture
                 );
                 break;
             }

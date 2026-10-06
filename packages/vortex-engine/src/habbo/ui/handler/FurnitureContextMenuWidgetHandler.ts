@@ -5,10 +5,11 @@
  *
  * It turns room-engine events into calls on the widget's `show*` methods. AS3 also owns the
  * mystery-box toolbar tracker here and routes the mystery-box / mystery-trophy flows; the RPG fork
- * removed mystery boxes.
+ * removed mystery boxes. AS3's monsterplant-seed flow (bubble, double-click dialog, plant message)
+ * is gone too: the RPG fork removed monsterplants.
  *
- * Ported for the guild-furni, purchasable-clothing and monsterplant flows, including every other
- * request AS3 subscribes to.
+ * Ported for the guild-furni and purchasable-clothing flows, including every other request AS3
+ * subscribes to.
  *
  * **Purchasable clothing arrives by two different routes and they are not interchangeable.** A
  * context menu (`RETWE_OPEN_FURNI_CONTEXT_MENU` carrying `PURCHASABLE_CLOTHING`) opens the generic
@@ -25,7 +26,6 @@ import type {IRoomObject} from '@room/object/IRoomObject';
 import {RoomEngineToWidgetEvent} from '@habbo/room/events/RoomEngineToWidgetEvent';
 import {RoomObjectCategoryEnum} from '@habbo/room/object/RoomObjectCategoryEnum';
 import type {IRoomWidgetHandler} from '@habbo/ui/IRoomWidgetHandler';
-import {RoomWidgetUseProductMessage} from '@habbo/ui/widget/messages/RoomWidgetUseProductMessage';
 import type {IMessageEvent} from '@core/communication/messages/IMessageEvent';
 import {FigureSetIdsMessageEvent} from '@habbo/communication/messages/incoming/inventory/FigureSetIdsMessageEvent';
 import {
@@ -65,8 +65,6 @@ export class FurnitureContextMenuWidgetHandler implements IRoomWidgetHandler
     * logic returns from `get contextMenu()`, which is what the widget switches on.
     */
     private static readonly CONTEXT_MENU_FRIEND_FURNITURE: string = 'FRIEND_FURNITURE';
-
-    private static readonly CONTEXT_MENU_MONSTERPLANT_SEED: string = 'MONSTERPLANT_SEED';
 
     private static readonly CONTEXT_MENU_RANDOM_TELEPORT: string = 'RANDOM_TELEPORT';
 
@@ -134,6 +132,8 @@ export class FurnitureContextMenuWidgetHandler implements IRoomWidgetHandler
 
     // DEVIATION: AS3 also subscribes to the mystery-box and mystery-trophy open-dialog requests;
     //   the RPG fork removed mystery boxes.
+    // DEVIATION: AS3 also subscribes to the monsterplant-seed plant request; the RPG fork removed
+    //   monsterplants.
     // AS3: FurnitureContextMenuWidgetHandler.as::set container()
     public set container(value: IRoomWidgetHandlerContainer | null)
     {
@@ -148,11 +148,6 @@ export class FurnitureContextMenuWidgetHandler implements IRoomWidgetHandler
         if(!events) return;
 
         events.on(
-            RoomEngineToWidgetEvent.REQUEST_MONSTERPLANT_SEED_PLANT_CONFIRMATION_DIALOG,
-            this.onMonsterPlantSeedPlantConfirmationDialogRequested,
-            this
-        );
-        events.on(
             RoomEngineToWidgetEvent.REQUEST_PURCHASABLE_CLOTHING_CONFIRMATION_DIALOG,
             this.onPurchasableClothingConfirmationDialogRequested,
             this
@@ -162,6 +157,8 @@ export class FurnitureContextMenuWidgetHandler implements IRoomWidgetHandler
 
     // DEVIATION: AS3 also unsubscribes the mystery-box and mystery-trophy requests; the RPG fork
     //   removed mystery boxes.
+    // DEVIATION: AS3 also unsubscribes the monsterplant-seed plant request; the RPG fork removed
+    //   monsterplants.
     // AS3: FurnitureContextMenuWidgetHandler.as::unsetContainer()
     private unsetContainer(): void
     {
@@ -169,11 +166,6 @@ export class FurnitureContextMenuWidgetHandler implements IRoomWidgetHandler
 
         if(events)
         {
-            events.off(
-                RoomEngineToWidgetEvent.REQUEST_MONSTERPLANT_SEED_PLANT_CONFIRMATION_DIALOG,
-                this.onMonsterPlantSeedPlantConfirmationDialogRequested,
-                this
-            );
             events.off(
                 RoomEngineToWidgetEvent.REQUEST_PURCHASABLE_CLOTHING_CONFIRMATION_DIALOG,
                 this.onPurchasableClothingConfirmationDialogRequested,
@@ -230,24 +222,19 @@ export class FurnitureContextMenuWidgetHandler implements IRoomWidgetHandler
         return this._connection;
     }
 
+    // DEVIATION: AS3 takes RWUPM_MONSTERPLANT_SEED, its only widget message; the RPG fork removed
+    //   monsterplants, so there is none left.
     // AS3: FurnitureContextMenuWidgetHandler.as::getWidgetMessages()
     public getWidgetMessages(): string[]
     {
-        return [RoomWidgetUseProductMessage.MONSTERPLANT_SEED];
+        return [];
     }
 
+    // DEVIATION: AS3 plants the seed on RWUPM_MONSTERPLANT_SEED, its only case; the RPG fork removed
+    //   monsterplants.
     // AS3: FurnitureContextMenuWidgetHandler.as::processWidgetMessage()
-    public processWidgetMessage(message: unknown): unknown
+    public processWidgetMessage(_message: unknown): unknown
     {
-        const widgetMessage = message as RoomWidgetUseProductMessage | null;
-
-        if(widgetMessage === null) return null;
-
-        if(widgetMessage.type === RoomWidgetUseProductMessage.MONSTERPLANT_SEED)
-        {
-            this._container?.roomSession?.plantSeed(widgetMessage.roomObjectId);
-        }
-
         return null;
     }
 
@@ -274,6 +261,8 @@ export class FurnitureContextMenuWidgetHandler implements IRoomWidgetHandler
 
     // DEVIATION: AS3 also routes the MYSTERY_BOX context menu to the mystery-box bubble; the RPG
     //   fork removed mystery boxes.
+    // DEVIATION: AS3 also routes the MONSTERPLANT_SEED context menu to the seed bubble; the RPG fork
+    //   removed monsterplants.
     // AS3: FurnitureContextMenuWidgetHandler.as::processEvent()
     public processEvent(event: unknown): void
     {
@@ -297,13 +286,6 @@ export class FurnitureContextMenuWidgetHandler implements IRoomWidgetHandler
                         break;
                     case FurnitureContextMenuWidgetHandler.CONTEXT_MENU_RANDOM_TELEPORT:
                         this._widget.showRandomTeleportContextMenu(object, widgetEvent.category);
-                        break;
-                    case FurnitureContextMenuWidgetHandler.CONTEXT_MENU_MONSTERPLANT_SEED:
-                        // AS3 gates this one on ownership: a visitor gets no seed menu.
-                        if(this._container?.isOwnerOfFurniture(object) ?? false)
-                        {
-                            this._widget.showMonsterPlantSeedContextMenu(object, widgetEvent.category);
-                        }
                         break;
                     // AS3 opens the *generic usable* menu here, not the confirmation dialog — that
                     // one belongs to the double-click path below. AS3 also leaves this case without
@@ -512,29 +494,9 @@ export class FurnitureContextMenuWidgetHandler implements IRoomWidgetHandler
     }
 
     /**
-     * The seed's other way in. Its context bubble reaches `showPlantSeedConfirmationDialog()`
-     * through the Use button, but a double click skips the bubble entirely: the logic raises
-     * ROWRE_MONSTERPLANT_SEED_PLANT_CONFIRMATION_DIALOG and the room engine forwards it here.
-     * Owner-only, the same gate the bubble itself gets in processEvent().
-     */
-    // AS3: FurnitureContextMenuWidgetHandler.as::onMonsterPlantSeedPlantConfirmationDialogRequested()
-    private onMonsterPlantSeedPlantConfirmationDialogRequested(event: RoomEngineToWidgetEvent): void
-    {
-        if(this._widget === null) return;
-
-        const object = this.getRoomObject(event.objectId);
-
-        if(object === null) return;
-
-        if(!this._container?.isOwnerOfFurniture(object)) return;
-
-        this._widget.showPlantSeedConfirmationDialog(object);
-    }
-
-    /**
 	 * Double-clicking a purchasable-clothing furni. The context menu reaches the same furni through
 	 * `showUsableFurnitureContextMenu()`; this path skips it and asks straight for the confirmation.
-	 * Owner-only, like its monsterplant sibling.
+	 * Owner-only.
 	 */
     // AS3: FurnitureContextMenuWidgetHandler.as::onPurchasableClothingConfirmationDialogRequested()
     private onPurchasableClothingConfirmationDialogRequested(event: RoomEngineToWidgetEvent): void

@@ -6,7 +6,8 @@
  * One instance per candidate pet (AvatarInfoWidgetHandler::activateUseProductMenuForPets builds
  * the list, from either an inventory double-click or a click on the product already in the room).
  * The product's furniture category decides which single button the bubble shows; clicking it
- * opens UseProductConfirmationView for that pair.
+ * opens UseProductConfirmationView for that pair. The RPG fork removed monsterplants: AS3's
+ * revive / rebreed / fertilize modes are not ported.
  *
  * AS3 adaptation: the window's WME_OVER/WME_OUT listeners become one `procedure`, as in the
  * other pet bubbles.
@@ -38,12 +39,6 @@ export class UseProductView extends AvatarContextInfoButtonView
 
     private static readonly MODE_SADDLE: number = 4;
 
-    private static readonly MODE_REVIVE: number = 5;
-
-    private static readonly MODE_REBREED: number = 6;
-
-    private static readonly MODE_FERTILIZE: number = 7;
-
     // Furniture categories the modes above map to. AS3 writes them as `category - 13` switch
     // offsets; the names come from the mode each one selects.
     private static readonly CATEGORY_SHAMPOO: number = 13;
@@ -53,12 +48,6 @@ export class UseProductView extends AvatarContextInfoButtonView
     private static readonly CATEGORY_CUSTOM_PART_SHAMPOO: number = 15;
 
     private static readonly CATEGORY_SADDLE: number = 16;
-
-    private static readonly CATEGORY_REVIVE: number = 20;
-
-    private static readonly CATEGORY_REBREED: number = 21;
-
-    private static readonly CATEGORY_FERTILIZE: number = 22;
 
     // AS3: UseProductView.as::_mode
     private _mode: number = UseProductView.MODE_NORMAL;
@@ -107,6 +96,8 @@ export class UseProductView extends AvatarContextInfoButtonView
         return this._widget as AvatarInfoWidget;
     }
 
+    // DEVIATION: AS3 also maps the three monsterplant potion categories (20-22) to their own
+    //   modes — the RPG fork removed monsterplants, so they fall to the unsupported-category warning.
     // AS3: UseProductView.as::resolveMode()
     // The product may already be in the room (look it up as a room object) or still be in the
     // inventory (then requestRoomObjectId is a furniture *type* id, not a room object id).
@@ -146,15 +137,6 @@ export class UseProductView extends AvatarContextInfoButtonView
                 break;
             case UseProductView.CATEGORY_SADDLE:
                 this._mode = UseProductView.MODE_SADDLE;
-                break;
-            case UseProductView.CATEGORY_REVIVE:
-                this._mode = UseProductView.MODE_REVIVE;
-                break;
-            case UseProductView.CATEGORY_REBREED:
-                this._mode = UseProductView.MODE_REBREED;
-                break;
-            case UseProductView.CATEGORY_FERTILIZE:
-                this._mode = UseProductView.MODE_FERTILIZE;
                 break;
             default:
                 logger.warn(`[UseProductView.open()] Unsupported furniture category: ${furniData.category}`);
@@ -203,6 +185,8 @@ export class UseProductView extends AvatarContextInfoButtonView
         this.updateButtons();
     }
 
+    // DEVIATION: AS3 also shows the revive / rebreed / fertilize monsterplant buttons — the RPG
+    //   fork removed monsterplants.
     // AS3: UseProductView.as::updateButtons()
     public updateButtons(): void
     {
@@ -238,21 +222,13 @@ export class UseProductView extends AvatarContextInfoButtonView
                 if(this._item?.replace) this.showButton('replace_product_saddle');
                 else this.showButton('use_product_saddle');
                 break;
-            case UseProductView.MODE_REVIVE:
-                this.showButton('revive_monsterplant');
-                break;
-            case UseProductView.MODE_REBREED:
-                this.showButton('rebreed_monsterplant');
-                break;
-            case UseProductView.MODE_FERTILIZE:
-                this.showButton('fertilize_monsterplant');
-                break;
         }
 
         this._buttons.autoArrangeItems = true;
         this._buttons.visible = true;
     }
 
+    // DEVIATION: AS3 also routes the three monsterplant buttons — the RPG fork removed monsterplants.
     // AS3: UseProductView.as::buttonEventProc()
     protected override buttonEventProc = (event: WindowEvent, window: IWindow): void =>
     {
@@ -274,9 +250,6 @@ export class UseProductView extends AvatarContextInfoButtonView
                     case 'use_product_custom_part_shampoo':
                     case 'use_product_saddle':
                     case 'replace_product_saddle':
-                    case 'revive_monsterplant':
-                    case 'rebreed_monsterplant':
-                    case 'fertilize_monsterplant':
                         this.widget.showUseProductConfirmation(
                             this._item.requestRoomObjectId, this._item.targetRoomObjectId, this._item.requestInventoryStripId
                         );

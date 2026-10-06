@@ -5,10 +5,12 @@
  *
  * AS3 backs every field with a private var + read-only getter; this port keeps the
  * existing plain-public-field shape used by the sibling InfoStand*Data classes.
- * The field set is AS3's exactly — note it deliberately drops the event's
- * petRespectLeft/hasFreeSaddle/isRiding/canBreed/canHarvest/canRevive, which AS3's
- * setData() does not copy either (petRespectLeft goes to InfoStandUserData instead,
- * see InfoStandWidget.onPetInfo()).
+ * The field set is AS3's — note it deliberately drops the event's
+ * petRespectLeft/hasFreeSaddle/isRiding, which AS3's setData() does not copy either
+ * (petRespectLeft goes to InfoStandUserData instead, see InfoStandWidget.onPetInfo()).
+ *
+ * The RPG fork removed pet breeding and monsterplants: AS3's rarityLevel,
+ * hasBreedingPermission and the three monsterplant timers are not ported.
  */
 import type {RoomWidgetPetInfoUpdateEvent} from '@habbo/ui/widget/events/RoomWidgetPetInfoUpdateEvent';
 
@@ -60,17 +62,9 @@ export class InfoStandPetData
     public petRespect: number = 0;
     // AS3: .../src/com/sulake/habbo/ui/widget/infostand/InfoStandPetData.as::get roomIndex()
     public roomIndex: number = 0;
-    // AS3: .../src/com/sulake/habbo/ui/widget/infostand/InfoStandPetData.as::get rarityLevel()
-    public rarityLevel: number = 0;
-    // AS3: .../src/com/sulake/habbo/ui/widget/infostand/InfoStandPetData.as::get maxWellBeingSeconds()
-    public maxWellBeingSeconds: number = 0;
-    // AS3: .../src/com/sulake/habbo/ui/widget/infostand/InfoStandPetData.as::get remainingWellBeingSeconds()
-    public remainingWellBeingSeconds: number = 0;
-    // AS3: .../src/com/sulake/habbo/ui/widget/infostand/InfoStandPetData.as::get remainingGrowingSeconds()
-    public remainingGrowingSeconds: number = 0;
-    // AS3: .../src/com/sulake/habbo/ui/widget/infostand/InfoStandPetData.as::get hasBreedingPermission()
-    public hasBreedingPermission: boolean = false;
 
+    // DEVIATION: AS3 also copies the rarity, the breeding permission and the three monsterplant
+    //   timers; the RPG fork removed pet breeding and monsterplants.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandPetData.as::setData()
     public setData(event: RoomWidgetPetInfoUpdateEvent): void
     {
@@ -97,10 +91,5 @@ export class InfoStandPetData
         this.breedId = event.breedId;
         this.skillTresholds = event.skillTresholds;
         this.accessRights = event.accessRights;
-        this.maxWellBeingSeconds = event.maxWellBeingSeconds;
-        this.remainingWellBeingSeconds = event.remainingWellBeingSeconds;
-        this.remainingGrowingSeconds = event.remainingGrowingSeconds;
-        this.rarityLevel = event.rarityLevel;
-        this.hasBreedingPermission = event.hasBreedingPermission;
     }
 }

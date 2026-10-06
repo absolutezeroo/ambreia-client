@@ -39,7 +39,6 @@ export * from './RelationshipStatusInfoEvent';
 export * from './ScrKickbackData';
 export * from './ScrSendKickbackInfoMessageEvent';
 export * from './ScrSendUserInfoEvent';
-export * from './PetSupplementedNotificationEvent';
 export * from './GuildMemberData';
 export * from './GuildMemberEntryData';
 export * from './GuildMembersMessageEvent';

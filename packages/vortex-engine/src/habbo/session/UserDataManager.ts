@@ -9,6 +9,9 @@ import type {ISelectedBadge} from '@habbo/communication/messages/parser/users/Ha
 /**
  * Room user data manager
  * Based on AS3 com.sulake.habbo.session.UserDataManager
+ *
+ * The RPG fork removed pet breeding and monsterplants: AS3's updatePetBreedingStatus() is not
+ * ported.
  */
 export class UserDataManager implements IUserDataManager
 {
@@ -200,20 +203,6 @@ export class UserDataManager implements IUserDataManager
         if(userData)
         {
             userData.petLevel = level;
-        }
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/UserDataManager.as::updatePetBreedingStatus()
-    updatePetBreedingStatus(roomIndex: number, canBreed: boolean, canHarvest: boolean, canRevive: boolean, hasBreedingPermission: boolean): void
-    {
-        const userData = this.getUserDataByIndex(roomIndex);
-
-        if(userData)
-        {
-            userData.canBreed = canBreed;
-            userData.canHarvest = canHarvest;
-            userData.canRevive = canRevive;
-            userData.hasBreedingPermission = hasBreedingPermission;
         }
     }
 

@@ -39,8 +39,6 @@ export class RoomEngineToWidgetEvent extends RoomEngineObjectEvent
     public static readonly REQUEST_CLOTHING_CHANGE = 'RETWE_REQUEST_CLOTHING_CHANGE';
     // AS3: .../src/com/sulake/habbo/room/events/RoomEngineToWidgetEvent.as::REQUEST_MANNEQUIN
     public static readonly REQUEST_MANNEQUIN = 'RETWE_REQUEST_MANNEQUIN';
-    // AS3: .../src/com/sulake/habbo/room/events/RoomEngineToWidgetEvent.as::REQUEST_MONSTERPLANT_SEED_PLANT_CONFIRMATION_DIALOG
-    public static readonly REQUEST_MONSTERPLANT_SEED_PLANT_CONFIRMATION_DIALOG = 'ROWRE_REQUEST_MONSTERPLANT_SEED_PLANT_CONFIRMATION_DIALOG';
     // AS3: .../src/com/sulake/habbo/room/events/RoomEngineToWidgetEvent.as::REQUEST_PURCHASABLE_CLOTHING_CONFIRMATION_DIALOG
     public static readonly REQUEST_PURCHASABLE_CLOTHING_CONFIRMATION_DIALOG = 'ROWRE_REQUEST_PURCHASABLE_CLOTHING_CONFIRMATION_DIALOG';
     // AS3: .../src/com/sulake/habbo/room/events/RoomEngineToWidgetEvent.as::REQUEST_BACKGROUND_COLOR

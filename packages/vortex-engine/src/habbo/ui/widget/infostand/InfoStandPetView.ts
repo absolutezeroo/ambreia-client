@@ -4,27 +4,26 @@
  * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandPetView.as
  *
  * The pet infostand panel: name, rendered pet image, level/breed/age, respect count, the
- * happiness/experience/energy bars (or the monsterplant well-being/growth pair), and the action
- * button strip. Structure follows InfoStandFurniView, the sibling that already works against the
+ * happiness/experience/energy bars, and the action button strip. Structure follows InfoStandFurniView, the sibling that already works against the
  * same `info_border` / `infostand_element_list` / `button_list` layout shape.
  *
  * AS3 caches the last InfoStandPetData per pet id purely to feed PetCommandTool on a later
  * openTrainView(); that cache is kept (_petDataCache) and is what openTrainView() reads.
+ *
+ * The RPG fork removed monsterplants and pet feeding: AS3's monsterplant panel (well-being bar,
+ * growth countdown, rarity line and overlay), its treat / move / rotate buttons and the
+ * buy-food button are not ported. The layout still ships those children; they are kept hidden.
  */
 import type {IWindow} from '@core/window/IWindow';
 import type {IWindowContainer} from '@core/window/IWindowContainer';
 import type {IItemListWindow} from '@core/window/components/IItemListWindow';
 import type {ITextWindow} from '@core/window/components/ITextWindow';
 import type {IBitmapWrapperWindow} from '@core/window/components/IBitmapWrapperWindow';
-import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
 import {WindowEvent} from '@core/window/events/WindowEvent';
 import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
 import type {IHabboCatalog} from '@habbo/catalog/IHabboCatalog';
-import type {IRarityItemPreviewOverlayWidget} from '@habbo/window/widgets/IRarityItemPreviewOverlayWidget';
-import type {CountdownWidget} from '@habbo/window/widgets/CountdownWidget';
 import {RoomWidgetFurniActionMessage} from '../messages/RoomWidgetFurniActionMessage';
 import {RoomWidgetUserActionMessage} from '../messages/RoomWidgetUserActionMessage';
-import {SecondsFormatter} from './SecondsFormatter';
 import type {CommandConfiguration} from './CommandConfiguration';
 import {PetCommandTool} from './PetCommandTool';
 import type {InfoStandPetData} from './InfoStandPetData';
@@ -72,12 +71,6 @@ export class InfoStandPetView
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandPetView.as::STATUS_BAR_ENERGY_CONTENT_COLOR
     private static readonly STATUS_BAR_ENERGY_CONTENT_COLOR = 6200576;
 
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandPetView.as::STATUS_BAR_WELLBEING_HIGHLIGHT_COLOR
-    private static readonly STATUS_BAR_WELLBEING_HIGHLIGHT_COLOR = 9094430;
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandPetView.as::STATUS_BAR_WELLBEING_CONTENT_COLOR
-    private static readonly STATUS_BAR_WELLBEING_CONTENT_COLOR = 6200576;
-
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandPetView.as::STATE_HAPPINESS
     private static readonly STATE_HAPPINESS = 'happiness';
 
@@ -86,12 +79,6 @@ export class InfoStandPetView
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandPetView.as::STATE_ENERGY
     private static readonly STATE_ENERGY = 'energy';
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandPetView.as::STATE_WELLBEING
-    private static readonly STATE_WELLBEING = 'wellbeing';
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandPetView.as::STATE_GROWTH
-    private static readonly STATE_GROWTH = 'growth';
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandPetView.as::BUTTONS_MAX_WIDTH
     private static readonly BUTTONS_MAX_WIDTH = 250;
@@ -102,10 +89,7 @@ export class InfoStandPetView
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandPetView.as::BUTTON_MARGIN
     private static readonly BUTTON_MARGIN = 5;
 
-    // The monsterplant is the one pet type with a growth/well-being panel instead of the standard
-    // happiness/experience/energy one; type 15 is the one with the enhancement skill indicator.
-    private static readonly PET_TYPE_MONSTERPLANT = 16;
-
+    // Type 15 is the one pet type with the enhancement skill indicator.
     private static readonly PET_TYPE_ENHANCEABLE = 15;
 
     private readonly _widget: InfoStandWidget;
@@ -126,9 +110,9 @@ export class InfoStandPetView
     // Built lazily on the first openTrainView(), exactly as AS3 does.
     private _commandTool: PetCommandTool | null = null;
 
+    // AS3 also grabs HabboTracking.getInstance() for the buy-food click, which the RPG fork removed
+    // with pet feeding.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandPetView.as::InfoStandPetView()
-    // AS3 also grabs HabboTracking.getInstance() for the buy-food click; this port reads tracking
-    // off the handler container instead (as InfoStandFurniView does), so there is no field for it.
     constructor(widget: InfoStandWidget, name: string, catalog: IHabboCatalog | null)
     {
         this._widget = widget;
@@ -149,6 +133,10 @@ export class InfoStandPetView
         return this._currentPetId;
     }
 
+    // DEVIATION: AS3 shows a monsterplant panel instead (well-being bar, growth countdown, rarity
+    //   line and overlay, treat button, move/rotate for a plant) and offers buy-food on every other
+    //   pet; the RPG fork removed monsterplants and pet feeding. Every pet gets the standard
+    //   panel, and the plant-only and buy-food children of the layout stay hidden.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandPetView.as::update()
     public update(petData: InfoStandPetData): void
     {
@@ -158,71 +146,41 @@ export class InfoStandPetView
         this.setBreedText(
             this._widget.localizations?.getLocalization(this.getBreedLocalizationKey(petData.type, petData.breedId)) ?? ''
         );
-        this.updatePetRespect(petData.petRespect, petData.type !== InfoStandPetView.PET_TYPE_MONSTERPLANT);
+        this.updatePetRespect(petData.petRespect, true);
         this.setAgeText(petData.age);
-        this.setLevelText(petData.level, petData.levelMax, petData.type !== InfoStandPetView.PET_TYPE_MONSTERPLANT);
+        this.setLevelText(petData.level, petData.levelMax);
         this.setSpecialSkillLevel(petData.level, petData.skillTresholds, petData.type);
-        this.setRarityLevel(petData.rarityLevel, petData.type);
 
-        if(petData.type === InfoStandPetView.PET_TYPE_MONSTERPLANT)
-        {
-            this.showStatusContainer('default', false);
-            this.showStatusContainer('monsterplant', true);
+        const rarityText = this.getStatusContainer('default')?.getListItemByName('status_rarity_level') ?? null;
 
-            this.updateStateElement(
-                InfoStandPetView.STATE_WELLBEING, petData.remainingWellBeingSeconds, petData.maxWellBeingSeconds,
-                InfoStandPetView.STATUS_BAR_WELLBEING_CONTENT_COLOR, InfoStandPetView.STATUS_BAR_WELLBEING_HIGHLIGHT_COLOR,
-                SecondsFormatter.formatSeconds(petData.remainingWellBeingSeconds)
-            );
-            this.updateStateWidget(InfoStandPetView.STATE_GROWTH, petData.remainingGrowingSeconds);
+        if(rarityText) rarityText.visible = false;
 
-            this.showButton('petrespect', false);
+        this.showStatusContainer('default', true);
+        this.showStatusContainer('monsterplant', false);
 
-            // AS3 only offers the treat button while the plant is not already ~full on energy.
-            this.showButton('pettreat', petData.energy > 0 ? (petData.energy / petData.energyMax) < 0.98 : false);
+        this.showButton('petrespect', true);
+        this.showButton('pettreat', false);
+        this.showButton('train', petData.isOwnPet);
+        this.showButton('pick', petData.isOwnPet);
+        this.showButton('buy_food', false);
+        this.showButton('kick', petData.canRemovePet);
 
-            this.showButton('train', false);
-            this.showButton('buy_food', false);
-            this.showButton('kick', false);
-            this.showButton('pick', petData.canRemovePet);
-            this.showRarityItem(petData.rarityLevel >= 0, petData);
-        }
-        else
-        {
-            this.showStatusContainer('default', true);
-            this.showStatusContainer('monsterplant', false);
+        this.updateStateElement(
+            InfoStandPetView.STATE_HAPPINESS, petData.nutrition, petData.nutritionMax,
+            InfoStandPetView.STATUS_BAR_HAPPINESS_CONTENT_COLOR, InfoStandPetView.STATUS_BAR_HAPPINESS_HIGHLIGHT_COLOR
+        );
+        this.updateStateElement(
+            InfoStandPetView.STATE_EXPERIENCE, petData.experience, petData.experienceMax,
+            InfoStandPetView.STATUS_BAR_EXPERIENCE_CONTENT_COLOR, InfoStandPetView.STATUS_BAR_EXPERIENCE_HIGHLIGHT_COLOR
+        );
+        this.updateStateElement(
+            InfoStandPetView.STATE_ENERGY, petData.energy, petData.energyMax,
+            InfoStandPetView.STATUS_BAR_ENERGY_CONTENT_COLOR, InfoStandPetView.STATUS_BAR_ENERGY_HIGHLIGHT_COLOR
+        );
+        this.updateRespectButton();
 
-            this.showButton('petrespect', true);
-            this.showButton('pettreat', false);
-            this.showButton('train', petData.isOwnPet);
-            this.showButton('pick', petData.isOwnPet);
-            this.showButton('buy_food', true);
-            this.showButton('kick', petData.canRemovePet);
-
-            this.updateStateElement(
-                InfoStandPetView.STATE_HAPPINESS, petData.nutrition, petData.nutritionMax,
-                InfoStandPetView.STATUS_BAR_HAPPINESS_CONTENT_COLOR, InfoStandPetView.STATUS_BAR_HAPPINESS_HIGHLIGHT_COLOR
-            );
-            this.updateStateElement(
-                InfoStandPetView.STATE_EXPERIENCE, petData.experience, petData.experienceMax,
-                InfoStandPetView.STATUS_BAR_EXPERIENCE_CONTENT_COLOR, InfoStandPetView.STATUS_BAR_EXPERIENCE_HIGHLIGHT_COLOR
-            );
-            this.updateStateElement(
-                InfoStandPetView.STATE_ENERGY, petData.energy, petData.energyMax,
-                InfoStandPetView.STATUS_BAR_ENERGY_CONTENT_COLOR, InfoStandPetView.STATUS_BAR_ENERGY_HIGHLIGHT_COLOR
-            );
-            this.updateRespectButton();
-        }
-
-        const roomSession = this._widget.handler.container?.roomSession ?? null;
-        const isPlayTestMode = roomSession != null && roomSession.playTestMode;
-        const roomControllerLevel = roomSession?.roomControllerLevel ?? 0;
-        const isAnyRoomController = this._widget.handler.container?.sessionDataManager?.isAnyRoomController ?? false;
-        const canMove = !isPlayTestMode && (roomControllerLevel >= 1 || petData.isOwnPet || isAnyRoomController);
-
-        // Only the monsterplant is a furniture-like object you can move/rotate.
-        this.showButton('move', canMove && petData.type === InfoStandPetView.PET_TYPE_MONSTERPLANT);
-        this.showButton('rotate', canMove && petData.type === InfoStandPetView.PET_TYPE_MONSTERPLANT);
+        this.showButton('move', false);
+        this.showButton('rotate', false);
 
         this.updateWindow();
 
@@ -352,7 +310,6 @@ export class InfoStandPetView
         this.setIcon('status_experience_icon', 'icon_pet_experience');
         this.setIcon('status_energy_icon', 'icon_pet_energy');
         this.setIcon('skill_level_indicator', 'pet_skill_level_0');
-        this.setIcon('status_wellbeing_icon', 'icon_pet_wellbeing');
 
         // AS3 runs this as a second pass over the same list, after the icons are in place.
         for(const button of buttons)
@@ -363,6 +320,7 @@ export class InfoStandPetView
         }
     }
 
+    // DEVIATION: AS3 also sets the monsterplant well-being icon; the RPG fork removed monsterplants.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandPetView.as::createWindow() (the six icon blocks)
     // AS3 repeats the same getAssetByName/clone/assign block per icon; folded into one helper.
     private setIcon(childName: string, assetName: string): void
@@ -502,27 +460,6 @@ export class InfoStandPetView
         this.updateWindow();
     }
 
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandPetView.as::setRarityLevel()
-    private setRarityLevel(rarityLevel: number, petType: number): void
-    {
-        // AS3's literal list: only these two pet types display a rarity line.
-        const rarityPetTypes = [16, 26];
-        const container = this.getStatusContainer(petType !== InfoStandPetView.PET_TYPE_MONSTERPLANT ? 'default' : 'monsterplant');
-        const text = container?.getListItemByName('status_rarity_level') as ITextWindow | null;
-
-        if(!text) return;
-
-        text.visible = rarityPetTypes.indexOf(petType) > -1;
-
-        this._widget.localizations?.registerParameter(
-            'infostand.pet.text.raritylevel',
-            'level',
-            this._widget.localizations?.getLocalization(`infostand.pet.raritylevel.${rarityLevel}`) ?? ''
-        );
-
-        this.updateWindow();
-    }
-
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandPetView.as::set ownerName()
     private setOwnerName(value: string): void
     {
@@ -586,42 +523,6 @@ export class InfoStandPetView
         const container = this._elementList?.getListItemByName('status_container') as IWindowContainer | null;
 
         return (container?.findChildByName(`status_item_list_${name}`) as IItemListWindow | null) ?? null;
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandPetView.as::updateStateWidget()
-    // AS3's switch has a single "growth" case and no default, so this is a no-op for any other
-    // state name — preserved rather than collapsed into an unconditional body.
-    private updateStateWidget(state: string, seconds: number): void
-    {
-        if(state !== InfoStandPetView.STATE_GROWTH) return;
-
-        const container = this._elementList?.getListItemByName('status_container') as IWindowContainer | null;
-
-        if(!container) return;
-
-        const widgetWindow = container.findChildByName(`${state}_status_widget`) as IWidgetWindow | null;
-        const widget = (widgetWindow?.widget ?? null) as CountdownWidget | null;
-
-        if(!widget || !widgetWindow) return;
-
-        widget.seconds = seconds;
-
-        const visible = seconds > 0;
-        const visibilityChanged = widgetWindow.visible !== visible;
-
-        widgetWindow.visible = visible;
-
-        const text = container.findChildByName(`${state}_status_text`) as ITextWindow | null;
-
-        if(text) text.visible = visible;
-
-        // Only re-flow the list when the row actually appeared or disappeared.
-        if(visibilityChanged)
-        {
-            const list = container.findChildByName('status_item_list_monsterplant') as IItemListWindow | null;
-
-            list?.arrangeListItems();
-        }
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandPetView.as::updateStateElement()
@@ -692,20 +593,6 @@ export class InfoStandPetView
         context.fillRect(1, 1, ratio * (InfoStandPetView.STATUS_BAR_WIDTH - 2), InfoStandPetView.STATUS_BAR_HIGHLIGHT_HEIGHT);
 
         return canvas.transferToImageBitmap();
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandPetView.as::showRarityItem()
-    // AS3 declares param1 and never reads it — the overlay's rarityLevel is set unconditionally
-    // from the pet data. Kept as a dead parameter, matching the original.
-    private showRarityItem(_visible: boolean, petData: InfoStandPetData): void
-    {
-        const container = this._elementList?.getListItemByName('status_container') as IWindowContainer | null;
-        const widgetWindow = container?.findChildByName('rarity_item_overlay_widget') as IWidgetWindow | null;
-        const widget = (widgetWindow?.widget ?? null) as IRarityItemPreviewOverlayWidget | null;
-
-        if(!widget) return;
-
-        widget.rarityLevel = petData.rarityLevel;
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandPetView.as::updateRespectButton()
@@ -823,6 +710,8 @@ export class InfoStandPetView
         this._widget.close();
     };
 
+    // DEVIATION: AS3 also handles buy-food (opens the pet-accessories catalog page) and treat; the
+    //   RPG fork removed pet feeding and monsterplants. Move/rotate stay: the buttons are hidden.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandPetView.as::onButtonClicked()
     private onButtonClicked = (event: WindowMouseEvent): void =>
     {
@@ -846,22 +735,12 @@ export class InfoStandPetView
             case 'btn_train':
                 this.openTrainView();
                 break;
-            case 'btn_buy_food':
-                if(this._catalog)
-                {
-                    this._catalog.openCatalogPage('pet_accessories');
-                    this._widget.handler.container?.habboTracking?.trackGoogle('infostandBuyPetFoodButton', 'click');
-                }
-                break;
             case 'btn_petrespect':
                 // AS3 decrements optimistically before the server confirms, so the count and the
                 // button's own visibility update on click rather than on the response.
                 this._widget.userData.petRespectLeft -= 1;
                 this.updateRespectButton();
                 messageType = ' RWUAM_RESPECT_PET';
-                break;
-            case 'btn_pettreat':
-                messageType = 'RWUAM_TREAT_PET';
                 break;
         }
 

@@ -5,7 +5,3 @@ export * from './PetLevelUpdateEvent';
 export * from './PetFigureUpdateEvent';
 export * from './PetExperienceEvent';
 export * from './PetPlacingErrorEvent';
-export * from './PetBreedingResultEvent';
-export * from './PetBreedingResultData';
-export * from './BreedingPetInfo';
-export * from './PetBreedingRarityCategory';

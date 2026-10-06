@@ -3,8 +3,9 @@
  *
  * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/avatarinfo/PetMenuView.as
  *
- * Mode-driven button set (normal / saddled-up / riding / monsterplant), built on the
- * `pet_menu` layout. OwnPetMenuView is the richer sibling shown for your own pets.
+ * Mode-driven button set (normal / saddled-up / riding), built on the `pet_menu` layout.
+ * OwnPetMenuView is the richer sibling shown for your own pets. The RPG fork removed
+ * monsterplants: AS3's fourth mode and its treat button are not ported.
  *
  * AS3 adaptation: the window's WME_OVER/WME_OUT listeners become one `procedure`
  * (a window carries a single procedure in this port), which also handles the
@@ -32,8 +33,6 @@ export class PetMenuView extends AvatarContextInfoButtonView
 
     private static readonly MODE_RIDING: number = 2;
 
-    private static readonly MODE_MONSTER_PLANT: number = 3;
-
     // AS3: PetMenuView.as::_petData (obfuscated `_SafeStr_4556`)
     private _petData: PetInfoData | null = null;
     // AS3: PetMenuView.as::_mode
@@ -46,6 +45,7 @@ export class PetMenuView extends AvatarContextInfoButtonView
         this._autoHideEnabled = false;
     }
 
+    // DEVIATION: AS3 first picks a monsterplant mode — the RPG fork removed monsterplants.
     // AS3: PetMenuView.as::setup()
     public static setup(
         view: PetMenuView,
@@ -63,11 +63,7 @@ export class PetMenuView extends AvatarContextInfoButtonView
         const hasFreeSaddle = view.widget.hasFreeSaddle;
         const isRiding = view.widget.isRiding;
 
-        if(view.widget.isMonsterPlant())
-        {
-            view._mode = PetMenuView.MODE_MONSTER_PLANT;
-        }
-        else if(hasFreeSaddle && !isRiding)
+        if(hasFreeSaddle && !isRiding)
         {
             view._mode = PetMenuView.MODE_SADDLED_UP;
         }
@@ -129,6 +125,8 @@ export class PetMenuView extends AvatarContextInfoButtonView
         this.updateButtons();
     }
 
+    // DEVIATION: AS3 also has a monsterplant mode offering treat — the RPG fork removed
+    //   monsterplants.
     // AS3: PetMenuView.as::updateButtons()
     public updateButtons(): void
     {
@@ -176,13 +174,6 @@ export class PetMenuView extends AvatarContextInfoButtonView
                 }
                 this.showButton('respect', this._petData.petRespectLeft > 0);
                 break;
-            case PetMenuView.MODE_MONSTER_PLANT:
-                if(!this._petData.canRevive)
-                {
-                    this.showButton('respect', false);
-                    this.showButton('treat', true, (this._petData.energy / this._petData.energyMax) < 0.98);
-                }
-                break;
         }
 
         this._widget.localizations?.registerParameter(
@@ -210,6 +201,7 @@ export class PetMenuView extends AvatarContextInfoButtonView
         this._buttons.visible = true;
     }
 
+    // DEVIATION: AS3 also handles treat — the RPG fork removed monsterplants.
     // AS3: PetMenuView.as::buttonEventProc()
     protected override buttonEventProc = (event: WindowEvent, window: IWindow): void =>
     {
@@ -237,9 +229,6 @@ export class PetMenuView extends AvatarContextInfoButtonView
                         if(this._petData) this._petData.petRespectLeft -= 1;
                         this.updateButtons();
                         message = new RoomWidgetUserActionMessage(RoomWidgetUserActionMessage.RESPECT_PET, this.userId);
-                        break;
-                    case 'treat':
-                        message = new RoomWidgetUserActionMessage(RoomWidgetUserActionMessage.TREAT_PET, this.userId);
                         break;
                     case 'pass_handitem':
                         message = new RoomWidgetUserActionMessage(RoomWidgetUserActionMessage.GIVE_CARRY_ITEM_TO_PET, this.userId);

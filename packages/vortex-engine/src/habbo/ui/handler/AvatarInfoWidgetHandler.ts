@@ -6,9 +6,11 @@
  * Opens the own-avatar bubble on the toolbar MEMENU click, routes the bubble's
  * dance/expression/posture actions to roomSession.send* (consolidating what AS3 splits across
  * MeMenuWidgetHandler/InfoStandWidgetHandler), and owns the pet side of the widget: the
- * status/level/nest-breeding session events, the pet actions the bubbles raise (harvest, revive,
- * compost, use-product, request-breed) and the two room scans that build the per-pet
- * "use this product on…" / "breed with…" bubble sets.
+ * status/level session events, the use-product action the bubbles raise and the room scan that
+ * builds the per-pet "use this product on…" bubble set.
+ *
+ * The RPG fork removed pet breeding and monsterplants: AS3's nest-breeding event, its harvest /
+ * revive / compost / request-breed actions and the "breed with…" scan are not ported.
  */
 import type {IRoomWidgetHandler} from '@habbo/ui/IRoomWidgetHandler';
 import type {IRoomWidgetHandlerContainer} from '@habbo/ui/IRoomWidgetHandlerContainer';
@@ -31,7 +33,6 @@ import {RoomWidgetPetLevelUpdateEvent} from '@habbo/ui/widget/events/RoomWidgetP
 import {UseProductItem} from '@habbo/ui/widget/events/UseProductItem';
 import {RoomSessionPetStatusUpdateEvent} from '@habbo/session/events/RoomSessionPetStatusUpdateEvent';
 import {RoomSessionPetLevelUpdateEvent} from '@habbo/session/events/RoomSessionPetLevelUpdateEvent';
-import {RoomSessionNestBreedingSuccessEvent} from '@habbo/session/events/RoomSessionNestBreedingSuccessEvent';
 import {RoomSessionDanceEvent} from '@habbo/session/events/RoomSessionDanceEvent';
 import {RoomEngineUseProductEvent} from '@habbo/room/events/RoomEngineUseProductEvent';
 import {RoomObjectCategoryEnum} from '@habbo/room/object/RoomObjectCategoryEnum';
@@ -41,8 +42,6 @@ import {HabboToolbarIconEnum} from '@habbo/toolbar/HabboToolbarIconEnum';
 import type {IFurnitureData} from '@habbo/session/furniture/IFurnitureData';
 import type {IUserData} from '@habbo/session/IUserData';
 import type {IRoomObject} from '@room/object/IRoomObject';
-import type {IDisposable} from '@core/runtime/IDisposable';
-import type {WindowEvent} from '@core/window/events/WindowEvent';
 import {Logger} from '@core/utils/Logger';
 import type {AvatarInfoWidget} from '@habbo/ui/widget/avatarinfo/AvatarInfoWidget';
 import type {IMessageEvent} from '@core/communication/messages/IMessageEvent';
@@ -56,10 +55,6 @@ export class AvatarInfoWidgetHandler implements IRoomWidgetHandler
 {
     // IUserData.type for a pet — the literal AS3 passes to getUserDataByType()/its type checks.
     private static readonly USER_TYPE_PET: number = 2;
-
-    // Monsterplant level at which the plant is fully grown; below it the rebreed product is refused
-    // and above it the fertilizer is (AvatarInfoWidgetHandler.as::activateUseProductMenuForPets()).
-    private static readonly MONSTERPLANT_GROWN_LEVEL: number = 7;
 
     // AS3: .../src/com/sulake/habbo/ui/handler/AvatarInfoWidgetHandler.as::_disposed
     private _disposed: boolean = false;
@@ -104,6 +99,8 @@ export class AvatarInfoWidgetHandler implements IRoomWidgetHandler
         return this._container?.friendList ?? null;
     }
 
+    // DEVIATION: AS3 also listens for the nest-breeding success event — the RPG fork removed pet
+    //   breeding.
     // AS3: AvatarInfoWidgetHandler.as::set container() / get container()
     public set container(value: IRoomWidgetHandlerContainer | null)
     {
@@ -118,7 +115,6 @@ export class AvatarInfoWidgetHandler implements IRoomWidgetHandler
         {
             previousSessionEvents.off(RoomSessionPetStatusUpdateEvent.PET_STATUS_UPDATE, this.onPetStatusUpdate);
             previousSessionEvents.off(RoomSessionPetLevelUpdateEvent.PET_LEVEL_UPDATE, this.onPetLevelUpdate);
-            previousSessionEvents.off(RoomSessionNestBreedingSuccessEvent.NEST_BREEDING_SUCCESS, this.onNestBreedingSuccessEvent);
             previousSessionEvents.off(RoomSessionDanceEvent.RSDE_DANCE, this.onDanceEvent);
             previousSessionEvents.off(RoomSessionUserDataUpdateEvent.RSUDUE_USER_DATA_UPDATE, this.onUserDataUpdate);
         }
@@ -155,7 +151,6 @@ export class AvatarInfoWidgetHandler implements IRoomWidgetHandler
         {
             sessionEvents.on(RoomSessionPetStatusUpdateEvent.PET_STATUS_UPDATE, this.onPetStatusUpdate);
             sessionEvents.on(RoomSessionPetLevelUpdateEvent.PET_LEVEL_UPDATE, this.onPetLevelUpdate);
-            sessionEvents.on(RoomSessionNestBreedingSuccessEvent.NEST_BREEDING_SUCCESS, this.onNestBreedingSuccessEvent);
             sessionEvents.on(RoomSessionDanceEvent.RSDE_DANCE, this.onDanceEvent);
             sessionEvents.on(RoomSessionUserDataUpdateEvent.RSUDUE_USER_DATA_UPDATE, this.onUserDataUpdate);
         }
@@ -315,8 +310,10 @@ export class AvatarInfoWidgetHandler implements IRoomWidgetHandler
         this._widget.isDancing = event.danceStyle !== 0;
     };
 
-    // AS3: AvatarInfoWidgetHandler.as::onPetStatusUpdate()
     // The session event carries the pet's webID; the widget event carries its room object id.
+    // DEVIATION: AS3 also forwards the breed / harvest / revive / breeding-permission flags — the
+    //   RPG fork removed pet breeding and monsterplants.
+    // AS3: AvatarInfoWidgetHandler.as::onPetStatusUpdate()
     private onPetStatusUpdate = (event: RoomSessionPetStatusUpdateEvent): void =>
     {
         const container = this._container;
@@ -334,9 +331,7 @@ export class AvatarInfoWidgetHandler implements IRoomWidgetHandler
 
         container.desktopEvents.emit(
             RoomWidgetPetStatusUpdateEvent.PET_STATUS_UPDATE,
-            new RoomWidgetPetStatusUpdateEvent(
-                petData.roomObjectId, event.canBreed, event.canHarvest, event.canRevive, event.hasBreedingPermission
-            )
+            new RoomWidgetPetStatusUpdateEvent(petData.roomObjectId)
         );
     };
 
@@ -359,14 +354,10 @@ export class AvatarInfoWidgetHandler implements IRoomWidgetHandler
         );
     };
 
-    // AS3: AvatarInfoWidgetHandler.as::onNestBreedingSuccessEvent()
-    private onNestBreedingSuccessEvent = (event: RoomSessionNestBreedingSuccessEvent): void =>
-    {
-        this._widget?.showNestBreedingSuccess(event.petId, event.rarityCategory);
-    };
-
-    // AS3: AvatarInfoWidgetHandler.as::getWidgetMessages()
     // The dance/expression/posture types are the port's own consolidation of AS3's MeMenu handler.
+    // DEVIATION: AS3 also takes REQUEST_BREED_PET, HARVEST_PET, REVIVE_PET and COMPOST_PLANT — the
+    //   RPG fork removed pet breeding and monsterplants.
+    // AS3: AvatarInfoWidgetHandler.as::getWidgetMessages()
     public getWidgetMessages(): string[]
     {
         return [
@@ -377,10 +368,6 @@ export class AvatarInfoWidgetHandler implements IRoomWidgetHandler
             RoomWidgetUserActionMessage.START_NAME_CHANGE,
             RoomWidgetUserActionMessage.REQUEST_PET_UPDATE,
             RoomWidgetUseProductMessage.PET_PRODUCT,
-            RoomWidgetUserActionMessage.REQUEST_BREED_PET,
-            RoomWidgetUserActionMessage.HARVEST_PET,
-            RoomWidgetUserActionMessage.REVIVE_PET,
-            RoomWidgetUserActionMessage.COMPOST_PLANT,
         ];
     }
 
@@ -397,13 +384,14 @@ export class AvatarInfoWidgetHandler implements IRoomWidgetHandler
         ];
     }
 
+    // DEVIATION: AS3 also handles harvest, compost, request-breed and revive — the RPG fork removed
+    //   pet breeding and monsterplants.
     // AS3: AvatarInfoWidgetHandler.as::processWidgetMessage() (+ MeMenuWidgetHandler action cases)
     public processWidgetMessage(message: RoomWidgetMessage): RoomWidgetUpdateEvent | null
     {
         if(!message || !this._container) return null;
 
         const roomSession = this._container.roomSession;
-        const userId = (message as RoomWidgetUserActionMessage).userId ?? 0;
 
         switch(message.type)
         {
@@ -443,43 +431,9 @@ export class AvatarInfoWidgetHandler implements IRoomWidgetHandler
                 roomSession.useProductForPet(useProductMessage.roomObjectId, useProductMessage.petId);
                 break;
             }
-            case RoomWidgetUserActionMessage.HARVEST_PET:
-                roomSession.harvestPet(userId);
-                break;
-            case RoomWidgetUserActionMessage.COMPOST_PLANT:
-                this.confirmCompost(userId);
-                break;
-            case RoomWidgetUserActionMessage.REQUEST_BREED_PET:
-                this.requestBreedMenu(userId);
-                break;
-            case RoomWidgetUserActionMessage.REVIVE_PET:
-                // AS3 falls through with no body — the revive itself is the catalog purchase the
-                // bubble already opened.
-                break;
         }
 
         return null;
-    }
-
-    // AS3: AvatarInfoWidgetHandler.as::processWidgetMessage() (RWUAM_COMPOST_PLANT case)
-    private confirmCompost(petId: number): void
-    {
-        const localization = this._widget?.catalog?.localization ?? this._container?.localization ?? null;
-        const windowManager = this._widget?.windowManager;
-
-        if(!windowManager) return;
-
-        windowManager.confirm(
-            localization?.getLocalization('monsterplant.confirm.title.compost') ?? '',
-            localization?.getLocalization('monsterplant.confirm.desc.compost') ?? '',
-            0,
-            (dialog: IDisposable, event: WindowEvent): void =>
-            {
-                dialog.dispose();
-
-                if(event.type === 'WE_OK') this._container?.roomSession.compostPlant(petId);
-            }
-        );
     }
 
     // AS3: AvatarInfoWidgetHandler.as::processEvent()
@@ -508,24 +462,6 @@ export class AvatarInfoWidgetHandler implements IRoomWidgetHandler
         const typeId = object.getModel().getNumber('furniture_type_id');
 
         return this._container?.sessionDataManager?.getFloorItemData(typeId) ?? null;
-    }
-
-    // AS3: AvatarInfoWidgetHandler.as::requestBreedMenu()
-    // The clicked plant's own species (the first token of its figure) decides which other plants
-    // are offered as partners.
-    private requestBreedMenu(petRoomIndex: number): void
-    {
-        const container = this._container;
-
-        if(!container?.roomEngine) return;
-
-        const roomId = container.roomSession.roomId;
-        const ownUserId = container.sessionDataManager?.userId ?? -1;
-        const petData = container.roomSession.userDataManager.getUserDataByType(petRoomIndex, AvatarInfoWidgetHandler.USER_TYPE_PET);
-
-        if(!petData) return;
-
-        this.activateBreedMenuForPets(roomId, petRoomIndex, this.getPetTypeId(petData), petData.roomObjectId, ownUserId);
     }
 
     // AS3: AvatarInfoWidgetHandler.as::handleUseProductMenuRequestInventoryItem()
@@ -568,9 +504,11 @@ export class AvatarInfoWidgetHandler implements IRoomWidgetHandler
         this.activateUseProductMenuForPets(roomId, objectId, -1, furniData.category, ownerId);
     }
 
-    // AS3: AvatarInfoWidgetHandler.as::activateUseProductMenuForPets()
     // Scans every pet in the room and keeps the ones the product can actually be used on: same
-    // owner, same species, and — for the three monsterplant products — the right growth state.
+    // owner and same species.
+    // DEVIATION: AS3 also filters the three monsterplant products (categories 20-22) on the plant's
+    //   growth state — the RPG fork removed monsterplants.
+    // AS3: AvatarInfoWidgetHandler.as::activateUseProductMenuForPets()
     private activateUseProductMenuForPets(
         roomId: number,
         requestRoomObjectId: number,
@@ -602,14 +540,6 @@ export class AvatarInfoWidgetHandler implements IRoomWidgetHandler
 
             if(this.getPetTypeId(userData) !== petTypeId) continue;
 
-            if(category === FurnitureCategory.MONSTERPLANT_REVIVAL && !userData.canRevive) continue;
-
-            if(category === FurnitureCategory.MONSTERPLANT_REBREED
-                && (userData.petLevel < AvatarInfoWidgetHandler.MONSTERPLANT_GROWN_LEVEL || userData.canRevive || userData.canBreed)) continue;
-
-            if(category === FurnitureCategory.MONSTERPLANT_FERTILIZE
-                && (userData.petLevel >= AvatarInfoWidgetHandler.MONSTERPLANT_GROWN_LEVEL || userData.canRevive)) continue;
-
             items.push(new UseProductItem(
                 userData.roomObjectId, RoomObjectCategoryEnum.OBJECT_CATEGORY_USER, userData.name,
                 requestRoomObjectId, object.getId(), inventoryStripId, replace
@@ -617,53 +547,6 @@ export class AvatarInfoWidgetHandler implements IRoomWidgetHandler
         }
 
         this._widget?.showUseProductMenuForItems(items);
-    }
-
-    // AS3: AvatarInfoWidgetHandler.as::activateBreedMenuForPets()
-    // The partner must be breedable, of the same species, not the plant that started the round,
-    // and either yours or one whose owner allowed breeding.
-    private activateBreedMenuForPets(
-        roomId: number,
-        _petRoomIndex: number,
-        petTypeId: number,
-        requestRoomObjectId: number,
-        ownUserId: number
-    ): void
-    {
-        const container = this._container;
-
-        if(!container?.roomEngine) return;
-
-        const items: UseProductItem[] = [];
-        const count = container.roomEngine.getRoomObjectCount(roomId, RoomObjectCategoryEnum.OBJECT_CATEGORY_USER);
-
-        for(let i = 0; i < count; i++)
-        {
-            const object = container.roomEngine.getRoomObjectWithIndex(roomId, i, RoomObjectCategoryEnum.OBJECT_CATEGORY_USER);
-
-            if(!object) continue;
-
-            const userData = container.roomSession.userDataManager.getUserDataByIndex(object.getId());
-
-            if(!userData || userData.type !== AvatarInfoWidgetHandler.USER_TYPE_PET || !userData.canBreed) continue;
-
-            if(!userData.hasBreedingPermission && userData.ownerId !== ownUserId) continue;
-
-            // The partner's owner has to be in the room — AS3 looks their user data up and skips
-            // the pet when it is missing.
-            const ownerData = container.roomSession.userDataManager.getUserData(userData.ownerId);
-
-            if(!ownerData) continue;
-
-            if(this.getPetTypeId(userData) !== petTypeId || userData.roomObjectId === requestRoomObjectId) continue;
-
-            items.push(new UseProductItem(
-                userData.roomObjectId, RoomObjectCategoryEnum.OBJECT_CATEGORY_USER, userData.name,
-                requestRoomObjectId, object.getId()
-            ));
-        }
-
-        this._widget?.showBreedPetMenuForItems(items);
     }
 
     // AS3: AvatarInfoWidgetHandler.as::findPetWithWebId()
@@ -690,8 +573,8 @@ export class AvatarInfoWidgetHandler implements IRoomWidgetHandler
         return null;
     }
 
-    // AS3: AvatarInfoWidgetHandler.as::activateBreedMenuForPets()/requestBreedMenu() — the
-    // `figure.split(" ")[0]` both perform to read a pet's species.
+    // AS3: AvatarInfoWidgetHandler.as::activateUseProductMenuForPets() — the `figure.split(" ")[0]`
+    // it performs to read a pet's species.
     private getPetTypeId(userData: IUserData): number
     {
         const parts = (userData.figure ?? '').split(' ');

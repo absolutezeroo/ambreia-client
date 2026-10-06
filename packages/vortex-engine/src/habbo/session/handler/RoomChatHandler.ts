@@ -8,10 +8,6 @@ import {ChatMessageEvent} from '../../communication/messages/incoming/room/chat/
 import {ShoutMessageEvent} from '../../communication/messages/incoming/room/chat/ShoutMessageEvent';
 import {WhisperMessageEvent} from '../../communication/messages/incoming/room/chat/WhisperMessageEvent';
 import {PetRespectNotificationEvent} from '../../communication/messages/incoming/notifications/PetRespectNotificationEvent';
-import {PetSupplementedNotificationEvent} from '../../communication/messages/incoming/users/PetSupplementedNotificationEvent';
-import type {
-    PetSupplementedNotificationEventParser
-} from '../../communication/messages/parser/users/PetSupplementedNotificationEventParser';
 
 // Parsers
 import type {
@@ -76,8 +72,9 @@ export class RoomChatHandler extends BaseHandler
         this.addMessageEvent(connection, new ChatMessageEvent(this.onRoomChat.bind(this)));
         this.addMessageEvent(connection, new WhisperMessageEvent(this.onRoomWhisper.bind(this)));
         this.addMessageEvent(connection, new ShoutMessageEvent(this.onRoomShout.bind(this)));
+        // DEVIATION: AS3 also subscribes PetSupplementedNotification; the RPG fork removed the
+        //   monsterplant supplements.
         // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/handler/RoomChatHandler.as::RoomChatHandler()
-        this.addMessageEvent(connection, new PetSupplementedNotificationEvent(this.onPetSupplementedNotification.bind(this)));
         this.addMessageEvent(connection, new PetRespectNotificationEvent(this.onPetRespectNotification.bind(this)));
 
         // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/handler/RoomChatHandler.as::RoomChatHandler()
@@ -179,7 +176,7 @@ export class RoomChatHandler extends BaseHandler
             ? RoomSessionChatEvent.CHAT_TYPE_PET_TREAT
             : RoomSessionChatEvent.CHAT_TYPE_PET_RESPECT;
 
-        // AS3 passes no giver here, unlike its supplement sibling one method down.
+        // AS3 passes no giver here.
         this.dispatchChatEvent(petData.roomObjectId, '', chatType, 1);
     }
 
@@ -318,46 +315,6 @@ export class RoomChatHandler extends BaseHandler
                 RoomSessionChatEvent.RSCE_CHAT_EVENT, session, session.ownUserRoomId, '', 10, 1, null, parser.secondsRemaining
             )
         );
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/handler/RoomChatHandler.as::onPetSupplementedNotification()
-    // Water/light/treat given to a pet surfaces as a bubble over the *pet*, so the chat event's
-    // object id is the pet's room object and the giver's is passed as the extra parameter. AS3
-    // starts from PET_REVIVE and switches on `supplementType - 2`, leaving anything outside 2..4 on
-    // that default — kept exactly, including the fall-through-free default.
-    private onPetSupplementedNotification(event: IMessageEvent): void
-    {
-        const parser = event.parser as PetSupplementedNotificationEventParser | null;
-
-        if(parser === null) return;
-
-        const session = this.listener.getSession(this.roomId);
-
-        if(session === null) return;
-
-        let chatType = RoomSessionChatEvent.CHAT_TYPE_PET_REVIVE;
-
-        switch(parser.supplementType - 2)
-        {
-            case 0:
-                chatType = RoomSessionChatEvent.CHAT_TYPE_PET_REVIVE;
-                break;
-            case 1:
-                chatType = RoomSessionChatEvent.CHAT_TYPE_PET_REBREED;
-                break;
-            case 2:
-                chatType = RoomSessionChatEvent.CHAT_TYPE_PET_SPEED;
-                break;
-        }
-
-        const petData = session.userDataManager.getPetUserData(parser.petId);
-
-        if(petData === null) return;
-
-        const giverData = session.userDataManager.getUserData(parser.userId);
-        const giverObjectId = giverData !== null ? giverData.roomObjectId : -1;
-
-        this.dispatchChatEvent(petData.roomObjectId, '', chatType, 1, null, giverObjectId);
     }
 
     /**

@@ -93,12 +93,6 @@ export interface IUserDataManager extends IDisposable
     updatePetLevel(roomIndex: number, level: number): void;
 
     /**
-	 * Update pet breeding status
-	 */
-    // AS3: .../src/com/sulake/habbo/session/UserDataManager.as::updatePetBreedingStatus()
-    updatePetBreedingStatus(roomIndex: number, canBreed: boolean, canHarvest: boolean, canRevive: boolean, hasBreedingPermission: boolean): void;
-
-    /**
 	 * Update custom data (motto)
 	 */
     // AS3: .../src/com/sulake/habbo/session/UserDataManager.as::updateCustom()

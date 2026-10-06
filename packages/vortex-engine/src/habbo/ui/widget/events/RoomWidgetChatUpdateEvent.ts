@@ -26,12 +26,8 @@ export class RoomWidgetChatUpdateEvent extends RoomWidgetUpdateEvent
     public static readonly CHAT_TYPE_NOTIFY: number = 5;
     // AS3: sources/win63_version/habbo/ui/widget/events/RoomWidgetChatUpdateEvent.as::CHAT_TYPE_PETTREAT
     public static readonly CHAT_TYPE_PETTREAT: number = 6;
-    // AS3: sources/win63_version/habbo/ui/widget/events/RoomWidgetChatUpdateEvent.as::CHAT_TYPE_PETREVIVE
-    public static readonly CHAT_TYPE_PETREVIVE: number = 7;
-    // AS3: sources/win63_version/habbo/ui/widget/events/RoomWidgetChatUpdateEvent.as::CHAT_TYPE_PET_REBREED_FERTILIZE
-    public static readonly CHAT_TYPE_PET_REBREED_FERTILIZE: number = 8;
-    // AS3: sources/win63_version/habbo/ui/widget/events/RoomWidgetChatUpdateEvent.as::CHAT_TYPE_PET_SPEED_FERTILIZE
-    public static readonly CHAT_TYPE_PET_SPEED_FERTILIZE: number = 9;
+    // 7, 8 and 9 were the monsterplant supplement bubbles (revive, rebreed, speed); the RPG fork
+    // removed monsterplants. Not renumbered: these are AS3's values.
     // AS3: sources/win63_version/habbo/ui/widget/events/RoomWidgetChatUpdateEvent.as::CHAT_TYPE_BOT_SPEAK
     public static readonly CHAT_TYPE_BOT_SPEAK: number = 10;
     // AS3: sources/win63_version/habbo/ui/widget/events/RoomWidgetChatUpdateEvent.as::CHAT_TYPE_BOT_SHOUT

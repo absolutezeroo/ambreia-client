@@ -182,8 +182,6 @@ import {
     BotAddedToInventoryMessageEvent,
     BotInventoryMessageEvent,
     BotRemovedFromInventoryMessageEvent,
-    ConfirmBreedingRequestEvent,
-    ConfirmBreedingResultEvent,
     CreditBalanceEvent,
     FigureSetIdsMessageEvent,
     FurniListAddOrUpdateMessageEvent,
@@ -191,10 +189,7 @@ import {
     FurniListMessageEvent,
     FurniListRemoveMessageEvent,
     FurniListRemoveMultipleMessageEvent,
-    GoToBreedingNestFailureEvent,
-    NestBreedingSuccessEvent,
     PetAddedToInventoryEvent,
-    PetBreedingEvent,
     PetInventoryMessageEvent,
     PetRemovedFromInventoryEvent,
     TradeOpenFailedEvent,
@@ -401,7 +396,6 @@ import {
 
 // Incoming Events - Room Pet
 import {
-    PetBreedingResultEvent,
     PetCommandsMessageEvent,
     PetExperienceEvent,
     PetFigureUpdateEvent,
@@ -676,7 +670,6 @@ import {
     IgnoredUsersMessageEvent,
     IgnoreResultMessageEvent,
     InClientLinkMessageEvent,
-    PetSupplementedNotificationEvent,
     RelationshipStatusInfoEvent,
     ScrSendKickbackInfoMessageEvent,
     ScrSendUserInfoEvent,
@@ -995,19 +988,14 @@ import {
 
 // Outgoing Composers - Room Pet
 import {
-    BreedPetsMessageComposer,
-    CompostPlantComposer,
     GetPetCommandsComposer,
     GetPetInfoMessageComposer,
-    GiveSupplementToPetMessageComposer,
-    HarvestPetComposer,
     MountPetComposer,
     MovePetMessageComposer,
     PetSelectedMessageComposer,
     PickUpPetComposer,
     PlacePetComposer,
     RemoveSaddleFromPetComposer,
-    TogglePetBreedingPermissionComposer,
     TogglePetRidingPermissionComposer,
     UseProductForPetComposer,
 } from './messages/outgoing/room/pet';
@@ -1194,11 +1182,9 @@ import {
     AddItemToTradeComposer,
     AvatarEffectActivatedComposer,
     AvatarEffectSelectedComposer,
-    CancelPetBreedingComposer,
     CloseTradingComposer,
     ConfirmAcceptTradingComposer,
     ConfirmDeclineTradingComposer,
-    ConfirmPetBreedingComposer,
     CreditVaultStatusMessageComposer,
     GetBadgesComposer,
     GetBadgeInformationComposer,
@@ -1673,10 +1659,9 @@ export class HabboMessages implements IMessageConfiguration
         //   3796 -> _SafeCls_2731 (PetFigureUpdate, onPetFigureUpdate)
         //    946 -> _SafeCls_3946 (PetExperience, habbo/room/_SafeCls_1984.as:284 onPetExperience)
         //   3195 -> _SafeCls_3208 (PetPlacingError, onPetPlacingError)
-        //   2940 -> _SafeCls_3328 (PetBreedingResult, onPetBreedingResult)
         //
         // These used to be annotated as emulator-derived, with 3192 marked Vortex-custom outright.
-        // They are not: all eight are the client's own headers, and the emulator agrees with them.
+        // They are not: all seven are the client's own headers, and the emulator agrees with them.
         // The one genuinely invented member of this block, PetVocalMessageEvent at 3073, is gone —
         // no AS3 tree has such a message, and 3073 is WhisperMessageEvent, which it silently
         // overwrote in this Map.
@@ -1687,7 +1672,6 @@ export class HabboMessages implements IMessageConfiguration
         this._events.set(3796, PetFigureUpdateEvent);
         this._events.set(946, PetExperienceEvent);
         this._events.set(3195, PetPlacingErrorEvent);
-        this._events.set(2940, PetBreedingResultEvent);
 
         // === ROOM RENTABLE BOT ===
         // Same route as the pet block above: every id read out of WIN63's own registry
@@ -1700,28 +1684,11 @@ export class HabboMessages implements IMessageConfiguration
         this._events.set(2336, BotForceOpenContextMenuEvent);
         this._events.set(520, BotErrorEvent);
 
-        // Monster-plant breeding, same registry, same identification route (RoomUsersHandler.as:90-95
-        // for the first four, habbo/inventory/_SafeCls_1951.as:195 for the last):
-        //    939 -> _SafeCls_2392 (PetBreeding, onPetBreedingEvent)
-        //   1477 -> _SafeCls_2909 (ConfirmBreedingRequest, onConfirmPetBreeding)
-        //   2068 -> _SafeCls_2894 (ConfirmBreedingResult, onConfirmPetBreedingResult)
-        //     40 -> _SafeCls_3668 (NestBreedingSuccess, onNestBreedingSuccess)
-        //   2441 -> _SafeCls_3355 (GoToBreedingNestFailure, onGoToBreedingNestFailure)
-        this._events.set(939, PetBreedingEvent);
-        this._events.set(1477, ConfirmBreedingRequestEvent);
-        this._events.set(2068, ConfirmBreedingResultEvent);
-        this._events.set(40, NestBreedingSuccessEvent);
-        this._events.set(2441, GoToBreedingNestFailureEvent);
-
         // Pet inventory add/remove, from habbo/inventory/_SafeCls_1951.as:170/181:
         //   3013 -> _SafeCls_2397 (PetRemovedFromInventory, onPetRemoved)
         //   3653 -> _SafeCls_3510 (PetAddedToInventory, onPetAdded)
         this._events.set(3013, PetRemovedFromInventoryEvent);
         this._events.set(3653, PetAddedToInventoryEvent);
-
-        // Water/light/treat given to a pet, from RoomChatHandler.as:41:
-        //   3858 -> _SafeCls_3489 (PetSupplementedNotification, onPetSupplementedNotification)
-        this._events.set(3858, PetSupplementedNotificationEvent);
 
         // PetRespectFailedEvent (header 31, AS3 incoming/room/pets/) is deliberately absent here:
         // it was already ported and registered under incoming/notifications/ (see the NOTIFICATIONS
@@ -2513,12 +2480,7 @@ export class HabboMessages implements IMessageConfiguration
         //   3713 -> _SafeCls_3089 (TogglePetRidingPermission)
         //   2884 -> _SafeCls_3921 (RemoveSaddleFromPet)
         //   2425 -> _SafeCls_2559 (GetPetCommands)
-        //   1210 -> _SafeCls_2914 (HarvestPet)
-        //    144 -> _SafeCls_3539 (TogglePetBreedingPermission)
-        //   1989 -> _SafeCls_3384 (CompostPlant)
         //   2099 -> _SafeCls_2749 (CustomizePetWithFurni, RoomSession::useProductForPet)
-        //   1694 -> _SafeCls_2695 (GiveSupplementToPet)
-        //   1922 -> _SafeCls_2980 (BreedPets, AvatarInfoWidget::breedPets/accept/cancel)
         //
         // MovePet used to be registered at 2761 as "Vortex-custom": that is the *secondary* tree's
         // header (win63_version/habbo/communication/class_1881.as:754), a different build. 2761 does
@@ -2552,17 +2514,7 @@ export class HabboMessages implements IMessageConfiguration
         this._composers.set(3713, TogglePetRidingPermissionComposer);
         this._composers.set(2884, RemoveSaddleFromPetComposer);
         this._composers.set(2425, GetPetCommandsComposer);
-        this._composers.set(1210, HarvestPetComposer);
-        this._composers.set(144, TogglePetBreedingPermissionComposer);
-        this._composers.set(1989, CompostPlantComposer);
         this._composers.set(2099, UseProductForPetComposer);
-        this._composers.set(1694, GiveSupplementToPetMessageComposer);
-        this._composers.set(1922, BreedPetsMessageComposer);
-        // Breeding-nest lifecycle, same registry, from AvatarInfoWidget.as:1789/1794:
-        //   3367 -> _SafeCls_3504 (CancelPetBreeding)
-        //   2872 -> _SafeCls_3418 (ConfirmPetBreeding)
-        this._composers.set(3367, CancelPetBreedingComposer);
-        this._composers.set(2872, ConfirmPetBreedingComposer);
         // Hand the carried item to a pet, from InfoStandWidgetHandler.as "RWUAM_GIVE_CARRY_ITEM_TO_PET":
         //   1429 -> _SafeCls_2543 (PassCarryItemToPet)
         this._composers.set(1429, PassCarryItemToPetMessageComposer);

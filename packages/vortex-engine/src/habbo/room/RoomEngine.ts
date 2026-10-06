@@ -8622,6 +8622,8 @@ export class RoomEngine extends Component implements IRoomEngine,
     //   RPG fork removed jukebox music.
     // DEVIATION: AS3 also forwards the mystery-box and mystery-trophy open-dialog requests; the RPG
     //   fork removed mystery boxes.
+    // DEVIATION: AS3 also forwards ROWRE_MONSTERPLANT_SEED_PLANT_CONFIRMATION_DIALOG
+    //   (`_SafeCls_1821.as:1486`); the RPG fork removed monsterplants.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_1821.as::handleObjectWidgetRequestEvent()
     private handleObjectWidgetRequestEvent(event: RoomObjectWidgetRequestEvent, roomId: number): void
     {
@@ -8729,18 +8731,9 @@ export class RoomEngine extends Component implements IRoomEngine,
                 this.connection?.send(new GetGuildFurniContextMenuInfoMessageComposer(objectId, guildId));
                 break;
             }
-            // Double-clicking a monsterplant seed already standing in the room. The widget event
-            // keeps the ROWRE_ prefix its sibling requests trade for RETWE_ — AS3 spells it that
-            // way on both sides (_SafeCls_1821.as:1486, FurnitureContextMenuWidgetHandler.as:127),
-            // so the mismatch is the source's, not a typo here.
-            case RoomObjectWidgetRequestEvent.ROWRE_MONSTERPLANT_SEED_PLANT_CONFIRMATION_DIALOG:
-                this.emitToWidget(
-                    RoomEngineToWidgetEvent.REQUEST_MONSTERPLANT_SEED_PLANT_CONFIRMATION_DIALOG,
-                    roomId, objectId, category
-                );
-                break;
-            // AS3: _SafeCls_1821.as:1488-1490. Same ROWRE_-on-both-sides spelling as the
-            // monsterplant case above, and for the same reason — AS3 writes it that way.
+            // AS3: _SafeCls_1821.as:1488-1490. The widget event keeps the ROWRE_ prefix its sibling
+            // requests trade for RETWE_ — AS3 spells it that way on both sides, so the mismatch is
+            // the source's, not a typo here.
             case RoomObjectWidgetRequestEvent.ROWRE_PURCHASABLE_CLOTHING_CONFIRMATION_DIALOG:
                 this.emitToWidget(
                     RoomEngineToWidgetEvent.REQUEST_PURCHASABLE_CLOTHING_CONFIRMATION_DIALOG,

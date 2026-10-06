@@ -71,12 +71,10 @@ import type {
     PetInventoryMessageParser
 } from '../communication/messages/parser/inventory/pets/PetInventoryMessageParser';
 import {
-    GoToBreedingNestFailureEvent,
     PetAddedToInventoryEvent,
     PetRemovedFromInventoryEvent
 } from '../communication/messages/incoming/inventory/pets';
 import type {
-    GoToBreedingNestFailureEventParser,
     PetAddedToInventoryEventParser,
     PetRemovedFromInventoryEventParser
 } from '../communication/messages/parser/inventory/pets';
@@ -1826,9 +1824,10 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
         this._marketplaceModel?.endOfferMaking(parser.result);
     };
 
-    // AS3: HabboInventory.as::registerMessageEvents() — the pet-inventory branch. Without this the
-    // PetInventory response (header 1200) reached the registry but nothing consumed it, so the pets
-    // tab stayed empty even though requestPets() sent GetPetInventoryComposer.
+    // Without this the PetInventory response (header 1200) reached the registry but nothing
+    // consumed it, so the pets tab stayed empty even though requestPets() sent GetPetInventoryComposer.
+    // DEVIATION: AS3 also subscribes GoToBreedingNestFailure; the RPG fork removed pet breeding.
+    // AS3: HabboInventory.as::registerMessageEvents() — the pet-inventory branch.
     private registerPetMessageEvents(): void
     {
         if(!this._communication) return;
@@ -1836,8 +1835,7 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
         this._petMessageEvents.push(
             this._communication.addMessageEvent(new PetInventoryMessageEvent(this.onPetInventory)),
             this._communication.addMessageEvent(new PetAddedToInventoryEvent(this.onPetAdded)),
-            this._communication.addMessageEvent(new PetRemovedFromInventoryEvent(this.onPetRemoved)),
-            this._communication.addMessageEvent(new GoToBreedingNestFailureEvent(this.onGoToBreedingNestFailure))
+            this._communication.addMessageEvent(new PetRemovedFromInventoryEvent(this.onPetRemoved))
         );
     }
 
@@ -2396,49 +2394,6 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
         if(!parser || !this._petsModel) return;
 
         this._petsModel.removePet(parser.petId);
-    };
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/_SafeCls_1951.as::onGoToBreedingNestFailure()
-    // Reason 6 is "no food": the alert's action button then points at the food catalog page instead
-    // of the nests page. Every other reason keeps the nest page, and the message key itself is built
-    // from the raw reason code.
-    private onGoToBreedingNestFailure = (event: IMessageEvent): void =>
-    {
-        const parser = event.parser as GoToBreedingNestFailureEventParser | null;
-
-        if(!parser || !this._windowManager) return;
-
-        let linkCaption = '${gotobreedingnestfailure.getnest}';
-        let linkClickCallback = this.getNest;
-
-        if(parser.reason === 6)
-        {
-            linkCaption = '${gotobreedingnestfailure.getfood}';
-            linkClickCallback = this.getFood;
-        }
-
-        this._windowManager.simpleAlert(
-            '${gotobreedingnestfailure.caption}',
-            '${gotobreedingnestfailure.subtitle}',
-            `\${gotobreedingnestfailure.message.${parser.reason}}`,
-            linkCaption,
-            '',
-            null,
-            null,
-            linkClickCallback
-        );
-    };
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/_SafeCls_1951.as::getNest()
-    private getNest = (): void =>
-    {
-        this._catalog?.openCatalogPage(this.getProperty('gotobreedingnestfailure.catalogpage.nests'));
-    };
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/_SafeCls_1951.as::getFood()
-    private getFood = (): void =>
-    {
-        this._catalog?.openCatalogPage(this.getProperty('gotobreedingnestfailure.catalogpage.food'));
     };
 
     // Mirrors onFurniList: accumulate across fragments, then hand the full set to the model.

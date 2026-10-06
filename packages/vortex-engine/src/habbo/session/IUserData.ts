@@ -41,23 +41,14 @@ export interface IUserData
     // AS3: .../src/com/sulake/habbo/session/_SafeCls_1826.as::get ownerName()
     ownerName: string;
 
-    // Pet properties
+    // Pet properties. The RPG fork removed pet breeding and monsterplants: AS3's rarityLevel,
+    // canBreed, canHarvest, canRevive and hasBreedingPermission are not ported.
     // AS3: .../src/com/sulake/habbo/session/_SafeCls_1826.as::get petLevel()
     petLevel: number;
-    // AS3: .../src/com/sulake/habbo/session/_SafeCls_1826.as::get rarityLevel()
-    rarityLevel: number;
     // AS3: .../src/com/sulake/habbo/session/_SafeCls_1826.as::get hasSaddle()
     hasSaddle: boolean;
     // AS3: .../src/com/sulake/habbo/session/_SafeCls_1826.as::get isRiding()
     isRiding: boolean;
-    // AS3: .../src/com/sulake/habbo/session/_SafeCls_1826.as::get canBreed()
-    canBreed: boolean;
-    // AS3: .../src/com/sulake/habbo/session/_SafeCls_1826.as::get canHarvest()
-    canHarvest: boolean;
-    // AS3: .../src/com/sulake/habbo/session/_SafeCls_1826.as::get canRevive()
-    canRevive: boolean;
-    // AS3: .../src/com/sulake/habbo/session/_SafeCls_1826.as::get hasBreedingPermission()
-    hasBreedingPermission: boolean;
 
     // Bot properties
     // AS3: .../src/com/sulake/habbo/session/_SafeCls_1826.as::get botSkills()

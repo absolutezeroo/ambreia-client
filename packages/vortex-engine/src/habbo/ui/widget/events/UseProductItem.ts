@@ -1,10 +1,11 @@
 /**
- * UseProductItem — one candidate pet in a "use this product on…" / "breed with…" menu.
+ * UseProductItem — one candidate pet in a "use this product on…" menu.
  *
  * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/events/UseProductItem.as
  *
  * Built by AvatarInfoWidgetHandler's two scans of the room's pets and consumed by
- * UseProductView / BreedPetView, which render one bubble per item over its pet.
+ * UseProductView, which renders one bubble per item over its pet (AS3's BreedPetView, the other
+ * consumer, went with pet breeding in the RPG fork).
  */
 export class UseProductItem
 {

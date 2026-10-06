@@ -48,12 +48,6 @@ import {RoomWidgetOpenProfileMessage} from '@habbo/ui/widget/messages/RoomWidget
 import {RoomWidgetUserActionMessage} from '@habbo/ui/widget/messages/RoomWidgetUserActionMessage';
 import {RoomWidgetPetCommandMessage} from '@habbo/ui/widget/messages/RoomWidgetPetCommandMessage';
 import {
-    RespectPetMessageComposer
-} from '@habbo/communication/messages/outgoing/room/RespectPetMessageComposer';
-import {
-    GiveSupplementToPetMessageComposer
-} from '@habbo/communication/messages/outgoing/room/pet/GiveSupplementToPetMessageComposer';
-import {
     PassCarryItemToPetMessageComposer
 } from '@habbo/communication/messages/outgoing/room/avatar/PassCarryItemToPetMessageComposer';
 import {PassCarryItemMessageComposer} from '@habbo/communication/messages/outgoing/room/avatar/PassCarryItemMessageComposer';
@@ -72,25 +66,8 @@ import {RoomWidgetPetInfoUpdateEvent} from '@habbo/ui/widget/events/RoomWidgetPe
 import {RoomSessionPetInfoUpdateEvent} from '@habbo/session/events/RoomSessionPetInfoUpdateEvent';
 import {RoomSessionPetCommandsUpdateEvent} from '@habbo/session/events/RoomSessionPetCommandsUpdateEvent';
 import {RoomSessionPetFigureUpdateEvent} from '@habbo/session/events/RoomSessionPetFigureUpdateEvent';
-import {RoomSessionPetBreedingEvent} from '@habbo/session/events/RoomSessionPetBreedingEvent';
-import {RoomSessionPetBreedingResultEvent} from '@habbo/session/events/RoomSessionPetBreedingResultEvent';
-import {RoomSessionConfirmPetBreedingEvent} from '@habbo/session/events/RoomSessionConfirmPetBreedingEvent';
-import {
-    RoomSessionConfirmPetBreedingResultEvent
-} from '@habbo/session/events/RoomSessionConfirmPetBreedingResultEvent';
 import {RoomWidgetPetCommandsUpdateEvent} from '@habbo/ui/widget/events/RoomWidgetPetCommandsUpdateEvent';
 import {RoomWidgetPetFigureUpdateEvent} from '@habbo/ui/widget/events/RoomWidgetPetFigureUpdateEvent';
-import {RoomWidgetPetBreedingEvent} from '@habbo/ui/widget/events/RoomWidgetPetBreedingEvent';
-import {RoomWidgetPetBreedingResultEvent} from '@habbo/ui/widget/events/RoomWidgetPetBreedingResultEvent';
-import {RoomWidgetConfirmPetBreedingEvent} from '@habbo/ui/widget/events/RoomWidgetConfirmPetBreedingEvent';
-import {
-    RoomWidgetConfirmPetBreedingResultEvent
-} from '@habbo/ui/widget/events/RoomWidgetConfirmPetBreedingResultEvent';
-import {PetBreedingResultEventData} from '@habbo/ui/widget/events/PetBreedingResultEventData';
-import {ConfirmPetBreedingPetData} from '@habbo/ui/widget/events/ConfirmPetBreedingPetData';
-import {BreedingRarityCategoryData} from '@habbo/ui/widget/events/BreedingRarityCategoryData';
-import type {PetBreedingResultData} from '@habbo/communication/messages/incoming/room/pet/PetBreedingResultData';
-import type {BreedingPetInfo} from '@habbo/communication/messages/incoming/room/pet/BreedingPetInfo';
 import {PetFigureData} from '@habbo/avatar/pets/PetFigureData';
 import {
     PetSelectedMessageComposer
@@ -150,13 +127,14 @@ export class InfoStandWidgetHandler implements IRoomWidgetHandler, IGetImageList
         return this._container;
     }
 
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/InfoStandWidgetHandler.as::set container()
-    // AS3 registers nine roomSessionManager listeners here, and all nine are wired below.
-    //
     // AS3 dispatches these on `roomSessionManager.events`; this port routes session events
     // through `sessionEvents` instead (see .claude/rules/20-architecture.md #4 — `events` is
     // reserved by the DI Component base). RoomUsersHandler emits PET_INFO on exactly that
     // emitter, so it is the correct subscription point.
+    // DEVIATION: AS3 registers nine roomSessionManager listeners here; the four breeding ones
+    //   (PetBreedingResult, PetBreeding, ConfirmPetBreeding, ConfirmPetBreedingResult) are gone
+    //   because the RPG fork removed pet breeding, so five are wired below.
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/InfoStandWidgetHandler.as::set container()
     public set container(value: IRoomWidgetHandlerContainer | null)
     {
         if(this._container?.connection && this._groupDetailsEvent)
@@ -182,13 +160,6 @@ export class InfoStandWidgetHandler implements IRoomWidgetHandler, IGetImageList
             previousEvents.off(RoomSessionPetInfoUpdateEvent.PET_INFO, this.onPetInfo);
             previousEvents.off(RoomSessionPetCommandsUpdateEvent.PET_COMMANDS, this.onPetCommands);
             previousEvents.off(RoomSessionPetFigureUpdateEvent.PET_FIGURE_UPDATE, this.onPetFigureUpdate);
-            previousEvents.off(RoomSessionPetBreedingResultEvent.PET_BREEDING_RESULT, this.onPetBreedingResult);
-            previousEvents.off(RoomSessionPetBreedingEvent.PET_BREEDING, this.onPetBreedingEvent);
-            previousEvents.off(RoomSessionConfirmPetBreedingEvent.CONFIRM_PET_BREEDING, this.onConfirmPetBreedingEvent);
-            previousEvents.off(
-                RoomSessionConfirmPetBreedingResultEvent.CONFIRM_PET_BREEDING_RESULT,
-                this.onConfirmPetBreedingResultEvent
-            );
         }
 
         this._container = value;
@@ -204,13 +175,6 @@ export class InfoStandWidgetHandler implements IRoomWidgetHandler, IGetImageList
             sessionEvents.on(RoomSessionPetInfoUpdateEvent.PET_INFO, this.onPetInfo);
             sessionEvents.on(RoomSessionPetCommandsUpdateEvent.PET_COMMANDS, this.onPetCommands);
             sessionEvents.on(RoomSessionPetFigureUpdateEvent.PET_FIGURE_UPDATE, this.onPetFigureUpdate);
-            sessionEvents.on(RoomSessionPetBreedingResultEvent.PET_BREEDING_RESULT, this.onPetBreedingResult);
-            sessionEvents.on(RoomSessionPetBreedingEvent.PET_BREEDING, this.onPetBreedingEvent);
-            sessionEvents.on(RoomSessionConfirmPetBreedingEvent.CONFIRM_PET_BREEDING, this.onConfirmPetBreedingEvent);
-            sessionEvents.on(
-                RoomSessionConfirmPetBreedingResultEvent.CONFIRM_PET_BREEDING_RESULT,
-                this.onConfirmPetBreedingResultEvent
-            );
         }
 
         if(value.connection)
@@ -312,6 +276,8 @@ export class InfoStandWidgetHandler implements IRoomWidgetHandler, IGetImageList
         this._disposed = true;
     }
 
+    // DEVIATION: AS3 also takes RWUAM_TOGGLE_PET_BREEDING_PERMISSION, RWUAM_GIVE_LIGHT_TO_PET and
+    //   RWUAM_GIVE_WATER_TO_PET; the RPG fork removed pet breeding and the monsterplant supplements.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/InfoStandWidgetHandler.as::getWidgetMessages()
     public getWidgetMessages(): string[] 
     {
@@ -331,11 +297,11 @@ export class InfoStandWidgetHandler implements IRoomWidgetHandler, IGetImageList
             RoomWidgetFurniActionMessage.WIRED_INSPECT,
             'RWRTSM_ROOM_TAG_SEARCH', RoomWidgetGetBadgeDetailsMessage.WIDGET_MESSAGE_GET_BADGE_DETAILS,
             'RWGOI_MESSAGE_GET_BADGE_IMAGE', 'RWUAM_REPORT', 'RWUAM_PICKUP_PET', 'RWUAM_MOUNT_PET',
-            'RWUAM_TOGGLE_PET_RIDING_PERMISSION', 'RWUAM_TOGGLE_PET_BREEDING_PERMISSION',
+            'RWUAM_TOGGLE_PET_RIDING_PERMISSION',
             'RWUAM_DISMOUNT_PET', 'RWUAM_SADDLE_OFF', 'RWUAM_TRAIN_PET',
             'RWPCM_PET_COMMAND', 'RWPCM_REQUEST_PET_COMMANDS', ' RWUAM_RESPECT_PET',
             'RWUAM_REQUEST_PET_UPDATE', 'RWVM_CHANGE_MOTTO_MESSAGE', 'RWOPEM_OPEN_USER_PROFILE',
-            'RWPOM_OPEN_PRESENT', 'RWUAM_GIVE_LIGHT_TO_PET', 'RWUAM_GIVE_WATER_TO_PET',
+            'RWPOM_OPEN_PRESENT',
             'RWUAM_REPORT_CFH_OTHER', 'RWUAM_AMBASSADOR_ALERT_USER',
             'RWUAM_AMBASSADOR_KICK_USER', 'RWUAM_AMBASSADOR_MUTE_2MIN', 'RWUAM_AMBASSADOR_MUTE_10MIN',
             'RWUAM_AMBASSADOR_MUTE_15MIN', 'RWUAM_AMBASSADOR_MUTE_60MIN', 'RWUAM_AMBASSADOR_MUTE_18HOUR',
@@ -664,6 +630,9 @@ export class InfoStandWidgetHandler implements IRoomWidgetHandler, IGetImageList
         if(event.type === 'WE_OK') this._container?.sessionDataManager?.replenishRespect();
     };
 
+    // DEVIATION: AS3 also handles the breeding-permission toggle and the three monsterplant care
+    //   actions (treat, water, light); the RPG fork removed pet breeding and monsterplants.
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/InfoStandWidgetHandler.as::processWidgetMessage()
     private processUserActionMessage(message: RoomWidgetUserActionMessage): void
     {
         const container = this._container;
@@ -690,9 +659,6 @@ export class InfoStandWidgetHandler implements IRoomWidgetHandler, IGetImageList
             case RoomWidgetUserActionMessage.TOGGLE_PET_RIDING_PERMISSION:
                 container.roomSession.togglePetRidingPermission(petId);
                 break;
-            case RoomWidgetUserActionMessage.TOGGLE_PET_BREEDING_PERMISSION:
-                container.roomSession.togglePetBreedingPermission(petId);
-                break;
             case RoomWidgetUserActionMessage.SADDLE_OFF:
                 container.roomSession.removeSaddleFromPet(petId);
                 break;
@@ -701,18 +667,6 @@ export class InfoStandWidgetHandler implements IRoomWidgetHandler, IGetImageList
                 break;
             case RoomWidgetUserActionMessage.REQUEST_PET_UPDATE:
                 container.roomSession.userDataManager.requestPetInfo(petId);
-                break;
-            // AS3 sends the care composers straight down the connection here, not through
-            // sessionDataManager — so TREAT_PET reuses RespectPetMessageComposer without touching
-            // the respect counter that givePetRespect() maintains.
-            case RoomWidgetUserActionMessage.TREAT_PET:
-                container.connection?.send(new RespectPetMessageComposer(petId));
-                break;
-            case RoomWidgetUserActionMessage.GIVE_WATER_TO_PET:
-                container.connection?.send(new GiveSupplementToPetMessageComposer(petId, 0));
-                break;
-            case RoomWidgetUserActionMessage.GIVE_LIGHT_TO_PET:
-                container.connection?.send(new GiveSupplementToPetMessageComposer(petId, 1));
                 break;
             case RoomWidgetUserActionMessage.GIVE_CARRY_ITEM_TO_PET:
                 container.connection?.send(new PassCarryItemToPetMessageComposer(petId));
@@ -835,122 +789,9 @@ export class InfoStandWidgetHandler implements IRoomWidgetHandler, IGetImageList
         container.desktopEvents.emit(widgetEvent.type, widgetEvent);
     };
 
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/InfoStandWidgetHandler.as::onPetBreedingResult()
-    private onPetBreedingResult = (event: RoomSessionPetBreedingResultEvent): void =>
-    {
-        const container = this._container;
-
-        if(!container) return;
-
-        const resultData = event.resultData;
-        const otherResultData = event.otherResultData;
-
-        if(!resultData || !otherResultData) return;
-
-        const widgetEvent = new RoomWidgetPetBreedingResultEvent(
-            InfoStandWidgetHandler.toBreedingResultEventData(resultData),
-            InfoStandWidgetHandler.toBreedingResultEventData(otherResultData)
-        );
-
-        container.desktopEvents.emit(widgetEvent.type, widgetEvent);
-    };
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/InfoStandWidgetHandler.as::onPetBreedingEvent()
-    private onPetBreedingEvent = (event: RoomSessionPetBreedingEvent): void =>
-    {
-        const container = this._container;
-
-        if(!container) return;
-
-        const widgetEvent = new RoomWidgetPetBreedingEvent();
-
-        widgetEvent.state = event.state;
-        widgetEvent.ownPetId = event.ownPetId;
-        widgetEvent.otherPetId = event.otherPetId;
-
-        container.desktopEvents.emit(widgetEvent.type, widgetEvent);
-    };
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/InfoStandWidgetHandler.as::onConfirmPetBreedingEvent()
-    private onConfirmPetBreedingEvent = (event: RoomSessionConfirmPetBreedingEvent): void =>
-    {
-        const container = this._container;
-
-        if(!container) return;
-
-        const pet1 = event.pet1;
-        const pet2 = event.pet2;
-
-        if(!pet1 || !pet2) return;
-
-        const rarityCategories: BreedingRarityCategoryData[] = [];
-
-        for(const category of event.rarityCategories)
-        {
-            const data = new BreedingRarityCategoryData();
-
-            data.chance = category.chance;
-            // AS3 copies the array with concat(); slice() is the TS equivalent.
-            data.breeds = category.breeds.slice();
-
-            rarityCategories.push(data);
-        }
-
-        const widgetEvent = new RoomWidgetConfirmPetBreedingEvent(
-            event.nestId,
-            InfoStandWidgetHandler.toConfirmPetBreedingPetData(pet1),
-            InfoStandWidgetHandler.toConfirmPetBreedingPetData(pet2),
-            rarityCategories,
-            event.resultPetTypeId
-        );
-
-        container.desktopEvents.emit(widgetEvent.type, widgetEvent);
-    };
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/InfoStandWidgetHandler.as::onConfirmPetBreedingResultEvent()
-    private onConfirmPetBreedingResultEvent = (event: RoomSessionConfirmPetBreedingResultEvent): void =>
-    {
-        const container = this._container;
-
-        if(!container) return;
-
-        const widgetEvent = new RoomWidgetConfirmPetBreedingResultEvent(event.breedingNestStuffId, event.result);
-
-        container.desktopEvents.emit(widgetEvent.type, widgetEvent);
-    };
-
-    // TS-only: no AS3 counterpart; AS3 inlines this copy field by field inside
-    // onPetBreedingResult(), twice. Factored out only because it is done twice.
-    private static toBreedingResultEventData(source: PetBreedingResultData): PetBreedingResultEventData
-    {
-        const data = new PetBreedingResultEventData();
-
-        data.stuffId = source.stuffId;
-        data.classId = source.classId;
-        data.productCode = source.productCode;
-        data.userId = source.userId;
-        data.userName = source.userName;
-        data.rarityLevel = source.rarityLevel;
-        data.hasMutation = source.hasMutation;
-
-        return data;
-    }
-
-    // TS-only: no AS3 counterpart; AS3 inlines this copy field by field inside
-    // onConfirmPetBreedingEvent(), once per parent.
-    private static toConfirmPetBreedingPetData(source: BreedingPetInfo): ConfirmPetBreedingPetData
-    {
-        const data = new ConfirmPetBreedingPetData();
-
-        data.webId = source.webId;
-        data.name = source.name;
-        data.level = source.level;
-        data.figure = source.figure;
-        data.owner = source.owner;
-
-        return data;
-    }
-
+    // DEVIATION: AS3 also copies the breed / harvest / revive / breeding-permission flags, the rarity
+    //   and the three monsterplant timers onto the widget event; the RPG fork removed pet breeding
+    //   and monsterplants.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/InfoStandWidgetHandler.as::onPetInfo()
     private onPetInfo = (event: RoomSessionPetInfoUpdateEvent): void =>
     {
@@ -1012,17 +853,9 @@ export class InfoStandWidgetHandler implements IRoomWidgetHandler, IGetImageList
         infoEvent.age = petInfo.age;
         infoEvent.hasFreeSaddle = petInfo.hasFreeSaddle;
         infoEvent.isRiding = petInfo.isRiding;
-        infoEvent.canBreed = petInfo.canBreed;
-        infoEvent.canHarvest = petInfo.canHarvest;
-        infoEvent.canRevive = petInfo.canRevive;
-        infoEvent.rarityLevel = petInfo.rarityLevel;
         infoEvent.skillTresholds = petInfo.skillTresholds;
         infoEvent.canRemovePet = false;
         infoEvent.accessRights = petInfo.accessRights;
-        infoEvent.maxWellBeingSeconds = petInfo.maxWellBeingSeconds;
-        infoEvent.remainingWellBeingSeconds = petInfo.remainingWellBeingSeconds;
-        infoEvent.remainingGrowingSeconds = petInfo.remainingGrowingSeconds;
-        infoEvent.hasBreedingPermission = petInfo.hasBreedingPermission;
 
         const roomSession = container.roomSession;
 

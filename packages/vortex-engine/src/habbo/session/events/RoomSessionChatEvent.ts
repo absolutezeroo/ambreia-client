@@ -29,12 +29,8 @@ export class RoomSessionChatEvent extends RoomSessionEvent
     public static readonly CHAT_TYPE_HAND_ITEM_RECEIVED = 5;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/events/RoomSessionChatEvent.as::CHAT_TYPE_PETTREAT
     public static readonly CHAT_TYPE_PET_TREAT = 6;
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/events/RoomSessionChatEvent.as::CHAT_TYPE_PETREVIVE
-    public static readonly CHAT_TYPE_PET_REVIVE = 7;
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/events/RoomSessionChatEvent.as::CHAT_TYPE_PET_REBREED_FERTILIZE
-    public static readonly CHAT_TYPE_PET_REBREED = 8;
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/events/RoomSessionChatEvent.as::CHAT_TYPE_PET_SPEED_FERTILIZE
-    public static readonly CHAT_TYPE_PET_SPEED = 9;
+    // 7, 8 and 9 were the monsterplant supplement bubbles (revive, rebreed, speed); the RPG fork
+    // removed monsterplants. Not renumbered: these are AS3's values.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/events/RoomSessionChatEvent.as::CHAT_TYPE_MUTE_REMAINING
     public static readonly CHAT_TYPE_MUTE_REMAINING = 10;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/events/RoomSessionChatEvent.as::CHAT_TYPE_PING

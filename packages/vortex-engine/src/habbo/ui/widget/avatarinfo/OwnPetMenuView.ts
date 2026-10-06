@@ -3,10 +3,12 @@
  *
  * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/avatarinfo/OwnPetMenuView.as
  *
- * Same four modes as PetMenuView (normal / saddled-up / riding / monsterplant) but with the
- * owner-only actions: train, saddle off, riding + breeding permission checkboxes, breed,
- * revive, compost and the two catalog shortcuts (buy saddle / revive potion), built on the
- * `own_pet_menu` layout.
+ * Same three modes as PetMenuView (normal / saddled-up / riding) but with the owner-only
+ * actions: train, saddle off, the riding permission checkbox and the buy-saddle catalog
+ * shortcut, built on the `own_pet_menu` layout.
+ *
+ * The RPG fork removed pet breeding and monsterplants: AS3's monsterplant mode and its breed,
+ * treat, revive, compost and breeding-permission buttons are not ported.
  *
  * AS3 adaptation: the window's WME_OVER/WME_OUT listeners become one `procedure` (a window
  * carries a single procedure in this port), which also handles click-away dismissal.
@@ -25,7 +27,6 @@ import {RoomObjectCategoryEnum} from '@habbo/room/object/RoomObjectCategoryEnum'
 import type {RoomWidgetMessage} from '../messages/RoomWidgetMessage';
 import {RoomWidgetUserActionMessage} from '../messages/RoomWidgetUserActionMessage';
 import {RoomWidgetOpenProfileMessage} from '../messages/RoomWidgetOpenProfileMessage';
-import {RoomWidgetPetCommandMessage} from '../messages/RoomWidgetPetCommandMessage';
 import {AvatarContextInfoButtonView} from './AvatarContextInfoButtonView';
 import type {PetInfoData} from './PetInfoData';
 import type {AvatarInfoWidget} from './AvatarInfoWidget';
@@ -39,29 +40,12 @@ export class OwnPetMenuView extends AvatarContextInfoButtonView
 
     private static readonly MODE_RIDING: number = 2;
 
-    private static readonly MODE_MONSTERPLANT: number = 3;
-
-    // Pet type ids AS3 tests inline. Names derived from the config keys guarding each branch
-    // (`nest.breeding.<species>.enabled`) and from the saddle lookup — the ids themselves are
-    // literals in the source with no named constant in any tree.
-    private static readonly PET_TYPE_DOG: number = 0;
-
-    private static readonly PET_TYPE_CAT: number = 1;
-
-    private static readonly PET_TYPE_TERRIER: number = 3;
-
-    private static readonly PET_TYPE_BEAR: number = 4;
-
-    private static readonly PET_TYPE_PIG: number = 5;
-
+    // Pet type id AS3 tests inline, named from the saddle lookup — the id itself is a literal in
+    // the source with no named constant in any tree.
     private static readonly PET_TYPE_HORSE: number = 15;
 
-    private static readonly PET_TYPE_MONSTERPLANT: number = 16;
-
-    // Furniture categories AS3 passes to findFurnitureData(): 16 = saddle, 20 = revive potion.
+    // Furniture category AS3 passes to findFurnitureData() for the saddle.
     private static readonly FURNI_CATEGORY_SADDLE: number = 16;
-
-    private static readonly FURNI_CATEGORY_MONSTERPLANT_REVIVE: number = 20;
 
     // AS3: OwnPetMenuView.as::_petData (obfuscated `_SafeStr_4556`)
     private _petData: PetInfoData | null = null;
@@ -70,9 +54,6 @@ export class OwnPetMenuView extends AvatarContextInfoButtonView
     // AS3: OwnPetMenuView.as::_saddleFurnitureData (obfuscated `_SafeStr_6269`; named from the
     // findFurnitureData(16, 15) that fills it and the buy_saddle button that reads it)
     private _saddleFurnitureData: IFurnitureData | null = null;
-    // AS3: OwnPetMenuView.as::_reviveFurnitureData (obfuscated `_SafeStr_8187`; named from the
-    // findFurnitureData(20, 16) that fills it and the revive button that reads it)
-    private _reviveFurnitureData: IFurnitureData | null = null;
 
     // AS3: OwnPetMenuView.as::_catalog
     protected _catalog: IHabboCatalog | null;
@@ -91,6 +72,7 @@ export class OwnPetMenuView extends AvatarContextInfoButtonView
         this._catalog = catalog;
     }
 
+    // DEVIATION: AS3 first picks a monsterplant mode — the RPG fork removed monsterplants.
     // AS3: OwnPetMenuView.as::setup()
     public static setup(
         view: OwnPetMenuView,
@@ -108,11 +90,7 @@ export class OwnPetMenuView extends AvatarContextInfoButtonView
         const hasFreeSaddle = view.widget.hasFreeSaddle;
         const isRiding = view.widget.isRiding;
 
-        if(view.widget.isMonsterPlant())
-        {
-            view._mode = OwnPetMenuView.MODE_MONSTERPLANT;
-        }
-        else if(hasFreeSaddle && !isRiding)
+        if(hasFreeSaddle && !isRiding)
         {
             view._mode = OwnPetMenuView.MODE_SADDLED_UP;
         }
@@ -180,6 +158,9 @@ export class OwnPetMenuView extends AvatarContextInfoButtonView
         this.updateButtons();
     }
 
+    // DEVIATION: AS3 also offers breed (per-species config flags) in normal mode, and a whole
+    //   monsterplant mode (treat, revive, compost, breed, breeding permission) — the RPG fork
+    //   removed pet breeding and monsterplants.
     // AS3: OwnPetMenuView.as::updateButtons()
     public updateButtons(): void
     {
@@ -215,32 +196,6 @@ export class OwnPetMenuView extends AvatarContextInfoButtonView
 
                     if(this._saddleFurnitureData) this.showButton('buy_saddle');
                 }
-
-                // AS3 tests each species against its own config flag, one branch per species.
-                if(config?.getBoolean('nest.breeding.bear.enabled') && this._petData.petType === OwnPetMenuView.PET_TYPE_BEAR)
-                {
-                    this.showButton('breed');
-                }
-
-                if(config?.getBoolean('nest.breeding.terrier.enabled') && this._petData.petType === OwnPetMenuView.PET_TYPE_TERRIER)
-                {
-                    this.showButton('breed');
-                }
-
-                if(config?.getBoolean('nest.breeding.cat.enabled') && this._petData.petType === OwnPetMenuView.PET_TYPE_CAT)
-                {
-                    this.showButton('breed');
-                }
-
-                if(config?.getBoolean('nest.breeding.dog.enabled') && this._petData.petType === OwnPetMenuView.PET_TYPE_DOG)
-                {
-                    this.showButton('breed');
-                }
-
-                if(config?.getBoolean('nest.breeding.pig.enabled') && this._petData.petType === OwnPetMenuView.PET_TYPE_PIG)
-                {
-                    this.showButton('breed');
-                }
                 break;
             case OwnPetMenuView.MODE_SADDLED_UP:
                 this.showButton('mount');
@@ -259,31 +214,6 @@ export class OwnPetMenuView extends AvatarContextInfoButtonView
             case OwnPetMenuView.MODE_RIDING:
                 this.showButton('dismount');
                 this.showButton('respect', this._petData.petRespectLeft > 0);
-                break;
-            case OwnPetMenuView.MODE_MONSTERPLANT:
-                this.showButton('pick_up');
-
-                if(this._petData.canRevive)
-                {
-                    this._reviveFurnitureData = this.findFurnitureData(OwnPetMenuView.FURNI_CATEGORY_MONSTERPLANT_REVIVE, OwnPetMenuView.PET_TYPE_MONSTERPLANT);
-                    this.showButton('revive');
-
-                    if(config?.getBoolean('monsterplants.composting.enabled') && container?.roomSession?.isRoomOwner)
-                    {
-                        this.showButton('compost');
-                    }
-
-                    break;
-                }
-
-                this.showButton('treat', true, (this._petData.energy / this._petData.energyMax) < 0.98);
-
-                if(this._petData.level === this._petData.levelMax && this._petData.canBreed)
-                {
-                    this.showButton('toggle_breeding_permission');
-                    this.enableCheckbox('toggle_breeding_permission', this._petData.hasBreedingPermission);
-                    this.showButton('breed');
-                }
                 break;
         }
 
@@ -393,6 +323,8 @@ export class OwnPetMenuView extends AvatarContextInfoButtonView
         return row.findChildByName(`${name}_checkbox`) as ISelectableWindow | null;
     }
 
+    // DEVIATION: AS3 also handles treat, breed, harvest, revive, compost and the breeding
+    //   permission toggle — the RPG fork removed pet breeding and monsterplants.
     // AS3: OwnPetMenuView.as::buttonEventProc()
     protected override buttonEventProc = (event: WindowEvent, window: IWindow): void =>
     {
@@ -414,9 +346,6 @@ export class OwnPetMenuView extends AvatarContextInfoButtonView
                         if(this._petData) this._petData.petRespectLeft -= 1;
                         this.updateButtons();
                         message = new RoomWidgetUserActionMessage(RoomWidgetUserActionMessage.RESPECT_PET, this.petId);
-                        break;
-                    case 'treat':
-                        message = new RoomWidgetUserActionMessage(RoomWidgetUserActionMessage.TREAT_PET, this.petId);
                         break;
                     case 'pass_handitem':
                         message = new RoomWidgetUserActionMessage(RoomWidgetUserActionMessage.GIVE_CARRY_ITEM_TO_PET, this.petId);
@@ -443,48 +372,11 @@ export class OwnPetMenuView extends AvatarContextInfoButtonView
                         if(checkbox) this.enableCheckbox('toggle_riding_permission', !checkbox.isSelected);
                         break;
                     }
-                    case 'toggle_breeding_permission':
-                    {
-                        message = new RoomWidgetUserActionMessage(RoomWidgetUserActionMessage.TOGGLE_PET_BREEDING_PERMISSION, this.petId);
-
-                        const checkbox = this.getCheckbox('toggle_breeding_permission');
-
-                        if(checkbox) this.enableCheckbox('toggle_breeding_permission', !checkbox.isSelected);
-                        break;
-                    }
                     case 'dismount':
                         message = new RoomWidgetUserActionMessage(RoomWidgetUserActionMessage.DISMOUNT_PET, this.petId);
                         break;
                     case 'saddle_off':
                         message = new RoomWidgetUserActionMessage(RoomWidgetUserActionMessage.SADDLE_OFF, this.petId);
-                        break;
-                    case 'breed':
-                        // Normal pets breed by *saying* the localised breed command (id 46) — there is
-                        // no breeding packet for them. Monsterplants use the real negotiation instead.
-                        if(this._mode === OwnPetMenuView.MODE_NORMAL && this._petData)
-                        {
-                            const key = `pet.command.${RoomWidgetPetCommandMessage.BREED_TRAIN_COMMAND_ID}`;
-                            const command = this._widget.localizations?.getLocalization(key) ?? '';
-
-                            message = new RoomWidgetPetCommandMessage(
-                                RoomWidgetPetCommandMessage.PET_COMMAND, this._petData.id, `${this._petData.name} ${command}`
-                            );
-                        }
-                        else if(this._mode === OwnPetMenuView.MODE_MONSTERPLANT)
-                        {
-                            message = new RoomWidgetUserActionMessage(RoomWidgetUserActionMessage.REQUEST_BREED_PET, this.petId);
-                        }
-                        break;
-                    case 'harvest':
-                        message = new RoomWidgetUserActionMessage(RoomWidgetUserActionMessage.HARVEST_PET, this.petId);
-                        break;
-                    case 'revive':
-                        // AS3 opens the potion's catalog page and sends the revive action either way.
-                        this.openCatalogPage(this._reviveFurnitureData);
-                        message = new RoomWidgetUserActionMessage(RoomWidgetUserActionMessage.REVIVE_PET, this.petId);
-                        break;
-                    case 'compost':
-                        message = new RoomWidgetUserActionMessage(RoomWidgetUserActionMessage.COMPOST_PLANT, this.petId);
                         break;
                     case 'buy_saddle':
                         this.openCatalogPage(this._saddleFurnitureData);
@@ -501,11 +393,6 @@ export class OwnPetMenuView extends AvatarContextInfoButtonView
             {
                 close = true;
                 message = new RoomWidgetUserActionMessage(RoomWidgetUserActionMessage.TOGGLE_PET_RIDING_PERMISSION, this.petId);
-            }
-            else if(window.name === 'toggle_breeding_permission_checkbox')
-            {
-                close = true;
-                message = new RoomWidgetUserActionMessage(RoomWidgetUserActionMessage.TOGGLE_PET_BREEDING_PERMISSION, this.petId);
             }
 
             if(message) this._widget.messageListener?.processWidgetMessage(message);
@@ -547,7 +434,6 @@ export class OwnPetMenuView extends AvatarContextInfoButtonView
     {
         this._petData = null;
         this._saddleFurnitureData = null;
-        this._reviveFurnitureData = null;
         this._catalog = null;
         this._habboTracking = null;
 

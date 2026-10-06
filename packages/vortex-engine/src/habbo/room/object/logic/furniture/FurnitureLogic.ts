@@ -109,8 +109,7 @@ export class FurnitureLogic extends MovingObjectLogic
         ];
 
         // AS3 reads the `widget`/`contextMenu` **getters**, not the backing fields. Subclasses
-        // that override the getter (FurnitureMonsterplantSeedLogic returns "MONSTERPLANT_SEED", and every other
-        // context-menu logic does the same) never touch `contextMenuType`, so reading the field
+        // that override the getter (every context-menu logic does) never touch `contextMenuType`, so reading the field
         // here silently dropped their two event types — and with them the whole context menu.
         if(this.widget !== null)
         {

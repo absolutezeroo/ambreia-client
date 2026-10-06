@@ -232,18 +232,6 @@ export interface IRoomSession
     // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::useProductForPet()
     useProductForPet(petId: number, productId: number): void;
 
-    // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::plantSeed()
-    plantSeed(itemId: number): void;
-
-    // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::harvestPet()
-    harvestPet(petId: number): void;
-
-    // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::togglePetBreedingPermission()
-    togglePetBreedingPermission(petId: number): void;
-
-    // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::compostPlant()
-    compostPlant(petId: number): void;
-
     // Queue methods
     // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::changeQueue()
     changeQueue(targetQueue: number): void;

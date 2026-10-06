@@ -5,4 +5,3 @@ export * from './PetLevelUpdateEventParser';
 export * from './PetFigureUpdateEventParser';
 export * from './PetExperienceEventParser';
 export * from './PetPlacingErrorEventParser';
-export * from './PetBreedingResultEventParser';

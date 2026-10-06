@@ -25,7 +25,6 @@ export * from './InClientLinkMessageParser';
 export * from './RelationshipStatusInfoMessageParser';
 export * from './ScrSendKickbackInfoMessageParser';
 export * from './ScrSendUserInfoMessageParser';
-export * from './PetSupplementedNotificationEventParser';
 export * from './GuildMembersMessageParser';
 export * from './GuildMembershipUpdatedMessageParser';
 export * from './GuildMemberMgmtFailedMessageParser';

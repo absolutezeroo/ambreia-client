@@ -8,6 +8,9 @@
  * construction; `readonly` vs mutable below preserves that split. AS3's trailing
  * `bubbles`/`cancelable` constructor params are dropped along with the rest of the
  * Flash Event base — see RoomWidgetUpdateEvent.ts.
+ *
+ * The RPG fork removed pet breeding and monsterplants: AS3's canBreed, canHarvest, canRevive,
+ * rarityLevel, hasBreedingPermission and the three monsterplant timers are not ported.
  */
 import {RoomWidgetUpdateEvent} from './RoomWidgetUpdateEvent';
 
@@ -27,18 +30,6 @@ export class RoomWidgetPetInfoUpdateEvent extends RoomWidgetUpdateEvent
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/events/RoomWidgetPetInfoUpdateEvent.as::set isRiding()
     public isRiding: boolean = false;
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/events/RoomWidgetPetInfoUpdateEvent.as::set canBreed()
-    public canBreed: boolean = false;
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/events/RoomWidgetPetInfoUpdateEvent.as::set canHarvest()
-    public canHarvest: boolean = false;
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/events/RoomWidgetPetInfoUpdateEvent.as::set canRevive()
-    public canRevive: boolean = false;
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/events/RoomWidgetPetInfoUpdateEvent.as::set rarityLevel()
-    public rarityLevel: number = 0;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/events/RoomWidgetPetInfoUpdateEvent.as::set skillTresholds()
     public skillTresholds: number[] = [];
@@ -75,18 +66,6 @@ export class RoomWidgetPetInfoUpdateEvent extends RoomWidgetUpdateEvent
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/events/RoomWidgetPetInfoUpdateEvent.as::set petRespect()
     public petRespect: number = 0;
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/events/RoomWidgetPetInfoUpdateEvent.as::set maxWellBeingSeconds()
-    public maxWellBeingSeconds: number = 0;
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/events/RoomWidgetPetInfoUpdateEvent.as::set remainingWellBeingSeconds()
-    public remainingWellBeingSeconds: number = 0;
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/events/RoomWidgetPetInfoUpdateEvent.as::set remainingGrowingSeconds()
-    public remainingGrowingSeconds: number = 0;
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/events/RoomWidgetPetInfoUpdateEvent.as::set hasBreedingPermission()
-    public hasBreedingPermission: boolean = false;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/events/RoomWidgetPetInfoUpdateEvent.as::RoomWidgetPetInfoUpdateEvent()
     constructor(

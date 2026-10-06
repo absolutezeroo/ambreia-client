@@ -12,53 +12,19 @@ export class RoomWidgetPetStatusUpdateEvent extends RoomWidgetUpdateEvent
 
     private _petId: number;
 
-    private _canBreed: boolean;
-
-    private _canHarvest: boolean;
-
-    private _canRevive: boolean;
-
-    private _hasBreedingPermission: boolean;
-
+    // DEVIATION: AS3 also carries canBreed / canHarvest / canRevive / hasBreedingPermission; the RPG
+    //   fork removed pet breeding and monsterplants, so only the pet id is left.
     // AS3: .../RoomWidgetPetStatusUpdateEvent.as::RoomWidgetPetStatusUpdateEvent()
-    constructor(petId: number, canBreed: boolean, canHarvest: boolean, canRevive: boolean, hasBreedingPermission: boolean)
+    constructor(petId: number)
     {
         super(RoomWidgetPetStatusUpdateEvent.PET_STATUS_UPDATE);
 
         this._petId = petId;
-        this._canBreed = canBreed;
-        this._canHarvest = canHarvest;
-        this._canRevive = canRevive;
-        this._hasBreedingPermission = hasBreedingPermission;
     }
 
     // AS3: .../RoomWidgetPetStatusUpdateEvent.as::get petId()
     get petId(): number
     {
         return this._petId;
-    }
-
-    // AS3: .../RoomWidgetPetStatusUpdateEvent.as::get canBreed()
-    get canBreed(): boolean
-    {
-        return this._canBreed;
-    }
-
-    // AS3: .../RoomWidgetPetStatusUpdateEvent.as::get canHarvest()
-    get canHarvest(): boolean
-    {
-        return this._canHarvest;
-    }
-
-    // AS3: .../RoomWidgetPetStatusUpdateEvent.as::get canRevive()
-    get canRevive(): boolean
-    {
-        return this._canRevive;
-    }
-
-    // AS3: .../RoomWidgetPetStatusUpdateEvent.as::get hasBreedingPermission()
-    get hasBreedingPermission(): boolean
-    {
-        return this._hasBreedingPermission;
     }
 }

@@ -65,14 +65,6 @@ export class InfoStandWidget extends RoomWidgetBase
     // AS3: .../src/com/sulake/habbo/ui/widget/infostand/InfoStandWidget.as::InfoStandWidget() — `new Timer(3000)`
     private static readonly UPDATE_TIMER_INTERVAL = 3000;
 
-    // The three species AS3 gates the breeding-train command on in onPetCommands(). The values are the
-    // pet type ids it compares against directly (0, 1, 5); the names are this port's.
-    private static readonly PET_TYPE_DOG = 0;
-
-    private static readonly PET_TYPE_CAT = 1;
-
-    private static readonly PET_TYPE_PIG = 5;
-
     private readonly _furniView: InfoStandFurniView;
     private readonly _userView: InfoStandUserView;
     private readonly _petView: InfoStandPetView;
@@ -549,30 +541,22 @@ export class InfoStandWidget extends RoomWidgetBase
         this._petView.updateImage(event.petId, this.handler.getPetImage(event.figure));
     };
 
+    // The breeding-train command (id 46) is stripped from the event's own arrays in place before
+    // the configuration is built, as AS3 does.
+    // DEVIATION: AS3 strips it only for a dog, cat or pig whose `nest.breeding.<species>.enabled` is
+    //   off; the RPG fork removed pet breeding, so it is stripped for every pet.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandWidget.as::onPetCommands()
-    // The breeding-train command (id 46) is stripped for species whose nest breeding is switched off
-    // in config — AS3 mutates the event's own arrays in place before building the configuration.
     private onPetCommands = (event: RoomWidgetPetCommandsUpdateEvent): void =>
     {
         const allCommands = event.allCommands;
         const enabledCommands = event.enabledCommands;
-        const type = this._petData.type;
+        const allIndex = allCommands.indexOf(RoomWidgetPetCommandMessage.BREED_TRAIN_COMMAND_ID);
 
-        const breedingDisabled =
-            (type === InfoStandWidget.PET_TYPE_DOG && !(this._config?.getBoolean('nest.breeding.dog.enabled') ?? false)) ||
-            (type === InfoStandWidget.PET_TYPE_CAT && !(this._config?.getBoolean('nest.breeding.cat.enabled') ?? false)) ||
-            (type === InfoStandWidget.PET_TYPE_PIG && !(this._config?.getBoolean('nest.breeding.pig.enabled') ?? false));
+        if(allIndex !== -1) allCommands.splice(allIndex, 1);
 
-        if(breedingDisabled)
-        {
-            const allIndex = allCommands.indexOf(RoomWidgetPetCommandMessage.BREED_TRAIN_COMMAND_ID);
+        const enabledIndex = enabledCommands.indexOf(RoomWidgetPetCommandMessage.BREED_TRAIN_COMMAND_ID);
 
-            if(allIndex !== -1) allCommands.splice(allIndex, 1);
-
-            const enabledIndex = enabledCommands.indexOf(RoomWidgetPetCommandMessage.BREED_TRAIN_COMMAND_ID);
-
-            if(enabledIndex !== -1) enabledCommands.splice(enabledIndex, 1);
-        }
+        if(enabledIndex !== -1) enabledCommands.splice(enabledIndex, 1);
 
         this._petView.updateEnabledTrainingCommands(event.id, new CommandConfiguration(allCommands, enabledCommands));
     };
