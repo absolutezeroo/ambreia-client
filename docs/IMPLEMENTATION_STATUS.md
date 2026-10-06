@@ -28,6 +28,14 @@
 
 ---
 
+## Retiré dans le fork RPG
+
+Features supprimées volontairement (spec du fork, section 7 ; règle 8 de `.claude/rules/20-architecture.md`).
+Le derby est conservé : il fait partie de la pêche. Section remplie au fil des tâches M0.
+
+| Feature | Tâche | Commit |
+|---------|-------|--------|
+
 ## Snapshot
 
 | Metric                                                        | 2026-07-28    | 2026-08-13    | 2026-09-07    |

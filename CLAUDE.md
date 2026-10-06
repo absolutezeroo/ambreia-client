@@ -1,5 +1,7 @@
 # Vortex
 
+Fork RPG de vortex-modern-client ; voir la spec et `.claude/rules/20-architecture.md` règle 8.
+
 Full TypeScript/PixiJS v8 port of the Habbo Hotel Flash client. pnpm monorepo: `vortex-engine` (engine) + `vortex-client` (display, UI). The entire Flash client is ported — both logic and display — and the original Flash window layouts/skins ship as XML, verbatim from the dump (see Assets below).
 
 ## Commands

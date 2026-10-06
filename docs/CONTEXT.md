@@ -1,5 +1,7 @@
 # Vortex Project Context
 
+> Fork RPG : les features retirées volontairement sont listées dans la spec du fork (`vortex-rpg-emulator/docs/superpowers/specs/2026-10-05-habbo-rpg-design.md`, section 7) ; voir aussi `.claude/rules/20-architecture.md` règle 8.
+
 This document provides the architecture and project context. Read it before implementation work, then use `docs/IMPLEMENTATION_STATUS.md` for the current project state.
 
 ## Overview

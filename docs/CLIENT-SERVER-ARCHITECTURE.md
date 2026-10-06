@@ -8,6 +8,8 @@ How **Turbo Cloud** (`vortex-emulator`, the server) and **vortex-client** (the c
 
 > This document replaces an earlier draft that assumed a Java/Netty "Arcturus"-style server. That draft's protocol details, packet IDs, and bug list did not apply to this project's actual server and have been discarded rather than patched. Every fact below is sourced from `vortex-emulator` and `vortex-client` directly (file paths cited throughout), plus the emulator's own status docs (`ROADMAP.md`, `TODO.md`, `CONSOLIDATION.md`, `DATA-MODEL.md`, `PETS-DESIGN.md`, `docs/walkthroughs/request-lifecycle.md`).
 
+> Fork RPG : les messages des features retirées du fork ne sont plus portés ; voir la spec du fork (`vortex-rpg-emulator/docs/superpowers/specs/2026-10-05-habbo-rpg-design.md`, section 7).
+
 ---
 
 

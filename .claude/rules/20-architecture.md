@@ -20,4 +20,8 @@ Data flow: `Engine emits event → Client display class listens and updates`
 6. **Update `docs/IMPLEMENTATION_STATUS.md`** after every significant implementation
 7. **Performance**: `Set`/`Map` for lookups, no allocations in render loops, cache textures, viewport culling (see `docs/STYLEGUIDE.md` Performance section and `docs/PATTERNS.md` section 0)
 8. **Full port**: ALL AS3 files are ported — both logic AND display. Flash XML layouts/skins ship as XML, verbatim. No ENGINE/VIEW distinction
+   **Exception du fork RPG :** ce dépôt est le client du RPG Habbo
+   (spec : `vortex-rpg-emulator/docs/superpowers/specs/2026-10-05-habbo-rpg-design.md`).
+   Les features listées en section 7 de la spec (« Retiré ») sont supprimées volontairement et ne
+   doivent pas être re-portées. Tout le reste suit toujours la règle du port complet.
 9. **Managers**: DI Component with IID registration, one `I<Manager>` interface per manager (see `docs/PATTERNS.md` → Manager template)
