@@ -214,7 +214,6 @@ import {RoomEngineHSLColorEnableEvent} from './events/RoomEngineHSLColorEnableEv
 import {RoomObjectFurnitureActionEvent} from './events/RoomObjectFurnitureActionEvent';
 import {RoomEngineToWidgetEvent} from './events/RoomEngineToWidgetEvent';
 import {
-    ClaimNftRewardBoxMessageComposer,
     DiceOffMessageComposer,
     EnterOneWayDoorMessageComposer,
     GetItemDataMessageComposer,
@@ -8654,6 +8653,7 @@ export class RoomEngine extends Component implements IRoomEngine,
         this.useObject(roomId, event.objectId, event.objectType, event.type);
     }
 
+    // DEVIATION: AS3 also confirms and claims an NFT reward box here; the RPG fork removed NFT.
     /**
      * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_1821.as::useObject()
      *
@@ -8682,23 +8682,6 @@ export class RoomEngine extends Component implements IRoomEngine,
                 break;
             case RoomObjectFurnitureActionEvent.ROFCAE_ENTER_ONEWAYDOOR:
                 connection.send(new EnterOneWayDoorMessageComposer(objectId));
-                break;
-            case RoomObjectFurnitureActionEvent.ROFCAE_NFT_REWARD_BOX:
-                // AS3 gates this one behind a confirm dialog and sends only on WE_OK.
-                this._windowManager?.confirm(
-                    '${collectibles.reward_box.confirm_title}',
-                    '${collectibles.reward_box.confirm_description}',
-                    0,
-                    (dialog, dialogEvent) =>
-                    {
-                        dialog.dispose();
-
-                        if(dialogEvent.type === 'WE_OK')
-                        {
-                            connection.send(new ClaimNftRewardBoxMessageComposer(objectId));
-                        }
-                    }
-                );
                 break;
         }
     }

@@ -422,12 +422,6 @@ export class GroupItem implements IGetImageListener
         }
     }
 
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/items/GroupItem.as::isNft()
-    isNft(): boolean
-    {
-        return this.className.indexOf('nft_') === 0;
-    }
-
     /**
 	 * Adds an item at the *front* of the group
 	 *

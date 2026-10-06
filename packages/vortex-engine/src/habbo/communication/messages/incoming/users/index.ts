@@ -49,3 +49,6 @@ export * from './GuildMembershipRejectedMessageEvent';
 export * from './GroupMembershipRequestedMessageEvent';
 export * from './BadgeRarityCount';
 export {BadgeLeaderboardMessageEvent} from './BadgeLeaderboardMessageEvent';
+export * from './UserNftChatStylesMessageEvent';
+export * from './UserPurchasableChatStyleChangedMessageEvent';
+export * from './UserPurchasableChatStylesMessageEvent';

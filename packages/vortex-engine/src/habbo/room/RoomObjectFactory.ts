@@ -22,8 +22,6 @@ import {AvatarLogic} from './object/logic/AvatarLogic';
 import {PetLogic} from './object/logic/PetLogic';
 import {FurnitureRandomStateLogic} from './object/logic/furniture/FurnitureRandomStateLogic';
 import {FurnitureCreditLogic} from './object/logic/furniture/FurnitureCreditLogic';
-import {FurnitureNftCreditLogic} from './object/logic/furniture/FurnitureNftCreditLogic';
-import {FurnitureNftRewardBoxLogic} from './object/logic/furniture/FurnitureNftRewardBoxLogic';
 import {FurnitureStickieLogic} from './object/logic/furniture/FurnitureStickieLogic';
 import {FurnitureExternalImageLogic} from './object/logic/furniture/FurnitureExternalImageLogic';
 import {FurniturePresentLogic} from './object/logic/furniture/FurniturePresentLogic';
@@ -524,13 +522,12 @@ export class RoomObjectFactory implements IRoomObjectFactory
 
                 break;
 
+            // DEVIATION: AS3 builds FurnitureNftCreditLogic / FurnitureNftRewardBoxLogic here. The RPG
+            //   fork removed collectibles and NFT, but furnidata can still name these two types, so
+            //   they get the NFT logics' own base, FurnitureLogic: a plain furni, like the chests above.
             case RoomObjectLogicEnum.FURNITURE_NFT_CREDIT:
-                LogicClass = FurnitureNftCreditLogic;
-
-                break;
-
             case RoomObjectLogicEnum.FURNITURE_NFT_REWARD_BOX:
-                LogicClass = FurnitureNftRewardBoxLogic;
+                LogicClass = FurnitureLogic;
 
                 break;
 

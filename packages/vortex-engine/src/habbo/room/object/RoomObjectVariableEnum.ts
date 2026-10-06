@@ -92,8 +92,6 @@ export const RoomObjectVariableEnum = {
     // name is derived from the value, not recovered.
     FURNITURE_EXTRA: 'furniture_extra',
     FURNITURE_ITEMDATA: 'furniture_itemdata',
-    // AS3: .../src/com/sulake/habbo/room/object/RoomObjectVariableEnum.as::FURNITURE_NFT_CREDIT
-    FURNITURE_NFT_CREDIT: 'furniture_nft_credit',
     FURNITURE_ALPHA_MULTIPLIER: 'furniture_alpha_multiplier',
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/RoomObjectVariableEnum.as::FURNITURE_INVISIBLE_LAYER
     FURNITURE_INVISIBLE_LAYER: 'furniture_invisible_layer',

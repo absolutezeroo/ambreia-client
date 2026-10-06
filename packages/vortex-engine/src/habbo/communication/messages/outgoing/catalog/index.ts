@@ -17,8 +17,6 @@ export * from './GetRecyclerStatusMessageComposer';
 export * from './GetRecyclerPrizesMessageComposer';
 export * from './RecycleItemsMessageComposer';
 export * from './GetSellablePetPalettesComposer';
-export * from './PurchaseNftOfferMessageComposer';
-export * from './PurchaseMintTokensMessageComposer';
 export * from './CheckGiftableMessageComposer';
 export * from './GetRoomAdsPurchaseInfoMessageComposer';
 export * from './PurchaseProductAsGiftMessageComposer';

@@ -5,9 +5,9 @@ import type {ICategoryModelOwner} from '../common/ICategoryModelOwner';
 import {Logger} from '@core/utils/Logger';
 import {CategoryBaseModel} from '../common/CategoryBaseModel';
 import {FigureData} from '../figuredata/FigureData';
-import type {HotLooksMessageParser} from '@habbo/communication/messages/parser/nftwardrobe/HotLooksMessageParser';
-import {HotLooksMessageEvent} from '@habbo/communication/messages/incoming/nftwardrobe/HotLooksMessageEvent';
-import {GetHotLooksMessageComposer} from '@habbo/communication/messages/outgoing/nftwardrobe/GetHotLooksMessageComposer';
+import type {HotLooksMessageParser} from '@habbo/communication/messages/parser/hotlooks/HotLooksMessageParser';
+import {HotLooksMessageEvent} from '@habbo/communication/messages/incoming/hotlooks/HotLooksMessageEvent';
+import {GetHotLooksMessageComposer} from '@habbo/communication/messages/outgoing/hotlooks/GetHotLooksMessageComposer';
 import {HotLooksView} from './HotLooksView';
 import {Outfit} from '../wardrobe/Outfit';
 
@@ -118,8 +118,7 @@ export class HotLooksModel extends CategoryBaseModel implements ICategoryModel
      * 🐛 Calls `super.dispose()` **first**, which nulls `_controller` — then guards the
      * unregistration on `controller && controller.manager && …`, which is now false. The message
      * event is therefore **never removed**, and a disposed model keeps receiving hot-look pushes
-     * and keeps building `Outfit`s into a map it has already dropped. `NftAvatarsModel` does the
-     * same two steps in the opposite order and gets it right. Kept as written.
+     * and keeps building `Outfit`s into a map it has already dropped. Kept as written.
      */
     public override dispose(): void
     {
@@ -156,7 +155,7 @@ export class HotLooksModel extends CategoryBaseModel implements ICategoryModel
      * AS3: .../avatar/hotlooks/HotLooksModel.as::requestHotLooks()
      *
      * Registers on the connection directly rather than through `AvatarEditorMessageHandler` — this
-     * model and `NftAvatarsModel` are the only two parts of the editor that do.
+     * model is the only part of the editor that does.
      */
     // AS3: .../avatar/hotlooks/HotLooksModel.as::requestHotLooks()
     private requestHotLooks(controller: ICategoryModelOwner | null): void

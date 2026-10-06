@@ -111,7 +111,7 @@ export class AvatarEditorView implements IAvatarEditorView
     private _sideContentId: string = '';
 
     // AS3: .../avatar/AvatarEditorView.as::_showWardrobeOnUpdate
-    // Cleared for good the first time the user closes the wardrobe or opens the NFT page.
+    // Cleared for good the first time the user closes the wardrobe.
     private _showWardrobeOnUpdate: boolean = true;
 
     // AS3: .../avatar/AvatarEditorView.as::_availableCategories
@@ -123,8 +123,10 @@ export class AvatarEditorView implements IAvatarEditorView
      * `wardrobe` is in this list even though it is a side panel rather than a page — the layout has
      * no `wardrobe` tab, so it only ever affects `validateAvailableCategories()`. AS3's; kept.
      */
+    // DEVIATION: AS3 also lists `nfts`; the RPG fork removed NFT, so `createWindow()` drops the
+    //   layout's `nfts` tab like any other unavailable one.
     // AS3: .../avatar/AvatarEditorView.as::_allCategories
-    private _allCategories: string[] = ['generic', 'head', 'torso', 'legs', 'hotlooks', 'wardrobe', 'nfts'];
+    private _allCategories: string[] = ['generic', 'head', 'torso', 'legs', 'hotlooks', 'wardrobe'];
 
     // AS3: .../avatar/AvatarEditorView.as::_categoryContainers
     // Page id → the `<id>_content` container detached from `contentArea` at build time.
@@ -196,12 +198,6 @@ export class AvatarEditorView implements IAvatarEditorView
     public get effectsParamViewContainer(): IWindowContainer | null
     {
         return (this._window?.findChildByName('effectParamsContainer') as IWindowContainer | null) ?? null;
-    }
-
-    // AS3: .../avatar/AvatarEditorView.as::get collectiblesAvatarInfoContainer()
-    public get collectiblesAvatarInfoContainer(): IWindowContainer | null
-    {
-        return (this._window?.findChildByName('collectible_avatar_info') as IWindowContainer | null) ?? null;
     }
 
     /**
@@ -419,12 +415,6 @@ export class AvatarEditorView implements IAvatarEditorView
 
     /**
      * The window procedure for the body, the frame's close button and the tab strip.
-     *
-     * The NFT branch is the interesting part: switching *to* the NFT page loads the NFT figure,
-     * switching *away* from it either drops back to the fallback figure (an NFT is actually worn)
-     * or rolls back to what was on screen before the preview (one was merely being tried). The
-     * effects and hot-looks pages are exempt from the "switching away" rule, except that arriving
-     * at `effects` while wearing an NFT still loads the NFT figure.
      */
     // AS3: .../avatar/AvatarEditorView.as::windowEventProc()
     public windowEventProc = (event: WindowEvent, window: IWindow): void =>
@@ -712,32 +702,16 @@ export class AvatarEditorView implements IAvatarEditorView
         editor.manager?.close(editor.instanceId);
     }
 
+    // DEVIATION: AS3 also loads the NFT, fallback or rollback figure around the page switch; the
+    //   RPG fork removed NFT, so only the switch is left.
     // AS3: .../avatar/AvatarEditorView.as::windowEventProc() — the "WE_SELECTED" branch
-    // Split out of the procedure; see that method's note for what the three flags mean.
     private onTabSelected(categoryId: string): void
     {
         const editor = this._editor;
 
         if(editor === null || categoryId === this._currentViewId) return;
 
-        let loadFallback = false;
-        let loadRollback = false;
-        let loadNft = false;
-
-        if(categoryId !== 'effects' && categoryId !== 'hotlooks')
-        {
-            if(editor.hasNftOutfit() && categoryId === 'nfts') loadNft = true;
-            else if(editor.hasNftOutfit() && categoryId !== 'nfts') loadFallback = true;
-            else if(editor.hasSetNftOutfitInViewer() && categoryId !== 'nfts') loadRollback = true;
-        }
-
-        if(editor.hasNftOutfit() && categoryId === 'effects') loadNft = true;
-
         editor.toggleAvatarEditorPage(categoryId);
-
-        if(loadFallback) editor.loadFallbackFigure();
-        else if(loadRollback) editor.loadRollbackFigure();
-        else if(loadNft) editor.loadNftFigure();
     }
 
     // AS3: .../avatar/AvatarEditorView.as::toggleWardrobe()
@@ -805,10 +779,10 @@ export class AvatarEditorView implements IAvatarEditorView
      * The outgoing page is removed **before** the incoming one is fetched, so a page whose view is
      * not built leaves the area empty rather than unchanged. That is the visible symptom of an
      * unported category: the tab lights up and the panel goes blank.
-     *
-     * The NFT page additionally disables the wardrobe button and closes the side panel, because an
-     * NFT outfit cannot be saved into a wardrobe slot.
      */
+    // DEVIATION: AS3 also disables the wardrobe button and closes the side panel on the `nfts`
+    //   page; the RPG fork removed NFT. The layout's `collectible_avatar_info` panel, which only that
+    //   page showed, is still hidden here until Task 10 removes it from the XML.
     // AS3: .../avatar/AvatarEditorView.as::setViewToCategory()
     private setViewToCategory(categoryId: string): void
     {
@@ -822,22 +796,11 @@ export class AvatarEditorView implements IAvatarEditorView
 
         if(effectsParams !== null) effectsParams.visible = categoryId === 'effects';
 
-        const collectibles = this.collectiblesAvatarInfoContainer;
+        const collectibleInfo = this._window.findChildByName('collectible_avatar_info');
 
-        if(collectibles !== null) collectibles.visible = false;
+        if(collectibleInfo !== null) collectibleInfo.visible = false;
 
-        const wardrobeButton = this._window.findChildByName('wardrobe');
-
-        if(categoryId === 'nfts')
-        {
-            this._showWardrobeOnUpdate = false;
-            wardrobeButton?.disable();
-            this.setSideContent(AvatarEditorView.SIDE_CONTENT_NONE);
-        }
-        else
-        {
-            wardrobeButton?.enable();
-        }
+        this._window.findChildByName('wardrobe')?.enable();
 
         const outgoing = contentArea.getChildAt(0);
 

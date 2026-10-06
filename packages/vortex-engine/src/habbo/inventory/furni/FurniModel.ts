@@ -222,14 +222,6 @@ export class FurniModel implements IFurniModel
     // call sites for either, as FurniView.ts's own note records. Re-checked 2026-09-01; the marker
     // here used to blame the view side for being unported, which read as owed work.
 
-    private _showingNfts: boolean = true;
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/furni/FurniModel.as::get showingNfts()
-    get showingNfts(): boolean
-    {
-        return this._showingNfts;
-    }
-
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/furni/FurniModel.as::get isPrivateRoom()
     get isPrivateRoom(): boolean
     {
@@ -791,8 +783,8 @@ export class FurniModel implements IFurniModel
         this.initListImages();
 
         // AS3 dispatches this at the tail of insertFurniture(), only on the pass that actually
-        // claimed the category. Its only AS3 consumer is CollectiblesController, which is not
-        // ported — the event is raised anyway so the chain is complete rather than silently absent.
+        // claimed the category. Its only AS3 consumer was the collectibles hub, which the RPG fork
+        // removed — the event is raised anyway so the chain is complete rather than silently absent.
         if(categoryWasInitialized)
         {
             this._habboInventory.events.emit(
@@ -808,6 +800,7 @@ export class FurniModel implements IFurniModel
         };
     }
 
+    // DEVIATION: AS3 also tells the collectibles hub an item arrived; the RPG fork removed it.
     // AS3: .../src/com/sulake/habbo/inventory/furni/FurniModel.as::addOrUpdateItem()
     addOrUpdateItem(item: FurnitureItem, isInitializing: boolean): {
         groupItem: GroupItem;
@@ -844,11 +837,11 @@ export class FurniModel implements IFurniModel
         }
 
         this._catalog.itemAddedToInventory(item.type, item.id, item.category);
-        this._catalog.collectorHub?.itemAddedToInventory(item.type, item.id, item.isWallItem);
 
         return result;
     }
 
+    // DEVIATION: AS3 also tells the collectibles hub an item left; the RPG fork removed it.
     // AS3: .../src/com/sulake/habbo/inventory/furni/FurniModel.as::removeFurni()
     removeFurni(itemId: number): GroupItem | null
     {
@@ -885,9 +878,6 @@ export class FurniModel implements IFurniModel
                 }
 
                 this._view.setViewToState();
-
-                this._catalog.collectorHub?.itemRemovedFromInventory(
-                    removedItem.type, removedItem.id, removedItem.isWallItem);
 
                 return groupItem;
             }
@@ -1146,17 +1136,13 @@ export class FurniModel implements IFurniModel
         this._communication.connection?.send(new RequestFurniInventoryWhenNotInRoomComposer());
     }
 
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/furni/FurniModel.as::subCategorySwitch()
     /**
-	 * **NFTs are hidden for the duration of a trade and come back when it ends.** They cannot be
-	 * traded through the normal window, so opening one flips `_showingNfts` off and re-filters the
-	 * grid; going back to `empty` — no sub-view, i.e. the trade closed — flips it back. Both are
-	 * gated on `web3tradeEnabled`, so a hotel without the feature never hides anything.
-	 *
 	 * Only the wired branch resets the filter option: a plain trade shows the same inventory the
 	 * player was just browsing, while a wired contract is about specific items a leftover filter
 	 * may be hiding.
 	 */
+    // DEVIATION: AS3 hides NFT furni for the duration of a trade (and shows them again on `empty`)
+    //   when `web3tradeEnabled` is on; the RPG fork removed NFT.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/furni/FurniModel.as::subCategorySwitch()
     subCategorySwitch(category: string): void
     {
@@ -1169,24 +1155,10 @@ export class FurniModel implements IFurniModel
                 break;
             case 'trading':
                 this.cancelFurniInMover();
-
-                if(this._showingNfts && this.controller.web3tradeEnabled)
-                {
-                    this._showingNfts = false;
-                    this._view.updateGridFilters();
-                }
-
                 this._view.updateActionView();
                 break;
             case 'empty':
                 this.removeAllLocks();
-
-                if(!this._showingNfts && this.controller.web3tradeEnabled)
-                {
-                    this._showingNfts = true;
-                    this._view.updateGridFilters();
-                }
-
                 this._view.updateActionView();
                 break;
         }

@@ -65,8 +65,6 @@ export class RoomWidgetFurniInfoUpdateEvent extends RoomWidgetUpdateEvent
     public purchaseCouldBeUsedForBuyout: boolean = false;
     // AS3: .../src/com/sulake/habbo/ui/widget/events/RoomWidgetFurniInfoUpdateEvent.as::get rentCouldBeUsedForBuyout()
     public rentCouldBeUsedForBuyout: boolean = false;
-    // AS3: .../src/com/sulake/habbo/ui/widget/events/RoomWidgetFurniInfoUpdateEvent.as::get isNft()
-    public isNft: boolean = false;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/events/RoomWidgetFurniInfoUpdateEvent.as::RoomWidgetFurniInfoUpdateEvent()
     constructor(type: string)

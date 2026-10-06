@@ -84,7 +84,6 @@ export class FurniGridView
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/furni/FurniGridView.as::_showingRentedItems
     private _showingRentedItems: boolean = false;
     private _mergeRentFurni: boolean = false;
-    private _showingNfts: boolean = true;
     private _placementFilter: number = FurniGridView.PLACEMENT_ANYWHERE;
     private _searchText: string = '';
 
@@ -138,6 +137,8 @@ export class FurniGridView
         this._grid.destroyGridItems();
     }
 
+    // DEVIATION: AS3 takes a last `showingNfts` flag that hides NFT furni during a trade; the RPG
+    //   fork removed NFT.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/furni/FurniGridView.as::setFilter()
     setFilter(
         placementOrWallFilter: number,
@@ -145,8 +146,7 @@ export class FurniGridView
         showingRentedItems: boolean,
         mergeRentFurni: boolean,
         searchText: string,
-        placementFilter: number,
-        showingNfts: boolean
+        placementFilter: number
     ): void
     {
         this._mainFilter = FurniGridView.MAIN_FILTER_BY_SELECTION[placementOrWallFilter]
@@ -157,7 +157,6 @@ export class FurniGridView
         this._typeFilter = FurniGridFilters.TYPE_ANY;
         this._showingRentedItems = showingRentedItems;
         this._mergeRentFurni = mergeRentFurni;
-        this._showingNfts = showingNfts;
         this._placementFilter = placementFilter;
         this._searchText = (searchText ?? '').toLowerCase();
 
@@ -368,6 +367,7 @@ export class FurniGridView
         }
     };
 
+    // DEVIATION: AS3 also drops NFT furni while `showingNfts` is off; the RPG fork removed NFT.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/furni/FurniGridView.as::passFilter()
     private passFilter(item: GroupItem): boolean
     {
@@ -376,8 +376,6 @@ export class FurniGridView
         if(!this.passTypeFilter(item)) return false;
 
         if(!this._mergeRentFurni && this._showingRentedItems !== item.isRented) return false;
-
-        if(!this._showingNfts && item.isNft()) return false;
 
         // DEVIATION: AS3 has no placement filter — this port's layout carries a second dropdown
         //   answering "is this item currently in a room", which its filter strings cannot express.
@@ -422,6 +420,7 @@ export class FurniGridView
         }
     }
 
+    // DEVIATION: AS3 also has a `collectibles` type (NFT furni); the RPG fork removed NFT.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/furni/FurniGridView.as::passTypeFilter()
     private passTypeFilter(item: GroupItem): boolean
     {
@@ -436,7 +435,6 @@ export class FurniGridView
             case FurniGridFilters.TYPE_CREDIT_FURNI: return FurniGridFilters.isCreditFurni(item);
             case FurniGridFilters.TYPE_CLOTHES: return FurniGridFilters.isClothes(item);
             case FurniGridFilters.TYPE_PET_FOOD: return FurniGridFilters.isPetFood(item);
-            case FurniGridFilters.TYPE_COLLECTIBLES: return FurniGridFilters.isCollectible(item);
             case FurniGridFilters.TYPE_TRADABLE: return FurniGridFilters.isTradable(item);
             case FurniGridFilters.TYPE_NON_TRADABLE: return FurniGridFilters.isNonTradable(item);
             case FurniGridFilters.TYPE_RECYCLABLE: return FurniGridFilters.isRecyclable(item);

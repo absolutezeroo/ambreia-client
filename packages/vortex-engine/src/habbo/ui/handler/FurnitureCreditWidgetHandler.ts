@@ -69,10 +69,10 @@ export class FurnitureCreditWidgetHandler implements IRoomWidgetHandler
     }
 
     /**
-     * Two gates, both AS3's: only the furni's owner sees the dialog at all, and an NFT credit furni
-     * is refused outright unless `nft.credit.converting.enabled` is set — the widget is never told,
-     * so the click simply does nothing.
+     * Only the furni's owner sees the dialog at all.
      */
+    // DEVIATION: AS3 also refuses an NFT credit furni unless `nft.credit.converting.enabled` is set,
+    //   and tells the widget which kind it is; the RPG fork removed NFT.
     // AS3: FurnitureCreditWidgetHandler.as::processWidgetMessage() "RWFWM_MESSAGE_REQUEST_CREDITFURNI"
     private openRedeemDialog(message: RoomWidgetFurniToWidgetMessage): void
     {
@@ -89,14 +89,11 @@ export class FurnitureCreditWidgetHandler implements IRoomWidgetHandler
         if(model === null) return;
 
         const creditValue = model.getNumber('furniture_credit_value');
-        const isNftCredit = model.getString('furniture_nft_credit') === 'true';
-
-        if(isNftCredit && !this._container?.config?.getBoolean('nft.credit.converting.enabled')) return;
 
         this._container?.desktopEvents.emit(
             RoomWidgetCreditFurniUpdateEvent.UPDATE_CREDIT_FURNI,
             new RoomWidgetCreditFurniUpdateEvent(
-                RoomWidgetCreditFurniUpdateEvent.UPDATE_CREDIT_FURNI, message.id, creditValue, isNftCredit
+                RoomWidgetCreditFurniUpdateEvent.UPDATE_CREDIT_FURNI, message.id, creditValue
             )
         );
     }

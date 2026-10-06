@@ -1,7 +1,5 @@
 import type {ITextWindow} from '@core/window/components/ITextWindow';
 import type {IDisposable} from '@core/runtime/IDisposable';
-import {MintTokenPurchaseOffer} from '@habbo/catalog/collectibles/tabs/MintTokenPurchaseOffer';
-import {NftStorePurchaseOffer} from '@habbo/catalog/collectibles/tabs/NftStorePurchaseOffer';
 import type {IWindow} from '@core/window/IWindow';
 import type {IWindowContainer} from '@core/window/IWindowContainer';
 import type {IIterable} from '@core/window/utils/IIterable';
@@ -26,7 +24,6 @@ import {Offer} from '../viewer/Offer';
 import {CatalogProductImages} from '../viewer/CatalogProductImages';
 import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
 import type {ProductImageWidget} from '@habbo/window/widgets/ProductImageWidget';
-import {RenderableShopNftItem} from '../collectibles/RenderableShopNftItem';
 import {ClubBuyOfferData} from '../club/ClubBuyOfferData';
 import {RentUtils} from '../viewer/widgets/utils/RentUtils';
 import {CatalogWidgetEvent} from '../viewer/widgets/events/CatalogWidgetEvent';
@@ -47,21 +44,9 @@ const log = Logger.getLogger('habbo.catalog.purchase.PurchaseConfirmationDialog'
 // which is IAvatarImageListener (it is what `createAvatarImage(..., this)` in the "r" branch takes).
 export class PurchaseConfirmationDialog implements IDisposable, IGetImageListener, IAvatarImageListener
 {
-    // AS3: PurchaseConfirmationDialog.as::_window.color — the light (non-collectible) header tint.
+    // AS3: PurchaseConfirmationDialog.as::_window.color — the light header tint. AS3 has a dark one
+    // for mint-token and NFT purchases too, which the RPG fork removed.
     private static readonly WINDOW_COLOR: number = 4296112;
-
-    // AS3: PurchaseConfirmationDialog.as::showConfirmationDialog() — the dark one a mint-token or
-    // NFT purchase gets instead.
-    private static readonly WINDOW_COLOR_COLLECTIBLE: number = 2763306;
-
-    // AS3: PurchaseConfirmationDialog.as::_SafeStr_4977, the two collectible product types. They
-    // are not product types the server sends — the dialog invents them so the preview switch can
-    // tell a mint token and an NFT apart from the letter codes everything else uses.
-    private static readonly PRODUCT_TYPE_MINT_TOKEN: string = 'MINT_TOKEN';
-    private static readonly PRODUCT_TYPE_NFT: string = 'n';
-
-    // AS3: PurchaseConfirmationDialog.as::_nftProductCode
-    private _nftProductCode: string = '';
 
     // AS3: .../src/com/sulake/habbo/catalog/purchase/PurchaseConfirmationDialog.as::_catalog
     private _catalog: HabboCatalog | null;
@@ -185,18 +170,6 @@ export class PurchaseConfirmationDialog implements IDisposable, IGetImageListene
     }
 
     /**
-     * The NFT preview widget. AS3 dereferences both casts without a null check; this port does not,
-     * because the four sibling `purchase_confirmation` layouts do not all carry an `nft_image`.
-     */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/purchase/PurchaseConfirmationDialog.as::getNftImage()
-    getNftImage(): ProductImageWidget | null
-    {
-        const holder = this._window?.findChildByName('nft_image') as unknown as IWidgetWindow | null;
-
-        return (holder?.widget as unknown as ProductImageWidget | null) ?? null;
-    }
-
-    /**
      * The sender's head, for the "from" corner of the gift card.
      *
      * Cropped to `"head"` rather than rendered full: the card shows a face, not an avatar.
@@ -254,7 +227,8 @@ export class PurchaseConfirmationDialog implements IDisposable, IGetImageListene
      * constructor (see HabboCatalog.showPurchaseConfirmation()), so the first two are already known.
      */
     // DEVIATION: AS3 also stores the habbicon id (`_SafeStr_6120`) off a `habbicon` offer's
-    //   `extraParam`; the RPG fork removed Habbicons.
+    //   `extraParam`; the RPG fork removed Habbicons. AS3 also admits the mint-token and NFT store
+    //   offers of the collectibles hub; the RPG fork removed collectibles and NFT.
     // AS3: .../src/com/sulake/habbo/catalog/purchase/PurchaseConfirmationDialog.as::showOffer()
     showOffer(
         offer: IPurchasableOffer,
@@ -287,15 +261,6 @@ export class PurchaseConfirmationDialog implements IDisposable, IGetImageListene
         {
             this._productType = 'h';
         }
-        else if(offer instanceof MintTokenPurchaseOffer)
-        {
-            this._productType = PurchaseConfirmationDialog.PRODUCT_TYPE_MINT_TOKEN;
-        }
-        else if(offer instanceof NftStorePurchaseOffer)
-        {
-            this._productType = PurchaseConfirmationDialog.PRODUCT_TYPE_NFT;
-            this._nftProductCode = offer.productCode;
-        }
         else
         {
             // AS3's remaining class is GameTokensOffer (snow-war tokens), which has no port; every
@@ -309,6 +274,10 @@ export class PurchaseConfirmationDialog implements IDisposable, IGetImageListene
         this._catalog.syncPlacedOfferWithPurchase(offer);
     }
 
+    // DEVIATION: AS3 tints the window dark and shows the `nft_image` widget instead of the product
+    //   image for a mint-token or NFT purchase; the RPG fork removed collectibles and NFT. The
+    //   widget stays in the layout until Task 10, so it is still hidden here as AS3 does for every
+    //   other offer.
     // AS3: PurchaseConfirmationDialog.as::showConfirmationDialog()
     private showConfirmationDialog(offer: IPurchasableOffer, previewImage: ImageBitmap | null = null): void
     {
@@ -321,9 +290,7 @@ export class PurchaseConfirmationDialog implements IDisposable, IGetImageListene
 
         if(!this._window) return;
 
-        this._window.color = (offer instanceof MintTokenPurchaseOffer || offer instanceof NftStorePurchaseOffer)
-            ? PurchaseConfirmationDialog.WINDOW_COLOR_COLLECTIBLE
-            : PurchaseConfirmationDialog.WINDOW_COLOR;
+        this._window.color = PurchaseConfirmationDialog.WINDOW_COLOR;
 
         this.updateLocalizations(offer);
 
@@ -397,18 +364,9 @@ export class PurchaseConfirmationDialog implements IDisposable, IGetImageListene
             catalog.localization?.registerParameter('shop.bonus.items.count', 'amount', discountItemsCount.toString());
         }
 
-        // An NFT is shown by the `nft_image` widget itself and by nothing else — AS3 returns here,
-        // so neither the product image below nor the rent buy-caption runs for one. Every other
-        // offer hides the widget, because the layout stacks it on top of the product bitmap.
+        // The layout stacks the `nft_image` widget on top of the product bitmap; hide it.
         const nftImage = this._window.findChildByName('nft_image') as unknown as IWidgetWindow | null;
         const nftWidget = (nftImage?.widget as unknown as ProductImageWidget | null) ?? null;
-
-        if(offer instanceof NftStorePurchaseOffer)
-        {
-            if(nftWidget !== null) nftWidget.productInfo = new RenderableShopNftItem(offer.productInfo);
-
-            return;
-        }
 
         if(nftImage) (nftImage as unknown as IWindow).visible = false;
 
@@ -434,7 +392,8 @@ export class PurchaseConfirmationDialog implements IDisposable, IGetImageListene
      * synchronously so the pet widgets' imageReady->updateImage chain would terminate).
      */
     // DEVIATION: AS3 also previews a `habbicon` offer from the habbicon spritesheet; the RPG fork
-    //   removed Habbicons, so that type now takes the unknown-type warning.
+    //   removed Habbicons, so that type now takes the unknown-type warning. AS3 also shows the
+    //   mint-token icon for a `MINT_TOKEN` purchase; the RPG fork removed collectibles.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/purchase/PurchaseConfirmationDialog.as::showConfirmationDialog()
     private showProductImage(offer: IPurchasableOffer, previewImage: ImageBitmap | null = null): void
     {
@@ -508,10 +467,6 @@ export class PurchaseConfirmationDialog implements IDisposable, IGetImageListene
                 break;
             case 'h':
                 image = catalog.getSubscriptionProductIcon(classId);
-
-                break;
-            case PurchaseConfirmationDialog.PRODUCT_TYPE_MINT_TOKEN:
-                image = catalog.getMintTokenProductIcon();
 
                 break;
             case 'r':
@@ -749,7 +704,8 @@ export class PurchaseConfirmationDialog implements IDisposable, IGetImageListene
     };
 
     // DEVIATION: AS3 first returns on a `habbicon` offer when `habbicons.enabled` is off or the
-    //   habbicon is already owned (with an alert); the RPG fork removed Habbicons.
+    //   habbicon is already owned (with an alert); the RPG fork removed Habbicons. AS3 also sends
+    //   the mint-token and NFT store purchases on their own composers; the RPG fork removed them.
     // AS3: PurchaseConfirmationDialog.as::onBuyButtonClick()
     private _onBuyButtonClick = (): void =>
     {
@@ -762,22 +718,6 @@ export class PurchaseConfirmationDialog implements IDisposable, IGetImageListene
         this.safeDisable('buy_button');
         this.safeDisable('cancel_button');
         this.safeDisable('publish_check');
-
-        // The two collectible purchases are their own composers and do not touch the catalog
-        // page: they are bought from the collectibles hub, which has no `currentPage` to notify.
-        if(this._productType === PurchaseConfirmationDialog.PRODUCT_TYPE_MINT_TOKEN)
-        {
-            catalog.purchaseMintTokens(this._offerId, this._extraParam);
-
-            return;
-        }
-
-        if(this._productType === PurchaseConfirmationDialog.PRODUCT_TYPE_NFT)
-        {
-            catalog.purchaseNftOffer(this._nftProductCode, this._extraParam);
-
-            return;
-        }
 
         catalog.purchaseProduct(this._pageId, this._offerId, this._extraParam, this._quantity);
         catalog.currentPage?.dispatchWidgetEvent(new CatalogWidgetEvent('PURCHASE'));

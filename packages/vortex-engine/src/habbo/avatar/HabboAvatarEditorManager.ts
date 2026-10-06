@@ -237,20 +237,14 @@ export class HabboAvatarEditorManager extends Component
         this._editors?.getValue(editorId)?.loadAvatarInEditor(figure, gender, clubLevel);
     }
 
+    // DEVIATION: AS3 loads the NFT fallback figure instead when an NFT outfit is worn; the RPG fork
+    //   removed NFT.
     // AS3: .../avatar/HabboAvatarEditorManager.as::loadOwnAvatarInEditor()
-    // An NFT outfit cannot be edited, so the *fallback* figure is loaded instead.
     public loadOwnAvatarInEditor(editorId: number): void
     {
         const editor = this._editors?.getValue(editorId) ?? null;
 
         if(editor === null) return;
-
-        if(editor.hasNftOutfit())
-        {
-            editor.loadFallbackFigure();
-
-            return;
-        }
 
         editor.loadAvatarInEditor(
             this._sessionData?.figure ?? '',

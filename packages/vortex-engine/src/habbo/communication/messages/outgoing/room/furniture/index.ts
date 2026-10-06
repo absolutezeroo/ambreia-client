@@ -18,7 +18,6 @@ export * from './ThrowDiceMessageComposer';
 export * from './DiceOffMessageComposer';
 export * from './SpinWheelOfFortuneMessageComposer';
 export * from './EnterOneWayDoorMessageComposer';
-export * from './ClaimNftRewardBoxMessageComposer';
 export * from './GetItemDataMessageComposer';
 export * from './SetItemDataMessageComposer';
 export * from './RemoveItemMessageComposer';

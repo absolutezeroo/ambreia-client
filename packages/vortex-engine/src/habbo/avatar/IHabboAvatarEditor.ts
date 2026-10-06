@@ -48,7 +48,6 @@ export interface IHabboAvatarEditor
     loadAvatarInEditor(editorId: number, figure: string, gender: string, clubLevel?: number): void;
 
     // AS3: .../avatar/_SafeCls_68.as::loadOwnAvatarInEditor()
-    // Loads the *fallback* figure instead when an NFT outfit is worn — you cannot edit an NFT.
     loadOwnAvatarInEditor(editorId: number): void;
 
     // AS3: .../avatar/_SafeCls_68.as::get events()

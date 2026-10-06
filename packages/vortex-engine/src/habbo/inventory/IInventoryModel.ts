@@ -5,7 +5,7 @@ import type {IWindowContainer} from '@core/window/IWindowContainer';
  * IInventoryModel
  *
  * Common contract every inventory category model (furni, badges, pets, bots,
- * effects, trading, collectibles, marketplace, recycler) implements so that
+ * effects, trading, marketplace, recycler) implements so that
  * InventoryMainView/HabboInventory can drive it generically by category name.
  *
  * @see sources/win63_version/habbo/inventory/IInventoryModel.as

@@ -1,7 +1,4 @@
 import {Component, ComponentDependency, type IContext} from '@core/runtime';
-import type {ICollectorHub} from './collectibles/ICollectorHub';
-import {CollectiblesController} from './collectibles/CollectiblesController';
-import {IID_CollectiblesController} from '@iid/IIDCollectiblesController';
 import {EarningsController} from './earnings/EarningsController';
 import {IID_VaultController} from '@iid/IIDVaultController';
 import {Logger} from '@core/utils/Logger';
@@ -89,8 +86,6 @@ import {GetCreditsInfoComposer} from '@habbo/communication/messages/outgoing/inv
 import {GetCatalogPageComposer} from '@habbo/communication/messages/outgoing/catalog/GetCatalogPageComposer';
 import {PurchaseFromCatalogComposer} from '@habbo/communication/messages/outgoing/catalog/PurchaseFromCatalogComposer';
 import {GetProductOfferComposer} from '@habbo/communication/messages/outgoing/catalog/GetProductOfferComposer';
-import {PurchaseNftOfferMessageComposer} from '@habbo/communication/messages/outgoing/catalog/PurchaseNftOfferMessageComposer';
-import {PurchaseMintTokensMessageComposer} from '@habbo/communication/messages/outgoing/catalog/PurchaseMintTokensMessageComposer';
 import {CheckGiftableMessageComposer} from '@habbo/communication/messages/outgoing/catalog/CheckGiftableMessageComposer';
 import {GetRoomAdsPurchaseInfoMessageComposer} from '@habbo/communication/messages/outgoing/catalog/GetRoomAdsPurchaseInfoMessageComposer';
 import {PurchaseRoomAdMessageComposer} from '@habbo/communication/messages/outgoing/catalog/PurchaseRoomAdMessageComposer';
@@ -112,10 +107,10 @@ import {
 } from '@habbo/communication/messages/outgoing/catalog/PurchaseSnowWarGameTokensOfferComposer';
 import {GameTokensOffer} from '@habbo/catalog/viewer/GameTokensOffer';
 import type {LtdRaffleResultMessageParser} from '@habbo/communication/messages/parser/catalog/LtdRaffleResultMessageParser';
-import {SilverBalanceMessageEvent} from '@habbo/communication/messages/incoming/collectibles/SilverBalanceMessageEvent';
-import {EmeraldBalanceMessageEvent} from '@habbo/communication/messages/incoming/collectibles/EmeraldBalanceMessageEvent';
-import type {SilverBalanceMessageParser} from '@habbo/communication/messages/parser/collectibles/SilverBalanceMessageParser';
-import type {EmeraldBalanceMessageParser} from '@habbo/communication/messages/parser/collectibles/EmeraldBalanceMessageParser';
+import {SilverBalanceMessageEvent} from '@habbo/communication/messages/incoming/inventory/purse/SilverBalanceMessageEvent';
+import {EmeraldBalanceMessageEvent} from '@habbo/communication/messages/incoming/inventory/purse/EmeraldBalanceMessageEvent';
+import type {SilverBalanceMessageParser} from '@habbo/communication/messages/parser/inventory/purse/SilverBalanceMessageParser';
+import type {EmeraldBalanceMessageParser} from '@habbo/communication/messages/parser/inventory/purse/EmeraldBalanceMessageParser';
 import {PurchaseProductAsGiftMessageComposer} from '@habbo/communication/messages/outgoing/catalog/PurchaseProductAsGiftMessageComposer';
 import {CatalogIndexMessageEvent} from '@habbo/communication/messages/incoming/catalog/CatalogIndexMessageEvent';
 import {BundleDiscountRulesetMessageEvent} from '@habbo/communication/messages/incoming/catalog/BundleDiscountRulesetMessageEvent';
@@ -211,7 +206,6 @@ import {GuildSettingsChangedInManageEvent} from '@habbo/groups/events/GuildSetti
 import {GuildMembershipsMessageEvent} from '@habbo/communication/messages/incoming/users/GuildMembershipsMessageEvent';
 import {GuildMembershipsController} from './guilds/GuildMembershipsController';
 import {PurchaseConfirmationDialog} from './purchase/PurchaseConfirmationDialog';
-import {ProductTypeEnum} from './enum/ProductTypeEnum';
 import type {IHabboCatalog} from './IHabboCatalog';
 import type {IPurchasableOffer} from './IPurchasableOffer';
 import type {ICatalogNavigator} from './navigation/ICatalogNavigator';
@@ -238,8 +232,6 @@ import {RentConfirmationWindow} from './purchase/RentConfirmationWindow';
 import {RoomAdPurchaseData} from './purchase/RoomAdPurchaseData';
 import {OfferController} from './targetedoffers/OfferController';
 import {VideoOfferManager} from './VideoOfferManager';
-import {NftStorePurchaseMessageEvent} from '@habbo/communication/messages/incoming/collectibles/NftStorePurchaseMessageEvent';
-import {NftStorePurchaseMessageParser} from '@habbo/communication/messages/parser/collectibles/NftStorePurchaseMessageParser';
 import type {IVideoOfferManager} from './IVideoOfferManager';
 import {FurnitureCategory} from '@habbo/inventory/enum/FurnitureCategory';
 import {PlaceObjectMessageComposer} from '@habbo/communication/messages/outgoing/room/engine/PlaceObjectMessageComposer';
@@ -260,8 +252,6 @@ import type {IUserData} from '@habbo/session';
 import {HabboCatalogUtils} from './HabboCatalogUtils';
 import {WindowToggle} from '@habbo/utils/WindowToggle';
 import {CatalogUserEvent} from '@habbo/catalog/event/CatalogUserEvent';
-import {MintTokenPurchaseOffer} from '@habbo/catalog/collectibles/tabs/MintTokenPurchaseOffer';
-import {NftStorePurchaseOffer} from '@habbo/catalog/collectibles/tabs/NftStorePurchaseOffer';
 import {CatalogEvent} from './event/CatalogEvent';
 import type {IEarningsController} from './earnings/IEarningsController';
 import {Purse} from './purse/Purse';
@@ -402,10 +392,11 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
     private _purchaseConfirmationDialog: PurchaseConfirmationDialog | null = null;
 
     /**
-     * AS3 builds the collectibles hub here, in the catalog's own constructor, and attaches it to
-     * the context under `IIDCollectiblesController` — it is not a top-level component the bootstrap
-     * creates.
+     * AS3 builds the earnings vault here, in the catalog's own constructor, and attaches it to the
+     * context under `IIDVaultController` — it is not a top-level component the bootstrap creates.
      */
+    // DEVIATION: AS3 also builds the collectibles hub here and attaches it under
+    //   `IIDCollectiblesController`; the RPG fork removed collectibles and NFT.
     // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::HabboCatalog()
     constructor(context: IContext, assetLibrary: IAssetLibrary | null = null)
     {
@@ -413,9 +404,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
 
         this._earningsController = new EarningsController(context, 0, assetLibrary);
         context.attachComponent(this._earningsController, [IID_VaultController]);
-
-        this._collectorHub = new CollectiblesController(context, 0, assetLibrary);
-        context.attachComponent(this._collectorHub, [IID_CollectiblesController]);
 
         // AS3 attaches this from the same constructor (HabboCatalog.as:455). It registers a link
         // tracker for `special_items_display/<set>` and builds nothing until one arrives.
@@ -428,9 +416,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
 
     // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::_SafeStr_8735 (name derived: the vault)
     private _earningsController: EarningsController | null = null;
-
-    // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::_SafeStr_4729
-    private _collectorHub: CollectiblesController | null = null;
 
     // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::_windowManager
     private _windowManager: IHabboWindowManager | null = null;
@@ -648,20 +633,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         return this.getProperty('image.library.catalogue.url');
     }
 
-    /**
-     * The collectibles hub, built in the constructor above.
-     *
-     * Its *hub* half is real — product naming, the reward-box messages, the send/subscribe
-     * plumbing. Its *view* half is not: the collectibles catalog tab is roughly 4,200 lines that
-     * `CollectiblesController` still marks as owed at each entry point. Callers get honest names
-     * regardless, which is what they were falling back on product codes for.
-     */
-    // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::get collectorHub()
-    get collectorHub(): ICollectorHub | null
-    {
-        return this._collectorHub;
-    }
-
     // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::_frontPageItems
     private _frontPageItems: FrontPageItem[] | null = null;
 
@@ -725,48 +696,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
      * refetching immediately - the refetch happens on the next `init()`, so a user who never
      * reopens the catalog never pays for it.
      */
-    /**
-     * The NFT store's answer to a purchase: an alert on failure, a notification naming the item on
-     * success. Either way the confirmation dialog is taken down — AS3 disposes it after the branch,
-     * not inside it.
-     */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::onNftStorePurchase()
-    private onNftStorePurchase = (event: IMessageEvent): void =>
-    {
-        const parser = event.parser as NftStorePurchaseMessageParser | null;
-
-        if(parser == null) return;
-
-        if(parser.result === NftStorePurchaseMessageParser.RESULT_ERROR)
-        {
-            this._windowManager?.alert(
-                '${catalog.alert.purchaseerror.title}',
-                '${notification.nft.purchase.error}',
-                0,
-                null
-            );
-        }
-        else
-        {
-            const productInfo = this._purchaseConfirmationDialog?.getNftImage()?.productInfo ?? null;
-            const productName = this._collectorHub?.getProductName(productInfo) ?? '';
-
-            this._notifications?.addItem(
-                this._localization?.getLocalizationWithParams(
-                    'notifications.text.purchase.ok', '', 'productName', productName
-                ) ?? '',
-                'info',
-                'icon_curator_stamp_large_png'
-            );
-        }
-
-        if(this._purchaseConfirmationDialog != null)
-        {
-            this._purchaseConfirmationDialog.dispose();
-            this._purchaseConfirmationDialog = null;
-        }
-    };
-
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::onCatalogPublished()
     private onCatalogPublished(event: IMessageEvent): void
     {
@@ -1250,18 +1179,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
     purchaseBasicMembershipExtension(offerId: number): void
     {
         this.connection?.send(new PurchaseBasicMembershipExtensionComposer(offerId));
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::purchaseNftOffer()
-    purchaseNftOffer(offerId: string, extraParam: string): void
-    {
-        this.connection?.send(new PurchaseNftOfferMessageComposer(offerId, extraParam));
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::purchaseMintTokens()
-    purchaseMintTokens(amount: number, currency: string): void
-    {
-        this.connection?.send(new PurchaseMintTokensMessageComposer(amount, currency));
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::checkGiftable()
@@ -1793,14 +1710,12 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         // AS3 splits here: furniture-shaped offers get the generic dialog, a ClubBuyOfferData goes
         // to the club buy controller instead. Note a gift always takes the generic path, even for a
         // club offer — that is why _purchaseWillBeGift is part of the first test, not a separate one.
-        // All five of AS3's offer classes are admitted. Three of them are not catalog offers at
-        // all — MintTokenPurchaseOffer and NftStorePurchaseOffer come from the collectibles shop,
-        // GameTokensOffer from the snow-war lobby — and each was reaching neither branch, and so
-        // doing nothing, until it was listed here.
+        // AS3 admits five offer classes. GameTokensOffer is not a catalog offer at all — it comes
+        // from the snow-war lobby — and was reaching neither branch, and so doing nothing, until it
+        // was listed here. The other two, MintTokenPurchaseOffer and NftStorePurchaseOffer, came
+        // from the collectibles shop, which the RPG fork removed.
         if(offer instanceof Offer
             || this._purchaseWillBeGift
-            || offer instanceof MintTokenPurchaseOffer
-            || offer instanceof NftStorePurchaseOffer
             || offer instanceof GameTokensOffer)
         {
             if(this._purchaseConfirmationDialog == null || this._purchaseConfirmationDialog.disposed)
@@ -2388,34 +2303,7 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         return this.getIconBitmap('icon_hc');
     }
 
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::getMintTokenProductIcon()
-    public getMintTokenProductIcon(): ImageBitmap | null
-    {
-        return this.getIconBitmap('minting_token_large');
-    }
-
-    /**
-     * Closes the confirmation dialog once a stamp purchase has been answered.
-     *
-     * Guarded on the product type rather than closing whatever is open: `MintInventoryListTab` calls
-     * this from the balance message, and the tab asks for that balance when it opens as well as
-     * after a purchase — so an unguarded close would shut a dialog the player opened somewhere else.
-     */
-    // DEVIATION: the AS3 has no counterpart and needs one. `_SafeStr_4602` is touched in 18 places
-    //   in HabboCatalog.as and not one of them is the mint-token path, so the dialog that
-    //   `onBuyStampsClicked` opens is never closed — and `onBuyButtonClick` disables Buy and Cancel
-    //   before sending, leaving two dead buttons and a close cross. The sibling purchase does have
-    //   one (`onNftStorePurchase` disposes it on the answer), which is the shape copied here.
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/HabboCatalog.as::onNftStorePurchase()
-    public closeMintTokenPurchaseConfirmation(): void
-    {
-        if(this._purchaseConfirmationDialog?.productType !== ProductTypeEnum.PRODUCT_TYPE_MINT_TOKEN) return;
-
-        this._purchaseConfirmationDialog.dispose();
-        this._purchaseConfirmationDialog = null;
-    }
-
-    // TS-only: the shared body of the three icon getters above. AS3 clones the BitmapData at each
+    // TS-only: the shared body of the icon getters above. AS3 clones the BitmapData at each
     // of them because a BitmapData is mutable and the caller may draw on it; an ImageBitmap is
     // immutable, so the library's own object is handed out directly.
     private getIconBitmap(assetName: string): ImageBitmap | null
@@ -3294,8 +3182,6 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
         this.addMessageEvent(new MarketplaceCancelAllOffersResultEvent(this.onMarketPlaceCancelAllResult.bind(this)));
         this.addMessageEvent(new MarketplaceClearOwnHistoryResultEvent(this.onMarketPlaceClearOwnHistoryResult.bind(this)));
         this.addMessageEvent(new MarketplaceMakeOfferResultEvent(this.onMarketplaceMakeOfferResult.bind(this)));
-
-        this.addMessageEvent(new NftStorePurchaseMessageEvent(this.onNftStorePurchase));
 
         // One header AS3 subscribes here and this port does not: 3404 CloseConnection, whose AS3
         // handler `onRoomExit(param1:IMessageEvent)` has an **empty body**. Subscribing it would
@@ -4306,7 +4192,7 @@ export class HabboCatalog extends Component implements IHabboCatalog, ILinkEvent
     }
 
     /**
-     * The two collectible currencies, each its own message and each one int.
+     * The two wallet currencies, emeralds and silver, each its own message and each one int.
      *
      * Note what they do *not* do, next to `onCreditBalance()` above: no `updatePurse()` and no
      * purchase sound. AS3 dispatches the two events and stops, which is why the catalog header

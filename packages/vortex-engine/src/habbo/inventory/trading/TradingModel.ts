@@ -26,8 +26,6 @@ import {Logger} from '@core/utils/Logger';
 import {FurnitureCategory} from '../enum';
 import {AcceptTradingComposer} from '@habbo/communication/messages/outgoing/inventory/AcceptTradingComposer';
 import {AddItemsToTradeComposer} from '@habbo/communication/messages/outgoing/inventory/AddItemsToTradeComposer';
-import {AddNftToTradeComposer} from '@habbo/communication/messages/outgoing/collectibles/AddNftToTradeComposer';
-import type {CollectibleGroupedItem} from '../collectibles/CollectibleGroupedItem';
 import {AddItemToTradeComposer} from '@habbo/communication/messages/outgoing/inventory/AddItemToTradeComposer';
 import {CloseTradingComposer} from '@habbo/communication/messages/outgoing/inventory/CloseTradingComposer';
 import {
@@ -40,9 +38,6 @@ import {OpenTradingComposer} from '@habbo/communication/messages/outgoing/invent
 import {
     RemoveItemFromTradeComposer
 } from '@habbo/communication/messages/outgoing/inventory/RemoveItemFromTradeComposer';
-import {
-    RemoveNftFromTradeComposer
-} from '@habbo/communication/messages/outgoing/collectibles/RemoveNftFromTradeComposer';
 import {SilverFeeMessageComposer} from '@habbo/communication/messages/outgoing/inventory/SilverFeeMessageComposer';
 import {UnacceptTradingComposer} from '@habbo/communication/messages/outgoing/inventory/UnacceptTradingComposer';
 import {TradeOpenFailedEvent} from '@habbo/communication/messages/incoming/inventory/trading/TradeOpenFailedEvent';
@@ -97,8 +92,8 @@ const log = Logger.getLogger('habbo.inventory.trading.TradingModel');
  * `TradingView` it drives, as AS3 does.
  *
  * One edge is still unported, marked where it belongs: the Trax song title in the view's hover
- * tooltip. The NFT/collectibles half of both item lists used to be on that list too, and is now
- * live on both sides — the tooltip through the collector hub, removal through header 521.
+ * tooltip. AS3 also carries an NFT half of both item lists, which the RPG fork removed; the silver
+ * fee that prices such a trade is kept.
  *
  * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/trading/TradingModel.as
  */
@@ -152,12 +147,6 @@ export class TradingModel implements ITradingModel, IInventoryModel
     // AS3: .../TradingModel.as::_ownUserNumCredits
     private _ownUserNumCredits: number = 0;
 
-    // AS3: .../TradingModel.as::_ownUserNftItems
-    private _ownUserNftItems: OrderedMap<string, CollectibleGroupedItem> | null = null;
-
-    // AS3: .../TradingModel.as::_ownUserNumNftItems
-    private _ownUserNumNftItems: number = 0;
-
     // AS3: .../TradingModel.as::_ownUserAccepts
     private _ownUserAccepts: boolean = false;
 
@@ -178,12 +167,6 @@ export class TradingModel implements ITradingModel, IInventoryModel
 
     // AS3: .../TradingModel.as::_otherUserNumCredits
     private _otherUserNumCredits: number = 0;
-
-    // AS3: .../TradingModel.as::_otherUserNftItems
-    private _otherUserNftItems: OrderedMap<string, CollectibleGroupedItem> | null = null;
-
-    // AS3: .../TradingModel.as::_otherUserNumNftItems
-    private _otherUserNumNftItems: number = 0;
 
     // AS3: .../TradingModel.as::_otherUserAccepts
     private _otherUserAccepts: boolean = false;
@@ -299,34 +282,24 @@ export class TradingModel implements ITradingModel, IInventoryModel
         return this._ownUserNumItems;
     }
 
+    // DEVIATION: AS3 also counts the NFT list; the RPG fork removed NFT.
     // AS3: .../TradingModel.as::get ownHasAnyOffer()
     get ownHasAnyOffer(): boolean
     {
-        return (this._ownUserItems?.length ?? 0) > 0 || (this._ownUserNftItems?.length ?? 0) > 0;
+        return (this._ownUserItems?.length ?? 0) > 0;
     }
 
+    // DEVIATION: AS3 adds the NFT count; the RPG fork removed NFT.
     // AS3: .../TradingModel.as::get ownUserNumItemsTotal()
     get ownUserNumItemsTotal(): number
     {
-        return this._ownUserNumItems + this._ownUserNumNftItems;
+        return this._ownUserNumItems;
     }
 
     // AS3: .../TradingModel.as::get ownUserNumCredits()
     get ownUserNumCredits(): number
     {
         return this._ownUserNumCredits;
-    }
-
-    // AS3: .../TradingModel.as::get ownUserNftItems()
-    get ownUserNftItems(): OrderedMap<string, CollectibleGroupedItem> | null
-    {
-        return this._ownUserNftItems;
-    }
-
-    // AS3: .../TradingModel.as::get ownUserNumNftItems()
-    get ownUserNumNftItems(): number
-    {
-        return this._ownUserNumNftItems;
     }
 
     // AS3: .../TradingModel.as::get otherUserId()
@@ -365,34 +338,24 @@ export class TradingModel implements ITradingModel, IInventoryModel
         return this._otherUserNumItems;
     }
 
+    // DEVIATION: AS3 also counts the NFT list; the RPG fork removed NFT.
     // AS3: .../TradingModel.as::get otherHasAnyOffer()
     get otherHasAnyOffer(): boolean
     {
-        return (this._otherUserItems?.length ?? 0) > 0 || (this._otherUserNftItems?.length ?? 0) > 0;
+        return (this._otherUserItems?.length ?? 0) > 0;
     }
 
+    // DEVIATION: AS3 adds the NFT count; the RPG fork removed NFT.
     // AS3: .../TradingModel.as::get otherUserNumItemsTotal()
     get otherUserNumItemsTotal(): number
     {
-        return this._otherUserNumItems + this._otherUserNumNftItems;
+        return this._otherUserNumItems;
     }
 
     // AS3: .../TradingModel.as::get otherUserNumCredits()
     get otherUserNumCredits(): number
     {
         return this._otherUserNumCredits;
-    }
-
-    // AS3: .../TradingModel.as::get otherUserNftItems()
-    get otherUserNftItems(): OrderedMap<string, CollectibleGroupedItem> | null
-    {
-        return this._otherUserNftItems;
-    }
-
-    // AS3: .../TradingModel.as::get otherUserNumNftItems()
-    get otherUserNumNftItems(): number
-    {
-        return this._otherUserNumNftItems;
     }
 
     // AS3: .../TradingModel.as::get requiredSilverFee()
@@ -413,6 +376,7 @@ export class TradingModel implements ITradingModel, IInventoryModel
         return this._otherPlayerSilver;
     }
 
+    // DEVIATION: AS3 also resets the two NFT lists and their counts; the RPG fork removed NFT.
     // AS3: .../TradingModel.as::startTrading()
     // `selfInitiated` is AS3's last parameter: true when the *other* id in the open message is
     // ours, i.e. we are the one who started the trade. It only feeds the name-scam check.
@@ -429,22 +393,18 @@ export class TradingModel implements ITradingModel, IInventoryModel
         this._ownUserId = ownUserId;
         this._ownUserName = ownUserName;
         this._ownUserItems = new OrderedMap<string, GroupItem>();
-        this._ownUserNftItems = new OrderedMap<string, CollectibleGroupedItem>();
         this._ownUserAccepts = false;
         this._ownUserCanTrade = ownUserCanTrade;
         this._otherUserId = otherUserId;
         this._otherUserName = otherUserName;
         this._otherUserItems = new OrderedMap<string, GroupItem>();
-        this._otherUserNftItems = new OrderedMap<string, CollectibleGroupedItem>();
         this._otherUserAccepts = false;
         this._otherUserCanTrade = otherUserCanTrade;
         this._requiredSilverFee = 0;
         this._playerSilver = 0;
         this._otherPlayerSilver = 0;
-        this._ownUserNumNftItems = 0;
         this._ownUserNumItems = 0;
         this._ownUserNumCredits = 0;
-        this._otherUserNumNftItems = 0;
         this._otherUserNumItems = 0;
         this._otherUserNumCredits = 0;
 
@@ -584,20 +544,21 @@ export class TradingModel implements ITradingModel, IInventoryModel
         return this.isWeb3Trade() && this._state === TradingState.CONFIRMED;
     }
 
+    // DEVIATION: AS3 also counts a trade with an NFT on either side; the RPG fork removed NFT, so
+    //   only the silver fee makes one.
     // AS3: .../TradingModel.as::isWeb3Trade()
     isWeb3Trade(): boolean
     {
-        return this._requiredSilverFee > 0
-            || (this._otherUserNftItems?.length ?? 0) > 0
-            || (this._ownUserNftItems?.length ?? 0) > 0;
+        return this._requiredSilverFee > 0;
     }
 
+    // DEVIATION: AS3 also keeps the window up on the collectibles tab; the RPG fork removed it.
     // AS3: .../TradingModel.as::categorySwitch()
-    // AS3 minimises the trade window on any tab that is not furni or collectibles, then refreshes
-    // the inventory's sub-view. Only the second half exists here.
+    // AS3 minimises the trade window on any tab that is not furni, then refreshes the inventory's
+    // sub-view.
     categorySwitch(category: string): void
     {
-        this._view.setMinimized(category !== 'furni' && category !== 'collectibles');
+        this._view.setMinimized(category !== 'furni');
         this._inventory?.updateSubView();
     }
 
@@ -808,33 +769,6 @@ export class TradingModel implements ITradingModel, IInventoryModel
         this._view.updateUserInterface();
 
         this._inventory.furniModel?.updateItemLocks();
-    }
-
-    // AS3: .../TradingModel.as::updateNftItems()
-    updateNftItems(
-        ownUserNftItems: OrderedMap<string, CollectibleGroupedItem>,
-        otherUserNftItems: OrderedMap<string, CollectibleGroupedItem>,
-        ownUserNumNftItems: number,
-        otherUserNumNftItems: number
-    ): void
-    {
-        if(this._inventory === null) return;
-
-        this._ownUserNftItems?.dispose();
-        this._otherUserNftItems?.dispose();
-
-        this._ownUserAccepts = false;
-        this._otherUserAccepts = false;
-        this._ownUserNftItems = ownUserNftItems;
-        this._otherUserNftItems = otherUserNftItems;
-        this._ownUserNumNftItems = ownUserNumNftItems;
-        this._otherUserNumNftItems = otherUserNumNftItems;
-
-        this._view.updateItemList(this._ownUserId);
-        this._view.updateItemList(this._otherUserId);
-        this._view.updateUserInterface();
-
-        this._inventory.collectiblesModel?.updateItemLocks();
     }
 
     // AS3: .../TradingModel.as::getOwnItemIdsInTrade()
@@ -1149,14 +1083,6 @@ export class TradingModel implements ITradingModel, IInventoryModel
         this._communication?.connection?.send(new AddItemsToTradeComposer(accepted));
     }
 
-    // AS3: .../TradingModel.as::requestAddNftsToTrading()
-    // The Number -> int narrowing AS3 does on the way in lives in the composer, next to the wire
-    // format it belongs to.
-    requestAddNftsToTrading(assetIds: number[]): void
-    {
-        this._communication?.connection?.send(new AddNftToTradeComposer(assetIds));
-    }
-
     // AS3: .../TradingModel.as::canAddItemToTrade()
     // Past MAX_ITEMS_TO_TRADE groups an item can still be added, but only onto an existing group
     // of the same category-specific key — that is what the key rules below are for.
@@ -1194,29 +1120,12 @@ export class TradingModel implements ITradingModel, IInventoryModel
         return this._ownUserItems.getValue(key) !== null;
     }
 
+    // DEVIATION: in AS3 an index past `ownUserItems.length` addresses the NFT list; the RPG fork
+    //   removed NFT, so such an index finds no group and nothing is sent.
     // AS3: .../TradingModel.as::requestRemoveItemFromTrading()
-    // The index runs across both lists: anything past `ownUserItems.length` is an NFT.
     requestRemoveItemFromTrading(index: number): void
     {
         if(this._ownUserAccepts) return;
-
-        const itemCount = this._ownUserItems?.length ?? 0;
-
-        if(index >= itemCount)
-        {
-            // `pop(1)` hands back the asset it just marked as offered. The length test is AS3's:
-            // a group whose assets are all already in the trade pops nothing, and sending the
-            // composer then would remove an asset the player never picked.
-            const nftItem = this._ownUserNftItems?.getWithIndex(index - itemCount) ?? null;
-            const popped = nftItem?.pop(1) ?? null;
-
-            if(popped !== null && popped.length === 1)
-            {
-                this._communication?.connection?.send(new RemoveNftFromTradeComposer(popped[0]));
-            }
-
-            return;
-        }
 
         const groupItem = this._ownUserItems?.getWithIndex(index) ?? null;
 

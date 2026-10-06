@@ -11,12 +11,12 @@ import {AvatarTextureUtils} from '../AvatarTextureUtils';
 /**
  * One outfit tile: a rendered avatar over a coloured button, with an optional gradient behind it.
  *
- * Used by the hot-looks and NFT pages rather than by the wardrobe — the wardrobe's own slots are
+ * Used by the hot-looks page rather than by the wardrobe — the wardrobe's own slots are
  * `WardrobeSlot`, which builds its window from a template instead of from this layout. The two
  * classes do much the same job and share nothing.
  *
  * The four colours come in as a set: a background and a gradient, each with an "active" variant.
- * `NftOutfit` is the only caller and picks them from the NFT's contract key.
+ * AS3's only caller was the NFT outfit, which the RPG fork removed; `setColors()` has no caller now.
  *
  * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/wardrobe/OutfitView.as
  */

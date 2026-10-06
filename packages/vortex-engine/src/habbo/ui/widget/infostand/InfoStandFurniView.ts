@@ -363,30 +363,6 @@ export class InfoStandFurniView
         this.updateWindow();
     }
 
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandFurniView.as::set isNft()
-    public set isNft(value: boolean)
-    {
-        const indicator = this._elementList?.getListItemByName('nft_indicator') as IWindowContainer | null;
-
-        if(!indicator) return;
-
-        indicator.height = value ? 22 : 0;
-        indicator.visible = value;
-
-        if(value)
-        {
-            const icon = this._infoBorder?.findChildByName('nft_icon') as IBitmapWrapperWindow | null;
-            const asset = this._widget.assets?.getAssetByName('icon_nft');
-
-            if(icon && asset)
-            {
-                icon.bitmap = asset.content as ImageBitmap;
-            }
-        }
-
-        this.updateWindow();
-    }
-
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandFurniView.as::set furniImage()
     public set furniImage(value: ImageBitmap | null)
     {
@@ -626,6 +602,9 @@ export class InfoStandFurniView
         }
     }
 
+    // DEVIATION: AS3 shows the `nft_indicator` row (with `icon_nft`) for an `nft_` furni through
+    //   `set isNft()`; the RPG fork removed NFT, so the row is only collapsed here until Task 10
+    //   removes it from the XML.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/infostand/InfoStandFurniView.as::update()
     public update(event: RoomWidgetFurniInfoUpdateEvent): void
     {
@@ -648,7 +627,15 @@ export class InfoStandFurniView
         this.description = event.description;
         this.furniImage = event.image as ImageBitmap | null;
         this.expiration = event.expiration;
-        this.isNft = event.isNft;
+
+        const nftIndicator = this._elementList?.getListItemByName('nft_indicator') ?? null;
+
+        if(nftIndicator !== null)
+        {
+            nftIndicator.height = 0;
+            nftIndicator.visible = false;
+        }
+
         this.setOwnerInfo(event.ownerId, event.ownerName);
 
         let showMove = false;

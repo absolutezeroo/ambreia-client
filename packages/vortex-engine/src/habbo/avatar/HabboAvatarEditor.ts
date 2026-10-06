@@ -21,7 +21,6 @@ import {AvatarUpdateEvent} from './events/AvatarUpdateEvent';
 import {CategoryData} from './common/CategoryData';
 import {EffectsModel} from './effects/EffectsModel';
 import {HotLooksModel} from './hotlooks/HotLooksModel';
-import {NftAvatarsModel} from './nft/NftAvatarsModel';
 import {FigureData} from './figuredata/FigureData';
 import {BodyModel} from './generic/BodyModel';
 import {HeadModel} from './head/HeadModel';
@@ -32,12 +31,6 @@ import {WardrobeModel} from './wardrobe/WardrobeModel';
 import {
     UpdateFigureDataMessageComposer
 } from '@habbo/communication/messages/outgoing/avatar/UpdateFigureDataMessageComposer';
-import {
-    SaveUserNftWardrobeMessageComposer
-} from '@habbo/communication/messages/outgoing/nftwardrobe/SaveUserNftWardrobeMessageComposer';
-import {
-    GetSelectedNftWardrobeOutfitMessageComposer
-} from '@habbo/communication/messages/outgoing/nftwardrobe/GetSelectedNftWardrobeOutfitMessageComposer';
 
 /**
  * One editor instance: two figures (one per gender), the eight category pages, the wardrobe, and
@@ -130,9 +123,6 @@ export class HabboAvatarEditor implements ICategoryModelOwner
     // save — so an effect is only pushed to the inventory when the user actually changed it.
     private _effectChanged: boolean = false;
 
-    // AS3: .../avatar/HabboAvatarEditor.as::_setNftOutfit
-    private _setNftOutfit: {id: string; figure: string; gender: string} | null = null;
-
     // AS3: .../avatar/HabboAvatarEditor.as::_clubMemberLevel
     // Name DERIVED (`_SafeStr_6218`). Zero means "ask the session", not "no club" — see the getter.
     private _clubMemberLevel: number = 0;
@@ -141,28 +131,6 @@ export class HabboAvatarEditor implements ICategoryModelOwner
     // Name DERIVED (`_SafeStr_9131`): the constructor flag, distinct from `isDevelopmentEditor()`
     // which tests the *id*. Only `generateDataContent()` reads it, to force the "get more" tile on.
     private _isDevelopmentEditor: boolean = false;
-
-    // AS3: .../avatar/HabboAvatarEditor.as::_currentNftTokenId
-    // Name DERIVED (`_SafeStr_6634`): non-null means an NFT avatar is worn — `hasNftOutfit()`.
-    private _currentNftTokenId: string | null = null;
-
-    // AS3: .../avatar/HabboAvatarEditor.as::_fallbackFigureString
-    // Name DERIVED (`_SafeStr_8697`): what to wear when the NFT comes off. Seeded with the male
-    // default, so it is never empty.
-    private _fallbackFigureString: string = HabboAvatarEditor.DEFAULT_MALE_FIGURE;
-
-    // AS3: .../avatar/HabboAvatarEditor.as::_fallbackFigureGender
-    // Name DERIVED (`_SafeStr_9530`).
-    private _fallbackFigureGender: string = FigureData.MALE;
-
-    // AS3: .../avatar/HabboAvatarEditor.as::_rollbackFigureString
-    // Name DERIVED (`_SafeStr_8867`): the figure to restore if the user backs out of an NFT
-    // preview, captured by `setNftOutfit()`.
-    private _rollbackFigureString: string = HabboAvatarEditor.DEFAULT_MALE_FIGURE;
-
-    // AS3: .../avatar/HabboAvatarEditor.as::_rollbackFigureGender
-    // Name DERIVED (`_SafeStr_10034`).
-    private _rollbackFigureGender: string = FigureData.MALE;
 
     // AS3: .../avatar/HabboAvatarEditor.as::HabboAvatarEditor()
     constructor(instanceId: number, manager: IHabboAvatarEditorHost, isDevelopmentEditor: boolean = false)
@@ -449,11 +417,12 @@ export class HabboAvatarEditor implements ICategoryModelOwner
     }
 
     /**
-     * Three destinations, in order of precedence. A save listener takes the figure and **nothing
-     * else happens** — no server message, no event, no effect change. Otherwise the figure (or the
-     * NFT id) goes to the server, the update event is raised, and a changed effect is pushed into
-     * the inventory.
+     * Two destinations, in order of precedence. A save listener takes the figure and **nothing
+     * else happens** — no server message, no event, no effect change. Otherwise the figure goes to
+     * the server, the update event is raised, and a changed effect is pushed into the inventory.
      */
+    // DEVIATION: AS3 saves a staged NFT outfit by token id instead of the figure, and takes a worn
+    //   NFT off on a plain save; the RPG fork removed NFT, so the figure is always what is sent.
     // AS3: .../avatar/HabboAvatarEditor.as::saveCurrentSelection()
     public saveCurrentSelection(): void
     {
@@ -471,24 +440,7 @@ export class HabboAvatarEditor implements ICategoryModelOwner
             return;
         }
 
-        const connection = this._manager?.connection ?? null;
-
-        if(connection !== null)
-        {
-            if(this._setNftOutfit !== null)
-            {
-                connection.send(new SaveUserNftWardrobeMessageComposer(this._setNftOutfit.id));
-                this.sendGetSelectedNftWardrobeOutfitMessage();
-                this._setNftOutfit = null;
-            }
-            else
-            {
-                connection.send(new UpdateFigureDataMessageComposer(figure, gender));
-            }
-        }
-
-        // Saving a plain figure over an NFT outfit takes the NFT off.
-        if(this.hasNftOutfit()) this._currentNftTokenId = null;
+        this._manager?.connection?.send(new UpdateFigureDataMessageComposer(figure, gender));
 
         this._manager?.events?.emit(AvatarUpdateEvent.AVATAR_FIGURE_UPDATED, new AvatarUpdateEvent(figure));
 
@@ -718,98 +670,11 @@ export class HabboAvatarEditor implements ICategoryModelOwner
         this._effectChanged = true;
     }
 
-    // AS3: .../avatar/HabboAvatarEditor.as::setNftOutfit()
-    // Captures the current figure first, so `loadRollbackFigure()` can undo the preview.
-    public setNftOutfit(outfit: {id: string; figure: string; gender: string} | null): void
-    {
-        this._setNftOutfit = outfit;
-        this._rollbackFigureString = this.figureData?.getFigureString() ?? this._rollbackFigureString;
-        this._rollbackFigureGender = this.figureData?.gender ?? this._rollbackFigureGender;
-    }
-
-    // AS3: .../avatar/HabboAvatarEditor.as::hasSetNftOutfitInViewer()
-    public hasSetNftOutfitInViewer(): boolean
-    {
-        return this._setNftOutfit !== null;
-    }
-
-    // AS3: .../avatar/HabboAvatarEditor.as::hasNftOutfit()
-    public hasNftOutfit(): boolean
-    {
-        return this._currentNftTokenId !== null;
-    }
-
-    /**
-     * AS3: .../avatar/HabboAvatarEditor.as::loadNftFigure()
-     *
-     * Two ways in. A preview already staged by `setNftOutfit()` is simply worn. Otherwise the
-     * *saved* NFT is looked up on the NFT page by token id and staged first — so arriving at the
-     * page re-dresses the avatar in the NFT it already owns.
-     *
-     * The second branch stages before loading, which means opening the page on a saved NFT leaves a
-     * rollback point behind: switching away without saving restores whatever was on screen.
-     */
-    // AS3: .../avatar/HabboAvatarEditor.as::loadNftFigure()
-    public loadNftFigure(): void
-    {
-        if(this._setNftOutfit !== null)
-        {
-            this.loadAvatarInEditor(this._setNftOutfit.figure, this._setNftOutfit.gender, this._clubMemberLevel);
-
-            return;
-        }
-
-        if(this._currentNftTokenId === null) return;
-
-        const page = this._categories?.getValue('nfts') as NftAvatarsModel | null;
-        const outfit = page?.getNftAvatarByTokenId(this._currentNftTokenId) ?? null;
-
-        if(outfit === null) return;
-
-        this.setNftOutfit(outfit);
-        this.loadAvatarInEditor(outfit.figure, outfit.gender, this._clubMemberLevel);
-    }
-
-    // AS3: .../avatar/HabboAvatarEditor.as::loadRollbackFigure()
-    // Only undoes when an NFT preview is actually in progress.
-    public loadRollbackFigure(): void
-    {
-        if(this._setNftOutfit === null) return;
-
-        this.loadAvatarInEditor(this._rollbackFigureString, this._rollbackFigureGender, this._clubMemberLevel);
-    }
-
-    // AS3: .../avatar/HabboAvatarEditor.as::loadFallbackFigure()
-    public loadFallbackFigure(): void
-    {
-        if(this._fallbackFigureString === '') return;
-
-        this.loadAvatarInEditor(this._fallbackFigureString, this._fallbackFigureGender, this._clubMemberLevel);
-    }
-
     // AS3: .../avatar/HabboAvatarEditor.as::isDevelopmentEditor()
     // Tests the **id**, not the constructor flag — the two are different things. See `_isDevelopmentEditor`.
     public isDevelopmentEditor(): boolean
     {
         return this._instanceId === AvatarEditorIdEnum.DEV_TOOL_EDITOR;
-    }
-
-    /**
-     * AS3 registers the message event on the editor itself, inside `init()`
-     * (`new _SafeCls_3434(onUserNftWardrobeMessage)`), and the handler reads the three
-     * values off the parser. This port keeps the registration in
-     * `HabboAvatarEditorManager` with the other seven, so the parser reads happen there
-     * and arrive here as arguments. The body below is otherwise the AS3 handler verbatim.
-     */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/HabboAvatarEditor.as::onUserNftWardrobeMessage()
-    public applySelectedNftOutfit(tokenId: string | null, fallbackFigure: string, fallbackGender: string): void
-    {
-        this._currentNftTokenId = tokenId;
-        this._fallbackFigureString = fallbackFigure;
-        this._fallbackFigureGender = fallbackGender;
-
-        // Do not yank the figure away while the user is looking at the NFT page.
-        if(this.hasNftOutfit() && this._view?.currentViewId !== 'nfts') this.loadFallbackFigure();
     }
 
     // AS3: .../avatar/HabboAvatarEditor.as::dispose()
@@ -833,19 +698,19 @@ export class HabboAvatarEditor implements ICategoryModelOwner
 
     /**
      * Runs once. Builds the wardrobe, then the view, then both gender figures pre-loaded with the
-     * defaults, then the eight pages — hot looks only when it is in the requested list, or when
+     * defaults, then the seven pages — hot looks only when it is in the requested list, or when
      * there is no list at all.
      *
      * The order matters twice. The view is built **before** the pages, because every page's own
      * view fetches its container from it. And the wardrobe goes in before the view, because the
      * view's constructor calls `update()`, which asks for the side panel.
      */
+    // DEVIATION: AS3 also asks for the selected NFT outfit, subscribes to its answer, and adds the
+    //   `nfts` page; the RPG fork removed NFT.
     // AS3: .../avatar/HabboAvatarEditor.as::init()
     private init(categories: string[] | null = null): void
     {
         if(this._initialised) return;
-
-        this.sendGetSelectedNftWardrobeOutfitMessage();
 
         this._categories = new OrderedMap<string, ICategoryModel>();
         this._sideContent = new OrderedMap<string, ISideContentModel>();
@@ -875,19 +740,11 @@ export class HabboAvatarEditor implements ICategoryModelOwner
             this._categories.add('hotlooks', new HotLooksModel(this));
         }
 
-        // These two are added unconditionally, as in AS3 — the *tab* is what `AvatarEditorView`
-        // prunes when the configuration is off, not the model. `NftAvatarsModel` therefore fires
-        // its request whatever the editor was opened for.
+        // Added unconditionally, as in AS3 — the *tab* is what `AvatarEditorView` prunes when the
+        // configuration is off, not the model.
         this._categories.add('effects', new EffectsModel(this));
-        this._categories.add('nfts', new NftAvatarsModel(this));
 
         this._initialised = true;
-    }
-
-    // AS3: .../avatar/HabboAvatarEditor.as::sendGetSelectedNftWardrobeOutfitMessage()
-    private sendGetSelectedNftWardrobeOutfitMessage(): void
-    {
-        this._manager?.connection?.send(new GetSelectedNftWardrobeOutfitMessageComposer());
     }
 
     /**

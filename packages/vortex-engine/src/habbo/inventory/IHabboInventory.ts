@@ -28,7 +28,6 @@ export const InventoryCategory = {
     BOTS: 'bots',
     TRADING: 'trading',
     MARKETPLACE: 'marketplace',
-    COLLECTIBLES: 'collectibles',
 } as const;
 
 export type InventoryCategoryType = typeof InventoryCategory[keyof typeof InventoryCategory];
@@ -138,7 +137,7 @@ export interface IHabboInventory
 
     /**
      * Every non-rented inventory id of one furni type. Declared on AS3's interface too
-     * (`_SafeCls_588.as:80`); the collectibles mint tab is its only caller.
+     * (`_SafeCls_588.as:80`); AS3's only caller is the mint tab, which the RPG fork removed.
      */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/HabboInventory.as::getNonRentedInventoryIds()
     getNonRentedInventoryIds(category: string, itemTypeId: number, isWallItem: boolean): number[] | null;

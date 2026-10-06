@@ -15,8 +15,8 @@ import {Util} from './Util';
 
 /**
  * Inventory main window — the frame, tabs, and category-switching shell that
- * every inventory category (furni, pets, bots, badges, effects, trading,
- * collectibles) plugs its own window container into.
+ * every inventory category (furni, pets, bots, badges, effects, trading)
+ * plugs its own window container into.
  *
  * @see sources/win63_version/habbo/inventory/InventoryMainView.as
  */
@@ -46,11 +46,6 @@ export class InventoryMainView
     private _petsCounter: IWindowContainer | null = null;
     private _badgesCounter: IWindowContainer | null = null;
     private _botsCounter: IWindowContainer | null = null;
-    private _collectiblesCounter: IWindowContainer | null = null;
-
-    private _collectiblesTabButton: ITabButtonWindow | null = null;
-    private _collectiblesTabIndex: number = 0;
-    private _showCollectiblesTab: boolean = false;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/InventoryMainView.as::InventoryMainView()
     // AS3 takes (habboInventory, windowManager, assets) explicitly; this port
@@ -105,7 +100,6 @@ export class InventoryMainView
         this._botsCounter = null;
         this._petsCounter = null;
         this._badgesCounter = null;
-        this._collectiblesCounter = null;
         this._currentCategoryContainer = null;
         this._currentSubCategoryContainer = null;
 
@@ -124,6 +118,7 @@ export class InventoryMainView
         this._extractedWindows.clear();
     }
 
+    // DEVIATION: AS3 also leaves the collectibles tab enabled; the RPG fork removed it.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/InventoryMainView.as::disableNonTradingTabs()
     disableNonTradingTabs(disabled: boolean): void 
     {
@@ -137,43 +132,11 @@ export class InventoryMainView
         {
             const tab = tabs.getTabItemAt(i);
 
-            if(tab !== null && tab.name !== 'collectibles' && tab.name !== 'furni') 
+            if(tab !== null && tab.name !== 'furni') 
             {
                 Util.disableSection(tab, disabled);
             }
         }
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/InventoryMainView.as::showCollectiblesTab()
-    showCollectiblesTab(show: boolean): void 
-    {
-        if(!this._window) 
-        {
-            this._showCollectiblesTab = show;
-
-            return;
-        }
-
-        const tabs = this._window.findChildByName('tabs') as ITabContextWindow | null;
-
-        if(tabs === null) return;
-
-        if(this._showCollectiblesTab && !show) 
-        {
-            if(this._collectiblesTabButton !== null) 
-            {
-                tabs.removeTabItem(this._collectiblesTabButton);
-            }
-        }
-        else if(!this._showCollectiblesTab && show) 
-        {
-            if(this._collectiblesTabButton !== null) 
-            {
-                tabs.addTabItemAt(this._collectiblesTabButton, this._collectiblesTabIndex);
-            }
-        }
-
-        this._showCollectiblesTab = show;
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/InventoryMainView.as::getCategoryViewId()
@@ -422,20 +385,6 @@ export class InventoryMainView
         this._habboInventory.botsModel.updateView();
     }
 
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/InventoryMainView.as::updateUnseenCollectiblesCount()
-    updateUnseenCollectiblesCount(count: number): void 
-    {
-        if(!this._window) return;
-
-        if(!this._collectiblesCounter) 
-        {
-            this._collectiblesCounter = this.createCounter('collectibles');
-        }
-
-        if(this._collectiblesCounter) this.updateCounter(this._collectiblesCounter, count, 'collectibles');
-        this._habboInventory.collectiblesModel?.updateView();
-    }
-
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/InventoryMainView.as::getView()
     getView(name: string): IWindowContainer | null 
     {
@@ -463,6 +412,7 @@ export class InventoryMainView
         this._window.resizeToFitContent();
     }
 
+    // DEVIATION: AS3 also maps the collectibles category to the furni view; the RPG fork removed it.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/InventoryMainView.as::onHabboToolbarEvent()
     onHabboToolbarEvent = (event: HabboToolbarEvent): void => 
     {
@@ -487,15 +437,15 @@ export class InventoryMainView
                 case 'bots':
                     this.toggleCategoryView('bots');
                     break;
-                case 'collectibles':
-                    this.toggleCategoryView('furni');
-                    break;
                 default:
                     this._habboInventory.toggleInventoryPage('furni');
             }
         }
     };
 
+    // DEVIATION: AS3 keeps the collectibles tab aside to re-insert it when a web3 trade opens; the
+    //   RPG fork removed collectibles, so the tab is dropped for good and its `collectibles`
+    //   container stays extracted, until Task 10 removes both from the XML.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/InventoryMainView.as::getWindow()
     private getWindow(): IFrameWindow | null 
     {
@@ -527,9 +477,7 @@ export class InventoryMainView
             {
                 // AS3's decompiled tab-setup loop is corrupted (`null.numTabItems`,
                 // `null.push(null)`, etc.); reconstructed intent: pull every tab out,
-                // then re-add it only if its feature flag allows it, tracking the
-                // collectibles tab's slot so showCollectiblesTab() can re-insert it
-                // at the right position later.
+                // then re-add it only if its feature flag allows it.
                 const extractedTabs: ITabButtonWindow[] = [];
 
                 while(tabs.numTabItems > 0) 
@@ -547,16 +495,6 @@ export class InventoryMainView
                     switch(tab.name) 
                     {
                         case 'collectibles':
-                            if(this._habboInventory.web3tradeEnabled) 
-                            {
-                                this._collectiblesTabButton = tab;
-                                this._collectiblesTabIndex = tabs.numTabItems;
-
-                                if(this._showCollectiblesTab) 
-                                {
-                                    tabs.addTabItem(tab);
-                                }
-                            }
                             break;
                         case 'bots':
                             if(this._habboInventory.getBoolean('inventory.bots.enabled')) 
@@ -606,6 +544,7 @@ export class InventoryMainView
         }
     }
 
+    // DEVIATION: AS3 also resets the collectibles model's unseen items; the RPG fork removed it.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/InventoryMainView.as::resetUnseenCounters()
     private resetUnseenCounters(category: string): void 
     {
@@ -620,9 +559,6 @@ export class InventoryMainView
                 break;
             case 'badges':
                 this._habboInventory.badgesModel.resetUnseenItems();
-                break;
-            case 'collectibles':
-                this._habboInventory.collectiblesModel?.resetUnseenItems();
                 break;
             case 'bots':
                 this._habboInventory.botsModel.resetUnseenItems();

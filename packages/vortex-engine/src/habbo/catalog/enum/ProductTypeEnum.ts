@@ -30,17 +30,11 @@ export const ProductTypeEnum = {
     // AS3: _SafeCls_1784.as::PRODUCT_TYPE_GAME_TOKEN
     PRODUCT_TYPE_GAME_TOKEN: 'GAME_TOKEN',
 
-    // AS3: _SafeCls_1784.as::PRODUCT_TYPE_MINT_TOKEN
-    PRODUCT_TYPE_MINT_TOKEN: 'MINT_TOKEN',
-
     // AS3: _SafeCls_1784.as::PRODUCT_TYPE_PET
     PRODUCT_TYPE_PET: 'p',
 
     // AS3: _SafeCls_1784.as::PRODUCT_TYPE_RENTABLE_BOT
     PRODUCT_TYPE_RENTABLE_BOT: 'r',
-
-    // AS3: _SafeCls_1784.as::PRODUCT_TYPE_NFT
-    PRODUCT_TYPE_NFT: 'n',
 
     // AS3: _SafeCls_1784.as::PRODUCT_TYPE_CHAT_STYLE
     PRODUCT_TYPE_CHAT_STYLE: 'chat_style',

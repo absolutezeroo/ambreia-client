@@ -60,8 +60,6 @@ export class FurniGridFilters
     // Name DERIVED (`_SafeStr_11426`): named after its value.
     // AS3: .../src/com/sulake/habbo/inventory/furni/_SafeCls_4087.as::_SafeStr_11426
     public static readonly TYPE_PET_FOOD: string = 'pet_food';
-    // AS3: .../src/com/sulake/habbo/inventory/furni/_SafeCls_4087.as::TYPE_COLLECTIBLES
-    public static readonly TYPE_COLLECTIBLES: string = 'collectibles';
     // Name DERIVED (`_SafeStr_11095`): named after its value.
     // AS3: .../src/com/sulake/habbo/inventory/furni/_SafeCls_4087.as::_SafeStr_11095
     public static readonly TYPE_TRADABLE: string = 'tradable';
@@ -203,12 +201,6 @@ export class FurniGridFilters
         if(data === null) return false;
 
         return data.className.startsWith('petfood') || data.furniLine === 'pet_food';
-    }
-
-    // AS3: .../src/com/sulake/habbo/inventory/furni/_SafeCls_4087.as::isCollectible()
-    public static isCollectible(item: GroupItem | null): boolean
-    {
-        return item !== null && item.isNft();
     }
 
     // AS3: .../src/com/sulake/habbo/inventory/furni/_SafeCls_4087.as::isTradable()

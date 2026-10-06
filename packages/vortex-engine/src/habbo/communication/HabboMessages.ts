@@ -225,43 +225,8 @@ import {
 import {RemainingMutePeriodMessageEvent} from './messages/incoming/room/session/RemainingMutePeriodMessageEvent';
 import {BadgePointLimitsMessageEvent} from './messages/incoming/inventory/badges/BadgePointLimitsMessageEvent';
 import {PostItPlacedMessageEvent} from './messages/incoming/inventory/furni/PostItPlacedMessageEvent';
-import {SilverBalanceMessageEvent} from './messages/incoming/collectibles/SilverBalanceMessageEvent';
-import {EmeraldBalanceMessageEvent} from './messages/incoming/collectibles/EmeraldBalanceMessageEvent';
-import {NftAssetsMessageEvent} from './messages/incoming/collectibles/NftAssetsMessageEvent';
-import {TradeNftAssetsMessageEvent} from './messages/incoming/collectibles/TradeNftAssetsMessageEvent';
-import {NftStorePurchaseMessageEvent} from './messages/incoming/collectibles/NftStorePurchaseMessageEvent';
-import {NftTransferAssetsResultMessageEvent} from './messages/incoming/collectibles/NftTransferAssetsResultMessageEvent';
-import {CollectibleMintingEnabledMessageEvent} from './messages/incoming/collectibles/CollectibleMintingEnabledMessageEvent';
-import {NftCollectionsScoreMessageEvent} from './messages/incoming/collectibles/NftCollectionsScoreMessageEvent';
-import {NftClaimResultMessageEvent} from './messages/incoming/collectibles/NftClaimResultMessageEvent';
-import {CollectibleWalletAddressesMessageEvent} from './messages/incoming/collectibles/CollectibleWalletAddressesMessageEvent';
-import {NftRewardItemClaimResultMessageEvent} from './messages/incoming/collectibles/NftRewardItemClaimResultMessageEvent';
-import {CollectibleMintTokenCountMessageEvent} from './messages/incoming/collectibles/CollectibleMintTokenCountMessageEvent';
-import {CollectibleMintableItemResultMessageEvent} from './messages/incoming/collectibles/CollectibleMintableItemResultMessageEvent';
-import {RedeemNftLootBoxResultMessageEvent} from './messages/incoming/collectibles/RedeemNftLootBoxResultMessageEvent';
-import {NftTransferFeeMessageEvent} from './messages/incoming/collectibles/NftTransferFeeMessageEvent';
-import {NftBonusItemClaimResultMessageEvent} from './messages/incoming/collectibles/NftBonusItemClaimResultMessageEvent';
-import {NftCollectionsMessageEvent} from './messages/incoming/collectibles/NftCollectionsMessageEvent';
-import {NftClaimsMessageEvent} from './messages/incoming/collectibles/NftClaimsMessageEvent';
-import {NftStoreOffersMessageEvent} from './messages/incoming/collectibles/NftStoreOffersMessageEvent';
-import {CollectibleMintTokenOffersMessageEvent} from './messages/incoming/collectibles/CollectibleMintTokenOffersMessageEvent';
-import {CollectableMintableItemTypesMessageEvent} from './messages/incoming/collectibles/CollectableMintableItemTypesMessageEvent';
-import {RedeemNftLootBoxStateMessageEvent} from './messages/incoming/collectibles/RedeemNftLootBoxStateMessageEvent';
-import {NftTransferAssetsComposer} from './messages/outgoing/collectibles/NftTransferAssetsComposer';
-import {GetMintTokenOffersComposer} from './messages/outgoing/collectibles/GetMintTokenOffersComposer';
-import {GetCollectorScoreComposer} from './messages/outgoing/collectibles/GetCollectorScoreComposer';
-import {ClaimNftClaimsComposer} from './messages/outgoing/collectibles/ClaimNftClaimsComposer';
-import {GetNftStoreOffersComposer} from './messages/outgoing/collectibles/GetNftStoreOffersComposer';
-import {GetCollectibleWalletAddressesComposer} from './messages/outgoing/collectibles/GetCollectibleWalletAddressesComposer';
-import {GetNftCollectionsComposer} from './messages/outgoing/collectibles/GetNftCollectionsComposer';
-import {GetCollectibleMintableItemTypesComposer} from './messages/outgoing/collectibles/GetCollectibleMintableItemTypesComposer';
-import {GetCollectibleMintingEnabledComposer} from './messages/outgoing/collectibles/GetCollectibleMintingEnabledComposer';
-import {GetNftClaimsComposer} from './messages/outgoing/collectibles/GetNftClaimsComposer';
-import {MintItemComposer} from './messages/outgoing/collectibles/MintItemComposer';
-import {NftCollectiblesClaimRewardItemComposer} from './messages/outgoing/collectibles/NftCollectiblesClaimRewardItemComposer';
-import {GetNftTransferFeeComposer} from './messages/outgoing/collectibles/GetNftTransferFeeComposer';
-import {NftCollectiblesClaimBonusItemComposer} from './messages/outgoing/collectibles/NftCollectiblesClaimBonusItemComposer';
-import {GetCollectibleMintTokensComposer} from './messages/outgoing/collectibles/GetCollectibleMintTokensComposer';
+import {SilverBalanceMessageEvent} from './messages/incoming/inventory/purse/SilverBalanceMessageEvent';
+import {EmeraldBalanceMessageEvent} from './messages/incoming/inventory/purse/EmeraldBalanceMessageEvent';
 import {
     BonusRareInfoMessageEvent,
     ProductOfferMessageEvent,
@@ -525,15 +490,6 @@ import {MarkCatalogNewAdditionsPageOpenedComposer} from './messages/outgoing/cat
 import {
     ClaimProductResultMessageEvent
 } from './messages/incoming/notifications/ClaimProductResultMessageEvent';
-import {
-    RequestNftAssetsComposer
-} from './messages/outgoing/collectibles/RequestNftAssetsComposer';
-import {
-    AddNftToTradeComposer
-} from './messages/outgoing/collectibles/AddNftToTradeComposer';
-import {
-    RemoveNftFromTradeComposer
-} from './messages/outgoing/collectibles/RemoveNftFromTradeComposer';
 import {
     GetSnowWarGameTokensOfferComposer
 } from './messages/outgoing/catalog/GetSnowWarGameTokensOfferComposer';
@@ -819,13 +775,8 @@ import {QuizResultsMessageEvent} from './messages/incoming/help/QuizResultsMessa
 import {ChangeUserNameMessageComposer} from './messages/outgoing/help/ChangeUserNameMessageComposer';
 import {CheckUserNameMessageComposer} from './messages/outgoing/help/CheckUserNameMessageComposer';
 import {GetWardrobeMessageComposer} from './messages/outgoing/wardrobe/GetWardrobeMessageComposer';
-import {GetHotLooksMessageComposer} from './messages/outgoing/nftwardrobe/GetHotLooksMessageComposer';
-import {GetUserNftWardrobeMessageComposer} from './messages/outgoing/nftwardrobe/GetUserNftWardrobeMessageComposer';
-import {SaveUserNftWardrobeMessageComposer} from './messages/outgoing/nftwardrobe/SaveUserNftWardrobeMessageComposer';
-import {GetSelectedNftWardrobeOutfitMessageComposer} from './messages/outgoing/nftwardrobe/GetSelectedNftWardrobeOutfitMessageComposer';
-import {HotLooksMessageEvent} from './messages/incoming/nftwardrobe/HotLooksMessageEvent';
-import {UserNftWardrobeMessageEvent} from './messages/incoming/nftwardrobe/UserNftWardrobeMessageEvent';
-import {SelectedNftWardrobeOutfitMessageEvent} from './messages/incoming/nftwardrobe/SelectedNftWardrobeOutfitMessageEvent';
+import {GetHotLooksMessageComposer} from './messages/outgoing/hotlooks/GetHotLooksMessageComposer';
+import {HotLooksMessageEvent} from './messages/incoming/hotlooks/HotLooksMessageEvent';
 import {SaveWardrobeOutfitMessageComposer} from './messages/outgoing/wardrobe/SaveWardrobeOutfitMessageComposer';
 import {WardrobeMessageEvent} from './messages/incoming/wardrobe/WardrobeMessageEvent';
 import {AvatarEffectSelectedMessageEvent} from './messages/incoming/wardrobe/AvatarEffectSelectedMessageEvent';
@@ -894,13 +845,12 @@ import {DiscordPreferencesMessageEvent} from './messages/incoming/discord';
 // Incoming Events - Perk
 import {PerkAllowancesMessageEvent} from './messages/incoming/perk';
 
-// Incoming Events - NFT
+// Incoming Events - Chat styles
 import {
-    NftEmeraldConvertResultMessageEvent,
     UserNftChatStylesMessageEvent,
     UserPurchasableChatStyleChangedMessageEvent,
     UserPurchasableChatStylesMessageEvent,
-} from './messages/incoming/nft';
+} from './messages/incoming/users';
 
 // Incoming Events - Campaign
 import {
@@ -1164,7 +1114,6 @@ import {MysteryBoxWaitingCanceledMessageComposer} from './messages/outgoing/myst
 
 // Outgoing Composers - Room Furniture
 import {
-    ClaimNftRewardBoxMessageComposer,
     ConfigureRentableSpaceMessageComposer,
     CreditFurniRedeemMessageComposer,
     DiceOffMessageComposer,
@@ -1251,8 +1200,6 @@ import {
     GetSellablePetPalettesComposer,
     PurchaseBasicMembershipExtensionComposer,
     PurchaseFromCatalogComposer,
-    PurchaseMintTokensMessageComposer,
-    PurchaseNftOfferMessageComposer,
     PurchaseProductAsGiftMessageComposer,
     PurchaseVipMembershipExtensionComposer,
     RecycleItemsMessageComposer,
@@ -1643,10 +1590,8 @@ export class HabboMessages implements IMessageConfiguration
         // (that is 2624, AvatarEffectMessageEvent) — both ids are real and carry different payloads.
         this._events.set(1484, WardrobeMessageEvent);
         this._events.set(3629, AvatarEffectSelectedMessageEvent);
-        // The avatar editor's hot-looks and NFT-wardrobe pages.
+        // The avatar editor's hot-looks page.
         this._events.set(3853, HotLooksMessageEvent);
-        this._events.set(2116, UserNftWardrobeMessageEvent);
-        this._events.set(582, SelectedNftWardrobeOutfitMessageEvent);
 
         // === INVENTORY - FURNI ===
         this._events.set(2694, FurniListMessageEvent);
@@ -2233,11 +2178,12 @@ export class HabboMessages implements IMessageConfiguration
         // === PERK ===
         this._events.set(1535, PerkAllowancesMessageEvent);
 
-        // === NFT ===
+        // === CHAT STYLES ===
+        // The unlockable band (1000..9999) and the purchasable one. "Nft" is the AS3 / protocol
+        // name; the RPG server still sends all three.
         this._events.set(2996, UserNftChatStylesMessageEvent);
         this._events.set(3774, UserPurchasableChatStylesMessageEvent);
         this._events.set(3971, UserPurchasableChatStyleChangedMessageEvent);
-        this._events.set(3159, NftEmeraldConvertResultMessageEvent);
 
         // === CAMPAIGN ===
         this._events.set(2503, BadgeLeaderboardMessageEvent);
@@ -2432,8 +2378,6 @@ export class HabboMessages implements IMessageConfiguration
         // The room list a room ad can point at (`_events[3787]`), read by RoomAdsCatalogWidget.
         this._events.set(3787, RoomAdPurchaseInfoMessageEvent);
         // The targeted-offer pair (`_events[2155]`/`_events[2013]`), read by OfferController.
-        // The two collectible currencies. Both were being sent by the emulator's wallet module
-        // and its NFT handlers with nothing on this side listening.
         // The mute countdown, read by RoomChatHandler.
         // The limited-edition raffle: entered (the dialog starts its "raffling..." animation) and
         // then drawn. Both read by HabboCatalog.
@@ -2446,34 +2390,9 @@ export class HabboMessages implements IMessageConfiguration
         this._events.set(3510, BadgePointLimitsMessageEvent);
         // The post-it sheet count, read by HabboInventory into the furni model.
         this._events.set(2145, PostItPlacedMessageEvent);
+        // The two wallet currencies, read by HabboCatalog into the purse.
         this._events.set(3727, SilverBalanceMessageEvent);
         this._events.set(583, EmeraldBalanceMessageEvent);
-        // The collectibles (NFT) inventory and its trade-side twin, both handled by
-        // HabboInventory: 2247 -> onCollectibles, 850 -> onTradeNfts
-        // (habbo/inventory/_SafeCls_1951.as:166 and :204). Header 2247 is the one the RoomAdError
-        // correction above named as "unported"; it is ported now.
-        this._events.set(2247, NftAssetsMessageEvent);
-        this._events.set(850, TradeNftAssetsMessageEvent);
-        // The collectibles CATALOG tab (habbo/catalog/collectibles). Every header below is from
-        // WIN63's own registry; the emulator agrees on 14 of the 18 and has no entry for the rest.
-        this._events.set(448, NftStorePurchaseMessageEvent);
-        this._events.set(2357, NftTransferAssetsResultMessageEvent);
-        this._events.set(1091, CollectibleMintingEnabledMessageEvent);
-        this._events.set(1857, NftCollectionsScoreMessageEvent);
-        this._events.set(3601, NftClaimResultMessageEvent);
-        this._events.set(1741, CollectibleWalletAddressesMessageEvent);
-        this._events.set(233, NftRewardItemClaimResultMessageEvent);
-        this._events.set(1770, CollectibleMintTokenCountMessageEvent);
-        this._events.set(19, CollectibleMintableItemResultMessageEvent);
-        this._events.set(3332, RedeemNftLootBoxResultMessageEvent);
-        this._events.set(3700, NftTransferFeeMessageEvent);
-        this._events.set(3498, NftBonusItemClaimResultMessageEvent);
-        this._events.set(3942, NftCollectionsMessageEvent);
-        this._events.set(108, NftClaimsMessageEvent);
-        this._events.set(3272, NftStoreOffersMessageEvent);
-        this._events.set(2462, CollectibleMintTokenOffersMessageEvent);
-        this._events.set(1902, CollectableMintableItemTypesMessageEvent);
-        this._events.set(3164, RedeemNftLootBoxStateMessageEvent);
         this._events.set(2155, TargetedOfferMessageEvent);
         this._events.set(2013, TargetedOfferNotFoundMessageEvent);
         this._events.set(1073, BundleDiscountRulesetMessageEvent);
@@ -2608,28 +2527,9 @@ export class HabboMessages implements IMessageConfiguration
      */
     private registerComposers(): void
     {
-        // Collectibles. Headers from WIN63's registry; the emulator defines neither.
-        this._composers.set(1646, RequestNftAssetsComposer);
-        this._composers.set(2481, AddNftToTradeComposer);
-        this._composers.set(521, RemoveNftFromTradeComposer);
         // Snow-war token bundles: ask, then buy.
         this._composers.set(2447, GetSnowWarGameTokensOfferComposer);
         this._composers.set(3243, PurchaseSnowWarGameTokensOfferComposer);
-        this._composers.set(1749, NftTransferAssetsComposer);
-        this._composers.set(3638, GetMintTokenOffersComposer);
-        this._composers.set(1614, GetCollectorScoreComposer);
-        this._composers.set(2898, ClaimNftClaimsComposer);
-        this._composers.set(1809, GetNftStoreOffersComposer);
-        this._composers.set(261, GetCollectibleWalletAddressesComposer);
-        this._composers.set(708, GetNftCollectionsComposer);
-        this._composers.set(3856, GetCollectibleMintableItemTypesComposer);
-        this._composers.set(813, GetCollectibleMintingEnabledComposer);
-        this._composers.set(3153, GetNftClaimsComposer);
-        this._composers.set(2815, MintItemComposer);
-        this._composers.set(1166, NftCollectiblesClaimRewardItemComposer);
-        this._composers.set(3484, GetNftTransferFeeComposer);
-        this._composers.set(1977, NftCollectiblesClaimBonusItemComposer);
-        this._composers.set(1554, GetCollectibleMintTokensComposer);
         // === HANDSHAKE ===
         this._composers.set(4000, ClientHelloMessageComposer);
         this._composers.set(2022, InitDiffieHandshakeMessageComposer);
@@ -2686,9 +2586,6 @@ export class HabboMessages implements IMessageConfiguration
         this._composers.set(2210, GetWardrobeMessageComposer);
         this._composers.set(116, SaveWardrobeOutfitMessageComposer);
         this._composers.set(3834, GetHotLooksMessageComposer);
-        this._composers.set(2203, GetUserNftWardrobeMessageComposer);
-        this._composers.set(3428, SaveUserNftWardrobeMessageComposer);
-        this._composers.set(3521, GetSelectedNftWardrobeOutfitMessageComposer);
         // 879 is ClaimNewUserName in WIN63's registry (`_composers[879] = _SafeCls_3401`), a
         // different message that happens to take the same single string — so the wrong id here
         // would have been accepted and handled as a *claim* rather than a change. ChangeUserName
@@ -2807,7 +2704,6 @@ export class HabboMessages implements IMessageConfiguration
         this._composers.set(259, DiceOffMessageComposer);
         this._composers.set(3625, SpinWheelOfFortuneMessageComposer);
         this._composers.set(1753, EnterOneWayDoorMessageComposer);
-        this._composers.set(3422, ClaimNftRewardBoxMessageComposer);
         // 350 disagrees with the emulator, which listens on 204 — see the composer's own note.
         this._composers.set(350, GetItemDataMessageComposer);
         // AS3: _SafeCls_1821.as::modifyWallItemData() / deleteWallItem()
@@ -3206,8 +3102,6 @@ export class HabboMessages implements IMessageConfiguration
         this._composers.set(2087, SelectClubGiftComposer);
         this._composers.set(3342, GetSellablePetPalettesComposer);
         // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/communication/_SafeCls_2046.as
-        this._composers.set(3196, PurchaseNftOfferMessageComposer);
-        this._composers.set(67, PurchaseMintTokensMessageComposer);
         this._composers.set(2564, CheckGiftableMessageComposer);
         this._composers.set(366, GetRoomAdsPurchaseInfoMessageComposer);
         // The room-ad purchase pair (`_composers[2928]`/`_composers[3607]` in the WIN63 registry).

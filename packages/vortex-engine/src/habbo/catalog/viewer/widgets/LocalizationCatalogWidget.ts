@@ -89,6 +89,8 @@ export class LocalizationCatalogWidget extends CatalogWidget
      * The two `frontpage3` cases check the caption first: an empty slot still has its link window,
      * and clicking blank space must not open whatever the *previous* week's text pointed at.
      */
+    // DEVIATION: AS3 also opens `link.format.collectibles` from the `collectibles` page layout; the
+    //   RPG fork removed collectibles.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/viewer/widgets/LocalizationCatalogWidget.as::onClickLink()
     private onClickLink = (event: WindowMouseEvent): void =>
     {
@@ -125,10 +127,6 @@ export class LocalizationCatalogWidget extends CatalogWidget
             case 'info_credits':
                 if(name === 'ctlg_text_5') HabboWebTools.openWebPageAndMinimizeClient(catalog.getProperty('web.shop.relativeUrl'));
                 else if(name === 'ctlg_text_7') catalog.openCatalogPage(this.page.localization.getTextElementContent(7));
-
-                break;
-            case 'collectibles':
-                if(name === 'ctlg_collectibles_link') this.openExternalLink(catalog.getProperty('link.format.collectibles'));
 
                 break;
             case 'club1':

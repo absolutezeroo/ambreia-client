@@ -835,8 +835,8 @@ export class HabboFreeFlowChat extends Component implements IHabboFreeFlowChat
 	 * @returns A string in HH:MM:SS format
 	 */
     /**
-     * One chat bubble rendered on its own, for a preview: the catalog's chat-style swatches and the
-     * collectibles hub's large style preview both ask for this.
+     * One chat bubble rendered on its own, for a preview: the catalog's chat-style swatches ask for
+     * this.
      *
      * The bubble is built from a *synthetic* chat item — an empty RoomSessionChatEvent, no session,
      * user id -1 — because there is no message and no speaker here, only a style being shown off.

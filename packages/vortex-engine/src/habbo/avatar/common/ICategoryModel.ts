@@ -4,7 +4,7 @@ import type {ICategoryModelOwner} from './ICategoryModelOwner';
 import type {IFigureSetOwnership} from './IFigureSetOwnership';
 
 /**
- * One page of the avatar editor — body, head, torso, legs, misc, hot looks, effects or NFTs.
+ * One page of the avatar editor — body, head, torso, legs, misc, hot looks or effects.
  *
  * Interface name DERIVED: the AS3 file is `_SafeCls_2660.as` and the identifier exists in no tree.
  * Named for its sole implementor, `CategoryBaseModel`, and for `HabboAvatarEditor`'s `_categories`

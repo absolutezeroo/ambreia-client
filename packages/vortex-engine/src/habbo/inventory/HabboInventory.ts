@@ -30,14 +30,6 @@ import {BadgesModel} from './badges/BadgesModel';
 import {EffectsModel} from './effects/EffectsModel';
 import {RecyclerModel} from './recycler/RecyclerModel';
 import type {IRecyclerModel} from './recycler/IRecyclerModel';
-import {CollectiblesModel} from './collectibles/CollectiblesModel';
-import {CollectibleGroupedItem} from './collectibles/CollectibleGroupedItem';
-import type {ICollectiblesModel} from './collectibles/ICollectiblesModel';
-import {NftAssetsMessageEvent} from '@habbo/communication/messages/incoming/collectibles/NftAssetsMessageEvent';
-import {TradeNftAssetsMessageEvent} from '@habbo/communication/messages/incoming/collectibles/TradeNftAssetsMessageEvent';
-import type {NftAssetsMessageParser} from '@habbo/communication/messages/parser/collectibles/NftAssetsMessageParser';
-import type {TradeNftAssetsMessageParser} from '@habbo/communication/messages/parser/collectibles/TradeNftAssetsMessageParser';
-import type {CollectibleAsset} from '@habbo/communication/messages/parser/collectibles/CollectibleAsset';
 import {PetsModel} from './pets/PetsModel';
 import {Pet} from './pets/Pet';
 import {PetFigureData} from './pets/PetFigureData';
@@ -541,22 +533,13 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
         return this.activeTradingModel !== null;
     }
 
+    // DEVIATION: with web3 trading on, AS3 also shows the collectibles tab for the trade and, on a
+    //   trade that finished (`tradeComplete`), refreshes the collectibles model; the RPG fork
+    //   removed collectibles, so `tradeComplete` has nothing left to drive.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/HabboInventory.as::onTradeActiveChanged()
-    // `tradeComplete` is AS3's parameter: only a trade that *finished* refreshes the collectibles
-    // model, and only when web3 trading is on at all.
-    onTradeActiveChanged(tradeComplete: boolean = false): void
+    onTradeActiveChanged(_tradeComplete: boolean = false): void
     {
         this._view?.disableNonTradingTabs(this.tradingActive);
-
-        if(this.web3tradeEnabled)
-        {
-            this._view?.showCollectiblesTab(this.tradingActive);
-
-            if(tradeComplete)
-            {
-                this._collectiblesModel?.onTradeComplete();
-            }
-        }
     }
 
     private _isInitialized: boolean = false;
@@ -712,9 +695,7 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
 
     /**
      * AS3 declares this `TradingModel`, not `ITradingModel` — the interface is the *view's* narrow
-     * four-member contract, and every model-side caller (CollectiblesModel, FurniModel) needs the
-     * concrete class. The port had narrowed it, which is what left `requestAddNftsToTrading()`,
-     * `running` and `ownUserNftItems` unreachable from the collectibles model.
+     * four-member contract, and the model-side callers (FurniModel) need the concrete class.
      */
     /**
      * AS3 reads this as `getModel("trading")`, and `getModel()` is what runs the lazy `init()` —
@@ -729,19 +710,6 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
         if(!this._isInitialized) this.init();
 
         return this._tradingModel;
-    }
-
-    // AS3: .../src/com/sulake/habbo/inventory/HabboInventory.as::_inventories (the "collectibles" entry)
-    private _collectiblesModel: CollectiblesModel | null = null;
-
-    /**
-     * AS3 resolves this through `getModel("collectibles")` and casts, returning null once disposed.
-     * Kept the same way as `recyclerModel` below.
-     */
-    // AS3: .../src/com/sulake/habbo/inventory/HabboInventory.as::get collectiblesModel()
-    get collectiblesModel(): ICollectiblesModel | null
-    {
-        return this.disposed ? null : (this.getModel('collectibles') as ICollectiblesModel | null);
     }
 
     // AS3: .../src/com/sulake/habbo/inventory/HabboInventory.as::_inventories (the "recycler" entry)
@@ -1196,17 +1164,11 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
             );
         }
 
-        // AS3: HabboInventory.as:491 — `new CollectiblesModel(this, _windowManager, _communication,
-        // assets, _roomEngine, _catalog, _avatarRenderer)`. The last four are stored and never read
-        // there; the model documents that at its constructor.
-        this._collectiblesModel = new CollectiblesModel(this, this._windowManager, this._communication);
-
         // AS3: HabboInventory.as:501 — `new RecyclerModel(this, _windowManager, _communication,
         // assets, _roomEngine, _localization)`. Five of those six are stored and never read; the
         // model documents that at its constructor.
         this._recyclerModel = new RecyclerModel(this);
 
-        this._inventories.add('collectibles', this._collectiblesModel);
         this._inventories.add('trading', this._tradingModel);
         this._inventories.add('recycler', this._recyclerModel);
         this._inventories.add('pets', this._petsModel);
@@ -1288,9 +1250,7 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
      * AS3: .../HabboInventory.as::inventoryViewOpened()
      *
      * Every registered model is told, not just furni's. Each one decides for itself whether the
-     * category is its own — which is the whole point of the callback, and why the collectibles tab
-     * could never load until this looped: `CollectiblesModel.categorySwitch()` is what sends
-     * RequestNftAssetsComposer.
+     * category is its own — which is the whole point of the callback.
      */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/HabboInventory.as::inventoryViewOpened()
     inventoryViewOpened(category: string): void
@@ -1353,9 +1313,7 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
 
         this._view.toggleSubCategoryView(category, false);
 
-        // AS3 loops every registered model here, and so does this now. FurniModel is no longer the
-        // only one with something to do: CollectiblesModel re-arms its once-per-trade asset request
-        // on "trading" and drops every lock on "empty".
+        // AS3 loops every registered model here, and so does this now.
         for(const model of this._inventories.getValues()) model.subCategorySwitch(category);
     }
 
@@ -1407,12 +1365,13 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
     }
 
     /**
-     * Every non-rented inventory id of one furni type, for the collectibles mint tab.
+     * Every non-rented inventory id of one furni type. AS3's only caller is the mint tab, which the
+     * RPG fork removed.
      *
      * AS3's first line looks up `_inventories.getValue(category)` and types it as a `FurniModel` —
      * and then never uses it, reading `furniModel` directly instead. So the lookup is purely a
      * guard on the category name existing, and passing anything but "furni" returns null. Kept,
-     * because the mint tab passes "furni" and tests the null.
+     * because AS3's caller passes "furni" and tests the null.
      */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/HabboInventory.as::getNonRentedInventoryIds()
     getNonRentedInventoryIds(category: string, itemTypeId: number, isWallItem: boolean): number[] | null
@@ -1666,8 +1625,8 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
     /**
 	 * Resolves the furniture data for a class id and type ("s" floor / "i" wall).
 	 *
-	 * GroupItem.furniData calls this to recover an item's className, which every
-	 * NFT check and the furni-line lookups depend on. It null-guards the session
+	 * GroupItem.furniData calls this to recover an item's className, which the
+	 * furni-line lookups depend on. It null-guards the session
 	 * data manager exactly as AS3 does, so a call before that manager is injected
 	 * returns null rather than throwing.
 	 */
@@ -1953,9 +1912,8 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
      * the open and the item list are unpacked here first, because they need the session's own
      * user id, the room's user data and the furni model to build their group items.
      *
-     * The same block also registers `onTradeNfts` (the header for the NFT half is 850, not the
-     * 2159 an old note carried). AS3 registers the four wired-trading answers here too; the RPG
-     * fork removed wired trading.
+     * AS3 registers the four wired-trading answers here too, and the collectibles pair
+     * (`_SafeCls_1951.as:166` and `:204`); the RPG fork removed wired trading and NFT.
      */
     private registerTradingMessageEvents(): void
     {
@@ -1973,77 +1931,8 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
             this._communication.addMessageEvent(new TradingYouAreNotAllowedEvent(this.onTradingMessage)),
             this._communication.addMessageEvent(new TradeSilverSetMessageEvent(this.onTradingMessage)),
             this._communication.addMessageEvent(new TradeSilverFeeMessageEvent(this.onTradingMessage)),
-            this._communication.addMessageEvent(new TradingItemListMessageEvent(this.onTradingItemList)),
-            // AS3: .../_SafeCls_1951.as:166 and :204 — the collectibles pair. `onCollectibles` is
-            // the tab's own inventory; `onTradeNfts` is the NFT half of an open trade, which is why
-            // it sits in this trading block rather than beside the tab.
-            this._communication.addMessageEvent(new NftAssetsMessageEvent(this.onCollectibles)),
-            this._communication.addMessageEvent(new TradeNftAssetsMessageEvent(this.onTradeNfts))
+            this._communication.addMessageEvent(new TradingItemListMessageEvent(this.onTradingItemList))
         );
-    }
-
-    // AS3: .../src/com/sulake/habbo/inventory/_SafeCls_1951.as::onCollectibles()
-    private onCollectibles = (event: IMessageEvent): void =>
-    {
-        const parser = event.parser as NftAssetsMessageParser | null;
-
-        if(!parser || !this._collectiblesModel) return;
-
-        const items = new OrderedMap<number, CollectibleAsset>();
-
-        for(const asset of parser.items) items.add(asset.assetId, asset);
-
-        this._collectiblesModel.initCollectibles(items);
-    };
-
-    // AS3: .../src/com/sulake/habbo/inventory/_SafeCls_1951.as::onTradeNfts()
-    private onTradeNfts = (event: IMessageEvent): void =>
-    {
-        const parser = event.parser as TradeNftAssetsMessageParser | null;
-
-        if(!parser || !this._collectiblesModel || !this._tradingModel) return;
-
-        const ownItems = this.parseNftTradeMap(parser.myItems, this._collectiblesModel);
-        const otherItems = this.parseNftTradeMap(parser.theirItems, this._collectiblesModel);
-
-        this._tradingModel.updateNftItems(ownItems, otherItems, parser.myItems.length, parser.theirItems.length);
-    };
-
-    /**
-     * AS3: .../_SafeCls_1951.as::parseNftTradeMap()
-     *
-     * Builds a *throwaway* set of grouped items for one side of the trade — these are not the
-     * inventory tab's groups, they are fresh ones the trade window renders. Note the
-     * `initializeImage()` on the first copy of each product only: the trade window shows every
-     * offered item at once, so unlike the tab's grid it cannot spread the renders over a timer.
-     */
-    // AS3: .../src/com/sulake/habbo/inventory/_SafeCls_1951.as::parseNftTradeMap()
-    private parseNftTradeMap(
-        assets: CollectibleAsset[],
-        model: CollectiblesModel
-    ): OrderedMap<string, CollectibleGroupedItem>
-    {
-        const groups = new OrderedMap<string, CollectibleGroupedItem>();
-
-        for(const asset of assets)
-        {
-            const key = asset.productCode;
-            const existing = groups.getValue(key);
-
-            if(existing === null)
-            {
-                const group = new CollectibleGroupedItem(asset, [asset.assetId], model);
-
-                groups.add(key, group);
-                group.initializeImage();
-            }
-            else
-            {
-                existing.addAssetId(asset.assetId);
-            }
-        }
-
-        return groups;
     }
 
     // AS3: .../_SafeCls_1951.as::onTradingOpenFailed(), onTradingClose(), onTradingCompleted(),

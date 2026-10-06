@@ -13,10 +13,9 @@ import {AvatarTextureUtils} from '@habbo/avatar/AvatarTextureUtils';
  * rendered and pushed in as a still. The second path is also the one `avatarImageReady()` serves,
  * so a figure that was not cached lands there a moment later.
  *
- * AS3 has this class twice, once here and once as
- * `catalog/collectibles/tabs/subviews/EffectPreviewer.as`, and the two bodies are identical but
- * for one line: this one also hides the preview room's walls and floor in its constructor. Both
- * are ported, separately, because both exist.
+ * AS3 has this class twice; the other copy belonged to the collectibles hub, which the RPG fork
+ * removed. This one differs from it by one line: it also hides the preview room's walls and floor
+ * in its constructor.
  *
  * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/utils/EffectPreviewer.as
  */

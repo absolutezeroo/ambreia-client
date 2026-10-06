@@ -1,7 +1,6 @@
 // Exports
 export {IID_AssetLibrary} from './IIDAssetLibrary';
 export {IID_AvatarRenderManager} from './IIDAvatarRenderManager';
-export {IID_CollectiblesController} from './IIDCollectiblesController';
 export {IID_CoreCommunicationManager} from './IIDCoreCommunicationManager';
 export {IID_CoreLocalizationManager} from './IIDCoreLocalizationManager';
 export {IID_CoreWindowManager} from './IIDCoreWindowManager';

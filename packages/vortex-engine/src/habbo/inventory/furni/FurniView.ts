@@ -236,8 +236,7 @@ export class FurniView
             this._model.showingRentedFurni,
             this._model.controller.mergeRentFurni,
             searchField?.text ?? '',
-            placementFilter.selection,
-            this._model.showingNfts
+            placementFilter.selection
         );
     }
 

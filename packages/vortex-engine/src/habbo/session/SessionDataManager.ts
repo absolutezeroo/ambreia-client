@@ -82,15 +82,15 @@ import {UserNameChangedMessageEvent} from '../communication/messages/incoming/he
 import {RoomReadyMessageEvent} from '../communication/messages/incoming/room/session/RoomReadyMessageEvent';
 import {UserChangeMessageEvent} from '../communication/messages/incoming/room/action/UserChangeMessageEvent';
 
-// Events - Preferences & NFT
+// Events - Preferences & chat styles
 import {AccountPreferencesEvent} from '../communication/messages/incoming/preferences/AccountPreferencesEvent';
-import {UserNftChatStylesMessageEvent} from '../communication/messages/incoming/nft/UserNftChatStylesMessageEvent';
+import {UserNftChatStylesMessageEvent} from '../communication/messages/incoming/users/UserNftChatStylesMessageEvent';
 import {
     UserPurchasableChatStyleChangedMessageEvent
-} from '../communication/messages/incoming/nft/UserPurchasableChatStyleChangedMessageEvent';
+} from '../communication/messages/incoming/users/UserPurchasableChatStyleChangedMessageEvent';
 import {
     UserPurchasableChatStylesMessageEvent
-} from '../communication/messages/incoming/nft/UserPurchasableChatStylesMessageEvent';
+} from '../communication/messages/incoming/users/UserPurchasableChatStylesMessageEvent';
 
 // Parsers
 import type {UserObjectMessageParser} from '../communication/messages/parser/handshake/UserObjectMessageParser';
@@ -135,13 +135,13 @@ import type {
 import type {UserNameChangedMessageParser} from '../communication/messages/parser/help/UserNameChangedMessageParser';
 import type {RoomReadyMessageParser} from '../communication/messages/parser/room/session/RoomReadyMessageParser';
 import type {AccountPreferencesParser} from '../communication/messages/parser/preferences/AccountPreferencesParser';
-import type {UserNftChatStylesMessageParser} from '../communication/messages/parser/nft/UserNftChatStylesMessageParser';
+import type {UserNftChatStylesMessageParser} from '../communication/messages/parser/users/UserNftChatStylesMessageParser';
 import type {
     UserPurchasableChatStyleChangedMessageParser
-} from '../communication/messages/parser/nft/UserPurchasableChatStyleChangedMessageParser';
+} from '../communication/messages/parser/users/UserPurchasableChatStyleChangedMessageParser';
 import type {
     UserPurchasableChatStylesMessageParser
-} from '../communication/messages/parser/nft/UserPurchasableChatStylesMessageParser';
+} from '../communication/messages/parser/users/UserPurchasableChatStylesMessageParser';
 
 // Composers
 import {RespectUserMessageComposer} from '../communication/messages/outgoing/room/RespectUserMessageComposer';
@@ -1727,7 +1727,7 @@ export class SessionDataManager extends Component implements ISessionDataManager
         // Notification events
         this.addMessageEvent(new PetRespectFailedEvent(this.onPetRespectFailed.bind(this)));
 
-        // Preferences & NFT events
+        // Preferences & chat-style events
         this.addMessageEvent(new AccountPreferencesEvent(this.onAccountPreferences.bind(this)));
         this.addMessageEvent(new UserNftChatStylesMessageEvent(this.onNftChatStyles.bind(this)));
         this.addMessageEvent(new UserPurchasableChatStylesMessageEvent(this.onPurchasableChatStyles.bind(this)));

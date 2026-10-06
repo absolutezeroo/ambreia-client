@@ -11,8 +11,6 @@ export class NotificationType
     public static readonly FRIEND_OFFLINE: string = 'friendoffline';
     // AS3: .../src/com/sulake/habbo/notifications/NotificationType.as::FRIEND_ONLINE
     public static readonly FRIEND_ONLINE: string = 'friendonline';
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/notifications/NotificationType.as::NFT_OPENING
-    public static readonly NFT_OPENING: string = 'nft_opening';
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/notifications/NotificationType.as::TREASURE_HUNT
     public static readonly TREASURE_HUNT: string = 'treasure_hunt';
     // AS3: .../src/com/sulake/habbo/notifications/NotificationType.as::THIRDPARTY_FRIEND_OFFLINE

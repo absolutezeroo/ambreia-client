@@ -1,4 +1,3 @@
-export * from './NftOutfit';
 export * from './Outfit';
 export * from './OutfitView';
 export * from './WardrobeModel';

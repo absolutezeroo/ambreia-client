@@ -19,7 +19,6 @@ export * from './landingview';
 export * from './moderation';
 export * from './mysterybox';
 export * from './navigator';
-export * from './nft';
 export * from './perk';
 export * from './preferences';
 export * from './newnavigator';

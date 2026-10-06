@@ -1,7 +1,6 @@
 import type {IDragAndDropDoneReceiver} from './viewer/IDragAndDropDoneReceiver';
 import type {IOfferCenter} from './offers/IOfferCenter';
 import type {IOfferExtension} from './offers/IOfferExtension';
-import type {ICollectorHub} from './collectibles/ICollectorHub';
 import type {EventEmitter} from 'eventemitter3';
 import type {IConnection} from '@core/communication/connection/IConnection';
 import type {IAssetLibrary} from '@core/assets/IAssetLibrary';
@@ -53,8 +52,6 @@ export interface IHabboCatalog
     readonly imageGalleryHost: string;
     // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::get catalogType()
     readonly catalogType: string;
-    // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::get collectorHub()
-    readonly collectorHub: ICollectorHub | null;
     // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::get utils()
     readonly utils: HabboCatalogUtils;
     // AS3: .../src/com/sulake/habbo/catalog/HabboCatalog.as::get currentCatalogNavigator()

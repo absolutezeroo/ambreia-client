@@ -23,13 +23,13 @@ import {
 } from '@habbo/communication/messages/incoming/catalog/RecyclerFinishedMessageEvent';
 import {
     UserPurchasableChatStyleChangedMessageEvent
-} from '@habbo/communication/messages/incoming/nft/UserPurchasableChatStyleChangedMessageEvent';
+} from '@habbo/communication/messages/incoming/users/UserPurchasableChatStyleChangedMessageEvent';
 import type {
     RecyclerFinishedMessageEventParser
 } from '@habbo/communication/messages/parser/catalog/RecyclerFinishedMessageEventParser';
 import type {
     UserPurchasableChatStyleChangedMessageParser
-} from '@habbo/communication/messages/parser/nft/UserPurchasableChatStyleChangedMessageParser';
+} from '@habbo/communication/messages/parser/users/UserPurchasableChatStyleChangedMessageParser';
 
 // Existing parsers
 import type {
@@ -131,12 +131,6 @@ import {BanInfoMessageEvent} from '@habbo/communication/messages/incoming/modera
 import type {
     BanInfoMessageEventParser
 } from '@habbo/communication/messages/parser/moderation/BanInfoMessageEventParser';
-import {
-    NftEmeraldConvertResultMessageEvent
-} from '@habbo/communication/messages/incoming/nft/NftEmeraldConvertResultMessageEvent';
-import {
-    NftEmeraldConvertResultMessageEventParser
-} from '@habbo/communication/messages/parser/nft/NftEmeraldConvertResultMessageEventParser';
 import {
     TreasureHuntUpdateMessageEvent
 } from '@habbo/communication/messages/incoming/campaign/treasurehunt/TreasureHuntUpdateMessageEvent';
@@ -350,8 +344,6 @@ export class NotificationMessageHandler implements IAvatarImageListener
         this.addMessageEvent(new UserPurchasableChatStyleChangedMessageEvent(this.onChatStyleNotification.bind(this)));
         // AS3: _SafeCls_1951.as:130
         this.addMessageEvent(new BanInfoMessageEvent(this.onBanInfoMessageEvent.bind(this)));
-        // AS3: _SafeCls_1951.as:143
-        this.addMessageEvent(new NftEmeraldConvertResultMessageEvent(this.onNftEmeraldConvertResult.bind(this)));
         // AS3: _SafeCls_1951.as:118, 132, 147 — the treasure-hunt chain.
         this.addMessageEvent(new TreasureHuntUpdateMessageEvent(this.onTreasureHuntUpdate.bind(this)));
         this.addMessageEvent(new TreasureHuntFailMessageEvent(this.onTreasureHuntFail.bind(this)));
@@ -1023,35 +1015,6 @@ export class NotificationMessageHandler implements IAvatarImageListener
             parser.reason,
             parser.banExpirySeconds,
             parser.localizedReason
-        );
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/notifications/_SafeCls_1951.as::onNftEmeraldConvertResult()
-    private onNftEmeraldConvertResult(event: IMessageEvent): void
-    {
-        const parser = event.parser as NftEmeraldConvertResultMessageEventParser;
-
-        if(parser == null || this._notifications == null) return;
-
-        // Success is silent — the converted furni simply appears.
-        if(parser.result === NftEmeraldConvertResultMessageEventParser.RESULT_OK) return;
-
-        if(parser.result === NftEmeraldConvertResultMessageEventParser.RESULT_NOT_IN_COLLECTOR)
-        {
-            this._notifications.addItem(
-                this._notifications.localizationManager?.getLocalization(
-                    'notification.nft.emerald_convert.not_in_collector',
-                    'To convert this Emerald furni, it needs to be in your Collector Wallet'
-                ) ?? '',
-                'info'
-            );
-
-            return;
-        }
-
-        this._notifications.addItem(
-            this._notifications.localizationManager?.getLocalization('notification.nft.emerald_convert_failed') ?? '',
-            'info'
         );
     }
 

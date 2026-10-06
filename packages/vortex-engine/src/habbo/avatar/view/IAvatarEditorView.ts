@@ -17,7 +17,6 @@ import type {AvatarEditorNameChangeView} from './AvatarEditorNameChangeView';
 export interface IAvatarEditorView
 {
     // AS3: .../avatar/AvatarEditorView.as::get currentViewId()
-    // Read by the NFT path to avoid yanking the figure out from under the NFT page.
     readonly currentViewId: string;
 
     // AS3: .../avatar/AvatarEditorView.as::get gridView()
@@ -35,9 +34,6 @@ export interface IAvatarEditorView
 
     // AS3: .../avatar/AvatarEditorView.as::get effectsParamViewContainer()
     readonly effectsParamViewContainer: IWindowContainer | null;
-
-    // AS3: .../avatar/AvatarEditorView.as::get collectiblesAvatarInfoContainer()
-    readonly collectiblesAvatarInfoContainer: IWindowContainer | null;
 
     // AS3: .../avatar/AvatarEditorView.as::getFrame()
     // Wraps the body in the standalone frame and hands it back — what `openEditor()` returns.

@@ -3,8 +3,8 @@
  *
  * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/furniture/credit/CreditFurniWidget.as
  *
- * The "exchange this furni for credits" confirmation. Two wordings: a plain credit furni, and an
- * NFT credit furni, which uses a different string, appends a prompt, and hides the info link.
+ * The "exchange this furni for credits" confirmation. AS3 has a second wording for an NFT credit
+ * furni, which the RPG fork removed with NFT.
  */
 import type {EventEmitter} from 'eventemitter3';
 import type {IAssetLibrary} from '@core/assets/IAssetLibrary';
@@ -44,9 +44,6 @@ export class CreditFurniWidget extends RoomWidgetBase
 
     // AS3: CreditFurniWidget.as::_SafeStr_8218
     private _creditValue: number = 0;
-
-    // AS3: CreditFurniWidget.as::_isNftCredit
-    private _isNftCredit: boolean = false;
 
     // AS3: CreditFurniWidget.as::CreditFurniWidget()
     constructor(
@@ -88,7 +85,6 @@ export class CreditFurniWidget extends RoomWidgetBase
 
         this._objectId = event.objectId;
         this._creditValue = event.creditValue;
-        this._isNftCredit = event.isNftCredit;
 
         this.showInterface();
     }
@@ -101,6 +97,8 @@ export class CreditFurniWidget extends RoomWidgetBase
      * both steps, so that becomes `buildWidgetLayout('credit_redeem')` plus the properties AS3
      * sets afterwards.
      */
+    // DEVIATION: AS3 words an NFT credit furni differently, appends a prompt and hides the info
+    //   link for it; the RPG fork removed NFT.
     // AS3: CreditFurniWidget.as::showInterface()
     private showInterface(): void
     {
@@ -112,12 +110,9 @@ export class CreditFurniWidget extends RoomWidgetBase
             this._window = null;
         }
 
-        const valueKey = this._isNftCredit
-            ? 'nft.creditfurni.redeem.description'
-            : 'widgets.furniture.credit.redeem.value';
-
-        const valueText = this.localizations?.getLocalizationWithParams(valueKey, '', 'value', String(this._creditValue)) ?? '';
-        const prompt = this.localizations?.getLocalization('nft.creditfurni.redeem.prompt') ?? '';
+        const valueText = this.localizations?.getLocalizationWithParams(
+            'widgets.furniture.credit.redeem.value', '', 'value', String(this._creditValue)
+        ) ?? '';
 
         this._window = this.windowManager.buildWidgetLayout('credit_redeem') as IWindowContainer | null;
 
@@ -133,7 +128,7 @@ export class CreditFurniWidget extends RoomWidgetBase
 
         if(exchangeText !== null)
         {
-            exchangeText.caption = this._isNftCredit ? `${valueText} ${prompt}` : valueText;
+            exchangeText.caption = valueText;
         }
 
         const cancel = this._window.findChildByName('cancel');
@@ -148,9 +143,7 @@ export class CreditFurniWidget extends RoomWidgetBase
 
         if(link !== null)
         {
-            // The info link is meaningless for an NFT credit furni — AS3 hides it rather than
-            // pointing it somewhere else.
-            link.visible = !this._isNftCredit;
+            link.visible = true;
             link.procedure = this.onMouseEvent;
         }
 

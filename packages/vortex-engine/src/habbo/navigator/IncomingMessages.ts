@@ -1034,6 +1034,8 @@ export class IncomingMessages
     }
 
     /** Only these six codes are handled; anything else falls through silently, as in AS3. */
+    // DEVIATION: AS3 also alerts `${notification.nft_token_required}` on -100005 (an NFT-gated
+    //   room); the RPG fork removed NFT.
     // AS3: .../_SafeCls_1951.as::onError()
     private onError(event: IMessageEvent): void
     {
@@ -1064,9 +1066,6 @@ export class IncomingMessages
                 break;
             case 4013:
                 alert('${navigator.alert.room_in_maintenance}');
-                break;
-            case -100005:
-                alert('${notification.nft_token_required}');
                 break;
         }
     }

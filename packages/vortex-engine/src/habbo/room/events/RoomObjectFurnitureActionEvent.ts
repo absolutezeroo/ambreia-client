@@ -25,9 +25,6 @@ export class RoomObjectFurnitureActionEvent extends RoomObjectEvent
     public static readonly ROFCAE_JUKEBOX_DISPOSE = 'ROFCAE_JUKEBOX_DISPOSE';
     public static readonly ROFCAE_MOUSE_BUTTON = 'ROFCAE_MOUSE_BUTTON';
     public static readonly ROFCAE_MOUSE_ARROW = 'ROFCAE_MOUSE_ARROW';
-    // AS3: RoomObjectFurnitureActionEvent.as::NFT_REWARD_BOX — was missing from this port
-    // entirely, so useObject()'s reward-box branch had no constant to switch on.
-    public static readonly ROFCAE_NFT_REWARD_BOX = 'ROFCAE_NFT_REWARD_BOX';
 
     constructor(type: string, object: IRoomObject | null)
     {

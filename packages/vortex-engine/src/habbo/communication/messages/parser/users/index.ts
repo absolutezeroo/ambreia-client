@@ -33,3 +33,6 @@ export * from './GuildMembershipRejectedMessageParser';
 export * from './GroupMembershipRequestedMessageParser';
 export {BadgeLeaderboardMessageParser} from './BadgeLeaderboardMessageParser';
 export {BadgeLeaderboardEntryData} from './BadgeLeaderboardEntryData';
+export * from './UserNftChatStylesMessageParser';
+export * from './UserPurchasableChatStyleChangedMessageParser';
+export * from './UserPurchasableChatStylesMessageParser';

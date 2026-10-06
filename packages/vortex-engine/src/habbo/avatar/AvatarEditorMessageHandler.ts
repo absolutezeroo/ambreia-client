@@ -13,7 +13,6 @@ import type {CheckUserNameResultMessageParser} from '@habbo/communication/messag
 import {CheckUserNameResultMessageEvent} from '@habbo/communication/messages/incoming/help/CheckUserNameResultMessageEvent';
 import {UserRightsMessageEvent} from '@habbo/communication/messages/incoming/handshake/UserRightsMessageEvent';
 import {WardrobeMessageEvent} from '@habbo/communication/messages/incoming/wardrobe/WardrobeMessageEvent';
-import {SelectedNftWardrobeOutfitMessageEvent} from '@habbo/communication/messages/incoming/nftwardrobe/SelectedNftWardrobeOutfitMessageEvent';
 import {CheckUserNameMessageComposer} from '@habbo/communication/messages/outgoing/help/CheckUserNameMessageComposer';
 import {GetWardrobeMessageComposer} from '@habbo/communication/messages/outgoing/wardrobe/GetWardrobeMessageComposer';
 import {SaveWardrobeOutfitMessageComposer} from '@habbo/communication/messages/outgoing/wardrobe/SaveWardrobeOutfitMessageComposer';
@@ -59,7 +58,6 @@ export class AvatarEditorMessageHandler implements IAvatarEditorMessageHandler
         this.register(new AvatarEffectExpiredMessageEvent(this.onAvatarEffectExpired));
         this.register(new CheckUserNameResultMessageEvent(this.onCheckUserNameResult));
         this.register(new AvatarEffectActivatedMessageEvent(this.onAvatarEffectActivated));
-        this.register(new SelectedNftWardrobeOutfitMessageEvent(this.onUserNftWardrobeMessage));
     }
 
     // AS3: .../avatar/AvatarEditorMessageHandler.as::saveWardrobeOutfit()
@@ -240,25 +238,5 @@ export class AvatarEditorMessageHandler implements IAvatarEditorMessageHandler
 
         figureData.avatarEffectType = ((event as {parser?: unknown}).parser as {type?: number} | null)?.type ?? -1;
         figureData.updateView();
-    };
-
-    /**
-     * Registered by the *editor* in AS3, not by this handler — moved here so all nine
-     * registrations live together and are unregistered together.
-     */
-    // AS3: .../avatar/HabboAvatarEditor.as::onUserNftWardrobeMessage()
-    private onUserNftWardrobeMessage = (event: IMessageEvent): void =>
-    {
-        const parser = (event as {parser?: unknown}).parser as {
-            currentTokenId?: string | null;
-            fallbackFigureString?: string;
-            fallbackFigureGender?: string;
-        } | null;
-
-        if(parser == null) return;
-
-        this.editor?.applySelectedNftOutfit(
-            parser.currentTokenId ?? null, parser.fallbackFigureString ?? '', parser.fallbackFigureGender ?? ''
-        );
     };
 }

@@ -5,7 +5,7 @@ import {FigureData} from '../figuredata/FigureData';
 import {OutfitView} from './OutfitView';
 
 /**
- * A saved figure with a tile to show it — the hot-looks and NFT pages are grids of these.
+ * A saved figure with a tile to show it — the hot-looks page is a grid of these.
  *
  * The render is asynchronous by nature: `createAvatarImage()` is asked for the picture immediately,
  * and if the parts are not downloaded yet the renderer calls back through `avatarImageReady()`,

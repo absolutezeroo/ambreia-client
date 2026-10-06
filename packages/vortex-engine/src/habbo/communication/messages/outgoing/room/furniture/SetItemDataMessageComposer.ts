@@ -13,9 +13,6 @@ import {MessageComposer} from '@core/communication/messages/MessageComposer';
  * colour field, then `getMessageArray()` returns `[objectId, colour, text]`. This port takes the
  * arguments in wire order to remove the trap; `modifyWallItemData()` is the only caller and passes
  * them the same way AS3 does.
- *
- * 3498 is also `NftBonusItemClaimResultMessageComposer` server→client. Not a collision: the
- * registry keeps `_events` and `_composers` in separate maps, exactly as AS3 does.
  */
 export class SetItemDataMessageComposer extends MessageComposer<ConstructorParameters<typeof SetItemDataMessageComposer>>
 {

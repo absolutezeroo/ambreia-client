@@ -17,16 +17,6 @@ export class CatalogEvent
     static readonly CATALOG_USER_SELECTED: string = 'CATALOG_USER_SELECTED';
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/event/CatalogEvent.as::CATALOG_INVISIBLE_PAGE_VISITED
     static readonly CATALOG_INVISIBLE_PAGE_VISITED: string = 'CATALOG_INVISIBLE_PAGE_VISITED';
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/event/CatalogEvent.as::COLLECTIBLES_CLAIM_WAIT
-    static readonly COLLECTIBLES_CLAIM_WAIT: string = 'COLLECTIBLE_CLAIM_WAIT';
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/event/CatalogEvent.as::COLLECTIBLES_CLAIM_SUCCESS
-    static readonly COLLECTIBLES_CLAIM_SUCCESS: string = 'COLLECTIBLE_CLAIM_SUCCESS';
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/event/CatalogEvent.as::COLLECTIBLES_CLAIM_FAIL
-    static readonly COLLECTIBLES_CLAIM_FAIL: string = 'COLLECTIBLES_CLAIM_FAIL';
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/event/CatalogEvent.as::COLLECTIBLES_MINT_SUCCESS
-    static readonly COLLECTIBLES_MINT_SUCCESS: string = 'COLLECTIBLES_MINT_SUCCESS';
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/event/CatalogEvent.as::COLLECTIBLES_MINT_FAIL
-    static readonly COLLECTIBLES_MINT_FAIL: string = 'COLLECTIBLES_MINT_FAIL';
 
     private _type: string;
 

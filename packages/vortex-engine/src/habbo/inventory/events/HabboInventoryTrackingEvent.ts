@@ -32,7 +32,4 @@ export class HabboInventoryTrackingEvent
 
     // AS3: .../src/com/sulake/habbo/inventory/events/HabboInventoryTrackingEvent.as::HABBO_INVENTORY_TRACKING_EVENT_BOTS
     public static readonly BOTS: string = 'HABBO_INVENTORY_TRACKING_EVENT_BOTS';
-
-    // AS3: .../src/com/sulake/habbo/inventory/events/HabboInventoryTrackingEvent.as::HABBO_INVENTORY_TRACKING_EVENT_COLLECTIBLES
-    public static readonly COLLECTIBLES: string = 'HABBO_INVENTORY_TRACKING_EVENT_COLLECTIBLES';
 }

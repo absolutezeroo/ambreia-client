@@ -3,8 +3,8 @@
  *
  * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/events/RoomWidgetCreditFurniUpdateEvent.as
  *
- * Carries an exchangeable furni's credit value to the redeem dialog. `isNftCredit` selects a
- * different wording and hides the info link.
+ * Carries an exchangeable furni's credit value to the redeem dialog. AS3 also carries an
+ * `isNftCredit` flag, which the RPG fork removed with NFT.
  */
 import {RoomWidgetUpdateEvent} from './RoomWidgetUpdateEvent';
 
@@ -19,17 +19,14 @@ export class RoomWidgetCreditFurniUpdateEvent extends RoomWidgetUpdateEvent
     // AS3: RoomWidgetCreditFurniUpdateEvent.as::_SafeStr_9198
     private _creditValue: number;
 
-    // AS3: RoomWidgetCreditFurniUpdateEvent.as::_isNftCredit
-    private _isNftCredit: boolean;
-
+    // DEVIATION: AS3 takes a fourth `isNftCredit` argument; the RPG fork removed NFT.
     // AS3: RoomWidgetCreditFurniUpdateEvent.as::RoomWidgetCreditFurniUpdateEvent()
-    constructor(type: string, objectId: number, creditValue: number, isNftCredit: boolean)
+    constructor(type: string, objectId: number, creditValue: number)
     {
         super(type);
 
         this._creditValue = creditValue;
         this._objectId = objectId;
-        this._isNftCredit = isNftCredit;
     }
 
     // AS3: RoomWidgetCreditFurniUpdateEvent.as::get creditValue()
@@ -42,11 +39,5 @@ export class RoomWidgetCreditFurniUpdateEvent extends RoomWidgetUpdateEvent
     public get objectId(): number
     {
         return this._objectId;
-    }
-
-    // AS3: RoomWidgetCreditFurniUpdateEvent.as::get isNftCredit()
-    public get isNftCredit(): boolean
-    {
-        return this._isNftCredit;
     }
 }

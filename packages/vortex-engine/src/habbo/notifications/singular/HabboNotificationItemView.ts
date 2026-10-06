@@ -4,14 +4,11 @@ import type {IWindowContainer} from '@core/window/IWindowContainer';
 import type {ITextWindow} from '@core/window/components/ITextWindow';
 import type {IBitmapWrapperWindow} from '@core/window/components/IBitmapWrapperWindow';
 import type {IStaticBitmapWrapperWindow} from '@core/window/components/IStaticBitmapWrapperWindow';
-import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
 import {WindowEvent} from '@core/window/events/WindowEvent';
 import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
 import type {OrderedMap} from '@core/utils/OrderedMap';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 import type {IHabboLocalizationManager} from '@habbo/localization';
-import type {ProductImageWidget} from '@habbo/window/widgets/ProductImageWidget';
-import type {IProductDisplayInfo} from '@habbo/window/widgets/IProductDisplayInfo';
 import type {BadgeImageReadyEvent} from '@habbo/session/events/BadgeImageReadyEvent';
 import {NotificationExtraDataKey} from '../NotificationExtraDataKey';
 import type {HabboNotificationItem} from './HabboNotificationItem';
@@ -149,13 +146,15 @@ export class HabboNotificationItemView implements IUpdateReceiver
     private readonly _onToggleButtonClickedBound = (): void => this.onToggleButtonClicked();
 
     /**
-     * @param localization Resolves the NFT bubble's rarity caption; nothing else needs it
+     * @param localization Stored as AS3 does; its only reader was the `nft_opening` style, now removed
      * @param layout The `<layout>` document of this style's asset, already read from the library
      * @param windowManager Builds the window on desktop layer 1
      * @param styleConfig The whole `styles` map — see the field note
      * @param viewConfig This style's view timings (`view`, or the style's `customview` entry)
      * @param item The notification being displayed
      */
+    // DEVIATION: AS3 also renders the `nft_opening` style (product image and rarity); the RPG fork
+    //   removed NFT, and nothing produces that style any more.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/notifications/singular/HabboNotificationItemView.as::HabboNotificationItemView()
     constructor(
         localization: IHabboLocalizationManager | null,
@@ -199,11 +198,7 @@ export class HabboNotificationItemView implements IUpdateReceiver
 
         const styleName = item.style?.styleName ?? null;
 
-        if(styleName === 'nft_opening')
-        {
-            this.showNftOpeningNotification(item);
-        }
-        else if(styleName === 'treasure_hunt')
+        if(styleName === 'treasure_hunt')
         {
             this.showTreasureHuntNotification(item);
         }
@@ -551,43 +546,6 @@ export class HabboNotificationItemView implements IUpdateReceiver
         button.caption = this._togglePaused ? '${notification.resume}' : '${notification.stop}';
 
         this._toggleButtonCallback?.(this._togglePaused);
-    }
-
-    /**
-     * The NFT-opening bubble renders the product itself through the layout's product widget, and
-     * captions it with the rarity in that rarity's colour.
-     */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/notifications/singular/HabboNotificationItemView.as::showNftOpeningNotification()
-    private showNftOpeningNotification(item: HabboNotificationItem): void
-    {
-        const extraData = item.style?.extraData ?? null;
-
-        this.setNotificationText(item.content);
-
-        const container = this._window as unknown as IWindowContainer | null;
-        const iconWidget = container?.findChildByName('icon_widget') as unknown as IWidgetWindow | null;
-        const widget = (iconWidget?.widget ?? null) as ProductImageWidget | null;
-
-        if(widget !== null && extraData !== null)
-        {
-            widget.productInfo = (extraData[NotificationExtraDataKey.PRODUCT] as IProductDisplayInfo | null) ?? null;
-        }
-
-        const rarityText = container?.findChildByName('rarity_text') ?? null;
-
-        if(rarityText !== null && extraData !== null)
-        {
-            const rarity = (extraData[NotificationExtraDataKey.RARITY] as string | null) ?? '';
-            const rarityLabel = this._localization?.getLocalizationWithParams('collectibles.item.rarity') ?? '';
-
-            rarityText.caption = `${rarityLabel}: ${rarity}`;
-            rarityText.color = Number(extraData[NotificationExtraDataKey.RARITY_COLOR] ?? 0) >>> 0;
-        }
-
-        this._item = item;
-
-        this.reposition();
-        this.startFadeIn();
     }
 
     /**

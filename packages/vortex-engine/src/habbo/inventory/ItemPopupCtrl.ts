@@ -7,25 +7,12 @@ import type {IBitmapWrapperWindow} from '@core/window/components/IBitmapWrapperW
 import type {IStaticBitmapWrapperWindow} from '@core/window/components/IStaticBitmapWrapperWindow';
 import type {ITextWindow} from '@core/window/components/ITextWindow';
 import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
-import type {IProductDisplayInfo} from '@habbo/window/widgets/IProductDisplayInfo';
 import type {ILimitedItemPreviewOverlayWidget} from '@habbo/window/widgets/ILimitedItemPreviewOverlayWidget';
 import type {IStuffData} from '@habbo/room/object/data/IStuffData';
 import {StringUtil} from '@habbo/utils/StringUtil';
 import {Logger} from '@core/utils/Logger';
 
 const log = Logger.getLogger('habbo.inventory.ItemPopupCtrl');
-
-/**
- * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/_SafeCls_2029.as
- *
- * The product previewer a `<widget>` host carries. The AS3 interface is obfuscated in every tree
- * and its name is not recoverable, so it is described here by the two members this file uses
- * rather than given an invented name of its own. `ProductImageWidget` implements it.
- */
-type ProductPreviewerWidget = {
-    productInfo: IProductDisplayInfo | null;
-    clearPreviewer(): void;
-};
 
 /**
  * The hover tooltip beside an inventory or trade thumb: the item's name, its picture, and — for a
@@ -127,14 +114,16 @@ export class ItemPopupCtrl
         this._arrowLeft = this.resolveImage('popup_arrow_left');
     }
 
+    // DEVIATION: AS3 takes a `productInfo` and shows it through the layout's `nft_image` product
+    //   previewer, with `nft_overlay_icon`; the RPG fork removed NFT, so both are only hidden here
+    //   until Task 10 removes them from the XML.
     // AS3: .../ItemPopupCtrl.as::updateContent()
-    // Three shapes in one method, in AS3's own order: a product previewer (NFT), an external image
-    // fetched from a URL, or a plain bitmap. Each hides the other two's windows.
+    // Two shapes in one method, in AS3's own order: an external image fetched from a URL, or a
+    // plain bitmap. Each hides the other's windows.
     updateContent(
         parent: IWindowContainer | null,
         itemName: string,
         image: ImageBitmap | null = null,
-        productInfo: IProductDisplayInfo | null = null,
         stuffData: IStuffData | null = null,
         location: number = ItemPopupCtrl.LOCATION_RIGHT,
         isExternalImageItem: boolean = false
@@ -159,26 +148,8 @@ export class ItemPopupCtrl
         const nftOverlayIcon = this._window.findChildByName('nft_overlay_icon') as IStaticBitmapWrapperWindow | null;
         const uniqueOverlay = this._window.findChildByName('unique_item_overlay_widget') as unknown as IWidgetWindow | null;
         const itemImage = this._window.findChildByName('item_image') as unknown as IBitmapWrapperWindow | null;
-        const previewer = (nftImage?.widget ?? null) as ProductPreviewerWidget | null;
-
-        if(productInfo !== null)
-        {
-            if(nftImage !== null) nftImage.visible = true;
-            if(nftOverlayIcon !== null) nftOverlayIcon.visible = true;
-            if(uniqueOverlay !== null) uniqueOverlay.visible = false;
-            if(itemImage !== null) itemImage.visible = false;
-
-            if(previewer !== null) previewer.productInfo = productInfo;
-
-            if(nftImage !== null) this._window.height = nftImage.bottom + 28;
-
-            return;
-        }
 
         if(nftImage !== null) nftImage.visible = false;
-
-        previewer?.clearPreviewer();
-
         if(nftOverlayIcon !== null) nftOverlayIcon.visible = false;
         if(itemImage !== null) itemImage.visible = true;
 

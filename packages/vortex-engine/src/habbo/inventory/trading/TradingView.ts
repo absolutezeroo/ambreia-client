@@ -138,13 +138,13 @@ export class TradingView implements IInventoryView
         }
     }
 
+    // DEVIATION: AS3 takes a second map, the NFT list, appended after the furniture with its
+    //   indices continuing on; the RPG fork removed NFT.
     // AS3: .../TradingView.as::updateItemsGrid()
-    // Fills a grid from an item map, then blanks whatever tiles are left over. The second map is
-    // AS3's NFT list, appended after the furniture with its indices continuing on.
+    // Fills a grid from an item map, then blanks whatever tiles are left over.
     static updateItemsGrid(
         grid: IItemGridWindow | null,
-        items: OrderedMap<string, GroupItem> | null,
-        nftItems: OrderedMap<string, GroupItem> | null = null
+        items: OrderedMap<string, GroupItem> | null
     ): void
     {
         if(grid === null || items === null) return;
@@ -177,39 +177,6 @@ export class TradingView implements IInventoryView
             }
 
             index++;
-        }
-
-        if(nftItems !== null)
-        {
-            const furnitureCount = index;
-
-            while(index < furnitureCount + nftItems.length)
-            {
-                const groupItem = nftItems.getWithIndex(index - furnitureCount);
-                const gridItem = grid.getGridItemAt(index) as IWindowContainer | null;
-
-                if(gridItem !== null && groupItem !== null)
-                {
-                    gridItem.id = index;
-
-                    while(gridItem.numChildren > 0)
-                    {
-                        gridItem.removeChildAt(0);
-                    }
-
-                    const itemWindow = groupItem.window;
-
-                    if(itemWindow !== null)
-                    {
-                        gridItem.addChild(TradingView.fixItemWindow(itemWindow));
-                        itemWindow.id = index;
-                    }
-
-                    groupItem.removeIntervalProcedure();
-                }
-
-                index++;
-            }
         }
 
         while(index < grid.numGridItems)
@@ -333,12 +300,9 @@ export class TradingView implements IInventoryView
 
         const isOtherUser = userId === this._model.otherUserId;
         const items = isOtherUser ? this._model.otherUserItems : this._model.ownUserItems;
-        const nftItems = isOtherUser ? this._model.otherUserNftItems : this._model.ownUserNftItems;
         const grid = isOtherUser ? this.getOtherUsersItemGrid() : this.getOwnUsersItemGrid();
 
-        // The NFT map is typed `unknown` on the model until the collectibles items are ported;
-        // `updateItemsGrid()` only ever asks it for `.window`, so the shape it needs is a GroupItem.
-        TradingView.updateItemsGrid(grid, items, nftItems as OrderedMap<string, GroupItem> | null);
+        TradingView.updateItemsGrid(grid, items);
         this.updateActionState();
     }
 
@@ -916,6 +880,8 @@ export class TradingView implements IInventoryView
         }
     };
 
+    // DEVIATION: AS3's scam check also requires the other side's NFT list to be empty; the RPG fork
+    //   removed NFT.
     // AS3: .../TradingView.as::windowEventProc()
     // AS3 switches on `state - 1`, so case 0 is RUNNING and case 2 is CONFIRMING; every other
     // state ignores both buttons. Written out here rather than kept as arithmetic.
@@ -928,8 +894,7 @@ export class TradingView implements IInventoryView
             case 'button_accept':
                 if(this._model.state === TradingState.RUNNING)
                 {
-                    const otherOffersNothing = (this._model.otherUserItems?.length ?? 0) === 0
-                        && (this._model.otherUserNftItems?.length ?? 0) === 0;
+                    const otherOffersNothing = (this._model.otherUserItems?.length ?? 0) === 0;
 
                     if(otherOffersNothing && !this._model.ownUserAccepts)
                     {
@@ -991,13 +956,11 @@ export class TradingView implements IInventoryView
      * AS3: .../TradingView.as::thumbEventProc()
      *
      * Clicking one of *your* tiles takes it back out of the trade; the id carried by the cell is
-     * the index the model expects, counting across the furniture list into the NFT one. Hovering
-     * either side's tile opens the tooltip beside it.
-     *
-     * AS3's version is `static` and takes both sides' maps as parameters because the collectibles
-     * view calls it too. That view is unported, so this is an instance method reading the model
-     * directly; the shape is worth restoring when collectibles lands.
+     * the index the model expects. Hovering either side's tile opens the tooltip beside it.
      */
+    // DEVIATION: AS3's version is `static`, takes both sides' maps (the collectibles view calls it
+    //   too), and gives an NFT tile its own tooltip named by the collector hub; the RPG fork
+    //   removed collectibles and NFT, so this is an instance method over the furniture list only.
     // AS3: .../src/com/sulake/habbo/inventory/trading/TradingView.as::thumbEventProc()
     private thumbEventProc(event: WindowEvent, window: IWindow, isOwnUser: boolean): void
     {
@@ -1016,27 +979,6 @@ export class TradingView implements IInventoryView
         if(event.type !== 'WME_OVER' || this._model === null || this._itemPopup === null) return;
 
         const items = isOwnUser ? this._model.ownUserItems : this._model.otherUserItems;
-        const furnitureCount = items?.length ?? 0;
-
-        // Past the furniture count the id addresses the NFT list, whose tooltip is a different
-        // shape: the collector hub names the product, and the popup renders it through its product
-        // previewer rather than a bitmap.
-        if(window.id >= furnitureCount)
-        {
-            const nftItems = isOwnUser ? this._model.ownUserNftItems : this._model.otherUserNftItems;
-            const nftItem = nftItems?.getWithIndex(window.id - furnitureCount) ?? null;
-
-            if(nftItem === null) return;
-
-            const product = nftItem.renderableItem;
-            const collectorHub = this._model.getInventory()?.catalog?.collectorHub ?? null;
-
-            this._itemPopup.updateContent(window as unknown as IWindowContainer, collectorHub?.getProductName(product) ?? '', null, product);
-            this._itemPopup.show();
-
-            return;
-        }
-
         const groupItem = items?.getWithIndex(window.id) ?? null;
 
         if(groupItem === null) return;
@@ -1050,7 +992,6 @@ export class TradingView implements IInventoryView
                     window as unknown as IWindowContainer,
                     groupItem.getItemTooltipText(),
                     groupItem.getItemIcon(),
-                    null,
                     null,
                     ItemPopupCtrl.LOCATION_RIGHT,
                     false
@@ -1094,7 +1035,6 @@ export class TradingView implements IInventoryView
             window as unknown as IWindowContainer,
             name,
             image,
-            null,
             item.stuffData,
             ItemPopupCtrl.LOCATION_RIGHT,
             TradingView.isExternalImageType(inventory, item.type)

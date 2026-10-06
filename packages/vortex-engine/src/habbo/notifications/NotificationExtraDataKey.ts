@@ -30,14 +30,6 @@ export const NotificationExtraDataKey = {
     // AS3: .../src/com/sulake/habbo/notifications/NotificationExtraDataKey.as::PRODUCT
     PRODUCT: 'product',
 
-    // Name DERIVED (`_SafeStr_10973`): obfuscated in every tree; named after its value.
-    // AS3: .../src/com/sulake/habbo/notifications/NotificationExtraDataKey.as::_SafeStr_10973
-    RARITY: 'rarity',
-
-    // Name DERIVED (`_SafeStr_11642`): obfuscated in every tree; named after its value.
-    // AS3: .../src/com/sulake/habbo/notifications/NotificationExtraDataKey.as::_SafeStr_11642
-    RARITY_COLOR: 'rarity_color',
-
     // AS3: .../src/com/sulake/habbo/notifications/NotificationExtraDataKey.as::TOGGLE_BUTTON_CALLBACK
     TOGGLE_BUTTON_CALLBACK: 'toggle_callback'
 } as const;

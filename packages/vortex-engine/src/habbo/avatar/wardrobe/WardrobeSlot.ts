@@ -275,9 +275,9 @@ export class WardrobeSlot implements IOutfit, IAvatarImageListener
      * false for a non-subscriber, so a disabled slot advertises rather than acts.
      *
      * `set_button` saves the figure **and updates the slot immediately**, before the server has
-     * acknowledged anything. `get_button` and `get_figure` both wear it, and clear any staged NFT
-     * outfit first — you cannot be half in an NFT and half in a wardrobe figure.
+     * acknowledged anything. `get_button` and `get_figure` both wear it.
      */
+    // DEVIATION: AS3 clears any staged NFT outfit before wearing the slot; the RPG fork removed NFT.
     // AS3: .../avatar/wardrobe/WardrobeSlot.as::eventHandler()
     private eventHandler = (event: WindowEvent, window: IWindow): void =>
     {
@@ -302,7 +302,6 @@ export class WardrobeSlot implements IOutfit, IAvatarImageListener
             case 'get_figure':
                 if(this._figure === null || this._figure === '') break;
 
-                controller.setNftOutfit(null);
                 controller.loadAvatarInEditor(this._figure, this.gender, controller.clubMemberLevel);
                 break;
         }

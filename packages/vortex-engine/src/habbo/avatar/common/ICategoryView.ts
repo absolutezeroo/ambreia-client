@@ -4,10 +4,10 @@ import type {ICategoryModel} from './ICategoryModel';
 /**
  * The window side of one editor page.
  *
- * Interface name DERIVED: the AS3 file is `_SafeCls_4089.as`. Named for its eight implementors —
- * `BodyView`, `HeadView`, `TorsoView`, `LegsView`, `MiscView`, `EffectsView`, `HotLooksView` and
- * `NftAvatarsView`. The first six extend `CategoryBaseView`; the last two implement it directly,
- * which is why the shared behaviour lives in a base class and not here.
+ * Interface name DERIVED: the AS3 file is `_SafeCls_4089.as`. Named for its seven implementors —
+ * `BodyView`, `HeadView`, `TorsoView`, `LegsView`, `MiscView`, `EffectsView` and `HotLooksView`
+ * (AS3 has an eighth, the NFT page, which the RPG fork removed). The first six extend
+ * `CategoryBaseView`; `HotLooksView` implements it directly, which is why the shared behaviour lives in a base class and not here.
  *
  * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/common/_SafeCls_4089.as
  */

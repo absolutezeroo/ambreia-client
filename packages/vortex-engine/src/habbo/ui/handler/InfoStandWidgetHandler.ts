@@ -1783,6 +1783,7 @@ export class InfoStandWidgetHandler implements IRoomWidgetHandler, IGetImageList
     // attempt. AS3 reads the result synchronously and re-requests at scale 1 if the image is
     // null or larger than the panel's 140x200 slot; ImageBitmap conversion is always async in
     // the browser (see ImageResult.ts), so that same fallback check happens in imageReady()/
+    // DEVIATION: AS3 also flags an `nft_` furni for the info stand; the RPG fork removed NFT.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/InfoStandWidgetHandler.as::handleGetFurniInfoMessage()
     private handleGetFurniInfoMessage(message: RoomWidgetRoomObjectMessage, roomId: number): void 
     {
@@ -1829,7 +1830,6 @@ export class InfoStandWidgetHandler implements IRoomWidgetHandler, IGetImageList
             if(furnitureData) 
             {
                 event.name = furnitureData.localizedName;
-                event.isNft = furnitureData.className.indexOf('nft_') === 0;
                 event.description = furnitureData.description;
                 event.purchaseOfferId = furnitureData.purchaseOfferId;
                 event.tradeable = furnitureData.tradeable;

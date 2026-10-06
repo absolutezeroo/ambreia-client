@@ -15,7 +15,7 @@ const log = Logger.getLogger('habbo.toolbar.memenu.MeMenuNewController');
 
 /**
  * The "me menu" popup for the new horizontal bottom bar: profile, minimail, rooms,
- * talents, settings, achievements, guide, clothes, forums, collectibles.
+ * talents, settings, achievements, guide, clothes, forums.
  *
  * Note: this build's shipped `me_menu_new_view_xml` layout has no "achievements"
  * region at all (verified against the raw AS3 dump too - not a stale-asset gap), so
@@ -51,6 +51,9 @@ export class MeMenuNewController extends AbstractSubMenuController
     private _iconLoader: MeMenuNewIconLoader | null;
     private _settingsView: MeMenuSettingsMenuView | null = null;
 
+    // DEVIATION: AS3 hides the `collectibles` entry only when `classic.collectibles.hub.enabled` or
+    //   `collectibles.hub.enabled` is off; the RPG fork removed collectibles, so it is always hidden
+    //   until Task 10 removes it from the XML.
     // AS3: MeMenuNewController.as::MeMenuNewController()
     constructor(toolbar: HabboToolbar, bottomBarLeft: BottomBarLeft)
     {
@@ -61,10 +64,7 @@ export class MeMenuNewController extends AbstractSubMenuController
             this.setGuideToolVisibility(false);
         }
 
-        if(!toolbar.getBoolean('classic.collectibles.hub.enabled') || !toolbar.getBoolean('collectibles.hub.enabled'))
-        {
-            this.setCollectiblesVisibility(false);
-        }
+        this.setCollectiblesVisibility(false);
 
         this.setMinimailVisibility(false);
 
@@ -164,6 +164,7 @@ export class MeMenuNewController extends AbstractSubMenuController
         this.setUnseenItemCount('forums', value);
     }
 
+    // DEVIATION: AS3 also opens the collectibles hub (`collectibles/open`); the RPG fork removed it.
     // AS3: MeMenuNewController.as::onSubMenuItemClick()
     protected override onSubMenuItemClick(itemName: string): void
     {
@@ -209,9 +210,6 @@ export class MeMenuNewController extends AbstractSubMenuController
                 break;
             case 'forums':
                 this.toolbar?.context.createLinkEvent('groupforum/list/my');
-                break;
-            case 'collectibles':
-                this.toolbar?.context.createLinkEvent('collectibles/open');
                 break;
             // TS-only: Vortex-only fishing system — no AS3 counterpart. `HabboFishing` registers
             //   itself as the `fishpedia/` link tracker, so the toolbar needs no reference to it.
