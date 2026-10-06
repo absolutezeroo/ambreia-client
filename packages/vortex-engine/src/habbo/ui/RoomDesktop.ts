@@ -38,7 +38,6 @@ import type {IHabboFriendList} from '@habbo/friendlist/IHabboFriendList';
 import type {IHabboFreeFlowChat} from '@habbo/freeflowchat/IHabboFreeFlowChat';
 import type {IHabboNavigator} from '@habbo/navigator/IHabboNavigator';
 import type {IHabboCommunicationManager} from '@habbo/communication/IHabboCommunicationManager';
-import type {IHabboUserDefinedRoomEvents} from '@habbo/roomevents/IHabboUserDefinedRoomEvents';
 import type {IHabboModeration} from '@habbo/moderation/IHabboModeration';
 import type {IDesktopWindow} from '@core/window/components/IDesktopWindow';
 import type {IRoomObject} from '@room/object/IRoomObject';
@@ -774,25 +773,8 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
         this._widgetFactory = value;
     }
 
-    // AS3: RoomDesktop.as::get/set userDefinedRoomEvents — injected by RoomUI, which DI-resolves the
-    // HabboUserDefinedRoomEvents component. Drives wired furni picking: InfoStandWidgetHandler routes
-    // furni clicks here via container.userDefinedRoomEvents.stuffSelected(id).
-    private _userDefinedRoomEvents: IHabboUserDefinedRoomEvents | null = null;
-
-    // AS3: .../src/com/sulake/habbo/ui/RoomDesktop.as::get userDefinedRoomEvents()
-    public get userDefinedRoomEvents(): IHabboUserDefinedRoomEvents | null
-    {
-        return this._userDefinedRoomEvents;
-    }
-
-    // AS3: RoomDesktop.as::set userDefinedRoomEvents()
-    public set userDefinedRoomEvents(value: IHabboUserDefinedRoomEvents | null)
-    {
-        this._userDefinedRoomEvents = value;
-    }
-
     // AS3 declares `moderation` on IRoomWidgetHandlerContainer; RoomUI DI-resolves the component
-    // and injects it the same way it does userDefinedRoomEvents above.
+    // and injects it into every desktop.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::get moderation()
     private _moderation: IHabboModeration | null = null;
 

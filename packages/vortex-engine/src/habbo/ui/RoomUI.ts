@@ -51,7 +51,6 @@ import {IID_HabboFriendList} from '@iid/IIDHabboFriendList';
 import {IID_HabboFreeFlowChat} from '@iid/IIDHabboFreeFlowChat';
 import {IID_HabboNavigator} from '@iid/IIDHabboNavigator';
 import {IID_HabboCommunicationManager} from '@iid/IIDHabboCommunicationManager';
-import {IID_HabboUserDefinedRoomEvents} from '@iid/IIDHabboUserDefinedRoomEvents';
 import {IID_HabboModeration} from '@iid/IIDHabboModeration';
 import type {IHabboModeration} from '@habbo/moderation/IHabboModeration';
 
@@ -68,7 +67,6 @@ import type {IHabboInventory} from '@habbo/inventory/IHabboInventory';
 import type {IAvatarRenderManager} from '@habbo/avatar/IAvatarRenderManager';
 import type {IHabboFurniEditor} from '@habbo/vortex/furnieditor/IHabboFurniEditor';
 import type {IHabboHelp} from '@habbo/help/IHabboHelp';
-import type {IHabboUserDefinedRoomEvents} from '@habbo/roomevents/IHabboUserDefinedRoomEvents';
 import type {IHabboTracking} from '@habbo/tracking/IHabboTracking';
 import type {IHabboGroupsManager} from '@habbo/groups/IHabboGroupsManager';
 import type {IHabboFriendList} from '@habbo/friendlist/IHabboFriendList';
@@ -364,9 +362,6 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
 
     // AS3: .../src/com/sulake/habbo/ui/RoomUI.as::_avatarEditor
     private _avatarEditor: IHabboAvatarEditor | null = null;
-
-    // AS3: RoomUI.as::_userDefinedRoomEvents — DI-resolved; injected into every RoomDesktop.
-    private _userDefinedRoomEvents: IHabboUserDefinedRoomEvents | null = null;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomUI.as::_moderation
     private _moderation: IHabboModeration | null = null;
@@ -873,19 +868,6 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
                 false
             ),
             new ComponentDependency(
-                IID_HabboUserDefinedRoomEvents,
-                (roomEvents: IHabboUserDefinedRoomEvents | null) =>
-                {
-                    this._userDefinedRoomEvents = roomEvents;
-
-                    for(const desktop of this._desktops.values())
-                    {
-                        desktop.userDefinedRoomEvents = roomEvents;
-                    }
-                },
-                false
-            ),
-            new ComponentDependency(
                 IID_HabboTracking,
                 (tracking: IHabboTracking | null) => 
                 {
@@ -1006,7 +988,6 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
         desktop.soundManager = this._soundManager;
         desktop.messenger = this._messenger;
         desktop.avatarEditor = this._avatarEditor;
-        desktop.userDefinedRoomEvents = this._userDefinedRoomEvents;
         desktop.habboTracking = this._habboTracking;
         desktop.habboGroupsManager = this._habboGroupsManager;
         desktop.friendList = this._friendList;

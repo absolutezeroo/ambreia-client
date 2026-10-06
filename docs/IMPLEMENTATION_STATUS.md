@@ -35,6 +35,7 @@ Le derby est conservé : il fait partie de la pêche. Section remplie au fil des
 
 | Feature | Tâche | Commit |
 |---------|-------|--------|
+| Wired : éditeur (`roomevents/`), variables et Variable FX (rendu + logique + messages), coffres (logiques, visualisations, widget), échanges wired (`inventory/wired_trading/`), mouvements wired, tous les messages `userdefinedroomevents`. Les types de furni `furniture_furnichest`/`furniture_coinschest` retombent sur `FurnitureLogic`/`AnimatedFurnitureVisualization`. `visualization/stacked/` est conservé (porte la bulle habbicon). | Tâche 2 | Tâche 2 |
 
 ## Snapshot
 

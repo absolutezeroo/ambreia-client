@@ -426,7 +426,6 @@ import {
     UserRemoveMessageEvent,
     UsersMessageEvent,
     UserUpdateMessageEvent,
-    WiredMovementsMessageEvent,
 } from './messages/incoming/room/engine';
 
 // Incoming Events - Room Chat
@@ -468,87 +467,6 @@ import {
     BotSkillListUpdateEvent
 } from './messages/incoming/room/bot';
 
-// Incoming Events - User Defined Room Events (Wired)
-import {
-    OpenEvent,
-    WiredClickSettingsEvent,
-    WiredClickUserResponseEvent,
-    WiredEnvironmentEvent,
-    WiredFurniActionEvent,
-    WiredFurniAddonEvent,
-    WiredFurniConditionEvent,
-    WiredFurniSelectorEvent,
-    WiredFurniTriggerEvent,
-    WiredFurniVariableEvent,
-    WiredPermissionsEvent,
-    WiredRewardResultMessageEvent,
-    WiredSaveSuccessEvent,
-    WiredValidationErrorEvent,
-    VariableFxConfigUpdateMessageEvent,
-    VariableFxConfigRemoveMessageEvent,
-    VariableFxStatusUpdateMessageEvent,
-    VariableFxStatusRemoveMessageEvent,
-    WiredApiKeyResultMessageEvent
-} from './messages/incoming/userdefinedroomevents';
-// Outgoing Composers - User Defined Room Events (Wired)
-import {
-    ApplySnapshotMessageComposer,
-    OpenMessageComposer,
-    UpdateActionMessageComposer,
-    UpdateAddonMessageComposer,
-    UpdateConditionMessageComposer,
-    UpdateSelectorMessageComposer,
-    UpdateTriggerMessageComposer,
-    UpdateVariableMessageComposer,
-    WiredClickUserMessageComposer,
-    WiredDebugCommandMessageComposer,
-    GenerateWiredApiKeyMessageComposer
-} from './messages/outgoing/userdefinedroomevents';
-import {
-    GetAllVariablesMessageComposer
-} from './messages/outgoing/userdefinedroomevents/wiredmenu/GetAllVariablesMessageComposer';
-import {
-    GetAllVariablesDiffMessageComposer
-} from './messages/outgoing/userdefinedroomevents/wiredmenu/GetAllVariablesDiffMessageComposer';
-import {
-    SetWiredMenuPreferencesComposer
-} from './messages/outgoing/userdefinedroomevents/wiredmenu/SetWiredMenuPreferencesComposer';
-import {
-    RequestWiredRoomLogsComposer
-} from './messages/outgoing/userdefinedroomevents/wiredmenu/RequestWiredRoomLogsComposer';
-import {
-    SaveWiredMenuSettingsComposer
-} from './messages/outgoing/userdefinedroomevents/wiredmenu/SaveWiredMenuSettingsComposer';
-import {
-    WiredUpdateRoomComposer
-} from './messages/outgoing/userdefinedroomevents/wiredmenu/WiredUpdateRoomComposer';
-import {
-    RequestWiredMenuSettingsComposer
-} from './messages/outgoing/userdefinedroomevents/wiredmenu/RequestWiredMenuSettingsComposer';
-import {WiredMenuSettingsEvent} from './messages/incoming/userdefinedroomevents/wiredmenu/WiredMenuSettingsEvent';
-import {WiredRoomStatsEvent} from './messages/incoming/userdefinedroomevents/wiredmenu/WiredRoomStatsEvent';
-import {WiredErrorLogsEvent} from './messages/incoming/userdefinedroomevents/wiredmenu/WiredErrorLogsEvent';
-import {
-    RequestWiredRoomStatsComposer
-} from './messages/outgoing/userdefinedroomevents/wiredmenu/RequestWiredRoomStatsComposer';
-import {
-    RequestWiredErrorLogsComposer
-} from './messages/outgoing/userdefinedroomevents/wiredmenu/RequestWiredErrorLogsComposer';
-import {
-    ClearWiredErrorLogsComposer
-} from './messages/outgoing/userdefinedroomevents/wiredmenu/ClearWiredErrorLogsComposer';
-import {
-    AllVariablesHashMessageEvent
-} from './messages/incoming/userdefinedroomevents/wiredmenu/AllVariablesHashMessageEvent';
-import {
-    AllVariablesDiffMessageEvent
-} from './messages/incoming/userdefinedroomevents/wiredmenu/AllVariablesDiffMessageEvent';
-import {
-    VariableInfoAndHoldersEvent
-} from './messages/incoming/userdefinedroomevents/wiredmenu/VariableInfoAndHoldersEvent';
-import {
-    WiredTradeInitiateMessageEvent
-} from './messages/incoming/userdefinedroomevents/wiredtrading/WiredTradeInitiateMessageEvent';
 import {
     UserHabbiconsMessageEvent
 } from './messages/incoming/habbicons/UserHabbiconsMessageEvent';
@@ -658,125 +576,11 @@ import {
 import {
     IncomeRewardNotificationMessageEvent
 } from './messages/incoming/inventory/IncomeRewardNotificationMessageEvent';
-import {
-    WiredTransactionLogsEvent
-} from './messages/incoming/userdefinedroomevents/wiredtrading/WiredTransactionLogsEvent';
-import {
-    WiredTransactionDetailsMessageEvent
-} from './messages/incoming/userdefinedroomevents/wiredtrading/WiredTransactionDetailsMessageEvent';
-import {
-    SelfDonationResultMessageEvent
-} from './messages/incoming/userdefinedroomevents/misc/SelfDonationResultMessageEvent';
 import {RoomChatSettingsMessageEvent} from './messages/incoming/roomsettings/RoomChatSettingsMessageEvent';
 import {MarkCatalogNewAdditionsPageOpenedComposer} from './messages/outgoing/catalog/MarkCatalogNewAdditionsPageOpenedComposer';
 import {
-    WiredTransactionSuccessMessageEvent
-} from './messages/incoming/userdefinedroomevents/wiredtrading/WiredTransactionSuccessMessageEvent';
-import {
-    WiredTransactionFailMessageEvent
-} from './messages/incoming/userdefinedroomevents/wiredtrading/WiredTransactionFailMessageEvent';
-import {
-    WiredTradeTransactionNotificationMessageEvent
-} from './messages/incoming/userdefinedroomevents/wiredtrading/WiredTradeTransactionNotificationMessageEvent';
-import {
     ClaimProductResultMessageEvent
 } from './messages/incoming/notifications/ClaimProductResultMessageEvent';
-import {
-    OpenWiredChestMessageEvent
-} from './messages/incoming/userdefinedroomevents/wiredtrading/chests/OpenWiredChestMessageEvent';
-import {
-    WiredChestUpdateSuccessMessageEvent
-} from './messages/incoming/userdefinedroomevents/wiredtrading/chests/WiredChestUpdateSuccessMessageEvent';
-import {
-    WiredChestUpgradeResultMessageEvent
-} from './messages/incoming/userdefinedroomevents/wiredtrading/chests/WiredChestUpgradeResultMessageEvent';
-import {
-    WiredChestCoinsMessageEvent
-} from './messages/incoming/userdefinedroomevents/wiredtrading/chests/WiredChestCoinsMessageEvent';
-import {
-    WiredChestItemsChunkMessageEvent
-} from './messages/incoming/userdefinedroomevents/wiredtrading/chests/WiredChestItemsChunkMessageEvent';
-import {
-    WiredChestItemsUpdatedMessageEvent
-} from './messages/incoming/userdefinedroomevents/wiredtrading/chests/WiredChestItemsUpdatedMessageEvent';
-import {
-    OpenWiredChestComposer
-} from './messages/outgoing/userdefinedroomevents/wiredtrading/chests/OpenWiredChestComposer';
-import {
-    CloseWiredChestComposer
-} from './messages/outgoing/userdefinedroomevents/wiredtrading/chests/CloseWiredChestComposer';
-import {
-    StartWiredChestDepositComposer
-} from './messages/outgoing/userdefinedroomevents/wiredtrading/chests/StartWiredChestDepositComposer';
-import {
-    WithdrawAllWiredChestContentsComposer
-} from './messages/outgoing/userdefinedroomevents/wiredtrading/chests/WithdrawAllWiredChestContentsComposer';
-import {
-    WithdrawWiredChestCoinsComposer
-} from './messages/outgoing/userdefinedroomevents/wiredtrading/chests/WithdrawWiredChestCoinsComposer';
-import {
-    UpgradeWiredChestComposer
-} from './messages/outgoing/userdefinedroomevents/wiredtrading/chests/UpgradeWiredChestComposer';
-import {
-    RequestWiredChestLogsComposer
-} from './messages/outgoing/userdefinedroomevents/wiredtrading/chests/RequestWiredChestLogsComposer';
-import {
-    SetWiredChestOptionsComposer
-} from './messages/outgoing/userdefinedroomevents/wiredtrading/chests/SetWiredChestOptionsComposer';
-import {
-    SetWiredChestNotificationSettingsComposer
-} from './messages/outgoing/userdefinedroomevents/wiredtrading/chests/SetWiredChestNotificationSettingsComposer';
-import {
-    WithdrawChestItemsByTypeComposer
-} from './messages/outgoing/userdefinedroomevents/wiredtrading/chests/WithdrawChestItemsByTypeComposer';
-import {
-    SaveWiredChestSettingsComposer
-} from './messages/outgoing/userdefinedroomevents/wiredtrading/chests/SaveWiredChestSettingsComposer';
-import {
-    WiredContractContentsMessageEvent
-} from './messages/incoming/userdefinedroomevents/wiredtrading/contracts/WiredContractContentsMessageEvent';
-import {
-    WiredContractUpdateResultMessageEvent
-} from './messages/incoming/userdefinedroomevents/wiredtrading/contracts/WiredContractUpdateResultMessageEvent';
-import {
-    WiredOpenContractMessageEvent
-} from './messages/incoming/userdefinedroomevents/wiredtrading/contracts/WiredOpenContractMessageEvent';
-import {
-    SaveWiredContractComposer
-} from './messages/outgoing/userdefinedroomevents/wiredtrading/contracts/SaveWiredContractComposer';
-import {
-    RequestWiredContractContentsComposer
-} from './messages/outgoing/userdefinedroomevents/wiredtrading/contracts/RequestWiredContractContentsComposer';
-import {
-    SelfDonationComposer
-} from './messages/outgoing/userdefinedroomevents/misc/SelfDonationComposer';
-import {
-    RequestWiredTransactionLogsComposer
-} from './messages/outgoing/userdefinedroomevents/wiredtrading/RequestWiredTransactionLogsComposer';
-import {
-    RequestWiredTransactionDetailsComposer
-} from './messages/outgoing/userdefinedroomevents/wiredtrading/RequestWiredTransactionDetailsComposer';
-import {
-    SetWiredChestsLockedComposer
-} from './messages/outgoing/userdefinedroomevents/wiredtrading/SetWiredChestsLockedComposer';
-import {
-    WiredTradeCancelledMessageEvent
-} from './messages/incoming/userdefinedroomevents/wiredtrading/WiredTradeCancelledMessageEvent';
-import {
-    WiredTradeCompletedMessageEvent
-} from './messages/incoming/userdefinedroomevents/wiredtrading/WiredTradeCompletedMessageEvent';
-import {
-    WiredTradeItemsUpdateMessageEvent
-} from './messages/incoming/userdefinedroomevents/wiredtrading/WiredTradeItemsUpdateMessageEvent';
-import {
-    WiredTradeUpdateItemsComposer
-} from './messages/outgoing/userdefinedroomevents/wiredtrading/WiredTradeUpdateItemsComposer';
-import {
-    WiredTradeAcceptComposer
-} from './messages/outgoing/userdefinedroomevents/wiredtrading/WiredTradeAcceptComposer';
-import {
-    WiredTradeCancelComposer
-} from './messages/outgoing/userdefinedroomevents/wiredtrading/WiredTradeCancelComposer';
 import {
     RequestNftAssetsComposer
 } from './messages/outgoing/collectibles/RequestNftAssetsComposer';
@@ -863,38 +667,6 @@ import {
     Game2GetWeeklyLeaderboardComposer
 } from './messages/outgoing/game/score';
 import {ClaimDailyTaskComposer} from './messages/outgoing/quest/ClaimDailyTaskComposer';
-import {
-    RequestVariableHoldersComposer
-} from './messages/outgoing/userdefinedroomevents/wiredmenu/RequestVariableHoldersComposer';
-import {
-    RequestVariableManagementComposer
-} from './messages/outgoing/userdefinedroomevents/wiredmenu/RequestVariableManagementComposer';
-import {
-    WiredVariablesForObjectEvent
-} from './messages/incoming/userdefinedroomevents/wiredmenu/WiredVariablesForObjectEvent';
-import {WiredMenuErrorEvent} from './messages/incoming/userdefinedroomevents/wiredmenu/WiredMenuErrorEvent';
-import {WiredRoomLogsMessageEvent} from './messages/incoming/userdefinedroomevents/wiredmenu/WiredRoomLogsMessageEvent';
-import {
-    WiredUserVariablesPageMessageEvent
-} from './messages/incoming/userdefinedroomevents/wiredmenu/WiredUserVariablesPageMessageEvent';
-import {
-    RequestVariableManagementDetailComposer
-} from './messages/outgoing/userdefinedroomevents/wiredmenu/RequestVariableManagementDetailComposer';
-import {
-    WiredSetUserPermanentVariableComposer
-} from './messages/outgoing/userdefinedroomevents/wiredmenu/WiredSetUserPermanentVariableComposer';
-import {
-    WiredUserPermanentVariablesEvent
-} from './messages/incoming/userdefinedroomevents/wiredmenu/WiredUserPermanentVariablesEvent';
-import {
-    WiredSetUserPermanentVariableResultEvent
-} from './messages/incoming/userdefinedroomevents/wiredmenu/WiredSetUserPermanentVariableResultEvent';
-import {
-    RequestWiredVariablesForObjectComposer
-} from './messages/outgoing/userdefinedroomevents/wiredmenu/RequestWiredVariablesForObjectComposer';
-import {
-    UpdateWiredVariableComposer
-} from './messages/outgoing/userdefinedroomevents/wiredmenu/UpdateWiredVariableComposer';
 
 // Incoming Events - Poll
 import {
@@ -2122,7 +1894,6 @@ export class HabboMessages implements IMessageConfiguration
         this._events.set(1787, ItemsStateUpdateMessageEvent);
         this._events.set(540, ItemDataUpdateMessageEvent);
         this._events.set(1131, AreaHideMessageEvent);
-        this._events.set(325, WiredMovementsMessageEvent);
         this._events.set(3643, ObjectRemoveConfirmMessageEvent);
         this._events.set(2458, BCPlacementWarningMessageEvent);
         this._events.set(536, SpecialRoomEffectMessageEvent);
@@ -2270,85 +2041,6 @@ export class HabboMessages implements IMessageConfiguration
         // behaviour change — and registering a second copy at 31 would have silently overwritten
         // the first, since _events is a Map. The server sends this one with an empty body too.
 
-        // === WIRED ===
-        // AS3: sources/win63_version/habbo/communication/messages/incoming/userdefinedroomevents/wiredmenu/WiredPermissionsEvent.as
-        // (name recovered; obfuscated in primary dump as _SafeStr_4546[3483] = _SafeCls_3768,
-        // sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2538/_SafeCls_3768.as, whose
-        // parser is the real, non-obfuscated com/sulake/habbo/communication/messages/parser/
-        // userdefinedroomevents/wiredmenu/_SafeCls_2783.as - exact field match: canModify/canRead).
-        this._events.set(3483, WiredPermissionsEvent);
-        this._events.set(491, WiredMenuSettingsEvent);
-        this._events.set(1964, WiredRoomStatsEvent);
-        this._events.set(3419, WiredErrorLogsEvent);
-        // IDs read directly from WIN63's own message registry
-        // sources/WIN63-202607011411-782849652/src/com/sulake/habbo/communication/_SafeCls_2046.as
-        // (`_SafeStr_4546[id] = _SafeCls_N`, the incoming-events map):
-        //   2827 -> _SafeCls_3319 (WiredEnvironment), 3931 -> _SafeCls_3436 (WiredClickSettings),
-        //   309 -> _SafeCls_3728 (WiredClickUserResponse), 2997 -> _SafeCls_3832 (WiredRewardResult).
-        this._events.set(2827, WiredEnvironmentEvent);
-        this._events.set(3931, WiredClickSettingsEvent);
-        this._events.set(309, WiredClickUserResponseEvent);
-        this._events.set(2997, WiredRewardResultMessageEvent);
-        // Wired-furni definition pushes (server -> client), IDs from WIN63's registry _SafeCls_2046.as:
-        //   1265 -> _SafeCls_3224 (Trigger), 2552 -> _SafeCls_3816 (Action), 2250 -> _SafeCls_3178
-        //   (Condition), 2574 -> _SafeCls_3130 (Addon), 1501 -> _SafeCls_3199 (Variable),
-        //   722 -> _SafeCls_2636 (Selector). Each parser exposes .def (a Triggerable subclass).
-        this._events.set(1265, WiredFurniTriggerEvent);
-        this._events.set(2552, WiredFurniActionEvent);
-        this._events.set(2250, WiredFurniConditionEvent);
-        this._events.set(2574, WiredFurniAddonEvent);
-        this._events.set(1501, WiredFurniVariableEvent);
-        this._events.set(722, WiredFurniSelectorEvent);
-        // Wired config lifecycle (server -> client), IDs from WIN63 registry _SafeCls_2046.as:
-        //   2635 -> _SafeCls_2464 (Open), 3201 -> _SafeCls_2398 (ValidationError),
-        //   1192 -> _SafeCls_2958 (SaveSuccess).
-        this._events.set(2635, OpenEvent);
-        this._events.set(3201, WiredValidationErrorEvent);
-        this._events.set(1192, WiredSaveSuccessEvent);
-
-        // === VARIABLE FX ===
-        // AIR-1.0.31 only — the wired-variable effects drawn over avatars and furni. Same
-        // situation as raid protection above: AIR re-randomises the registry, so its ids are kept
-        // only where they are free in this revision, and assigned otherwise.
-        //
-        //   AIR  267 -> 3390  (267 is taken as an event here)
-        //   AIR 1200 -> 3391  (1200 is taken as an event here)
-        //   AIR 3388 -> 3388  (free on both sides, so AIR's own id is kept)
-        //   AIR 3889 -> 3889  (likewise)
-        //
-        // 3390 and 3391 are the first ids after 3388 unused as an event AND as a composer in the
-        // WIN63 registry, in this file, and in the emulator. The emulator has none of these four
-        // yet; they must be assigned there identically.
-        this._events.set(3390, VariableFxConfigUpdateMessageEvent);
-        this._events.set(3391, VariableFxConfigRemoveMessageEvent);
-        this._events.set(3889, VariableFxStatusUpdateMessageEvent);
-        this._events.set(3388, VariableFxStatusRemoveMessageEvent);
-
-        // === WIRED WEB API ===
-        // AIR-1.0.31 only, and the easy case of the three: AIR's event 59 is free as an event AND
-        // as a composer in the WIN63 registry (58 is RewardTrackPremiumPurchaseResult, 59 and 60
-        // are unused), in this file and in the emulator's Revision20260701 headers, so AIR's own
-        // number is kept. The emulator has neither this nor its composer yet; both must be
-        // assigned there identically.
-        this._events.set(59, WiredApiKeyResultMessageEvent);
-
-        this._events.set(3287, AllVariablesHashMessageEvent);
-        this._events.set(2733, AllVariablesDiffMessageEvent);
-        // Overview tab: variable-holders push (WIN63 registry _SafeCls_2046.as: 3506 -> _SafeCls_2537).
-        this._events.set(3506, VariableInfoAndHoldersEvent);
-        // Variable-management detail: the holder's permanent-variable list, and the verdict on a
-        // write (WIN63 registry: 1557 -> _SafeCls_3146, 1643 -> _SafeCls_2757). Both subscribed by
-        // VariableManagementDetailController. The emulator's constants for these two were
-        // themselves corrections of a collision and a wrong guess, so its names corroborate rather
-        // than merely coincide.
-        this._events.set(1557, WiredUserPermanentVariablesEvent);
-        this._events.set(1643, WiredSetUserPermanentVariableResultEvent);
-        // Wired trading. Headers read straight out of WIN63's registry (_SafeCls_2046.as); the
-        // reference emulator defines none of the four, so nothing sends them yet.
-        // Wired chests: one page of transaction logs (WIN63 registry: 2910 -> _SafeCls_3439). Two
-        // windows subscribe it — the chests tab's ten-row preview and the paged transactions
-        // window — and each drops a page whose `logListType` is not its own. Names derived: no
-        // unobfuscated tree carries the chest messages and the emulator has no constant for 2910.
         // === VAULT / EARNINGS ===
         // The three server->client halves of the vault. Their client->server siblings (809, 3417)
         // have been registered all along; nothing read the answers, because `EarningsController` was
@@ -2368,50 +2060,7 @@ export class HabboMessages implements IMessageConfiguration
         this._events.set(3714, HabbiconInfoMessageEvent);
         this._events.set(1547, RoomUseHabbiconMessageEvent);
 
-        this._events.set(2910, WiredTransactionLogsEvent);
-        // One transaction's full breakdown (WIN63 registry: 1306 -> _SafeCls_3176), the answer to a
-        // click on a log row's "details" cell. Name derived, same reason as 2910.
-        this._events.set(1306, WiredTransactionDetailsMessageEvent);
-        // A wired transaction completed, and what it paid out (WIN63 registry: 2677 -> _SafeCls_3244).
-        // Subscribed by RewardNotificationController. Name derived, same reason as 2910.
-        this._events.set(2677, WiredTransactionSuccessMessageEvent);
-        this._events.set(352, WiredTransactionFailMessageEvent);
-        this._events.set(655, WiredTradeTransactionNotificationMessageEvent);
         this._events.set(431, ClaimProductResultMessageEvent);
-        // Wired contracts (WIN63 registry: 2976 -> _SafeCls_2429, 3720 -> _SafeCls_3091,
-        // 1479 -> _SafeCls_3800). All three subscribed by WiredContractController. Names derived —
-        // no unobfuscated tree carries them. The emulator's 1479 is an unrelated *client->server*
-        // Game2 leaderboard request, a different table: not a collision, but not corroboration
-        // either.
-        // === WIRED CHESTS ===
-        // Six pushes, all read from WIN63's registry. Names derived — no unobfuscated tree carries
-        // the chest messages and the emulator has no constant for any of them.
-        this._events.set(1174, OpenWiredChestMessageEvent);
-        this._events.set(1957, WiredChestUpdateSuccessMessageEvent);
-        this._events.set(2721, WiredChestUpgradeResultMessageEvent);
-        this._events.set(1022, WiredChestCoinsMessageEvent);
-        this._events.set(2323, WiredChestItemsChunkMessageEvent);
-        this._events.set(2738, WiredChestItemsUpdatedMessageEvent);
-        this._events.set(2976, WiredContractContentsMessageEvent);
-        this._events.set(3720, WiredContractUpdateResultMessageEvent);
-        this._events.set(1479, WiredOpenContractMessageEvent);
-        // Sandbox self-donation result (WIN63 registry: 3407 -> SelfDonationResultMessageEvent, one
-        // of the few event classes that kept its real name).
-        this._events.set(3407, SelfDonationResultMessageEvent);
-        this._events.set(3650, WiredTradeInitiateMessageEvent);
-        this._events.set(1481, WiredTradeCancelledMessageEvent);
-        this._events.set(2137, WiredTradeCompletedMessageEvent);
-        this._events.set(2488, WiredTradeItemsUpdateMessageEvent);
-        // Inspection tab (WIN63 registry _SafeCls_2046.as): 2179 -> _SafeCls_3452 (variables for object),
-        // 1230 -> _SafeCls_2847 (wired-menu error).
-        this._events.set(2179, WiredVariablesForObjectEvent);
-        this._events.set(1230, WiredMenuErrorEvent);
-        // Room-logs sub-controller: a page of room logs (WIN63 registry _SafeCls_2046.as: 1910 ->
-        // _SafeCls_3729).
-        this._events.set(1910, WiredRoomLogsMessageEvent);
-        // Variable-management overview sub-controller: a page of user-variable holders (WIN63 registry
-        // _SafeCls_2046.as: 749 -> _SafeCls_2492).
-        this._events.set(749, WiredUserVariablesPageMessageEvent);
 
         // === USERS ===
         this._events.set(1879, ApproveNameMessageEvent);
@@ -3038,73 +2687,6 @@ export class HabboMessages implements IMessageConfiguration
      */
     private registerComposers(): void
     {
-        // === WIRED ===
-        // ID read directly from WIN63's registry
-        // sources/WIN63-202607011411-782849652/src/com/sulake/habbo/communication/_SafeCls_2046.as
-        // (`_composers[1953] = _SafeCls_2111`, the WiredClickUser composer).
-        this._composers.set(1953, WiredClickUserMessageComposer);
-        // OpenMessageComposer: WIN63 registry _SafeCls_2046.as `_composers[1869] = _SafeCls_3966`.
-        this._composers.set(1869, OpenMessageComposer);
-        // `_composers[3608] = _SafeCls_3004`. Its own class doc used to say it had no header
-        // because the command travels in the payload; the registry disagrees. The emulator has no
-        // handler for it, so this only makes the developer action addressable, not answered.
-        this._composers.set(3608, WiredDebugCommandMessageComposer);
-        // Wired save composers (ids from WIN63 registry _SafeCls_2046.as):
-        //   _composers[3953]=_SafeCls_2484 (trigger), [2197]=_SafeCls_2689 (action),
-        //   [767]=_SafeCls_3197 (condition), [1138]=_SafeCls_3344 (addon),
-        //   [2475]=_SafeCls_3053 (variable), [510]=UpdateSelectorMessageComposer (selector),
-        //   [2790]=_SafeCls_3118 (applySnapshot).
-        this._composers.set(3953, UpdateTriggerMessageComposer);
-        this._composers.set(2197, UpdateActionMessageComposer);
-        this._composers.set(767, UpdateConditionMessageComposer);
-        this._composers.set(1138, UpdateAddonMessageComposer);
-        this._composers.set(2475, UpdateVariableMessageComposer);
-        this._composers.set(510, UpdateSelectorMessageComposer);
-        this._composers.set(2790, ApplySnapshotMessageComposer);
-        // Wired web API — AIR-1.0.31 only; see the events block for how these two ids were
-        // settled. 2819 is free as a composer AND as an event in the WIN63 registry (2818 is
-        // WiredTradeAccept), in this file and in the emulator, so AIR's own number is kept.
-        this._composers.set(2819, GenerateWiredApiKeyMessageComposer);
-        this._composers.set(984, GetAllVariablesMessageComposer);
-        this._composers.set(797, GetAllVariablesDiffMessageComposer);
-        this._composers.set(3124, SetWiredMenuPreferencesComposer);
-        this._composers.set(706, RequestWiredRoomLogsComposer);
-        this._composers.set(2553, SaveWiredMenuSettingsComposer);
-        this._composers.set(501, WiredUpdateRoomComposer);
-        this._composers.set(1862, RequestWiredMenuSettingsComposer);
-        this._composers.set(427, RequestWiredRoomStatsComposer);
-        this._composers.set(452, RequestWiredErrorLogsComposer);
-        this._composers.set(2386, ClearWiredErrorLogsComposer);
-        // Wired trading, same source and same caveat as the four events above.
-        this._composers.set(3111, WiredTradeUpdateItemsComposer);
-        // Wired chests: request a page of transaction logs, and lock/unlock chests (WIN63 registry:
-        // 2016 -> _SafeCls_2406, 1630 -> _SafeCls_3599). Both names derived, same reason as 2910.
-        // Sandbox self-donation (WIN63 registry: 1119 -> _SafeCls_3986). Name derived; the tool
-        // refuses to send it outside a sandbox environment.
-        this._composers.set(1119, SelfDonationComposer);
-        // Wired contracts: save one, and ask for its contents (WIN63 registry: 1908, 1594).
-        // === WIRED CHESTS ===
-        // Eleven client->server messages. 3407 is also a server->client header here
-        // (SelfDonationResultMessageEvent), and 3611 is FriendListUpdateComposer in the emulator's
-        // server->client table; independent tables, so neither is a collision.
-        this._composers.set(806, OpenWiredChestComposer);
-        this._composers.set(2935, CloseWiredChestComposer);
-        this._composers.set(3514, StartWiredChestDepositComposer);
-        this._composers.set(3611, WithdrawAllWiredChestContentsComposer);
-        this._composers.set(2843, WithdrawWiredChestCoinsComposer);
-        this._composers.set(3407, UpgradeWiredChestComposer);
-        this._composers.set(1999, RequestWiredChestLogsComposer);
-        this._composers.set(2907, SetWiredChestOptionsComposer);
-        this._composers.set(2905, SetWiredChestNotificationSettingsComposer);
-        this._composers.set(873, WithdrawChestItemsByTypeComposer);
-        this._composers.set(3830, SaveWiredChestSettingsComposer);
-        this._composers.set(1908, SaveWiredContractComposer);
-        this._composers.set(1594, RequestWiredContractContentsComposer);
-        this._composers.set(2016, RequestWiredTransactionLogsComposer);
-        this._composers.set(475, RequestWiredTransactionDetailsComposer);
-        this._composers.set(1630, SetWiredChestsLockedComposer);
-        this._composers.set(2818, WiredTradeAcceptComposer);
-        this._composers.set(2646, WiredTradeCancelComposer);
         // Collectibles. Headers from WIN63's registry; the emulator defines neither.
         this._composers.set(1646, RequestNftAssetsComposer);
         this._composers.set(2481, AddNftToTradeComposer);
@@ -3127,30 +2709,6 @@ export class HabboMessages implements IMessageConfiguration
         this._composers.set(3484, GetNftTransferFeeComposer);
         this._composers.set(1977, NftCollectiblesClaimBonusItemComposer);
         this._composers.set(1554, GetCollectibleMintTokensComposer);
-        // The monitor tab's "wf15" report is the same AS3 class as the wired dialog's developer
-        // action (`_SafeCls_3004`), already registered at 3608 above as
-        // WiredDebugCommandMessageComposer. Registering it twice under two derived names left the
-        // first one headerless.
-        // Overview tab (WIN63 registry _SafeCls_2046.as): 113 -> _SafeCls_3916 (request variable
-        // holders), 2221 -> _SafeCls_3265 (open variable management).
-        this._composers.set(113, RequestVariableHoldersComposer);
-        this._composers.set(2221, RequestVariableManagementComposer);
-        // Inspection tab (WIN63 registry _SafeCls_2046.as): 3466 -> _SafeCls_3097 (request variables for
-        // object), 689 -> _SafeCls_3855 (set/create/delete variable).
-        this._composers.set(3466, RequestWiredVariablesForObjectComposer);
-        this._composers.set(689, UpdateWiredVariableComposer);
-        // Variable-management overview: open the detail view for one holder (WIN63 registry
-        // _SafeCls_2046.as: 3777 -> _SafeCls_2724).
-        //
-        // The class name is this port's own. `win63_version` names the file
-        // `WiredGetUserPermanentVariablesComposer.as`, so the real name IS recoverable and the
-        // header comment claiming it is "fully obfuscated in AS3" is wrong; left unrenamed to
-        // avoid churning its call sites, corrected at the declaration.
-        this._composers.set(3777, RequestVariableManagementDetailComposer);
-        // Its write-side sibling: set / create / delete one permanent variable, all three through
-        // the same message with a `mode` discriminator.
-        this._composers.set(625, WiredSetUserPermanentVariableComposer);
-
         // === HANDSHAKE ===
         this._composers.set(4000, ClientHelloMessageComposer);
         this._composers.set(2022, InitDiffieHandshakeMessageComposer);

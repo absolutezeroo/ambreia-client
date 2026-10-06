@@ -5,7 +5,6 @@
 export {AvatarImageWidget} from './AvatarImageWidget';
 export {BadgeImageWidget} from './BadgeImageWidget';
 export {BalloonWidget} from './BalloonWidget';
-export {ChestItemGridOverlayWidget} from './ChestItemGridOverlayWidget';
 export {CountdownWidget} from './CountdownWidget';
 export {FurnitureImageWidget} from './FurnitureImageWidget';
 export {HoverBitmapWidget} from './HoverBitmapWidget';
@@ -30,7 +29,6 @@ export {UpdatingTimeStampWidget} from './UpdatingTimeStampWidget';
 // Types
 export type {IAvatarImageWidget} from './IAvatarImageWidget';
 export type {IBadgeImageWidget} from './IBadgeImageWidget';
-export type {IChestItemGridOverlayWidget} from './IChestItemGridOverlayWidget';
 export type {IIlluminaBorderWidget} from './IIlluminaBorderWidget';
 export type {IIlluminaChatBubbleWidget} from './IIlluminaChatBubbleWidget';
 export type {IIlluminaInputHandler} from './IIlluminaInputHandler';

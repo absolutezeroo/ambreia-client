@@ -13,7 +13,9 @@ import {SeasonalCalendarDailyOfferMessageEvent} from '@habbo/communication/messa
 import {CatalogPublishedMessageEvent} from '@habbo/communication/messages/incoming/catalog/CatalogPublishedMessageEvent';
 import {GetSeasonalCalendarDailyComposer} from '@habbo/communication/messages/outgoing/catalog/GetSeasonalCalendarDailyComposer';
 import type {ClubOfferProductData} from '@habbo/communication/messages/parser/catalog/ClubOfferProductData';
-import {Util} from '@habbo/roomevents/Util';
+// AS3 imports `com.sulake.habbo.roomevents.Util`, which went with wired (RPG fork); the navigator's
+// `hideChildren()` has the same body.
+import {Util} from '@habbo/navigator/Util';
 import {Vector3d} from '@room/utils/Vector3d';
 import type {HabboQuestEngine} from '../HabboQuestEngine';
 import type {MainWindow} from './MainWindow';

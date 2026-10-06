@@ -23,7 +23,6 @@ import type {IHabboHelp} from '@habbo/help/IHabboHelp';
 import type {IHabboConfigurationManager} from '@habbo/configuration/IHabboConfigurationManager';
 import type {IHabboTracking} from '@habbo/tracking/IHabboTracking';
 import type {IHabboGroupsManager} from '@habbo/groups/IHabboGroupsManager';
-import type {IHabboUserDefinedRoomEvents} from '@habbo/roomevents/IHabboUserDefinedRoomEvents';
 import type {IHabboModeration} from '@habbo/moderation/IHabboModeration';
 import type {IHabboFriendList} from '@habbo/friendlist/IHabboFriendList';
 import type {IHabboFurniEditor} from '@habbo/vortex/furnieditor/IHabboFurniEditor';
@@ -103,11 +102,6 @@ export interface IRoomWidgetHandlerContainer
     // Vortex module because that import (widget -> Vortex -> VortexMain -> RoomUI -> widget) is a
     // cycle, and a cycle here takes the whole InfoStand widget down with it.
     readonly furniEditor: IHabboFurniEditor | null;
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/IRoomWidgetHandlerContainer.as::get userDefinedRoomEvents()
-    // Backed by HabboUserDefinedRoomEvents, DI-resolved in RoomUI and injected into every
-    // RoomDesktop it creates. Still `| null` because the dependency resolves asynchronously —
-    // a widget built before it lands sees null, exactly as AS3's own callback wiring does.
-    readonly userDefinedRoomEvents: IHabboUserDefinedRoomEvents | null;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/IRoomWidgetHandlerContainer.as::get moderation()
     readonly moderation: IHabboModeration | null;

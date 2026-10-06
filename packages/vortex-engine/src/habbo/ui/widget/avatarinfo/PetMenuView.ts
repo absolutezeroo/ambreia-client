@@ -203,7 +203,8 @@ export class PetMenuView extends AvatarContextInfoButtonView
             }
         }
 
-        this.showButton('wired_inspect', container?.userDefinedRoomEvents?.showInspectButton() ?? false);
+        // AS3 asks the wired component (`showInspectButton()`); the RPG fork removed wired.
+        this.showButton('wired_inspect', false);
 
         this._buttons.autoArrangeItems = true;
         this._buttons.visible = true;

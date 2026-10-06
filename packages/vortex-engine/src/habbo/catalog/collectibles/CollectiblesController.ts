@@ -22,7 +22,6 @@ import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 import type {IHabboInventory} from '@habbo/inventory/IHabboInventory';
 import {HabboInventoryCategoryInitializeEvent} from '@habbo/inventory/events/HabboInventoryCategoryInitializeEvent';
 import {ImageResult} from '@habbo/room/ImageResult';
-import {WiredDebugCommandMessageComposer} from '@habbo/communication/messages/outgoing/userdefinedroomevents/WiredDebugCommandMessageComposer';
 import {Vector3d} from '@room/utils/Vector3d';
 import {RedeemNftLootBoxStateMessageEvent} from '@habbo/communication/messages/incoming/collectibles/RedeemNftLootBoxStateMessageEvent';
 import {RedeemNftLootBoxResultMessageEvent} from '@habbo/communication/messages/incoming/collectibles/RedeemNftLootBoxResultMessageEvent';
@@ -665,12 +664,8 @@ export class CollectiblesController extends Component implements ICollectorHub, 
         result.data = bubble;
         previewer.imageResult = result;
 
-        const prefix = name.substr(0, 3);
-
-        if(name.indexOf('red') === 8 && product.itemTypeId === '1020')
-        {
-            this.send(new WiredDebugCommandMessageComposer('wf15', prefix.repeat(5)));
-        }
+        // AS3 then sends a wired debug command ("wf15") for one of these names; the RPG fork
+        // removed wired, and this whole controller goes with the collectibles.
 
         return true;
     }

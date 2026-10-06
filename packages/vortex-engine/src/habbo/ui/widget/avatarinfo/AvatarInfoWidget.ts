@@ -57,7 +57,6 @@ import {RoomWidgetPetStatusUpdateEvent} from '@habbo/ui/widget/events/RoomWidget
 import {RoomWidgetPetLevelUpdateEvent} from '@habbo/ui/widget/events/RoomWidgetPetLevelUpdateEvent';
 import {RoomWidgetUpdateEvent} from '@habbo/ui/widget/events/RoomWidgetUpdateEvent';
 import {HabboInventoryEffectsEvent} from '@habbo/inventory/events/HabboInventoryEffectsEvent';
-import {WiredUserClickHandledEvent} from '@habbo/roomevents/events/WiredUserClickHandledEvent';
 import type {IContextMenuParentWidget} from '../contextmenu/IContextMenuParentWidget';
 import type {ContextInfoView} from '../contextmenu/ContextInfoView';
 import {AvatarContextInfoButtonView} from './AvatarContextInfoButtonView';
@@ -278,9 +277,6 @@ export class AvatarInfoWidget extends RoomWidgetBase implements IContextMenuPare
         }
 
         this.container?.inventory?.events.on(HabboInventoryEffectsEvent.HIEE_EFFECTS_CHANGED, this.onEffectsChanged);
-        this.container?.userDefinedRoomEvents?.events.on(
-            WiredUserClickHandledEvent.WIRED_USER_CLICK_HANDLED, this.onUserClickHandledEvent
-        );
 
         // AS3: AvatarInfoWidget.as:167-168 — these two are on the ROOM ENGINE's emitter, not the
         // desktop's, because they fire for every room object appearing and disappearing rather
@@ -1219,25 +1215,15 @@ export class AvatarInfoWidget extends RoomWidgetBase implements IContextMenuPare
         this._botSkillConfigurationViews.get(skillType)?.open(botId, position);
     }
 
+    // DEVIATION: AS3 first returns when a click-user wired owns the click
+    //   (`roomEvents.hasClickUserWired()`), and opens the menu later from
+    //   `onUserClickHandledEvent()`. The RPG fork removed wired, so the menu always opens now —
+    //   AS3's own answer when no wired is on the click.
     // AS3: AvatarInfoWidget.as::maybeSetupMenuView()
-    // A room whose wired handles user clicks decides whether the menu opens: the click goes to
-    // the server first, and only the WIRED_USER_CLICK_HANDLED reply below says whether the menu
-    // may still open. With no wired on the click, the menu opens immediately.
     private maybeSetupMenuView(roomIndex: number): void
     {
-        if(this.container?.userDefinedRoomEvents?.hasClickUserWired() ?? false) return;
-
         this.setupMenuView(roomIndex);
     }
-
-    // AS3: AvatarInfoWidget.as::onUserClickHandledEvent()
-    private onUserClickHandledEvent = (event: WiredUserClickHandledEvent): void =>
-    {
-        if(this.disposed || !event.openMenu || this._buttonsSetup === null) return;
-
-        this.setupMenuView(event.index);
-        this.checkUpdateNeed();
-    };
 
     // AS3: AvatarInfoWidget.as::setupMenuView()
     private setupMenuView(roomIndex: number): void
@@ -2127,9 +2113,6 @@ export class AvatarInfoWidget extends RoomWidgetBase implements IContextMenuPare
         }
 
         this.container?.inventory?.events.off(HabboInventoryEffectsEvent.HIEE_EFFECTS_CHANGED, this.onEffectsChanged);
-        this.container?.userDefinedRoomEvents?.events.off(
-            WiredUserClickHandledEvent.WIRED_USER_CLICK_HANDLED, this.onUserClickHandledEvent
-        );
 
         if(this._updateRegistered)
         {

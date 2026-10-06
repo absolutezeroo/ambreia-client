@@ -1,5 +1,5 @@
 import {RoomObjectSprite} from '@room/object/visualization/RoomObjectSprite';
-import {AnimatedScalar} from '@habbo/room/object/visualization/variablefx/animation/AnimatedScalar';
+import {AnimatedScalar} from './AnimatedScalar';
 import type {IStackedAddition} from './IStackedAddition';
 
 /**

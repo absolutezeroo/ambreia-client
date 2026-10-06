@@ -24,8 +24,8 @@ import type {IRoomEngine} from './IRoomEngine';
 /**
  * AS3 declares `_SafeCls_89 extends _SafeCls_86` — IRoomCreator IS an IRoomEngine — and this port
  * had flattened the two into unrelated interfaces. Restored because `RoomMessageHandler` holds an
- * IRoomCreator and calls engine methods through it: AS3 reaches `updateVariableFxConfigs()` and
- * friends by inheritance, and the alternative here was redeclaring each on both. RoomEngine is the
+ * IRoomCreator and calls engine methods through it: AS3 reaches the engine's methods by
+ * inheritance, and the alternative here was redeclaring each on both. RoomEngine is the
  * only implementor and already declares both, so nothing had to change to satisfy it.
  */
 // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/_SafeCls_89.as

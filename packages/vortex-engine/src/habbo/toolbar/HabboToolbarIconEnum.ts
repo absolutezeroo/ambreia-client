@@ -50,9 +50,6 @@ export class HabboToolbarIconEnum
     // AS3: .../src/com/sulake/habbo/toolbar/HabboToolbarIconEnum.as::CAMERA
     public static readonly CAMERA: string = 'HTIE_ICON_CAMERA';
 
-    // AS3: .../src/com/sulake/habbo/toolbar/HabboToolbarIconEnum.as::WIRED_MENU
-    public static readonly WIRED_MENU: string = 'HTIE_ICON_WIRED_MENU';
-
     // AS3: .../src/com/sulake/habbo/toolbar/HabboToolbarIconEnum.as::ROOMINFO
     public static readonly ROOMINFO: string = 'HTIE_ICON_ROOMINFO';
 
@@ -76,7 +73,6 @@ export class HabboToolbarIconEnum
         ['HTIE_ICON_GUIDE', 'GUIDE'],
         ['HTIE_ICON_BUILDER', 'BUILDER'],
         ['HTIE_ICON_CAMERA', 'CAMERA'],
-        ['HTIE_ICON_WIRED_MENU', 'WIRED_MENU'],
     ]);
 
     /**

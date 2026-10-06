@@ -21,9 +21,6 @@ import type {RoomObjectDataUpdateMessage} from '@habbo/room/messages/RoomObjectD
 import type {RoomObjectHeightUpdateMessage} from '@habbo/room/messages/RoomObjectHeightUpdateMessage';
 import type {RoomObjectSelectedMessage} from '@habbo/room/messages/RoomObjectSelectedMessage';
 
-import type {FurnitureLogicRoomData} from '../FurnitureLogicRoomData';
-import type {VariableFxLogicConfigManager} from '../VariableFxLogicConfigManager';
-
 export class FurnitureLogic extends MovingObjectLogic
 {
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/room/object/logic/furniture/FurnitureLogic.as::BOUNCE_STEPS
@@ -128,20 +125,6 @@ export class FurnitureLogic extends MovingObjectLogic
         }
 
         return this.getAllEventTypes(super.getEventTypes(), types);
-    }
-
-    /**
-     * The room half this logic reads its VariableFx configs from. Injected by
-     * `RoomObjectFactory.createRoomObjectLogic()` at construction; null when the logic was built
-     * without a room, in which case no effect on this object ever resolves a config.
-     */
-    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/object/logic/_SafeCls_1799.as::roomData
-    roomData: FurnitureLogicRoomData | null = null;
-
-    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/object/logic/_SafeCls_1799.as::get variableFxLogicManager()
-    protected override get variableFxLogicManager(): VariableFxLogicConfigManager | null
-    {
-        return this.roomData?.variableFxLogicManager ?? null;
     }
 
     override dispose(): void

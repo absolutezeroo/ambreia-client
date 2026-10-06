@@ -735,7 +735,8 @@ export class InfoStandFurniView
         this.showButton('move', showMove);
         this.showButton('rotate', showRotate);
         this.showButton('use', showUse);
-        this.showButton('wired_inspect', !isPlayTestMode && (this.container?.userDefinedRoomEvents?.showInspectButton() ?? false));
+        // AS3 asks the wired component (`showInspectButton()`); the RPG fork removed wired.
+        this.showButton('wired_inspect', false);
         this.showAdFurnitureDetails(showAdFurniDetails);
         this.showGroupInfo(event.groupId > 0);
         this.updatePurchaseButtonVisibility(

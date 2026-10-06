@@ -11,7 +11,6 @@ type WritableTextWindow = ITextWindow & {underline: boolean};
 import {WindowMouseEvent as WindowMouseEventClass} from '@core/window/events/WindowMouseEvent';
 import type {GroupItem} from '../items/GroupItem';
 import {FurniGridFilters} from './FurniGridFilters';
-import type {WiredTradeRequirementsModel} from '../wired_trading/requirements/WiredTradeRequirementsModel';
 
 /**
  * Manages the paginated furniture grid (filtering, sorting, paging).
@@ -35,8 +34,8 @@ export class FurniGridView
      * The main dropdown's selection index, as the filter string AS3 works in.
      *
      * The layout's `filter.options` offers three entries in this order; AS3's fourth,
-     * `room_layout`, has no entry in it — `setFilterByWired()` is the only caller that can reach
-     * that one.
+     * `room_layout`, has no entry in it — only AS3's `setFilterByWired()` (wired trading, removed
+     * in the RPG fork) could reach that one.
      */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/furni/FurniGridView.as::setFilter()
     private static readonly MAIN_FILTER_BY_SELECTION: readonly string[] = [
@@ -82,16 +81,6 @@ export class FurniGridView
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/furni/FurniGridView.as::setFilter()
     private _typeFilter: string = FurniGridFilters.TYPE_ANY;
 
-    /**
-     * The wired trade the grid is picking an offer for, when it is.
-     *
-     * Non-null only between `setFilterByWired()` and the next `setFilter()`, which clears it — a
-     * grid still filtering against a finished trade would hide furniture for no visible reason.
-     *
-     * Name DERIVED: AS3's field is `_SafeStr_7060`, obfuscated; named after its type.
-     */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/furni/FurniGridView.as::setFilterByWired()
-    private _wiredRequirements: WiredTradeRequirementsModel | null = null;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/furni/FurniGridView.as::_showingRentedItems
     private _showingRentedItems: boolean = false;
     private _mergeRentFurni: boolean = false;
@@ -163,44 +152,14 @@ export class FurniGridView
         this._mainFilter = FurniGridView.MAIN_FILTER_BY_SELECTION[placementOrWallFilter]
             ?? FurniGridFilters.MAIN_ALL;
         // The type dropdown AS3's second argument comes from is not in this port's layout yet, so
-        // the normal path leaves it open; `setFilterByWired()` is the one caller that sets it.
+        // the normal path leaves it open. (AS3's other caller, `setFilterByWired()`, went with
+        // wired trading in the RPG fork.)
         this._typeFilter = FurniGridFilters.TYPE_ANY;
         this._showingRentedItems = showingRentedItems;
         this._mergeRentFurni = mergeRentFurni;
         this._showingNfts = showingNfts;
         this._placementFilter = placementFilter;
         this._searchText = (searchText ?? '').toLowerCase();
-        this._wiredRequirements = null;
-
-        this.update();
-    }
-
-    /**
-     * The grid as a wired trade's furniture picker.
-     *
-     * Four differences from the normal path, all AS3's and all deliberate: rented items are never
-     * shown as a separate bucket (`mergeRentFurni` is forced on, so the rented/not-rented split is
-     * skipped entirely), NFTs are hidden, the placement filter is off — a trade can offer furniture
-     * from anywhere — and every group additionally has to pass the trade's own
-     * `canOfferFurni()`, which is what keeps an item the trade cannot accept out of the picker
-     * rather than letting it be chosen and refused.
-     */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/furni/FurniGridView.as::setFilterByWired()
-    setFilterByWired(
-        mainFilter: string,
-        typeFilter: string,
-        searchText: string,
-        requirements: WiredTradeRequirementsModel | null
-    ): void
-    {
-        this._mainFilter = mainFilter;
-        this._typeFilter = typeFilter;
-        this._showingRentedItems = false;
-        this._mergeRentFurni = true;
-        this._showingNfts = false;
-        this._placementFilter = FurniGridView.PLACEMENT_ANYWHERE;
-        this._searchText = (searchText ?? '').toLowerCase();
-        this._wiredRequirements = requirements;
 
         this.update();
     }
@@ -216,7 +175,7 @@ export class FurniGridView
 
     // The substitution this used to describe is gone as of 2026-09-05: AS3's filter strings and
     // both of its predicates are ported (`FurniGridFilters`, `passMainFilter`, `passTypeFilter`),
-    // and `setFilterByWired()` above is no longer blocked on anything. What remains of the port's
+    // and nothing else is blocked on them. What remains of the port's
     // own model is the placement dropdown alone — `_placementFilter`, which answers "is this item
     // currently in a room", a question AS3's filters cannot ask — and it now sits *beside* AS3's
     // clauses in `passFilter()` rather than in place of them.
@@ -440,8 +399,6 @@ export class FurniGridView
                 && description.indexOf(this._searchText) === -1
                 && (chestName === '' || chestName.indexOf(this._searchText) === -1)) return false;
         }
-
-        if(this._wiredRequirements !== null && !this._wiredRequirements.canOfferFurni(item)) return false;
 
         return true;
     }

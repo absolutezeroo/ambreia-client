@@ -23,9 +23,6 @@ import {RoomObjectAvatarPetGestureUpdateMessage} from '../../messages/RoomObject
 import {RoomObjectAvatarExperienceUpdateMessage} from '../../messages/RoomObjectAvatarExperienceUpdateMessage';
 import {PetFigureData} from '@habbo/avatar/pets/PetFigureData';
 
-import type {AvatarLogicRoomData} from './AvatarLogicRoomData';
-import type {VariableFxLogicConfigManager} from './VariableFxLogicConfigManager';
-
 export class PetLogic extends MovingObjectLogic
 {
     // Timed actions
@@ -64,20 +61,6 @@ export class PetLogic extends MovingObjectLogic
         ];
 
         return this.getAllEventTypes(super.getEventTypes(), types);
-    }
-
-    /**
-     * The room half this logic reads its VariableFx configs from. Injected by
-     * `RoomObjectFactory.createRoomObjectLogic()` at construction; null when the logic was built
-     * without a room, in which case no effect on this object ever resolves a config.
-     */
-    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/object/logic/PetLogic.as::roomData
-    roomData: AvatarLogicRoomData | null = null;
-
-    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/object/logic/PetLogic.as::get variableFxLogicManager()
-    protected override get variableFxLogicManager(): VariableFxLogicConfigManager | null
-    {
-        return this.roomData?.variableFxLogicManager ?? null;
     }
 
     override dispose(): void

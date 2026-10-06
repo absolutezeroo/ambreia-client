@@ -18,7 +18,6 @@ import {IID_HabboSoundManager} from '@iid/IIDHabboSoundManager';
 import type {IHabboSoundManager} from '@habbo/sound/IHabboSoundManager';
 import {IID_HabboFreeFlowChat} from '@iid/IIDHabboFreeFlowChat';
 import {IID_HabboMessenger} from '@iid/IIDHabboMessenger';
-import {IID_HabboUserDefinedRoomEvents} from '@iid/IIDHabboUserDefinedRoomEvents';
 import type {IHabboToolbar} from './IHabboToolbar';
 import type {IRoomUI} from '@habbo/ui/IRoomUI';
 import type {IExtensionView} from './IExtensionView';
@@ -35,7 +34,6 @@ import type {IHabboNavigator} from '../navigator/IHabboNavigator';
 import type {IHabboNewNavigator} from '../navigator/IHabboNewNavigator';
 import type {IHabboFreeFlowChat} from '../freeflowchat/IHabboFreeFlowChat';
 import type {IHabboMessenger} from '../messenger/IHabboMessenger';
-import type {IHabboUserDefinedRoomEvents} from '../roomevents/IHabboUserDefinedRoomEvents';
 import type {IHabboConfigurationManager} from '../configuration/IHabboConfigurationManager';
 import type {IMessageEvent} from '@core/communication/messages/IMessageEvent';
 import {
@@ -125,10 +123,6 @@ export class HabboToolbar extends Component implements IHabboToolbar
     // No concrete HabboMessenger is attached against IID_HabboMessenger in this port
     // yet (only the interface is ported) - stays null until one is.
     private _messenger: IHabboMessenger | null = null;
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/toolbar/HabboToolbar.as::_roomEvents
-    // Resolved: `HabboUserDefinedRoomEvents` is attached under IID_HabboUserDefinedRoomEvents in
-    // VortexMain. The dependency stays optional, as AS3 declares it.
-    private _roomEvents: IHabboUserDefinedRoomEvents | null = null;
     // AS3: .../src/com/sulake/habbo/toolbar/HabboToolbar.as::_localization
     private _localization: IHabboLocalizationManager | null = null;
     private _configuration: IHabboConfigurationManager | null = null;
@@ -343,12 +337,6 @@ export class HabboToolbar extends Component implements IHabboToolbar
     get messenger(): IHabboMessenger | null
     {
         return this._messenger;
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/toolbar/HabboToolbar.as::get roomEvents()
-    get roomEvents(): IHabboUserDefinedRoomEvents | null
-    {
-        return this._roomEvents;
     }
 
     // AS3: .../src/com/sulake/habbo/toolbar/HabboToolbar.as::get localization()
@@ -579,21 +567,6 @@ export class HabboToolbar extends Component implements IHabboToolbar
                     this._messenger = messenger;
                 },
                 false
-            ),
-            // Optional in AS3 too, but no longer dormant: the listener below is what shows or
-            // hides the wired-menu toolbar icon when the player flips that preference, and
-            // `WiredMenuController.set wiredMenuButton()` emits it on the room-events `events` bus.
-            new ComponentDependency(
-                IID_HabboUserDefinedRoomEvents,
-                (roomEvents: IHabboUserDefinedRoomEvents | null) =>
-                {
-                    this._roomEvents = roomEvents;
-                },
-                false,
-                [{
-                    type: 'WIRED_MENU_BUTTON_PREFERENCE_CHANGED',
-                    callback: this.onWiredMenuEvent.bind(this)
-                }]
             ),
             // The forums contribute to the me-menu badge. AS3 takes no reference at all — the
             // dependency exists purely to subscribe to the controller's event bus, which is why
@@ -1042,26 +1015,9 @@ export class HabboToolbar extends Component implements IHabboToolbar
     }
 
     /**
-	 * Forward a wired-menu preference change to BottomBarLeft.
-	 *
-	 * This dependency listener is only ever invoked for
-	 * WIRED_MENU_BUTTON_PREFERENCE_CHANGED (see the dependencies getter above),
-	 * so the type is passed through as a literal rather than read off the args
-	 * (the DI dispatch here doesn't carry a typed event payload - see
-	 * RoomSessionManager.onRoomEngineInitialized() for the same convention).
-	 *
-	 * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/toolbar/HabboToolbar.as::onWiredMenuEvent()
-	 */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/toolbar/HabboToolbar.as::onWiredMenuEvent()
-    private onWiredMenuEvent(..._args: unknown[]): void
-    {
-        this._bottomBarLeft?.onWiredMenuEvent('WIRED_MENU_BUTTON_PREFERENCE_CHANGED');
-    }
-
-    /**
 	 * Forward a catalog state-change to BottomBarLeft (icon enable/disable and the
-	 * "new items" badge). Unlike onWiredMenuEvent()'s literal-type forward, HabboCatalog's
-	 * emit() passes the CatalogEvent instance itself, so it is forwarded as-is.
+	 * "new items" badge). HabboCatalog's emit() passes the CatalogEvent instance itself, so it
+	 * is forwarded as-is.
 	 */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/toolbar/HabboToolbar.as::onCatalogEvent()
     private onCatalogEvent(...args: unknown[]): void

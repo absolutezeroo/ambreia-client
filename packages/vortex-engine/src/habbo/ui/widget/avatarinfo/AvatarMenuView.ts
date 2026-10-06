@@ -255,7 +255,8 @@ export class AvatarMenuView extends AvatarContextInfoButtonView
             this.showButton('relationship',
                 (this.widget.configuration?.getBoolean('relationship.status.enabled') ?? false) && data.isFriend && !blocked);
             this.showButton('ambassador', this.ambassadorMenuHasContent());
-            this.showButton('wired_inspect', container?.userDefinedRoomEvents?.showInspectButton() ?? false);
+            // AS3 asks the wired component (`showInspectButton()`); the RPG fork removed wired.
+            this.showButton('wired_inspect', false);
         }
 
         if(this._mode === AvatarMenuView.MODE_MODERATE)

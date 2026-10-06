@@ -1,6 +1,5 @@
 import type {IRoomObjectSprite} from '@room/object/visualization/IRoomObjectSprite';
 import {StackedAdditionStack} from '../../stacked/StackedAdditionStack';
-import {VariableFxStackAddition} from '../../variablefx/VariableFxStackAddition';
 import type {IAvatarAddition} from './IAvatarAddition';
 import type {IStackedAvatarAddition} from './IStackedAvatarAddition';
 import type {HabbiconBubble} from './HabbiconBubble';
@@ -16,11 +15,8 @@ export interface IStackedAdditionsHost
  *
  * This is the shim that lets one sprite carry several things. From the visualization's side it is
  * just another `IAvatarAddition` with an id; inside, it owns a {@link StackedAdditionStack} whose
- * members are composited together. The habbicon and every Variable FX effect live in here rather
- * than each holding a room sprite of their own.
- *
- * The layers are fixed and far apart: Variable FX at 0, the habbicon at 100, so bars always stack
- * below the bubble whatever order they arrived in.
+ * members are composited together. In AS3 the habbicon and every Variable FX effect live in here;
+ * the RPG fork removed Variable FX (wired), so only the habbicon (layer 100) is left in it.
  *
  * `resolveStackBottomY()` is the only interesting method. The stack hangs off a point above the
  * avatar, and where that point is depends on both the render scale and what the avatar is DOING —
@@ -31,9 +27,6 @@ export interface IStackedAdditionsHost
  */
 export class StackedAdditions implements IAvatarAddition
 {
-    // AS3: .../additions/StackedAdditions.as::LAYER_VARIABLE_FX
-    static readonly LAYER_VARIABLE_FX: number = 0;
-
     // AS3: .../additions/StackedAdditions.as::LAYER_HABBICON
     static readonly LAYER_HABBICON: number = 100;
 
@@ -149,23 +142,6 @@ export class StackedAdditions implements IAvatarAddition
     getStackedAddition(id: number): IStackedAvatarAddition | null
     {
         return this._stack.get(id);
-    }
-
-    // AS3: .../additions/StackedAdditions.as::getVariableFxAddition()
-    getVariableFxAddition(configId: number, variableId: string): VariableFxStackAddition | null
-    {
-        for(const addition of this.getVariableFxAdditions())
-        {
-            if(addition.configId === configId && addition.variableId === variableId) return addition;
-        }
-
-        return null;
-    }
-
-    // AS3: .../additions/StackedAdditions.as::getVariableFxAdditions()
-    getVariableFxAdditions(): VariableFxStackAddition[]
-    {
-        return this._stack.getAdditionsByType(VariableFxStackAddition);
     }
 
     // AS3: .../additions/StackedAdditions.as::update()

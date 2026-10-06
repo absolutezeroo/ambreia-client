@@ -56,11 +56,10 @@
 // `--overrides=<file>[,<file>]` layers extra key=value files on top of the texts before pruning.
 // Later files win, and an override always wins over the raw texts file. Two things need it:
 //
-//   - Keys the client only has as an *embedded* asset. The Wired Creator Tools' 198 `wired*`
-//     strings live in `HabboLocalizationCom`'s `default_localizations` embed, not in the texts
-//     file, so they are English-only and unreachable from the server. Routing them through an
-//     override makes them editable without touching the gitignored asset bundle
-//     (`locale-overrides/wired.en.txt`).
+//   - Keys the client only has as an *embedded* asset (strings in `HabboLocalizationCom`'s
+//     `default_localizations` embed, not in the texts file, so English-only and unreachable from
+//     the server). Routing them through an override makes them editable without touching the
+//     gitignored asset bundle. (The RPG fork dropped the wired ones, `wired.en.txt`, with wired.)
 //   - Hotel-specific rewording of keys that DO exist upstream, kept in the repo instead of as an
 //     untracked edit to `sources/external_flash_texts.txt` (which is gitignored).
 //
@@ -82,8 +81,8 @@
 //   node build-gamedata-locale.mjs --prune --write     # convert + prune
 //   node build-gamedata-locale.mjs --prune --rules=landing,promos
 //   node build-gamedata-locale.mjs --prune --badges=badges.txt --quests=quests.txt
-//   node build-gamedata-locale.mjs --overrides=locale-overrides/wired.en.txt --write
-//   node build-gamedata-locale.mjs --overrides=locale-overrides/wired.en.txt \
+//   node build-gamedata-locale.mjs --overrides=locale-overrides/fishing.en.txt --write
+//   node build-gamedata-locale.mjs --overrides=locale-overrides/fishing.en.txt \
 //        --merge-into=C:/Laragon/www/vortex-assets/gamedata/external_flash_texts.json --write
 //   node build-gamedata-locale.mjs --pretty            # indented output (bigger)
 import fs from 'node:fs';

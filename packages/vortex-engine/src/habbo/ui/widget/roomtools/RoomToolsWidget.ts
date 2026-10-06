@@ -18,7 +18,6 @@ import type {GuestRoomData} from '@habbo/communication/messages/incoming/navigat
 import {StringUtil} from '@habbo/utils/StringUtil';
 import type {RoomToolsWidgetHandler} from '@habbo/ui/handler/RoomToolsWidgetHandler';
 import type {IHabboFreeFlowChat} from '@habbo/freeflowchat/IHabboFreeFlowChat';
-import {WiredAchievementsUpdatedEvent} from '@habbo/roomevents/events/WiredAchievementsUpdatedEvent';
 import {RoomToolsInfoCtrl} from './RoomToolsInfoCtrl';
 import {RoomToolsToolbarCtrl} from './RoomToolsToolbarCtrl';
 import {RoomVisitHistory} from './RoomVisitHistory';
@@ -60,26 +59,15 @@ export class RoomToolsWidget extends RoomWidgetBase
         );
         this._toolbarCtrl.setLikeButton(this.handler.canRate);
 
-        const roomEvents = this.handler.container?.userDefinedRoomEvents ?? null;
-
-        this._toolbarCtrl.setAchievementsButton((roomEvents?.achievementsInRoom?.length ?? 0) > 0);
-        roomEvents?.events.on(
-            WiredAchievementsUpdatedEvent.WIRED_ACHIEVEMENTS_UPDATED,
-            this._onAchievementsUpdated
-        );
+        // AS3 shows this button when the room's wired has achievements (`roomEvents.achievementsInRoom`)
+        // and follows its updates. The RPG fork removed wired, so there are never any.
+        this._toolbarCtrl.setAchievementsButton(false);
 
         this._toolbarCtrl.setCollapsed(
             (this.handler.sessionDataManager?.isNoob ?? true)
 			|| !((this.handler.sessionDataManager?.uiFlags ?? 0) & 2)
         );
     }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/roomtools/RoomToolsWidget.as::onAchievementsUpdated()
-    // A bound field rather than a method so dispose() can hand the same reference back to `off()`.
-    private readonly _onAchievementsUpdated = (event: WiredAchievementsUpdatedEvent): void =>
-    {
-        this._toolbarCtrl?.setAchievementsButton(event.achievements.length > 0);
-    };
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/roomtools/RoomToolsWidget.as::dispose()
     public override dispose(): void
@@ -89,15 +77,6 @@ export class RoomToolsWidget extends RoomWidgetBase
             clearTimeout(this._roomToolsTimer);
             this._roomToolsTimer = null;
         }
-
-        // AS3's dispose() only nulls its own fields and leaves the listener attached. Here the
-        // emitter belongs to HabboUserDefinedRoomEvents — a DI singleton outliving every room —
-        // so an un-removed listener would keep firing into a disposed widget for the rest of
-        // the session.
-        this.handler.container?.userDefinedRoomEvents?.events.off(
-            WiredAchievementsUpdatedEvent.WIRED_ACHIEVEMENTS_UPDATED,
-            this._onAchievementsUpdated
-        );
 
         this._toolbarCtrl?.dispose();
         this._toolbarCtrl = null;

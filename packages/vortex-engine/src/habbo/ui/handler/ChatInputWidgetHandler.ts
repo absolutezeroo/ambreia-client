@@ -35,12 +35,9 @@ import {RoomEngineZoomEvent} from '@habbo/room/events/RoomEngineZoomEvent';
 import {HabboToolbarEvent} from '@habbo/toolbar/events/HabboToolbarEvent';
 import {HabboWebTools} from '@habbo/utils/HabboWebTools';
 import {RoomShakingEffect} from '@room/utils/RoomShakingEffect';
-import {WiredUpdateRoomComposer} from '@habbo/communication/messages/outgoing/userdefinedroomevents/wiredmenu/WiredUpdateRoomComposer';
 import type {IRoomObjectSpriteVisualization} from '@room/object/visualization/IRoomObjectSpriteVisualization';
 import type {IRoomObject} from '@room/object/IRoomObject';
 import type {IRoomEngine} from '@habbo/room/IRoomEngine';
-import type {WindowEvent} from '@core/window/events/WindowEvent';
-import type {IDisposable} from '@core/runtime/IDisposable';
 import {Logger} from '@core/utils/Logger';
 import {RoomObjectCategoryEnum} from '@habbo/room/object/RoomObjectCategoryEnum';
 import {RoomStressTest} from '@habbo/room/utils/RoomStressTest';
@@ -620,35 +617,6 @@ export class ChatInputWidgetHandler implements IRoomWidgetHandler
 
                 return true;
 
-            case ':reload':
-                if(session.roomControllerLevel >= 4 || sessionData?.hasSecurity(5))
-                {
-                    container.windowManager?.confirm(
-                        '${wiredmenu.settings.room_state.reload}',
-                        '${wiredmenu.settings.room_state.reload.warning}',
-                        0,
-                        this.onReloadConfirmed
-                    );
-                }
-
-                return true;
-
-            case ':rollback':
-                if(session.roomControllerLevel >= 4 || sessionData?.hasSecurity(5))
-                {
-                    const dialog = container.windowManager?.confirm(
-                        '${wiredmenu.settings.room_state.roll_back}',
-                        '${wiredmenu.settings.room_state.roll_back.warning}',
-                        0,
-                        this.onRollbackConfirmed
-                    );
-
-                    // AS3 recolours only the roll-back dialog's title bar — the destructive one.
-                    if(dialog) dialog.titleBarColor = 13909337;
-                }
-
-                return true;
-
             case ':moonwalk':
             case ':habnam':
             case ':yyxxabxa':
@@ -660,11 +628,6 @@ export class ChatInputWidgetHandler implements IRoomWidgetHandler
             // The one special command that forwards the whole line rather than just its name.
             case ':mpgame':
                 sessionData?.sendSpecialCommandMessage(text);
-
-                return true;
-
-            case ':wiredreset':
-                container.userDefinedRoomEvents?.resetCache();
 
                 return true;
 
@@ -844,34 +807,6 @@ export class ChatInputWidgetHandler implements IRoomWidgetHandler
                 }
 
                 return false;
-
-            case ':wf':
-            case ':wired':
-                roomEngine?.createLinkEvent('wiredmenu/open');
-
-                return true;
-
-            case ':var':
-            case ':variables':
-                roomEngine?.createLinkEvent('wiredmenu/open/variable_overview');
-
-                return true;
-
-            case ':inspect':
-            case ':inspection':
-                roomEngine?.createLinkEvent('wiredmenu/open/inspection');
-
-                return true;
-
-            case ':playtest':
-                container.userDefinedRoomEvents?.switchPlayTestMode();
-
-                return true;
-
-            case ':donate':
-                roomEngine?.createLinkEvent('selfdonation/open');
-
-                return true;
 
             case ':demonictriggers':
                 this.toggleDemonicTriggers();
@@ -1060,22 +995,6 @@ export class ChatInputWidgetHandler implements IRoomWidgetHandler
             }
         }
     }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/ChatInputWidgetHandler.as::onRollbackConfirmed()
-    private onRollbackConfirmed = (dialog: IDisposable, event: WindowEvent): void =>
-    {
-        if(event.type === 'WE_OK') this._container?.connection?.send(new WiredUpdateRoomComposer(true));
-
-        dialog.dispose();
-    };
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/ChatInputWidgetHandler.as::onReloadConfirmed()
-    private onReloadConfirmed = (dialog: IDisposable, event: WindowEvent): void =>
-    {
-        if(event.type === 'WE_OK') this._container?.connection?.send(new WiredUpdateRoomComposer(false));
-
-        dialog.dispose();
-    };
 
     /**
 	 * All four AS3 events, in its order. The marker here used to hold two back as unraisable —

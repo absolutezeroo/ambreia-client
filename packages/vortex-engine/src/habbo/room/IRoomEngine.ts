@@ -18,9 +18,6 @@ import type {IGetImageListener} from './IGetImageListener';
 import type {ImageResult} from './ImageResult';
 import type {ISelectedRoomObjectData} from './ISelectedRoomObjectData';
 import type {SelectedRoomObjectData} from './utils/SelectedRoomObjectData';
-import type {VariableFxConfigUpdateData} from './object/variablefx/VariableFxConfigUpdateData';
-import type {VariableFxStatusUpdateData} from './object/variablefx/VariableFxStatusUpdateData';
-import type {VariableFxStatusRemoveData} from './object/variablefx/VariableFxStatusRemoveData';
 import type {IRoomAreaSelectionManager} from './IRoomAreaSelectionManager';
 import type {RoomPlaneParser} from './object/RoomPlaneParser';
 import type {IRoomEngineRectangle} from './RoomEngine';
@@ -744,24 +741,4 @@ export interface IRoomEngine extends IDisposable {
 	 */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_86.as::getPetTypeId()
     getPetTypeId(figure: string | null): number;
-
-    /**
-     * VariableFx *configurations* — the recipes. They belong to the room, not to any object, and
-     * go straight to the room manager's per-room stores.
-     */
-    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/_SafeCls_86.as::updateVariableFxConfigs()
-    updateVariableFxConfigs(roomId: number, configs: VariableFxConfigUpdateData[]): void;
-
-    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/_SafeCls_86.as::removeVariableFxConfigs()
-    removeVariableFxConfigs(roomId: number, configIds: number[]): void;
-
-    /**
-     * VariableFx *statuses* — the live values. Each one names an entity, so these are dispatched
-     * one object at a time as a `RoomObjectUpdateMessage`, not stored on the room.
-     */
-    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/_SafeCls_86.as::updateVariableFxStatuses()
-    updateVariableFxStatuses(roomId: number, statuses: VariableFxStatusUpdateData[]): void;
-
-    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/_SafeCls_86.as::removeVariableFxStatuses()
-    removeVariableFxStatuses(roomId: number, statuses: VariableFxStatusRemoveData[]): void;
 }

@@ -403,34 +403,11 @@ export class RoomManager extends Component implements IRoomManager, IRoomInstanc
         {
             room.dispose();
             this._rooms.delete(id);
-            // AS3 drops the per-room logic data on BOTH paths — whether or not the room was there
-            // to dispose — because a room that failed to register may still have accumulated
-            // VariableFx configs from a message that arrived first.
-            this._objectFactory?.disposeRoomLogicData(id);
 
             return true;
         }
 
-        this._objectFactory?.disposeRoomLogicData(id);
-
         return false;
-    }
-
-    // AS3: sources/AIR-1.0.31/src/com/sulake/room/RoomManager.as::updateVariableFxConfigs()
-    updateVariableFxConfigs(id: string, configs: unknown[]): void
-    {
-        // Both halves, and they are different things: the OBJECT factory stores the logic config
-        // (show mode, visibility mask, duration) and the VISUALIZATION factory stores the
-        // renderable one (category, style, renderer, colour, width).
-        this._objectFactory?.updateVariableFxConfigs(id, configs);
-        this._visualizationFactory?.updateVariableFxConfigs(id, configs);
-    }
-
-    // AS3: sources/AIR-1.0.31/src/com/sulake/room/RoomManager.as::removeVariableFxConfigs()
-    removeVariableFxConfigs(id: string, configIds: number[]): void
-    {
-        this._objectFactory?.removeVariableFxConfigs(id, configIds);
-        this._visualizationFactory?.removeVariableFxConfigs(id, configIds);
     }
 
     /**
@@ -555,9 +532,7 @@ export class RoomManager extends Component implements IRoomManager, IRoomInstanc
         // Create visualization
         if(this._visualizationFactory && visualizationType)
         {
-            // The room id is passed so the factory can hand the visualization that room's
-            // Variable FX services — see RoomObjectVisualizationFactory.createRoomObjectVisualization().
-            const visualization = this._visualizationFactory.createRoomObjectVisualization(visualizationType, roomId);
+            const visualization = this._visualizationFactory.createRoomObjectVisualization(visualizationType);
 
             if(visualization)
             {
@@ -587,7 +562,7 @@ export class RoomManager extends Component implements IRoomManager, IRoomInstanc
         // Create and assign logic
         if(this._objectFactory && logicType)
         {
-            const logic = this._objectFactory.createRoomObjectLogic(logicType, roomId);
+            const logic = this._objectFactory.createRoomObjectLogic(logicType);
 
             if(logic)
             {
@@ -852,9 +827,7 @@ export class RoomManager extends Component implements IRoomManager, IRoomInstanc
         const logicType = this._contentLoader.getLogicType(contentType);
         const visualizationConfig = this._contentLoader.getVisualizationXML(contentType);
 
-        // entries(), not values(): the key is the room identifier, and rebuilding a logic here has
-        // to hand it the same VariableFx store the object had before its content was reloaded.
-        for(const [roomId, room] of this._rooms.entries())
+        for(const room of this._rooms.values())
         {
             const roomInstance = room as RoomInstance;
             const managerIds = roomInstance.getObjectManagerIds();
@@ -888,7 +861,7 @@ export class RoomManager extends Component implements IRoomManager, IRoomInstanc
                     {
                         // Same room id as the loop's key — a visualization rebuilt on a content
                         // reload must get its room's Variable FX services back too.
-                        const visualization = this._visualizationFactory.createRoomObjectVisualization(visualizationType, roomId);
+                        const visualization = this._visualizationFactory.createRoomObjectVisualization(visualizationType);
 
                         if(visualization)
                         {
@@ -916,7 +889,7 @@ export class RoomManager extends Component implements IRoomManager, IRoomInstanc
                     // Create new logic handler
                     if(logicType)
                     {
-                        const logic = this._objectFactory.createRoomObjectLogic(logicType, roomId);
+                        const logic = this._objectFactory.createRoomObjectLogic(logicType);
 
                         if(logic)
                         {

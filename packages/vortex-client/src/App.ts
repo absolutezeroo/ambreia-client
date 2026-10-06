@@ -379,8 +379,8 @@ async function registerChatStyleImageAssets(vortex: Vortex, imageBundle: AssetBu
  * those lookups returned null, and each site turned that into "Missing layout X" and gave up.
  *
  * Handed to `Vortex.bootstrap()` rather than pushed in afterwards, which is what this used to do:
- * WiredChestController builds its whole window the moment the window-manager IID resolves, inside
- * prepareCore(), and asked for `chest_generic_xml` before this had run.
+ * components that build their window the moment the window-manager IID resolves, inside
+ * prepareCore(), asked for their layout before this had run.
  *
  * The name is the **file basename**, which `tools/build-window-assets.mjs` takes from the
  * `*Com.as` field name — the exact string AS3 passes to `getAssetByName()`. Deliberately *not*
@@ -396,8 +396,8 @@ async function registerChatStyleImageAssets(vortex: Vortex, imageBundle: AssetBu
  * Both halves are handed to `Vortex.bootstrap()` instead of pushed in after it returns, which is
  * what this used to do from `initClientUi()`, two steps *after* `connect()`. Components built
  * during prepareCore() read from both: HabboGroupsManager's badge editor wants `badge_part_add`
- * out of the library in its own constructor, and the chest window's every `asset_uri` wants the
- * URL registry. Neither existed yet, and both failed silently.
+ * out of the library in its own constructor, and a window built at DI time wants the URL
+ * registry for its every `asset_uri`. Neither existed yet, and both failed silently.
  *
  * The library half is scoped rather than covering the whole images/ bundle, because it eagerly
  * decodes an ImageBitmap per entry and nothing else needs library access today:
@@ -479,12 +479,6 @@ async function readImageAssets(imageBundle: AssetBundle, layoutNames: ReadonlySe
             // `AvatarVisualization.getAvatarRendererAsset()` asks the library for the result. Thirty
             // images between them.
             || name.startsWith('user_') || name.startsWith('number_')
-            // variablefx_*: the 121 pieces the room-object FX renderers composite - bar
-            // backgrounds, fills, darkenings, splitters, heart masks, level badges, digit sheets.
-            // Every one is fetched at runtime through AssetLibraryVariableFxAssetProvider, keyed
-            // by a name the renderer builds from the config the server sent, so no layout names
-            // any of them and nothing but a prefix can cover them.
-            || name.startsWith('variablefx_')
             || LIBRARY_IMAGE_NAMES.has(name))
         {
             decodes.push(imageBundle.getImageBitmap(key).then((bitmap) =>

@@ -6,12 +6,11 @@ import {ButtonElementHandler} from './ButtonElementHandler';
 import {GetIsBadgeRequestFulfilledComposer} from '@habbo/communication/messages/outgoing/inventory/GetIsBadgeRequestFulfilledComposer';
 import {IsBadgeRequestFulfilledEvent} from '@habbo/communication/messages/incoming/inventory/badges/IsBadgeRequestFulfilledEvent';
 import type {IsBadgeRequestFulfilledEventParser} from '@habbo/communication/messages/parser/inventory/badges/IsBadgeRequestFulfilledEventParser';
-import {WiredRewardResultMessageEvent} from '@habbo/communication/messages/incoming/userdefinedroomevents/WiredRewardResultMessageEvent';
 import type {IMessageEvent} from '@core/communication/messages/IMessageEvent';
 
 /**
- * Button that requests a badge tied to a wired-trigger reward, hiding itself
- * once the badge has been fulfilled and re-checking on any reward event.
+ * Button that requests a badge, hiding itself once the badge has been fulfilled.
+ * (AS3 also re-checks on any wired reward event; the RPG fork removed wired.)
  *
  * AS3 identifier recovered from sources/win63_version/habbo/friendbar/landingview/widget/elements/class_4144.as
  * (obfuscated as `_SafeCls_4537` in the primary source; the 5 `requestbadgebutton*`
@@ -39,8 +38,8 @@ export class RequestBadgeButtonElementHandler extends ButtonElementHandler imple
             this._isFloating = params[5] === 'true';
         }
 
+        // AS3 also re-checks on every wired reward result (`onReward`); the RPG fork removed wired.
         landingView.communicationManager?.addHabboConnectionMessageEvent(new IsBadgeRequestFulfilledEvent(this.onInfo));
-        landingView.communicationManager?.addHabboConnectionMessageEvent(new WiredRewardResultMessageEvent(this.onReward));
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/friendbar/landingview/widget/elements/_SafeCls_4537.as::onClick()
@@ -72,13 +71,5 @@ export class RequestBadgeButtonElementHandler extends ButtonElementHandler imple
         if(!this.window) return;
 
         this.window.visible = !parser.fulfilled;
-    };
-
-    private onReward = (): void =>
-    {
-        if(this.window)
-        {
-            this.landingView?.send(new GetIsBadgeRequestFulfilledComposer(this._badgeRequestCode));
-        }
     };
 }

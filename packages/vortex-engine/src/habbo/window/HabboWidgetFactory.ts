@@ -5,7 +5,6 @@ import {Logger} from '@core/utils/Logger';
 import {AvatarImageWidget} from './widgets/AvatarImageWidget';
 import {BadgeImageWidget} from './widgets/BadgeImageWidget';
 import {BalloonWidget} from './widgets/BalloonWidget';
-import {ChestItemGridOverlayWidget} from './widgets/ChestItemGridOverlayWidget';
 import {CountdownWidget} from './widgets/CountdownWidget';
 import {FurnitureImageWidget} from './widgets/FurnitureImageWidget';
 import {HoverBitmapWidget} from './widgets/HoverBitmapWidget';
@@ -65,7 +64,7 @@ export class HabboWidgetFactory implements IWidgetFactory
 	 *
 	 * AS3 derives it from the registry in the same class body (`for(key in _SafeStr_4661)` then
 	 * `.sort()`); deriving it here too is what stops the two lists drifting, which they already had
-	 * once — `chest_overlay_grid` is in the 2026 registry and was missing from the copy.
+	 * once. (The fork dropped `chest_overlay_grid` with the wired chests.)
 	 */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/WidgetClasses.as::WIDGET_TYPES
     public static readonly WIDGET_TYPES: readonly string[] =
@@ -91,7 +90,6 @@ export class HabboWidgetFactory implements IWidgetFactory
         registry.set('avatar_image', AvatarImageWidget);
         registry.set('badge_image', BadgeImageWidget);
         registry.set('balloon', BalloonWidget);
-        registry.set('chest_overlay_grid', ChestItemGridOverlayWidget);
         registry.set('countdown', CountdownWidget);
         registry.set('furniture_image', FurnitureImageWidget);
         registry.set('hover_bitmap', HoverBitmapWidget);

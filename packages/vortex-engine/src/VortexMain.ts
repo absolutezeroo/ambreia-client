@@ -9,7 +9,6 @@ import {HabboNewNavigator} from '@habbo/navigator/HabboNewNavigator';
 import {HabboInventory} from '@habbo/inventory/HabboInventory';
 import {HabboCatalog} from '@habbo/catalog/HabboCatalog';
 import {HabboClubCenter} from '@habbo/catalog/clubcenter/HabboClubCenter';
-import {HabboUserDefinedRoomEvents} from '@habbo/roomevents/HabboUserDefinedRoomEvents';
 import {HabboFishing} from '@habbo/vortex/fishing/HabboFishing';
 import {HabboGameManager} from '@habbo/game/HabboGameManager';
 import {HabboDiscordManager} from '@habbo/discord/HabboDiscordManager';
@@ -95,7 +94,6 @@ import {IID_HabboAvatarEditor} from '@iid/IIDHabboAvatarEditor';
 import {HabboAvatarEditorManager} from '@habbo/avatar/HabboAvatarEditorManager';
 import {IID_HabboModeration} from '@iid/IIDHabboModeration';
 import {IID_HabboClubCenter} from '@iid/IIDHabboClubCenter';
-import {IID_HabboUserDefinedRoomEvents} from '@iid/IIDHabboUserDefinedRoomEvents';
 import {IID_HabboFurniEditor} from '@iid/IIDHabboFurniEditor';
 import {IID_HabboFishing} from '@iid/IIDHabboFishing';
 import {IID_HabboGameManager} from '@iid/IIDHabboGameManager';
@@ -301,8 +299,6 @@ export class VortexMain implements IVortexMain
 
         return this._clubCenter;
     }
-
-    private _userDefinedRoomEvents: HabboUserDefinedRoomEvents | null = null;
 
     private _roomUI: RoomUI | null = null;
 
@@ -600,7 +596,6 @@ export class VortexMain implements IVortexMain
 
         // Nullify Habbo manager refs (inverse init order)
         this._clubCenter = null;
-        this._userDefinedRoomEvents = null;
         this._moderation = null;
         this._habboHelp = null;
         this._messenger = null;
@@ -685,9 +680,7 @@ export class VortexMain implements IVortexMain
         this.registerChatStyleTextAssets(config);
         // Before any component exists, not after: HabboGroupsManager (12g below) builds its badge
         // editor in its own constructor and reads `badge_part_add` out of the library while doing
-        // it, and HabboUserDefinedRoomEvents' WiredChestController builds the whole chest window
-        // the moment the window manager IID resolves, reading `chest_generic_xml` and a dozen
-        // bitmaps on the way. In AS3 those are `[Embed]`s in the component's own SWF library, so
+        // it. In AS3 those are `[Embed]`s in the component's own SWF library, so
         // they cannot be late; here they were pushed in from the client only after bootstrap()
         // returned, and every one of those lookups came back null.
         this.registerWindowAssetLibraryContent(config?.windowAssets ?? null);
@@ -903,18 +896,6 @@ export class VortexMain implements IVortexMain
         this._clubCenter = new HabboClubCenter(ctx);
         ctx.attachComponent(this._clubCenter, [IID_HabboClubCenter]);
 
-        // 12o. User-Defined Room Events (Wired)
-        // AS3 registers this via a *Com SWF library; this port constructs it directly. Attached
-        // after all of its required DI dependencies (communication, localization, roomEngine,
-        // roomSessionManager, sessionDataManager, notifications, toolbar, windowManager, roomUI).
-        // Consumer waiting on the IID: RoomDesktop.userDefinedRoomEvents (still hard-null there
-        // until the RoomUI->RoomDesktop plumbing is added — Bloc C).
-        // The asset library is AS3's third constructor argument, forwarded to every wired
-        // sub-controller; without it WiredChestWrapperView cannot find `chest_generic_xml` and the
-        // chest window is not built. Same omission already fixed for HabboGroupsManager above.
-        this._userDefinedRoomEvents = new HabboUserDefinedRoomEvents(ctx, 0, this._assets);
-        ctx.attachComponent(this._userDefinedRoomEvents, [IID_HabboUserDefinedRoomEvents]);
-
         // 12p. Furni editor (Vortex-specific, not from AS3). Attached after the window manager,
         // which it depends on. Its own capability flag arrives during the handshake, so until the
         // server says otherwise it stays inert and offers no UI.
@@ -946,8 +927,8 @@ export class VortexMain implements IVortexMain
         // (`HabboDiscordManagerBootstrap`, listed in `HabboDiscordCom.requiredClasses`), which this
         // port replaces with a direct construction — the same treatment `AdManager` gets above.
         // It goes last on purpose: its constructor builds `HabboActivityDetection`, which queues
-        // eight interfaces including the toolbar, the wired component, free-flow chat and the room
-        // engine, all attached above.
+        // eight interfaces including the toolbar, free-flow chat and the room engine, all attached
+        // above.
         // The asset library is what `DiscordSettingsView` reads `discord_settings_xml` out of;
         // without one the settings window builds nothing and only warns.
         this._discordManager = new HabboDiscordManager(ctx, 0, this._assets);

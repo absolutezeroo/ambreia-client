@@ -29,14 +29,6 @@ import {RoomObjectCategoryEnum} from '@habbo/room/object/RoomObjectCategoryEnum'
 import {BadgesModel} from './badges/BadgesModel';
 import {EffectsModel} from './effects/EffectsModel';
 import {RecyclerModel} from './recycler/RecyclerModel';
-import {WiredTradingModel} from './wired_trading/WiredTradingModel';
-import {WiredTradeInitiateMessageEvent} from '@habbo/communication/messages/incoming/userdefinedroomevents/wiredtrading/WiredTradeInitiateMessageEvent';
-import {WiredTradeCancelledMessageEvent} from '@habbo/communication/messages/incoming/userdefinedroomevents/wiredtrading/WiredTradeCancelledMessageEvent';
-import {WiredTradeCompletedMessageEvent} from '@habbo/communication/messages/incoming/userdefinedroomevents/wiredtrading/WiredTradeCompletedMessageEvent';
-import {WiredTradeItemsUpdateMessageEvent} from '@habbo/communication/messages/incoming/userdefinedroomevents/wiredtrading/WiredTradeItemsUpdateMessageEvent';
-import type {WiredTradeInitiateMessageParser} from '@habbo/communication/messages/parser/userdefinedroomevents/wiredtrading/trade/WiredTradeInitiateMessageParser';
-import type {WiredTradeCancelledMessageParser} from '@habbo/communication/messages/parser/userdefinedroomevents/wiredtrading/trade/WiredTradeCancelledMessageParser';
-import type {WiredTradeItemsUpdateMessageParser} from '@habbo/communication/messages/parser/userdefinedroomevents/wiredtrading/trade/WiredTradeItemsUpdateMessageParser';
 import type {IRecyclerModel} from './recycler/IRecyclerModel';
 import {CollectiblesModel} from './collectibles/CollectiblesModel';
 import {CollectibleGroupedItem} from './collectibles/CollectibleGroupedItem';
@@ -501,27 +493,13 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
      * Note this is *not* "is a trade running": a trade can be open while the server has still
      * refused this side the right to offer, which is what `ownUserCanTrade` carries.
      */
-    /**
-     * A wired trade short-circuits to true: the contract decides what may be offered, item by item,
-     * through `WiredTradeRequirementsModel.canOfferFurni()` — there is no per-side permission for
-     * the server to withhold the way there is in a player-to-player trade.
-     */
+    // DEVIATION: AS3 first answers true while a wired trade runs (its contract decides what may be
+    //   offered). The RPG fork removed wired trading, so only the player-to-player permission is read.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/HabboInventory.as::canUserOfferToTrade()
     canUserOfferToTrade(): boolean
     {
-        if(this._wiredTradingModel?.running) return true;
-
         return this._tradingModel?.ownUserCanTrade ?? false;
     }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/HabboInventory.as::onWiredTradeActiveChanged()
-    onWiredTradeActiveChanged(): void
-    {
-        this._view?.disableNonTradingTabs(this.tradingActive);
-    }
-
-    // AS3: .../src/com/sulake/habbo/inventory/HabboInventory.as::_inventories (the "wired_trading" entry)
-    private _wiredTradingModel: WiredTradingModel | null = null;
 
     /**
 	 * A model by name, building the inventory first if nobody has yet.
@@ -529,8 +507,7 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
 	 * This is what makes the lazy `init()` invisible in AS3: every model getter goes through here,
 	 * so *reading* a model is what creates it. The port read its private fields directly instead,
 	 * which turned the laziness into a hole — a message handler that arrived before the player had
-	 * ever opened the inventory found `null`, took its `?.` and did nothing, silently. That is how
-	 * a wired-chest deposit opened server-side and showed nothing at all on screen.
+	 * ever opened the inventory found `null`, took its `?.` and did nothing, silently.
 	 */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/HabboInventory.as::getModel()
     getModel(name: string): IInventoryModel | null
@@ -540,18 +517,12 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
         return this._inventories.getValue(name) ?? null;
     }
 
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/HabboInventory.as::get wiredTradingModel()
-    get wiredTradingModel(): WiredTradingModel | null
-    {
-        return this.disposed ? null : (this.getModel('wired_trading') as WiredTradingModel | null);
-    }
-
     /**
      * Whichever trade is live, or null. The ordinary one wins if both somehow are.
      *
-     * Returns `ITradingModel`, as AS3 does, rather than the concrete `TradingModel` the port used
-     * to declare — that narrower type is what kept the wired model out. Both callers only ever use
-     * `getOwnItemIdsInTrade()` and `requestAddItemsToTrading()`, which is the whole interface.
+     * Returns `ITradingModel`, as AS3 does. Both callers only ever use `getOwnItemIdsInTrade()`
+     * and `requestAddItemsToTrading()`, which is the whole interface. (AS3 also returns the wired
+     * trading model when it runs; the RPG fork removed wired trading.)
      */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/inventory/HabboInventory.as::get activeTradingModel()
     get activeTradingModel(): ITradingModel | null
@@ -559,11 +530,6 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
         if(this._tradingModel && this._tradingModel.running)
         {
             return this._tradingModel;
-        }
-
-        if(this._wiredTradingModel && this._wiredTradingModel.running)
-        {
-            return this._wiredTradingModel;
         }
 
         return null;
@@ -1240,21 +1206,8 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
         // model documents that at its constructor.
         this._recyclerModel = new RecyclerModel(this);
 
-        // AS3: HabboInventory.as:499
-        this._wiredTradingModel = new WiredTradingModel(
-            this,
-            this._windowManager,
-            this._communication,
-            this.assets,
-            this._roomEngine,
-            this._localization,
-            this._soundManager,
-            this._notifications
-        );
-
         this._inventories.add('collectibles', this._collectiblesModel);
         this._inventories.add('trading', this._tradingModel);
-        this._inventories.add('wired_trading', this._wiredTradingModel);
         this._inventories.add('recycler', this._recyclerModel);
         this._inventories.add('pets', this._petsModel);
         this._inventories.add('bots', this._botsModel);
@@ -2000,10 +1953,9 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
      * the open and the item list are unpacked here first, because they need the session's own
      * user id, the room's user data and the furni model to build their group items.
      *
-     * The same block also registers `onTradeNfts` and the four wired-trading answers, both of
-     * which used to be filed here as blocked on modules that did not exist. They do now, and all
-     * five are subscribed below. The header for the NFT half is 850, not the 2159 the old note
-     * carried.
+     * The same block also registers `onTradeNfts` (the header for the NFT half is 850, not the
+     * 2159 an old note carried). AS3 registers the four wired-trading answers here too; the RPG
+     * fork removed wired trading.
      */
     private registerTradingMessageEvents(): void
     {
@@ -2022,14 +1974,6 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
             this._communication.addMessageEvent(new TradeSilverSetMessageEvent(this.onTradingMessage)),
             this._communication.addMessageEvent(new TradeSilverFeeMessageEvent(this.onTradingMessage)),
             this._communication.addMessageEvent(new TradingItemListMessageEvent(this.onTradingItemList)),
-            // AS3: .../_SafeCls_1951.as::registerMessageEvents() — the wired-trading four. The
-            // reference emulator defines none of these headers, so they will not fire against it;
-            // registered anyway, because an unregistered event is the one failure this port makes
-            // over and over and it costs nothing to close here.
-            this._communication.addMessageEvent(new WiredTradeInitiateMessageEvent(this.onWiredTradeInitiate)),
-            this._communication.addMessageEvent(new WiredTradeCancelledMessageEvent(this.onWiredTradeCancelled)),
-            this._communication.addMessageEvent(new WiredTradeCompletedMessageEvent(this.onWiredTradeCompleted)),
-            this._communication.addMessageEvent(new WiredTradeItemsUpdateMessageEvent(this.onWiredTradeItemsUpdate)),
             // AS3: .../_SafeCls_1951.as:166 and :204 — the collectibles pair. `onCollectibles` is
             // the tab's own inventory; `onTradeNfts` is the NFT half of an open trade, which is why
             // it sits in this trading block rather than beside the tab.
@@ -2101,107 +2045,6 @@ export class HabboInventory extends Component implements IHabboInventory, ILinkE
 
         return groups;
     }
-
-    /**
-	 * Four guards, and none of them was here. Three say the client is not in a state to open a
-	 * trade at all; the fourth refuses a trade whose requirements ask the user to give NOTHING,
-	 * which AS3 calls "not possible" and drops on the floor. Each writes into the crash report on
-	 * the way out, which is where a trade that silently never opened would otherwise leave no
-	 * trace whatsoever.
-	 */
-    // AS3: .../src/com/sulake/habbo/inventory/_SafeCls_1951.as::onWiredTradeInitiate()
-    private onWiredTradeInitiate = (event: IMessageEvent): void =>
-    {
-        if(this.sessionData === null)
-        {
-            ErrorReportStorage.addDebugData('IncomingEvent', 'Trading open - sessionData not available!');
-
-            return;
-        }
-
-        if(this.roomSession === null)
-        {
-            ErrorReportStorage.addDebugData('IncomingEvent', 'Trading open - roomSession not available!');
-
-            return;
-        }
-
-        const parser = event.parser as WiredTradeInitiateMessageParser | null;
-        const requirement = parser?.requirement ?? null;
-
-        if(requirement == null) return;
-
-        if(requirement.rules !== null && requirement.rules.youGiveRule === null)
-        {
-            ErrorReportStorage.addDebugData(
-                'IncomingEvent', 'Initiated a trade where the user gives nothing - not possible');
-
-            return;
-        }
-
-        this.wiredTradingModel?.onWiredTradeInitiate(
-            requirement,
-            parser!.showRequirementsImmediate,
-            parser!.overridePreviousTrade,
-            parser!.timeoutSeconds
-        );
-    };
-
-    // AS3: .../src/com/sulake/habbo/inventory/_SafeCls_1951.as::onWiredTradeCancelled()
-    private onWiredTradeCancelled = (event: IMessageEvent): void =>
-    {
-        const parser = event.parser as WiredTradeCancelledMessageParser | null;
-
-        this.wiredTradingModel?.tradeIsCancelled(parser?.transactionFailureTypeId ?? 0);
-    };
-
-    // AS3: .../src/com/sulake/habbo/inventory/_SafeCls_1951.as::onWiredTradeCompleted()
-    private onWiredTradeCompleted = (): void =>
-    {
-        this.wiredTradingModel?.tradeIsCompleted();
-    };
-
-    /**
-     * AS3: .../_SafeCls_1951.as::onWiredTradeItemsUpdate()
-     *
-     * The mirror of `onTradingItemList()` for a wired trade, with two differences worth keeping in
-     * view: the grouping flags are hard-coded (`true` for our side, `false` for the room's) rather
-     * than compared against our own user id — a wired trade has no second player to be — and the
-     * *whole* parser is handed on, not just the item list, because the accept flag and `extra` ride
-     * on the outer message.
-     *
-     * The room's staked credits come first in its map, as a tile of their own — and unlike the
-     * player-to-player case there is no `trading.warning.enabled` gate on it.
-     */
-    // AS3: .../src/com/sulake/habbo/inventory/_SafeCls_1951.as::onWiredTradeItemsUpdate()
-    private onWiredTradeItemsUpdate = (event: IMessageEvent): void =>
-    {
-        const parser = event.parser as WiredTradeItemsUpdateMessageParser | null;
-
-        // Through the accessor, which is what builds the models if the player has never opened the
-        // inventory; the furni one is then read off the field because `createCreditGroupItem()` is
-        // on the concrete model, not on `IFurniModel`.
-        const wiredTradingModel = this.wiredTradingModel;
-        const furniModel = this._furniModel;
-
-        if(!parser || !furniModel || !wiredTradingModel) return;
-
-        const items = parser.tradingItems;
-        const ownUserItems = new OrderedMap<string, GroupItem>();
-        const wiredItems = new OrderedMap<string, GroupItem>();
-
-        // Added before the furniture so the tile heads the grid; the key is AS3's own literal and
-        // can never collide with a furniture group's (those key on type ids).
-        if(items.secondUserNumCredits > 0)
-        {
-            wiredItems.add('credit_groupitem_type_id', furniModel.createCreditGroupItem(items.secondUserNumCredits));
-        }
-
-        this.populateItemGroups(items.firstUserItemArray, ownUserItems, true);
-        this.populateItemGroups(items.secondUserItemArray, wiredItems, false);
-
-        wiredTradingModel.updateItemGroupMaps(items, ownUserItems, wiredItems, parser.canAccept, parser.extra);
-    };
 
     // AS3: .../_SafeCls_1951.as::onTradingOpenFailed(), onTradingClose(), onTradingCompleted(),
     // onTradingAccepted(), onTradingConfirmation(), onTradingNotOpen(), onTradingOtherNotAllowed(),

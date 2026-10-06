@@ -36,9 +36,8 @@ const log = Logger.getLogger('habbo.quest.AchievementController');
  * sites: the `_badgeImages`/100ms-Timer/`onBadgeImageReady` badge-load coalescing (the
  * port's BadgeImageWidget already loads and caches its own asset via ResourceManager,
  * so no external coalescing is needed), and `_questEngine.wired` room-achievement
- * filtering in `achievementIsVisible` (the wired-furni subsystem isn't ported; the
- * "wired_games" category — the only one this filter applies to — is treated as
- * always-visible instead of hidden, the safe default).
+ * filtering in `achievementIsVisible` (the RPG fork removed wired, so the "wired_games"
+ * category — the only one this filter applies to — shows nothing).
  *
  * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/quest/AchievementController.as
  */
@@ -517,18 +516,13 @@ export class AchievementController implements IDisposable
      * two namespaces line up: the wired subsystem reports bare codes, the achievement list carries
      * them prefixed, and an entry without the prefix belongs to no wired effect at all.
      */
+    // DEVIATION: AS3 keeps the `WF_` achievements listed in `_questEngine.wired.achievementsInRoom`.
+    //   The RPG fork removed wired, so nothing in "wired_games" is visible — AS3's own answer when
+    //   the room has no wired achievement list.
     // AS3: AchievementController.as::achievementIsVisible()
-    private achievementIsVisible(achievement: AchievementData): boolean
+    private achievementIsVisible(_achievement: AchievementData): boolean
     {
-        if(this._selectedCategory === null || this._selectedCategory.code !== 'wired_games') return true;
-
-        const code = achievement.code;
-
-        if(code.indexOf('WF_') !== 0) return false;
-
-        const inRoom = this._engine?.wired?.achievementsInRoom ?? null;
-
-        return inRoom !== null && inRoom.indexOf(code.substr(3)) >= 0;
+        return this._selectedCategory === null || this._selectedCategory.code !== 'wired_games';
     }
 
     // AS3: AchievementController.as::refreshAchievementList()

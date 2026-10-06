@@ -46,18 +46,11 @@ import {IID_HabboGameManager} from '@iid/IIDHabboGameManager';
 import type {IHabboGameManager} from '@habbo/game/IHabboGameManager';
 import type {IRoomSession} from '@habbo/session/IRoomSession';
 import {RoomObjectCategoryEnum} from './object/RoomObjectCategoryEnum';
-import type {VariableFxConfigUpdateData} from './object/variablefx/VariableFxConfigUpdateData';
-import type {VariableFxStatusUpdateData} from './object/variablefx/VariableFxStatusUpdateData';
-import type {VariableFxStatusRemoveData} from './object/variablefx/VariableFxStatusRemoveData';
-import {RoomObjectVariableFxStatusUpdateMessage} from './messages/RoomObjectVariableFxStatusUpdateMessage';
-import {RoomObjectVariableFxStatusRemoveMessage} from './messages/RoomObjectVariableFxStatusRemoveMessage';
 import {RoomObjectOperationEnum} from './object/RoomObjectOperationEnum';
 import {RoomObjectAvatarSelectedMessage} from './messages/RoomObjectAvatarSelectedMessage';
 import {RoomObjectSelectedMessage} from './messages/RoomObjectSelectedMessage';
 import {RoomObjectVisibilityUpdateMessage} from './messages/RoomObjectVisibilityUpdateMessage';
 import {LookToMessageComposer} from '@habbo/communication/messages/outgoing/room/avatar/LookToMessageComposer';
-import {IID_HabboUserDefinedRoomEvents} from '@iid/IIDHabboUserDefinedRoomEvents';
-import type {IHabboUserDefinedRoomEvents} from '@habbo/roomevents/IHabboUserDefinedRoomEvents';
 import {getUserTypeName, RoomObjectUserTypes} from './object/RoomObjectUserTypes';
 import {RoomObjectVariableEnum} from './object/RoomObjectVariableEnum';
 import {StuffDataFactory} from './object/data/StuffDataFactory';
@@ -599,8 +592,6 @@ export class RoomEngine extends Component implements IRoomEngine,
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_1821.as::getSelectedAvatarId()
     private _selectedAvatarId: number = -1;
 
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::get roomEvents()
-    private _roomEvents: IHabboUserDefinedRoomEvents | null = null;
     // AS3: _SafeCls_1821.as::processRoomCanvasMouseEvent() dedups per (category-bucket, event type):
     // getMouseEventId(category, type) keyed on BOTH the bucketed category and the type. The key is
     // `${bucket}_${type}`; the value is the last eventId already delivered for that slot, so a click
@@ -846,14 +837,6 @@ export class RoomEngine extends Component implements IRoomEngine,
                 false // Optional - only used to open a CATALOG_PAGE: room-ad link
             ),
             new ComponentDependency(
-                IID_HabboUserDefinedRoomEvents,
-                (roomEvents: IHabboUserDefinedRoomEvents | null) => 
-                {
-                    this._roomEvents = roomEvents;
-                },
-                false // Optional - only read to suppress LookTo when a click-user wired owns the click
-            ),
-            new ComponentDependency(
                 IID_RoomSessionManager,
                 (manager: IRoomSessionManager | null) =>
                 {
@@ -978,12 +961,6 @@ export class RoomEngine extends Component implements IRoomEngine,
         return this._toolbar;
     }
 
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::get roomEvents()
-    get roomEvents(): IHabboUserDefinedRoomEvents | null
-    {
-        return this._roomEvents;
-    }
-
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::get roomSessionManager()
     get roomSessionManager(): IRoomSessionManager | null
     {
@@ -1090,9 +1067,8 @@ export class RoomEngine extends Component implements IRoomEngine,
     /**
 	 * Whether a game is running in the given room
 	 *
-	 * Two independent sources, either of which is enough: the wired room-events component's own
-	 * game mode (active room only), and the room instance's `is_playing_game` variable, which the
-	 * server sets on a real minigame.
+	 * Read from the room instance's `is_playing_game` variable, which the server sets on a real
+	 * minigame (the RPG fork dropped AS3's second source, the wired game mode).
 	 */
     /**
 	 * The room's world type, as the server named it on entry
@@ -1155,79 +1131,6 @@ export class RoomEngine extends Component implements IRoomEngine,
         if(parts.length <= 1) return -1;
 
         return parseInt(parts[0], 10);
-    }
-
-    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/_SafeCls_90.as::updateVariableFxConfigs()
-    updateVariableFxConfigs(roomId: number, configs: VariableFxConfigUpdateData[]): void
-    {
-        this._roomManager?.updateVariableFxConfigs(this.getRoomIdentifier(roomId), configs);
-    }
-
-    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/_SafeCls_90.as::removeVariableFxConfigs()
-    removeVariableFxConfigs(roomId: number, configIds: number[]): void
-    {
-        this._roomManager?.removeVariableFxConfigs(this.getRoomIdentifier(roomId), configIds);
-    }
-
-    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/_SafeCls_90.as::updateVariableFxStatuses()
-    updateVariableFxStatuses(roomId: number, statuses: VariableFxStatusUpdateData[]): void
-    {
-        for(const status of statuses)
-        {
-            this.updateVariableFxStatus(roomId, status);
-        }
-    }
-
-    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/_SafeCls_90.as::removeVariableFxStatuses()
-    removeVariableFxStatuses(roomId: number, statuses: VariableFxStatusRemoveData[]): void
-    {
-        for(const status of statuses)
-        {
-            this.removeVariableFxStatus(roomId, status);
-        }
-    }
-
-    /**
-     * Silently drops a status whose entity is not in the room. That is the normal case, not an
-     * error: the server sends a room's statuses as one packet, and an avatar named in it may have
-     * walked out between the server building the packet and the client reading it.
-     */
-    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/_SafeCls_90.as::updateVariableFxStatus()
-    private updateVariableFxStatus(roomId: number, status: VariableFxStatusUpdateData): void
-    {
-        const category = status.isUserEntity
-            ? RoomObjectCategoryEnum.OBJECT_CATEGORY_USER
-            : RoomObjectCategoryEnum.OBJECT_CATEGORY_FURNITURE;
-
-        const object = this.getRoomObject(roomId, status.entityId, category) as IRoomObjectController | null;
-
-        if(!object || !object.getEventHandler()) return;
-
-        object.getEventHandler()?.processUpdateMessage(new RoomObjectVariableFxStatusUpdateMessage(
-            status.configId,
-            status.variableId,
-            status.value,
-            status.overrideMinValue,
-            status.overrideMaxValue,
-            status.extra,
-            status.isInitialize
-        ));
-    }
-
-    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/_SafeCls_90.as::removeVariableFxStatus()
-    private removeVariableFxStatus(roomId: number, status: VariableFxStatusRemoveData): void
-    {
-        const category = status.isUserEntity
-            ? RoomObjectCategoryEnum.OBJECT_CATEGORY_USER
-            : RoomObjectCategoryEnum.OBJECT_CATEGORY_FURNITURE;
-
-        const object = this.getRoomObject(roomId, status.entityId, category) as IRoomObjectController | null;
-
-        if(!object || !object.getEventHandler()) return;
-
-        object.getEventHandler()?.processUpdateMessage(
-            new RoomObjectVariableFxStatusRemoveMessage(status.configId, status.variableId)
-        );
     }
 
     /**
@@ -1419,14 +1322,11 @@ export class RoomEngine extends Component implements IRoomEngine,
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::SETUP_WITHOUT_TOOLBAR
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::SETUP_WITHOUT_GAME_MANAGER
 
+    // DEVIATION: AS3 first answers true when the active room's wired environment is in game mode
+    //   (`roomEvents.isGameMode`). The RPG fork removed wired, so only the room variable is read.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::getIsPlayingGame()
     getIsPlayingGame(roomId: number): boolean
     {
-        if(roomId === this._activeRoomId && this._roomEvents !== null && this._roomEvents.isGameMode)
-        {
-            return true;
-        }
-
         const room = this.getRoomInstance(roomId);
 
         return room !== null && room.getNumber(RoomVariableEnum.IS_PLAYING_GAME) > 0;
@@ -10020,16 +9920,12 @@ export class RoomEngine extends Component implements IRoomEngine,
                 selected = true;
                 this._selectedAvatarId = objectId;
 
-                // A click-user wired trigger owns the click, so the avatar must not turn as well.
-                // `_roomEvents` is an optional dependency here; AS3 reads `_roomEngine.roomEvents`
-                // unconditionally, and a null one means no wired environment has been received,
-                // which is the same answer as `hasClickUserWired() == false`.
-                if(!this._roomEvents?.hasClickUserWired())
-                {
-                    const location = object.getLocation();
+                // AS3 skips the LookTo when a click-user wired trigger owns the click
+                // (`roomEvents.hasClickUserWired()`). The RPG fork removed wired, which is the
+                // same answer AS3 gets with no wired environment received: always look.
+                const location = object.getLocation();
 
-                    this.connection?.send(new LookToMessageComposer(location.x, location.y));
-                }
+                this.connection?.send(new LookToMessageComposer(location.x, location.y));
             }
         }
 

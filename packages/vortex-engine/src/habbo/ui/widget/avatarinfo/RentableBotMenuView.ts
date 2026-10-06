@@ -167,10 +167,8 @@ export class RentableBotMenuView extends AvatarContextInfoButtonView
             this.showButton('nux_take_tour', skills.indexOf(BotSkillEnum.NUX_TAKE_TOUR) !== -1);
         }
 
-        this.showButton(
-            'wired_inspect',
-            this.widget.handler?.container?.userDefinedRoomEvents?.showInspectButton() ?? false
-        );
+        // AS3 asks the wired component (`showInspectButton()`); the RPG fork removed wired.
+        this.showButton('wired_inspect', false);
 
         for(const skill of data.botSkillsWithCommands)
         {

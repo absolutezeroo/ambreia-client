@@ -64,7 +64,7 @@ interface IRunIndexEntry
  *
  * Built from `vortex_perfmon_xml`, one of this port's own authored layouts in
  * `vortex-client/src/vortex-layouts/` — tab buttons wired to `WE_SELECTED`, one container per tab
- * toggled with `.visible`, exactly as `WiredMenuView` does it. Assembling the same window from
+ * toggled with `.visible`, exactly as the (removed) wired menu view did it. Assembling the same window from
  * `createWindow()` calls by hand produces something that works and looks nothing like the client:
  * the skinning lives in the layout, not in the window types.
  *

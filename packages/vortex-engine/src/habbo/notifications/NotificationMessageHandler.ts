@@ -156,24 +156,6 @@ import type {
     TreasureHuntFirstWinnerMessageEventParser
 } from '@habbo/communication/messages/parser/campaign/treasurehunt/TreasureHuntFirstWinnerMessageEventParser';
 import {
-    WiredTransactionSuccessMessageEvent
-} from '@habbo/communication/messages/incoming/userdefinedroomevents/wiredtrading/WiredTransactionSuccessMessageEvent';
-import type {
-    WiredTransactionSuccessMessageParser
-} from '@habbo/communication/messages/parser/userdefinedroomevents/wiredtrading/WiredTransactionSuccessMessageParser';
-import {
-    WiredTransactionFailMessageEvent
-} from '@habbo/communication/messages/incoming/userdefinedroomevents/wiredtrading/WiredTransactionFailMessageEvent';
-import type {
-    WiredTransactionFailMessageParser
-} from '@habbo/communication/messages/parser/userdefinedroomevents/wiredtrading/WiredTransactionFailMessageParser';
-import {
-    WiredTradeTransactionNotificationMessageEvent
-} from '@habbo/communication/messages/incoming/userdefinedroomevents/wiredtrading/WiredTradeTransactionNotificationMessageEvent';
-import type {
-    WiredTradeTransactionNotificationMessageParser
-} from '@habbo/communication/messages/parser/userdefinedroomevents/wiredtrading/trade/WiredTradeTransactionNotificationMessageParser';
-import {
     ClaimProductResultMessageEvent
 } from '@habbo/communication/messages/incoming/notifications/ClaimProductResultMessageEvent';
 import type {
@@ -374,12 +356,6 @@ export class NotificationMessageHandler implements IAvatarImageListener
         this.addMessageEvent(new TreasureHuntUpdateMessageEvent(this.onTreasureHuntUpdate.bind(this)));
         this.addMessageEvent(new TreasureHuntFailMessageEvent(this.onTreasureHuntFail.bind(this)));
         this.addMessageEvent(new TreasureHuntFirstWinnerMessageEvent(this.onTreasureHuntFirstWinner.bind(this)));
-        // AS3: _SafeCls_1951.as:129 — the toast beside the reward popup, see the handler below.
-        this.addMessageEvent(new WiredTransactionSuccessMessageEvent(this.onWiredTransactionSuccess.bind(this)));
-        this.addMessageEvent(new WiredTransactionFailMessageEvent(this.onWiredTransactionFail.bind(this)));
-        this.addMessageEvent(
-            new WiredTradeTransactionNotificationMessageEvent(this.onWiredTradeTransactionNotification.bind(this))
-        );
         this.addMessageEvent(new ClaimProductResultMessageEvent(this.onClaimProductResult.bind(this)));
 
         log.debug('Notification message handlers registered');
@@ -1125,99 +1101,6 @@ export class NotificationMessageHandler implements IAvatarImageListener
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/notifications/_SafeCls_1951.as::onTreasureHuntFirstWinner()
-    /**
-     * A wired transaction paid out — the toast that says so, in the notification list.
-     *
-     * This is not the reward popup: `RewardNotificationController` reads the same message and shows
-     * the chest. AS3 subscribes twice on purpose, and this port only had the popup half, so a
-     * transaction that opened no window left no trace at all.
-     *
-     * The key is built from the transaction type, with `.click_to_popup` appended when there is a
-     * reward the user has to open by hand — that suffix is what makes the toast say it is
-     * clickable, and the link it carries is what opens it.
-     */
-    // AS3: .../src/com/sulake/habbo/notifications/_SafeCls_1951.as::onWiredTransactionSuccess()
-    private onWiredTransactionSuccess(event: IMessageEvent): void
-    {
-        const contents = (event.parser as WiredTransactionSuccessMessageParser)?.contents ?? null;
-
-        if(contents === null) return;
-
-        const localization = this._notifications?.localizationManager;
-
-        if(!localization) return;
-
-        let key = `wired_transactions.notification.success.${contents.transactionSuccessTypeId}`;
-
-        if(contents.rewardContents !== null && !contents.openByDefault) key += '.click_to_popup';
-
-        const link = contents.rewardContents !== null ? `wiredrewards/open/${contents.internalId}` : null;
-
-        this._notifications?.addItem(
-            localization.getLocalizationWithParams(
-                key, localization.getLocalization('wired_transactions.notification.success')
-            ),
-            'info',
-            'chests_icon_successful',
-            link
-        );
-    }
-
-    /**
-     * A wired transaction was refused.
-     *
-     * The failure type is not the message — it is a key into
-     * `wired_transactions.notification.fail.<id>`, whose result becomes the `reason` parameter of
-     * the sentence around it. Two lookups, exactly as AS3 writes them.
-     */
-    // AS3: .../src/com/sulake/habbo/notifications/_SafeCls_1951.as::onWiredTransactionFail()
-    private onWiredTransactionFail(event: IMessageEvent): void
-    {
-        const localization = this._notifications?.localizationManager;
-
-        if(!localization) return;
-
-        const parser = event.parser as WiredTransactionFailMessageParser;
-
-        this._notifications?.addItem(
-            localization.getLocalizationWithParams(
-                'wired_transactions.notification.fail', '',
-                'reason',
-                localization.getLocalization(
-                    `wired_transactions.notification.fail.${parser.transactionFailureTypeId}`
-                )
-            ),
-            'info',
-            'chests_icon_rejected'
-        );
-    }
-
-    /**
-     * A wired *trade* went wrong — the same two-lookup shape as the failure above, on its own
-     * key space and with its own icon.
-     */
-    // AS3: .../src/com/sulake/habbo/notifications/_SafeCls_1951.as::onWiredTradeTransactionNotification()
-    private onWiredTradeTransactionNotification(event: IMessageEvent): void
-    {
-        const localization = this._notifications?.localizationManager;
-
-        if(!localization) return;
-
-        const parser = event.parser as WiredTradeTransactionNotificationMessageParser;
-
-        this._notifications?.addItem(
-            localization.getLocalizationWithParams(
-                'wired_transactions.notification.trade_error', '',
-                'error',
-                localization.getLocalization(
-                    `wired_transactions.notification.trade_error.${parser.tradeTransactionNotificationId}`
-                )
-            ),
-            'info',
-            'chests_icon_trading_error'
-        );
-    }
-
     /**
      * The result of claiming a product.
      *

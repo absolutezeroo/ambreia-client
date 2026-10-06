@@ -6,7 +6,6 @@ import type {IHabboNavigator} from '@habbo/navigator/IHabboNavigator';
 import type {IHabboInventory} from '@habbo/inventory/IHabboInventory';
 import type {IHabboToolbar} from '@habbo/toolbar/IHabboToolbar';
 import type {IHabboFreeFlowChat} from '@habbo/freeflowchat/IHabboFreeFlowChat';
-import type {IHabboUserDefinedRoomEvents} from '@habbo/roomevents/IHabboUserDefinedRoomEvents';
 import type {IRoomEngine} from '@habbo/room/IRoomEngine';
 import type {IRoomSession} from '@habbo/session/IRoomSession';
 import {RoomSessionEvent} from '@habbo/session/events/RoomSessionEvent';
@@ -20,18 +19,11 @@ import {
 import type {
     GetGuestRoomResultMessageParser
 } from '@habbo/communication/messages/parser/navigator/GetGuestRoomResultMessageParser';
-import {
-    WiredSaveSuccessEvent
-} from '@habbo/communication/messages/incoming/userdefinedroomevents/WiredSaveSuccessEvent';
-import {
-    WiredValidationErrorEvent
-} from '@habbo/communication/messages/incoming/userdefinedroomevents/WiredValidationErrorEvent';
 import {IID_HabboCommunicationManager} from '@iid/IIDHabboCommunicationManager';
 import {IID_HabboNavigator} from '@iid/IIDHabboNavigator';
 import {IID_HabboInventory} from '@iid/IIDHabboInventory';
 import {IID_HabboToolbar} from '@iid/IIDHabboToolbar';
 import {IID_HabboFreeFlowChat} from '@iid/IIDHabboFreeFlowChat';
-import {IID_HabboUserDefinedRoomEvents} from '@iid/IIDHabboUserDefinedRoomEvents';
 import {IID_RoomEngine} from '@iid/IIDRoomEngine';
 import {IID_RoomSessionManager} from '@iid/IIDRoomSessionManager';
 
@@ -44,14 +36,14 @@ import type {IHabboActivityDetection} from './IHabboActivityDetection';
  *
  * **Every activity has a decay window, and the window widens the more you do it.** A single chat
  * line counts as "chatting" for 30 seconds; thirty lines inside five minutes stretch that to the
- * full five. `getDynamicWindowMs()` is the interpolation, and the three arrays are the timestamps
- * it counts — chat, furniture moves, wired edits, each pruned to the last five minutes. That is
+ * full five. `getDynamicWindowMs()` is the interpolation, and the arrays are the timestamps it
+ * counts — chat and furniture moves, each pruned to the last five minutes. (AS3 also counts wired
+ * edits and an open wired UI as "creating wired"; the RPG fork removed wired.) That is
  * what keeps a status from flickering back to "chilling" between two sentences while still
  * dropping it for someone who typed once and left.
  *
  * Two states bypass the decay entirely because the session already knows them outright: dancing is
- * a flag on the avatar, and building is `isUserDecorating`. The wired UI being *open* likewise
- * counts as creating-wired with no timestamp involved.
+ * a flag on the avatar, and building is `isUserDecorating`.
  *
  * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/discord/habbo_activity/HabboActivityDetection.as
  */
@@ -87,9 +79,6 @@ export class HabboActivityDetection extends Component implements IHabboActivityD
     // AS3: .../habbo_activity/HabboActivityDetection.as::_communicationManager
     private _communicationManager: IHabboCommunicationManager | null = null;
 
-    // AS3: .../habbo_activity/HabboActivityDetection.as::_wired
-    private _wired: IHabboUserDefinedRoomEvents | null = null;
-
     // AS3: .../habbo_activity/HabboActivityDetection.as::_freeFlowChat
     private _freeFlowChat: IHabboFreeFlowChat | null = null;
 
@@ -104,9 +93,6 @@ export class HabboActivityDetection extends Component implements IHabboActivityD
 
     // AS3: .../habbo_activity/HabboActivityDetection.as::_SafeStr_7727 (name derived: currently dancing)
     private _dancing: boolean = false;
-
-    // AS3: .../habbo_activity/HabboActivityDetection.as::_SafeStr_6690 (name derived: last wired edit, ms)
-    private _lastWiredTime: number = 0;
 
     // AS3: .../habbo_activity/HabboActivityDetection.as::_SafeStr_5812 (name derived: last furni move, ms)
     private _lastFurniTime: number = 0;
@@ -129,9 +115,6 @@ export class HabboActivityDetection extends Component implements IHabboActivityD
     // AS3: .../habbo_activity/HabboActivityDetection.as::_SafeStr_6818 (name derived: furni timestamps)
     private _furniTimestamps: number[] = [];
 
-    // AS3: .../habbo_activity/HabboActivityDetection.as::_SafeStr_7343 (name derived: wired timestamps)
-    private _wiredTimestamps: number[] = [];
-
     /**
 	 * AS3 calls `addMessageEvent(new …)` for each of the three, *then* loops `_messageEvents` and
 	 * calls `addMessageEvent` again on every element — but nothing ever pushes into that vector, so
@@ -147,8 +130,6 @@ export class HabboActivityDetection extends Component implements IHabboActivityD
 
         this._manager = manager;
 
-        this._messageEvents.push(new WiredSaveSuccessEvent(this.onModifyingWired));
-        this._messageEvents.push(new WiredValidationErrorEvent(this.onModifyingWired));
         this._messageEvents.push(new GetGuestRoomResultMessageEvent(this.onGetGuestRoomResult));
     }
 
@@ -156,9 +137,9 @@ export class HabboActivityDetection extends Component implements IHabboActivityD
      * DEVIATION: AS3 subscribes in the constructor, where its DI has already resolved
      *   `_communicationManager`. This port resolves dependencies *after* construction, so the same
      *   loop ran against a null manager and `addMessageEvent()`'s optional chain swallowed all
-     *   three — the events were built and never registered. `WiredMenuController` carries the same
-     *   deviation for the same reason, and `DiscordSettingsController` needed it too: its
-     *   `DiscordPreferences` (2767) was arriving to no handler and being dropped.
+     *   three — the events were built and never registered. `DiscordSettingsController` needed the
+     *   same deviation for the same reason: its `DiscordPreferences` (2767) was arriving to no
+     *   handler and being dropped.
      * AS3: .../habbo_activity/HabboActivityDetection.as::HabboActivityDetection()
      */
     // AS3: .../habbo_activity/HabboActivityDetection.as::HabboActivityDetection()
@@ -246,10 +227,6 @@ export class HabboActivityDetection extends Component implements IHabboActivityD
             new ComponentDependency(
                 IID_HabboToolbar,
                 (toolbar: IHabboToolbar | null) => { this._toolbar = toolbar; }
-            ),
-            new ComponentDependency(
-                IID_HabboUserDefinedRoomEvents,
-                (wired: IHabboUserDefinedRoomEvents | null) => { this._wired = wired; }
             ),
         ];
     }
@@ -355,16 +332,6 @@ export class HabboActivityDetection extends Component implements IHabboActivityD
             states.push(HabboActivityState.CHATTING);
         }
 
-        const wiredWindow = this.getDynamicWindowMs(this._wiredTimestamps, now);
-
-        if(
-            (this._wired !== null && this._wired.hasWiredUIOpen())
-            || (this._lastWiredTime > 0 && now - this._lastWiredTime <= wiredWindow)
-        )
-        {
-            states.push(HabboActivityState.CREATING_WIRED);
-        }
-
         return states;
     }
 
@@ -412,16 +379,6 @@ export class HabboActivityDetection extends Component implements IHabboActivityD
             this._manager?.tryUpdatePresence();
         }
     }
-
-    // AS3: .../habbo_activity/HabboActivityDetection.as::onModifyingWired()
-    private onModifyingWired = (event: IMessageEvent): void =>
-    {
-        if(event === null) return;
-
-        this._lastWiredTime = HabboActivityDetection.getTimer();
-        this.recordActivity(this._wiredTimestamps, this._lastWiredTime);
-        this._manager?.tryUpdatePresence();
-    };
 
     // AS3: .../habbo_activity/HabboActivityDetection.as::onRoomEngineObjectPlaced()
     private onRoomEngineObjectPlaced(event: RoomEngineObjectPlacedEvent): void
@@ -519,11 +476,9 @@ export class HabboActivityDetection extends Component implements IHabboActivityD
     {
         this._lastChatTime = 0;
         this._dancing = false;
-        this._lastWiredTime = 0;
         this._lastFurniTime = 0;
         this._chatTimestamps = [];
         this._furniTimestamps = [];
-        this._wiredTimestamps = [];
     }
 
     // AS3: .../habbo_activity/HabboActivityDetection.as::addMessageEvent()

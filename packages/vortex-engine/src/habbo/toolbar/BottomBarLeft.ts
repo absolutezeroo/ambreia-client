@@ -156,7 +156,8 @@ export class BottomBarLeft implements ILinkEventTracker
         // Set initial icon visibility
         this.iconVisibility(HabboToolbarIconEnum.getIconName('HTIE_ICON_MEMENU') ?? '', false);
         this.iconVisibility(HabboToolbarIconEnum.getIconName('HTIE_ICON_INVENTORY') ?? '', false);
-        this.iconVisibility(HabboToolbarIconEnum.getIconName('HTIE_ICON_WIRED_MENU') ?? '', false);
+        // The wired-menu icon: its enum entry is gone with wired (RPG fork), the layout child is not yet.
+        this.iconVisibility('WIRED_MENU', false);
 
         const gamesEnabled = toolbar.getBoolean('games_icon_enabled');
 
@@ -486,12 +487,9 @@ export class BottomBarLeft implements ILinkEventTracker
             {
                 // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/toolbar/BottomBarLeft.as::setToolbarState()
                 // `_loc2_.visible &&= _loc4_ && _toolbar.roomEvents != null && _toolbar.roomEvents.showToolbarMenuButton();`
-                // roomEvents is currently always null (IHabboUserDefinedRoomEvents has no
-                // concrete implementation yet - see IHabboUserDefinedRoomEvents.ts), so this
-                // stays dormant (matches AS3's own `!= null` guard) rather than force-visible.
-                const roomEvents = this._toolbar!.roomEvents;
-
-                child.visible = child.visible && isRoomState && roomEvents != null && roomEvents.showToolbarMenuButton();
+                // The RPG fork removed wired, so `roomEvents` is always null and AS3's own guard
+                // makes this false. The icon is still in the shipped layout until it is cleaned.
+                child.visible = false;
             }
         }
 
@@ -698,31 +696,6 @@ export class BottomBarLeft implements ILinkEventTracker
             : (this._window as IWindowContainer).findChildByName(iconName);
 
         return onBar ?? this._meMenuController?.getIcon(iconId) ?? this._progMenuController?.getIcon(iconId) ?? null;
-    }
-
-    /**
-     * React to a wired-menu preference change: shows/hides the WIRED_MENU
-     * toolbar icon based on the room-events module's current permission.
-     *
-     * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/toolbar/BottomBarLeft.as::onWiredMenuEvent()
-     */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/toolbar/BottomBarLeft.as::onWiredMenuEvent()
-    public onWiredMenuEvent(eventType: string): void
-    {
-        if(eventType === 'WIRED_MENU_BUTTON_PREFERENCE_CHANGED' && this._window)
-        {
-            const iconName = HabboToolbarIconEnum.getIconName('HTIE_ICON_WIRED_MENU');
-            const icon = iconName ? (this._window as IWindowContainer).findChildByName(iconName) : null;
-
-            if(icon)
-            {
-                const roomEvents = this._toolbar!.roomEvents;
-
-                icon.visible = roomEvents != null && roomEvents.showToolbarMenuButton();
-            }
-        }
-
-        this.checkSize();
     }
 
     /**
@@ -1080,7 +1053,6 @@ export class BottomBarLeft implements ILinkEventTracker
             case 'HTIE_ICON_RECEPTION': return 'icons_toolbar_reception';
             case 'HTIE_ICON_BUILDER': return 'icons_toolbar_builder';
             case 'HTIE_ICON_CAMERA': return 'icons_toolbar_camera';
-            case 'HTIE_ICON_WIRED_MENU': return 'icons_toolbar_wired_menu';
             default: return null;
         }
     }

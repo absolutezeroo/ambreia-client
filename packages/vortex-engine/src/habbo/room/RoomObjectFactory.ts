@@ -13,11 +13,6 @@ import type {IRoomObjectFactory} from '@room/IRoomObjectFactory';
 import type {IRoomObjectEventHandler} from '@room/object/logic/IRoomObjectEventHandler';
 import type {IRoomObjectManager} from '@room/IRoomObjectManager';
 import {RoomObjectManager} from '@room/RoomObjectManager';
-import {OrderedMap} from '@core/utils/OrderedMap';
-import type {VariableFxConfigUpdateData} from './object/variablefx/VariableFxConfigUpdateData';
-import {VariableFxLogicConfig} from './object/logic/VariableFxLogicConfig';
-import {AvatarLogicRoomData} from './object/logic/AvatarLogicRoomData';
-import {FurnitureLogicRoomData} from './object/logic/FurnitureLogicRoomData';
 import {RoomObjectLogicEnum} from './object/RoomObjectLogicEnum';
 import {FurnitureLogic} from './object/logic/furniture/FurnitureLogic';
 import {FurnitureMultiStateLogic} from './object/logic/furniture/FurnitureMultiStateLogic';
@@ -34,8 +29,6 @@ import {FurnitureExternalImageLogic} from './object/logic/furniture/FurnitureExt
 import {FurniturePresentLogic} from './object/logic/furniture/FurniturePresentLogic';
 import {FurnitureTrophyLogic} from './object/logic/furniture/FurnitureTrophyLogic';
 import {FurnitureEcotronBoxLogic} from './object/logic/furniture/FurnitureEcotronBoxLogic';
-import {FurnitureFurniChestLogic} from './object/logic/furniture/FurnitureFurniChestLogic';
-import {FurnitureCoinsChestLogic} from './object/logic/furniture/FurnitureCoinsChestLogic';
 import {FurnitureDiceLogic} from './object/logic/furniture/FurnitureDiceLogic';
 import {FurnitureHockeyScoreLogic} from './object/logic/furniture/FurnitureHockeyScoreLogic';
 import {FurnitureHabboWheelLogic} from './object/logic/furniture/FurnitureHabboWheelLogic';
@@ -107,19 +100,6 @@ export class RoomObjectFactory implements IRoomObjectFactory
     // AS3: .../src/com/sulake/habbo/room/RoomObjectFactory.as::_objectEventListeners
     private _objectEventListeners: Array<(event: unknown) => void>;
 
-    /**
-     * Per-room VariableFx config stores, keyed by room *identifier*. Two maps rather than one
-     * because a config is either a user effect or a furniture one, and each half is read by a
-     * different set of object logics.
-     */
-    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/RoomObjectFactory.as::_avatarLogicRoomData
-    //   Name derived: the AS3 field is `_SafeStr_5897`; named for what it holds.
-    private _avatarLogicRoomData: OrderedMap<string, AvatarLogicRoomData> = new OrderedMap();
-
-    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/RoomObjectFactory.as::_furnitureLogicRoomData
-    //   Name derived: the AS3 field is `_SafeStr_5916`.
-    private _furnitureLogicRoomData: OrderedMap<string, FurnitureLogicRoomData> = new OrderedMap();
-
     constructor()
     {
         this._events = new EventEmitter();
@@ -174,7 +154,7 @@ export class RoomObjectFactory implements IRoomObjectFactory
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/RoomObjectFactory.as::createRoomObjectLogic()
     // The case order mirrors the AS3 switch. AS3 has no default branch: an unknown type leaves the
     // class null and the method returns null, so the object simply gets no event handler.
-    createRoomObjectLogic(type: string, roomId: string | null = null): IRoomObjectEventHandler | null
+    createRoomObjectLogic(type: string): IRoomObjectEventHandler | null
     {
         let LogicClass: LogicConstructor | null = null;
 
@@ -242,13 +222,13 @@ export class RoomObjectFactory implements IRoomObjectFactory
 
                 break;
 
+            // DEVIATION: AS3 builds FurnitureFurniChestLogic / FurnitureCoinsChestLogic here. The RPG
+            //   fork removed the wired chests, but furnidata can still name these two types, so they
+            //   get the chests' own base, FurnitureLogic: a plain furni rather than one with no
+            //   logic at all (which is what an unknown type gets — see the note above).
             case RoomObjectLogicEnum.FURNITURE_FURNI_CHEST:
-                LogicClass = FurnitureFurniChestLogic;
-
-                break;
-
             case RoomObjectLogicEnum.FURNITURE_COINS_CHEST:
-                LogicClass = FurnitureCoinsChestLogic;
+                LogicClass = FurnitureLogic;
 
                 break;
 
@@ -580,22 +560,6 @@ export class RoomObjectFactory implements IRoomObjectFactory
 
         if(logic !== null)
         {
-            // The logic's link to its room's VariableFx config store. Without it every effect on
-            // this object resolves no config and publishes nothing — the whole feature goes quiet
-            // without failing. Avatars and pets share the avatar store; everything else that is a
-            // FurnitureLogic takes the furniture one.
-            if(roomId)
-            {
-                if(logic instanceof AvatarLogic || logic instanceof PetLogic)
-                {
-                    logic.roomData = this.getAvatarLogicRoomData(roomId);
-                }
-                else if(logic instanceof FurnitureLogic)
-                {
-                    logic.roomData = this.getFurnitureLogicRoomData(roomId);
-                }
-            }
-
             logic.eventDispatcher = this._events;
 
             if(!this._registeredTypes.has(type))
@@ -620,76 +584,6 @@ export class RoomObjectFactory implements IRoomObjectFactory
     createRoomObjectManager(): IRoomObjectManager
     {
         return new RoomObjectManager();
-    }
-
-    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/RoomObjectFactory.as::getAvatarLogicRoomData()
-    private getAvatarLogicRoomData(roomId: string): AvatarLogicRoomData
-    {
-        let data = this._avatarLogicRoomData.getValue(roomId);
-
-        if(data === null)
-        {
-            data = new AvatarLogicRoomData();
-            this._avatarLogicRoomData.add(roomId, data);
-        }
-
-        return data;
-    }
-
-    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/RoomObjectFactory.as::getFurnitureLogicRoomData()
-    private getFurnitureLogicRoomData(roomId: string): FurnitureLogicRoomData
-    {
-        let data = this._furnitureLogicRoomData.getValue(roomId);
-
-        if(data === null)
-        {
-            data = new FurnitureLogicRoomData();
-            this._furnitureLogicRoomData.add(roomId, data);
-        }
-
-        return data;
-    }
-
-    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/RoomObjectFactory.as::updateVariableFxConfigs()
-    updateVariableFxConfigs(roomId: string, configs: VariableFxConfigUpdateData[]): void
-    {
-        for(const config of configs)
-        {
-            const store = config.isUserFx
-                ? this.getAvatarLogicRoomData(roomId)
-                : this.getFurnitureLogicRoomData(roomId);
-
-            store.variableFxLogicManager?.upsertConfig(new VariableFxLogicConfig(
-                config.configId,
-                config.isUserFx,
-                config.showMode,
-                config.visibilityMask,
-                config.showOnMouseHover,
-                config.showDuration
-            ));
-        }
-    }
-
-    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/RoomObjectFactory.as::removeVariableFxConfigs()
-    removeVariableFxConfigs(roomId: string, configIds: number[]): void
-    {
-        // Both stores, unconditionally: the remove message carries ids and nothing else, so which
-        // half a config lived in is not knowable here. Removing from the wrong one is a no-op.
-        const avatars = this.getAvatarLogicRoomData(roomId);
-        const furniture = this.getFurnitureLogicRoomData(roomId);
-
-        for(const configId of configIds)
-        {
-            avatars.variableFxLogicManager?.removeConfig(configId);
-            furniture.variableFxLogicManager?.removeConfig(configId);
-        }
-    }
-
-    // AS3: sources/AIR-1.0.31/src/com/sulake/habbo/room/RoomObjectFactory.as::disposeRoomLogicData()
-    disposeRoomLogicData(roomId: string): void
-    {
-        this._avatarLogicRoomData.remove(roomId)?.dispose();
-        this._furnitureLogicRoomData.remove(roomId)?.dispose();
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/RoomObjectFactory.as::addTrackedEventType()

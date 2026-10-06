@@ -77,7 +77,6 @@ export class OtherSettingsView
         this._window.procedure = this.onButtonClicked;
 
         this.setChecked('ignore_room_invites_checkbox', toolbar.messenger?.getRoomInvitesIgnored() ?? false);
-        this.setChecked('disable_wired_whisper_checkbox', toolbar.roomEvents?.wiredWhisperDisabled ?? false);
 
         const cameraFollowEnabled = toolbar.getBoolean('room.camera.follow_user');
         const cameraFollowRow = this._window.findChildByName('disable_room_camera_follow');
@@ -144,13 +143,6 @@ export class OtherSettingsView
                 toolbar.connection?.send(
                     new SetIgnoreRoomInvitesMessageComposer(toolbar.messenger?.getRoomInvitesIgnored() ?? false)
                 );
-                break;
-            case 'disable_wired_whisper_checkbox':
-                // Client-side only: AS3 sends nothing for this one.
-                if(toolbar.roomEvents !== null)
-                {
-                    toolbar.roomEvents.wiredWhisperDisabled = this.isChecked('disable_wired_whisper_checkbox');
-                }
                 break;
             case 'disable_room_camera_follow_checkbox':
             {

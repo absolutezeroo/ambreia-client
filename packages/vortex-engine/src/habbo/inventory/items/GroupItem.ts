@@ -11,7 +11,6 @@ import type {ITextWindow} from '@core/window/components/ITextWindow';
 import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
 import type {ILimitedItemGridOverlayWidget} from '@habbo/window/widgets/ILimitedItemGridOverlayWidget';
 import type {IRarityItemGridOverlayWidget} from '@habbo/window/widgets/IRarityItemGridOverlayWidget';
-import type {IChestItemGridOverlayWidget} from '@habbo/window/widgets/IChestItemGridOverlayWidget';
 import type {IGetImageListener} from '@habbo/room/IGetImageListener';
 import type {ImageResult} from '@habbo/room/ImageResult';
 import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
@@ -1220,34 +1219,8 @@ export class GroupItem implements IGetImageListener
                 container.visible = true;
             }
         }
-        else if(this._category === FurnitureCategory.COINS_CHEST || this._category === FurnitureCategory.FURNI_CHEST)
-        {
-            // AS3 has a whole chest branch this port was missing: a coloured plaque
-            // (gold for coins chests, brown for furni chests) with the contents count.
-            const container = this._window.findChildByName('chest_overlay_container') as IWidgetWindow | null;
-            const color = this._category === FurnitureCategory.COINS_CHEST ? 'gold' : 'brown';
-
-            if(container)
-            {
-                const widget = container.widget as IChestItemGridOverlayWidget | null;
-
-                if(widget)
-                {
-                    widget.contentsCount = this._stuffData?.contentsCount ?? 0;
-                    widget.color = color;
-                }
-
-                container.visible = true;
-            }
-
-            const background = this._window.findChildByName('chest_background_bitmap') as IStaticBitmapWrapperWindow | null;
-
-            if(background)
-            {
-                background.assetUri = `chest_overlay_${color}_background`;
-                background.visible = true;
-            }
-        }
+        // AS3 has a third branch here for coins/furni chests: a coloured plaque with the contents
+        // count, drawn by the `chest_overlay_grid` widget. The RPG fork removed the wired chests.
 
         const bitmap = this._window.findChildByName('bitmap') as IBitmapWrapperWindow | null;
 

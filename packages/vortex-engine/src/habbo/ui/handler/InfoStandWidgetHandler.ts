@@ -1471,10 +1471,6 @@ export class InfoStandWidgetHandler implements IRoomWidgetHandler, IGetImageList
                 this.handleGetRentableBotInfoMessage(roomId, message.id, message.category, userData);
                 break;
         }
-
-        // AS3: InfoStandWidgetHandler.as::handleGetUserInfoMessage() — tells the wired menu which
-        // user is selected, so its inspection tab follows the infostand.
-        container.userDefinedRoomEvents?.userSelected(message.id);
     }
 
     /**
@@ -1873,8 +1869,6 @@ export class InfoStandWidgetHandler implements IRoomWidgetHandler, IGetImageList
                 event.classId = typeId;
             }
         }
-
-        container.userDefinedRoomEvents?.stuffSelected(message.category === 10 ? object.getId() : -object.getId());
 
         if(type.indexOf('post_it') > -1) event.isStickie = true;
 
