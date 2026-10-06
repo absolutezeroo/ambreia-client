@@ -420,11 +420,11 @@ export class RoomObjectFactory implements IRoomObjectFactory
 
             // DEVIATION: AS3 builds FurnitureMysterboxLogic / FurnitureMysteryTrophyLogic here. The RPG
             //   fork removed mystery boxes, but furnidata still names these two types, so they get those
-            //   logics' common ancestor, FurnitureLogic: a plain furni that can still be clicked, moved
-            //   and picked up.
+            //   logics' real parent, FurnitureMultiStateLogic: a furni that still toggles its state, can
+            //   be moved and picked up.
             case RoomObjectLogicEnum.FURNITURE_MYSTERYBOX:
             case RoomObjectLogicEnum.FURNITURE_MYSTERYTROPHY:
-                LogicClass = FurnitureLogic;
+                LogicClass = FurnitureMultiStateLogic;
 
                 break;
 

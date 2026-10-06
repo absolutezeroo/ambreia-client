@@ -275,6 +275,7 @@ export class UserData implements IUserData
         this._isRiding = value;
     }
 
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/UserData.as::_botSkills
     private _botSkills: number[] = [];
 
     // AS3: .../src/com/sulake/habbo/session/UserData.as::get botSkills()

@@ -52,6 +52,8 @@ export class OtherSettingsView
         return this._window;
     }
 
+    // DEVIATION: AS3 leaves the `disable_wired_whisper` row visible, bound to the wired-whisper preference —
+    //   the RPG fork removed wired, so the row is hidden after the layout is built.
     // AS3: .../OtherSettingsView.as::createWindow()
     private createWindow(): void
     {
@@ -75,6 +77,10 @@ export class OtherSettingsView
         if(this._window === null) return;
 
         this._window.procedure = this.onButtonClicked;
+
+        const wiredWhisperRow = this._window.findChildByName('disable_wired_whisper');
+
+        if(wiredWhisperRow) wiredWhisperRow.visible = false;
 
         this.setChecked('ignore_room_invites_checkbox', toolbar.messenger?.getRoomInvitesIgnored() ?? false);
 

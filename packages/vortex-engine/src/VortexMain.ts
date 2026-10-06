@@ -914,7 +914,7 @@ export class VortexMain implements IVortexMain
         // (`HabboDiscordManagerBootstrap`, listed in `HabboDiscordCom.requiredClasses`), which this
         // port replaces with a direct construction — the same treatment `AdManager` gets above.
         // It goes last on purpose: its constructor builds `HabboActivityDetection`, which queues
-        // eight interfaces including the toolbar, free-flow chat and the room engine, all attached
+        // seven interfaces including the toolbar, free-flow chat and the room engine, all attached
         // above.
         // The asset library is what `DiscordSettingsView` reads `discord_settings_xml` out of;
         // without one the settings window builds nothing and only warns.

@@ -113,7 +113,7 @@ Data flow: `Engine emits event → Client display class listens and updates`
    **Exception du fork RPG :** ce dépôt est le client du RPG Habbo
    (spec : `vortex-rpg-emulator/docs/superpowers/specs/2026-10-05-habbo-rpg-design.md`).
    Les features listées en section 7 de la spec (« Retiré ») sont supprimées volontairement et ne
-   doivent pas être re-portées. Tout le reste suit toujours la règle du port complet.
+   doivent pas être re-portées, sauf le derby de pêche, gardé (décision 1 du plan M0 client). Tout le reste suit toujours la règle du port complet.
 9. **Managers**: DI Component with IID registration, one `I<Manager>` interface per manager (see `docs/PATTERNS.md` → Manager template)
 
 ## AS3 traceability
