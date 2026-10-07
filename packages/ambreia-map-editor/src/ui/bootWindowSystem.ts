@@ -4,8 +4,6 @@ import {parseElementDescriptionXml, parseSkinXml, parseWindowLayoutXml} from '@a
 import type {ISkinData} from '@ambreia/ui/graphics/renderer/BitmapSkinParser';
 import {WindowManager} from '@ambreia/ui/kit/WindowManager';
 import {EditorTexts} from './EditorTexts';
-import canvasLayout from './layouts/vortex_map_editor_canvas_xml.xml?raw';
-import isoViewLayout from './layouts/vortex_map_editor_iso_view_xml.xml?raw';
 
 const DESCRIPTION = 'habbo_element_description_xml';
 // The one atlas whose embedded name is not its file name (see the client's App.ts).
@@ -28,6 +26,9 @@ const FONTS: readonly [string, string, string, string][] = [
 const EDITOR_LAYOUTS = import.meta.glob('../../../vortex-client/src/vortex-layouts/vortex_map_editor_*.xml', {
     query: '?raw', import: 'default', eager: true
 }) as Record<string, string>;
+
+/** The editor's own layouts (view host, canvas host, forms, section title), next to the owner's. */
+const OWN_LAYOUTS = import.meta.glob('./layouts/*.xml', {query: '?raw', import: 'default', eager: true}) as Record<string, string>;
 
 /** Ambreia's own skins, merged over the Habbo dump as the client does (its src/vortex-skins/). */
 const AUTHORED_SKINS = import.meta.glob('../../../vortex-client/src/vortex-skins/*.xml', {
@@ -137,8 +138,7 @@ export async function bootWindowSystem(): Promise<{manager: WindowManager; texts
     }
 
     for(const [path, text] of Object.entries(EDITOR_LAYOUTS)) manager.registerWidgetLayout(baseName(path), text);
-    manager.registerWidgetLayout('vortex_map_editor_iso_view_xml', isoViewLayout);
-    manager.registerWidgetLayout('vortex_map_editor_canvas_xml', canvasLayout);
+    for(const [path, text] of Object.entries(OWN_LAYOUTS)) manager.registerWidgetLayout(baseName(path), text);
 
     return {manager, texts};
 }

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The editor's own, in the style of the owner's vortex_map_editor_inspect_tile_xml: the left column of a category edited as a form (walls, ambience).
+     The fields are the owner's templates (field_text, field_number, field_select, field_area,
+     check_row), added to field_list by the code. Retouch freely in Glaze. -->
+<layout name="vortex_map_editor_left_form_xml" width="300" height="584" version="0.1">
+  <window>
+    <border x="0" y="0" width="300" height="584" params="16" style="2" name="form_panel" color="0xe8eef4">
+      <children>
+        <container x="1" y="1" width="298" height="22" params="16" style="8" color="0xff3d7aa8" background="true"/>
+        <text x="8" y="4" width="240" height="16" params="16" style="3" name="form_title" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="0" y="24" width="300" height="560" params="16" style="3" name="form_body">
+          <children>
+            <text x="12" y="6" width="276" height="30" params="16" style="3" name="form_hint" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x6b7682" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <scrollable_itemlist_vertical x="4" y="38" width="292" height="514" params="16" style="3" name="field_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="4" type="int"/>
+              </variables>
+            </scrollable_itemlist_vertical>
+          </children>
+        </container>
+      </children>
+    </border>
+  </window>
+</layout>
