@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_bottom_test_xml" width="942" height="217" version="0.1">
+  <window>
+    <border x="0" y="0" width="942" height="217" params="16" style="2" name="test_panel" color="0xe8eef4">
+      <children>
+        <container x="1" y="1" width="940" height="22" params="16" style="8" color="0xff3d7aa8" background="true"/>
+        <text x="8" y="4" width="882" height="16" params="16" style="3" name="test_panel_title" caption="${vortex.mapeditor.test.title}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="0" y="24" width="942" height="193" params="16" style="3" name="test_panel_body">
+          <children>
+            <widget x="12" y="8" width="64" height="110" params="16" style="3" name="avatar_image">
+              <variables>
+                <var key="widget_type" value="avatar_image" type="String"/>
+              </variables>
+            </widget>
+            <button_thick x="90" y="40" width="170" height="28" params="131089" style="6" color="0x0aa00" name="run_test_button" caption="${vortex.mapeditor.test.run}" width_min="170" width_max="170"/>
+            <text x="290" y="22" width="100" height="16" params="16" style="3" caption="${vortex.mapeditor.test.level}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container x="290" y="42" width="90" height="24" params="16" style="3" name="test_level_box">
+              <children>
+                <border x="0" y="0" width="72" height="24" params="16" style="2" color="0xffffff">
+                  <children>
+                    <input x="6" y="4" width="60" height="16" params="1" style="0" name="test_level" caption=""/>
+                  </children>
+                </border>
+                <border x="72" y="0" width="12" height="12" params="17" style="2" name="test_level_up" dynamic_style="button" color="0xe4e4dc">
+                  <children>
+                    <static_bitmap x="-2" y="-2" width="16" height="16" params="16" style="3" tags="%23icon">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_up_north_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                  </children>
+                </border>
+                <border x="72" y="12" width="12" height="12" params="17" style="2" name="test_level_down" dynamic_style="button" color="0xe4e4dc">
+                  <children>
+                    <static_bitmap x="-2" y="-2" width="16" height="16" params="16" style="3" tags="%23icon">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_down_south_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                  </children>
+                </border>
+              </children>
+            </container>
+            <text x="400" y="22" width="100" height="16" params="16" style="3" caption="${vortex.character.class}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <dropmenu x="400" y="42" width="150" height="24" params="17" style="3" name="test_class" caption=""/>
+            <container x="290" y="84" width="300" height="92" params="16" style="3" name="debug_options">
+              <children>
+                <checkbox x="0" y="0" width="18" height="18" params="17" style="3" name="god_mode"/>
+                <text x="24" y="2" width="120" height="16" params="16" style="3" caption="${vortex.mapeditor.test.god}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <checkbox x="0" y="24" width="18" height="18" params="17" style="3" name="show_aoi"/>
+                <text x="24" y="26" width="120" height="16" params="16" style="3" caption="${vortex.mapeditor.test.aoi}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <checkbox x="150" y="0" width="18" height="18" params="17" style="3" name="show_collisions"/>
+                <text x="174" y="2" width="140" height="16" params="16" style="3" caption="${vortex.mapeditor.test.collisions}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <checkbox x="150" y="24" width="18" height="18" params="17" style="3" name="show_pathfinding"/>
+                <text x="174" y="26" width="140" height="16" params="16" style="3" caption="${vortex.mapeditor.test.pathfinding}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </container>
+            <container x="612" y="8" width="1" height="177" params="16" style="8" color="0xffd0d0c8" background="true"/>
+            <text x="626" y="8" width="240" height="16" params="16" style="3" caption="${vortex.mapeditor.test.perf}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x1f5f9a" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <itemlist_vertical x="626" y="30" width="220" height="80" params="16" style="3" name="perf_list">
+              <children>
+                <container x="0" y="0" width="220" height="20" params="144" style="3" name="kv_row">
+                  <children>
+                    <text x="0" y="2" width="100" height="16" params="16" style="3" name="label" caption="${vortex.mapeditor.test.players}">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <text x="100" y="2" width="120" height="16" params="16" style="3" name="value" caption="">
+                      <variables>
+                        <var key="text_style" value="u_bold" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </container>
+                <container x="0" y="0" width="220" height="20" params="144" style="3" name="kv_row">
+                  <children>
+                    <text x="0" y="2" width="100" height="16" params="16" style="3" name="label" caption="${vortex.mapeditor.test.entities}">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <text x="100" y="2" width="120" height="16" params="16" style="3" name="value" caption="">
+                      <variables>
+                        <var key="text_style" value="u_bold" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </container>
+                <container x="0" y="0" width="220" height="20" params="144" style="3" name="kv_row">
+                  <children>
+                    <text x="0" y="2" width="100" height="16" params="16" style="3" name="label" caption="${vortex.mapeditor.test.tick}">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <text x="100" y="2" width="120" height="16" params="16" style="3" name="value" caption="">
+                      <variables>
+                        <var key="text_style" value="u_bold" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </container>
+              </children>
+              <variables>
+                <var key="spacing" value="3" type="int"/>
+              </variables>
+            </itemlist_vertical>
+            <text x="626" y="120" width="302" height="40" params="16" style="3" name="test_hint" caption="${vortex.mapeditor.test.hint}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="multiline" value="true" type="Boolean"/>
+                <var key="word_wrap" value="true" type="Boolean"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </container>
+      </children>
+    </border>
+  </window>
+</layout>

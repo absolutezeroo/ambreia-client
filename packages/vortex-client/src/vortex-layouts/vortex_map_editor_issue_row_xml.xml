@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_issue_row_xml" width="300" height="22" version="0.1">
+  <window>
+    <border x="0" y="0" width="300" height="22" params="17" style="2" name="issue_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+      <children>
+        <static_bitmap x="3" y="3" width="16" height="16" params="16" style="3" tags="%23icon" color="0xd83030">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/software_warning_sign_circle_exclaimation_mark_error_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <text x="24" y="4" width="240" height="16" params="16" style="3" name="issue_txt" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0xc30000" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="270" y="3" width="24" height="16" params="16" style="3" name="issue_count" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0xc30000" type="hex"/>
+            <var key="auto_size" value="right" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </border>
+  </window>
+</layout>

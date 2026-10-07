@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_template_tile_xml" width="132" height="92" version="0.1">
+  <window>
+    <border x="0" y="0" width="132" height="92" params="17" style="2" name="template_tile" dynamic_style="lifted_hover" color="0xf2f2ec">
+      <children>
+        <border x="4" y="4" width="124" height="66" params="16" style="2" color="0x404040">
+          <children>
+            <container x="1" y="1" width="122" height="64" params="16" style="3" clipping="true">
+              <children>
+                <static_bitmap x="0" y="0" width="122" height="62" params="16" style="3" name="template_image" tags="%23icon">
+                  <variables>
+                    <var key="asset_uri" value="arena_8_preview" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="zoom_x" value="0.64" type="Number"/>
+                    <var key="zoom_y" value="0.64" type="Number"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </container>
+          </children>
+        </border>
+        <text x="4" y="72" width="124" height="16" params="16" style="3" name="template_label" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="auto_size" value="center" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </border>
+  </window>
+</layout>

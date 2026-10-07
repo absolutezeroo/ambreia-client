@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_rail_row_xml" width="108" height="40" version="0.1">
+  <window>
+    <border x="0" y="0" width="108" height="40" params="17" style="2" name="rail_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+      <children>
+        <static_bitmap x="6" y="4" width="32" height="32" params="16" style="3" tags="%23icon" color="0xb08050">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/map_markers_building_stone_wall_fortification_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="zoom_x" value="2" type="Number"/>
+            <var key="zoom_y" value="2" type="Number"/>
+          </variables>
+        </static_bitmap>
+        <text x="44" y="12" width="62" height="16" params="16" style="3" name="rail_label" caption="${vortex.mapeditor.layer.floor}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </border>
+  </window>
+</layout>

@@ -1,0 +1,473 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_inspect_decor_xml" width="340" height="809" version="0.1">
+  <window>
+    <border x="0" y="0" width="340" height="809" params="16" style="2" name="decor_inspector" color="0xe8eef4">
+      <children>
+        <container x="1" y="1" width="338" height="22" params="16" style="8" color="0xff3d7aa8" background="true"/>
+        <text x="8" y="4" width="280" height="16" params="16" style="3" name="decor_inspector_title" caption="${vortex.mapeditor.inspect.decor}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="0" y="24" width="340" height="785" params="16" style="3" name="decor_inspector_body">
+          <children>
+            <border x="12" y="8" width="316" height="60" params="16" style="2" name="decor_header" color="0xfbf3e2">
+              <children>
+                <border x="4" y="4" width="52" height="52" params="16" style="2" color="0xe4e4dc">
+                  <children>
+                    <static_bitmap x="10" y="10" width="32" height="32" params="16" style="3" name="decor_icon" tags="%23icon">
+                      <variables>
+                        <var key="asset_uri" value="rpg/dungeon-objects/icon_50" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                  </children>
+                </border>
+                <text x="64" y="8" width="244" height="18" params="16" style="3" name="decor_name" caption="">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="13" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="64" y="30" width="244" height="16" params="16" style="3" name="decor_info" caption="">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+            <itemlist_vertical x="12" y="76" width="316" height="84" params="16" style="3" name="identity_list">
+              <children>
+                <container x="0" y="0" width="316" height="26" params="144" style="3" name="field_row">
+                  <children>
+                    <text x="0" y="4" width="112" height="16" params="16" style="3" name="field_label" caption="${vortex.mapeditor.field.definition}">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <container x="118" y="0" width="198" height="24" params="16" style="3" name="decor_definition_box">
+                      <children>
+                        <border x="0" y="0" width="180" height="24" params="16" style="2" color="0xffffff">
+                          <children>
+                            <input x="6" y="4" width="168" height="16" params="1" style="0" name="decor_definition" caption=""/>
+                          </children>
+                        </border>
+                        <border x="180" y="0" width="12" height="12" params="17" style="2" name="decor_definition_up" dynamic_style="button" color="0xe4e4dc">
+                          <children>
+                            <static_bitmap x="-2" y="-2" width="16" height="16" params="16" style="3" tags="%23icon">
+                              <variables>
+                                <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_up_north_icon" type="String"/>
+                                <var key="stretched_x" value="false" type="Boolean"/>
+                                <var key="stretched_y" value="false" type="Boolean"/>
+                              </variables>
+                            </static_bitmap>
+                          </children>
+                        </border>
+                        <border x="180" y="12" width="12" height="12" params="17" style="2" name="decor_definition_down" dynamic_style="button" color="0xe4e4dc">
+                          <children>
+                            <static_bitmap x="-2" y="-2" width="16" height="16" params="16" style="3" tags="%23icon">
+                              <variables>
+                                <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_down_south_icon" type="String"/>
+                                <var key="stretched_x" value="false" type="Boolean"/>
+                                <var key="stretched_y" value="false" type="Boolean"/>
+                              </variables>
+                            </static_bitmap>
+                          </children>
+                        </border>
+                      </children>
+                    </container>
+                  </children>
+                </container>
+                <container x="0" y="0" width="316" height="26" params="144" style="3" name="field_row">
+                  <children>
+                    <text x="0" y="4" width="112" height="16" params="16" style="3" name="field_label" caption="${vortex.character.class}">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <border x="118" y="0" width="198" height="24" params="16" style="2" color="0xffffff">
+                      <children>
+                        <input x="6" y="4" width="186" height="16" params="1" style="0" name="decor_class" caption=""/>
+                      </children>
+                    </border>
+                  </children>
+                </container>
+                <container x="0" y="0" width="316" height="26" params="144" style="3" name="field_row">
+                  <children>
+                    <text x="0" y="4" width="112" height="16" params="16" style="3" name="field_label" caption="${vortex.mapeditor.field.id}">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <border x="118" y="0" width="198" height="24" params="16" style="2" color="0xffffff">
+                      <children>
+                        <input x="6" y="4" width="186" height="16" params="1" style="0" name="decor_id" caption=""/>
+                      </children>
+                    </border>
+                  </children>
+                </container>
+              </children>
+              <variables>
+                <var key="spacing" value="2" type="int"/>
+              </variables>
+            </itemlist_vertical>
+            <text x="12" y="166" width="200" height="16" params="16" style="3" caption="${vortex.mapeditor.field.position}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x1f5f9a" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <itemlist_vertical x="12" y="186" width="316" height="84" params="16" style="3" name="position_list">
+              <children>
+                <container x="0" y="0" width="316" height="26" params="144" style="3" name="field_row">
+                  <children>
+                    <text x="0" y="4" width="112" height="16" params="16" style="3" name="field_label" caption="X">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <container x="118" y="0" width="198" height="24" params="16" style="3" name="decor_x_box">
+                      <children>
+                        <border x="0" y="0" width="180" height="24" params="16" style="2" color="0xffffff">
+                          <children>
+                            <input x="6" y="4" width="168" height="16" params="1" style="0" name="decor_x" caption=""/>
+                          </children>
+                        </border>
+                        <border x="180" y="0" width="12" height="12" params="17" style="2" name="decor_x_up" dynamic_style="button" color="0xe4e4dc">
+                          <children>
+                            <static_bitmap x="-2" y="-2" width="16" height="16" params="16" style="3" tags="%23icon">
+                              <variables>
+                                <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_up_north_icon" type="String"/>
+                                <var key="stretched_x" value="false" type="Boolean"/>
+                                <var key="stretched_y" value="false" type="Boolean"/>
+                              </variables>
+                            </static_bitmap>
+                          </children>
+                        </border>
+                        <border x="180" y="12" width="12" height="12" params="17" style="2" name="decor_x_down" dynamic_style="button" color="0xe4e4dc">
+                          <children>
+                            <static_bitmap x="-2" y="-2" width="16" height="16" params="16" style="3" tags="%23icon">
+                              <variables>
+                                <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_down_south_icon" type="String"/>
+                                <var key="stretched_x" value="false" type="Boolean"/>
+                                <var key="stretched_y" value="false" type="Boolean"/>
+                              </variables>
+                            </static_bitmap>
+                          </children>
+                        </border>
+                      </children>
+                    </container>
+                  </children>
+                </container>
+                <container x="0" y="0" width="316" height="26" params="144" style="3" name="field_row">
+                  <children>
+                    <text x="0" y="4" width="112" height="16" params="16" style="3" name="field_label" caption="Y">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <container x="118" y="0" width="198" height="24" params="16" style="3" name="decor_y_box">
+                      <children>
+                        <border x="0" y="0" width="180" height="24" params="16" style="2" color="0xffffff">
+                          <children>
+                            <input x="6" y="4" width="168" height="16" params="1" style="0" name="decor_y" caption=""/>
+                          </children>
+                        </border>
+                        <border x="180" y="0" width="12" height="12" params="17" style="2" name="decor_y_up" dynamic_style="button" color="0xe4e4dc">
+                          <children>
+                            <static_bitmap x="-2" y="-2" width="16" height="16" params="16" style="3" tags="%23icon">
+                              <variables>
+                                <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_up_north_icon" type="String"/>
+                                <var key="stretched_x" value="false" type="Boolean"/>
+                                <var key="stretched_y" value="false" type="Boolean"/>
+                              </variables>
+                            </static_bitmap>
+                          </children>
+                        </border>
+                        <border x="180" y="12" width="12" height="12" params="17" style="2" name="decor_y_down" dynamic_style="button" color="0xe4e4dc">
+                          <children>
+                            <static_bitmap x="-2" y="-2" width="16" height="16" params="16" style="3" tags="%23icon">
+                              <variables>
+                                <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_down_south_icon" type="String"/>
+                                <var key="stretched_x" value="false" type="Boolean"/>
+                                <var key="stretched_y" value="false" type="Boolean"/>
+                              </variables>
+                            </static_bitmap>
+                          </children>
+                        </border>
+                      </children>
+                    </container>
+                  </children>
+                </container>
+                <container x="0" y="0" width="316" height="26" params="144" style="3" name="field_row">
+                  <children>
+                    <text x="0" y="4" width="112" height="16" params="16" style="3" name="field_label" caption="Z">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <container x="118" y="0" width="198" height="24" params="16" style="3" name="decor_z_box">
+                      <children>
+                        <border x="0" y="0" width="180" height="24" params="16" style="2" color="0xffffff">
+                          <children>
+                            <input x="6" y="4" width="168" height="16" params="1" style="0" name="decor_z" caption=""/>
+                          </children>
+                        </border>
+                        <border x="180" y="0" width="12" height="12" params="17" style="2" name="decor_z_up" dynamic_style="button" color="0xe4e4dc">
+                          <children>
+                            <static_bitmap x="-2" y="-2" width="16" height="16" params="16" style="3" tags="%23icon">
+                              <variables>
+                                <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_up_north_icon" type="String"/>
+                                <var key="stretched_x" value="false" type="Boolean"/>
+                                <var key="stretched_y" value="false" type="Boolean"/>
+                              </variables>
+                            </static_bitmap>
+                          </children>
+                        </border>
+                        <border x="180" y="12" width="12" height="12" params="17" style="2" name="decor_z_down" dynamic_style="button" color="0xe4e4dc">
+                          <children>
+                            <static_bitmap x="-2" y="-2" width="16" height="16" params="16" style="3" tags="%23icon">
+                              <variables>
+                                <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_down_south_icon" type="String"/>
+                                <var key="stretched_x" value="false" type="Boolean"/>
+                                <var key="stretched_y" value="false" type="Boolean"/>
+                              </variables>
+                            </static_bitmap>
+                          </children>
+                        </border>
+                      </children>
+                    </container>
+                  </children>
+                </container>
+              </children>
+              <variables>
+                <var key="spacing" value="2" type="int"/>
+              </variables>
+            </itemlist_vertical>
+            <container x="12" y="272" width="316" height="24" params="16" style="3" name="rotation_row">
+              <children>
+                <text x="0" y="4" width="110" height="16" params="16" style="3" caption="${vortex.mapeditor.tool.rotate}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <checkbox x="118" y="2" width="18" height="18" params="17" style="3" name="rotation_0"/>
+                <text x="140" y="4" width="20" height="16" params="16" style="3" caption="">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <checkbox x="166" y="2" width="18" height="18" params="17" style="3" name="rotation_2"/>
+                <text x="188" y="4" width="20" height="16" params="16" style="3" caption="">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <checkbox x="214" y="2" width="18" height="18" params="17" style="3" name="rotation_4"/>
+                <text x="236" y="4" width="20" height="16" params="16" style="3" caption="">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <checkbox x="262" y="2" width="18" height="18" params="17" style="3" name="rotation_6"/>
+                <text x="284" y="4" width="20" height="16" params="16" style="3" caption="">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </container>
+            <text x="12" y="302" width="200" height="16" params="16" style="3" caption="${vortex.mapeditor.field.collisions}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x1f5f9a" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <itemlist_vertical x="12" y="322" width="316" height="96" params="16" style="3" name="collision_list">
+              <children>
+                <container x="0" y="0" width="316" height="22" params="144" style="3" name="check_row">
+                  <children>
+                    <checkbox x="0" y="2" width="18" height="18" params="17" style="3" name="decor_walkable"/>
+                    <text x="24" y="3" width="292" height="16" params="16" style="3" name="check_label" caption="${vortex.mapeditor.field.walkable}">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </container>
+                <container x="0" y="0" width="316" height="22" params="144" style="3" name="check_row">
+                  <children>
+                    <checkbox x="0" y="2" width="18" height="18" params="17" style="3" name="decor_blocks_sight"/>
+                    <text x="24" y="3" width="292" height="16" params="16" style="3" name="check_label" caption="${vortex.mapeditor.field.blocks_sight}">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </container>
+                <container x="0" y="0" width="316" height="22" params="144" style="3" name="check_row">
+                  <children>
+                    <checkbox x="0" y="2" width="18" height="18" params="17" style="3" name="decor_seat"/>
+                    <text x="24" y="3" width="292" height="16" params="16" style="3" name="check_label" caption="${vortex.mapeditor.field.seat}">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </container>
+                <container x="0" y="0" width="316" height="22" params="144" style="3" name="check_row">
+                  <children>
+                    <checkbox x="0" y="2" width="18" height="18" params="17" style="3" name="decor_locked"/>
+                    <text x="24" y="3" width="292" height="16" params="16" style="3" name="check_label" caption="${vortex.ui.locked}">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </container>
+              </children>
+              <variables>
+                <var key="spacing" value="2" type="int"/>
+              </variables>
+            </itemlist_vertical>
+            <itemlist_vertical x="12" y="420" width="316" height="112" params="16" style="3" name="more_list">
+              <children>
+                <container x="0" y="0" width="316" height="26" params="144" style="3" name="field_row">
+                  <children>
+                    <text x="0" y="4" width="112" height="16" params="16" style="3" name="field_label" caption="${vortex.mapeditor.field.state}">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <dropmenu x="118" y="0" width="198" height="24" params="17" style="3" name="decor_state" caption=""/>
+                  </children>
+                </container>
+                <container x="0" y="0" width="316" height="26" params="144" style="3" name="field_row">
+                  <children>
+                    <text x="0" y="4" width="112" height="16" params="16" style="3" name="field_label" caption="${vortex.mapeditor.field.surface}">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <container x="118" y="0" width="198" height="24" params="16" style="3" name="decor_surface_box">
+                      <children>
+                        <border x="0" y="0" width="180" height="24" params="16" style="2" color="0xffffff">
+                          <children>
+                            <input x="6" y="4" width="168" height="16" params="1" style="0" name="decor_surface" caption=""/>
+                          </children>
+                        </border>
+                        <border x="180" y="0" width="12" height="12" params="17" style="2" name="decor_surface_up" dynamic_style="button" color="0xe4e4dc">
+                          <children>
+                            <static_bitmap x="-2" y="-2" width="16" height="16" params="16" style="3" tags="%23icon">
+                              <variables>
+                                <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_up_north_icon" type="String"/>
+                                <var key="stretched_x" value="false" type="Boolean"/>
+                                <var key="stretched_y" value="false" type="Boolean"/>
+                              </variables>
+                            </static_bitmap>
+                          </children>
+                        </border>
+                        <border x="180" y="12" width="12" height="12" params="17" style="2" name="decor_surface_down" dynamic_style="button" color="0xe4e4dc">
+                          <children>
+                            <static_bitmap x="-2" y="-2" width="16" height="16" params="16" style="3" tags="%23icon">
+                              <variables>
+                                <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_down_south_icon" type="String"/>
+                                <var key="stretched_x" value="false" type="Boolean"/>
+                                <var key="stretched_y" value="false" type="Boolean"/>
+                              </variables>
+                            </static_bitmap>
+                          </children>
+                        </border>
+                      </children>
+                    </container>
+                  </children>
+                </container>
+                <container x="0" y="0" width="316" height="26" params="144" style="3" name="field_row">
+                  <children>
+                    <text x="0" y="4" width="112" height="16" params="16" style="3" name="field_label" caption="${vortex.mapeditor.field.interaction}">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <dropmenu x="118" y="0" width="198" height="24" params="17" style="3" name="decor_interaction" caption=""/>
+                  </children>
+                </container>
+                <container x="0" y="0" width="316" height="26" params="144" style="3" name="field_row">
+                  <children>
+                    <text x="0" y="4" width="112" height="16" params="16" style="3" name="field_label" caption="${vortex.mapeditor.field.tag}">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <border x="118" y="0" width="198" height="24" params="16" style="2" color="0xffffff">
+                      <children>
+                        <input x="6" y="4" width="186" height="16" params="1" style="0" name="decor_tag" caption=""/>
+                      </children>
+                    </border>
+                  </children>
+                </container>
+              </children>
+              <variables>
+                <var key="spacing" value="2" type="int"/>
+              </variables>
+            </itemlist_vertical>
+            <button x="12" y="719" width="155" height="24" params="131089" style="6" color="0x8c8c86" name="duplicate_button" caption="${vortex.mapeditor.tool.duplicate}" width_min="155" width_max="155"/>
+            <button x="173" y="719" width="155" height="24" params="131089" style="6" color="0x8c8c86" name="copy_button" caption="${vortex.mapeditor.tool.copy}" width_min="155" width_max="155"/>
+            <button x="12" y="749" width="155" height="24" params="131089" style="6" color="0x8c8c86" name="lock_button" caption="${vortex.mapeditor.action.lock}" width_min="155" width_max="155"/>
+            <button x="173" y="749" width="155" height="24" params="131089" style="6" color="0xd23a2a" name="delete_button" caption="${vortex.mapeditor.tool.delete}" width_min="155" width_max="155"/>
+          </children>
+        </container>
+      </children>
+    </border>
+  </window>
+</layout>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_group_header_xml" width="272" height="28" version="0.1">
+  <window>
+    <border x="0" y="0" width="272" height="28" params="16" style="2" name="group_header" color="0xe6e6de">
+      <children>
+        <static_bitmap x="6" y="6" width="16" height="16" params="16" style="3" tags="%23icon" color="0x9a8a7a">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/rpg_creature_archetypes_beast_wolf_howling_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <text x="28" y="6" width="202" height="16" params="16" style="3" name="group_label" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="244" y="3" width="22" height="22" params="17" style="2" name="add_button" dynamic_style="button" color="0x4caa30">
+          <children>
+            <static_bitmap x="3" y="3" width="16" height="16" params="16" style="3" tags="%23icon" color="0xffffff">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_signs_maths_plus_addition_bonus_add_new_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+      </children>
+    </border>
+  </window>
+</layout>

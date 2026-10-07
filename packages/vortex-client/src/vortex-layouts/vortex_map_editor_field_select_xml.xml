@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_field_select_xml" width="316" height="26" version="0.1">
+  <window>
+    <container x="0" y="0" width="316" height="26" params="144" style="3" name="field_row">
+      <children>
+        <text x="0" y="4" width="112" height="16" params="16" style="3" name="field_label" caption="${vortex.market.column.type}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <dropmenu x="118" y="0" width="198" height="24" params="17" style="3" name="field" caption=""/>
+      </children>
+    </container>
+  </window>
+</layout>

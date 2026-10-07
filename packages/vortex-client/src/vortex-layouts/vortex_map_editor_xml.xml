@@ -1,0 +1,607 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_xml" width="1440" height="900" version="0.1">
+  <window>
+    <frame x="0" y="0" width="1440" height="900" params="32769" style="3" name="map_editor_window" caption="${vortex.mapeditor.title}" color="0x418db0">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <container x="0" y="4" width="1434" height="857" params="16" style="3" name="content">
+          <children>
+            <border x="0" y="0" width="1434" height="34" params="16" style="2" name="menu_bar" color="0xe6e6de">
+              <children>
+                <dropmenu x="8" y="5" width="98" height="24" params="17" style="3" name="menu_file" caption="${vortex.mapeditor.menu.file}"/>
+                <dropmenu x="112" y="5" width="98" height="24" params="17" style="3" name="menu_edit" caption="${vortex.mapeditor.menu.edit}"/>
+                <dropmenu x="216" y="5" width="98" height="24" params="17" style="3" name="menu_view" caption="${vortex.achievement.titles.display}"/>
+                <dropmenu x="320" y="5" width="98" height="24" params="17" style="3" name="menu_test" caption="${vortex.mapeditor.menu.test}"/>
+                <button x="432" y="4" width="120" height="24" params="131089" style="6" color="0x0aa00" name="test_button" caption="${vortex.mapeditor.action.test_zone}" width_min="120" width_max="120"/>
+                <button x="558" y="4" width="110" height="24" params="131089" style="6" color="0x8c8c86" name="save_button" caption="${vortex.mapeditor.action.save}" width_min="110" width_max="110"/>
+                <button x="674" y="4" width="100" height="24" params="131089" style="6" color="0x2a8fd6" name="publish_button" caption="${vortex.mapeditor.action.publish}" width_min="100" width_max="100"/>
+                <dropmenu x="1048" y="5" width="230" height="24" params="17" style="3" name="zone_menu" caption="${vortex.mapeditor.zone_menu}"/>
+                <dropmenu x="1286" y="5" width="140" height="24" params="17" style="3" name="zoom_menu" caption="${vortex.mapeditor.zoom_menu}"/>
+              </children>
+            </border>
+            <border x="8" y="40" width="120" height="809" params="16" style="2" name="rail" color="0xd6e2ee">
+              <children>
+                <itemlist_vertical x="6" y="6" width="108" height="797" params="16" style="3" name="rail_list">
+                  <children>
+                    <border x="0" y="0" width="108" height="40" params="17" style="2" name="rail_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+                      <children>
+                        <static_bitmap x="6" y="4" width="32" height="32" params="16" style="3" tags="%23icon" color="0xb08050">
+                          <variables>
+                            <var key="asset_uri" value="rpg/ui-icons/map_markers_building_stone_wall_fortification_icon" type="String"/>
+                            <var key="stretched_x" value="false" type="Boolean"/>
+                            <var key="stretched_y" value="false" type="Boolean"/>
+                            <var key="zoom_x" value="2" type="Number"/>
+                            <var key="zoom_y" value="2" type="Number"/>
+                          </variables>
+                        </static_bitmap>
+                        <text x="44" y="12" width="62" height="16" params="16" style="3" name="rail_label" caption="${vortex.mapeditor.layer.floor}">
+                          <variables>
+                            <var key="text_style" value="u_regular" type="String"/>
+                            <var key="font_size" value="11" type="uint"/>
+                            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                          </variables>
+                        </text>
+                      </children>
+                    </border>
+                    <border x="0" y="0" width="108" height="40" params="17" style="2" name="rail_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+                      <children>
+                        <static_bitmap x="6" y="4" width="32" height="32" params="16" style="3" tags="%23icon" color="0xa07040">
+                          <variables>
+                            <var key="asset_uri" value="rpg/ui-icons/map_markers_building_wooden_palisade_wall_icon" type="String"/>
+                            <var key="stretched_x" value="false" type="Boolean"/>
+                            <var key="stretched_y" value="false" type="Boolean"/>
+                            <var key="zoom_x" value="2" type="Number"/>
+                            <var key="zoom_y" value="2" type="Number"/>
+                          </variables>
+                        </static_bitmap>
+                        <text x="44" y="12" width="62" height="16" params="16" style="3" name="rail_label" caption="${vortex.mapeditor.layer.walls}">
+                          <variables>
+                            <var key="text_style" value="u_regular" type="String"/>
+                            <var key="font_size" value="11" type="uint"/>
+                            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                          </variables>
+                        </text>
+                      </children>
+                    </border>
+                    <border x="0" y="0" width="108" height="40" params="17" style="2" name="rail_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+                      <children>
+                        <static_bitmap x="6" y="4" width="32" height="32" params="16" style="3" tags="%23icon" color="0x60a0e0">
+                          <variables>
+                            <var key="asset_uri" value="rpg/ui-icons/map_markers_building_fountain_park_water_icon" type="String"/>
+                            <var key="stretched_x" value="false" type="Boolean"/>
+                            <var key="stretched_y" value="false" type="Boolean"/>
+                            <var key="zoom_x" value="2" type="Number"/>
+                            <var key="zoom_y" value="2" type="Number"/>
+                          </variables>
+                        </static_bitmap>
+                        <text x="44" y="12" width="62" height="16" params="16" style="3" name="rail_label" caption="${vortex.mapeditor.layer.decor}">
+                          <variables>
+                            <var key="text_style" value="u_regular" type="String"/>
+                            <var key="font_size" value="11" type="uint"/>
+                            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                          </variables>
+                        </text>
+                      </children>
+                    </border>
+                    <border x="0" y="0" width="108" height="40" params="17" style="2" name="rail_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+                      <children>
+                        <static_bitmap x="6" y="4" width="32" height="32" params="16" style="3" tags="%23icon" color="0x40b030">
+                          <variables>
+                            <var key="asset_uri" value="rpg/ui-icons/map_markers_enterance_exit_doorway_icon" type="String"/>
+                            <var key="stretched_x" value="false" type="Boolean"/>
+                            <var key="stretched_y" value="false" type="Boolean"/>
+                            <var key="zoom_x" value="2" type="Number"/>
+                            <var key="zoom_y" value="2" type="Number"/>
+                          </variables>
+                        </static_bitmap>
+                        <text x="44" y="12" width="62" height="16" params="16" style="3" name="rail_label" caption="${vortex.mapeditor.layer.entries}">
+                          <variables>
+                            <var key="text_style" value="u_regular" type="String"/>
+                            <var key="font_size" value="11" type="uint"/>
+                            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                          </variables>
+                        </text>
+                      </children>
+                    </border>
+                    <border x="0" y="0" width="108" height="40" params="17" style="2" name="rail_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+                      <children>
+                        <static_bitmap x="6" y="4" width="32" height="32" params="16" style="3" tags="%23icon" color="0x8a6ad8">
+                          <variables>
+                            <var key="asset_uri" value="rpg/ui-icons/map_markers_doorway_enterance_exit_open_icon" type="String"/>
+                            <var key="stretched_x" value="false" type="Boolean"/>
+                            <var key="stretched_y" value="false" type="Boolean"/>
+                            <var key="zoom_x" value="2" type="Number"/>
+                            <var key="zoom_y" value="2" type="Number"/>
+                          </variables>
+                        </static_bitmap>
+                        <text x="44" y="12" width="62" height="16" params="16" style="3" name="rail_label" caption="${vortex.mapeditor.layer.passages}">
+                          <variables>
+                            <var key="text_style" value="u_regular" type="String"/>
+                            <var key="font_size" value="11" type="uint"/>
+                            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                          </variables>
+                        </text>
+                      </children>
+                    </border>
+                    <border x="0" y="0" width="108" height="40" params="17" style="2" name="rail_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+                      <children>
+                        <static_bitmap x="6" y="4" width="32" height="32" params="16" style="3" tags="%23icon" color="0xe0a020">
+                          <variables>
+                            <var key="asset_uri" value="rpg/ui-icons/tools_crafting_graphic_design_shapes_polygon_outlined_icon" type="String"/>
+                            <var key="stretched_x" value="false" type="Boolean"/>
+                            <var key="stretched_y" value="false" type="Boolean"/>
+                            <var key="zoom_x" value="2" type="Number"/>
+                            <var key="zoom_y" value="2" type="Number"/>
+                          </variables>
+                        </static_bitmap>
+                        <text x="44" y="12" width="62" height="16" params="16" style="3" name="rail_label" caption="${vortex.mapeditor.layer.zones}">
+                          <variables>
+                            <var key="text_style" value="u_regular" type="String"/>
+                            <var key="font_size" value="11" type="uint"/>
+                            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                          </variables>
+                        </text>
+                      </children>
+                    </border>
+                    <border x="0" y="0" width="108" height="40" params="17" style="2" name="rail_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+                      <children>
+                        <static_bitmap x="6" y="4" width="32" height="32" params="16" style="3" tags="%23icon" color="0x6aa0e0">
+                          <variables>
+                            <var key="asset_uri" value="rpg/ui-icons/travel_person_player_character_single_icon" type="String"/>
+                            <var key="stretched_x" value="false" type="Boolean"/>
+                            <var key="stretched_y" value="false" type="Boolean"/>
+                            <var key="zoom_x" value="2" type="Number"/>
+                            <var key="zoom_y" value="2" type="Number"/>
+                          </variables>
+                        </static_bitmap>
+                        <text x="44" y="12" width="62" height="16" params="16" style="3" name="rail_label" caption="${vortex.mapeditor.layer.npcs}">
+                          <variables>
+                            <var key="text_style" value="u_regular" type="String"/>
+                            <var key="font_size" value="11" type="uint"/>
+                            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                          </variables>
+                        </text>
+                      </children>
+                    </border>
+                    <border x="0" y="0" width="108" height="40" params="17" style="2" name="rail_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+                      <children>
+                        <static_bitmap x="6" y="4" width="32" height="32" params="16" style="3" tags="%23icon" color="0x9a8a7a">
+                          <variables>
+                            <var key="asset_uri" value="rpg/ui-icons/rpg_creature_archetypes_beast_wolf_howling_icon" type="String"/>
+                            <var key="stretched_x" value="false" type="Boolean"/>
+                            <var key="stretched_y" value="false" type="Boolean"/>
+                            <var key="zoom_x" value="2" type="Number"/>
+                            <var key="zoom_y" value="2" type="Number"/>
+                          </variables>
+                        </static_bitmap>
+                        <text x="44" y="12" width="62" height="16" params="16" style="3" name="rail_label" caption="${vortex.mapeditor.layer.spawns}">
+                          <variables>
+                            <var key="text_style" value="u_regular" type="String"/>
+                            <var key="font_size" value="11" type="uint"/>
+                            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                          </variables>
+                        </text>
+                      </children>
+                    </border>
+                    <border x="0" y="0" width="108" height="40" params="17" style="2" name="rail_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+                      <children>
+                        <static_bitmap x="6" y="4" width="32" height="32" params="16" style="3" tags="%23icon" color="0xb0b0b8">
+                          <variables>
+                            <var key="asset_uri" value="rpg/ui-icons/tools_crafting_profession_mining_ore_rocks_stone_gold_pickaxe_icon" type="String"/>
+                            <var key="stretched_x" value="false" type="Boolean"/>
+                            <var key="stretched_y" value="false" type="Boolean"/>
+                            <var key="zoom_x" value="2" type="Number"/>
+                            <var key="zoom_y" value="2" type="Number"/>
+                          </variables>
+                        </static_bitmap>
+                        <text x="44" y="12" width="62" height="16" params="16" style="3" name="rail_label" caption="${vortex.market.category.resources}">
+                          <variables>
+                            <var key="text_style" value="u_regular" type="String"/>
+                            <var key="font_size" value="11" type="uint"/>
+                            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                          </variables>
+                        </text>
+                      </children>
+                    </border>
+                    <border x="0" y="0" width="108" height="40" params="17" style="2" name="rail_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+                      <children>
+                        <static_bitmap x="6" y="4" width="32" height="32" params="16" style="3" tags="%23icon" color="0xc89850">
+                          <variables>
+                            <var key="asset_uri" value="rpg/ui-icons/tools_crafting_chest_locked_loot_icon" type="String"/>
+                            <var key="stretched_x" value="false" type="Boolean"/>
+                            <var key="stretched_y" value="false" type="Boolean"/>
+                            <var key="zoom_x" value="2" type="Number"/>
+                            <var key="zoom_y" value="2" type="Number"/>
+                          </variables>
+                        </static_bitmap>
+                        <text x="44" y="12" width="62" height="16" params="16" style="3" name="rail_label" caption="${vortex.mapeditor.layer.chests}">
+                          <variables>
+                            <var key="text_style" value="u_regular" type="String"/>
+                            <var key="font_size" value="11" type="uint"/>
+                            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                          </variables>
+                        </text>
+                      </children>
+                    </border>
+                    <border x="0" y="0" width="108" height="40" params="17" style="2" name="rail_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+                      <children>
+                        <static_bitmap x="6" y="4" width="32" height="32" params="16" style="3" tags="%23icon" color="0xb08050">
+                          <variables>
+                            <var key="asset_uri" value="rpg/ui-icons/map_markers_sign_text_icon" type="String"/>
+                            <var key="stretched_x" value="false" type="Boolean"/>
+                            <var key="stretched_y" value="false" type="Boolean"/>
+                            <var key="zoom_x" value="2" type="Number"/>
+                            <var key="zoom_y" value="2" type="Number"/>
+                          </variables>
+                        </static_bitmap>
+                        <text x="44" y="12" width="62" height="16" params="16" style="3" name="rail_label" caption="${vortex.mapeditor.layer.interactives}">
+                          <variables>
+                            <var key="text_style" value="u_regular" type="String"/>
+                            <var key="font_size" value="11" type="uint"/>
+                            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                          </variables>
+                        </text>
+                      </children>
+                    </border>
+                    <border x="0" y="0" width="108" height="40" params="17" style="2" name="rail_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+                      <children>
+                        <static_bitmap x="6" y="4" width="32" height="32" params="16" style="3" tags="%23icon" color="0xd04a3a">
+                          <variables>
+                            <var key="asset_uri" value="rpg/ui-icons/rpg_creature_archetypes_dragon_icon" type="String"/>
+                            <var key="stretched_x" value="false" type="Boolean"/>
+                            <var key="stretched_y" value="false" type="Boolean"/>
+                            <var key="zoom_x" value="2" type="Number"/>
+                            <var key="zoom_y" value="2" type="Number"/>
+                          </variables>
+                        </static_bitmap>
+                        <text x="44" y="12" width="62" height="16" params="16" style="3" name="rail_label" caption="${vortex.hud.boss}">
+                          <variables>
+                            <var key="text_style" value="u_regular" type="String"/>
+                            <var key="font_size" value="11" type="uint"/>
+                            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                          </variables>
+                        </text>
+                      </children>
+                    </border>
+                    <border x="0" y="0" width="108" height="40" params="17" style="2" name="rail_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+                      <children>
+                        <static_bitmap x="6" y="4" width="32" height="32" params="16" style="3" tags="%23icon" color="0xe8d8a8">
+                          <variables>
+                            <var key="asset_uri" value="rpg/ui-icons/software_calendar_dates_organizer_month_1_icon" type="String"/>
+                            <var key="stretched_x" value="false" type="Boolean"/>
+                            <var key="stretched_y" value="false" type="Boolean"/>
+                            <var key="zoom_x" value="2" type="Number"/>
+                            <var key="zoom_y" value="2" type="Number"/>
+                          </variables>
+                        </static_bitmap>
+                        <text x="44" y="12" width="62" height="16" params="16" style="3" name="rail_label" caption="${vortex.guild.channel.events}">
+                          <variables>
+                            <var key="text_style" value="u_regular" type="String"/>
+                            <var key="font_size" value="11" type="uint"/>
+                            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                          </variables>
+                        </text>
+                      </children>
+                    </border>
+                    <border x="0" y="0" width="108" height="40" params="17" style="2" name="rail_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+                      <children>
+                        <static_bitmap x="6" y="4" width="32" height="32" params="16" style="3" tags="%23icon" color="0xe04848">
+                          <variables>
+                            <var key="asset_uri" value="rpg/ui-icons/arrows_power_button_switch_turn_on_off_icon" type="String"/>
+                            <var key="stretched_x" value="false" type="Boolean"/>
+                            <var key="stretched_y" value="false" type="Boolean"/>
+                            <var key="zoom_x" value="2" type="Number"/>
+                            <var key="zoom_y" value="2" type="Number"/>
+                          </variables>
+                        </static_bitmap>
+                        <text x="44" y="12" width="62" height="16" params="16" style="3" name="rail_label" caption="${vortex.mapeditor.layer.triggers}">
+                          <variables>
+                            <var key="text_style" value="u_regular" type="String"/>
+                            <var key="font_size" value="11" type="uint"/>
+                            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                          </variables>
+                        </text>
+                      </children>
+                    </border>
+                    <border x="0" y="0" width="108" height="40" params="17" style="2" name="rail_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+                      <children>
+                        <static_bitmap x="6" y="4" width="32" height="32" params="16" style="3" tags="%23icon" color="0xf0c040">
+                          <variables>
+                            <var key="asset_uri" value="rpg/ui-icons/software_lighting_bulb_idea_brainstorming_electricity_lit_on_icon" type="String"/>
+                            <var key="stretched_x" value="false" type="Boolean"/>
+                            <var key="stretched_y" value="false" type="Boolean"/>
+                            <var key="zoom_x" value="2" type="Number"/>
+                            <var key="zoom_y" value="2" type="Number"/>
+                          </variables>
+                        </static_bitmap>
+                        <text x="44" y="12" width="62" height="16" params="16" style="3" name="rail_label" caption="${vortex.mapeditor.layer.ambience}">
+                          <variables>
+                            <var key="text_style" value="u_regular" type="String"/>
+                            <var key="font_size" value="11" type="uint"/>
+                            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                          </variables>
+                        </text>
+                      </children>
+                    </border>
+                    <border x="0" y="0" width="108" height="40" params="17" style="2" name="rail_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+                      <children>
+                        <static_bitmap x="6" y="4" width="32" height="32" params="16" style="3" tags="%23icon" color="0x8a8a94">
+                          <variables>
+                            <var key="asset_uri" value="rpg/ui-icons/software_options_settings_cogwheel_gear_mechanics_icon" type="String"/>
+                            <var key="stretched_x" value="false" type="Boolean"/>
+                            <var key="stretched_y" value="false" type="Boolean"/>
+                            <var key="zoom_x" value="2" type="Number"/>
+                            <var key="zoom_y" value="2" type="Number"/>
+                          </variables>
+                        </static_bitmap>
+                        <text x="44" y="12" width="62" height="16" params="16" style="3" name="rail_label" caption="${vortex.guild.tab.settings}">
+                          <variables>
+                            <var key="text_style" value="u_regular" type="String"/>
+                            <var key="font_size" value="11" type="uint"/>
+                            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                          </variables>
+                        </text>
+                      </children>
+                    </border>
+                  </children>
+                  <variables>
+                    <var key="spacing" value="3" type="int"/>
+                  </variables>
+                </itemlist_vertical>
+              </children>
+            </border>
+            <container x="136" y="40" width="300" height="584" params="16" style="3" name="left_slot">
+              <children/>
+            </container>
+            <border x="444" y="40" width="634" height="584" params="16" style="2" name="viewport" color="0x1e2228">
+              <children>
+                <container x="1" y="1" width="632" height="582" params="16" style="3" name="viewport_slot" clipping="true">
+                  <children>
+                    <border x="6" y="6" width="498" height="58" params="16" style="2" name="view_tool_bar" color="0xe6e6de">
+                      <children>
+                        <itemlist_horizontal x="4" y="4" width="490" height="50" params="16" style="3" name="view_tools">
+                          <children>
+                            <border x="0" y="0" width="66" height="48" params="17" style="2" name="view_tool" dynamic_style="button" color="0xe4e4dc">
+                              <children>
+                                <static_bitmap x="17" y="2" width="32" height="32" params="16" style="3" tags="%23icon">
+                                  <variables>
+                                    <var key="asset_uri" value="rpg/ui-icons/emoji_hand_pointer_cursor_link_index_finger_icon" type="String"/>
+                                    <var key="stretched_x" value="false" type="Boolean"/>
+                                    <var key="stretched_y" value="false" type="Boolean"/>
+                                    <var key="zoom_x" value="2" type="Number"/>
+                                    <var key="zoom_y" value="2" type="Number"/>
+                                  </variables>
+                                </static_bitmap>
+                                <text x="0" y="32" width="66" height="16" params="16" style="3" name="view_tool_label" caption="${vortex.mapeditor.tool.select}">
+                                  <variables>
+                                    <var key="text_style" value="u_regular" type="String"/>
+                                    <var key="font_size" value="10" type="uint"/>
+                                    <var key="auto_size" value="center" type="String"/>
+                                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                                  </variables>
+                                </text>
+                              </children>
+                            </border>
+                            <border x="0" y="0" width="66" height="48" params="17" style="2" name="view_tool" dynamic_style="button" color="0xe4e4dc">
+                              <children>
+                                <static_bitmap x="17" y="2" width="32" height="32" params="16" style="3" tags="%23icon" color="0x2a6aa0">
+                                  <variables>
+                                    <var key="asset_uri" value="rpg/ui-icons/arrows_movement_cursor_drag_orthogonal_icon" type="String"/>
+                                    <var key="stretched_x" value="false" type="Boolean"/>
+                                    <var key="stretched_y" value="false" type="Boolean"/>
+                                    <var key="zoom_x" value="2" type="Number"/>
+                                    <var key="zoom_y" value="2" type="Number"/>
+                                  </variables>
+                                </static_bitmap>
+                                <text x="0" y="32" width="66" height="16" params="16" style="3" name="view_tool_label" caption="${vortex.mapeditor.tool.move}">
+                                  <variables>
+                                    <var key="text_style" value="u_regular" type="String"/>
+                                    <var key="font_size" value="10" type="uint"/>
+                                    <var key="auto_size" value="center" type="String"/>
+                                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                                  </variables>
+                                </text>
+                              </children>
+                            </border>
+                            <border x="0" y="0" width="66" height="48" params="17" style="2" name="view_tool" dynamic_style="button" color="0xe4e4dc">
+                              <children>
+                                <static_bitmap x="17" y="2" width="32" height="32" params="16" style="3" tags="%23icon" color="0x2a8fd6">
+                                  <variables>
+                                    <var key="asset_uri" value="rpg/ui-icons/arrows_reload_refresh_rotate_clockwise_icon" type="String"/>
+                                    <var key="stretched_x" value="false" type="Boolean"/>
+                                    <var key="stretched_y" value="false" type="Boolean"/>
+                                    <var key="zoom_x" value="2" type="Number"/>
+                                    <var key="zoom_y" value="2" type="Number"/>
+                                  </variables>
+                                </static_bitmap>
+                                <text x="0" y="32" width="66" height="16" params="16" style="3" name="view_tool_label" caption="${vortex.mapeditor.tool.rotate}">
+                                  <variables>
+                                    <var key="text_style" value="u_regular" type="String"/>
+                                    <var key="font_size" value="10" type="uint"/>
+                                    <var key="auto_size" value="center" type="String"/>
+                                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                                  </variables>
+                                </text>
+                              </children>
+                            </border>
+                            <border x="0" y="0" width="66" height="48" params="17" style="2" name="view_tool" dynamic_style="button" color="0xe4e4dc">
+                              <children>
+                                <static_bitmap x="17" y="2" width="32" height="32" params="16" style="3" tags="%23icon" color="0x8a8a94">
+                                  <variables>
+                                    <var key="asset_uri" value="rpg/ui-icons/software_clipbaord_list_file_copy_paste_icon" type="String"/>
+                                    <var key="stretched_x" value="false" type="Boolean"/>
+                                    <var key="stretched_y" value="false" type="Boolean"/>
+                                    <var key="zoom_x" value="2" type="Number"/>
+                                    <var key="zoom_y" value="2" type="Number"/>
+                                  </variables>
+                                </static_bitmap>
+                                <text x="0" y="32" width="66" height="16" params="16" style="3" name="view_tool_label" caption="${vortex.mapeditor.tool.copy}">
+                                  <variables>
+                                    <var key="text_style" value="u_regular" type="String"/>
+                                    <var key="font_size" value="10" type="uint"/>
+                                    <var key="auto_size" value="center" type="String"/>
+                                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                                  </variables>
+                                </text>
+                              </children>
+                            </border>
+                            <border x="0" y="0" width="66" height="48" params="17" style="2" name="view_tool" dynamic_style="button" color="0xe4e4dc">
+                              <children>
+                                <static_bitmap x="17" y="2" width="32" height="32" params="16" style="3" tags="%23icon" color="0xc89850">
+                                  <variables>
+                                    <var key="asset_uri" value="rpg/ui-icons/software_clipboard_todo_tasks_done_checkmark_icon" type="String"/>
+                                    <var key="stretched_x" value="false" type="Boolean"/>
+                                    <var key="stretched_y" value="false" type="Boolean"/>
+                                    <var key="zoom_x" value="2" type="Number"/>
+                                    <var key="zoom_y" value="2" type="Number"/>
+                                  </variables>
+                                </static_bitmap>
+                                <text x="0" y="32" width="66" height="16" params="16" style="3" name="view_tool_label" caption="${vortex.mapeditor.tool.paste}">
+                                  <variables>
+                                    <var key="text_style" value="u_regular" type="String"/>
+                                    <var key="font_size" value="10" type="uint"/>
+                                    <var key="auto_size" value="center" type="String"/>
+                                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                                  </variables>
+                                </text>
+                              </children>
+                            </border>
+                            <border x="0" y="0" width="66" height="48" params="17" style="2" name="view_tool" dynamic_style="button" color="0xe4e4dc">
+                              <children>
+                                <static_bitmap x="17" y="2" width="32" height="32" params="16" style="3" tags="%23icon" color="0xd84040">
+                                  <variables>
+                                    <var key="asset_uri" value="rpg/ui-icons/software_signs_maths_multiplication_x_crossout_checkmark_cancel_icon" type="String"/>
+                                    <var key="stretched_x" value="false" type="Boolean"/>
+                                    <var key="stretched_y" value="false" type="Boolean"/>
+                                    <var key="zoom_x" value="2" type="Number"/>
+                                    <var key="zoom_y" value="2" type="Number"/>
+                                  </variables>
+                                </static_bitmap>
+                                <text x="0" y="32" width="66" height="16" params="16" style="3" name="view_tool_label" caption="${vortex.mapeditor.tool.delete}">
+                                  <variables>
+                                    <var key="text_style" value="u_regular" type="String"/>
+                                    <var key="font_size" value="10" type="uint"/>
+                                    <var key="auto_size" value="center" type="String"/>
+                                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                                  </variables>
+                                </text>
+                              </children>
+                            </border>
+                            <border x="0" y="0" width="66" height="48" params="17" style="2" name="view_tool" dynamic_style="button" color="0xe4e4dc">
+                              <children>
+                                <static_bitmap x="17" y="2" width="32" height="32" params="16" style="3" tags="%23icon" color="0x6a9fd8">
+                                  <variables>
+                                    <var key="asset_uri" value="rpg/ui-icons/software_file_document_page_plus_add_new_icon" type="String"/>
+                                    <var key="stretched_x" value="false" type="Boolean"/>
+                                    <var key="stretched_y" value="false" type="Boolean"/>
+                                    <var key="zoom_x" value="2" type="Number"/>
+                                    <var key="zoom_y" value="2" type="Number"/>
+                                  </variables>
+                                </static_bitmap>
+                                <text x="0" y="32" width="66" height="16" params="16" style="3" name="view_tool_label" caption="${vortex.mapeditor.tool.duplicate}">
+                                  <variables>
+                                    <var key="text_style" value="u_regular" type="String"/>
+                                    <var key="font_size" value="10" type="uint"/>
+                                    <var key="auto_size" value="center" type="String"/>
+                                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                                  </variables>
+                                </text>
+                              </children>
+                            </border>
+                          </children>
+                          <variables>
+                            <var key="spacing" value="4" type="int"/>
+                            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                          </variables>
+                        </itemlist_horizontal>
+                      </children>
+                    </border>
+                    <container x="6" y="504" width="198" height="72" params="16" style="8" name="view_info_bg" color="0xff000000" blend="0.6" background="true"/>
+                    <text x="14" y="508" width="60" height="16" params="16" style="3" caption="${vortex.mapeditor.field.zone}">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="10" type="uint"/>
+                        <var key="text_color" value="0xc8c6c0" type="hex"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <text x="72" y="508" width="130" height="16" params="16" style="3" name="view_info_0" caption="">
+                      <variables>
+                        <var key="text_style" value="u_bold" type="String"/>
+                        <var key="font_size" value="10" type="uint"/>
+                        <var key="text_color" value="0xffffff" type="hex"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <text x="14" y="524" width="60" height="16" params="16" style="3" caption="${vortex.mapeditor.info.size}">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="10" type="uint"/>
+                        <var key="text_color" value="0xc8c6c0" type="hex"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <text x="72" y="524" width="130" height="16" params="16" style="3" name="view_info_1" caption="">
+                      <variables>
+                        <var key="text_style" value="u_bold" type="String"/>
+                        <var key="font_size" value="10" type="uint"/>
+                        <var key="text_color" value="0xffffff" type="hex"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <text x="14" y="540" width="60" height="16" params="16" style="3" caption="${vortex.mapeditor.info.layer}">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="10" type="uint"/>
+                        <var key="text_color" value="0xc8c6c0" type="hex"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <text x="72" y="540" width="130" height="16" params="16" style="3" name="view_info_2" caption="${vortex.mapeditor.layer.floor}">
+                      <variables>
+                        <var key="text_style" value="u_bold" type="String"/>
+                        <var key="font_size" value="10" type="uint"/>
+                        <var key="text_color" value="0xffffff" type="hex"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <text x="14" y="556" width="60" height="16" params="16" style="3" caption="${vortex.mapeditor.info.zoom}">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="10" type="uint"/>
+                        <var key="text_color" value="0xc8c6c0" type="hex"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <text x="72" y="556" width="130" height="16" params="16" style="3" name="view_info_3" caption="">
+                      <variables>
+                        <var key="text_style" value="u_bold" type="String"/>
+                        <var key="font_size" value="10" type="uint"/>
+                        <var key="text_color" value="0xffffff" type="hex"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </container>
+              </children>
+            </border>
+            <container x="1086" y="40" width="340" height="809" params="16" style="3" name="inspector_slot">
+              <children/>
+            </container>
+            <container x="136" y="632" width="942" height="217" params="16" style="3" name="bottom_slot">
+              <children/>
+            </container>
+          </children>
+        </container>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>
