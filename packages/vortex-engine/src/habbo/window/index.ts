@@ -8,9 +8,9 @@ export * from './widgets';
 // Exports
 export {ElementRegistry} from '@ambreia/ui/kit/ElementRegistry';
 export {HabboWindowManager} from './HabboWindowManager';
-export {HintManager} from './HintManager';
+export {HintManager} from '@ambreia/ui/kit/HintManager';
 export {HintTarget} from '@ambreia/ui/kit/HintTarget';
-export {ResourceManager} from './ResourceManager';
+export {ResourceManager} from '@ambreia/ui/kit/ResourceManager';
 
 // Types
 export type {

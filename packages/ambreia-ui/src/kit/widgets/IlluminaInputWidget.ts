@@ -1,16 +1,16 @@
-import type {IIlluminaInputWidget} from '@ambreia/ui/kit/widgets/IIlluminaInputWidget';
-import type {IIlluminaInputHandler} from '@ambreia/ui/kit/widgets/IIlluminaInputHandler';
-import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
-import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {IWindow} from '@ambreia/ui/IWindow';
-import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
-import type {ITextFieldWindow} from '@ambreia/ui/components/ITextFieldWindow';
-import {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
-import {WindowEvent} from '@ambreia/ui/events/WindowEvent';
-import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
-import {WindowKeyboardEvent} from '@ambreia/ui/events/WindowKeyboardEvent';
-import type {IIterator} from '@ambreia/ui/utils/IIterator';
-import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
+import type {IIlluminaInputWidget} from './IIlluminaInputWidget';
+import type {IIlluminaInputHandler} from './IIlluminaInputHandler';
+import type {IWidgetWindow} from '../../components/IWidgetWindow';
+import type {IWindowManager} from '../IWindowManager';
+import type {IWindow} from '../../IWindow';
+import type {IWindowContainer} from '../../IWindowContainer';
+import type {ITextFieldWindow} from '../../components/ITextFieldWindow';
+import {PropertyStruct} from '../../utils/PropertyStruct';
+import {WindowEvent} from '../../events/WindowEvent';
+import {WindowMouseEvent} from '../../events/WindowMouseEvent';
+import {WindowKeyboardEvent} from '../../events/WindowKeyboardEvent';
+import type {IIterator} from '../../utils/IIterator';
+import {EmptyIterator} from '../../iterators/EmptyIterator';
 
 /**
  * Illumina input field widget.
@@ -56,7 +56,7 @@ export class IlluminaInputWidget implements IIlluminaInputWidget
 
     private _widgetWindow: IWidgetWindow | null = null;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/IlluminaInputWidget.as::_windowManager
-    private _windowManager: IHabboWindowManager | null = null;
+    private _windowManager: IWindowManager | null = null;
 
     private _root: IWindowContainer | null = null;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/IlluminaInputWidget.as::_submitButton
@@ -67,7 +67,7 @@ export class IlluminaInputWidget implements IIlluminaInputWidget
 
     private _widgetProcedureBound: ((event: WindowEvent, window: IWindow) => void);
 
-    constructor(window: IWidgetWindow, windowManager: IHabboWindowManager)
+    constructor(window: IWidgetWindow, windowManager: IWindowManager)
     {
         this._widgetWindow = window;
         this._windowManager = windowManager;

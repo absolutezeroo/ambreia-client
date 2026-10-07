@@ -1,7 +1,7 @@
-import type {IWindow} from '@ambreia/ui/IWindow';
-import type {IHabboWindowManager} from './IHabboWindowManager';
-import {HintTarget} from '@ambreia/ui/kit/HintTarget';
-import type {IUpdateReceiver} from '@core/runtime/IContext';
+import type {IWindow} from '../IWindow';
+import type {IWindowManager} from './IWindowManager';
+import {HintTarget} from './HintTarget';
+import type {IWindowUpdateReceiver} from '../IWindowUpdateReceiver';
 
 /**
  * Manages hint windows that point to registered UI elements.
@@ -12,7 +12,7 @@ import type {IUpdateReceiver} from '@core/runtime/IContext';
  * @see sources/win63_version/habbo/window/HintManager.as
  */
 export class HintManager
-implements IUpdateReceiver
+implements IWindowUpdateReceiver
 {
     // Derived name: `VERTICAL_PADDING` is declared in no AS3 tree — the trace points
     // at the class it belongs to, but the identifier itself is this port's.
@@ -26,7 +26,7 @@ implements IUpdateReceiver
     private static readonly MIN_DISTANCE: number = 15;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/HintManager.as::_windowManager
-    private _windowManager: IHabboWindowManager;
+    private _windowManager: IWindowManager;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/HintManager.as::_registeredWindows (Dictionary)
     private _registeredWindows: Map<string, HintTarget> = new Map();
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/HintManager.as::_activeHint
@@ -45,7 +45,7 @@ implements IUpdateReceiver
     private _animationActive: boolean = false;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/HintManager.as::HintManager()
-    constructor(windowManager: IHabboWindowManager)
+    constructor(windowManager: IWindowManager)
     {
         this._windowManager = windowManager;
     }
@@ -390,9 +390,9 @@ implements IUpdateReceiver
     private registerForUpdates(): void
     {
         const updateAwareManager = this._windowManager as unknown as {
-            registerUpdateReceiver?: (receiver: IUpdateReceiver, priority: number) => void
+            registerUpdateReceiver?: (receiver: IWindowUpdateReceiver, priority: number) => void
             context?: {
-                registerUpdateReceiver?: (receiver: IUpdateReceiver, priority: number) => void
+                registerUpdateReceiver?: (receiver: IWindowUpdateReceiver, priority: number) => void
             }
         };
 
@@ -404,9 +404,9 @@ implements IUpdateReceiver
     private unregisterFromUpdates(): void
     {
         const updateAwareManager = this._windowManager as unknown as {
-            removeUpdateReceiver?: (receiver: IUpdateReceiver) => void
+            removeUpdateReceiver?: (receiver: IWindowUpdateReceiver) => void
             context?: {
-                removeUpdateReceiver?: (receiver: IUpdateReceiver) => void
+                removeUpdateReceiver?: (receiver: IWindowUpdateReceiver) => void
             }
         };
 

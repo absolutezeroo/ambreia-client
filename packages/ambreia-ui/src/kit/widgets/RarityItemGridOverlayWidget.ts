@@ -1,11 +1,11 @@
-import type {IRarityItemGridOverlayWidget} from '@ambreia/ui/kit/widgets/IRarityItemGridOverlayWidget';
-import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
-import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {IWindow} from '@ambreia/ui/IWindow';
-import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
-import type {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
-import type {IIterator} from '@ambreia/ui/utils/IIterator';
-import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
+import type {IRarityItemGridOverlayWidget} from './IRarityItemGridOverlayWidget';
+import type {IWidgetWindow} from '../../components/IWidgetWindow';
+import type {IWindowManager} from '../IWindowManager';
+import type {IWindow} from '../../IWindow';
+import type {IWindowContainer} from '../../IWindowContainer';
+import type {PropertyStruct} from '../../utils/PropertyStruct';
+import type {IIterator} from '../../utils/IIterator';
+import {EmptyIterator} from '../../iterators/EmptyIterator';
 
 /**
  * Rarity item grid overlay widget.
@@ -22,12 +22,12 @@ export class RarityItemGridOverlayWidget implements IRarityItemGridOverlayWidget
 
     private _widgetWindow: IWidgetWindow | null = null;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/RarityItemGridOverlayWidget.as::_windowManager
-    private _windowManager: IHabboWindowManager | null = null;
+    private _windowManager: IWindowManager | null = null;
 
     private _root: IWindowContainer | null = null;
     private _plaqueBitmap: IWindow | null = null;
 
-    constructor(window: IWidgetWindow, windowManager: IHabboWindowManager) 
+    constructor(window: IWidgetWindow, windowManager: IWindowManager) 
     {
         this._widgetWindow = window;
         this._windowManager = windowManager;

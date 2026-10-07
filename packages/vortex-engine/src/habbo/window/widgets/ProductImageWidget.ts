@@ -9,7 +9,7 @@ import {Vector3d} from '@room/utils/Vector3d';
 import type {IProductDisplayInfo} from '@ambreia/ui/kit/widgets/IProductDisplayInfo';
 import {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
 import {ImageResult} from '@habbo/room/ImageResult';
-import {ProductCategoryMapping} from '../utils/ProductCategoryMapping';
+import {ProductCategoryMapping} from '@ambreia/ui/kit/utils/ProductCategoryMapping';
 import {PIVOT_NAMES, pivotFromName} from '@ambreia/ui/enum/PivotPoint';
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {BadgeImageWidget} from './BadgeImageWidget';

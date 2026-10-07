@@ -1,9 +1,9 @@
 import {Logger} from '@ambreia/common/utils/Logger';
-import type {IWindow} from '@ambreia/ui/IWindow';
-import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
-import type {IBitmapWrapperWindow} from '@ambreia/ui/components/IBitmapWrapperWindow';
-import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {IModalDialog} from '@ambreia/ui/kit/utils/IModalDialog';
+import type {IWindow} from '../../IWindow';
+import type {IWindowContainer} from '../../IWindowContainer';
+import type {IBitmapWrapperWindow} from '../../components/IBitmapWrapperWindow';
+import type {IWindowManager} from '../IWindowManager';
+import type {IModalDialog} from './IModalDialog';
 
 const log = Logger.getLogger('habbo.window.utils.ModalDialog');
 
@@ -28,7 +28,7 @@ export class ModalDialog implements IModalDialog
     private static readonly MODAL_DIALOG_LAYER: number = 3;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/utils/ModalDialog.as::_windowManager (static)
-    private static _windowManager: IHabboWindowManager | null = null;
+    private static _windowManager: IWindowManager | null = null;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/utils/ModalDialog.as::_container (static)
     private static _container: IWindowContainer | null = null;
     // Derived name: obfuscated in every tree that carries this class (`_SafeStr_*`
@@ -39,7 +39,7 @@ export class ModalDialog implements IModalDialog
     private static _initialized: boolean = false;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/utils/ModalDialog.as::ModalDialog()
-    constructor(windowManager: IHabboWindowManager, xml: string)
+    constructor(windowManager: IWindowManager, xml: string)
     {
         ModalDialog.initialiseStaticMembers(windowManager);
 
@@ -131,7 +131,7 @@ export class ModalDialog implements IModalDialog
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/utils/ModalDialog.as::initialiseStaticMembers()
-    private static initialiseStaticMembers(windowManager: IHabboWindowManager): void
+    private static initialiseStaticMembers(windowManager: IWindowManager): void
     {
         if(ModalDialog._initialized) return;
 

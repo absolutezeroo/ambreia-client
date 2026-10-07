@@ -1,7 +1,7 @@
-import type {IWindow} from '@ambreia/ui/IWindow';
-import {WindowEvent} from '@ambreia/ui/events/WindowEvent';
-import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
-import type {IHabboWindowManager} from '../IHabboWindowManager';
+import type {IWindow} from '../../IWindow';
+import {WindowEvent} from '../../events/WindowEvent';
+import {WindowMouseEvent} from '../../events/WindowMouseEvent';
+import type {IWindowManager} from '../IWindowManager';
 import type {AlertDialogCallback, IAlertDialog} from './AlertDialog';
 import {AlertDialog} from './AlertDialog';
 
@@ -46,7 +46,7 @@ export class ConfirmDialog extends AlertDialog
      */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/utils/ConfirmDialog.as::ConfirmDialog()
     constructor(
-        windowManager: IHabboWindowManager,
+        windowManager: IWindowManager,
         xml: string,
         title: string,
         summary: string,

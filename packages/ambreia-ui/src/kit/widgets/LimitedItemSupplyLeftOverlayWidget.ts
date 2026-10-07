@@ -1,11 +1,11 @@
-import type {ILimitedItemSupplyLeftOverlayWidget} from '@ambreia/ui/kit/widgets/ILimitedItemSupplyLeftOverlayWidget';
-import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
-import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
-import type {IWindow} from '@ambreia/ui/IWindow';
-import type {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
-import type {IIterator} from '@ambreia/ui/utils/IIterator';
-import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
+import type {ILimitedItemSupplyLeftOverlayWidget} from './ILimitedItemSupplyLeftOverlayWidget';
+import type {IWidgetWindow} from '../../components/IWidgetWindow';
+import type {IWindowManager} from '../IWindowManager';
+import type {IWindowContainer} from '../../IWindowContainer';
+import type {IWindow} from '../../IWindow';
+import type {PropertyStruct} from '../../utils/PropertyStruct';
+import type {IIterator} from '../../utils/IIterator';
+import {EmptyIterator} from '../../iterators/EmptyIterator';
 
 /**
  * Limited supply left overlay widget.
@@ -27,10 +27,10 @@ export class LimitedItemSupplyLeftOverlayWidget implements ILimitedItemSupplyLef
 
     private _widgetWindow: IWidgetWindow | null = null;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/LimitedItemSupplyLeftOverlayWidget.as::_windowManager
-    private _windowManager: IHabboWindowManager | null = null;
+    private _windowManager: IWindowManager | null = null;
     private _root: IWindowContainer | null = null;
 
-    constructor(window: IWidgetWindow, windowManager: IHabboWindowManager) 
+    constructor(window: IWidgetWindow, windowManager: IWindowManager) 
     {
         this._widgetWindow = window;
         this._windowManager = windowManager;

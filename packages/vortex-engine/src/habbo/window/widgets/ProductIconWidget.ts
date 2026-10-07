@@ -11,7 +11,7 @@ import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
 import type {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
 import type {IProductDisplayInfo} from '@ambreia/ui/kit/widgets/IProductDisplayInfo';
 import {ImageResult} from '@habbo/room/ImageResult';
-import {ProductCategoryMapping} from '../utils/ProductCategoryMapping';
+import {ProductCategoryMapping} from '@ambreia/ui/kit/utils/ProductCategoryMapping';
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {BadgeImageWidget} from './BadgeImageWidget';
 import type {PetImageWidget} from './PetImageWidget';

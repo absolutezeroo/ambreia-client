@@ -1,7 +1,7 @@
-import type {IWindow} from '@ambreia/ui/IWindow';
-import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
-import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
-import type {IHabboWindowManager} from '../IHabboWindowManager';
+import type {IWindow} from '../../IWindow';
+import type {WindowEvent} from '../../events/WindowEvent';
+import {WindowMouseEvent} from '../../events/WindowMouseEvent';
+import type {IWindowManager} from '../IWindowManager';
 import type {AlertDialogCallback} from './AlertDialog';
 import {AlertDialog} from './AlertDialog';
 
@@ -51,7 +51,7 @@ export class AlertDialogWithLink extends AlertDialog implements IAlertDialogWith
      * @param callback - Optional callback for button events
      */
     constructor(
-        windowManager: IHabboWindowManager,
+        windowManager: IWindowManager,
         xml: string,
         title: string,
         summary: string,

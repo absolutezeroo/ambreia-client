@@ -1,6 +1,6 @@
 import type {IWidget} from '@ambreia/ui/kit/widgets/IWidget';
 import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
-import type {IHabboWindowManager} from '../IHabboWindowManager';
+import type {IWindowManager} from '@ambreia/ui/kit/IWindowManager';
 import type {IWindow} from '@ambreia/ui/IWindow';
 import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 import {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
@@ -54,7 +54,7 @@ export class BalloonWidget implements IWidget
 
     private _widgetWindow: IWidgetWindow | null = null;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/BalloonWidget.as::_windowManager
-    private _windowManager: IHabboWindowManager | null = null;
+    private _windowManager: IWindowManager | null = null;
 
     private _root: IWindowContainer | null = null;
     private _arrowBitmap: IWindow | null = null;
@@ -62,7 +62,7 @@ export class BalloonWidget implements IWidget
 
     private _onChangeBound: WindowEventListener;
 
-    constructor(window: IWidgetWindow, windowManager: IHabboWindowManager)
+    constructor(window: IWidgetWindow, windowManager: IWindowManager)
     {
         this._widgetWindow = window;
         this._windowManager = windowManager;

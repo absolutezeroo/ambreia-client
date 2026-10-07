@@ -1,7 +1,7 @@
 import {Logger} from '@ambreia/common/utils/Logger';
-import type {AssetUrlSource, IResourceManager} from '@ambreia/ui/IResourceManager';
-import type {IAssetReceiver} from '@ambreia/ui/IAssetReceiver';
-import type {IHabboWindowManager} from './IHabboWindowManager';
+import type {AssetUrlSource, IResourceManager} from '../IResourceManager';
+import type {IAssetReceiver} from '../IAssetReceiver';
+import type {IWindowManager} from './IWindowManager';
 
 const log = Logger.getLogger('habbo.window.ResourceManager');
 
@@ -22,7 +22,7 @@ const log = Logger.getLogger('habbo.window.ResourceManager');
 export class ResourceManager implements IResourceManager 
 {
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/ResourceManager.as::_windowManager
-    private _windowManager: IHabboWindowManager;
+    private _windowManager: IWindowManager;
     /**
      * The decoded bitmaps, by resolved name.
      *
@@ -45,7 +45,7 @@ export class ResourceManager implements IResourceManager
     private _loading: Set<string> = new Set();
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/ResourceManager.as::ResourceManager()
-    constructor(windowManager: IHabboWindowManager) 
+    constructor(windowManager: IWindowManager) 
     {
         this._windowManager = windowManager;
     }

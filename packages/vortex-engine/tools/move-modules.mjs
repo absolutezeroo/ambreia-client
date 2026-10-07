@@ -163,7 +163,17 @@ export function applyMoves(root, plan)
     for(const [from, to] of plan.moved)
     {
         fs.mkdirSync(path.dirname(path.join(root, to)), { recursive: true });
-        execFileSync('git', ['mv', from, to], { cwd: root });
+
+        // git mv keeps the history, but refuses a file git does not track yet (one created in
+        // the same change); that one is simply renamed.
+        try
+        {
+            execFileSync('git', ['mv', from, to], { cwd: root, stdio: 'ignore' });
+        }
+        catch
+        {
+            fs.renameSync(path.join(root, from), path.join(root, to));
+        }
     }
 }
 

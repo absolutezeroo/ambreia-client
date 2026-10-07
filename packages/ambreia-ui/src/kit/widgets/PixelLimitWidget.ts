@@ -1,13 +1,13 @@
-import type {IPixelLimitWidget} from '@ambreia/ui/kit/widgets/IPixelLimitWidget';
-import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
-import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
-import type {IWindow} from '@ambreia/ui/IWindow';
-import type {IStaticBitmapWrapperWindow} from '@ambreia/ui/components/IStaticBitmapWrapperWindow';
-import type {IIterator} from '@ambreia/ui/utils/IIterator';
-import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
-import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
-import {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
+import type {IPixelLimitWidget} from './IPixelLimitWidget';
+import type {IWidgetWindow} from '../../components/IWidgetWindow';
+import type {IWindowManager} from '../IWindowManager';
+import type {IWindowContainer} from '../../IWindowContainer';
+import type {IWindow} from '../../IWindow';
+import type {IStaticBitmapWrapperWindow} from '../../components/IStaticBitmapWrapperWindow';
+import type {IIterator} from '../../utils/IIterator';
+import {WindowMouseEvent} from '../../events/WindowMouseEvent';
+import {EmptyIterator} from '../../iterators/EmptyIterator';
+import {PropertyStruct} from '../../utils/PropertyStruct';
 
 /**
  * Pixel limit display widget.
@@ -41,7 +41,7 @@ export class PixelLimitWidget implements IPixelLimitWidget
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/window/widgets/PixelLimitWidget.as::_widgetWindow
     private _widgetWindow: IWidgetWindow | null = null;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/PixelLimitWidget.as::_windowManager
-    private _windowManager: IHabboWindowManager | null = null;
+    private _windowManager: IWindowManager | null = null;
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/window/widgets/PixelLimitWidget.as::_refreshing
     private _refreshing: boolean = false;
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/window/widgets/PixelLimitWidget.as::_root
@@ -56,7 +56,7 @@ export class PixelLimitWidget implements IPixelLimitWidget
     private _limit: number = Number(PixelLimitWidget.LIMIT_DEFAULT.value);
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/PixelLimitWidget.as::PixelLimitWidget()
-    constructor(window: IWidgetWindow, windowManager: IHabboWindowManager)
+    constructor(window: IWidgetWindow, windowManager: IWindowManager)
     {
         this._widgetWindow = window;
         this._windowManager = windowManager;

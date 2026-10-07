@@ -1,13 +1,13 @@
 import type {IDisposable} from '@ambreia/common/IDisposable';
-import type {IWindow} from '@ambreia/ui/IWindow';
-import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
-import {WindowEvent} from '@ambreia/ui/events/WindowEvent';
-import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
-import {HabboAlertDialogFlag} from '@ambreia/ui/kit/enum/HabboAlertDialogFlag';
-import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {ICaption} from '@ambreia/ui/kit/utils/AlertDialogCaption';
-import {AlertDialogCaption} from '@ambreia/ui/kit/utils/AlertDialogCaption';
-import type {IModalDialog} from '@ambreia/ui/kit/utils/IModalDialog';
+import type {IWindow} from '../../IWindow';
+import type {IWindowContainer} from '../../IWindowContainer';
+import {WindowEvent} from '../../events/WindowEvent';
+import {WindowMouseEvent} from '../../events/WindowMouseEvent';
+import {HabboAlertDialogFlag} from '../enum/HabboAlertDialogFlag';
+import type {IWindowManager} from '../IWindowManager';
+import type {ICaption} from './AlertDialogCaption';
+import {AlertDialogCaption} from './AlertDialogCaption';
+import type {IModalDialog} from './IModalDialog';
 
 /**
  * Callback type for alert dialog events.
@@ -91,7 +91,7 @@ export class AlertDialog implements IAlertDialog
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/utils/AlertDialog.as::AlertDialog()
     constructor(
-        windowManager: IHabboWindowManager,
+        windowManager: IWindowManager,
         xml: string,
         title: string,
         summary: string,

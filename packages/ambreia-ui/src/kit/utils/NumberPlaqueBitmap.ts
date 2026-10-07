@@ -1,4 +1,4 @@
-import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
+import type {IWindowManager} from '../IWindowManager';
 
 /**
  * Renders a number as the little glyph strip on a rare's plaque — the serial number on a limited
@@ -31,7 +31,7 @@ export class NumberPlaqueBitmap
      */
     // AS3: _SafeCls_4213.as::createBitmap()
     public static createBitmap(
-        windowManager: IHabboWindowManager | null,
+        windowManager: IWindowManager | null,
         value: number,
         width: number,
         height: number

@@ -1,14 +1,14 @@
-import type {ICountdownWidget} from '@ambreia/ui/kit/widgets/ICountdownWidget';
-import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
-import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {IWindow} from '@ambreia/ui/IWindow';
-import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
-import type {IItemListWindow} from '@ambreia/ui/components/IItemListWindow';
-import type {ITextWindow} from '@ambreia/ui/components/ITextWindow';
-import type {IUpdateReceiver} from '@core/runtime/IContext';
-import {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
-import type {IIterator} from '@ambreia/ui/utils/IIterator';
-import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
+import type {ICountdownWidget} from './ICountdownWidget';
+import type {IWidgetWindow} from '../../components/IWidgetWindow';
+import type {IWindowManager} from '../IWindowManager';
+import type {IWindow} from '../../IWindow';
+import type {IWindowContainer} from '../../IWindowContainer';
+import type {IItemListWindow} from '../../components/IItemListWindow';
+import type {ITextWindow} from '../../components/ITextWindow';
+import type {IWindowUpdateReceiver} from '../../IWindowUpdateReceiver';
+import {PropertyStruct} from '../../utils/PropertyStruct';
+import type {IIterator} from '../../utils/IIterator';
+import {EmptyIterator} from '../../iterators/EmptyIterator';
 
 /**
  * Countdown timer widget.
@@ -22,7 +22,7 @@ import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
  *
  * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/CountdownWidget.as
  */
-export class CountdownWidget implements ICountdownWidget, IUpdateReceiver
+export class CountdownWidget implements ICountdownWidget, IWindowUpdateReceiver
 {
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/CountdownWidget.as::TYPE
     public static readonly TYPE: string = 'countdown';
@@ -58,7 +58,7 @@ export class CountdownWidget implements ICountdownWidget, IUpdateReceiver
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/window/widgets/CountdownWidget.as::_widgetWindow
     private _widgetWindow: IWidgetWindow | null = null;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/CountdownWidget.as::_windowManager
-    private _windowManager: IHabboWindowManager | null = null;
+    private _windowManager: IWindowManager | null = null;
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/window/widgets/CountdownWidget.as::_root
     private _root: IItemListWindow | null = null;
     // Derived name: obfuscated in every tree — the `counter` list item cloned per unit group.
@@ -81,7 +81,7 @@ export class CountdownWidget implements ICountdownWidget, IUpdateReceiver
     private _displayedTime: number = -1;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/CountdownWidget.as::CountdownWidget()
-    constructor(window: IWidgetWindow, windowManager: IHabboWindowManager)
+    constructor(window: IWidgetWindow, windowManager: IWindowManager)
     {
         this._widgetWindow = window;
         this._windowManager = windowManager;

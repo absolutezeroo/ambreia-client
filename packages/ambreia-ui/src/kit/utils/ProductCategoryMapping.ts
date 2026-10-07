@@ -9,7 +9,7 @@
  *
  * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/utils/_SafeCls_4273.as::categoryMapping()
  */
-import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
+import type {IWindowManager} from '../IWindowManager';
 
 export class ProductCategoryMapping 
 {
@@ -44,7 +44,7 @@ export class ProductCategoryMapping
     //   (2026-10-07); there is no chat style to preview, so the answer is always null.
     // AS3: .../src/com/sulake/habbo/window/utils/_SafeCls_4273.as::createChatItemPreview()
     public static createChatItemPreview(
-        _windowManager: IHabboWindowManager | null,
+        _windowManager: IWindowManager | null,
         _styleId: number,
         _username: string | null = null
     ): ImageBitmap | null

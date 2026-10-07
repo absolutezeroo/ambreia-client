@@ -1,4 +1,4 @@
-// AS3 types this field as the concrete HabboWindowManagerComponent, not IHabboWindowManager —
+// AS3 types this field as the concrete HabboWindowManagerComponent, not IWindowManager —
 // which is what lets it read `getProperty()` off the Component base. The port had narrowed it to
 // the interface, where that accessor is not declared, and the shop link could not be resolved.
 import type {HabboWindowManager} from '../HabboWindowManager';

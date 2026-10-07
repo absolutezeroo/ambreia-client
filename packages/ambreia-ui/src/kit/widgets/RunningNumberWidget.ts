@@ -1,12 +1,12 @@
-import type {IRunningNumberWidget} from '@ambreia/ui/kit/widgets/IRunningNumberWidget';
-import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
-import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
-import type {IUpdateReceiver} from '@core/runtime/IContext';
-import type {ITextWindow} from '@ambreia/ui/components/ITextWindow';
-import {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
-import type {IIterator} from '@ambreia/ui/utils/IIterator';
-import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
+import type {IRunningNumberWidget} from './IRunningNumberWidget';
+import type {IWidgetWindow} from '../../components/IWidgetWindow';
+import type {IWindowManager} from '../IWindowManager';
+import type {IWindowContainer} from '../../IWindowContainer';
+import type {IWindowUpdateReceiver} from '../../IWindowUpdateReceiver';
+import type {ITextWindow} from '../../components/ITextWindow';
+import {PropertyStruct} from '../../utils/PropertyStruct';
+import type {IIterator} from '../../utils/IIterator';
+import {EmptyIterator} from '../../iterators/EmptyIterator';
 
 /**
  * Animated running number widget.
@@ -15,7 +15,7 @@ import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
  * to a target value at a configurable frequency. Shows the number
  * with leading zeros based on the digit count.
  *
- * In the AS3 version, implements IUpdateReceiver for animation ticks.
+ * In the AS3 version, implements IWindowUpdateReceiver for animation ticks.
  * In the TypeScript port, number state is stored for the UI layer.
  *
  * @see sources/win63_version/habbo/window/widgets/RunningNumberWidget.as
@@ -43,12 +43,12 @@ export class RunningNumberWidget implements IRunningNumberWidget
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/window/widgets/RunningNumberWidget.as::_widgetWindow
     private _widgetWindow: IWidgetWindow | null = null;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/RunningNumberWidget.as::_windowManager
-    private _windowManager: IHabboWindowManager | null = null;
+    private _windowManager: IWindowManager | null = null;
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/window/widgets/RunningNumberWidget.as::_root
     private _root: IWindowContainer | null = null;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/RunningNumberWidget.as::RunningNumberWidget()
-    constructor(window: IWidgetWindow, windowManager: IHabboWindowManager)
+    constructor(window: IWidgetWindow, windowManager: IWindowManager)
     {
         this._widgetWindow = window;
         this._windowManager = windowManager;
@@ -63,8 +63,8 @@ export class RunningNumberWidget implements IRunningNumberWidget
         // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/RunningNumberWidget.as::RunningNumberWidget() — _windowManager.registerUpdateReceiver(this, var_1449)
         const updateAwareManager = this._windowManager as unknown as
 		{
-		    registerUpdateReceiver?: (r: IUpdateReceiver, p: number) => void;
-		    context?: { registerUpdateReceiver?: (r: IUpdateReceiver, p: number) => void };
+		    registerUpdateReceiver?: (r: IWindowUpdateReceiver, p: number) => void;
+		    context?: { registerUpdateReceiver?: (r: IWindowUpdateReceiver, p: number) => void };
 		};
         updateAwareManager.registerUpdateReceiver?.(this, this._updateFrequency);
         updateAwareManager.context?.registerUpdateReceiver?.(this, this._updateFrequency);
@@ -272,8 +272,8 @@ export class RunningNumberWidget implements IRunningNumberWidget
         // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/RunningNumberWidget.as::dispose() — _windowManager.removeUpdateReceiver(this)
         const updateAwareManager = this._windowManager as unknown as
 		{
-		    removeUpdateReceiver?: (r: IUpdateReceiver) => void;
-		    context?: { removeUpdateReceiver?: (r: IUpdateReceiver) => void };
+		    removeUpdateReceiver?: (r: IWindowUpdateReceiver) => void;
+		    context?: { removeUpdateReceiver?: (r: IWindowUpdateReceiver) => void };
 		};
         updateAwareManager.removeUpdateReceiver?.(this);
         updateAwareManager.context?.removeUpdateReceiver?.(this);

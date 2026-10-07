@@ -1,5 +1,5 @@
 import type {IDisposable} from '@ambreia/common/IDisposable';
-import type {ITableObject} from '@ambreia/ui/kit/utils/tableview/ITableObject';
+import type {ITableObject} from './ITableObject';
 import type {TableRowView} from './TableRowView';
 
 /**

@@ -1,13 +1,13 @@
-import type {IWidget} from '@ambreia/ui/kit/widgets/IWidget';
-import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
-import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {IWindow} from '@ambreia/ui/IWindow';
-import type {IStaticBitmapWrapperWindow} from '@ambreia/ui/components/IStaticBitmapWrapperWindow';
-import {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
-import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
-import type {WindowEventListener} from '@ambreia/ui/events/WindowEventDispatcher';
-import type {IIterator} from '@ambreia/ui/utils/IIterator';
-import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
+import type {IWidget} from './IWidget';
+import type {IWidgetWindow} from '../../components/IWidgetWindow';
+import type {IWindowManager} from '../IWindowManager';
+import type {IWindow} from '../../IWindow';
+import type {IStaticBitmapWrapperWindow} from '../../components/IStaticBitmapWrapperWindow';
+import {PropertyStruct} from '../../utils/PropertyStruct';
+import {WindowMouseEvent} from '../../events/WindowMouseEvent';
+import type {WindowEventListener} from '../../events/WindowEventDispatcher';
+import type {IIterator} from '../../utils/IIterator';
+import {EmptyIterator} from '../../iterators/EmptyIterator';
 
 /**
  * Hover bitmap effect widget.
@@ -31,14 +31,14 @@ export class HoverBitmapWidget implements IWidget
 
     private _widgetWindow: IWidgetWindow | null = null;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/HoverBitmapWidget.as::_windowManager
-    private _windowManager: IHabboWindowManager | null = null;
+    private _windowManager: IWindowManager | null = null;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/HoverBitmapWidget.as::_bitmap
     private _bitmap: IStaticBitmapWrapperWindow | null = null;
 
     private _onMouseOverBound: WindowEventListener;
     private _onMouseOutBound: WindowEventListener;
 
-    constructor(window: IWidgetWindow, windowManager: IHabboWindowManager)
+    constructor(window: IWidgetWindow, windowManager: IWindowManager)
     {
         this._widgetWindow = window;
         this._windowManager = windowManager;

@@ -1,20 +1,20 @@
 import type {IDisposable} from '@ambreia/common/IDisposable';
-import type {IWindow} from '@ambreia/ui/IWindow';
-import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
-import type {IItemListWindow} from '@ambreia/ui/components/IItemListWindow';
-import type {IScrollableListWindow} from '@ambreia/ui/components/IScrollableListWindow';
-import type {IScrollableWindow} from '@ambreia/ui/components/IScrollableWindow';
-import type {IRegionWindow} from '@ambreia/ui/components/IRegionWindow';
-import type {ITextWindow} from '@ambreia/ui/components/ITextWindow';
-import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
-import {DeBouncer} from '@habbo/utils/DeBouncer';
+import type {IWindow} from '../../../IWindow';
+import type {IWindowContainer} from '../../../IWindowContainer';
+import type {IItemListWindow} from '../../../components/IItemListWindow';
+import type {IScrollableListWindow} from '../../../components/IScrollableListWindow';
+import type {IScrollableWindow} from '../../../components/IScrollableWindow';
+import type {IRegionWindow} from '../../../components/IRegionWindow';
+import type {ITextWindow} from '../../../components/ITextWindow';
+import type {IWindowManager} from '../../IWindowManager';
+import {DeBouncer} from '../DeBouncer';
 
-import {CellTemplate} from '@ambreia/ui/kit/utils/tableview/CellTemplate';
-import type {ITableObject} from '@ambreia/ui/kit/utils/tableview/ITableObject';
-import type {TableColumn} from '@ambreia/ui/kit/utils/tableview/TableColumn';
+import {CellTemplate} from './CellTemplate';
+import type {ITableObject} from './ITableObject';
+import type {TableColumn} from './TableColumn';
 import {TableRowModel} from './TableRowModel';
 import {TableRowView} from './TableRowView';
-import {WindowEvent} from '@ambreia/ui/events/WindowEvent';
+import {WindowEvent} from '../../../events/WindowEvent';
 
 type Rectangle = {x: number; y: number; width: number; height: number};
 type RowCallback = (object: ITableObject | null) => void;
@@ -139,7 +139,7 @@ export class TableView implements IDisposable
     private _resetScrollNextUpdate: boolean = false;
 
     // AS3: TableView.as::TableView()
-    constructor(windowManager: IHabboWindowManager, parent: IWindowContainer, pinnable: boolean = false, minimalResourcesMode: boolean = false)
+    constructor(windowManager: IWindowManager, parent: IWindowContainer, pinnable: boolean = false, minimalResourcesMode: boolean = false)
     {
         this._parent = parent;
         this._debouncer = new DeBouncer(150, 300, () => this.manageRowViews());

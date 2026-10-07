@@ -1,12 +1,12 @@
-import type {IIlluminaBorderWidget} from '@ambreia/ui/kit/widgets/IIlluminaBorderWidget';
-import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
-import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {IWindow} from '@ambreia/ui/IWindow';
-import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
-import {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
-import {WindowEvent} from '@ambreia/ui/events/WindowEvent';
-import type {WindowEventListener} from '@ambreia/ui/events/WindowEventDispatcher';
-import type {IIterator} from '@ambreia/ui/utils/IIterator';
+import type {IIlluminaBorderWidget} from './IIlluminaBorderWidget';
+import type {IWidgetWindow} from '../../components/IWidgetWindow';
+import type {IWindowManager} from '../IWindowManager';
+import type {IWindow} from '../../IWindow';
+import type {IWindowContainer} from '../../IWindowContainer';
+import {PropertyStruct} from '../../utils/PropertyStruct';
+import {WindowEvent} from '../../events/WindowEvent';
+import type {WindowEventListener} from '../../events/WindowEventDispatcher';
+import type {IIterator} from '../../utils/IIterator';
 
 /**
  * Illumina theme border widget.
@@ -67,7 +67,7 @@ export class IlluminaBorderWidget implements IIlluminaBorderWidget
     private _batchUpdate: boolean = false;
     private _widgetWindow: IWidgetWindow | null = null;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/IlluminaBorderWidget.as::_windowManager
-    private _windowManager: IHabboWindowManager | null = null;
+    private _windowManager: IWindowManager | null = null;
 
     private _root: IWindowContainer | null = null;
     private _canvas: IWindow | null = null;
@@ -76,7 +76,7 @@ export class IlluminaBorderWidget implements IIlluminaBorderWidget
 
     private _onChangeBound: WindowEventListener;
 
-    constructor(window: IWidgetWindow, windowManager: IHabboWindowManager)
+    constructor(window: IWidgetWindow, windowManager: IWindowManager)
     {
         this._widgetWindow = window;
         this._windowManager = windowManager;

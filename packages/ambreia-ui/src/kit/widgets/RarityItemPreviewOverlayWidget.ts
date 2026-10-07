@@ -1,11 +1,11 @@
-import type {IRarityItemPreviewOverlayWidget} from '@ambreia/ui/kit/widgets/IRarityItemPreviewOverlayWidget';
-import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
-import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {IWindow} from '@ambreia/ui/IWindow';
-import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
-import {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
-import type {IIterator} from '@ambreia/ui/utils/IIterator';
-import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
+import type {IRarityItemPreviewOverlayWidget} from './IRarityItemPreviewOverlayWidget';
+import type {IWidgetWindow} from '../../components/IWidgetWindow';
+import type {IWindowManager} from '../IWindowManager';
+import type {IWindow} from '../../IWindow';
+import type {IWindowContainer} from '../../IWindowContainer';
+import {PropertyStruct} from '../../utils/PropertyStruct';
+import type {IIterator} from '../../utils/IIterator';
+import {EmptyIterator} from '../../iterators/EmptyIterator';
 
 /**
  * Rarity item preview overlay widget.
@@ -23,11 +23,11 @@ export class RarityItemPreviewOverlayWidget implements IRarityItemPreviewOverlay
 
     private _widgetWindow: IWidgetWindow | null = null;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/RarityItemPreviewOverlayWidget.as::_windowManager
-    private _windowManager: IHabboWindowManager | null = null;
+    private _windowManager: IWindowManager | null = null;
 
     private _root: IWindowContainer | null = null;
 
-    constructor(window: IWidgetWindow, windowManager: IHabboWindowManager) 
+    constructor(window: IWidgetWindow, windowManager: IWindowManager) 
     {
         this._widgetWindow = window;
         this._windowManager = windowManager;

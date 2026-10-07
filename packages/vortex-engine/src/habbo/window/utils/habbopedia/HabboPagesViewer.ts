@@ -1,4 +1,4 @@
-// Typed against the concrete manager rather than `IHabboWindowManager`, as AS3 is
+// Typed against the concrete manager rather than `IWindowManager`, as AS3 is
 // (`HabboWindowManagerComponent`): the viewer needs `context`, `assets` and `getProperty()`, and
 // the interface declares none of the three. Type-only, so the import cycle is erased at build.
 import type {HabboWindowManager} from '../../HabboWindowManager';

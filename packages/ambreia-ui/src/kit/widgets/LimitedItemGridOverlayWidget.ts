@@ -1,15 +1,15 @@
-import type {ILimitedItemGridOverlayWidget} from '@ambreia/ui/kit/widgets/ILimitedItemGridOverlayWidget';
-import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
-import type {IHabboWindowManager} from '../IHabboWindowManager';
-import {NumberPlaqueBitmap} from '@habbo/window/utils/NumberPlaqueBitmap';
-import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
-import type {IWindow} from '@ambreia/ui/IWindow';
-import type {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
-import type {IIterator} from '@ambreia/ui/utils/IIterator';
-import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
-import type {IUpdateReceiver} from '@core/runtime/IContext';
-import type {IAssetReceiver} from '@ambreia/ui/IAssetReceiver';
-import type {IBitmapWrapperWindow} from '@ambreia/ui/components/IBitmapWrapperWindow';
+import type {ILimitedItemGridOverlayWidget} from './ILimitedItemGridOverlayWidget';
+import type {IWidgetWindow} from '../../components/IWidgetWindow';
+import type {IWindowManager} from '../IWindowManager';
+import {NumberPlaqueBitmap} from '../utils/NumberPlaqueBitmap';
+import type {IWindowContainer} from '../../IWindowContainer';
+import type {IWindow} from '../../IWindow';
+import type {PropertyStruct} from '../../utils/PropertyStruct';
+import type {IIterator} from '../../utils/IIterator';
+import {EmptyIterator} from '../../iterators/EmptyIterator';
+import type {IWindowUpdateReceiver} from '../../IWindowUpdateReceiver';
+import type {IAssetReceiver} from '../../IAssetReceiver';
+import type {IBitmapWrapperWindow} from '../../components/IBitmapWrapperWindow';
 
 /**
  * Limited item grid overlay widget.
@@ -22,7 +22,7 @@ import type {IBitmapWrapperWindow} from '@ambreia/ui/components/IBitmapWrapperWi
  *
  * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/LimitedItemGridOverlayWidget.as
  */
-export class LimitedItemGridOverlayWidget implements ILimitedItemGridOverlayWidget, IUpdateReceiver
+export class LimitedItemGridOverlayWidget implements ILimitedItemGridOverlayWidget, IWindowUpdateReceiver
 {
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/LimitedItemGridOverlayWidget.as::TYPE
     public static readonly TYPE: string = 'limited_item_overlay_grid';
@@ -37,7 +37,7 @@ export class LimitedItemGridOverlayWidget implements ILimitedItemGridOverlayWidg
     // `_disposed`, `_serialNumber` and `_windowManager` survived the obfuscator on this class.
     private _widgetWindow: IWidgetWindow | null = null;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/LimitedItemGridOverlayWidget.as::_windowManager
-    private _windowManager: IHabboWindowManager | null = null;
+    private _windowManager: IWindowManager | null = null;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/LimitedItemGridOverlayWidget.as::_root
     private _root: IWindowContainer | null = null;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/LimitedItemGridOverlayWidget.as::_plaqueBitmap
@@ -55,7 +55,7 @@ export class LimitedItemGridOverlayWidget implements ILimitedItemGridOverlayWidg
     private _lastShineTime: number = 0;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/LimitedItemGridOverlayWidget.as::LimitedItemGridOverlayWidget()
-    constructor(window: IWidgetWindow, windowManager: IHabboWindowManager)
+    constructor(window: IWidgetWindow, windowManager: IWindowManager)
     {
         this._widgetWindow = window;
         this._windowManager = windowManager;
