@@ -199,6 +199,8 @@ export interface IAttachInstanceOptions
 {
     /** Resolved before the instance is announced, like a Component's own dependencies. */
     dependencies?: Array<ComponentDependency<any>>;
+    /** Runs once the dependencies are resolved, before the instance is announced to anyone. */
+    ready?: () => void;
     /** Called every frame through the context's update loop, once the dependencies are there. */
     update?: (deltaTime: number) => void;
     updatePriority?: number;

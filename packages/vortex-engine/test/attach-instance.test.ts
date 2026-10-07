@@ -71,3 +71,19 @@ test('the update option is called by the context update loop, once per frame', a
 
     assert.equal(calls.length, 2);
 });
+
+test('ready runs once the dependencies resolve, before anyone receives the instance', async () =>
+{
+    const context = new CoreComponentContext();
+    const order: string[] = [];
+
+    context.queueInterface(IID_Thing, () => order.push('received'));
+    context.attachInstance(IID_Thing, {name: 'initialised'}, {
+        dependencies: [new ComponentDependency(IID_Dep, () => undefined, true)],
+        ready: () => order.push('ready')
+    });
+    context.attachInstance(IID_Dep, {value: 2});
+    await flush();
+
+    assert.deepEqual(order, ['ready', 'received']);
+});

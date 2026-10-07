@@ -617,6 +617,14 @@ export class ComponentContext extends Component implements IContext
         };
         const carrier = new Carrier(this);
 
+        // Registered before attachComponent() adds its own unlock listener, so `ready` runs first:
+        // the instance is initialised before anyone receives it.
+        if(options.ready)
+        {
+            if(carrier.locked) carrier.events.once(ComponentEvents.INTERNAL_UNLOCKED, options.ready);
+            else options.ready();
+        }
+
         this.attachComponent(carrier, [iid], instance);
 
         if(!options.update) return;
