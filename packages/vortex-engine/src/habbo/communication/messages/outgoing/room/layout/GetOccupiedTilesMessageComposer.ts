@@ -1,4 +1,4 @@
-import {MessageComposer} from '@core/communication/messages/MessageComposer';
+import {MessageComposer} from '@ambreia/net/messages/MessageComposer';
 
 /**
  * Asks which tiles the room already has furniture on — sent when the floor plan editor is shown

@@ -1,4 +1,4 @@
-import {MessageComposer} from '@core/communication/messages/MessageComposer';
+import {MessageComposer} from '@ambreia/net/messages/MessageComposer';
 
 /**
  * Moves a pet already in the room to another tile (header 432) — what dragging a monster plant

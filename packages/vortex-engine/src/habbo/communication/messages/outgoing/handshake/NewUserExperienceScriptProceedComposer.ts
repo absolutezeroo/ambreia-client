@@ -1,4 +1,4 @@
-import {MessageComposer} from '@core/communication/messages/MessageComposer';
+import {MessageComposer} from '@ambreia/net/messages/MessageComposer';
 
 /**
  * Signal progression through the new user experience (NUX) tutorial.

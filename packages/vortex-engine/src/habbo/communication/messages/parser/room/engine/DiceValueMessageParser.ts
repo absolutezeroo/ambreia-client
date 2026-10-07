@@ -1,5 +1,5 @@
-import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
-import type {IMessageParser} from '@core/communication/messages/IMessageParser';
+import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
+import type {IMessageParser} from '@ambreia/net/messages/IMessageParser';
 
 /**
  * DiceValueMessageParser — the rolled value of a dice furni: the furni id and the face value the

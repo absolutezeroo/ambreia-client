@@ -1,5 +1,5 @@
-import type {IMessageParser} from '@core/communication/messages/IMessageParser';
-import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
+import type {IMessageParser} from '@ambreia/net/messages/IMessageParser';
+import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
 
 /**
  * A pet gained experience — drives the floating "+N" bubble over the pet (header 946).

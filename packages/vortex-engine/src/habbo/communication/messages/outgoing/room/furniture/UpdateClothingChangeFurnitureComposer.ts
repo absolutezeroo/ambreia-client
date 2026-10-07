@@ -1,4 +1,4 @@
-import {MessageComposer} from '@core/communication/messages/MessageComposer';
+import {MessageComposer} from '@ambreia/net/messages/MessageComposer';
 
 /**
  * Update clothing change furniture with gender and figure data

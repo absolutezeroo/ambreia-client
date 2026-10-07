@@ -59,11 +59,27 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
+  packages/ambreia-net:
+    dependencies:
+      '@ambreia/common':
+        specifier: workspace:*
+        version: link:../ambreia-common
+      eventemitter3:
+        specifier: ^5.0.1
+        version: 5.0.4
+    devDependencies:
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
   packages/vortex-client:
     dependencies:
       '@ambreia/common':
         specifier: workspace:*
         version: link:../ambreia-common
+      '@ambreia/net':
+        specifier: workspace:*
+        version: link:../ambreia-net
       eventemitter3:
         specifier: ^5.0.1
         version: 5.0.4
@@ -104,6 +120,9 @@ importers:
       '@ambreia/common':
         specifier: workspace:*
         version: link:../ambreia-common
+      '@ambreia/net':
+        specifier: workspace:*
+        version: link:../ambreia-net
       eventemitter3:
         specifier: ^5.0.1
         version: 5.0.4
@@ -132,6 +151,9 @@ importers:
       '@ambreia/common':
         specifier: workspace:*
         version: link:../ambreia-common
+      '@ambreia/net':
+        specifier: workspace:*
+        version: link:../ambreia-net
       eventemitter3:
         specifier: ^5.0.1
         version: 5.0.4
@@ -160,6 +182,9 @@ importers:
       '@ambreia/common':
         specifier: workspace:*
         version: link:../ambreia-common
+      '@ambreia/net':
+        specifier: workspace:*
+        version: link:../ambreia-net
       '@napi-rs/canvas':
         specifier: ^0.1.71
         version: 0.1.100

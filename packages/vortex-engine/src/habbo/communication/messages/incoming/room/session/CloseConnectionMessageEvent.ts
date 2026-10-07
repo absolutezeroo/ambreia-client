@@ -5,8 +5,8 @@
  *
  * Sent when the room connection should be closed.
  */
-import {MessageEvent} from '@core/communication/messages/MessageEvent';
-import type {IMessageEvent, MessageEventCallback} from '@core/communication/messages/IMessageEvent';
+import {MessageEvent} from '@ambreia/net/messages/MessageEvent';
+import type {IMessageEvent, MessageEventCallback} from '@ambreia/net/messages/IMessageEvent';
 import {
     CloseConnectionMessageParser
 } from '@habbo/communication/messages/parser/room/session/CloseConnectionMessageParser';

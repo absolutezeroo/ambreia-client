@@ -14,7 +14,7 @@ import {Sprite, Texture} from 'pixi.js';
 import {Component, ComponentDependency, type IContext, type IUpdateReceiver} from '@core/runtime';
 import {Vortex} from '../../Vortex';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
-import type {IConnection} from '@core/communication/connection/IConnection';
+import type {IConnection} from '@ambreia/net/connection/IConnection';
 import type {IRoomEngine} from './IRoomEngine';
 import {RoomAreaSelectionManager} from './utils/RoomAreaSelectionManager';
 import type {IRoomCreator} from './IRoomCreator';

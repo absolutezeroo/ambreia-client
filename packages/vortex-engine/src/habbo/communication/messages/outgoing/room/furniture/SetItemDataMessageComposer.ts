@@ -1,4 +1,4 @@
-import {MessageComposer} from '@core/communication/messages/MessageComposer';
+import {MessageComposer} from '@ambreia/net/messages/MessageComposer';
 
 /**
  * Write a wall item's colour and text — the stickie save path.

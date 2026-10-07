@@ -1,5 +1,5 @@
 import {PetFigureData} from '@habbo/communication/messages/parser/room/pet/PetFigureData';
-import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
+import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
 
 /**
  * Helper to parse PetFigureData from a message wrapper

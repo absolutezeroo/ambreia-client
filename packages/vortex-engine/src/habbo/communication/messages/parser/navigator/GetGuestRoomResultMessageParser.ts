@@ -1,5 +1,5 @@
-import type {IMessageParser} from '@core/communication/messages/IMessageParser';
-import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
+import type {IMessageParser} from '@ambreia/net/messages/IMessageParser';
+import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
 import type {IDisposable} from '@ambreia/common/IDisposable';
 import {GuestRoomData, RoomModerationSettings} from '../../incoming/navigator';
 import {RoomChatSettings} from '../roomsettings/RoomChatSettings';

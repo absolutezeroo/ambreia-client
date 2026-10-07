@@ -1,5 +1,5 @@
 import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {IMessageEvent} from '@core/communication/messages/IMessageEvent';
+import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
 import {ElementPointerMessageEvent} from '@habbo/communication/messages/incoming/notifications/ElementPointerMessageEvent';
 
 /**

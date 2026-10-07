@@ -5,7 +5,7 @@ import type {IWindowContainer} from '@core/window/IWindowContainer';
 import type {IRegionWindow} from '@core/window/components/IRegionWindow';
 import type {IStaticBitmapWrapperWindow} from '@core/window/components/IStaticBitmapWrapperWindow';
 import type {IIterator} from '@core/window/utils/IIterator';
-import type {IMessageEvent} from '@core/communication/messages/IMessageEvent';
+import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
 import {EmptyIterator} from '@core/window/iterators/EmptyIterator';
 import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
 import {PropertyStruct} from '@core/window/utils/PropertyStruct';

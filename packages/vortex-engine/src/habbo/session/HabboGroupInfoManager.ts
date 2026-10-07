@@ -1,6 +1,6 @@
 import type {IHabboGroupInfoManager} from './IHabboGroupInfoManager';
-import type {IMessageEvent} from '@core/communication/messages/IMessageEvent';
-import type {IMessageComposer} from '@core/communication/messages/IMessageComposer';
+import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
+import type {IMessageComposer} from '@ambreia/net/messages/IMessageComposer';
 import type {IHabboCommunicationManager} from '../communication/IHabboCommunicationManager';
 import {HabboGroupBadgesMessageEvent, RoomReadyMessageEvent} from "@habbo/communication";
 import {

@@ -3,8 +3,8 @@
  *
  * AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2102/_SafeCls_3490.as
  */
-import {MessageEvent} from '@core/communication/messages/MessageEvent';
-import type {IMessageEvent, MessageEventCallback} from '@core/communication/messages/IMessageEvent';
+import {MessageEvent} from '@ambreia/net/messages/MessageEvent';
+import type {IMessageEvent, MessageEventCallback} from '@ambreia/net/messages/IMessageEvent';
 import {
     ObjectsDataUpdateMessageParser
 } from '@habbo/communication/messages/parser/room/engine/ObjectsDataUpdateMessageParser';

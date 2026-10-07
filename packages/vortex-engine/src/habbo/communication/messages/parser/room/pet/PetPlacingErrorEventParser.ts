@@ -1,5 +1,5 @@
-import type {IMessageParser} from '@core/communication/messages/IMessageParser';
-import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
+import type {IMessageParser} from '@ambreia/net/messages/IMessageParser';
+import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
 
 /**
  * Placing a pet in the room failed (header 3195) — errorCode selects the localized alert.

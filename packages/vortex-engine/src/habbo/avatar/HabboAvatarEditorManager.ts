@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- Component.dependencies is declared Array<ComponentDependency<any>>; matching it keeps the typed IID setters. */
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import type {IContext} from '@core/runtime';
-import type {IConnection} from '@core/communication/connection/IConnection';
+import type {IConnection} from '@ambreia/net/connection/IConnection';
 import type {ILinkEventTracker} from '@core/runtime/events/ILinkEventTracker';
 import type {IWindowContainer} from '@core/window/IWindowContainer';
 import type {IHabboCommunicationManager} from '@habbo/communication/IHabboCommunicationManager';

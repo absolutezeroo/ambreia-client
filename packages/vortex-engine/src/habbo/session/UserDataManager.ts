@@ -1,7 +1,7 @@
 import type {IUserDataManager} from './IUserDataManager';
 import type {IUserData} from './IUserData';
 import {UserDataType} from './UserData';
-import type {IConnection} from '@core/communication/connection/IConnection';
+import type {IConnection} from '@ambreia/net/connection/IConnection';
 import {GetSelectedBadgesMessageComposer} from '../communication/messages/outgoing/users/GetSelectedBadgesMessageComposer';
 import {GetPetInfoMessageComposer} from '../communication/messages/outgoing/room/pet/GetPetInfoMessageComposer';
 import type {ISelectedBadge} from '@habbo/communication/messages/parser/users/HabboUserBadgesMessageParser';

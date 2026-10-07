@@ -5,8 +5,8 @@
  *
  * Parses user figure/info changes (different from UserUpdateMessageParser which handles position)
  */
-import type {IMessageParser} from '@core/communication/messages/IMessageParser';
-import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
+import type {IMessageParser} from '@ambreia/net/messages/IMessageParser';
+import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
 
 export class UserChangeMessageEventParser implements IMessageParser
 {

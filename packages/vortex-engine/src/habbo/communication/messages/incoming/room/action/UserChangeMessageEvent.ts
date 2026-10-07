@@ -5,8 +5,8 @@
  *
  * Fired when a user's figure/info changes (different from UserUpdateMessageEvent which handles position)
  */
-import {MessageEvent} from '@core/communication/messages/MessageEvent';
-import type {IMessageEvent, MessageEventCallback} from '@core/communication/messages/IMessageEvent';
+import {MessageEvent} from '@ambreia/net/messages/MessageEvent';
+import type {IMessageEvent, MessageEventCallback} from '@ambreia/net/messages/IMessageEvent';
 import {
     UserChangeMessageEventParser
 } from '@habbo/communication/messages/parser/room/action/UserChangeMessageEventParser';

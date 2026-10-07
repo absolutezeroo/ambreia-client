@@ -1,5 +1,5 @@
-import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
-import type {IMessageParser} from '@core/communication/messages/IMessageParser';
+import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
+import type {IMessageParser} from '@ambreia/net/messages/IMessageParser';
 
 /**
  * The server asking the client to pop a bot's context menu open (header 2336) — what a NUX bot

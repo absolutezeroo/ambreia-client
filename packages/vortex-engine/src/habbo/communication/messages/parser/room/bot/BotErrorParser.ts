@@ -1,5 +1,5 @@
-import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
-import type {IMessageParser} from '@core/communication/messages/IMessageParser';
+import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
+import type {IMessageParser} from '@ambreia/net/messages/IMessageParser';
 
 /**
  * A bot action the server refused (header 520) — the code is looked up as a localized alert.

@@ -1,5 +1,5 @@
-import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
-import type {IMessageParser} from '@core/communication/messages/IMessageParser';
+import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
+import type {IMessageParser} from '@ambreia/net/messages/IMessageParser';
 
 /**
  * ObjectRemoveMultipleMessageParser — a bulk floor-furniture removal: the ids to dispose plus the id

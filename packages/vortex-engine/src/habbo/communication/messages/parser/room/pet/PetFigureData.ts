@@ -1,4 +1,4 @@
-import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
+import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
 
 /**
  * Pet figure/appearance data.

@@ -5,7 +5,7 @@
  *
  * Simple string-based furniture data (format type 0).
  */
-import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
+import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
 import type {IRoomObjectModel} from '@room/object/IRoomObjectModel';
 import type {IRoomObjectModelController} from '@room/object/IRoomObjectModelController';
 import {RoomObjectVariableEnum} from '../RoomObjectVariableEnum';

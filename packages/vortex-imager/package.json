@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@ambreia/common": "workspace:*",
+    "@ambreia/net": "workspace:*",
     "@napi-rs/canvas": "^0.1.71",
     "eventemitter3": "^5.0.1",
     "fastify": "^5.2.0",

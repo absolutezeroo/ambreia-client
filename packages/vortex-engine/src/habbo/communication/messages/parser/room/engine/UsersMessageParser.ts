@@ -5,8 +5,8 @@
  *
  * Parser for room users (avatars, pets, bots).
  */
-import type {IMessageParser} from '@core/communication/messages/IMessageParser';
-import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
+import type {IMessageParser} from '@ambreia/net/messages/IMessageParser';
+import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
 import {RoomUserData} from '@habbo/communication/messages/incoming/room/engine/RoomUserData';
 
 export class UsersMessageParser implements IMessageParser

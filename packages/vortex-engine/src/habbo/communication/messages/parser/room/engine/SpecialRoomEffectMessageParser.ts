@@ -1,5 +1,5 @@
-import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
-import type {IMessageParser} from '@core/communication/messages/IMessageParser';
+import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
+import type {IMessageParser} from '@ambreia/net/messages/IMessageParser';
 
 /**
  * SpecialRoomEffectMessageParser — a room-wide special effect was triggered (WIN63 header 536).

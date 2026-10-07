@@ -1,5 +1,5 @@
-import type {IConnection} from '@core/communication/connection/IConnection';
-import type {IMessageEvent} from '@core/communication/messages/IMessageEvent';
+import type {IConnection} from '@ambreia/net/connection/IConnection';
+import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
 import type {IRoomHandlerListener} from '../IRoomHandlerListener';
 import {BaseHandler} from './BaseHandler';
 import {RoomShakingEffect} from '@room/utils/RoomShakingEffect';

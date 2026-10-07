@@ -10,8 +10,8 @@
  * is in no unobfuscated tree and vortex-emulator has no constant for 3102. It is named for the AS3
  * handler it feeds, `RoomChatHandler.as::onSpecialSystemChat()`.
  */
-import {MessageEvent} from '@core/communication/messages/MessageEvent';
-import type {IMessageEvent, MessageEventCallback} from '@core/communication/messages/IMessageEvent';
+import {MessageEvent} from '@ambreia/net/messages/MessageEvent';
+import type {IMessageEvent, MessageEventCallback} from '@ambreia/net/messages/IMessageEvent';
 import {
     SpecialSystemChatMessageParser
 } from '@habbo/communication/messages/parser/room/chat/SpecialSystemChatMessageParser';

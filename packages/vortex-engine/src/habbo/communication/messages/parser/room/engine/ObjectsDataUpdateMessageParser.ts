@@ -7,8 +7,8 @@
  * AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2184/_SafeCls_2377.as (parser)
  *      sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2102/_SafeCls_3191.as (ObjectData)
  */
-import type {IMessageParser} from '@core/communication/messages/IMessageParser';
-import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
+import type {IMessageParser} from '@ambreia/net/messages/IMessageParser';
+import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
 import type {IStuffData} from '@habbo/room/object/data/IStuffData';
 import {FurnitureDataParser} from './FurnitureDataParser';
 

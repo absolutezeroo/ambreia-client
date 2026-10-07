@@ -12,7 +12,7 @@
 import {EventEmitter} from 'eventemitter3';
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
-import type {IConnection} from '@core/communication/connection/IConnection';
+import type {IConnection} from '@ambreia/net/connection/IConnection';
 import type {IWindow} from '@core/window/IWindow';
 import type {IWindowContainer} from '@core/window/IWindowContainer';
 import type {IDisplayObjectWrapper} from '@core/window/components/IDisplayObjectWrapper';
@@ -65,7 +65,7 @@ import {ObjectLocationRequestHandler} from './handler/ObjectLocationRequestHandl
 import {RoomWidgetFurniToWidgetMessage} from './widget/messages/RoomWidgetFurniToWidgetMessage';
 import {RoomEngineToWidgetEvent} from '@habbo/room/events/RoomEngineToWidgetEvent';
 import type {IRoomWidget} from './widget/IRoomWidget';
-import type {IMessageEvent} from '@core/communication/messages/IMessageEvent';
+import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
 import {
     BotSkillListUpdateEvent
 } from '@habbo/communication/messages/incoming/room/bot/BotSkillListUpdateEvent';

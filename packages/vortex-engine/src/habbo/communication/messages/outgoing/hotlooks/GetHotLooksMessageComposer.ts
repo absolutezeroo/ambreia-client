@@ -1,5 +1,5 @@
-import {MessageComposer} from '@core/communication/messages/MessageComposer';
-import {Byte} from '@core/communication/util/Byte';
+import {MessageComposer} from '@ambreia/net/messages/MessageComposer';
+import {Byte} from '@ambreia/net/util/Byte';
 
 /**
  * "Send me up to N featured looks." The server answers with `HotLooksMessageEvent`.

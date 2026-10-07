@@ -5,8 +5,8 @@
  *
  * Parser for removing a floor furniture object.
  */
-import type {IMessageParser} from '@core/communication/messages/IMessageParser';
-import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
+import type {IMessageParser} from '@ambreia/net/messages/IMessageParser';
+import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
 
 export class ObjectRemoveMessageParser implements IMessageParser
 {

@@ -6,7 +6,7 @@
  * Exposes services to widget handlers. Implemented by RoomDesktop.
  */
 import type {EventEmitter} from 'eventemitter3';
-import type {IConnection} from '@core/communication/connection/IConnection';
+import type {IConnection} from '@ambreia/net/connection/IConnection';
 import type {IRoomEngine} from '@habbo/room/IRoomEngine';
 import type {IRoomObject} from '@room/object/IRoomObject';
 import type {IRoomSession} from '@habbo/session/IRoomSession';

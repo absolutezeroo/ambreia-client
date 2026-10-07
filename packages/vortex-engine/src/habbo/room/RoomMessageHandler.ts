@@ -6,8 +6,8 @@
  * Handles all incoming server messages for rooms.
  * Bridges the communication layer to the room engine.
  */
-import type {IConnection} from '@core/communication/connection/IConnection';
-import type {IMessageEvent} from '@core/communication/messages/IMessageEvent';
+import type {IConnection} from '@ambreia/net/connection/IConnection';
+import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
 import type {IRoomCreator} from './IRoomCreator';
 import {Vector3d} from '@room/utils/Vector3d';
 import type {IVector3d} from '@room/utils/IVector3d';

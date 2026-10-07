@@ -5,8 +5,8 @@
  *
  * Parser for updating a floor furniture object position/state.
  */
-import type {IMessageParser} from '@core/communication/messages/IMessageParser';
-import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
+import type {IMessageParser} from '@ambreia/net/messages/IMessageParser';
+import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
 import type {FurnitureFloorData} from '@habbo/communication/messages/incoming/room/engine/FurnitureFloorData';
 import {FurnitureDataParser} from './FurnitureDataParser';
 

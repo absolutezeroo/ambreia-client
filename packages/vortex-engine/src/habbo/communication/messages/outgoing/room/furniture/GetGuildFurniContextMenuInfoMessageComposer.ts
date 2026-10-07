@@ -11,7 +11,7 @@
  *
  * @see sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2609/_SafeCls_3874.as
  */
-import {MessageComposer} from '@core/communication/messages/MessageComposer';
+import {MessageComposer} from '@ambreia/net/messages/MessageComposer';
 
 export class GetGuildFurniContextMenuInfoMessageComposer extends MessageComposer<[number, number]>
 {

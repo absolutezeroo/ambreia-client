@@ -1,4 +1,4 @@
-import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
+import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
 
 /**
  * One of the hotel's featured looks: a gender and the figure string to wear.

@@ -2,12 +2,12 @@
 // class must warn once, not on every subscription or every send, or the real warnings drown.
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {MessageRegistry} from '../src/core/communication/messages/MessageRegistry';
-import {MessageComposer} from '../src/core/communication/messages/MessageComposer';
-import {MessageEvent} from '../src/core/communication/messages/MessageEvent';
-import {SocketConnection} from '../src/core/communication/connection/SocketConnection';
-import type {IEncryption} from '../src/core/communication/encryption/IEncryption';
-import type {IMessageDataWrapper} from '../src/core/communication/messages/IMessageDataWrapper';
+import {MessageRegistry} from '../src/messages/MessageRegistry';
+import {MessageComposer} from '../src/messages/MessageComposer';
+import {MessageEvent} from '../src/messages/MessageEvent';
+import {SocketConnection} from '../src/connection/SocketConnection';
+import type {IEncryption} from '../src/encryption/IEncryption';
+import type {IMessageDataWrapper} from '../src/messages/IMessageDataWrapper';
 
 class OutsideContractParser
 {

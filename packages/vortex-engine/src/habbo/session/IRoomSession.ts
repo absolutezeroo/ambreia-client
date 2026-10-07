@@ -1,4 +1,4 @@
-import type {IConnection} from '@core/communication/connection/IConnection';
+import type {IConnection} from '@ambreia/net/connection/IConnection';
 import type {RoomModerationSettings} from '../communication/messages/incoming/navigator';
 import type {IUserDataManager} from "@habbo/session/IUserDataManager";
 

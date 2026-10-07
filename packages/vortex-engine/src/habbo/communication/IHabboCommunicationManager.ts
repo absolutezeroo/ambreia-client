@@ -1,8 +1,8 @@
 import type {EventEmitter} from 'eventemitter3';
-import type {IConnection} from '@core/communication/connection/IConnection';
-import type {IMessageEvent} from '@core/communication/messages/IMessageEvent';
-import type {IEncryption} from '@core/communication/encryption/IEncryption';
-import type {IKeyExchange} from '@core/communication/handshake/IKeyExchange';
+import type {IConnection} from '@ambreia/net/connection/IConnection';
+import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
+import type {IEncryption} from '@ambreia/net/encryption/IEncryption';
+import type {IKeyExchange} from '@ambreia/net/handshake/IKeyExchange';
 import type {HabboCommunicationEventType} from './enum';
 import type {HabboCommunicationManagerEvent} from './enum';
 import type {IHabboWebApiListener} from './IHabboWebApiListener';

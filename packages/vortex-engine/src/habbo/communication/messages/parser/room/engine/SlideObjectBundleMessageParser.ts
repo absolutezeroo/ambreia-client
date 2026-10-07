@@ -5,8 +5,8 @@
  *
  * Parser for roller/slide object movements.
  */
-import type {IMessageParser} from '@core/communication/messages/IMessageParser';
-import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
+import type {IMessageParser} from '@ambreia/net/messages/IMessageParser';
+import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
 import {SlideObjectData} from '@habbo/communication/messages/incoming/room/engine/SlideObjectData';
 import {Vector3d} from '@room/utils/Vector3d';
 

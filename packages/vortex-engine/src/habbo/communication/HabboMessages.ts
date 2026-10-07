@@ -2,7 +2,7 @@ import type {
     ComposerClass,
     EventClass,
     IMessageConfiguration,
-} from '@core/communication/messages/IMessageConfiguration';
+} from '@ambreia/net/messages/IMessageConfiguration';
 import {
     Logger,
 } from '@ambreia/common/utils/Logger';

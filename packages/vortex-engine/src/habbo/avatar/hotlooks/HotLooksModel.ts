@@ -1,4 +1,4 @@
-import type {IMessageEvent} from '@core/communication/messages/IMessageEvent';
+import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
 import type {CategoryData} from '../common/CategoryData';
 import type {ICategoryModel} from '../common/ICategoryModel';
 import type {ICategoryModelOwner} from '../common/ICategoryModelOwner';

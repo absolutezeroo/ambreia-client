@@ -1,5 +1,5 @@
-import type {IMessageParser} from '@core/communication/messages/IMessageParser';
-import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
+import type {IMessageParser} from '@ambreia/net/messages/IMessageParser';
+import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
 import type {IPetInfoData} from '../../incoming/notifications/PetFigureDataParser';
 import {parsePetInfoData} from '../../incoming/notifications/PetFigureDataParser';
 

@@ -1,5 +1,5 @@
 import type {EventEmitter} from 'eventemitter3';
-import type {IConnection} from '@core/communication/connection/IConnection';
+import type {IConnection} from '@ambreia/net/connection/IConnection';
 import type {ISessionDataManager} from '@habbo/session/ISessionDataManager';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 import type {IAvatarEffect} from './IAvatarEffect';

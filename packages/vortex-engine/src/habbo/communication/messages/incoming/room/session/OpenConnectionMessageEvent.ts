@@ -5,8 +5,8 @@
  *
  * Event fired when a room connection is opened.
  */
-import {MessageEvent} from '@core/communication/messages/MessageEvent';
-import type {IMessageEvent, MessageEventCallback} from '@core/communication/messages/IMessageEvent';
+import {MessageEvent} from '@ambreia/net/messages/MessageEvent';
+import type {IMessageEvent, MessageEventCallback} from '@ambreia/net/messages/IMessageEvent';
 import {
     OpenConnectionMessageParser
 } from '@habbo/communication/messages/parser/room/session/OpenConnectionMessageParser';

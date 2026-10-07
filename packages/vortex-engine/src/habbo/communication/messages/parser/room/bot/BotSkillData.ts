@@ -1,4 +1,4 @@
-import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
+import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
 
 /**
  * One configured skill of a rentable bot: the skill id and whatever that skill stores.

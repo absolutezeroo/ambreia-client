@@ -33,7 +33,7 @@ import type {IHabboConfigurationManager} from '@habbo/configuration/IHabboConfig
 import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';
 import type {IAvatarRenderManager} from '@habbo/avatar/IAvatarRenderManager';
 import type {IHabboCommunicationManager} from '@habbo/communication/IHabboCommunicationManager';
-import type {IMessageEvent} from '@core/communication/messages/IMessageEvent';
+import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
 import {CantConnectMessageEvent} from '@habbo/communication/messages/incoming/room/session/CantConnectMessageEvent';
 import type {CantConnectMessageParser} from '@habbo/communication/messages/parser/room/session/CantConnectMessageParser';
 import {NotificationDialogMessageEvent} from '@habbo/communication/messages/incoming/notifications/NotificationDialogMessageEvent';

@@ -6,7 +6,7 @@
  * Extended interface for room engine services used by other systems.
  */
 import type {EventEmitter} from 'eventemitter3';
-import type {IConnection} from '@core/communication/connection/IConnection';
+import type {IConnection} from '@ambreia/net/connection/IConnection';
 import type {IRoomInstance} from '@room/IRoomInstance';
 import type {IRoomRenderingCanvas} from '@room/renderer/IRoomRenderingCanvas';
 import type {IRoomObject} from '@room/object/IRoomObject';

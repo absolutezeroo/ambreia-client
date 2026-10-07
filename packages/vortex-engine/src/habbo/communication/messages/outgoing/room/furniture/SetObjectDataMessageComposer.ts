@@ -1,4 +1,4 @@
-import {MessageComposer} from '@core/communication/messages/MessageComposer';
+import {MessageComposer} from '@ambreia/net/messages/MessageComposer';
 
 /**
  * Save a furniture item's stuff data — the "OBJECT_SAVE_STUFF_DATA" operation, used by the

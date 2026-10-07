@@ -1,4 +1,4 @@
-import {MessageComposer} from '@core/communication/messages/MessageComposer';
+import {MessageComposer} from '@ambreia/net/messages/MessageComposer';
 
 /**
  * Pick a rentable bot back up out of the room — the "OBJECT_PICKUP_BOT" gesture.

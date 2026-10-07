@@ -1,4 +1,4 @@
-import {PreEncryptionMessageComposer} from '@core/communication/messages/PreEncryptionMessageComposer';
+import {PreEncryptionMessageComposer} from '@ambreia/net/messages/PreEncryptionMessageComposer';
 
 /**
  * First message sent to server to initiate connection

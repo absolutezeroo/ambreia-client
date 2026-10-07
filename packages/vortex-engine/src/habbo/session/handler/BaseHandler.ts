@@ -1,4 +1,4 @@
-import type {IConnection} from '@core/communication/connection/IConnection';
+import type {IConnection} from '@ambreia/net/connection/IConnection';
 import type {IRoomHandlerListener} from '../IRoomHandlerListener';
 
 /**

@@ -1,7 +1,7 @@
 import type {EventEmitter} from 'eventemitter3';
 import type {IDisposable} from '@ambreia/common/IDisposable';
 import type {IWindow} from '@core/window/IWindow';
-import type {IMessageComposer} from '@core/communication/messages/IMessageComposer';
+import type {IMessageComposer} from '@ambreia/net/messages/IMessageComposer';
 import type {IHabboCommunicationManager} from '../communication/IHabboCommunicationManager';
 import type {IHabboLocalizationManager} from '../localization/IHabboLocalizationManager';
 import type {IHabboWindowManager} from '../window/IHabboWindowManager';

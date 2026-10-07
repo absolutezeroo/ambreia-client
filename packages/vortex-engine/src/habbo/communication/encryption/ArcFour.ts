@@ -1,5 +1,5 @@
-import type {ByteArray} from '@core/communication/util/ByteArray';
-import type {IEncryption} from '@core/communication/encryption/IEncryption';
+import type {ByteArray} from '@ambreia/net/util/ByteArray';
+import type {IEncryption} from '@ambreia/net/encryption/IEncryption';
 
 /**
  * ArcFour (RC4) stream cipher implementation

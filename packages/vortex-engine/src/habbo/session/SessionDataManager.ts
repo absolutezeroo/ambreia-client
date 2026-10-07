@@ -1,8 +1,8 @@
 import {Component, ComponentDependency, type IContext} from '@core/runtime';
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {IWindow} from '@core/window/IWindow';
-import type {IMessageEvent} from '@core/communication/messages/IMessageEvent';
-import type {IMessageComposer} from '@core/communication/messages/IMessageComposer';
+import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
+import type {IMessageComposer} from '@ambreia/net/messages/IMessageComposer';
 import type {IHabboCommunicationManager} from '../communication/IHabboCommunicationManager';
 import type {ISessionDataManager} from './ISessionDataManager';
 import {HabboClubLevelEnum, hasClub as clubLevelHasClub, hasVip as clubLevelHasVip, UIFlagsEnum} from './enum';

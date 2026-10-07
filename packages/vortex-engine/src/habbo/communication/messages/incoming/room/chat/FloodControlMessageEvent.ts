@@ -9,8 +9,8 @@
  *
  * The name comes from vortex-emulator; no unobfuscated tree carries this event.
  */
-import {MessageEvent} from '@core/communication/messages/MessageEvent';
-import type {IMessageEvent, MessageEventCallback} from '@core/communication/messages/IMessageEvent';
+import {MessageEvent} from '@ambreia/net/messages/MessageEvent';
+import type {IMessageEvent, MessageEventCallback} from '@ambreia/net/messages/IMessageEvent';
 import {FloodControlMessageParser} from '@habbo/communication/messages/parser/room/chat/FloodControlMessageParser';
 
 export class FloodControlMessageEvent extends MessageEvent implements IMessageEvent

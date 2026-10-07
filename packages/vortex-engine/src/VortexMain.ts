@@ -27,7 +27,7 @@ import {FrameTimings} from '@ambreia/common/utils/FrameTimings';
 import type {IVortexConfig, IVortexWindowAssets} from './Vortex';
 import {Vortex} from './Vortex';
 
-import {PacketLogger} from '@core/communication/PacketLogger';
+import {PacketLogger} from '@ambreia/net/PacketLogger';
 import {IID_HabboCommunicationManager} from '@iid/IIDHabboCommunicationManager';
 import {IID_HabboConfigurationManager} from '@iid/IIDHabboConfigurationManager';
 import {IID_HabboLocalizationManager} from '@iid/IIDHabboLocalizationManager';

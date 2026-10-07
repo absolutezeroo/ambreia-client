@@ -5,8 +5,8 @@
  *
  * Sent when access to a room is granted (e.g., doorbell answered).
  */
-import {MessageEvent} from '@core/communication/messages/MessageEvent';
-import type {IMessageEvent, MessageEventCallback} from '@core/communication/messages/IMessageEvent';
+import {MessageEvent} from '@ambreia/net/messages/MessageEvent';
+import type {IMessageEvent, MessageEventCallback} from '@ambreia/net/messages/IMessageEvent';
 import {
     FlatAccessibleMessageParser
 } from '@habbo/communication/messages/parser/room/session/FlatAccessibleMessageParser';

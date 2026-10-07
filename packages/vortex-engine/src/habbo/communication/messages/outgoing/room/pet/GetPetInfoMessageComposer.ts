@@ -1,4 +1,4 @@
-import {MessageComposer} from '@core/communication/messages/MessageComposer';
+import {MessageComposer} from '@ambreia/net/messages/MessageComposer';
 
 /**
  * Asks the server for a pet's full info (header 3899) — answered with PetInfoMessageEvent (3192).

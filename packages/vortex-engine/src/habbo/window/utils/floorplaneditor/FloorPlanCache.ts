@@ -1,4 +1,4 @@
-import type {IMessageEvent} from '@core/communication/messages/IMessageEvent';
+import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
 import type {
     FloorHeightMapMessageParser
 } from '@habbo/communication/messages/parser/room/engine/FloorHeightMapMessageParser';

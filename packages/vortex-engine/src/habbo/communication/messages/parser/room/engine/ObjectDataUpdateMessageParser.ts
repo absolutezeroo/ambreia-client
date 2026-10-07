@@ -5,8 +5,8 @@
  *
  * Parser for updating furniture data/state.
  */
-import type {IMessageParser} from '@core/communication/messages/IMessageParser';
-import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
+import type {IMessageParser} from '@ambreia/net/messages/IMessageParser';
+import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
 import type {IStuffData} from '@habbo/room/object/data/IStuffData';
 import {LegacyStuffData} from '@habbo/room/object/data/LegacyStuffData';
 import {FurnitureDataParser} from './FurnitureDataParser';

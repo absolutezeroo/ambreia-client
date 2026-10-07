@@ -1,4 +1,4 @@
-import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
+import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
 
 /**
  * One saved wardrobe slot: its number, the figure string in it, and the gender that figure was

@@ -1,0 +1,17 @@
+{
+  "name": "@ambreia/net",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "WebSocket transport, encryption, wire format and message registry of the Ambreia client",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "dependencies": {
+    "@ambreia/common": "workspace:*",
+    "eventemitter3": "^5.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}

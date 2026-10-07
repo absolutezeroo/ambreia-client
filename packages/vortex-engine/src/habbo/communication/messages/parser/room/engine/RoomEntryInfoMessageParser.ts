@@ -3,8 +3,8 @@
  *
  * Based on AS3: com.sulake.habbo.communication.messages.parser.room.engine.RoomEntryInfoMessageEventParser
  */
-import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
-import type {IMessageParser} from '@core/communication/messages/IMessageParser';
+import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
+import type {IMessageParser} from '@ambreia/net/messages/IMessageParser';
 
 export class RoomEntryInfoMessageParser implements IMessageParser
 {

@@ -1,9 +1,9 @@
-import type {IMessageEvent} from '@core/communication/messages/IMessageEvent';
-import type {IEncryption} from '@core/communication/encryption/IEncryption';
-import type {IKeyExchange} from '@core/communication/handshake/IKeyExchange';
-import {CryptoTools} from '@core/communication/encryption/CryptoTools';
-import {RSA} from '@core/communication/encryption/RSA';
-import type {SocketConnection} from '@core/communication/connection/SocketConnection';
+import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
+import type {IEncryption} from '@ambreia/net/encryption/IEncryption';
+import type {IKeyExchange} from '@ambreia/net/handshake/IKeyExchange';
+import {CryptoTools} from '@ambreia/net/encryption/CryptoTools';
+import {RSA} from '@ambreia/net/encryption/RSA';
+import type {SocketConnection} from '@ambreia/net/connection/SocketConnection';
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {HabboCommunicationDemo} from './HabboCommunicationDemo';
 import type {IHabboCommunicationManager} from '../IHabboCommunicationManager';

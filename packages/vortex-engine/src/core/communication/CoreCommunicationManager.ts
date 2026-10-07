@@ -1,8 +1,8 @@
 import {Component} from '@core/runtime/Component';
-import {SocketConnection} from './connection/SocketConnection';
+import {SocketConnection} from '@ambreia/net/connection/SocketConnection';
 import type {ICoreCommunicationManager} from './ICoreCommunicationManager';
-import type {IConnection} from './connection/IConnection';
-import type {IConnectionCallback} from './connection/IConnectionCallback';
+import type {IConnection} from '@ambreia/net/connection/IConnection';
+import type {IConnectionCallback} from '@ambreia/net/connection/IConnectionCallback';
 import type {IContext, IUpdateReceiver} from '@core/runtime/IContext';
 
 /**

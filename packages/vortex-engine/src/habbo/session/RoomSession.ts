@@ -1,6 +1,6 @@
 import {Logger} from '@ambreia/common/utils/Logger';
-import type {IConnection} from '@core/communication/connection/IConnection';
-import type {IMessageComposer} from '@core/communication/messages/IMessageComposer';
+import type {IConnection} from '@ambreia/net/connection/IConnection';
+import type {IMessageComposer} from '@ambreia/net/messages/IMessageComposer';
 import type {IRoomSession, RoomSessionStateType} from './IRoomSession';
 import {RoomSessionState} from './IRoomSession';
 import type {RoomModerationSettings} from '../communication/messages/incoming/navigator';

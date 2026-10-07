@@ -5,8 +5,8 @@
  *
  * Parser for room wall items (initial list).
  */
-import type {IMessageParser} from '@core/communication/messages/IMessageParser';
-import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
+import type {IMessageParser} from '@ambreia/net/messages/IMessageParser';
+import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
 import type {FurnitureWallData} from '@habbo/communication/messages/incoming/room/engine/FurnitureWallData';
 import {WallDataParser} from './WallDataParser';
 

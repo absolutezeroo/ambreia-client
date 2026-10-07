@@ -5,8 +5,8 @@
  *
  * Parser for furniture type aliases. Maps furniture type names to their aliases.
  */
-import type {IMessageParser} from '@core/communication/messages/IMessageParser';
-import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
+import type {IMessageParser} from '@ambreia/net/messages/IMessageParser';
+import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
 
 export class FurnitureAliasesMessageParser implements IMessageParser
 {

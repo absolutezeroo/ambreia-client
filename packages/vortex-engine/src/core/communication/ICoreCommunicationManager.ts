@@ -1,6 +1,6 @@
 import type {IDisposable} from '@ambreia/common/IDisposable';
-import type {IConnection} from './connection/IConnection';
-import type {IConnectionCallback} from './connection/IConnectionCallback';
+import type {IConnection} from '@ambreia/net/connection/IConnection';
+import type {IConnectionCallback} from '@ambreia/net/connection/IConnectionCallback';
 
 /**
  * Interface for the core communication manager

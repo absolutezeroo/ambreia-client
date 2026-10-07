@@ -1,4 +1,4 @@
-import {PreEncryptionMessageComposer} from '@core/communication/messages/PreEncryptionMessageComposer';
+import {PreEncryptionMessageComposer} from '@ambreia/net/messages/PreEncryptionMessageComposer';
 
 /**
  * Request to start Diffie-Hellman key exchange
