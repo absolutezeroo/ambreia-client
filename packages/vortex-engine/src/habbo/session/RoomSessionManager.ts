@@ -4,7 +4,7 @@ import {IID_RoomEngine} from '@iid/IIDRoomEngine';
 import {IID_HabboConfigurationManager} from '@iid/IIDHabboConfigurationManager';
 import {IID_AvatarRenderManager} from '@iid/IIDAvatarRenderManager';
 import type {IHabboCommunicationManager} from '../communication/IHabboCommunicationManager';
-import type {IAvatarRenderManager} from '../avatar/IAvatarRenderManager';
+import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
 import type {IRoomSessionManager} from './IRoomSessionManager';
 import type {IRoomHandlerListener} from './IRoomHandlerListener';
 import type {IRoomSession} from './IRoomSession';

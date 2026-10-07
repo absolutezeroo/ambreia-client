@@ -1,4 +1,4 @@
-import type {IAvatarImageListener} from '../IAvatarImageListener';
+import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
 import type {ICategoryModelOwner} from '../common/ICategoryModelOwner';
 import type {IOutfit} from '../IOutfit';
 import {FigureData} from '../figuredata/FigureData';

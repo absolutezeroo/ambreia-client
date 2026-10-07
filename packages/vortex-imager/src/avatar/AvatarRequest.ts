@@ -5,8 +5,8 @@
  * client's own login screen, forums, CMS templates. The values are translated here into
  * `AvatarAction` constants so nothing downstream has to know about the URL shape.
  */
-import {AvatarAction} from '@habbo/avatar/enum/AvatarAction';
-import {AvatarScaleType} from '@habbo/avatar/enum/AvatarScaleType';
+import {AvatarAction} from '@ambreia/avatar/enum/AvatarAction';
+import {AvatarScaleType} from '@ambreia/avatar/enum/AvatarScaleType';
 
 export interface IAvatarActionRequest
 {

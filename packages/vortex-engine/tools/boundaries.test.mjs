@@ -137,3 +137,17 @@ test('a package never reaches another package by a relative path into its source
     assert.equal(net.length, 1);
     assert.equal(common.length, 1);
 });
+
+test('avatar: common is allowed, the engine and room are refused', async () =>
+{
+    const common = await wallHits("import {Logger} from '@ambreia/common/utils/Logger';\nexport {Logger};\n",
+        'packages/ambreia-avatar/src/Probe.ts');
+    const room = await wallHits("import {RoomEngine} from '@habbo/room/RoomEngine';\nexport {RoomEngine};\n",
+        'packages/ambreia-avatar/src/Probe.ts');
+    const net = await wallHits("import {ByteArray} from '@ambreia/net/util/ByteArray';\nexport {ByteArray};\n",
+        'packages/ambreia-avatar/src/Probe.ts');
+
+    assert.equal(common.length, 0);
+    assert.equal(room.length, 1);
+    assert.equal(net.length, 1);
+});

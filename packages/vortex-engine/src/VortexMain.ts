@@ -10,7 +10,7 @@ import {RoomManager} from '@room/RoomManager';
 import {RoomSessionManager} from '@habbo/session/RoomSessionManager';
 import {RoomSessionEvent} from '@habbo/session/events/RoomSessionEvent';
 import {SessionDataManager} from '@habbo/session/SessionDataManager';
-import {AvatarRenderManager} from '@habbo/avatar/AvatarRenderManager';
+import {AvatarRenderManager} from '@ambreia/avatar/AvatarRenderManager';
 import {HabboWindowManager} from '@habbo/window/HabboWindowManager';
 import {RoomUI} from '@habbo/ui/RoomUI';
 import {Core} from '@core/Core';

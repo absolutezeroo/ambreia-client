@@ -1,6 +1,6 @@
 import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
-import type {IAvatarRenderManager} from '@habbo/avatar/IAvatarRenderManager';
-import type {IAvatarImageListener} from '@habbo/avatar/IAvatarImageListener';
+import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
+import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
 import type {IRoomPreviewerWidget} from '@habbo/window/widgets/IRoomPreviewerWidget';
 import type {RoomPreviewer} from '@habbo/room/preview/RoomPreviewer';
 import {AvatarTextureUtils} from '@habbo/avatar/AvatarTextureUtils';

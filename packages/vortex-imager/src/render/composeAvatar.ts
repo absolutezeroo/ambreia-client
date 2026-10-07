@@ -18,7 +18,7 @@
  */
 import {createCanvas} from '@napi-rs/canvas';
 import type {Canvas} from '@napi-rs/canvas';
-import type {IAvatarImage} from '@habbo/avatar/IAvatarImage';
+import type {IAvatarImage} from '@ambreia/avatar/IAvatarImage';
 import {extractDarknessToAlpha} from './extractDarknessToAlpha';
 
 /**

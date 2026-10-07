@@ -1,5 +1,5 @@
 import {createIID} from '@core/runtime/IID';
-import type {IAvatarRenderManager} from '@habbo/avatar/IAvatarRenderManager';
+import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
 
 /**
  * IID for Avatar Render Manager

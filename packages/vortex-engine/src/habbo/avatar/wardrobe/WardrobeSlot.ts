@@ -3,7 +3,7 @@ import type {IWindowContainer} from '@core/window/IWindowContainer';
 import type {IBitmapWrapperWindow} from '@core/window/components/IBitmapWrapperWindow';
 import type {WindowEvent} from '@core/window/events/WindowEvent';
 import type {HabboAvatarEditor} from '../HabboAvatarEditor';
-import type {IAvatarImageListener} from '../IAvatarImageListener';
+import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
 import type {IOutfit} from '../IOutfit';
 import {Logger} from '@ambreia/common/utils/Logger';
 import {AvatarTextureUtils} from '../AvatarTextureUtils';

@@ -8,10 +8,10 @@
  *
  * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/furniture/AvatarFurnitureVisualizationData.as
  */
-import type {IAvatarRenderManager} from '@habbo/avatar/IAvatarRenderManager';
-import type {IAvatarImage} from '@habbo/avatar/IAvatarImage';
-import type {IAvatarImageListener} from '@habbo/avatar/IAvatarImageListener';
-import type {IAvatarEffectListener} from '@habbo/avatar/IAvatarEffectListener';
+import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
+import type {IAvatarImage} from '@ambreia/avatar/IAvatarImage';
+import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
+import type {IAvatarEffectListener} from '@ambreia/avatar/IAvatarEffectListener';
 import {AvatarVisualizationData} from '../avatar/AvatarVisualizationData';
 import {FurnitureVisualizationData} from './FurnitureVisualizationData';
 

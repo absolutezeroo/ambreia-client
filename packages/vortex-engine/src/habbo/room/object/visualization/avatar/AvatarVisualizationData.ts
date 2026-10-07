@@ -8,11 +8,11 @@
  * @see sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/room/object/visualization/avatar/AvatarVisualizationData.as
  */
 import type {IRoomObjectVisualizationData} from '@room/object/visualization/IRoomObjectVisualizationData';
-import type {IAvatarRenderManager} from '@habbo/avatar/IAvatarRenderManager';
-import type {IAvatarImage} from '@habbo/avatar/IAvatarImage';
-import type {IAvatarImageListener} from '@habbo/avatar/IAvatarImageListener';
-import type {IAvatarEffectListener} from '@habbo/avatar/IAvatarEffectListener';
-import {AvatarScaleType} from '@habbo/avatar/enum/AvatarScaleType';
+import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
+import type {IAvatarImage} from '@ambreia/avatar/IAvatarImage';
+import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
+import type {IAvatarEffectListener} from '@ambreia/avatar/IAvatarEffectListener';
+import {AvatarScaleType} from '@ambreia/avatar/enum/AvatarScaleType';
 
 export class AvatarVisualizationData implements IRoomObjectVisualizationData 
 {

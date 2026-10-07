@@ -2,7 +2,7 @@ import type {IWindow} from '@core/window/IWindow';
 import type {IWindowContainer} from '@core/window/IWindowContainer';
 import type {IBitmapWrapperWindow} from '@core/window/components/IBitmapWrapperWindow';
 import type {IStaticBitmapWrapperWindow} from '@core/window/components/IStaticBitmapWrapperWindow';
-import type {IPartColor} from '../structure/figure/IPartColor';
+import type {IPartColor} from '@ambreia/avatar/structure/figure/IPartColor';
 import type {IAvatarEditorGridColorItem} from './IAvatarEditorGridItem';
 import type {ICategoryModel} from './ICategoryModel';
 import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';

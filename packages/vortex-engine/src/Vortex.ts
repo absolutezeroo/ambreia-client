@@ -15,7 +15,7 @@ import type {ISessionDataManager} from '@habbo/session/ISessionDataManager';
 import type {IRoomSessionManager} from '@habbo/session/IRoomSessionManager';
 import type {HabboCommunicationManager} from '@habbo/communication/HabboCommunicationManager';
 import type {RoomEngine} from '@habbo/room';
-import type {IAvatarRenderManager} from '@habbo/avatar/IAvatarRenderManager';
+import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
 import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';

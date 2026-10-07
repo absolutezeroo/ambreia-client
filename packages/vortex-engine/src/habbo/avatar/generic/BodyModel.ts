@@ -1,5 +1,5 @@
 import type {CategoryData} from '../common/CategoryData';
-import type {IAvatarImageListener} from '../IAvatarImageListener';
+import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
 import type {ICategoryModel} from '../common/ICategoryModel';
 import type {ICategoryModelOwner} from '../common/ICategoryModelOwner';
 import {AvatarTextureUtils} from '../AvatarTextureUtils';

@@ -10,8 +10,8 @@
  */
 import type {IRoomObjectVisualizationData} from '@room/object/visualization/IRoomObjectVisualizationData';
 import type {RoomObjectSpriteData} from '@ambreia/common/graphics/RoomObjectSpriteData';
-import type {IAvatarImage} from '@habbo/avatar/IAvatarImage';
-import type {IAvatarImageListener} from '@habbo/avatar/IAvatarImageListener';
+import type {IAvatarImage} from '@ambreia/avatar/IAvatarImage';
+import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
 import {RoomObjectVariableEnum} from '@habbo/room/object/RoomObjectVariableEnum';
 import {AvatarFurnitureVisualizationData} from './AvatarFurnitureVisualizationData';
 import {FurnitureVisualization} from './FurnitureVisualization';

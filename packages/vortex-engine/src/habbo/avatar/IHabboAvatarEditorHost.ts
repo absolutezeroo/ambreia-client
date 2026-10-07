@@ -3,8 +3,8 @@ import type {IConnection} from '@ambreia/net/connection/IConnection';
 import type {ISessionDataManager} from '@habbo/session/ISessionDataManager';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 import type {IAvatarEffect} from './IAvatarEffect';
-import type {IAvatarRenderManager} from './IAvatarRenderManager';
-import type {IFigurePartSet} from './structure/figure/IFigurePartSet';
+import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
+import type {IFigurePartSet} from '@ambreia/avatar/structure/figure/IFigurePartSet';
 import type {ICategoryModel} from './common/ICategoryModel';
 import type {
     IAvatarEditorGridColorItem,

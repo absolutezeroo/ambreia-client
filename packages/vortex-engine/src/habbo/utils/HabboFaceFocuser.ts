@@ -1,4 +1,4 @@
-import type {IAvatarImage} from '@habbo/avatar/IAvatarImage';
+import type {IAvatarImage} from '@ambreia/avatar/IAvatarImage';
 
 /**
  * Utility for extracting a focused avatar face bitmap.

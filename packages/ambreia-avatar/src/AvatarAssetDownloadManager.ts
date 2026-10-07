@@ -1,5 +1,5 @@
 import EventEmitter from 'eventemitter3';
-import type {IAssetLibrary} from '@core/assets';
+import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import type {IAvatarFigureContainer} from './IAvatarFigureContainer';
 import type {IAvatarImageListener} from './IAvatarImageListener';
 import type {AvatarStructure} from './AvatarStructure';

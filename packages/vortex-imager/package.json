@@ -16,6 +16,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@ambreia/avatar": "workspace:*",
     "@ambreia/common": "workspace:*",
     "@ambreia/net": "workspace:*",
     "@napi-rs/canvas": "^0.1.71",

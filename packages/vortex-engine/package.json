@@ -5,6 +5,7 @@
   "main": "src/index.ts",
   "types": "src/index.ts",
   "dependencies": {
+    "@ambreia/avatar": "workspace:*",
     "@ambreia/common": "workspace:*",
     "@ambreia/net": "workspace:*",
     "eventemitter3": "^5.0.1",

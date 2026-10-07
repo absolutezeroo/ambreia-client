@@ -31,7 +31,7 @@ import type {IRoomSessionManager} from '@habbo/session/IRoomSessionManager';
 import type {ISessionDataManager} from '@habbo/session/ISessionDataManager';
 import type {IHabboConfigurationManager} from '@habbo/configuration/IHabboConfigurationManager';
 import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';
-import type {IAvatarRenderManager} from '@habbo/avatar/IAvatarRenderManager';
+import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
 import type {IHabboCommunicationManager} from '@habbo/communication/IHabboCommunicationManager';
 import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
 import {CantConnectMessageEvent} from '@habbo/communication/messages/incoming/room/session/CantConnectMessageEvent';

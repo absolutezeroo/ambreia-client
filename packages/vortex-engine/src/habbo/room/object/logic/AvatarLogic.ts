@@ -21,7 +21,7 @@ import {RoomObjectAvatarTypingUpdateMessage} from '../../messages/RoomObjectAvat
 import {RoomObjectAvatarGestureUpdateMessage} from '../../messages/RoomObjectAvatarGestureUpdateMessage';
 import {RoomObjectAvatarExpressionUpdateMessage} from '../../messages/RoomObjectAvatarExpressionUpdateMessage';
 import {RoomObjectAvatarDanceUpdateMessage} from '../../messages/RoomObjectAvatarDanceUpdateMessage';
-import {AvatarAction} from '@habbo/avatar/enum/AvatarAction';
+import {AvatarAction} from '@ambreia/avatar/enum/AvatarAction';
 import {RoomObjectAvatarSleepUpdateMessage} from '../../messages/RoomObjectAvatarSleepUpdateMessage';
 import {RoomObjectAvatarEffectUpdateMessage} from '../../messages/RoomObjectAvatarEffectUpdateMessage';
 import {RoomObjectAvatarCarryObjectUpdateMessage} from '../../messages/RoomObjectAvatarCarryObjectUpdateMessage';

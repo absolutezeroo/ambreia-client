@@ -1,4 +1,4 @@
-import type {IPartColor} from '../structure/figure/IPartColor';
+import type {IPartColor} from '@ambreia/avatar/structure/figure/IPartColor';
 import type {IFigureSetOwnership} from './IFigureSetOwnership';
 import type {IAvatarEditorGridColorItem, IAvatarEditorGridPartItem} from './IAvatarEditorGridItem';
 

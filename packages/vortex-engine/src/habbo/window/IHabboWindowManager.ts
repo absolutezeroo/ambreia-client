@@ -17,7 +17,7 @@ import type {ISkinData} from '@core/window/graphics/renderer/BitmapSkinParser';
 import type {WindowEvent} from '@core/window/events/WindowEvent';
 import type {IModalDialog} from './utils/IModalDialog';
 import type {IInternalWindowServices} from "@core/window";
-import type {IAvatarRenderManager} from '@habbo/avatar/IAvatarRenderManager';
+import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
 import type {IHabboCommunicationManager} from '@habbo/communication/IHabboCommunicationManager';
 import type {ISessionDataManager} from '@habbo/session/ISessionDataManager';
 import type {IRoomEngine} from '@habbo/room/IRoomEngine';

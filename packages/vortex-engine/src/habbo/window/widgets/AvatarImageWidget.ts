@@ -1,6 +1,6 @@
 import type {Texture} from 'pixi.js';
 import type {IAvatarImageWidget} from './IAvatarImageWidget';
-import type {IAvatarImageListener} from '@habbo/avatar/IAvatarImageListener';
+import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
 import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
 import type {IHabboWindowManager} from '../IHabboWindowManager';
 import type {IWindowContainer} from '@core/window/IWindowContainer';
@@ -9,7 +9,7 @@ import type {IBitmapWrapperWindow} from '@core/window/components/IBitmapWrapperW
 import type {IAssetReceiver} from '@core/window/IAssetReceiver';
 import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
 import {PropertyStruct} from '@core/window/utils/PropertyStruct';
-import {AvatarRenderEvent} from '@habbo/avatar/enum/AvatarRenderEvent';
+import {AvatarRenderEvent} from '@ambreia/avatar/enum/AvatarRenderEvent';
 import {Logger} from '@ambreia/common/utils/Logger';
 import {
     GetExtendedProfileMessageComposer

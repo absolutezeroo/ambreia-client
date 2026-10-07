@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {AssetLibrary} from '@ambreia/common/assets/AssetLibrary';
 import {setPlatform, BROWSER_PLATFORM} from '@ambreia/common/platform/Platform';
-import {AvatarRenderManager} from '../src/habbo/avatar/AvatarRenderManager';
+import {AvatarRenderManager} from '../src/AvatarRenderManager';
 
 // No DOM here: the embedded-XML step of the constructor parses into an empty document.
 const EMPTY_DOCUMENT = {documentElement: null, getElementsByTagName: () => [], querySelectorAll: () => []} as unknown as Document;

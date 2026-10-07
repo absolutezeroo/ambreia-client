@@ -1,6 +1,6 @@
 import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IPartColor} from '../structure/figure/IPartColor';
-import type {IFigurePartSet} from '../structure/figure/IFigurePartSet';
+import type {IPartColor} from '@ambreia/avatar/structure/figure/IPartColor';
+import type {IFigurePartSet} from '@ambreia/avatar/structure/figure/IFigurePartSet';
 
 /**
  * One clothing thumbnail in a category's grid, as `CategoryData` sees it.

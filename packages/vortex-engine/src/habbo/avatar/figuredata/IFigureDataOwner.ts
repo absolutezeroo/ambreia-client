@@ -1,5 +1,5 @@
 import type {IAvatarEditorView} from '../view/IAvatarEditorView';
-import type {IAvatarRenderManager} from '../IAvatarRenderManager';
+import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
 /**
  * The one thing `FigureData` asks of the editor that owns it.
  *

@@ -1,4 +1,4 @@
-import type {IAvatarImage} from './IAvatarImage';
+import type {IAvatarImage} from '@ambreia/avatar/IAvatarImage';
 
 /**
  * TS-only: no AS3 counterpart — Flash's `getCroppedImage()`/`getImage()` hand back a `BitmapData`

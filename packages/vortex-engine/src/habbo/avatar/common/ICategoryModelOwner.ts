@@ -1,6 +1,6 @@
-import type {IAvatarImage} from '../IAvatarImage';
-import type {IAvatarRenderManager} from '../IAvatarRenderManager';
-import type {IAvatarImageListener} from '../IAvatarImageListener';
+import type {IAvatarImage} from '@ambreia/avatar/IAvatarImage';
+import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
+import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
 import type {FigureData} from '../figuredata/FigureData';
 import type {IAvatarEditorView} from '../view/IAvatarEditorView';
 import type {IHabboAvatarEditorHost} from '../IHabboAvatarEditorHost';

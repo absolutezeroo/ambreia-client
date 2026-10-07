@@ -1,11 +1,11 @@
 import type {IWindow} from '@core/window/IWindow';
 import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IAvatarImage} from './IAvatarImage';
-import type {IAvatarRenderManager} from './IAvatarRenderManager';
-import type {IAvatarImageListener} from './IAvatarImageListener';
-import type {IFigurePartSet} from './structure/figure/IFigurePartSet';
-import type {IPalette} from './structure/figure/IPalette';
-import type {ISetType} from './structure/figure/ISetType';
+import type {IAvatarImage} from '@ambreia/avatar/IAvatarImage';
+import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
+import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
+import type {IFigurePartSet} from '@ambreia/avatar/structure/figure/IFigurePartSet';
+import type {IPalette} from '@ambreia/avatar/structure/figure/IPalette';
+import type {ISetType} from '@ambreia/avatar/structure/figure/ISetType';
 import type {IAvatarEditorSaveListener} from './IAvatarEditorSaveListener';
 import type {IAvatarEditorView} from './view/IAvatarEditorView';
 import type {ICategoryModel} from './common/ICategoryModel';

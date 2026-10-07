@@ -1,4 +1,4 @@
-import type {IAssetLibrary} from '@core/assets';
+import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import {ActionDefinition} from './ActionDefinition';
 import type {IActiveActionData} from './IActiveActionData';
 import {getXmlAttribute, getXmlChildElements, getXmlRoot} from '../structure/AvatarXmlUtils';

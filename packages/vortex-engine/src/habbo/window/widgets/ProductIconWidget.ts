@@ -7,7 +7,7 @@ import type {IIconWindow} from '@core/window/components/IIconWindow';
 import type {IStaticBitmapWrapperWindow} from '@core/window/components/IStaticBitmapWrapperWindow';
 import type {IBitmapWrapperWindow} from '@core/window/components/IBitmapWrapperWindow';
 import type {IGetImageListener} from '@habbo/room/IGetImageListener';
-import type {IAvatarImageListener} from '@habbo/avatar/IAvatarImageListener';
+import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
 import type {PropertyStruct} from '@core/window/utils/PropertyStruct';
 import type {IProductDisplayInfo} from './IProductDisplayInfo';
 import {ImageResult} from '@habbo/room/ImageResult';

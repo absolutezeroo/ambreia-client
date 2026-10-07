@@ -13,7 +13,7 @@ import type {IRoomObjectVisualization} from '@room/object/visualization/IRoomObj
 import type {IRoomObjectVisualizationData} from '@room/object/visualization/IRoomObjectVisualizationData';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import type {IGraphicAssetCollection} from '@ambreia/common/graphics/IGraphicAssetCollection';
-import type {IAvatarRenderManager} from '@habbo/avatar/IAvatarRenderManager';
+import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
 import {GraphicAssetCollection} from '@ambreia/common/graphics/GraphicAssetCollection';
 import {RoomObjectVisualizationEnum} from './RoomObjectVisualizationEnum';
 

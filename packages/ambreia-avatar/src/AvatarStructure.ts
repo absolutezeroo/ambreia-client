@@ -7,7 +7,7 @@ import {AnimationManager} from './animation/AnimationManager';
 import {AvatarImagePartContainer} from './AvatarImagePartContainer';
 import {AvatarDirectionAngle} from './enum/AvatarDirectionAngle';
 import {AvatarModelGeometry} from './geometry/AvatarModelGeometry';
-import type {IAssetLibrary} from '@core/assets';
+import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import type {IAvatarRenderManager} from './IAvatarRenderManager';
 import type {IAvatarFigureContainer} from './IAvatarFigureContainer';
 import type {IAvatarImage} from './IAvatarImage';

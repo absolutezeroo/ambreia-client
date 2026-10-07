@@ -108,7 +108,7 @@ import type {IHabboConfigurationManager} from '@habbo/configuration/IHabboConfig
 import {IID_SessionDataManager} from '@iid/IIDSessionDataManager';
 import type {ISessionDataManager} from '@habbo/session/ISessionDataManager';
 import {IID_AvatarRenderManager} from '@iid/IIDAvatarRenderManager';
-import type {IAvatarRenderManager} from '@habbo/avatar/IAvatarRenderManager';
+import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
 import {BadgeImageReadyEvent} from '@habbo/session/events/BadgeImageReadyEvent';
 import {RoomObjectGroupBadgeUpdateMessage} from './messages/RoomObjectGroupBadgeUpdateMessage';
 import {RoomObjectRoomAdEvent} from './events/RoomObjectRoomAdEvent';
