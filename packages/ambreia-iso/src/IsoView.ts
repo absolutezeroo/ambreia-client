@@ -193,9 +193,10 @@ export class IsoView implements IIsoView, IRoomRenderingCanvasMouseListener
     }
 
     /** The renderer's hit walk goes top to bottom: the first furni or wall item met is the topmost. */
-    processRoomCanvasMouseEvent(_event: RoomSpriteMouseEvent, object: IRoomObject, _geometry: IRoomGeometry): void
+    processRoomCanvasMouseEvent(event: RoomSpriteMouseEvent, object: IRoomObject, _geometry: IRoomGeometry): void
     {
-        if(!this._picking || this._picked !== null) return;
+        // The walk also rolls out what the previous point was over: only what is hit now counts.
+        if(!this._picking || this._picked !== null || event.type === 'rollOut') return;
 
         const id = object.getId();
         const instance = this._room.instance;

@@ -4,6 +4,9 @@
   "private": true,
   "type": "module",
   "description": "Ambreia isometric room engine: rooms, objects, renderer, furniture, avatars and effects in a room",
+  "scripts": {
+    "sandbox": "vite --config sandbox/vite.config.ts"
+  },
   "exports": {
     "./*": "./src/*.ts"
   },

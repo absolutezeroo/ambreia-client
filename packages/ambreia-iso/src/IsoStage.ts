@@ -103,10 +103,15 @@ export class IsoStage
         this._loader = loader;
     }
 
-    /** A renderer of its own for a host without PixiJS, to pass as `renderer` (browser only). */
-    static createOffscreenRenderer(width: number = 800, height: number = 600): Promise<Renderer>
+    /**
+     * A renderer of its own for a host without PixiJS, to pass as `renderer` (browser only). The
+     * background is opaque, in the host's colour: on a transparent one a room sprite composites
+     * black where it should not (seen in the sandbox's canvas page).
+     */
+    // ponytail: opaque only; find the offending sprite's alpha if a host needs a transparent view.
+    static createOffscreenRenderer(width: number = 800, height: number = 600, background: number = 0x000000): Promise<Renderer>
     {
-        return autoDetectRenderer({width, height, backgroundAlpha: 0, antialias: false}) as Promise<Renderer>;
+        return autoDetectRenderer({width, height, background, backgroundAlpha: 1, antialias: false}) as Promise<Renderer>;
     }
 
     /** Builds the room pipeline and waits for its placeholder content (room, cursor, fallbacks). */
