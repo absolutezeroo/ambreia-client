@@ -5,104 +5,128 @@ import {editTiles} from '@ambreia/map-editor-core/commands/editTiles';
 import type {IEditorCommand} from '@ambreia/map-editor-core/commands/IEditorCommand';
 import {moveDecor} from '@ambreia/map-editor-core/commands/moveDecor';
 import {moveDoor} from '@ambreia/map-editor-core/commands/moveDoor';
+import {pasteDecor} from '@ambreia/map-editor-core/commands/pasteDecor';
 import {placeDecor} from '@ambreia/map-editor-core/commands/placeDecor';
 import {removeDecor} from '@ambreia/map-editor-core/commands/removeDecor';
-import {resizeFloor} from '@ambreia/map-editor-core/commands/resizeFloor';
 import {rotateDecor} from '@ambreia/map-editor-core/commands/rotateDecor';
-import {setDecorState} from '@ambreia/map-editor-core/commands/setDecorState';
+import {setDecorLocked} from '@ambreia/map-editor-core/commands/setDecorLocked';
+import {toggleSpawn} from '@ambreia/map-editor-core/commands/toggleSpawn';
 import {EditorHistory} from '@ambreia/map-editor-core/history/EditorHistory';
-import type {LayerName} from '@ambreia/map-editor-core/layers/LayerName';
 import {LayerState} from '@ambreia/map-editor-core/layers/LayerState';
 import {EditorSelection} from '@ambreia/map-editor-core/selection/EditorSelection';
 import type {IZoneFinding} from '@ambreia/map-editor-core/validation/IZoneFinding';
 import {validateLocally} from '@ambreia/map-editor-core/validation/validateLocally';
-import type {ZoneDocument, ZoneTile} from '@ambreia/map-editor-core/zone/Zone.generated';
+import {fillCells} from '@ambreia/map-editor-core/zone/fillCells';
+import type {ZoneCell, ZoneDocument, ZoneTile} from '@ambreia/map-editor-core/zone/Zone.generated';
 import {nextId, tileAt, tileIndex} from '@ambreia/map-editor-core/zone/zoneGeometry';
 import {$, describe, esc} from '../panels/html';
-import {PalettePanel} from '../panels/PalettePanel';
+import {BottomPanels} from '../panels/BottomPanels';
+import {CategoryRail} from '../panels/CategoryRail';
+import {PropertiesPanel} from '../panels/PropertiesPanel';
+import {SidePanel} from '../panels/SidePanel';
+import {TitleBar} from '../panels/TitleBar';
+import {ViewToolbar} from '../panels/ViewToolbar';
+import {FurnitureSprites} from '../view/FurnitureSprites';
 import type {IPick} from '../view/IPick';
+import type {IViewOptions} from '../view/IViewOptions';
 import {IsoView} from '../view/IsoView';
+import type {Category} from './Category';
+import {FLOOR_TOOLS} from './FLOOR_TOOLS';
+import type {IClipboardEntry} from './IClipboardEntry';
+import type {IJournalEntry} from './IJournalEntry';
 import type {ToolName} from './ToolName';
-import {TOOLS} from './TOOLS';
 
-const LAYER_LABELS: Record<LayerName, string> = {floor: 'Sol', door: 'Porte', decor: 'Mobis', wallDecor: 'Mobis muraux'};
 const GAME_CLIENT = 'http://localhost:5173/';
 
 type Cell = {readonly x: number; readonly y: number};
 
 /**
- * One open zone: the panels around the view, the tools, save and publish. Resolves run() when
- * the user goes back to the zone list.
+ * One open zone, laid out like the owner's mock-ups: title bar and menus, the category rail, a
+ * side panel per category, the view and its toolbar, the properties, and the bottom panels.
+ * Panels read this object and call its actions; run() resolves when the user goes back to the
+ * zone list.
  */
 export class EditorApp
 {
-    private readonly _history: EditorHistory;
-    private readonly _layers = new LayerState();
+    readonly history: EditorHistory;
+    readonly layers = new LayerState();
+    readonly sprites = new FurnitureSprites();
+    readonly view: IsoView;
+    readonly options: IViewOptions = {grid: true, heights: false, walls: true, sprites: true};
+    readonly journal: IJournalEntry[] = [];
+
+    selection = EditorSelection.EMPTY;
+    category: Category = 'floor';
+    tool: ToolName = 'select';
+    /** The height "Ajouter case", "Rectangle" and "Remplir" paint with. */
+    paintHeight = 0;
+    choice: IFurniturePaletteEntry | null = null;
+    serverFindings: IZoneFinding[] = [];
+    savedVersion: number | null;
+    publishedVersion: number | null;
+    status = '';
+    hover: Cell | null = null;
+    busy = false;
+
     private readonly _furniture: Map<number, IFurniturePaletteEntry>;
-    private readonly _view: IsoView;
-    private _selection = EditorSelection.EMPTY;
-    private _tool: ToolName = 'select';
-    private _choice: IFurniturePaletteEntry | null = null;
-    private _serverFindings: IZoneFinding[] = [];
-    private _savedVersion: number | null;
-    private _publishedVersion: number | null;
-    private _hover: Cell | null = null;
+    private readonly _panels: {render(): void}[];
+    private _clipboard: IClipboardEntry | null = null;
     private _stroke = new Map<number, Cell>();
     private _dragFrom: Cell | null = null;
     private _dragTo: Cell | null = null;
     private _rectFrom: Cell | null = null;
-    private _status = '';
-    private _busy = false;
     private _close: () => void = () => undefined;
 
     constructor(
         private readonly _root: HTMLElement,
-        private readonly _api: EditorApiClient,
-        private readonly _zone: IZoneSummary,
+        readonly api: EditorApiClient,
+        readonly zone: IZoneSummary,
         doc: ZoneDocument,
-        palette: readonly IFurniturePaletteEntry[]
+        readonly palette: readonly IFurniturePaletteEntry[]
     )
     {
-        this._history = new EditorHistory(doc);
+        this.history = new EditorHistory(doc);
         this._furniture = new Map(palette.map(p => [p.definition, p]));
-        this._savedVersion = _zone.latestVersion || null;
-        this._publishedVersion = _zone.publishedVersion;
+        this.savedVersion = zone.latestVersion || null;
+        this.publishedVersion = zone.publishedVersion;
 
         _root.innerHTML = `
             <div class="editor">
-                <header class="topbar">
-                    <button data-action="zones" title="Revenir à la liste des zones">☰ Zones</button>
-                    <span class="title">${esc(_zone.name)} <code>${esc(_zone.key)}</code></span>
-                    <button data-action="undo" title="Annuler (Ctrl+Z)">↶</button>
-                    <button data-action="redo" title="Refaire (Ctrl+Y)">↷</button>
-                    <button data-action="save" class="primary" title="Enregistrer une version (Ctrl+S)">Enregistrer</button>
-                    <button data-action="publish" title="Publier la dernière version : la room se recharge">Publier</button>
-                    <button data-action="test" title="Publier si besoin, puis ouvrir le client du jeu">▶ Tester</button>
-                    <span class="status"></span>
-                </header>
-                <nav class="tools">${TOOLS.map(t => `<button data-tool="${t.name}" title="${esc(t.label)} (${t.key})">${t.icon}</button>`).join('')}</nav>
-                <aside class="palette"></aside>
-                <main class="stage"><canvas></canvas><div class="hud muted"></div></main>
-                <aside class="inspector"></aside>
-                <footer class="bottom">
-                    <section><h3>Calques</h3><div class="layers"></div></section>
-                    <section><h3>Historique</h3><ol class="history"></ol></section>
-                    <section><h3>Constats</h3><ul class="findings"></ul></section>
-                </footer>
+                <header class="titlebar"></header>
+                <nav class="rail"></nav>
+                <aside class="side"></aside>
+                <main class="stage">
+                    <div class="viewbar"></div>
+                    <div class="canvas-wrap"><canvas></canvas><div class="hud"></div></div>
+                </main>
+                <aside class="props"></aside>
+                <footer class="bottom"></footer>
             </div>`;
 
-        this._view = new IsoView($<HTMLCanvasElement>(_root, 'canvas'));
-        this._view.onPointer = (kind, pick, e) => this.pointer(kind, pick, e);
+        this.view = new IsoView($<HTMLCanvasElement>(_root, 'canvas'));
+        this.view.onPointer = (kind, pick, e) => this.pointer(kind, pick, e);
 
-        const palettePanel = new PalettePanel($(_root, '.palette'), palette);
+        const bottom = new BottomPanels($(_root, '.bottom'), this);
 
-        palettePanel.onChoose = entry =>
+        this._panels = [
+            new TitleBar($(_root, '.titlebar'), this),
+            new CategoryRail($(_root, '.rail'), this),
+            new SidePanel($(_root, '.side'), this),
+            new ViewToolbar($(_root, '.viewbar'), this),
+            new PropertiesPanel($(_root, '.props'), this),
+            bottom
+        ];
+        this.view.onViewChange = () =>
         {
-            this._choice = entry;
-            this.setTool('place');
+            bottom.renderMiniMap();
+            this._panels[0].render();
         };
+        this.sprites.onLoad = () => this.drawView();
 
-        this.wire();
+        window.addEventListener('keydown', this.keydown);
+        window.addEventListener('beforeunload', this.unload);
+
+        this.log(`Zone ${zone.key} ouverte (${this.savedVersion ? `v${this.savedVersion}` : 'nouvelle'}).`);
         this.refresh();
     }
 
@@ -112,90 +136,315 @@ export class EditorApp
         return new Promise(resolve => this._close = resolve);
     }
 
-    private get doc(): ZoneDocument
+    get doc(): ZoneDocument
     {
-        return this._history.current;
+        return this.history.current;
     }
 
-    private wire(): void
+    furniture(definition: number): IFurniturePaletteEntry | null
     {
-        $(this._root, '.topbar').addEventListener('click', e =>
+        return this._furniture.get(definition) ?? null;
+    }
+
+    get localFindings(): IZoneFinding[]
+    {
+        return validateLocally(this.doc, d => this.furniture(d));
+    }
+
+    get canPaste(): boolean
+    {
+        return !!this._clipboard;
+    }
+
+    // ── Actions ──────────────────────────────────────────────────────────────────
+
+    execute(command: IEditorCommand): void
+    {
+        if(this.history.execute(command)) this.afterChange();
+    }
+
+    undo(): void
+    {
+        if(this.history.undo()) this.afterChange();
+    }
+
+    redo(): void
+    {
+        if(this.history.redo()) this.afterChange();
+    }
+
+    /** Undo or redo several steps at once (a click in the History panel). */
+    travel(steps: number): void
+    {
+        for(let i = 0; i < Math.abs(steps); i++)
         {
-            const action = (e.target as HTMLElement).closest<HTMLElement>('[data-action]')?.dataset.action;
+            if(steps < 0) this.history.undo();
+            else this.history.redo();
+        }
+        this.afterChange();
+    }
 
-            if(action === 'zones') void this.leave();
-            if(action === 'undo') this.undo();
-            if(action === 'redo') this.redo();
-            if(action === 'save') void this.save();
-            if(action === 'publish') void this.publish();
-            if(action === 'test') void this.test();
-        });
+    select(selection: EditorSelection): void
+    {
+        this.selection = selection;
+        this.refresh();
+    }
 
-        $(this._root, '.tools').addEventListener('click', e =>
+    setCategory(category: Category): void
+    {
+        this.category = category;
+        if(category === 'decor' && !['select', 'move', 'place'].includes(this.tool)) this.tool = 'select';
+        if(category === 'floor' && ['move', 'place'].includes(this.tool)) this.tool = 'select';
+        this.refresh();
+    }
+
+    setTool(tool: ToolName): void
+    {
+        if(tool === 'place' && !this.choice)
         {
-            const tool = ((e.target as HTMLElement).closest<HTMLElement>('[data-tool]')?.dataset.tool ?? null) as ToolName | null;
+            this.status = 'Choisissez d\'abord un mobi dans le catalogue.';
+            tool = 'select';
+        }
+        this.tool = tool;
+        this.refresh();
+    }
 
-            if(tool) this.setTool(tool);
-        });
+    setPaintHeight(height: number): void
+    {
+        this.paintHeight = height;
+        if(!['tile-add', 'rect', 'fill'].includes(this.tool)) this.tool = 'tile-add';
+        this.refresh();
+    }
 
-        $(this._root, '.layers').addEventListener('change', e =>
+    choose(entry: IFurniturePaletteEntry): void
+    {
+        this.choice = entry;
+        this.tool = 'place';
+        this.refresh();
+    }
+
+    toggleOption(option: keyof IViewOptions): void
+    {
+        this.options[option] = !this.options[option];
+        this.refresh();
+    }
+
+    copy(): void
+    {
+        const objects = (this.doc.decor ?? []).filter(o => this.selection.ids.has(o.id));
+
+        if(!objects.length) return;
+
+        this._clipboard = {objects, originX: Math.min(...objects.map(o => o.x)), originY: Math.min(...objects.map(o => o.y))};
+        this.log(`${objects.length} mobi(s) copié(s).`);
+        this.refresh();
+    }
+
+    /** Pastes under the pointer, or one cell off the originals when the pointer is not on the floor. */
+    paste(): void
+    {
+        const clip = this._clipboard;
+
+        if(!clip) return;
+
+        const target = this.hover ?? {x: clip.originX + 1, y: clip.originY + 1};
+        const before = new Set((this.doc.decor ?? []).map(o => o.id));
+
+        this.execute(pasteDecor(clip.objects, target.x - clip.originX, target.y - clip.originY));
+        this.selectNew(before);
+    }
+
+    duplicate(): void
+    {
+        const objects = (this.doc.decor ?? []).filter(o => this.selection.ids.has(o.id));
+        const before = new Set((this.doc.decor ?? []).map(o => o.id));
+
+        if(!objects.length) return;
+
+        this.execute(pasteDecor(objects, 1, 1));
+        this.selectNew(before);
+    }
+
+    deleteSelection(): void
+    {
+        this.execute(removeDecor(this.selection.ids));
+    }
+
+    rotateSelection(): void
+    {
+        this.execute(rotateDecor(this.selection.ids));
+    }
+
+    toggleLock(): void
+    {
+        const selected = (this.doc.decor ?? []).filter(o => this.selection.ids.has(o.id));
+
+        this.execute(setDecorLocked(this.selection.ids, !selected.every(o => o.locked)));
+    }
+
+    log(text: string, level: IJournalEntry['level'] = 'info'): void
+    {
+        const time = new Date().toLocaleTimeString('fr-FR');
+
+        this.journal.unshift({time, text, level});
+        this.journal.length = Math.min(this.journal.length, 200);
+    }
+
+    async save(): Promise<boolean>
+    {
+        if(this.busy) return false;
+
+        this.busy = true;
+        this.status = 'Enregistrement…';
+        this.refresh();
+        try
         {
-            const input = e.target as HTMLInputElement;
-            const layer = input.dataset.layer as LayerName;
+            const result = await this.api.save(this.zone.key, this.doc);
 
-            if(input.dataset.kind === 'visible') this._layers.setVisible(layer, input.checked);
-            else this._layers.setLocked(layer, input.checked);
-            this.refresh();
-        });
-
-        $(this._root, '.history').addEventListener('click', e =>
-        {
-            const li = (e.target as HTMLElement).closest<HTMLElement>('[data-steps]');
-
-            if(!li) return;
-
-            const steps = Number(li.dataset.steps);
-
-            for(let i = 0; i < Math.abs(steps); i++)
+            this.serverFindings = [...result.findings];
+            if(result.saved)
             {
-                if(steps < 0) this._history.undo();
-                else this._history.redo();
+                this.history.markSaved();
+                this.savedVersion = result.version;
+                this.status = `Version ${result.version} enregistrée.`;
+                this.log(this.status, 'success');
             }
-            this.afterChange();
-        });
-
-        $(this._root, '.findings').addEventListener('click', e =>
-        {
-            const id = (e.target as HTMLElement).closest<HTMLElement>('[data-element]')?.dataset.element;
-            const o = this.doc.decor?.find(d => d.id === id);
-
-            if(!o) return;
-
-            this._selection = EditorSelection.of(o.id);
-            this._view.centerOn(o.x, o.y);
-            this.refresh();
-        });
-
-        $(this._root, '.inspector').addEventListener('change', e => this.inspectorChange(e.target as HTMLInputElement));
-        $(this._root, '.inspector').addEventListener('click', e =>
-        {
-            const action = (e.target as HTMLElement).closest<HTMLElement>('[data-do]')?.dataset.do;
-
-            if(action === 'rotate') this.execute(rotateDecor(this._selection.ids));
-            if(action === 'delete') this.execute(removeDecor(this._selection.ids));
-            if(action === 'resize')
+            else
             {
-                this.execute(resizeFloor(
-                    Number($<HTMLInputElement>(this._root, '[data-field=width]').value),
-                    Number($<HTMLInputElement>(this._root, '[data-field=length]').value)
-                ));
-                this._view.fit();
-                this.refresh();
+                this.status = result.findings.some(f => f.code === 'Conflict')
+                    ? 'Une autre sauvegarde est passée avant : enregistrez à nouveau.'
+                    : 'Refusé par le serveur : voir la validation.';
+                this.log(this.status, 'error');
             }
-        });
 
-        window.addEventListener('keydown', this.keydown);
-        window.addEventListener('beforeunload', this.unload);
+            return result.saved;
+        }
+        catch (error)
+        {
+            this.status = describe(error);
+            this.log(this.status, 'error');
+
+            return false;
+        }
+        finally
+        {
+            this.busy = false;
+            this.refresh();
+        }
+    }
+
+    async publish(): Promise<boolean>
+    {
+        if((this.history.isDirty || this.savedVersion === null) && !await this.save()) return false;
+        if(this.savedVersion === null || this.busy) return false;
+
+        this.busy = true;
+        this.status = 'Publication…';
+        this.refresh();
+        try
+        {
+            const result = await this.api.publish(this.zone.key, this.savedVersion);
+
+            this.serverFindings = [...result.findings];
+            if(result.published) this.publishedVersion = this.savedVersion;
+            this.status = result.published
+                ? `Version ${this.savedVersion} publiée : la room est rechargée.`
+                : 'Publication refusée : voir la validation.';
+            this.log(this.status, result.published ? 'success' : 'error');
+
+            return result.published;
+        }
+        catch (error)
+        {
+            this.status = describe(error);
+            this.log(this.status, 'error');
+
+            return false;
+        }
+        finally
+        {
+            this.busy = false;
+            this.refresh();
+        }
+    }
+
+    /** "Vérifier la map": the server's verdict on the current document, without saving it. */
+    async verify(): Promise<void>
+    {
+        try
+        {
+            this.serverFindings = await this.api.validate(this.zone.key, this.doc);
+
+            const errors = this.serverFindings.filter(f => f.severity === 'Error').length;
+
+            this.log(errors ? `Vérification : ${errors} erreur(s).` : 'Vérification : la map est jouable.', errors ? 'error' : 'success');
+        }
+        catch (error)
+        {
+            this.log(describe(error), 'error');
+        }
+        this.refresh();
+    }
+
+    async test(): Promise<void>
+    {
+        const current = !this.history.isDirty && this.savedVersion !== null && this.publishedVersion === this.savedVersion;
+
+        if(!current && !await this.publish()) return;
+
+        try
+        {
+            if('__TAURI_INTERNALS__' in window)
+            {
+                const {openUrl} = await import('@tauri-apps/plugin-opener');
+
+                await openUrl(GAME_CLIENT);
+            }
+            else window.open(GAME_CLIENT, '_blank');
+            this.status = `Client ouvert : la zone est la room ${this.zone.roomId}.`;
+            this.log(this.status);
+        }
+        catch (error)
+        {
+            this.status = `Impossible d'ouvrir le client : ${describe(error)}`;
+            this.log(this.status, 'error');
+        }
+        this.refresh();
+    }
+
+    async leave(): Promise<void>
+    {
+        if(this.history.isDirty && !window.confirm('Des modifications ne sont pas enregistrées. Quitter quand même ?')) return;
+
+        window.removeEventListener('keydown', this.keydown);
+        window.removeEventListener('beforeunload', this.unload);
+        await this.api.unlock(this.zone.key).catch(() => undefined);
+        this._close();
+    }
+
+    refresh(): void
+    {
+        this.drawView();
+        for(const panel of this._panels) panel.render();
+        this.updateHud();
+    }
+
+    // ── Internals ────────────────────────────────────────────────────────────────
+
+    private afterChange(): void
+    {
+        this.selection = this.selection.keepOnly(new Set((this.doc.decor ?? []).map(o => o.id)));
+        this.refresh();
+    }
+
+    private selectNew(before: ReadonlySet<string>): void
+    {
+        const added = (this.doc.decor ?? []).map(o => o.id).filter(id => !before.has(id));
+
+        if(!added.length) return;
+
+        this.selection = added.slice(1).reduce((s, id) => s.toggle(id), EditorSelection.of(added[0]));
+        this.refresh();
     }
 
     private readonly keydown = (e: KeyboardEvent): void =>
@@ -207,19 +456,26 @@ export class EditorApp
         if(e.ctrlKey && key === 'z' && !e.shiftKey) this.undo();
         else if(e.ctrlKey && (key === 'y' || (key === 'z' && e.shiftKey))) this.redo();
         else if(e.ctrlKey && key === 's') void this.save();
-        else if(key === 'delete' || key === 'backspace') this.execute(removeDecor(this._selection.ids));
-        else if(key === 'r') this.execute(rotateDecor(this._selection.ids));
+        else if(e.ctrlKey && key === 'c') this.copy();
+        else if(e.ctrlKey && key === 'v') this.paste();
+        else if(e.ctrlKey && key === 'd') this.duplicate();
+        else if(key === 'delete' || key === 'backspace') this.deleteSelection();
         else if(key === 'escape')
         {
-            this._selection = EditorSelection.EMPTY;
+            this.selection = EditorSelection.EMPTY;
             this.setTool('select');
         }
+        else if(e.ctrlKey || e.altKey) return;
+        else if(this.category === 'decor' && key === 'r') this.rotateSelection();
+        else if(this.category === 'decor' && key === 'm') this.setTool('move');
+        else if(this.category === 'decor' && key === 's') this.setTool('select');
         else
         {
-            const tool = TOOLS.find(t => t.key === key);
+            const tool = FLOOR_TOOLS.find(t => t.key.toLowerCase() === key);
 
-            if(!tool || e.ctrlKey) return;
-            this.setTool(tool.name);
+            if(!tool) return;
+            if(this.category !== 'floor') this.category = 'floor';
+            this.setTool(tool.tool);
         }
 
         e.preventDefault();
@@ -227,59 +483,45 @@ export class EditorApp
 
     private readonly unload = (): void =>
     {
-        void this._api.unlock(this._zone.key).catch(() => undefined);
+        void this.api.unlock(this.zone.key).catch(() => undefined);
     };
-
-    private setTool(tool: ToolName): void
-    {
-        this._tool = tool === 'place' && !this._choice ? 'select' : tool;
-        if(tool === 'place' && !this._choice) this._status = 'Choisissez d\'abord un meuble dans la palette.';
-        this.refresh();
-    }
-
-    private execute(command: IEditorCommand): void
-    {
-        if(this._history.execute(command)) this.afterChange();
-    }
-
-    private undo(): void
-    {
-        if(this._history.undo()) this.afterChange();
-    }
-
-    private redo(): void
-    {
-        if(this._history.redo()) this.afterChange();
-    }
-
-    private afterChange(): void
-    {
-        this._selection = this._selection.keepOnly(new Set((this.doc.decor ?? []).map(o => o.id)));
-        this.refresh();
-    }
-
-    // ── Pointer tools ────────────────────────────────────────────────────────────
 
     private pointer(kind: 'down' | 'move' | 'up', pick: IPick, e: PointerEvent): void
     {
-        this._hover = pick.cell;
+        this.hover = pick.cell;
 
-        switch(this._tool)
+        switch(this.tool)
         {
             case 'select':
+            case 'move':
                 this.selectTool(kind, pick, e);
                 break;
+            case 'tile-add':
+            case 'tile-remove':
             case 'raise':
             case 'lower':
-            case 'hole':
             case 'block':
                 this.brush(kind, pick, e);
                 break;
+            case 'rect':
+                this.rectTool(kind, pick);
+                break;
+            case 'fill':
+                if(kind === 'down' && pick.cell && this.layers.isEditable('floor'))
+                {
+                    const cells = fillCells(this.doc.floor, pick.cell.x, pick.cell.y);
+
+                    this.execute(editTiles(`Remplir (${cells.length}) à ${this.paintHeight}`, cells, t => ({...t, hole: false, height: this.paintHeight})));
+                }
+                break;
             case 'door':
-                if(kind === 'down' && pick.cell && this._layers.isEditable('door')) this.execute(moveDoor(pick.cell.x, pick.cell.y));
+                if(kind === 'down' && pick.cell && this.layers.isEditable('door')) this.execute(moveDoor(pick.cell.x, pick.cell.y));
+                break;
+            case 'spawn':
+                if(kind === 'down' && pick.cell && this.layers.isEditable('door')) this.execute(toggleSpawn(pick.cell.x, pick.cell.y));
                 break;
             case 'place':
-                if(kind === 'down' && pick.cell && this._choice && this._layers.isEditable('decor')) this.place(pick.cell, this._choice);
+                if(kind === 'down' && pick.cell && this.choice && this.layers.isEditable('decor')) this.place(pick.cell, this.choice);
                 break;
         }
 
@@ -291,29 +533,25 @@ export class EditorApp
     {
         if(kind === 'down')
         {
-            if(pick.objectId && this._layers.isEditable('decor'))
+            if(pick.objectId && this.layers.isEditable('decor'))
             {
-                if(e.shiftKey) this._selection = this._selection.toggle(pick.objectId);
-                else if(!this._selection.ids.has(pick.objectId)) this._selection = EditorSelection.of(pick.objectId);
+                if(e.shiftKey) this.selection = this.selection.toggle(pick.objectId);
+                else if(!this.selection.ids.has(pick.objectId)) this.selection = EditorSelection.of(pick.objectId);
                 this._dragFrom = pick.cell;
                 this._dragTo = pick.cell;
             }
-            else if(pick.cell)
+            else if(pick.cell && this.tool === 'select')
             {
                 this._rectFrom = pick.cell;
-                this._selection = EditorSelection.rectangle(pick.cell, pick.cell);
+                this.selection = EditorSelection.rectangle(pick.cell, pick.cell);
             }
-            else this._selection = EditorSelection.EMPTY;
+            else if(this.tool === 'select') this.selection = EditorSelection.EMPTY;
             this.refresh();
         }
         else if(kind === 'move')
         {
             if(this._dragFrom && pick.cell) this._dragTo = pick.cell;
-            if(this._rectFrom && pick.cell)
-            {
-                this._selection = EditorSelection.rectangle(this._rectFrom, pick.cell);
-                this.renderInspector();
-            }
+            if(this._rectFrom && pick.cell) this.selection = EditorSelection.rectangle(this._rectFrom, pick.cell);
         }
         else
         {
@@ -322,23 +560,27 @@ export class EditorApp
             if(offset)
             {
                 // The objects follow the floor: dz is the height difference under the first one.
-                const first = this.doc.decor?.find(o => this._selection.ids.has(o.id));
+                const first = this.doc.decor?.find(o => this.selection.ids.has(o.id));
                 const floor = this.doc.floor;
                 const dz = first
                     ? (tileAt(floor, first.x + offset.dx, first.y + offset.dy)?.height ?? 0) - (tileAt(floor, first.x, first.y)?.height ?? 0)
                     : 0;
 
-                this.execute(moveDecor(this._selection.ids, offset.dx, offset.dy, dz));
+                this.execute(moveDecor(this.selection.ids, offset.dx, offset.dy, dz));
             }
             this._dragFrom = null;
             this._dragTo = null;
-            this._rectFrom = null;
+            if(this._rectFrom)
+            {
+                this._rectFrom = null;
+                this.refresh();
+            }
         }
     }
 
     private brush(kind: 'down' | 'move' | 'up', pick: IPick, e: PointerEvent): void
     {
-        if(!this._layers.isEditable('floor')) return;
+        if(!this.layers.isEditable('floor')) return;
 
         if((kind === 'down' || (kind === 'move' && this._stroke.size)) && pick.cell)
         {
@@ -348,15 +590,38 @@ export class EditorApp
         if(kind !== 'up' || !this._stroke.size) return;
 
         const cells = [...this._stroke.values()];
-        const reverse = e.shiftKey;
+        const height = this.paintHeight;
         const [label, change]: [string, (t: ZoneTile) => ZoneTile] =
-            this._tool === 'raise' ? ['Monter le sol', t => ({...t, height: (t.height ?? 0) + 1})]
-                : this._tool === 'lower' ? ['Descendre le sol', t => ({...t, height: (t.height ?? 0) - 1})]
-                    : this._tool === 'hole' ? [reverse ? 'Boucher' : 'Creuser', t => ({...t, hole: !reverse})]
-                        : [reverse ? 'Rendre marchable' : 'Bloquer', t => ({...t, walkable: reverse})];
+            this.tool === 'tile-add' ? [`Ajouter case à ${height}`, t => ({...t, hole: false, height})]
+                : this.tool === 'tile-remove' ? ['Supprimer case', t => ({...t, hole: true})]
+                    : this.tool === 'raise' ? ['Monter le sol', t => ({...t, height: (t.height ?? 0) + 1})]
+                        : this.tool === 'lower' ? ['Descendre le sol', t => ({...t, height: (t.height ?? 0) - 1})]
+                            : [e.shiftKey ? 'Rendre marchable' : 'Bloquer', t => ({...t, walkable: e.shiftKey})];
 
         this._stroke = new Map();
         this.execute(editTiles(`${label} (${cells.length})`, cells, change));
+    }
+
+    private rectTool(kind: 'down' | 'move' | 'up', pick: IPick): void
+    {
+        if(!this.layers.isEditable('floor')) return;
+
+        if(kind === 'down' && pick.cell) this._rectFrom = pick.cell;
+
+        if(this._rectFrom && pick.cell)
+        {
+            this._stroke = new Map(EditorSelection.rectangle(this._rectFrom, pick.cell).cells
+                .map(c => [tileIndex(this.doc.floor, c.x ?? 0, c.y ?? 0), {x: c.x ?? 0, y: c.y ?? 0}]));
+        }
+
+        if(kind !== 'up' || !this._rectFrom) return;
+
+        const cells: ZoneCell[] = [...this._stroke.values()];
+        const height = this.paintHeight;
+
+        this._rectFrom = null;
+        this._stroke = new Map();
+        this.execute(editTiles(`Rectangle ${cells.length} cases à ${height}`, cells, t => ({...t, hole: false, height})));
     }
 
     private place(cell: Cell, entry: IFurniturePaletteEntry): void
@@ -371,7 +636,7 @@ export class EditorApp
             z: tileAt(this.doc.floor, cell.x, cell.y)?.height ?? 0,
             rotation: 0
         }));
-        this._selection = EditorSelection.of(id);
+        this.selection = EditorSelection.of(id);
         this.refresh();
     }
 
@@ -385,309 +650,37 @@ export class EditorApp
         return dx || dy ? {dx, dy} : null;
     }
 
-    // ── Server ───────────────────────────────────────────────────────────────────
-
-    private async save(): Promise<boolean>
-    {
-        if(this._busy) return false;
-
-        this._busy = true;
-        this._status = 'Enregistrement…';
-        this.renderTopbar();
-        try
-        {
-            const result = await this._api.save(this._zone.key, this.doc);
-
-            this._serverFindings = [...result.findings];
-            if(result.saved)
-            {
-                this._history.markSaved();
-                this._savedVersion = result.version;
-                this._status = `Version ${result.version} enregistrée.`;
-            }
-            else
-            {
-                this._status = result.findings.some(f => f.code === 'Conflict')
-                    ? 'Une autre sauvegarde est passée avant : enregistrez à nouveau.'
-                    : 'Refusé par le serveur : voir les constats.';
-            }
-
-            return result.saved;
-        }
-        catch (error)
-        {
-            this._status = describe(error);
-
-            return false;
-        }
-        finally
-        {
-            this._busy = false;
-            this.refresh();
-        }
-    }
-
-    private async publish(): Promise<boolean>
-    {
-        if((this._history.isDirty || this._savedVersion === null) && !await this.save()) return false;
-        if(this._savedVersion === null || this._busy) return false;
-
-        this._busy = true;
-        this._status = 'Publication…';
-        this.renderTopbar();
-        try
-        {
-            const result = await this._api.publish(this._zone.key, this._savedVersion);
-
-            this._serverFindings = [...result.findings];
-            if(result.published) this._publishedVersion = this._savedVersion;
-            this._status = result.published
-                ? `Version ${this._savedVersion} publiée : la room est rechargée.`
-                : 'Publication refusée : voir les constats.';
-
-            return result.published;
-        }
-        catch (error)
-        {
-            this._status = describe(error);
-
-            return false;
-        }
-        finally
-        {
-            this._busy = false;
-            this.refresh();
-        }
-    }
-
-    private async test(): Promise<void>
-    {
-        const current = !this._history.isDirty && this._savedVersion !== null && this._publishedVersion === this._savedVersion;
-
-        if(!current && !await this.publish()) return;
-
-        try
-        {
-            if('__TAURI_INTERNALS__' in window)
-            {
-                const {openUrl} = await import('@tauri-apps/plugin-opener');
-
-                await openUrl(GAME_CLIENT);
-            }
-            else window.open(GAME_CLIENT, '_blank');
-            this._status = `Client ouvert : la zone est la room ${this._zone.roomId}.`;
-        }
-        catch (error)
-        {
-            this._status = `Impossible d'ouvrir le client : ${describe(error)}`;
-        }
-        this.renderTopbar();
-    }
-
-    private async leave(): Promise<void>
-    {
-        if(this._history.isDirty && !window.confirm('Des modifications ne sont pas enregistrées. Quitter quand même ?')) return;
-
-        window.removeEventListener('keydown', this.keydown);
-        window.removeEventListener('beforeunload', this.unload);
-        await this._api.unlock(this._zone.key).catch(() => undefined);
-        this._close();
-    }
-
-    // ── Rendering ────────────────────────────────────────────────────────────────
-
-    private refresh(): void
-    {
-        this.drawView();
-        this.renderTopbar();
-        this.renderInspector();
-        this.renderBottom();
-        this.updateHud();
-        this._root.querySelectorAll<HTMLElement>('[data-tool]').forEach(b => b.classList.toggle('active', b.dataset.tool === this._tool));
-    }
-
     private drawView(): void
     {
         const floor = this.doc.floor;
-        const cells = new Set(this._selection.cells.map(c => tileIndex(floor, c.x ?? 0, c.y ?? 0)));
+        const cells = new Set(this.selection.cells.map(c => tileIndex(floor, c.x ?? 0, c.y ?? 0)));
 
-        this._view.setModel({
+        this.view.setModel({
             doc: this.doc,
-            furniture: d => this._furniture.get(d) ?? null,
-            layers: this._layers,
-            selectedIds: this._selection.ids,
+            furniture: d => this.furniture(d),
+            sprites: this.sprites,
+            options: this.options,
+            layers: this.layers,
+            selectedIds: this.selection.ids,
             selectedCells: cells,
             strokeCells: new Set(this._stroke.keys()),
-            hover: this._hover,
+            hover: this.hover,
             dragOffset: this.dragOffset(),
-            ghost: this._tool === 'place' ? this._choice : null
+            ghost: this.tool === 'place' ? this.choice : null
         });
-    }
-
-    private renderTopbar(): void
-    {
-        const dirty = this._history.isDirty;
-        const version = this._savedVersion === null ? 'jamais enregistrée'
-            : `v${this._savedVersion}${this._publishedVersion === this._savedVersion ? ' publiée' : ' brouillon'}`;
-
-        $<HTMLButtonElement>(this._root, '[data-action=undo]').disabled = !this._history.canUndo;
-        $<HTMLButtonElement>(this._root, '[data-action=redo]').disabled = !this._history.canRedo;
-        $<HTMLButtonElement>(this._root, '[data-action=save]').disabled = this._busy || !dirty;
-        $<HTMLButtonElement>(this._root, '[data-action=publish]').disabled = this._busy;
-        $(this._root, '.status').textContent = `${dirty ? '● modifié · ' : ''}${version}${this._status ? ` — ${this._status}` : ''}`;
     }
 
     private updateHud(): void
     {
-        const h = this._hover;
+        const h = this.hover;
         const tile = h ? tileAt(this.doc.floor, h.x, h.y) : null;
-
-        $(this._root, '.hud').textContent = [
-            h ? `(${h.x}, ${h.y}) h ${tile?.height ?? 0}${tile?.hole ? ' trou' : ''}${tile?.walkable === false ? ' bloqué' : ''}` : '',
-            'clic droit : déplacer la vue · molette : zoom'
-        ].filter(Boolean).join(' · ');
-    }
-
-    private renderInspector(): void
-    {
-        const el = $(this._root, '.inspector');
         const doc = this.doc;
-        const ids = this._selection.ids;
-        const cells = this._selection.cells;
 
-        if(ids.size === 1)
-        {
-            const o = doc.decor?.find(d => ids.has(d.id));
-
-            if(o)
-            {
-                const f = this._furniture.get(o.definition);
-
-                el.innerHTML = `
-                    <h2>${esc(o.class)}</h2>
-                    <p class="muted"><code>${esc(o.id)}</code> · définition #${o.definition}${f ? ` · ${f.width}×${f.length}` : ' · <b>inconnue</b>'}</p>
-                    <div class="grid3">
-                        <label>X <input type="number" data-field="x" value="${o.x}"></label>
-                        <label>Y <input type="number" data-field="y" value="${o.y}"></label>
-                        <label>Z <input type="number" data-field="z" step="0.5" min="0" value="${o.z ?? 0}"></label>
-                    </div>
-                    <label>Rotation <b>${o.rotation ?? 0}</b> <button data-do="rotate" title="R">Tourner ↻</button></label>
-                    ${f && f.states > 1 ? `<label>État <input type="number" data-field="state" min="0" max="${f.states - 1}" value="${o.state ?? 0}"></label>` : ''}
-                    ${o.locked ? '<p class="muted">🔒 Verrouillé</p>' : ''}
-                    <button data-do="delete" class="danger" title="Suppr">Supprimer</button>`;
-
-                return;
-            }
-        }
-
-        if(ids.size > 1)
-        {
-            el.innerHTML = `
-                <h2>${ids.size} objets</h2>
-                <button data-do="rotate">Tourner ↻</button>
-                <button data-do="delete" class="danger">Supprimer</button>`;
-
-            return;
-        }
-
-        if(cells.length)
-        {
-            const first = tileAt(doc.floor, cells[0].x ?? 0, cells[0].y ?? 0) ?? {};
-            const title = cells.length === 1 ? `Case (${cells[0].x}, ${cells[0].y})` : `${cells.length} cases`;
-
-            el.innerHTML = `
-                <h2>${title}</h2>
-                <label>Hauteur <input type="number" data-field="height" min="0" max="32" value="${first.height ?? 0}"></label>
-                <label class="check"><input type="checkbox" data-field="walkable" ${first.walkable === false ? '' : 'checked'}> Marchable</label>
-                <label class="check"><input type="checkbox" data-field="hole" ${first.hole ? 'checked' : ''}> Trou</label>
-                <p class="muted">Les valeurs s'appliquent à toute la sélection.</p>`;
-
-            return;
-        }
-
-        const floor = doc.floor;
-
-        el.innerHTML = `
-            <h2>${esc(doc.settings.name)}</h2>
-            <p class="muted"><code>${esc(doc.settings.id)}</code> · room ${this._zone.roomId}</p>
-            <h3>Sol</h3>
-            <div class="grid3">
-                <label>Largeur <input type="number" data-field="width" min="1" max="64" value="${floor.width}"></label>
-                <label>Longueur <input type="number" data-field="length" min="1" max="64" value="${floor.length}"></label>
-                <button data-do="resize">Appliquer</button>
-            </div>
-            <h3>Porte</h3>
-            <p>(${floor.door.x ?? 0}, ${floor.door.y ?? 0}) — outil 🚪 pour la déplacer.</p>
-            <label>Direction <input type="number" data-field="doorDirection" min="0" max="7" value="${floor.doorDirection ?? 2}"></label>
-            <h3>Aide</h3>
-            <p class="muted">Choisissez un meuble dans la palette puis cliquez sur le sol. Sélection : clic sur un meuble, glisser pour le déplacer ; glisser sur le sol pour choisir des cases.</p>`;
-    }
-
-    private inspectorChange(input: HTMLInputElement): void
-    {
-        const field = input.dataset.field;
-        const value = Number(input.value);
-        const ids = this._selection.ids;
-        const o = this.doc.decor?.find(d => ids.has(d.id));
-
-        switch(field)
-        {
-            case 'x':
-            case 'y':
-            case 'z':
-                if(o && Number.isFinite(value))
-                {
-                    this.execute(moveDecor(ids,
-                        field === 'x' ? value - o.x : 0,
-                        field === 'y' ? value - o.y : 0,
-                        field === 'z' ? value - (o.z ?? 0) : 0));
-                }
-                break;
-            case 'state':
-                if(o && Number.isInteger(value)) this.execute(setDecorState(o.id, value));
-                break;
-            case 'height':
-                if(Number.isFinite(value)) this.execute(editTiles(`Hauteur ${value}`, this._selection.cells, t => ({...t, height: value})));
-                break;
-            case 'walkable':
-                this.execute(editTiles(input.checked ? 'Rendre marchable' : 'Bloquer', this._selection.cells, t => ({...t, walkable: input.checked})));
-                break;
-            case 'hole':
-                this.execute(editTiles(input.checked ? 'Creuser' : 'Boucher', this._selection.cells, t => ({...t, hole: input.checked})));
-                break;
-            case 'doorDirection':
-                if(Number.isInteger(value)) this.execute(moveDoor(this.doc.floor.door.x ?? 0, this.doc.floor.door.y ?? 0, value));
-                break;
-        }
-    }
-
-    private renderBottom(): void
-    {
-        $(this._root, '.layers').innerHTML = LayerState.NAMES.map(l => `
-            <div class="layer">
-                <label title="Visible"><input type="checkbox" data-layer="${l}" data-kind="visible" ${this._layers.isVisible(l) ? 'checked' : ''}> 👁</label>
-                <label title="Verrouillé"><input type="checkbox" data-layer="${l}" data-kind="locked" ${this._layers.isLocked(l) ? 'checked' : ''}> 🔒</label>
-                <span>${LAYER_LABELS[l]}</span>
-            </div>`).join('');
-
-        const done = this._history.done;
-        const undone = this._history.undone;
-
-        $(this._root, '.history').innerHTML = [
-            '<li data-steps="' + -done.length + '" class="muted">Ouverture</li>',
-            ...done.map((label, i) => `<li data-steps="${i + 1 - done.length}" class="${i === done.length - 1 ? 'current' : ''}">${esc(label)}</li>`),
-            ...undone.map((label, i) => `<li data-steps="${i + 1}" class="undone">${esc(label)}</li>`)
-        ].join('');
-
-        const local = validateLocally(this.doc, d => this._furniture.get(d) ?? null);
-        const findings = [
-            ...local.map(f => ({...f, origin: 'local'})),
-            ...this._serverFindings.filter(s => !local.some(l => l.code === s.code && l.elementId === s.elementId)).map(f => ({...f, origin: 'serveur'}))
-        ];
-
-        $(this._root, '.findings').innerHTML = findings.map(f => `
-            <li class="${f.severity === 'Error' ? 'error' : 'warning'}" ${f.elementId ? `data-element="${esc(f.elementId)}"` : ''}>
-                <b>${esc(f.code)}</b> ${esc(f.message)} <span class="muted">(${f.origin})</span>
-            </li>`).join('') || '<li class="muted">Aucun constat.</li>';
+        $(this._root, '.hud').innerHTML = [
+            `<b>Map :</b> ${esc(doc.settings.id)}`,
+            `<b>Taille :</b> ${doc.floor.width} × ${doc.floor.length}`,
+            `<b>Zoom :</b> ${Math.round(this.view.zoom * 100)} %`,
+            h ? `<b>Case :</b> (${h.x}, ${h.y}) h ${tile?.height ?? 0}${tile?.hole ? ' · trou' : ''}${tile?.walkable === false ? ' · bloquée' : ''}` : '<span class="muted">clic droit : déplacer · molette : zoom</span>'
+        ].join('<br>');
     }
 }

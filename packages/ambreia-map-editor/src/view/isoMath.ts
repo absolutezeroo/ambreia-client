@@ -1,9 +1,9 @@
-/** Habbo's tile: 64 × 32 px on screen; one height unit lifts it 16 px in this simple view. */
+/** Habbo's room geometry at scale 64, as RoomGeometry projects it: x → (32, 16), y → (−32, 16), z → (0, −32). */
 export const HALF_W = 32;
 export const HALF_H = 16;
-export const STEP = 16;
+export const STEP = 32;
 
-/** Screen position of the grid corner (x, y) at altitude h. */
+/** Screen position of the grid corner (x, y) at altitude h. Tile (x, y) spans corners x..x+1, y..y+1. */
 export const project = (x: number, y: number, h: number): [number, number] =>
     [(x - y) * HALF_W, (x + y) * HALF_H - h * STEP];
 

@@ -1,12 +1,16 @@
 import type {IFurniturePaletteEntry} from '@ambreia/map-editor-core/api/IFurniturePaletteEntry';
 import type {LayerState} from '@ambreia/map-editor-core/layers/LayerState';
 import type {ZoneDocument} from '@ambreia/map-editor-core/zone/Zone.generated';
+import type {FurnitureSprites} from './FurnitureSprites';
+import type {IViewOptions} from './IViewOptions';
 
 /** Everything the view draws, rebuilt by the app after each change. */
 export interface IViewModel
 {
     readonly doc: ZoneDocument;
     readonly furniture: (definition: number) => IFurniturePaletteEntry | null;
+    readonly sprites: FurnitureSprites;
+    readonly options: IViewOptions;
     readonly layers: LayerState;
     readonly selectedIds: ReadonlySet<string>;
     /** Tile indexes (y * width + x). */
