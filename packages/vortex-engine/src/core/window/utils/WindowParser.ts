@@ -1,3 +1,4 @@
+import {platform} from '@ambreia/common/platform/Platform';
 import type {IWindowParser} from './IWindowParser';
 import type {IWindow} from '../IWindow';
 import type {IWindowContext} from '../IWindowContext';
@@ -702,7 +703,7 @@ export class WindowParser implements IWindowParser
 
         try 
         {
-            const doc = new DOMParser().parseFromString(layout, 'text/xml');
+            const doc = platform().parseXml(layout);
             const parserError = doc.getElementsByTagName('parsererror');
 
             if(parserError.length > 0) 

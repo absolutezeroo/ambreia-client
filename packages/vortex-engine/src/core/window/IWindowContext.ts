@@ -3,11 +3,11 @@ import type {IWindowParser} from './utils/IWindowParser';
 import type {IResourceManager} from './IResourceManager';
 import type {IDisposable} from "@ambreia/common/IDisposable";
 import type {IInputEventTracker} from './IInputEventTracker';
-import type {ILinkEventTracker} from '../runtime/events/ILinkEventTracker';
+import type {IWindowLinkTracker} from './IWindowLinkTracker';
 import type {IInternalWindowServices} from './services/IInternalWindowServices';
 import type {IWindowFactory} from './IWindowFactory';
 import type {IWidgetFactory} from './IWidgetFactory';
-import type {ICoreLocalizationManager} from '../localization/ICoreLocalizationManager';
+import type {IWindowLocalization} from './IWindowLocalization';
 
 /**
  * Window context interface.
@@ -28,7 +28,7 @@ export interface IWindowContext extends IDisposable
 	 * is empty hears about every link, the rest only about their own prefix.
 	 */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/core/window/WindowContext.as::get linkEventTrackers()
-    readonly linkEventTrackers: ILinkEventTracker[];
+    readonly linkEventTrackers: IWindowLinkTracker[];
 
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/core/window/IWindowContext.as::getWindowServices()
     getWindowServices(): IInternalWindowServices;
@@ -45,7 +45,7 @@ export interface IWindowContext extends IDisposable
 
     getResourceManager(): IResourceManager | null;
 
-    setLocalizationManager(localization: ICoreLocalizationManager | null): void;
+    setLocalizationManager(localization: IWindowLocalization | null): void;
 
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/core/window/IWindowContext.as::registerLocalizationListener()
     registerLocalizationListener(key: string, window: IWindow): void;

@@ -7,9 +7,9 @@ import type {IWindowRenderer} from './graphics/IWindowRenderer';
 import type {IInternalWindowServices} from './services/IInternalWindowServices';
 import type {IInputEventTracker} from './IInputEventTracker';
 import type {IResourceManager} from './IResourceManager';
-import type {ICoreLocalizationManager} from '../localization/ICoreLocalizationManager';
-import type {ILocalizable} from '../localization/ILocalizable';
-import type {ILinkEventTracker} from '../runtime/events/ILinkEventTracker';
+import type {IWindowLocalization} from './IWindowLocalization';
+import type {ILocalizable} from './ILocalizable';
+import type {IWindowLinkTracker} from './IWindowLinkTracker';
 import {Classes} from './Classes';
 import {SubstituteParentController} from './components/SubstituteParentController';
 import {EventProcessorState} from './utils/EventProcessorState';
@@ -65,7 +65,7 @@ export class WindowContext implements IWindowContext
     // AS3: .../src/com/sulake/core/window/WindowContext.as::inputEventTrackers
     public inputEventTrackers: IInputEventTracker[] = [];
     // AS3: .../src/com/sulake/core/window/WindowContext.as::_localization
-    protected _localization: ICoreLocalizationManager | null = null;
+    protected _localization: IWindowLocalization | null = null;
     // AS3: .../src/com/sulake/core/window/WindowContext.as::_windowServices
     protected _services: IInternalWindowServices | null = null;
     protected _parser: IWindowParser | null = null;
@@ -178,10 +178,10 @@ export class WindowContext implements IWindowContext
     }
 
     // AS3: .../src/com/sulake/core/window/WindowContext.as::_linkEventTrackers
-    private _linkEventTrackers: ILinkEventTracker[] = [];
+    private _linkEventTrackers: IWindowLinkTracker[] = [];
 
     // AS3: .../src/com/sulake/core/window/WindowContext.as::get linkEventTrackers()
-    public get linkEventTrackers(): ILinkEventTracker[] 
+    public get linkEventTrackers(): IWindowLinkTracker[] 
     {
         return this._linkEventTrackers;
     }
@@ -261,7 +261,7 @@ export class WindowContext implements IWindowContext
         this._resourceManager = resourceManager;
     }
 
-    public setLocalizationManager(localization: ICoreLocalizationManager | null): void 
+    public setLocalizationManager(localization: IWindowLocalization | null): void 
     {
         this._localization = localization;
     }

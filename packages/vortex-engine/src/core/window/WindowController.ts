@@ -1,3 +1,4 @@
+import {platform} from '@ambreia/common/platform/Platform';
 import type {IWindow} from './IWindow';
 import type {DynamicStyle} from './dynamicstyle/DynamicStyle';
 import type {IWindowContext} from './IWindowContext';
@@ -975,7 +976,7 @@ export class WindowController extends WindowModel implements IWindow, IGraphicCo
         {
             try 
             {
-                const doc = new DOMParser().parseFromString(layout, 'text/xml');
+                const doc = platform().parseXml(layout);
                 const parserError = doc.getElementsByTagName('parsererror');
 
                 if(parserError.length > 0) 
@@ -1025,7 +1026,7 @@ export class WindowController extends WindowModel implements IWindow, IGraphicCo
         {
             try 
             {
-                const doc = new DOMParser().parseFromString(layout, 'text/xml');
+                const doc = platform().parseXml(layout);
                 const parserError = doc.getElementsByTagName('parsererror');
 
                 if(parserError.length > 0) 
