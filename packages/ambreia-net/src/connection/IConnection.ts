@@ -3,6 +3,7 @@ import type {IEncryption} from '../encryption/IEncryption';
 import type {IMessageComposer} from '../messages/IMessageComposer';
 import type {IMessageEvent} from '../messages/IMessageEvent';
 import type {IMessageConfiguration} from '../messages/IMessageConfiguration';
+import type {IPacketTap} from './IPacketTap';
 
 /**
  * Interface for network connections
@@ -137,4 +138,10 @@ export interface IConnection extends IDisposable
 	 * Unsubscribe from messageEvent
 	 */
     off(event: 'messageEvent', listener: (event: IMessageEvent) => void): this;
+
+    // TS-only: the packet inspector's hook (spec §8); null removes it.
+    setPacketTap(tap: IPacketTap | null): void;
+
+    // TS-only: hands a message to the handlers as if the server had sent it, without touching the cipher.
+    injectIncoming(messageId: number, values: unknown[]): void;
 }

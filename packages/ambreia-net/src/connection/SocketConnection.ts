@@ -12,6 +12,8 @@ import type {IMessageEvent} from '../messages/IMessageEvent';
 import type {IMessageConfiguration} from '../messages/IMessageConfiguration';
 import type {IMessageDataWrapper} from '../messages/IMessageDataWrapper';
 import type {IWireFormatter} from '../wireformat/IWireFormatter';
+import type {IPacketTap} from './IPacketTap';
+import {MessageDataWrapper} from '../messages/MessageDataWrapper';
 import {PreEncryptionMessageComposer} from '../messages/PreEncryptionMessageComposer';
 import {PacketLogger} from '../PacketLogger';
 
@@ -39,6 +41,7 @@ export class SocketConnection extends EventEmitter<IConnectionEvents> implements
     private _pendingReceivedMessages: IMessageDataWrapper[] = [];
     // TS-only: no AS3 counterpart; dedupes the dropped-packet warnings in handleReceivedMessage().
     private readonly _unhandledMessageIds: Set<number> = new Set();
+    private _tap: IPacketTap | null = null;
 
     private _clientToServerEncryption: IEncryption | null = null;
     private _serverToClientEncryption: IEncryption | null = null;
@@ -219,7 +222,18 @@ export class SocketConnection extends EventEmitter<IConnectionEvents> implements
 
         PacketLogger.outgoing(messageId, composer.constructor.name);
 
-        const encoded = this._wireFormatter.encode(messageId, composer.getMessageArray());
+        let values: unknown[] = composer.getMessageArray();
+
+        if(this._tap?.outgoing)
+        {
+            const edited = this._tap.outgoing(messageId, values);
+
+            if(edited === null) return false;
+
+            values = edited;
+        }
+
+        const encoded = this._wireFormatter.encode(messageId, values);
 
         this._clientToServerEncryption.encipher(encoded);
 
@@ -618,8 +632,41 @@ export class SocketConnection extends EventEmitter<IConnectionEvents> implements
         }
     }
 
-    private handleReceivedMessage(wrapper: IMessageDataWrapper): void
+    // TS-only: see IConnection.setPacketTap().
+    setPacketTap(tap: IPacketTap | null): void
     {
+        this._tap = tap;
+    }
+
+    // TS-only: see IConnection.injectIncoming(). Encoded by the formatter the server's bytes go
+    // through, but never deciphered: an injected message must not advance the real stream's keystream.
+    injectIncoming(messageId: number, values: unknown[]): void
+    {
+        if(this._disposed) return;
+
+        const frame = this._wireFormatter.encode(messageId, values);
+        const body = new ByteArray(frame.length - 4);
+
+        frame.position = 4;
+        frame.readBytes(body, 0, frame.length - 4);
+        body.position = 2;
+
+        this.handleReceivedMessage(new MessageDataWrapper(messageId, body));
+    }
+
+    private handleReceivedMessage(received: IMessageDataWrapper): void
+    {
+        let wrapper = received;
+
+        if(this._tap?.incoming)
+        {
+            const edited = this._tap.incoming(wrapper);
+
+            if(edited === null) return;
+
+            wrapper = edited;
+        }
+
         const messageId = wrapper.getMessageId();
         const events = this._messageRegistry.getMessageEventsForId(messageId);
 
