@@ -1,3 +1,3 @@
 // Exports
-export {AlphaTolerance} from './AlphaTolerance';
-export {RoomObjectSpriteType} from './RoomObjectSpriteType';
+export {AlphaTolerance} from '@ambreia/iso/object/enum/AlphaTolerance';
+export {RoomObjectSpriteType} from '@ambreia/iso/object/enum/RoomObjectSpriteType';

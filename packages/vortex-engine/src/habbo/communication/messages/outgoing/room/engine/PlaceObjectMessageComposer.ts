@@ -1,5 +1,5 @@
 import {MessageComposer} from '@ambreia/net/messages/MessageComposer';
-import {RoomObjectCategoryEnum} from '@habbo/room/object/RoomObjectCategoryEnum';
+import {RoomObjectCategoryEnum} from '@ambreia/iso/scene/object/RoomObjectCategoryEnum';
 
 /**
  * Places a new object (from inventory) into the active room.

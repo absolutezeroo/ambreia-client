@@ -1,10 +1,10 @@
-import type {IRoomAreaSelectionManager} from '../IRoomAreaSelectionManager';
+import type {IRoomAreaSelectionManager} from '@ambreia/iso/scene/IRoomAreaSelectionManager';
 import type {IRoomEngine} from '../IRoomEngine';
-import type {RoomObjectTileMouseEvent} from '../events/RoomObjectTileMouseEvent';
-import {RoomEngineObjectEvent} from '../events/RoomEngineObjectEvent';
+import type {RoomObjectTileMouseEvent} from '@ambreia/iso/scene/events/RoomObjectTileMouseEvent';
+import {RoomEngineObjectEvent} from '@ambreia/iso/scene/events/RoomEngineObjectEvent';
 import {ColorMatrixFilter} from 'pixi.js';
-import type {FurnitureVisualization} from '../object/visualization/furniture/FurnitureVisualization';
-import type {RoomVisualization} from '../object/visualization/room/RoomVisualization';
+import type {FurnitureVisualization} from '@ambreia/iso/furniture/visualization/FurnitureVisualization';
+import type {RoomVisualization} from '@ambreia/iso/scene/object/visualization/room/RoomVisualization';
 
 /**
  * Drag a rectangle across the room's floor tiles — the picker behind the wired `InArea` selectors.

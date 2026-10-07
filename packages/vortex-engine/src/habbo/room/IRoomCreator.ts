@@ -6,19 +6,19 @@
  * Interface for room creation and object management.
  * Used by RoomMessageHandler to communicate with the room engine.
  */
-import type {IVector3d} from '@room/utils/IVector3d';
-import type {IRoomGeometry} from '@room/utils/IRoomGeometry';
-import type {IRoomInstance} from '@room/IRoomInstance';
-import type {IRoomObjectController} from '@room/object/IRoomObjectController';
+import type {IVector3d} from '@ambreia/iso/utils/IVector3d';
+import type {IRoomGeometry} from '@ambreia/iso/utils/IRoomGeometry';
+import type {IRoomInstance} from '@ambreia/iso/IRoomInstance';
+import type {IRoomObjectController} from '@ambreia/iso/object/IRoomObjectController';
 import type {IRoomSessionManager} from '../session/IRoomSessionManager';
 import type {ISessionDataManager} from '../session/ISessionDataManager';
 import type {IHabboWindowManager} from '../window/IHabboWindowManager';
 import type {IHabboConfigurationManager} from '../configuration/IHabboConfigurationManager';
-import type {IStuffData} from './object/data/IStuffData';
-import type {RoomPlaneParser} from './object/RoomPlaneParser';
-import type {FurniStackingHeightMap} from './utils/FurniStackingHeightMap';
-import type {TileObjectMap} from './utils/TileObjectMap';
-import type {LegacyWallGeometry} from './utils/LegacyWallGeometry';
+import type {IStuffData} from '@ambreia/iso/scene/object/data/IStuffData';
+import type {RoomPlaneParser} from '@ambreia/iso/scene/object/RoomPlaneParser';
+import type {FurniStackingHeightMap} from '@ambreia/iso/scene/utils/FurniStackingHeightMap';
+import type {TileObjectMap} from '@ambreia/iso/scene/utils/TileObjectMap';
+import type {LegacyWallGeometry} from '@ambreia/iso/scene/utils/LegacyWallGeometry';
 import type {IRoomEngine} from './IRoomEngine';
 
 /**

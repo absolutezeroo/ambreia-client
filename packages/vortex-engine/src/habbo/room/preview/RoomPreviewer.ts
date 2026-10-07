@@ -1,21 +1,21 @@
 import {Rectangle, Graphics} from 'pixi.js';
 import type {Container} from 'pixi.js';
-import type {IVector3d} from '@room/utils/IVector3d';
-import {Vector3d} from '@room/utils/Vector3d';
+import type {IVector3d} from '@ambreia/iso/utils/IVector3d';
+import {Vector3d} from '@ambreia/iso/utils/Vector3d';
 import type {IRoomEngine} from '@habbo/room/IRoomEngine';
-import {RoomPlaneParser} from '@habbo/room/object/RoomPlaneParser';
-import {RoomId} from '@room/utils/RoomId';
-import {RoomEngineEvent} from '@habbo/room/events/RoomEngineEvent';
-import {RoomEngineObjectEvent} from '@habbo/room/events/RoomEngineObjectEvent';
-import type {IGetImageListener} from '@habbo/room/IGetImageListener';
-import type {ImageResult} from '@habbo/room/ImageResult';
-import type {IStuffData} from '@habbo/room/object/data/IStuffData';
-import {LegacyStuffData} from '@habbo/room/object/data/LegacyStuffData';
-import type {IRoomObjectModelController} from '@room/object/IRoomObjectModelController';
-import type {IRoomObjectController} from '@room/object/IRoomObjectController';
-import {RoomObjectCategoryEnum} from '@habbo/room/object/RoomObjectCategoryEnum';
-import {RoomObjectVariableEnum} from '@habbo/room/object/RoomObjectVariableEnum';
-import type {IRoomObject} from '@room/object/IRoomObject';
+import {RoomPlaneParser} from '@ambreia/iso/scene/object/RoomPlaneParser';
+import {RoomId} from '@ambreia/iso/utils/RoomId';
+import {RoomEngineEvent} from '@ambreia/iso/scene/events/RoomEngineEvent';
+import {RoomEngineObjectEvent} from '@ambreia/iso/scene/events/RoomEngineObjectEvent';
+import type {IGetImageListener} from '@ambreia/iso/scene/IGetImageListener';
+import type {ImageResult} from '@ambreia/iso/scene/ImageResult';
+import type {IStuffData} from '@ambreia/iso/scene/object/data/IStuffData';
+import {LegacyStuffData} from '@ambreia/iso/scene/object/data/LegacyStuffData';
+import type {IRoomObjectModelController} from '@ambreia/iso/object/IRoomObjectModelController';
+import type {IRoomObjectController} from '@ambreia/iso/object/IRoomObjectController';
+import {RoomObjectCategoryEnum} from '@ambreia/iso/scene/object/RoomObjectCategoryEnum';
+import {RoomObjectVariableEnum} from '@ambreia/iso/scene/object/RoomObjectVariableEnum';
+import type {IRoomObject} from '@ambreia/iso/object/IRoomObject';
 
 interface IPoint
 {

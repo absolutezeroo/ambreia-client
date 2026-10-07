@@ -2,16 +2,16 @@
 // (`getFurniData(..., param3:_SafeCls_90, ...)`): `getRoomObjects()` is declared on the class and
 // not on the interface, in AS3 as here.
 import {RoomEngine, type IRoomEngineRectangle} from '@habbo/room/RoomEngine';
-import type {RoomRenderingCanvas} from '@habbo/room/renderer/RoomRenderingCanvas';
-import {PlaneDrawingData} from '@habbo/room/object/visualization/room/PlaneDrawingData';
-import type {IPlaneDrawingData} from '@room/object/visualization/IPlaneDrawingData';
+import type {RoomRenderingCanvas} from '@ambreia/iso/scene/renderer/RoomRenderingCanvas';
+import {PlaneDrawingData} from '@ambreia/iso/scene/object/visualization/room/PlaneDrawingData';
+import type {IPlaneDrawingData} from '@ambreia/iso/object/visualization/IPlaneDrawingData';
 import type {RoomObjectSpriteData} from '@ambreia/common/graphics/RoomObjectSpriteData';
-import type {IRoomObjectSpriteVisualization} from '@room/object/visualization/IRoomObjectSpriteVisualization';
-import {RoomObjectCategoryEnum} from '@habbo/room/object/RoomObjectCategoryEnum';
-import type {RoomPlane} from '@habbo/room/object/visualization/room/RoomPlane';
-import type {RoomVisualization} from '@habbo/room/object/visualization/room/RoomVisualization';
-import type {IPoint} from '@room/utils/IRoomGeometry';
-import {Vector3d} from '@room/utils/Vector3d';
+import type {IRoomObjectSpriteVisualization} from '@ambreia/iso/object/visualization/IRoomObjectSpriteVisualization';
+import {RoomObjectCategoryEnum} from '@ambreia/iso/scene/object/RoomObjectCategoryEnum';
+import type {RoomPlane} from '@ambreia/iso/scene/object/visualization/room/RoomPlane';
+import type {RoomVisualization} from '@ambreia/iso/scene/object/visualization/room/RoomVisualization';
+import type {IPoint} from '@ambreia/iso/utils/IRoomGeometry';
+import {Vector3d} from '@ambreia/iso/utils/Vector3d';
 
 /**
  * Turns the room canvas into the JSON payload the camera sends for server-side rendering.

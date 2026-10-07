@@ -8,12 +8,12 @@ import type {WindowEventListener} from '@ambreia/ui/events/WindowEventDispatcher
 import {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
 import type {IIterator} from '@ambreia/ui/utils/IIterator';
 import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
-import type {IGetImageListener} from '@habbo/room/IGetImageListener';
-import type {IStuffData} from '@habbo/room/object/data/IStuffData';
+import type {IGetImageListener} from '@ambreia/iso/scene/IGetImageListener';
+import type {IStuffData} from '@ambreia/iso/scene/object/data/IStuffData';
 import type {IAssetReceiver} from '@ambreia/ui/IAssetReceiver';
 import type {IBitmapWrapperWindow} from '@ambreia/ui/components/IBitmapWrapperWindow';
 import {OrderedMap} from '@ambreia/common/utils/OrderedMap';
-import {Vector3d} from '@room/utils/Vector3d';
+import {Vector3d} from '@ambreia/iso/utils/Vector3d';
 
 /**
  * Furniture image widget.

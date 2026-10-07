@@ -8,18 +8,18 @@
 import type {Container, Ticker} from 'pixi.js';
 import type {EventEmitter} from 'eventemitter3';
 import type {IDisposable} from '@ambreia/common/IDisposable';
-import type {IRoomInstance} from '@room/IRoomInstance';
-import type {IRoomGeometry} from '@room/utils/IRoomGeometry';
-import type {IRoomObject} from '@room/object/IRoomObject';
-import type {IVector3d} from '@room/utils/IVector3d';
-import type {IStuffData} from './object/data/IStuffData';
-import type {PetColorResult} from './PetColorResult';
-import type {IGetImageListener} from './IGetImageListener';
-import type {ImageResult} from './ImageResult';
-import type {ISelectedRoomObjectData} from './ISelectedRoomObjectData';
-import type {SelectedRoomObjectData} from './utils/SelectedRoomObjectData';
-import type {IRoomAreaSelectionManager} from './IRoomAreaSelectionManager';
-import type {RoomPlaneParser} from './object/RoomPlaneParser';
+import type {IRoomInstance} from '@ambreia/iso/IRoomInstance';
+import type {IRoomGeometry} from '@ambreia/iso/utils/IRoomGeometry';
+import type {IRoomObject} from '@ambreia/iso/object/IRoomObject';
+import type {IVector3d} from '@ambreia/iso/utils/IVector3d';
+import type {IStuffData} from '@ambreia/iso/scene/object/data/IStuffData';
+import type {PetColorResult} from '@ambreia/iso/scene/PetColorResult';
+import type {IGetImageListener} from '@ambreia/iso/scene/IGetImageListener';
+import type {ImageResult} from '@ambreia/iso/scene/ImageResult';
+import type {ISelectedRoomObjectData} from '@ambreia/iso/scene/ISelectedRoomObjectData';
+import type {SelectedRoomObjectData} from '@ambreia/iso/scene/utils/SelectedRoomObjectData';
+import type {IRoomAreaSelectionManager} from '@ambreia/iso/scene/IRoomAreaSelectionManager';
+import type {RoomPlaneParser} from '@ambreia/iso/scene/object/RoomPlaneParser';
 import type {IRoomEngineRectangle} from './RoomEngine';
 
 export interface IRoomEngine extends IDisposable {

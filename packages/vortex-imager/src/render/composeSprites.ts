@@ -29,7 +29,7 @@
  */
 import {createCanvas} from '@napi-rs/canvas';
 import type {Canvas, SKRSContext2D} from '@napi-rs/canvas';
-import type {IRoomObjectSprite} from '@room/object/visualization/IRoomObjectSprite';
+import type {IRoomObjectSprite} from '@ambreia/iso/object/visualization/IRoomObjectSprite';
 
 /** No tint: PixiJS's identity value for `Sprite.tint`. */
 const NO_TINT = 0xFFFFFF;

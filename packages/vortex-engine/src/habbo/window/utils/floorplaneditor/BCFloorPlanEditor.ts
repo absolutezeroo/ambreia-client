@@ -1,5 +1,5 @@
 import type {IDisposable} from '@ambreia/common/IDisposable';
-import {RoomEngineEvent} from '@habbo/room/events/RoomEngineEvent';
+import {RoomEngineEvent} from '@ambreia/iso/scene/events/RoomEngineEvent';
 import type {IUpdateReceiver} from '@core/runtime/IContext';
 import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
 import type {IWindow} from '@ambreia/ui/IWindow';

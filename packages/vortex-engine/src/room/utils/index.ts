@@ -1,9 +1,9 @@
 // Exports
-export {ColorConverter} from './ColorConverter';
-export {RoomGeometry} from './RoomGeometry';
-export {Vector3d} from './Vector3d';
-export {RoomId} from './RoomId';
+export {ColorConverter} from '@ambreia/iso/utils/ColorConverter';
+export {RoomGeometry} from '@ambreia/iso/utils/RoomGeometry';
+export {Vector3d} from '@ambreia/iso/utils/Vector3d';
+export {RoomId} from '@ambreia/iso/utils/RoomId';
 
 // Types
-export type {IPoint, IRoomGeometry,} from './IRoomGeometry';
-export type {IVector3d} from './IVector3d';
+export type {IPoint, IRoomGeometry,} from '@ambreia/iso/utils/IRoomGeometry';
+export type {IVector3d} from '@ambreia/iso/utils/IVector3d';

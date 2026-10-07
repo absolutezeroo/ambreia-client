@@ -2,7 +2,7 @@ import type {EventEmitter} from 'eventemitter3';
 import type {IAssetLibrary} from '@core/assets';
 import {AssetBitmap} from '@ambreia/common/assets/AssetBitmap';
 import {Logger} from '@ambreia/common/utils/Logger';
-import type {IFurnitureData} from './furniture/IFurnitureData';
+import type {IFurnitureData} from '@ambreia/iso/furniture/data/IFurnitureData';
 import {FurniIconImageReadyEvent} from './events/FurniIconImageReadyEvent';
 
 const log = Logger.getLogger('habbo.session.FurniIconImageManager');

@@ -1,5 +1,5 @@
 import {createIID} from '@core/runtime/IID';
-import type {IRoomRendererFactory} from '@room/renderer/IRoomRendererFactory';
+import type {IRoomRendererFactory} from '@ambreia/iso/renderer/IRoomRendererFactory';
 
 /**
  * IID for Room Renderer Factory

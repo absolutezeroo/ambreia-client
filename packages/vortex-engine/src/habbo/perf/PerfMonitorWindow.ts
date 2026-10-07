@@ -7,7 +7,7 @@ import type {ITabContextWindow} from '@ambreia/ui/components/ITabContextWindow';
 import {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 import type {IRoomEngine} from '@habbo/room/IRoomEngine';
-import {RoomObjectCategoryEnum} from '@habbo/room/object/RoomObjectCategoryEnum';
+import {RoomObjectCategoryEnum} from '@ambreia/iso/scene/object/RoomObjectCategoryEnum';
 import {RoomStressTest} from '@habbo/room/utils/RoomStressTest';
 import type {IProfileResult} from '@ambreia/common/utils/SelfProfiler';
 import {SelfProfiler} from '@ambreia/common/utils/SelfProfiler';

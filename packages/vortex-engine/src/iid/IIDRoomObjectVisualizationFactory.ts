@@ -1,5 +1,5 @@
 import {createIID} from "@core/runtime/IID";
-import type {IRoomObjectVisualizationFactory} from "@room/object/IRoomObjectVisualizationFactory";
+import type {IRoomObjectVisualizationFactory} from "@ambreia/iso/object/IRoomObjectVisualizationFactory";
 
 /**
  * IID for the IRoomObjectVisualizationFactory interface.

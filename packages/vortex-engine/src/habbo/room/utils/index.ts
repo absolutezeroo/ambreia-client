@@ -1,7 +1,7 @@
 // Exports
-export {FurniStackingHeightMap} from './FurniStackingHeightMap';
-export {LegacyWallGeometry} from './LegacyWallGeometry';
-export {RoomCamera} from './RoomCamera';
-export {RoomData} from './RoomData';
-export {SelectedRoomObjectData} from './SelectedRoomObjectData';
-export {TileObjectMap} from './TileObjectMap';
+export {FurniStackingHeightMap} from '@ambreia/iso/scene/utils/FurniStackingHeightMap';
+export {LegacyWallGeometry} from '@ambreia/iso/scene/utils/LegacyWallGeometry';
+export {RoomCamera} from '@ambreia/iso/scene/utils/RoomCamera';
+export {RoomData} from '@ambreia/iso/scene/utils/RoomData';
+export {SelectedRoomObjectData} from '@ambreia/iso/scene/utils/SelectedRoomObjectData';
+export {TileObjectMap} from '@ambreia/iso/scene/utils/TileObjectMap';

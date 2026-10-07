@@ -14,18 +14,18 @@
  * @see packages/vortex-engine/src/habbo/room/RoomEngine.ts
  */
 import {Logger} from '@ambreia/common/utils/Logger';
-import {Vector3d} from '@room/utils/Vector3d';
-import {RoomGeometry} from '@room/utils/RoomGeometry';
-import type {IRoomObjectController} from '@room/object/IRoomObjectController';
-import type {IRoomObjectSpriteVisualization} from '@room/object/visualization/IRoomObjectSpriteVisualization';
-import {RoomObjectCategoryEnum} from '@habbo/room/object/RoomObjectCategoryEnum';
-import {RoomObjectVariableEnum} from '@habbo/room/object/RoomObjectVariableEnum';
-import {RoomPlaneParser} from '@habbo/room/object/RoomPlaneParser';
-import {LegacyWallGeometry} from '@habbo/room/utils/LegacyWallGeometry';
-import {RoomObjectRoomUpdateMessage} from '@habbo/room/messages/RoomObjectRoomUpdateMessage';
-import {RoomObjectRoomMaskUpdateMessage} from '@habbo/room/messages/RoomObjectRoomMaskUpdateMessage';
-import {RoomObjectDataUpdateMessage} from '@habbo/room/messages/RoomObjectDataUpdateMessage';
-import {LegacyStuffData} from '@habbo/room/object/data/LegacyStuffData';
+import {Vector3d} from '@ambreia/iso/utils/Vector3d';
+import {RoomGeometry} from '@ambreia/iso/utils/RoomGeometry';
+import type {IRoomObjectController} from '@ambreia/iso/object/IRoomObjectController';
+import type {IRoomObjectSpriteVisualization} from '@ambreia/iso/object/visualization/IRoomObjectSpriteVisualization';
+import {RoomObjectCategoryEnum} from '@ambreia/iso/scene/object/RoomObjectCategoryEnum';
+import {RoomObjectVariableEnum} from '@ambreia/iso/scene/object/RoomObjectVariableEnum';
+import {RoomPlaneParser} from '@ambreia/iso/scene/object/RoomPlaneParser';
+import {LegacyWallGeometry} from '@ambreia/iso/scene/utils/LegacyWallGeometry';
+import {RoomObjectRoomUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectRoomUpdateMessage';
+import {RoomObjectRoomMaskUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectRoomMaskUpdateMessage';
+import {RoomObjectDataUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectDataUpdateMessage';
+import {LegacyStuffData} from '@ambreia/iso/scene/object/data/LegacyStuffData';
 import {PetFigureData} from '@ambreia/avatar/pets/PetFigureData';
 import type {RoomStack} from './RoomStack';
 import type {IFurnitureRequest, IPetRequest, IRoomRequest, ImagerQuery} from './FurnitureRequest';

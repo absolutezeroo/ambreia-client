@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import type {Container} from 'pixi.js';
-import {extractCanvas, setTextureExtractor} from '@room/renderer/TextureExtractor';
+import {extractCanvas, setTextureExtractor} from '@ambreia/iso/renderer/TextureExtractor';
 
 const target = {} as Container;
 

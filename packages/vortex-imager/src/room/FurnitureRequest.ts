@@ -9,7 +9,7 @@
  * `direction`, `frame`), because a CMS that already builds one of these URLs should not have
  * to learn a second vocabulary.
  */
-import {RoomObjectCategoryEnum} from '@habbo/room/object/RoomObjectCategoryEnum';
+import {RoomObjectCategoryEnum} from '@ambreia/iso/scene/object/RoomObjectCategoryEnum';
 
 export type ImagerQuery = Partial<Record<string, string | string[]>>;
 

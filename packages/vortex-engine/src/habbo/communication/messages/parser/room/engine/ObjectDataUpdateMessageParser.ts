@@ -7,8 +7,8 @@
  */
 import type {IMessageParser} from '@ambreia/net/messages/IMessageParser';
 import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
-import type {IStuffData} from '@habbo/room/object/data/IStuffData';
-import {LegacyStuffData} from '@habbo/room/object/data/LegacyStuffData';
+import type {IStuffData} from '@ambreia/iso/scene/object/data/IStuffData';
+import {LegacyStuffData} from '@ambreia/iso/scene/object/data/LegacyStuffData';
 import {FurnitureDataParser} from './FurnitureDataParser';
 
 export class ObjectDataUpdateMessageParser implements IMessageParser

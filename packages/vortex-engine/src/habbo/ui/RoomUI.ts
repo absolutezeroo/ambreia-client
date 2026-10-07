@@ -45,16 +45,16 @@ import {RoomSessionEvent} from '@habbo/session/events/RoomSessionEvent';
 import {RoomSessionErrorMessageEvent} from '@habbo/session/events/RoomSessionErrorMessageEvent';
 import {RoomSessionDoorbellEvent} from '@habbo/session/events/RoomSessionDoorbellEvent';
 import {RoomSessionQueueEvent} from '@habbo/session/events/RoomSessionQueueEvent';
-import {RoomEngineEvent} from '@habbo/room/events/RoomEngineEvent';
-import {RoomEngineObjectEvent} from '@habbo/room/events/RoomEngineObjectEvent';
-import {RoomEngineToWidgetEvent} from '@habbo/room/events/RoomEngineToWidgetEvent';
-import {RoomEngineUseProductEvent} from '@habbo/room/events/RoomEngineUseProductEvent';
-import {RoomEngineRoomAdEvent} from '@habbo/room/events/RoomEngineRoomAdEvent';
-import {RoomEngineAreaHideStateWidgetEvent} from '@habbo/room/events/RoomEngineAreaHideStateWidgetEvent';
-import {RoomEngineRoomColorEvent} from '@habbo/room/events/RoomEngineRoomColorEvent';
-import {RoomEngineZoomEvent} from '@habbo/room/events/RoomEngineZoomEvent';
-import {RoomEngineDimmerStateEvent} from '@habbo/room/events/RoomEngineDimmerStateEvent';
-import {RoomEngineHSLColorEnableEvent} from '@habbo/room/events/RoomEngineHSLColorEnableEvent';
+import {RoomEngineEvent} from '@ambreia/iso/scene/events/RoomEngineEvent';
+import {RoomEngineObjectEvent} from '@ambreia/iso/scene/events/RoomEngineObjectEvent';
+import {RoomEngineToWidgetEvent} from '@ambreia/iso/scene/events/RoomEngineToWidgetEvent';
+import {RoomEngineUseProductEvent} from '@ambreia/iso/scene/events/RoomEngineUseProductEvent';
+import {RoomEngineRoomAdEvent} from '@ambreia/iso/scene/events/RoomEngineRoomAdEvent';
+import {RoomEngineAreaHideStateWidgetEvent} from '@ambreia/iso/scene/events/RoomEngineAreaHideStateWidgetEvent';
+import {RoomEngineRoomColorEvent} from '@ambreia/iso/scene/events/RoomEngineRoomColorEvent';
+import {RoomEngineZoomEvent} from '@ambreia/iso/scene/events/RoomEngineZoomEvent';
+import {RoomEngineDimmerStateEvent} from '@ambreia/iso/scene/events/RoomEngineDimmerStateEvent';
+import {RoomEngineHSLColorEnableEvent} from '@ambreia/iso/scene/events/RoomEngineHSLColorEnableEvent';
 
 // Internal
 import type {IRoomUI} from './IRoomUI';

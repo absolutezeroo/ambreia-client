@@ -1,8 +1,8 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {RoomManager} from '@room/RoomManager';
-import type {IRoomContentLoader} from '@room/IRoomContentLoader';
-import type {IRoomManagerListener} from '@room/IRoomManagerListener';
+import {RoomManager} from '@ambreia/iso/RoomManager';
+import type {IRoomContentLoader} from '@ambreia/iso/IRoomContentLoader';
+import type {IRoomManagerListener} from '@ambreia/iso/IRoomManagerListener';
 
 // A plain class since J4: built from its options, started by its host, no Core and no DI context.
 const options = {property: (): string => '', flag: (): boolean => false};

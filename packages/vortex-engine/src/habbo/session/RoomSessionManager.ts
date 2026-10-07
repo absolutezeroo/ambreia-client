@@ -25,7 +25,7 @@ import {RoomDimmerPresetsHandler} from './handler/RoomDimmerPresetsHandler';
 import {PresentHandler} from './handler/PresentHandler';
 import {PetPackageHandler} from './handler/PetPackageHandler';
 import {AvatarEffectsHandler} from './handler/AvatarEffectsHandler';
-import {RoomEngineEvent} from '../room/events/RoomEngineEvent';
+import {RoomEngineEvent} from '@ambreia/iso/scene/events/RoomEngineEvent';
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {IRoomEngine} from '@habbo/room';
 import {IID_HabboCommunicationManager} from "@iid/IIDHabboCommunicationManager";

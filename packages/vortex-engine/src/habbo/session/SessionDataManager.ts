@@ -19,8 +19,8 @@ import {FurniIconImageManager} from './FurniIconImageManager';
 
 import type {IHabboLocalizationManager} from '../localization/IHabboLocalizationManager';
 import type {IHabboWindowManager} from '../window/IHabboWindowManager';
-import type {IFurnitureData} from './furniture/IFurnitureData';
-import type {IFurniDataListener} from './furniture/IFurniDataListener';
+import type {IFurnitureData} from '@ambreia/iso/furniture/data/IFurnitureData';
+import type {IFurniDataListener} from '@ambreia/iso/furniture/data/IFurniDataListener';
 import type {IProductData} from './product/IProductData';
 import type {IProductDataListener} from './product/IProductDataListener';
 import type {IRoomSessionManager} from './IRoomSessionManager';

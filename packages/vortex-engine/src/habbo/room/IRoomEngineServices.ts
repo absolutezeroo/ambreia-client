@@ -7,15 +7,15 @@
  */
 import type {EventEmitter} from 'eventemitter3';
 import type {IConnection} from '@ambreia/net/connection/IConnection';
-import type {IRoomInstance} from '@room/IRoomInstance';
-import type {IRoomRenderingCanvas} from '@room/renderer/IRoomRenderingCanvas';
-import type {IRoomObject} from '@room/object/IRoomObject';
-import type {IRoomObjectController} from '@room/object/IRoomObjectController';
-import type {IVector3d} from '@room/utils/IVector3d';
-import type {IStuffData} from '@habbo/room/object/data/IStuffData';
-import type {LegacyWallGeometry} from './utils/LegacyWallGeometry';
-import type {FurniStackingHeightMap} from './utils/FurniStackingHeightMap';
-import type {TileObjectMap} from './utils/TileObjectMap';
+import type {IRoomInstance} from '@ambreia/iso/IRoomInstance';
+import type {IRoomRenderingCanvas} from '@ambreia/iso/renderer/IRoomRenderingCanvas';
+import type {IRoomObject} from '@ambreia/iso/object/IRoomObject';
+import type {IRoomObjectController} from '@ambreia/iso/object/IRoomObjectController';
+import type {IVector3d} from '@ambreia/iso/utils/IVector3d';
+import type {IStuffData} from '@ambreia/iso/scene/object/data/IStuffData';
+import type {LegacyWallGeometry} from '@ambreia/iso/scene/utils/LegacyWallGeometry';
+import type {FurniStackingHeightMap} from '@ambreia/iso/scene/utils/FurniStackingHeightMap';
+import type {TileObjectMap} from '@ambreia/iso/scene/utils/TileObjectMap';
 import type {IHabboConfigurationManager} from '@habbo/configuration/IHabboConfigurationManager';
 import type {IRoomSessionManager} from '@habbo/session/IRoomSessionManager';
 import type {ISessionDataManager} from '@habbo/session/ISessionDataManager';

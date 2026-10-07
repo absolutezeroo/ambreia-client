@@ -1,17 +1,17 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import type {RoomObjectLogicRegistry} from '@room/object/RoomObjectLogicRegistry';
-import type {RoomObjectVisualizationRegistry} from '@room/object/RoomObjectVisualizationRegistry';
-import {RoomObjectFactory} from '@habbo/room/RoomObjectFactory';
-import {RoomObjectVisualizationFactory} from '@habbo/room/object/RoomObjectVisualizationFactory';
-import {createRoomRegistries} from '@room/object/createRoomRegistries';
-import {DEFAULT_ROOM_MODULES} from '@habbo/room/modules/defaultRoomModules';
-import {registerScene} from '@habbo/room/modules/registerScene';
-import {registerFurniture} from '@habbo/room/modules/registerFurniture';
-import {registerAvatars} from '@habbo/room/modules/registerAvatars';
-import {registerEffects} from '@habbo/room/modules/registerEffects';
-import {AvatarVisualization} from '@habbo/room/object/visualization/avatar/AvatarVisualization';
-import {FurnitureFireworksVisualization} from '@habbo/room/object/visualization/furniture/FurnitureFireworksVisualization';
+import type {RoomObjectLogicRegistry} from '@ambreia/iso/object/RoomObjectLogicRegistry';
+import type {RoomObjectVisualizationRegistry} from '@ambreia/iso/object/RoomObjectVisualizationRegistry';
+import {RoomObjectFactory} from '@ambreia/iso/scene/RoomObjectFactory';
+import {RoomObjectVisualizationFactory} from '@ambreia/iso/scene/object/RoomObjectVisualizationFactory';
+import {createRoomRegistries} from '@ambreia/iso/object/createRoomRegistries';
+import {DEFAULT_ROOM_MODULES} from '@ambreia/iso/defaultRoomModules';
+import {registerScene} from '@ambreia/iso/scene/registerScene';
+import {registerFurniture} from '@ambreia/iso/furniture/registerFurniture';
+import {registerAvatars} from '@ambreia/iso/avatar/registerAvatars';
+import {registerEffects} from '@ambreia/iso/effects/registerEffects';
+import {AvatarVisualization} from '@ambreia/iso/avatar/visualization/AvatarVisualization';
+import {FurnitureFireworksVisualization} from '@ambreia/iso/furniture/visualization/FurnitureFireworksVisualization';
 
 // Every type the two switches built before J4 (relevé 2026-10-07, by running them over every enum
 // value), and the class each one gave: the registries must give exactly these.

@@ -6,7 +6,7 @@
  * Data for area hide furniture zones.
  */
 import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
-import type {IAreaHideInfo} from '@habbo/room/IAreaHideInfo';
+import type {IAreaHideInfo} from '@ambreia/iso/scene/IAreaHideInfo';
 
 export class AreaHideMessageData implements IAreaHideInfo
 {

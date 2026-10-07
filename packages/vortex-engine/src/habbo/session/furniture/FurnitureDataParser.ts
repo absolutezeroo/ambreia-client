@@ -3,11 +3,11 @@ import {Logger} from '@ambreia/common/utils/Logger';
 import {AssetLibrary} from '@ambreia/common/assets/AssetLibrary';
 import {AssetLoaderEventType} from '@ambreia/common/assets/loaders/AssetLoaderEvent';
 import {Core} from '@core/Core';
-import {FurnitureData} from './FurnitureData';
+import {FurnitureData} from '@ambreia/iso/furniture/data/FurnitureData';
 
 import type {AssetLoaderEvent} from '@ambreia/common/assets/loaders/AssetLoaderEvent';
 import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';
-import type {IFurnitureData} from './IFurnitureData';
+import type {IFurnitureData} from '@ambreia/iso/furniture/data/IFurnitureData';
 
 const log = Logger.getLogger('habbo.session.furniture.FurnitureDataParser');
 

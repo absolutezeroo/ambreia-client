@@ -5,9 +5,9 @@ import {HabboCommunicationDemo} from '@habbo/communication/demo/HabboCommunicati
 import {HabboLocalizationManager} from '@habbo/localization/HabboLocalizationManager';
 import {WindowParser} from '@ambreia/ui/utils/WindowParser';
 import {RoomEngine, RoomMessageHandler} from '@habbo/room';
-import {HabboRoomRendererFactory} from '@habbo/room/renderer/HabboRoomRendererFactory';
-import {RoomManager} from '@room/RoomManager';
-import {setTextureExtractor} from '@room/renderer/TextureExtractor';
+import {HabboRoomRendererFactory} from '@ambreia/iso/scene/renderer/HabboRoomRendererFactory';
+import {RoomManager} from '@ambreia/iso/RoomManager';
+import {setTextureExtractor} from '@ambreia/iso/renderer/TextureExtractor';
 import {RoomSessionManager} from '@habbo/session/RoomSessionManager';
 import {RoomSessionEvent} from '@habbo/session/events/RoomSessionEvent';
 import {SessionDataManager} from '@habbo/session/SessionDataManager';

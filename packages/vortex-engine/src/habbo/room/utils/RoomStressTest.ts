@@ -4,11 +4,11 @@ import {FrameTimingsReporter} from '@ambreia/common/utils/FrameTimingsReporter';
 import {SelfProfiler} from '@ambreia/common/utils/SelfProfiler';
 import type {IProfileResult} from '@ambreia/common/utils/SelfProfiler';
 import type {IFrameTimingsRun, IFrameTimingsSample} from '@ambreia/common/utils/FrameTimingsReporter';
-import {Vector3d} from '@room/utils/Vector3d';
-import type {IVector3d} from '@room/utils/IVector3d';
+import {Vector3d} from '@ambreia/iso/utils/Vector3d';
+import type {IVector3d} from '@ambreia/iso/utils/IVector3d';
 import type {IRoomEngine} from '../IRoomEngine';
-import {RoomObjectCategoryEnum} from '../object/RoomObjectCategoryEnum';
-import {RoomObjectVariableEnum} from '../object/RoomObjectVariableEnum';
+import {RoomObjectCategoryEnum} from '@ambreia/iso/scene/object/RoomObjectCategoryEnum';
+import {RoomObjectVariableEnum} from '@ambreia/iso/scene/object/RoomObjectVariableEnum';
 
 const log = Logger.getLogger('habbo.room.utils.RoomStressTest');
 

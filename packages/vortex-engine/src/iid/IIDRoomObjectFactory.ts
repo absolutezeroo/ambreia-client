@@ -1,5 +1,5 @@
 import {createIID} from '@core/runtime/IID';
-import type {IRoomObjectFactory} from '@room/IRoomObjectFactory';
+import type {IRoomObjectFactory} from '@ambreia/iso/IRoomObjectFactory';
 
 /**
  * IID for Room Object Factory

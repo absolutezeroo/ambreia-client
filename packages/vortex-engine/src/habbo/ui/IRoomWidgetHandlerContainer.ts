@@ -8,7 +8,7 @@
 import type {EventEmitter} from 'eventemitter3';
 import type {IConnection} from '@ambreia/net/connection/IConnection';
 import type {IRoomEngine} from '@habbo/room/IRoomEngine';
-import type {IRoomObject} from '@room/object/IRoomObject';
+import type {IRoomObject} from '@ambreia/iso/object/IRoomObject';
 import type {IRoomSession} from '@habbo/session/IRoomSession';
 import type {IRoomSessionManager} from '@habbo/session/IRoomSessionManager';
 import type {ISessionDataManager} from '@habbo/session/ISessionDataManager';
