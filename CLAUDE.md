@@ -11,7 +11,6 @@ pnpm install      # Install dependencies
 pnpm dev          # Dev server (Vite)
 pnpm build        # Production build (TSC + Vite)
 pnpm lint         # ESLint over both packages
-pnpm web          # The CMS (packages/vortex-web) on :5174 — see its README
 ```
 
 ### `pnpm dev` pre-bundles the engine
@@ -259,43 +258,13 @@ Header source-of-truth order stays: WIN63's own registry
 (`.../habbo/communication/_SafeCls_2046.as`) first, then the emulator as corroboration — never the
 emulator alone.
 
-### The website is `packages/vortex-web`, and habbo.com's own files are its source of truth
+### The website lives in its own repository
 
-`vortex-web` is the hotel's CMS — a port of **habbo-web** (the modern habbo.com) in Svelte 5 + Vite +
-Tailwind 4 + `svelte-spa-router`, the same stack as the emulator's dashboard. `pnpm web` serves it on
-:5174. Its README has the full map; three things matter from outside it:
+`vortex-web` (the hotel's CMS, a port of habbo-web) moved out of this repository. Two things still
+matter from the client side:
 
-- **The URLs have no `#`.** `svelte-spa-router` is hash-only by design and is patched to the History
-  API instead (`patches/svelte-spa-router@4.0.2.patch`, applied by pnpm on install — which is why
-  every Dockerfile copies `patches/` before `pnpm install`). Two things hold it up: the server's
-  `try_files {path} /index.html` fallback, and `src/lib/links.ts`, which routes clicks on the plain
-  `<a href="/…">` that injected CMS markup carries. Do not reintroduce `#/` in an href or a mirror
-  tool; a destination written that way still works, but it is no longer what the site produces.
-
-- **A page that looks empty next to habbo.com is usually a CMS page, not a porting gap.** Its
-  editorial content is in none of the files below: `habbo-web-pages` fetches it at runtime from
-  `images.habbo.com/habbo-web-pages/production/<key>.fr.html` (the whole "Les clés du jeu" section,
-  and the small side boxes on settings/community/home). `tools/fetch-web-pages.mjs` mirrors those
-  fragments and their images into `src/webpages/` + `public/webpages/`; `components/WebPage.svelte`
-  injects them, and `.static-content` in `src/styles.css` is real CSS for exactly that reason —
-  the markup is habbo.com's and carries none of our classes.
-- **Three reference files settle everything else, and they are not optional.** `sources/app.5ac3d2f8.css`
-  (habbo.com's stylesheet — `mockup/habbo.css` is the same 2299 rules, beautified) says how a thing
-  looks; `sources/habbo.js` (its AngularJS bundle) carries the route table AND all 210 HTML
-  templates inline, extracted by `tools/extract-templates.mjs`, which say what is inside a page and
-  in what order; `sources/fr.json` (its localisation, 1688 keys, shipped as `src/lib/fr.json`) says
-  what everything is called — a template names its own key in `translate="…"`, so a label is never a
-  guess. Building from the CSS alone produced a site that looked right and was structurally wrong:
-  no tabs anywhere, a `/me` route habbo.com does not have, a sign-in form where habbo.com has a
-  modal, and invented French for every label. The port keeps habbo-web's values and structure and
-  drops its delivery: Tailwind utilities against tokens in `src/styles.css`, not
-  `.navigation__link--home` classes.
-- **The web API is `Vortex.WebApi` in the emulator**, not the dashboard's API — `/api/public/authentication/*`,
-  `/api/user/avatars`, `/api/ssotoken`, `/api/newuser/name/*`, on :8080, authenticated by an HttpOnly
-  cookie (so `/api` must stay same-origin — the dev server proxies it). It has **no identity route**:
-  `GET /api/user/avatars` is the probe, 401 = signed out. Everything else the site shows — articles,
-  badges, friends, groups, rooms, the purse, the shop — is mocked in `src/lib/mock.js` and labelled as
-  such, because no endpoint serves it yet.
+- **It frames the client.** Comments that mention `vortex-web` describe that site and its
+  behaviour (login, the SSO handover, the buttons around the client), not a package here.
 - **`?sso=<ticket>` on the client's URL** is how the CMS hands over a session it already
   authenticated; `packages/vortex-client/index.html` reads it into
   `VortexConfig.connection.ssoTicket`. With no ticket the client runs its own login flow exactly as

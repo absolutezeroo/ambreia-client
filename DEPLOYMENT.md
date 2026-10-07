@@ -60,8 +60,8 @@ cross-site cookie — on whichever host serves the client. That is why moving it
 `client.vortex-hotel.online` cost nothing: it asks its own host, and its Caddy answers.
 
 The site works the same way for `/api` and `/habbo-imaging`. The only two things it cannot derive
-are the other hosts — the client and the assets — and both already have a seam for it in
-`packages/vortex-web/src/lib/config.js`.
+are the other hosts — the client and the assets — and both already have a seam for it in the
+site's `src/lib/config.js` (the site now lives in its own repository).
 
 ## Why the assets do not
 
@@ -342,46 +342,21 @@ This is the heaviest build in the deployment — `tsc && vite build` over the wh
 
 ## 7. The website app
 
-New Coolify application, same repository. Builds in seconds — it is Svelte and Tailwind, none of
-the game engine.
+The website (`vortex-web`, the habbo-web port) no longer lives in this repository; deploy it from
+its own. It still sits at the apex `https://vortex-hotel.online` and frames this client, which is
+why the diagram above keeps it.
 
-- **Build Pack** — `Dockerfile`.
-- **Dockerfile Location** — `/Dockerfile.web`, **Base Directory** `/`.
-- **Domains** — `https://vortex-hotel.online`. The apex: this is what a visitor lands on.
-- **Ports Exposes** — `80`, and **Port** `80`.
-- **Persistent Storage** — none.
+## 8. Watch Paths, so one push does not rebuild both
 
-Environment:
-
-```
-EMULATOR_UPSTREAM=vortex-emulator
-IMAGER_UPSTREAM=vortex-imager
-```
-
-The site proxies less than the client does — only `/api/*` (unrewritten: unlike the client's
-`/webapi`, these are already the paths the emulator serves) and `/habbo-imaging/*`.
-
-**The two hosts it cannot derive** are build arguments, not runtime variables, because a browser
-has no environment and the values are baked into the bundle:
-`VITE_CLIENT_URL=https://client.vortex-hotel.online` and
-`VITE_ASSET_BASE=https://assets.vortex-hotel.online`. Both are defaulted in `Dockerfile.web`;
-override them with Coolify's **Build Variables** if the hostnames change. The seam already existed
-in `packages/vortex-web/src/lib/config.js` — nothing in the site's source changes to deploy it.
-
-Leave `VITE_ASSET_BASE` empty and the site asks *this* origin for promo art and badges, which
-nothing here serves: the pages render with every image missing and no error anywhere.
-
-## 8. Watch Paths, so one push does not rebuild all three
-
-Three applications share one repository, so by default every push fires all three webhooks: a
-one-line change in the client rebuilds the imager and the website too. **Configuration → General →
+Two applications share one repository, so by default every push fires both webhooks: a
+one-line change in the client rebuilds the imager too. **Configuration → General →
 Watch Paths**, one glob per line, is the whole fix — Coolify matches the push's changed files
 against them and skips the deploy when nothing matches. It gates the *webhook* only; **Redeploy**
 by hand always builds.
 
 Each list is the app's `COPY` surface, not its directory. The three roots are shared on purpose:
 `pnpm install --frozen-lockfile` runs in every build, so the lockfile and the workspace manifest
-invalidate all three.
+invalidate both.
 
 The client app (`/Dockerfile`):
 
@@ -417,19 +392,8 @@ line in the imager pointing at the client is `src/config.ts`'s `avatarConfigDir`
 into the unpacked assets, never into the client's source. So client source is genuinely not an
 input here — which is the case the list exists for.
 
-The website app (`/Dockerfile.web`):
-
-```
-packages/vortex-web/**
-Dockerfile.web
-Caddyfile.web
-package.json
-pnpm-lock.yaml
-pnpm-workspace.yaml
-```
-
-`vortex-engine` is in nobody's list by accident: the client and the imager both depend on it
-through `workspace:*`, the website does not depend on it at all.
+`vortex-engine` is in both lists on purpose: the client and the imager both depend on it through
+`workspace:*`.
 
 ---
 
@@ -541,7 +505,7 @@ curl -sS https://client.vortex-hotel.online/webapi/api/public/info/hello   # JSO
 npx wscat -c wss://client.vortex-hotel.online/ws                           # opens and stays open
 ```
 
-7. **Website app.** Then:
+7. **Website** (deployed from its own repository). Then:
 
 ```bash
 curl -sS https://vortex-hotel.online/api/public/info/hello                 # JSON, not HTML

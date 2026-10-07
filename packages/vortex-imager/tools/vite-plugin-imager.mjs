@@ -1,10 +1,10 @@
 /**
  * Starts the imager alongside a Vite dev server.
  *
- * Both dev servers already proxy `/habbo-imaging` to :8081, so an imager that is not running is
+ * The client's dev server already proxies `/habbo-imaging` to :8081, so an imager that is not running is
  * not an error anyone sees — it is avatars and badges that silently do not draw, and a second
- * terminal to remember. This plugin removes the second terminal: `pnpm dev` and `pnpm web` each
- * bring the service up themselves.
+ * terminal to remember. This plugin removes the second terminal: `pnpm dev` brings the
+ * service up itself.
  *
  * It probes the port first rather than owning the process, because both dev servers load this
  * plugin and `pnpm imager` is still the way to run the service on its own. Whoever is already

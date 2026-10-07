@@ -7,7 +7,7 @@
  * It renders nothing itself: it asks the running imager over HTTP, which is the only way the
  * baked bytes are guaranteed to be the bytes the live route would have produced — every
  * parameter default, every cache tier and the PNG encoder are the service's, not a second
- * implementation of them here. `pnpm dev` and `pnpm web` start that service, so it is already up.
+ * implementation of them here. `pnpm dev` starts that service, so it is already up.
  *
  * The file names come from `imagingKey()` in `vite-plugin-imager.mjs`, which is also what serves
  * them, so the two cannot disagree about where an image lives.

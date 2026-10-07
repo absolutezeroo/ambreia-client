@@ -20,8 +20,6 @@ tools/
 !packages/vortex-glaze/tools/*.mjs
 !packages/vortex-imager/tools/
 !packages/vortex-imager/tools/*.mjs
-!packages/vortex-web/tools/
-!packages/vortex-web/tools/*.mjs
 *.bundle
 *.log
 .DS_Store
@@ -31,17 +29,6 @@ configurations/
 mockup/
 tools/flash2html/output/
 *.png
-
-# ...except the website's own, which are not dump-derived and which nothing regenerates. The blanket
-# rule above caught them by accident, and the result only appears in a deployment: a clone has no
-# sprite sheet, so the site builds with no logo, no navigation icons and no currencies.
-#
-# It builds GREEN, which is what makes this worth a comment. Vite leaves an unresolvable
-# `new URL('../assets/sprite.png', import.meta.url)` as a literal string instead of failing, so the
-# browser asks for a path that does not exist and the SPA fallback answers index.html with a 200 —
-# an image request served HTML, reported nowhere.
-!packages/vortex-web/src/assets/*.png
-!packages/vortex-web/public/**/*.png
 
 # Window layouts/skins extracted from a Habbo dump by tools/build-window-assets.mjs, and
 # the sound effects extracted by tools/import-crypted-sounds.mjs. Derived dump content,

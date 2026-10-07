@@ -6,7 +6,8 @@
  *
  *   src/assets/images/icon_currency_vortex_mid.png    24x24  in-client, big  (purse, catalog price)
  *   src/assets/images/icon_currency_vortex_tiny.png   13x13  in-client, small
- *   ../vortex-web/public/vortexcoin-256.png          256x256 the MetaMask / token-list image
+ *
+ * (The 256x256 MetaMask / token-list image went with the website, which left this repository.)
  *
  * This file exists because the art is not a port and has no dump to come back from: `*.png` is
  * gitignored repo-wide, so the two client icons reach anyone else only through
@@ -15,8 +16,7 @@
  *
  * Every size is drawn natively rather than resampled: downscaling the 24px coin to 13 turns the
  * swirl into a blob, which is the same reason the shipped silver/emerald icons ship a separately
- * drawn `_tiny`. The 256 is the 32px drawing scaled x8 with nearest neighbour, so it stays pixel
- * art rather than becoming a blurry circle.
+ * drawn `_tiny`.
  *
  * Wiring the icon into the client is a separate job and needs no change here - see
  * ActivityPointTypeEnum.getIconStyleFor(), which resolves an unknown currency type through the
@@ -33,7 +33,6 @@ const sharp = require('sharp');
 const HERE = dirname(fileURLToPath(import.meta.url));
 const CLIENT = join(HERE, '..');
 const IMAGES = join(CLIENT, 'src', 'assets', 'images');
-const WEB_PUBLIC = join(CLIENT, '..', 'vortex-web', 'public');
 
 /**
  * Violet is the one currency family no shipped icon occupies: gold, cream, magenta, cyan,
@@ -113,7 +112,7 @@ function draw(size, {shadow = true, margin = 0} = {})
 
 async function main()
 {
-    for(const dir of [IMAGES, WEB_PUBLIC]) if(!existsSync(dir)) mkdirSync(dir, {recursive: true});
+    if(!existsSync(IMAGES)) mkdirSync(IMAGES, {recursive: true});
 
     const written = [];
 
@@ -137,14 +136,6 @@ async function main()
         .png()
         .toFile(join(IMAGES, 'vortex_icons.png'));
     written.push('vortex_icons.png                     37x24  (coin 0,0,24,24 | tiny 24,0,13,13)');
-
-    // MetaMask crops a token image to a circle, so the drop shadow goes - it clips into a crescent
-    // - and a 2px margin at the 32px drawing keeps the black outline clear of the crop edge.
-    await draw(32, {shadow: false, margin: 2})
-        .resize({width: 256, height: 256, kernel: 'nearest'})
-        .png()
-        .toFile(join(WEB_PUBLIC, 'vortexcoin-256.png'));
-    written.push('vortexcoin-256.png                256x256');
 
     console.log('\nVortexCoin icon\n');
     for(const line of written) console.log(`  ${line}`);

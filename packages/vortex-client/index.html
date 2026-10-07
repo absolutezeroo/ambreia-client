@@ -14,7 +14,7 @@
     const existingConnection = existingConfig.connection ?? {};
 
     // `?sso=<ticket>` is how the CMS hands the client a session it already authenticated
-    // (packages/vortex-web, pages/HotelPage.svelte), and it is the same mechanism the real hotel
+    // (the website repository, pages/HotelPage.svelte), and it is the same mechanism the real hotel
     // uses: habbo.com puts the ticket in the client's FlashVars rather than making the visitor sign
     // in twice. With no ticket the client runs its own login flow, exactly as before — see
     // App.ts::init(), which branches on connection.ssoTicket.

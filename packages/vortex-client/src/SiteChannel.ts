@@ -1,10 +1,10 @@
 /**
  * The `postMessage` protocol between this client and the site that frames it.
  *
- * Both halves are literals in two packages that share no module — `vortex-web` does not depend on
+ * Both halves are literals in two repositories that share no module — `vortex-web` does not depend on
  * `vortex-client` — so the names cannot be imported across the boundary. They can at least stop
  * being sprinkled: this file is the client half and
- * `packages/vortex-web/src/lib/clientChannel.ts` is the site half, and the two must be edited
+ * the website repository's `src/lib/clientChannel.ts` is the site half, and the two must be edited
  * together. A name that drifts here does not fail a build, it just stops delivering, which is the
  * whole reason neither side spells one inline any more.
  *

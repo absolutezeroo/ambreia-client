@@ -19,14 +19,10 @@ RUN corepack enable
 WORKDIR /src
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-# `patchedDependencies` in pnpm-workspace.yaml names a file, and install fails without it. Here
-# rather than in the `COPY . .` below, because that one comes AFTER the install.
-COPY patches/ patches/
 COPY packages/vortex-client/package.json packages/vortex-client/
 COPY packages/vortex-engine/package.json packages/vortex-engine/
 COPY packages/vortex-glaze/package.json packages/vortex-glaze/
 COPY packages/vortex-imager/package.json packages/vortex-imager/
-COPY packages/vortex-web/package.json packages/vortex-web/
 RUN pnpm install --frozen-lockfile
 
 COPY . .

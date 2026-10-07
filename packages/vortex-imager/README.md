@@ -21,8 +21,8 @@ PixiJS was in the picture.
 
 ## Running
 
-Nothing, most of the time: `pnpm dev` and `pnpm web` each start the imager themselves
-(`tools/vite-plugin-imager.mjs`), because both dev servers proxy `/habbo-imaging` to it and a
+Nothing, most of the time: `pnpm dev` starts the imager itself
+(`tools/vite-plugin-imager.mjs`), because the dev server proxies `/habbo-imaging` to it and a
 proxy with nothing behind it is avatars that silently do not draw. The plugin probes :8081 first,
 so whichever you start second — or a service you started by hand — keeps the port.
 

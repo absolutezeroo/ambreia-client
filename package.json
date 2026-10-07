@@ -9,8 +9,6 @@
     "dev": "pnpm --filter vortex-client dev",
     "build": "pnpm --filter vortex-client build",
     "preview": "pnpm --filter vortex-client preview",
-    "web": "pnpm --filter vortex-web dev",
-    "web:build": "pnpm --filter vortex-web build",
     "imager:dev": "pnpm --filter vortex-imager dev",
     "imager:build": "pnpm --filter vortex-imager build",
     "imager": "pnpm --filter vortex-imager start",

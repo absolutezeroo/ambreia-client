@@ -177,7 +177,6 @@ The game socket is dialled directly at `127.0.0.1:40001`.
 Other packages:
 
 ```bash
-pnpm web          # the CMS (vortex-web)
 pnpm imager:dev   # the standalone avatar/furni imager
 pnpm build        # production build of the client
 pnpm lint         # eslint over the workspace
@@ -191,7 +190,6 @@ pnpm lint         # eslint over the workspace
 |---|---|
 | `vortex-engine` | the port itself — core, communication, room engine, Habbo game logic |
 | `vortex-client` | the shell: display classes, window system, assets, boot |
-| `vortex-web` | the hotel's CMS, a port of habbo-web (Svelte 5) |
 | `vortex-imager` | avatar and furni image rendering as a service |
 | `vortex-glaze` | a window-layout editor built out of the client's own widgets |
 
