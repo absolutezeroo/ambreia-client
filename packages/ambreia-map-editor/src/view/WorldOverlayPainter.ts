@@ -20,10 +20,15 @@ const COLORS: Readonly<Record<LayerKey, Rgb>> = {
     triggers: [164, 110, 232]
 };
 
-/** An area's colour follows its kind (S§20.1): safe green, PvP red, town blue, quest yellow, boss dark red. */
+/**
+ * An area's colour follows its kind (S§20.1): safe green, PvP red, hostile orange, restricted grey,
+ * town blue, quest yellow, boss dark red.
+ */
 const AREA_COLORS: Readonly<Record<string, Rgb>> = {
     Safe: [76, 175, 80], PvP: [232, 77, 77], Town: [63, 127, 208], City: [63, 127, 208], Quest: [242, 201, 76],
-    Boss: [150, 30, 30], Dungeon: [120, 80, 160], NoCombat: [120, 200, 120]
+    Boss: [150, 30, 30], Dungeon: [120, 80, 160], NoCombat: [120, 200, 120], Hostile: [230, 126, 34],
+    Restricted: [110, 110, 120], NoMount: [160, 120, 80], Gathering: [140, 190, 60], Audio: [80, 190, 200],
+    Event: [220, 100, 190]
 };
 
 const LAYERS: readonly LayerKey[] = ['zones', 'passages', 'events', 'bosses', 'spawns', 'entries', 'resources', 'chests', 'interactives', 'triggers', 'npcs'];
