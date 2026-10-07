@@ -1,4 +1,4 @@
-import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
+import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
 import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
 import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
 import type {IRoomPreviewerWidget} from '@habbo/window/widgets/IRoomPreviewerWidget';

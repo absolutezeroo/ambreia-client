@@ -6,8 +6,8 @@
  *
  * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/avatarinfo/AvatarContextInfoView.as
  */
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {ITextWindow} from '@core/window/components/ITextWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {ITextWindow} from '@ambreia/ui/components/ITextWindow';
 import {ContextInfoView} from '../contextmenu/ContextInfoView';
 import type {IScreenRectangle} from '../contextmenu/ContextInfoView';
 

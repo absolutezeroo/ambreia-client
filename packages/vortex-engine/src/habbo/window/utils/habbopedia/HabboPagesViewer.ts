@@ -1,16 +1,16 @@
-// Typed against the concrete manager rather than `IHabboWindowManager`, as AS3 is
+// Typed against the concrete manager rather than `IWindowManager`, as AS3 is
 // (`HabboWindowManagerComponent`): the viewer needs `context`, `assets` and `getProperty()`, and
 // the interface declares none of the three. Type-only, so the import cycle is erased at build.
 import type {HabboWindowManager} from '../../HabboWindowManager';
-import type {IWindow} from '@core/window/IWindow';
-import type {IFrameWindow} from '@core/window/components/IFrameWindow';
-import type {ITextWindow} from '@core/window/components/ITextWindow';
-import type {IScrollbarWindow} from '@core/window/components/IScrollbarWindow';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IFrameWindow} from '@ambreia/ui/components/IFrameWindow';
+import type {ITextWindow} from '@ambreia/ui/components/ITextWindow';
+import type {IScrollbarWindow} from '@ambreia/ui/components/IScrollbarWindow';
 import type {ILinkEventTracker} from '@core/runtime/events/ILinkEventTracker';
 import type {AssetLoaderStruct} from '@ambreia/common/assets/AssetLoaderStruct';
 import {AssetLoaderEvent} from '@ambreia/common/assets/loaders/AssetLoaderEvent';
-import {WindowEvent} from '@core/window/events/WindowEvent';
-import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
+import {WindowEvent} from '@ambreia/ui/events/WindowEvent';
+import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
 import {HabboWebTools} from '@habbo/utils/HabboWebTools';
 import {Logger} from '@ambreia/common/utils/Logger';
 

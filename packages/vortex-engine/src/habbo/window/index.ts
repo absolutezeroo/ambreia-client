@@ -6,11 +6,11 @@ export * from './utils';
 export * from './widgets';
 
 // Exports
-export {ElementRegistry} from './ElementRegistry';
+export {ElementRegistry} from '@ambreia/ui/kit/ElementRegistry';
 export {HabboWindowManager} from './HabboWindowManager';
-export {HintManager} from './HintManager';
-export {HintTarget} from './HintTarget';
-export {ResourceManager} from './ResourceManager';
+export {HintManager} from '@ambreia/ui/kit/HintManager';
+export {HintTarget} from '@ambreia/ui/kit/HintTarget';
+export {ResourceManager} from '@ambreia/ui/kit/ResourceManager';
 
 // Types
 export type {
@@ -18,11 +18,11 @@ export type {
     IElementState,
     IElementDescriptor,
     IElementDescriptionData,
-} from './IElementDescriptor';
+} from '@ambreia/ui/kit/IElementDescriptor';
 export type {IHabboWindowManager} from './IHabboWindowManager';
 export type {
     IWindowLayoutAttributes,
     IWindowLayoutNode,
     IWindowLayoutFilter,
     IWindowLayout,
-} from './IWindowLayout';
+} from '@ambreia/ui/kit/IWindowLayout';

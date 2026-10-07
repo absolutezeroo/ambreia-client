@@ -1,5 +1,5 @@
-import type {IWindow} from '@core/window/IWindow';
-import type {WindowController} from '@core/window/WindowController';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {WindowController} from '@ambreia/ui/WindowController';
 import type {AlignEdge, EditorState} from '../state/EditorState';
 
 interface IRect { x: number; y: number; width: number; height: number; }

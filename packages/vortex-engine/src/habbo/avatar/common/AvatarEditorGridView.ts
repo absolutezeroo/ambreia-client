@@ -1,9 +1,9 @@
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IItemGridWindow} from '@core/window/components/IItemGridWindow';
-import type {IScrollableGridWindow} from '@core/window/components/IScrollableGridWindow';
-import type {WindowEvent} from '@core/window/events/WindowEvent';
-import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {IItemGridWindow} from '@ambreia/ui/components/IItemGridWindow';
+import type {IScrollableGridWindow} from '@ambreia/ui/components/IScrollableGridWindow';
+import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
+import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
 import type {IAvatarEditorGridView} from './ICategoryView';
 import type {ICategoryModel} from './ICategoryModel';
 

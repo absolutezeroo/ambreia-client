@@ -1,7 +1,7 @@
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IBitmapWrapperWindow} from '@core/window/components/IBitmapWrapperWindow';
-import type {IStaticBitmapWrapperWindow} from '@core/window/components/IStaticBitmapWrapperWindow';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {IBitmapWrapperWindow} from '@ambreia/ui/components/IBitmapWrapperWindow';
+import type {IStaticBitmapWrapperWindow} from '@ambreia/ui/components/IStaticBitmapWrapperWindow';
 import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
 import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
 import type {IFigurePart} from '@ambreia/avatar/structure/figure/IFigurePart';
@@ -10,7 +10,7 @@ import type {IFigurePartSet} from '@ambreia/avatar/structure/figure/IFigurePartS
 import type {IPartColor} from '@ambreia/avatar/structure/figure/IPartColor';
 import type {IAvatarEditorGridPartItem} from './IAvatarEditorGridItem';
 import type {ICategoryModel} from './ICategoryModel';
-import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
+import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
 
 /** TS-only: the rectangle union `analyzePartLayers()` accumulates. */
 /**

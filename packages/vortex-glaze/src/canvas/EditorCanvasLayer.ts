@@ -1,5 +1,5 @@
-import type {IWindow} from '@core/window/IWindow';
-import type {WindowController} from '@core/window/WindowController';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {WindowController} from '@ambreia/ui/WindowController';
 import {EditorEvents, type EditorState} from '../state/EditorState';
 import type {CanvasSurface} from './CanvasSurface';
 import {collectSnapTargets, globalRectOf, snapEdge, snapMove, SNAP_THRESHOLD, type ISnapGuide, type ISnapRect} from './SnapGuides';

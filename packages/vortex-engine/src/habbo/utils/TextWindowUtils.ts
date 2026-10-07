@@ -1,4 +1,4 @@
-import type {ITextWindow} from '@core/window/components/ITextWindow';
+import type {ITextWindow} from '@ambreia/ui/components/ITextWindow';
 
 /**
  * Styling helpers for HTML text windows.

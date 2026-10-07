@@ -1,4 +1,4 @@
-import type {IWidget} from './IWidget';
+import type {IWidget} from '@ambreia/ui/kit/widgets/IWidget';
 import type {RoomPreviewer} from '@habbo/room/preview/RoomPreviewer';
 
 /**

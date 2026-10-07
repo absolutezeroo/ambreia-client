@@ -1,4 +1,4 @@
-import type {IWindow} from '@core/window/IWindow';
+import type {IWindow} from '@ambreia/ui/IWindow';
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {GlazeLayoutName, GlazeSlot} from './GlazeLayoutSlots';
 

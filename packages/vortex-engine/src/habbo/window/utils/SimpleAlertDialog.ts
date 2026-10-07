@@ -1,12 +1,12 @@
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {IDisposable} from '@ambreia/common/IDisposable';
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IItemListWindow} from '@core/window/components/IItemListWindow';
-import {WindowEvent} from '@core/window/events/WindowEvent';
-import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {IItemListWindow} from '@ambreia/ui/components/IItemListWindow';
+import {WindowEvent} from '@ambreia/ui/events/WindowEvent';
+import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
 import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {IModalDialog} from './IModalDialog';
+import type {IModalDialog} from '@ambreia/ui/kit/utils/IModalDialog';
 
 const log = Logger.getLogger('habbo.window.utils.SimpleAlertDialog');
 

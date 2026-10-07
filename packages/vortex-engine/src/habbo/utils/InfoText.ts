@@ -1,5 +1,5 @@
-import type {ITextFieldWindow} from '@core/window/components/ITextFieldWindow';
-import {WindowEvent} from '@core/window/events/WindowEvent';
+import type {ITextFieldWindow} from '@ambreia/ui/components/ITextFieldWindow';
+import {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 
 /**
  * InfoText

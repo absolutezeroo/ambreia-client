@@ -1,21 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {Component, ComponentDependency, type IContext} from '@core/runtime';
 import type {ErrorEvent} from '@core/runtime/events/ErrorEvent';
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IItemListWindow} from '@core/window/components/IItemListWindow';
-import type {ITextWindow} from '@core/window/components/ITextWindow';
-import type {ITextFieldWindow} from '@core/window/components/ITextFieldWindow';
-import type {ISelectableWindow} from '@core/window/components/ISelectableWindow';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {IItemListWindow} from '@ambreia/ui/components/IItemListWindow';
+import type {ITextWindow} from '@ambreia/ui/components/ITextWindow';
+import type {ITextFieldWindow} from '@ambreia/ui/components/ITextFieldWindow';
+import type {ISelectableWindow} from '@ambreia/ui/components/ISelectableWindow';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';
 import type {ISessionDataManager} from '@habbo/session/ISessionDataManager';
-import type {IModalDialog} from '@habbo/window/utils/IModalDialog';
+import type {IModalDialog} from '@ambreia/ui/kit/utils/IModalDialog';
 import {IID_HabboWindowManager} from '@iid/IIDHabboWindowManager';
 import {IID_HabboLocalizationManager} from '@iid/IIDHabboLocalizationManager';
 import {IID_SessionDataManager} from '@iid/IIDSessionDataManager';
 import {Logger} from '@ambreia/common/utils/Logger';
-import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
+import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
 
 const log = Logger.getLogger('habbo.communication.demo.ErrorPopupCtrl');
 

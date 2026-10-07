@@ -1,20 +1,17 @@
-import {Core} from '@core/Core';
-import type {CoreComponentContext} from '@core/runtime/CoreComponentContext';
 import {Logger, LogLevel} from '@ambreia/common/utils/Logger';
-import {HabboWindowManager} from '@habbo/window';
-import type {IHabboWindowManager, IElementDescriptionData} from '@habbo/window';
-import type {ISkinData} from '@core/window';
-import {IID_HabboLocalizationManager} from '@iid/IIDHabboLocalizationManager';
-import {IID_HabboWindowManager} from '@iid/IIDHabboWindowManager';
-import {IID_Core} from '@iid/IIDCore';
-import {AssetBundle} from '@client/AssetBundle';
+import {AssetBundle} from '@ambreia/common/assets/AssetBundle';
+import {WindowManager} from '@ambreia/ui/kit/WindowManager';
+import type {IWindowManager} from '@ambreia/ui/kit/IWindowManager';
+import type {IElementDescriptionData} from '@ambreia/ui/kit/IElementDescriptor';
+import type {ISkinData} from '@ambreia/ui/index';
 import {
     type IWindowLayoutXmlData,
     parseElementDescriptionXml,
     parseSkinXml,
     parseWindowLayoutXml
-} from '@client/window/WindowXmlAssetParser';
+} from '@ambreia/ui/assets/WindowXmlAssetParser';
 import {GlazeConfigurationStub} from './GlazeConfigurationStub';
+import {registerGameWidgetPlaceholders} from './GameWidgetPlaceholder';
 import {GlazeLocalizationStub} from './GlazeLocalizationStub';
 
 const log = Logger.getLogger('glaze.boot.GlazeBoot');
@@ -104,8 +101,7 @@ const WEBFONT_FACES: Array<{ family: string; file: string; weight?: string; styl
  */
 export interface IGlazeRuntime
 {
-    context: CoreComponentContext;
-    windowManager: IHabboWindowManager;
+    windowManager: IWindowManager;
     imageBundle: AssetBundle;
     xmlBundle: AssetBundle;
 
@@ -122,13 +118,12 @@ export interface IGlazeRuntime
 /**
  * GlazeBoot — brings up ONLY the window subsystem, standalone.
  *
- * A window-layout editor needs the ported `com.sulake.core.window` framework and
- * nothing else — no communication, room engine, catalog, avatar rendering,
- * furnidata, or even a PixiJS stage. So instead of `Vortex.bootstrap()` (which
- * wires ~25 managers and forces an `external_variables` download), this creates a
- * bare Core DI context, attaches a localization stub (the window manager's only
- * required dependency) and the `HabboWindowManager`, then drives the DI update
- * loop from a `requestAnimationFrame` ticker. Windows composite onto a 2D
+ * A window-layout editor needs the window system (@ambreia/ui) and nothing else — no
+ * communication, room engine, catalog, avatar rendering, furnidata, DI, or even a PixiJS stage.
+ * So this builds a bare `WindowManager` with a localisation and a configuration stub, and updates
+ * it from its own `requestAnimationFrame` ticker. The game widgets (avatar, badge, furni…) are
+ * placeholders that draw nothing but keep their properties (GameWidgetPlaceholder), so Glaze can
+ * still offer them, lay them out and save them unchanged. Windows composite onto a 2D
  * `OffscreenCanvas` via `compositeToBuffer` — the editor blits that onto its own
  * canvas — so PixiJS is never involved.
  *
@@ -139,7 +134,6 @@ export interface IGlazeRuntime
 export class GlazeBoot
 {
     private _tickerId: number = 0;
-    private _context: CoreComponentContext | null = null;
 
     /**
      * Boots the window subsystem and loads every window asset, then returns a
@@ -157,7 +151,7 @@ export class GlazeBoot
             this.loadBundle('/assets-xml.bundle')
         ]);
 
-        const windowManager = await this.buildWindowSubsystem();
+        const windowManager = this.buildWindowSubsystem();
 
         if(import.meta.env.DEV)
         {
@@ -174,7 +168,6 @@ export class GlazeBoot
         this.registerImageAssets(windowManager, imageBundle);
 
         return {
-            context: this._context!,
             windowManager,
             imageBundle,
             xmlBundle,
@@ -195,62 +188,34 @@ export class GlazeBoot
     }
 
     /**
-     * Creates the minimal Core DI context, attaches the localization stub and the
-     * window manager, waits for the manager to finish initializing, and starts the
-     * rAF-driven update loop that replaces the PixiJS ticker.
+     * Builds the window manager and starts the rAF loop that replaces the PixiJS ticker.
      */
-    private async buildWindowSubsystem(): Promise<IHabboWindowManager>
+    private buildWindowSubsystem(): IWindowManager
     {
-        const ctx = Core.instantiate() as CoreComponentContext;
+        // `interpolate` is what resolves `${image.library.url}…` in a layout's asset_uri: without
+        // it every externally hosted image in a layout renders as nothing.
+        const configuration = new GlazeConfigurationStub();
+        const windowManager = new WindowManager({interpolate: (text: string): string => configuration.interpolate(text)});
 
-        this._context = ctx;
-        ctx.targetFps = 60;
-        ctx.registerInterface(IID_Core, ctx);
+        registerGameWidgetPlaceholders(windowManager);
 
-        // Not a component: `Component.interpolate()` reads `context.configuration` directly, and
-        // without it every `${image.library.url}…` asset_uri in a layout resolves to the empty
-        // string. Set before the window manager so nothing can resolve a URI ahead of it.
-        ctx.configuration = new GlazeConfigurationStub();
-
-        // The window manager's only required dependency.
-        const localization = new GlazeLocalizationStub(ctx);
-
-        ctx.attachComponent(localization, [IID_HabboLocalizationManager]);
-
-        const windowManager = new HabboWindowManager(ctx);
-
-        ctx.attachComponent(windowManager, [IID_HabboWindowManager]);
-
-        ctx.initialize();
-
-        // The manager resolves its dependency and runs initComponent() on a
-        // microtask; wait until it unlocks before touching the context/renderer.
-        for(let i = 0; i < 200 && (windowManager as unknown as { locked: boolean }).locked; i++)
-        {
-            await new Promise<void>((resolve) => setTimeout(resolve, 0));
-        }
-
-        if((windowManager as unknown as { locked: boolean }).locked)
-        {
-            throw new Error('[GlazeBoot] Window manager never finished initialization (dependency unresolved).');
-        }
-
-        this.startTicker(ctx);
+        windowManager.setLocalization(new GlazeLocalizationStub());
+        windowManager.initialize();
+        this.startTicker(windowManager);
 
         return windowManager;
     }
 
-    /**
-     * Drives the DI update loop each frame (in the real client this is the PixiJS
-     * ticker calling `ctx.update`).
-     */
-    private startTicker(ctx: CoreComponentContext): void
+    private startTicker(windowManager: WindowManager): void
     {
-        const tick = (): void =>
-        {
-            if(ctx.disposed) return;
+        let last = performance.now();
 
-            ctx.update(0);
+        const tick = (now: number): void =>
+        {
+            if(windowManager.disposed) return;
+
+            windowManager.update(now - last);
+            last = now;
             this._tickerId = requestAnimationFrame(tick);
         };
 
@@ -278,7 +243,7 @@ export class GlazeBoot
      * them to the window manager (this call is what creates the WindowRenderer +
      * WindowComposite; before it, `compositeToBuffer` returns null).
      */
-    private async loadSkinAssets(windowManager: IHabboWindowManager, imageBundle: AssetBundle, xmlBundle: AssetBundle): Promise<void>
+    private async loadSkinAssets(windowManager: IWindowManager, imageBundle: AssetBundle, xmlBundle: AssetBundle): Promise<void>
     {
         try
         {
@@ -313,7 +278,7 @@ export class GlazeBoot
      * skinless windows for the ~1 frame until it resolves.
      */
     private async decodeAtlasesAndSkins(
-        windowManager: IHabboWindowManager,
+        windowManager: IWindowManager,
         imageBundle: AssetBundle,
         xmlBundle: AssetBundle,
         elementDescriptionKey: string
@@ -355,7 +320,7 @@ export class GlazeBoot
      * Registers every window layout XML under its AS3 asset name.
      */
     private registerLayouts(
-        windowManager: IHabboWindowManager,
+        windowManager: IWindowManager,
         xmlBundle: AssetBundle,
         layoutXmlSink: Map<string, string>
     ): void
@@ -402,7 +367,7 @@ export class GlazeBoot
      * an empty response.
      */
     private async overlaySourceLayouts(
-        windowManager: IHabboWindowManager,
+        windowManager: IWindowManager,
         layoutXmlSink: Map<string, string>
     ): Promise<void>
     {
@@ -464,7 +429,7 @@ export class GlazeBoot
      * Registers Glaze's own editor-UI layouts (src/assets/window-layouts/glaze_*.xml),
      * bundled at build time via import.meta.glob, under their file basename.
      */
-    private registerGlazeLayouts(windowManager: IHabboWindowManager, layoutXmlSink: Map<string, string>): void
+    private registerGlazeLayouts(windowManager: IWindowManager, layoutXmlSink: Map<string, string>): void
     {
         const modules = import.meta.glob('../assets/window-layouts/*.xml', {
             query: '?raw',
@@ -485,7 +450,7 @@ export class GlazeBoot
      * Registers every bundled image as a blob URL with the window manager so
      * bitmap-backed skins resolve their assets.
      */
-    private registerImageAssets(windowManager: IHabboWindowManager, imageBundle: AssetBundle): void
+    private registerImageAssets(windowManager: IWindowManager, imageBundle: AssetBundle): void
     {
         for(const key of imageBundle.listKeys('images/'))
         {

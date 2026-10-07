@@ -1,4 +1,4 @@
-import {TYPE_NAME_TO_CODE} from '@core/window/enum/WindowType';
+import {TYPE_NAME_TO_CODE} from '@ambreia/ui/enum/WindowType';
 
 /**
  * A widget the editor can drop into the tree: the window type plus the geometry,

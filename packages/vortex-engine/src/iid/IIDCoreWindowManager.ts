@@ -1,5 +1,5 @@
 import {createIID} from '@core/runtime/IID';
-import type {ICoreWindowManager} from '@core/window/ICoreWindowManager';
+import type {ICoreWindowManager} from '@ambreia/ui/ICoreWindowManager';
 
 /**
  * IID for Core Window Manager

@@ -1,6 +1,6 @@
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {ITextWindow} from '@core/window/components/ITextWindow';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {ITextWindow} from '@ambreia/ui/components/ITextWindow';
 import type {IHabboAvatarEditorHost} from '../IHabboAvatarEditorHost';
 
 /**

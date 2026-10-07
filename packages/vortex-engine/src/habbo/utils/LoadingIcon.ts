@@ -1,5 +1,5 @@
 import type {IDisposable} from '@ambreia/common/IDisposable';
-import type {IIconWindow} from '@core/window/components/IIconWindow';
+import type {IIconWindow} from '@ambreia/ui/components/IIconWindow';
 
 /**
  * LoadingIcon — a small spinner helper that cycles an IIconWindow through four asset frames on a timer

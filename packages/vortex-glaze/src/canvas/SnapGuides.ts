@@ -1,4 +1,4 @@
-import type {IWindow} from '@core/window/IWindow';
+import type {IWindow} from '@ambreia/ui/IWindow';
 
 export interface ISnapRect { x: number; y: number; width: number; height: number; }
 

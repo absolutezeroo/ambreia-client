@@ -15,8 +15,7 @@ import {GlazeShortcuts} from './input/GlazeShortcuts';
 import {layoutPngDataUrl} from './ops/ScreenshotOps';
 import {importLayoutXml} from './ops/LayoutSerializer';
 import {Scheduler} from '@ambreia/common/reactive/index';
-import type {IFlushEmitter} from '@ambreia/common/reactive/index';
-import {HabboWindowTrackingEvent} from '@habbo/window/enum/HabboWindowTrackingEvent';
+import {HabboWindowTrackingEvent} from '@ambreia/ui/kit/enum/HabboWindowTrackingEvent';
 import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('glaze.main');
@@ -36,7 +35,7 @@ async function main(): Promise<void>
     // run exactly there (docs/REACTIVE-UI.md §5). Consumer-side wiring — no
     // ported file is edited for this.
     Scheduler.attach(
-        (runtime.windowManager as unknown as {events: IFlushEmitter}).events,
+        runtime.windowManager.events,
         HabboWindowTrackingEvent.HABBO_WINDOW_TRACKING_EVENT_RENDER
     );
 

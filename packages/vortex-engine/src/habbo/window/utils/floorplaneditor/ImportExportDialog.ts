@@ -1,6 +1,6 @@
-import type {IWindow} from '@core/window/IWindow';
-import type {IFrameWindow} from '@core/window/components/IFrameWindow';
-import type {WindowEvent} from '@core/window/events/WindowEvent';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IFrameWindow} from '@ambreia/ui/components/IFrameWindow';
+import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import {
     UpdateFloorPropertiesMessageComposer
 } from '@habbo/communication/messages/outgoing/room/layout/UpdateFloorPropertiesMessageComposer';

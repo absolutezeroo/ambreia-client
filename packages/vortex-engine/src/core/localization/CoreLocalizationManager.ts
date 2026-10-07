@@ -4,10 +4,10 @@ import type {ICoreLocalizationManager} from './ICoreLocalizationManager';
 import type {ILocalizable} from './ILocalizable';
 import type {ILocalization} from './ILocalization';
 import type {ILocalizationDefinition} from './ILocalizationDefinition';
-import type {IGameDataResources} from './IGameDataResources';
+import type {IGameDataResources} from '@ambreia/common/localization/IGameDataResources';
 import {Localization} from './Localization';
 import {LocalizationDefinition} from './LocalizationDefinition';
-import {GameDataResources} from './GameDataResources';
+import {GameDataResources} from '@ambreia/common/localization/GameDataResources';
 import {LocalizationEvent} from './LocalizationEvent';
 
 const log = Logger.getLogger('core.localization.CoreLocalizationManager');

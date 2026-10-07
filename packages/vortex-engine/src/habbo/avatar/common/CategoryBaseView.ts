@@ -1,5 +1,5 @@
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IStaticBitmapWrapperWindow} from '@core/window/components/IStaticBitmapWrapperWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {IStaticBitmapWrapperWindow} from '@ambreia/ui/components/IStaticBitmapWrapperWindow';
 import type {ICategoryModel} from './ICategoryModel';
 import {TabUtils} from './TabUtils';
 

@@ -163,7 +163,17 @@ export function applyMoves(root, plan)
     for(const [from, to] of plan.moved)
     {
         fs.mkdirSync(path.dirname(path.join(root, to)), { recursive: true });
-        execFileSync('git', ['mv', from, to], { cwd: root });
+
+        // git mv keeps the history, but refuses a file git does not track yet (one created in
+        // the same change); that one is simply renamed.
+        try
+        {
+            execFileSync('git', ['mv', from, to], { cwd: root, stdio: 'ignore' });
+        }
+        catch
+        {
+            fs.renameSync(path.join(root, from), path.join(root, to));
+        }
     }
 }
 
@@ -176,7 +186,7 @@ if(process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.met
     const plan = planMoves({
         root,
         moves,
-        scan: [E, 'packages/vortex-engine/test', C, 'packages/vortex-glaze/src', 'packages/vortex-imager/src', 'packages/ambreia-common/src', 'packages/ambreia-net/src'],
+        scan: [E, 'packages/vortex-engine/test', C, 'packages/vortex-glaze/src', 'packages/vortex-imager/src', 'packages/ambreia-common/src', 'packages/ambreia-net/src', 'packages/ambreia-avatar/src', 'packages/ambreia-ui/src'],
         aliases: { '@core': `${E}/core`, '@habbo': `${E}/habbo`, '@room': `${E}/room`, '@iid': `${E}/iid`, '@ui': C, '@': C, '@client': C }
     });
     const count = [...plan.rewrites.values()].reduce((n, l) => n + l.length, 0);

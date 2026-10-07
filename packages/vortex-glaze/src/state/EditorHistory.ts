@@ -1,4 +1,4 @@
-import type {IWindow} from '@core/window/IWindow';
+import type {IWindow} from '@ambreia/ui/IWindow';
 import {serializeLayout, importLayoutXml} from '../ops/LayoutSerializer';
 import type {EditorState} from './EditorState';
 

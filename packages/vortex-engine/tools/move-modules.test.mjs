@@ -159,3 +159,20 @@ test('a moved file that imported its destination package by name now reaches it 
 
     assert.deepEqual(next(p, 'eng/src/room/G.ts'), ['@x/common/D -> ../D']);
 });
+
+test('applying a plan moves a file git does not track yet', async () =>
+{
+    const { execFileSync } = await import('node:child_process');
+    const { existsSync } = await import('node:fs');
+    const { applyMoves } = await import('./move-modules.mjs');
+    const root = project({ 'eng/src/core/utils/New.ts': 'export const N = 1;\n' });
+
+    execFileSync('git', ['init', '-q'], { cwd: root });
+
+    const p = planMoves({ root, scan: ['eng/src'], aliases: ALIASES, moves: MOVES });
+
+    applyMoves(root, p);
+
+    assert.ok(existsSync(join(root, 'common/src/utils/New.ts')));
+    assert.ok(!existsSync(join(root, 'eng/src/core/utils/New.ts')));
+});

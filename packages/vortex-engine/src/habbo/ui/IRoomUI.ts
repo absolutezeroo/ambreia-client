@@ -7,7 +7,7 @@
  */
 import type {IRoomDesktop} from './IRoomDesktop';
 import type {IRoomSession} from '@habbo/session/IRoomSession';
-import type {IDisplayObjectWrapper} from '@core/window/components/IDisplayObjectWrapper';
+import type {IDisplayObjectWrapper} from '@ambreia/ui/components/IDisplayObjectWrapper';
 
 export interface IRoomUI
 {

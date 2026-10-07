@@ -1,22 +1,22 @@
 import {ActivityPointTypeEnum} from '../utils/ActivityPointTypeEnum';
-import type {IWidget} from './IWidget';
-import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
+import type {IWidget} from '@ambreia/ui/kit/widgets/IWidget';
+import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
 import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IIconWindow} from '@core/window/components/IIconWindow';
-import type {IStaticBitmapWrapperWindow} from '@core/window/components/IStaticBitmapWrapperWindow';
-import type {IBitmapWrapperWindow} from '@core/window/components/IBitmapWrapperWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {IIconWindow} from '@ambreia/ui/components/IIconWindow';
+import type {IStaticBitmapWrapperWindow} from '@ambreia/ui/components/IStaticBitmapWrapperWindow';
+import type {IBitmapWrapperWindow} from '@ambreia/ui/components/IBitmapWrapperWindow';
 import type {IGetImageListener} from '@habbo/room/IGetImageListener';
 import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
-import type {PropertyStruct} from '@core/window/utils/PropertyStruct';
-import type {IProductDisplayInfo} from './IProductDisplayInfo';
+import type {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
+import type {IProductDisplayInfo} from '@ambreia/ui/kit/widgets/IProductDisplayInfo';
 import {ImageResult} from '@habbo/room/ImageResult';
-import {ProductCategoryMapping} from '../utils/ProductCategoryMapping';
+import {ProductCategoryMapping} from '@ambreia/ui/kit/utils/ProductCategoryMapping';
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {BadgeImageWidget} from './BadgeImageWidget';
 import type {PetImageWidget} from './PetImageWidget';
-import type {IIterator} from '@core/window/utils/IIterator';
-import {EmptyIterator} from '@core/window/iterators/EmptyIterator';
+import type {IIterator} from '@ambreia/ui/utils/IIterator';
+import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
 
 const log = Logger.getLogger('habbo.window.widgets.ProductIconWidget');
 

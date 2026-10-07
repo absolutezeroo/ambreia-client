@@ -142,11 +142,8 @@ function glazeSavePlugin(): Plugin
 /**
  * vortex-glaze — Vite config.
  *
- * Cloned from vortex-client's config (same monorepo depth → identical relative
- * engine paths). Two differences:
- *  - `@client` alias resolves into vortex-client/src so glaze can reuse the
- *    asset-bundle loader and the window XML parsers (single source of truth for
- *    the layout/skin XML vocabulary) instead of duplicating them.
+ * Glaze imports only the @ambreia/* packages (the window system, nothing of the engine or the
+ * client). One thing it shares with vortex-client is data, not code:
  *  - `publicDir` points at vortex-client's built `public/` so the two
  *    `.bundle` files are served at glaze's root exactly as they are for the
  *    client. Run `pnpm --filter vortex-client build:bundle` (or `pnpm --filter
@@ -176,12 +173,7 @@ export default defineConfig({
         alias: {
             '@/assets': resolve(__dirname, 'src/assets'),
             '@': resolve(__dirname, 'src'),
-            '@core': resolve(__dirname, '../vortex-engine/src/core'),
-            '@habbo': resolve(__dirname, '../vortex-engine/src/habbo'),
-            '@room': resolve(__dirname, '../vortex-engine/src/room'),
-            '@iid': resolve(__dirname, '../vortex-engine/src/iid'),
             '@ui': resolve(__dirname, 'src'),
-            '@client': resolve(__dirname, '../vortex-client/src'),
         },
     },
     build: {

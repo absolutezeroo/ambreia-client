@@ -1,4 +1,4 @@
-import type {IWindow} from '@core/window/IWindow';
+import type {IWindow} from '@ambreia/ui/IWindow';
 import type {CategoryData} from './CategoryData';
 import type {ICategoryModel} from './ICategoryModel';
 import type {ICategoryModelOwner} from './ICategoryModelOwner';

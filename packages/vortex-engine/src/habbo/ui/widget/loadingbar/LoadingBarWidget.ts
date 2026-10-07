@@ -1,6 +1,6 @@
 import type EventEmitter from 'eventemitter3';
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';

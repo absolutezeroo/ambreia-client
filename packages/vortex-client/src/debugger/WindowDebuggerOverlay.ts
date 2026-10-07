@@ -1,14 +1,14 @@
 import {Vortex} from 'vortex-engine';
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IWindowDebugNode, IWindowDebugRect} from '@core/window/debugger';
-import {SkinPreviewRenderer, WindowTreeInspector} from '@core/window/debugger';
-import {TextStyleManager} from '@core/window/utils/TextStyleManager';
-import {GlyphAtlas} from '@core/window/utils/GlyphAtlas';
-import {TYPE_CODE_TO_NAME, WindowType} from '@core/window/enum/WindowType';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {IWindowDebugNode, IWindowDebugRect} from '@ambreia/ui/debugger/index';
+import {SkinPreviewRenderer, WindowTreeInspector} from '@ambreia/ui/debugger/index';
+import {TextStyleManager} from '@ambreia/ui/utils/TextStyleManager';
+import {GlyphAtlas} from '@ambreia/ui/utils/GlyphAtlas';
+import {TYPE_CODE_TO_NAME, WindowType} from '@ambreia/ui/enum/WindowType';
 import type {ILogRecord} from '@ambreia/common/utils/Logger';
 import {Logger, LogLevel} from '@ambreia/common/utils/Logger';
-import type {IElementDescriptor} from '@habbo/window/IElementDescriptor';
+import type {IElementDescriptor} from '@ambreia/ui/kit/IElementDescriptor';
 import type {ILinkEventTracker} from '@core/runtime/events';
 
 const log = Logger.getLogger('client.debugger.WindowDebuggerOverlay');

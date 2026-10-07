@@ -1,21 +1,21 @@
 import type {Container} from 'pixi.js';
 import {Graphics} from 'pixi.js';
 import type {IRoomPreviewerWidget} from './IRoomPreviewerWidget';
-import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
+import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
 import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IDisplayObjectWrapper} from '@core/window/components/IDisplayObjectWrapper';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {IDisplayObjectWrapper} from '@ambreia/ui/components/IDisplayObjectWrapper';
 import type {IRoomEngine} from '@habbo/room/IRoomEngine';
-import {PropertyStruct} from '@core/window/utils/PropertyStruct';
-import {WindowEvent} from '@core/window/events/WindowEvent';
-import type {WindowEventListener} from '@core/window/events/WindowEventDispatcher';
-import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
+import {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
+import {WindowEvent} from '@ambreia/ui/events/WindowEvent';
+import type {WindowEventListener} from '@ambreia/ui/events/WindowEventDispatcher';
+import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
 import {RoomPreviewer} from '@habbo/room/preview/RoomPreviewer';
 import {PreviewCanvasStack} from '@habbo/room/preview/PreviewCanvasStack';
 import {RoomEngineEvent} from '@habbo/room/events/RoomEngineEvent';
-import type {IIterator} from '@core/window/utils/IIterator';
-import {EmptyIterator} from '@core/window/iterators/EmptyIterator';
+import type {IIterator} from '@ambreia/ui/utils/IIterator';
+import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
 
 /**
  * Room previewer widget.

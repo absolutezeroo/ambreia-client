@@ -7,7 +7,7 @@
  * e.g. infostand, chat, me-menu).
  */
 import type {EventEmitter} from 'eventemitter3';
-import type {IWindow} from '@core/window/IWindow';
+import type {IWindow} from '@ambreia/ui/IWindow';
 import type {IRoomDesktop} from '@habbo/ui/IRoomDesktop';
 import type {IRoomWidgetMessageListener} from '@habbo/ui/IRoomWidgetMessageListener';
 

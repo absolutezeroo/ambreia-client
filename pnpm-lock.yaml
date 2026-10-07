@@ -94,6 +94,28 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
+  packages/ambreia-ui:
+    dependencies:
+      '@ambreia/common':
+        specifier: workspace:*
+        version: link:../ambreia-common
+      eventemitter3:
+        specifier: ^5.0.1
+        version: 5.0.4
+    devDependencies:
+      '@napi-rs/canvas':
+        specifier: ^0.1.71
+        version: 0.1.100
+      linkedom:
+        specifier: ^0.18.9
+        version: 0.18.13
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+      vite:
+        specifier: ^6.0.0
+        version: 6.4.3(@types/node@22.19.10)(jiti@2.7.0)(lightningcss@1.33.0)(sass-embedded@1.97.3)(sass@1.97.3)(tsx@4.23.0)(yaml@2.9.0)
+
   packages/vortex-client:
     dependencies:
       '@ambreia/common':
@@ -102,6 +124,9 @@ importers:
       '@ambreia/net':
         specifier: workspace:*
         version: link:../ambreia-net
+      '@ambreia/ui':
+        specifier: workspace:*
+        version: link:../ambreia-ui
       eventemitter3:
         specifier: ^5.0.1
         version: 5.0.4
@@ -148,6 +173,9 @@ importers:
       '@ambreia/net':
         specifier: workspace:*
         version: link:../ambreia-net
+      '@ambreia/ui':
+        specifier: workspace:*
+        version: link:../ambreia-ui
       eventemitter3:
         specifier: ^5.0.1
         version: 5.0.4
@@ -176,21 +204,15 @@ importers:
       '@ambreia/common':
         specifier: workspace:*
         version: link:../ambreia-common
-      '@ambreia/net':
+      '@ambreia/ui':
         specifier: workspace:*
-        version: link:../ambreia-net
+        version: link:../ambreia-ui
       eventemitter3:
         specifier: ^5.0.1
         version: 5.0.4
       pixi.js:
         specifier: ^8.6.6
         version: 8.16.0
-      vortex-client:
-        specifier: workspace:*
-        version: link:../vortex-client
-      vortex-engine:
-        specifier: workspace:*
-        version: link:../vortex-engine
     devDependencies:
       '@types/node':
         specifier: ^22.10.0
@@ -213,6 +235,9 @@ importers:
       '@ambreia/net':
         specifier: workspace:*
         version: link:../ambreia-net
+      '@ambreia/ui':
+        specifier: workspace:*
+        version: link:../ambreia-ui
       '@napi-rs/canvas':
         specifier: ^0.1.71
         version: 0.1.100

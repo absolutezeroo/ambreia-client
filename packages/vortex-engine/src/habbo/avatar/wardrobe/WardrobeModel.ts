@@ -1,4 +1,4 @@
-import type {IWindowContainer} from '@core/window/IWindowContainer';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 import type {WardrobeOutfit} from '@habbo/communication/messages/parser/wardrobe/WardrobeOutfit';
 import type {HabboAvatarEditor} from '../HabboAvatarEditor';
 import type {ISideContentModel} from '../common/ISideContent';

@@ -3,7 +3,7 @@ import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import type {IContext} from '@core/runtime';
 import type {IConnection} from '@ambreia/net/connection/IConnection';
 import type {ILinkEventTracker} from '@core/runtime/events/ILinkEventTracker';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 import type {IHabboCommunicationManager} from '@habbo/communication/IHabboCommunicationManager';
 import type {ISessionDataManager} from '@habbo/session/ISessionDataManager';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';

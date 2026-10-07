@@ -1,5 +1,5 @@
-import type {IWindow} from '@core/window/IWindow';
-import {PropertyStruct} from '@core/window/utils';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import {PropertyStruct} from '@ambreia/ui/utils/index';
 import type {IGlazeVar} from '../state/VariablesModel';
 
 /**

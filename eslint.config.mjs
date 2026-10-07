@@ -227,6 +227,32 @@ export default tseslint.config(
         }
     },
     {
+        files: ['packages/ambreia-ui/src/**/*.ts'],
+        rules:
+        {
+            'no-restricted-imports': wall(
+                {
+                    regex: '^@(core|habbo|room|iid|ui)(/|$)|^@ambreia/(?!common/)|(^|/)vortex-(engine|client)(/|$)|(^|/)ambreia-[a-z]+/src(/|$)',
+                    message: `@ambreia/ui depends on @ambreia/common only (${WALLS_SPEC}).`
+                }
+            )
+        }
+    },
+    {
+        // Glaze is the window system's own editor: it stands on @ambreia/ui and @ambreia/common, so
+        // what it can do is what any other host of the window system can (spec §11, J3).
+        files: ['packages/vortex-glaze/src/**/*.ts'],
+        rules:
+        {
+            'no-restricted-imports': wall(
+                {
+                    regex: '^@(core|habbo|room|iid|client)(/|$)|^@ambreia/(?!(common|ui)/)|(^|/)vortex-(engine|client)(/|$)|(^|/)ambreia-[a-z]+/src(/|$)',
+                    message: `Glaze depends on @ambreia/ui and @ambreia/common only (${WALLS_SPEC}).`
+                }
+            )
+        }
+    },
+    {
         files: ['**/*.mjs'],
         languageOptions: { globals: { ...globals.node } }
     },

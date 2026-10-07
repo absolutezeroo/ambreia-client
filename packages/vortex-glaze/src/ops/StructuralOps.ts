@@ -1,6 +1,6 @@
-import type {IWindow} from '@core/window/IWindow';
-import type {WindowController} from '@core/window/WindowController';
-import {TYPE_NAME_TO_CODE} from '@core/window/enum/WindowType';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {WindowController} from '@ambreia/ui/WindowController';
+import {TYPE_NAME_TO_CODE} from '@ambreia/ui/enum/WindowType';
 import type {EditorState} from '../state/EditorState';
 import {specFor, type IWidgetSpec} from './WidgetCatalog';
 

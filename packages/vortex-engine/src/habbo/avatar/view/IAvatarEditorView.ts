@@ -1,7 +1,7 @@
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IFrameWindow} from '@core/window/components/IFrameWindow';
-import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {IFrameWindow} from '@ambreia/ui/components/IFrameWindow';
+import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
 import type {IAvatarEditorGridView} from '../common/ICategoryView';
 import type {AvatarEditorNameChangeView} from './AvatarEditorNameChangeView';
 
