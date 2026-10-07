@@ -24,6 +24,8 @@ tools/
 !packages/vortex-glaze/tools/*.mjs
 !packages/vortex-imager/tools/
 !packages/vortex-imager/tools/*.mjs
+!packages/ambreia-*/tools/
+!packages/ambreia-*/tools/**/*.mjs
 *.bundle
 *.log
 .DS_Store
