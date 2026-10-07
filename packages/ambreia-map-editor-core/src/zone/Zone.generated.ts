@@ -265,6 +265,7 @@ export interface ZoneNpc {
     interactions?: string[];
     animation?: string | null;
     icon?: string | null;
+    dialogue?: string | null;
     appearWhen?: ZoneCondition[];
 }
 /**

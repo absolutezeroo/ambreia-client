@@ -42,8 +42,7 @@ export class NpcInspectorUi implements IPanelUi
             new ChoiceBinding(_window, 'npc_rotation', () => String(npc()?.rotation ?? 2), r => set({rotation: Number(r)})).options(DIRECTIONS),
             ...SERVICES.map(service => new CheckBinding(_window, `npc_${service}`, () => services().includes(service),
                 on => set({interactions: on ? [...services(), service] : services().filter(s => s !== service)}))),
-            new TextBinding(_window, 'npc_dialogue', () => (npc() as {dialogue?: string | null} | null)?.dialogue ?? '',
-                dialogue => set({dialogue: dialogue.trim() || null} as Partial<ZoneNpc>)),
+            new TextBinding(_window, 'npc_dialogue', () => npc()?.dialogue ?? '', dialogue => set({dialogue: dialogue.trim() || null})),
             new ChoiceBinding(_window, 'npc_animation', () => npc()?.animation ?? '', animation => set({animation: animation || null})).options(ANIMATIONS),
             new ChoiceBinding(_window, 'npc_icon', () => npc()?.icon ?? '', icon => set({icon: icon || null})).options(ICONS)
         ];
