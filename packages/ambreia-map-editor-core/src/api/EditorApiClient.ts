@@ -1,9 +1,10 @@
 import type {IZoneFinding} from '../validation/IZoneFinding';
-import type {ZoneDocument} from '../zone/Zone.generated';
+import type {ZoneCell, ZoneDocument} from '../zone/Zone.generated';
 import {EditorApiError} from './EditorApiError';
 import type {IFurniturePaletteEntry} from './IFurniturePaletteEntry';
 import type {IZoneSaveResult} from './IZoneSaveResult';
 import type {IZoneSummary} from './IZoneSummary';
+import type {IZoneTestTicket} from './IZoneTestTicket';
 
 type Fetch = (input: string, init?: RequestInit) => Promise<Response>;
 
@@ -79,6 +80,15 @@ export class EditorApiClient
     async unlock(key: string): Promise<void>
     {
         await this.ok(await this.send('DELETE', `/api/editor/zones/${enc(key)}/lock`));
+    }
+
+    /**
+     * A ticket whose sign-in starts in the published zone, on <cell> when given (plan D18). The
+     * server answers 409 for a zone never published.
+     */
+    testTicket(key: string, cell: ZoneCell | null): Promise<IZoneTestTicket>
+    {
+        return this.json('POST', `/api/editor/zones/${enc(key)}/test${cell ? `?x=${cell.x}&y=${cell.y}` : ''}`);
     }
 
     palette(): Promise<IFurniturePaletteEntry[]>

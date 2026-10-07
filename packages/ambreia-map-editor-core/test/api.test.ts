@@ -53,3 +53,19 @@ test('requests carry the session cookie and the document as JSON', async () =>
     assert.equal(seen[0].init?.credentials, 'include');
     assert.equal(JSON.parse(String(seen[0].init?.body)).settings.id, 'v');
 });
+
+test('the test ticket names the cell when there is one', async () =>
+{
+    const seen: string[] = [];
+    const api = new EditorApiClient('http://x', async url =>
+    {
+        seen.push(url);
+
+        return new Response(JSON.stringify({ssoToken: 't', roomId: 5}));
+    });
+
+    assert.deepEqual(await api.testTicket('v', {x: 2, y: 3}), {ssoToken: 't', roomId: 5});
+    await api.testTicket('v', null);
+
+    assert.deepEqual(seen, ['http://x/api/editor/zones/v/test?x=2&y=3', 'http://x/api/editor/zones/v/test']);
+});

@@ -377,14 +377,21 @@ export class EditorApp
 
         try
         {
+            // One selected cell is where the tester appears; otherwise the zone's own arrival.
+            const cell = this.selection.cells.length === 1 ? this.selection.cells[0] : null;
+            const {ssoToken} = await this.api.testTicket(this.zone.key, cell);
+            const url = `${GAME_CLIENT}?sso=${encodeURIComponent(ssoToken)}`;
+
             if('__TAURI_INTERNALS__' in window)
             {
                 const {openUrl} = await import('@tauri-apps/plugin-opener');
 
-                await openUrl(GAME_CLIENT);
+                await openUrl(url);
             }
-            else window.open(GAME_CLIENT, '_blank');
-            this.status = `Client ouvert : la zone est la room ${this.zone.roomId}.`;
+            else window.open(url, '_blank');
+            this.status = cell
+                ? `Client ouvert dans la zone, sur la case ${cell.x}, ${cell.y}.`
+                : 'Client ouvert dans la zone, sur son arrivée.';
             this.log(this.status);
         }
         catch (error)
