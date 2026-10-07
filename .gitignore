@@ -16,6 +16,8 @@ dist/
 tools/
 !packages/vortex-client/tools/
 !packages/vortex-client/tools/*.mjs
+!packages/vortex-engine/tools/
+!packages/vortex-engine/tools/**/*.mjs
 !packages/vortex-glaze/tools/
 !packages/vortex-glaze/tools/*.mjs
 !packages/vortex-imager/tools/

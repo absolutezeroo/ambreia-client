@@ -1,5 +1,9 @@
 npx lint-staged
 
+# Message ids come from the emulator (docs/superpowers/specs/2026-10-07-client-architecture-design.md §6).
+# Unlike the optional checks below, this one is shared tooling and blocks the commit.
+node packages/vortex-engine/tools/gen-headers.mjs --check || exit 1
+
 # scripts/ is local-only tooling and is not part of the shared repository, so every
 # check below is optional: it runs for whoever has the script and is skipped silently
 # for everyone else. Without these guards a fresh clone fails its first commit with

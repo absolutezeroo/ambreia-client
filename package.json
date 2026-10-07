@@ -14,6 +14,8 @@
     "imager": "pnpm --filter vortex-imager start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "test": "node --test \"packages/*/tools/**/*.test.mjs\"",
+    "gen:headers": "node packages/vortex-engine/tools/gen-headers.mjs",
     "prepare": "husky"
   },
   "author": "Clayton",
