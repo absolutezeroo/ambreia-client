@@ -20,7 +20,6 @@ import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocaliza
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 import type {IAssetLibrary} from '@core/assets/IAssetLibrary';
 import type {IRoomUI} from '@habbo/ui/IRoomUI';
-import {AvatarEditorIdEnum} from '@habbo/avatar/enum/AvatarEditorIdEnum';
 import type {IVortex} from './IVortex';
 import type {IVortexLoadingScreen} from './IVortexLoadingScreen';
 
@@ -453,7 +452,8 @@ export class Vortex implements IVortex
     //   `Vortex.instance.openAvatarEditor()` from the console (App.ts exposes `window.Vortex`).
     openAvatarEditor(): void
     {
-        this._habboMain?.avatarEditor?.openEditor(AvatarEditorIdEnum.MAIN_EDITOR, null, null, true);
+        // The `avatareditor/open` route opens the main editor AND loads the user's own figure into it.
+        this._habboMain?.avatarEditor?.linkReceived('avatareditor/open');
     }
 
     /**

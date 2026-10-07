@@ -45,6 +45,13 @@ changer le format des layouts XML ; le gameplay RPG (specs filles de la spec uni
 | Features | Deux registres centraux obligatoires + pièges silencieux | `E/VortexMain.ts` (`prepareCore`, ex. `:910-911`) ; `HabboMessages.ts` ; `C/src/App.ts:683` `LIBRARY_IMAGE_NAMES` (oubli = image absente sans erreur) ; `switch` dans `E/habbo/room/RoomObjectFactory.ts`, `E/habbo/ui/RoomDesktop.ts`, `E/habbo/ui/RoomWidgetFactory.ts`, `E/habbo/ui/handler/ChatInputWidgetHandler.ts` |
 | Config | Un `Map<string,string>`, ~270 clés en chaînes brutes, défauts éparpillés, ordre fragile | `E/habbo/configuration/HabboConfigurationManager.ts:37` ; `E/VortexMain.ts:694-741` (dont `await Promise.resolve()`) ; hôte en dur dans `C/index.html` ; doublons dans `HabboProperty.ts` |
 
+**Après la coupe au noyau (2026-10-07, `docs/superpowers/plans/2026-10-07-coupe-noyau-client.bilan.md`).**
+Le moteur passe de 4 086 à 1 743 fichiers `.ts` (538 753 → 233 953 lignes). `habbo/` ne garde que
+`avatar` (rendu + éditeur), `communication`, `configuration`, `localization`, `room`, `session`, `ui`
+(bureau de room, bulle de nom), `window`, `utils`, `perf`. `HabboMessages.ts` n'enregistre plus que
+46 events et 14 composers, alignés 1:1 sur le serveur coupé. Les chiffres et preuves du tableau
+ci-dessus décrivent l'état d'avant la coupe (tag `pre-noyau-client`).
+
 ---
 
 ## 3. Les paquets et leurs règles — APPROUVÉ
@@ -302,6 +309,10 @@ commit). Les alias `@core`, `@habbo`, `@room`, `@iid` disparaissent au fil des e
 | J4 | `iso` | `room/` + rendu de `habbo/room` ; les 3 imports de `Vortex.ts` supprimés ; registres de logiques et de visualisations | Bac à sable `iso` qui charge une room ; l'imager rend une room sans faux `Vortex.ts` |
 | J5 | `kernel` | DI ; config Zod (sections, `enabled`, `legacy`) ; `defineFeature`, `FEATURES` ; échec bruyant ; introspection | `VortexMain.prepareCore` remplacé, démarrage identique |
 | J6 | `protocol` + `game` | Messages existants dans `protocol`, nouveau style réseau disponible ; reste de `habbo/` dans `game` ; features passées à `defineFeature` une par une ; `LIBRARY_IMAGE_NAMES` supprimé | Ajouter / retirer une feature = un dossier + une ligne |
+
+La coupe au noyau (entre J0 et J1) a retiré les modules de l'hôtel avant les extractions : J6 n'a
+plus à migrer que les features gardées (room, session, éditeur d'avatar, bulle de nom), et les 60
+messages du contrat au lieu de 870.
 
 Ensuite, le RPG reprend à **F1** de la spec unifiée sur cette base.
 

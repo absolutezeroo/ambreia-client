@@ -33,7 +33,7 @@ node install.mjs             # unpack assets (vortex-client-assets.zip); --pack 
 
 | Package | What it is |
 |---|---|
-| `packages/vortex-engine` | Engine: `core/` (runtime/DI, assets, network transport, window engine), `room/` (generic room engine), `habbo/` (game logic, messages), `iid/` (DI symbols) |
+| `packages/vortex-engine` | Engine: `core/` (runtime/DI, assets, network transport, window engine), `room/` (generic room engine), `habbo/` (game core: `avatar` incl. the editor, `communication`, `configuration`, `localization`, `room`, `session`, `ui` (room desktop, name bubble), `window`), `iid/` (DI symbols) |
 | `packages/vortex-client` | App shell: boot (`src/App.ts`), display classes, assets, `src/vortex-layouts/` (new window XML) |
 | `packages/vortex-glaze` | Live window-layout editor built on the client's own widgets |
 | `packages/vortex-imager` | Server-side avatar/furni/room renderer reusing the engine |
@@ -54,7 +54,11 @@ Aliases: `@core/` `@habbo/` `@room/` `@iid/` → engine `src/`; in the client al
   `git commit -m "…" -- <paths>`.
 - **Override `get events()` in a `Component` subclass**: it breaks DI events (use another name, e.g.
   `sessionEvents`).
-- **Re-port a removed feature** (RPG spec §7: wired, Builders Club, NFT, …); the fishing derby stays.
+- **Re-port a removed feature** (RPG spec §7: wired, Builders Club, NFT, …), nor a hotel module the
+  core cut removed (catalog, inventory, navigator, messenger, friends, groups, help, moderation,
+  quests, toolbar, notifications, sound, the fishing derby…). A new feature is written for the RPG; the old code is under
+  the git tag `pre-noyau-client` for reading. The network contract is the 60 messages in
+  `HabboMessages.ts`, aligned on the server.
 
 ## Conventions ESLint does not check
 
