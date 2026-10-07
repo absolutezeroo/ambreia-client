@@ -1,6 +1,6 @@
 ---
 name: design-habbo-window
-description: Use when designing, authoring or restyling a window, dialog, bubble, panel or UI screen for the Vortex Habbo client — including "make me a design like this one", "make it look Habbo", porting a non-Habbo mockup into the client's look, or building a new .xml window layout.
+description: Designs, authors and restyles Vortex window XML layouts (windows, dialogs, bubbles, panels, HUD, RPG screens in src/vortex-layouts/) in the Habbo look. Use when asked to design or build a window or UI screen, "make it look Habbo", reproduce a mockup or screenshot in the client's style, or write a new .xml window layout.
 ---
 
 # Designing a Habbo window

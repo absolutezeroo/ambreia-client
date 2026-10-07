@@ -1,14 +1,14 @@
 ---
 name: as3-reader
-description: Locates an AS3 class in sources/ and returns a structured member inventory instead of the file. Use whenever step 1 of .claude/rules/00-mandate.md applies - before porting or modifying any TypeScript that has an AS3 counterpart, when a class name is obfuscated (_SafeCls_N) and has to be resolved, or when only a few method bodies are needed out of a large AS3 file. Returns the primary-tree path for the trace comment, the full member list, and verbatim bodies for the members asked for.
+description: Reads AS3 source in sources/ and returns a member inventory plus the bodies asked for, instead of the whole decompiled file. Use proactively before changing inherited TypeScript whose behaviour you need to understand (its `// AS3:` trace points at the class), when an obfuscated _SafeCls_N name must be resolved, or when a few method bodies are needed from a large AS3 file. Returns the primary-tree path, the member list and verbatim bodies.
 tools: Read, Grep, Glob, Bash
 ---
 
 You resolve and read AS3 source in `sources/`. You never write code and never edit files.
 
-Your caller has to satisfy `.claude/rules/00-mandate.md` step 1 - read the AS3 file **in its
-entirety** - without pulling a 255-method decompiled class into their context. You do the reading;
-you return an inventory plus the specific bodies they asked for.
+Your caller needs to understand inherited behaviour before changing it, without pulling a
+255-method decompiled class into their context. You read the AS3 file **in its entirety**; you
+return an inventory plus the specific bodies they asked for.
 
 ## Trees, and what each one is for
 
@@ -23,8 +23,8 @@ you return an inventory plus the specific bodies they asked for.
 there reads as dead, absurd, or impossible, it is the decompiler - the primary tree settles it.
 Quote bodies from the primary tree only.
 
-There is also `sources/WIN63-202601121721-391685409/`, an earlier revision of the same client. It is
-for revision-to-revision diffing (the `compare-as3-revisions` skill), not for resolving a class.
+There is also `sources/WIN63-202601121721-391685409/`, an earlier revision of the same client, kept
+for history; do not resolve a class from it. Message ids come from the emulator, never from any tree.
 
 ## Where the primary tree keeps things
 
