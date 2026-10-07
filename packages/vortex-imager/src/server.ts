@@ -258,6 +258,26 @@ export function createServer(deps: IServerDependencies): FastifyInstance
         return renderFurniture(deps, request.query as ImagerQuery, reply);
     });
 
+    // Same query as above; answers where the furni's tile centre falls in that image, so an
+    // editor can stand the picture on its tile: `{x, y, width, height}` in output pixels.
+    app.get('/habbo-imaging/furniture-anchor', async (request, reply) =>
+    {
+        const rooms = deps.rooms;
+
+        if(rooms === null) return reply.code(503).send({error: 'The room pipeline is not available'});
+
+        try
+        {
+            const query = parseFurnitureRequest(request.query as ImagerQuery, (q) => rooms.resolveFurniture(q));
+
+            return reply.header('Cache-Control', CACHE_CONTROL).send(await rooms.furnitureAnchor(query));
+        }
+        catch (error)
+        {
+            return sendError(reply, error, 'furniture');
+        }
+    });
+
     // `/habbo-imaging/furniture/<class>.png` — the path form, for a CMS template that would
     // rather interpolate a name than build a query string.
     app.get<{ Params: IFurnitureParams }>('/habbo-imaging/furniture/:name', async (request, reply) =>

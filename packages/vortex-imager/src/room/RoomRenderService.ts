@@ -156,6 +156,34 @@ export class RoomRenderService
 	 */
     async renderFurniture(request: IFurnitureRequest): Promise<Buffer>
     {
+        return this.composeFurniture(request, async composite => canvasToPng(composite.canvas, request.zoom));
+    }
+
+    /**
+	 * Where the furni's own position falls in the image `renderFurniture()` returns for the same
+	 * request, in output pixels. That position is the centre of the furni's tile at its height, so
+	 * an editor that draws the image there puts the furni where the room would.
+	 */
+    async furnitureAnchor(request: IFurnitureRequest): Promise<{ x: number; y: number; width: number; height: number }>
+    {
+        return this.composeFurniture(request, async composite =>
+        {
+            const zoom = request.zoom > 0 ? request.zoom : 1;
+
+            return {
+                x: Math.round(-composite.originX * zoom),
+                y: Math.round(-composite.originY * zoom),
+                width: Math.max(1, Math.round(composite.canvas.width * zoom)),
+                height: Math.max(1, Math.round(composite.canvas.height * zoom))
+            };
+        });
+    }
+
+    private async composeFurniture<T>(
+        request: IFurnitureRequest,
+        finish: (composite: NonNullable<ReturnType<typeof composeSprites>>) => Promise<T>
+    ): Promise<T>
+    {
         const roomKey = this.nextRoomKey();
 
         try
@@ -210,7 +238,7 @@ export class RoomRenderService
                 throw new RoomRequestError(`"${request.type}" rendered nothing — no visible sprites`);
             }
 
-            return await canvasToPng(composite.canvas, request.zoom);
+            return await finish(composite);
         }
         finally
         {
