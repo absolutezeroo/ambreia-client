@@ -5,7 +5,7 @@
   "identifier": "com.ambreia.mapeditor",
   "build": {
     "beforeDevCommand": "pnpm dev",
-    "devUrl": "http://localhost:5174",
+    "devUrl": "http://localhost:5178",
     "beforeBuildCommand": "pnpm vite build",
     "frontendDist": "../dist"
   },

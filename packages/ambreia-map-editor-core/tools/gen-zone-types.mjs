@@ -57,7 +57,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url))
 
     if (process.argv.includes('--check'))
     {
-        if (readFileSync(outPath, 'utf8') !== ts)
+        // Git may check the file out with CRLF: only the content counts.
+        if (readFileSync(outPath, 'utf8').replace(/\r\n/g, '\n') !== ts)
         {
             console.error('Zone.generated.ts is stale: run pnpm --filter @ambreia/map-editor-core gen:types');
             process.exit(1);

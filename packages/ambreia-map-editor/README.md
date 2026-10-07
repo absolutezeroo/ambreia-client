@@ -7,7 +7,7 @@ Logiciel Windows (Tauri 2) au-dessus de `@ambreia/map-editor-core`. Spec :
 
 1. L'émulateur tourne, avec son API web sur `:8080` (le plugin `Vortex.WebApi` chargé).
 2. Depuis la racine du dépôt : `pnpm editor`. La première fois, Cargo compile la coquille (≈ 2 min).
-   Sans Rust : `pnpm editor:web`, puis ouvrir http://localhost:5174 dans le navigateur.
+   Sans Rust : `pnpm editor:web`, puis ouvrir http://localhost:5178 dans le navigateur.
 3. Se connecter avec un compte du site qui a le droit `world.zone.edit` (le rôle owner l'a).
 
 Le proxy de Vite envoie `/api` vers `http://127.0.0.1:8080` (`AMBREIA_API` pour un autre serveur).

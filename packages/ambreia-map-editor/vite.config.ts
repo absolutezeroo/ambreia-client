@@ -5,7 +5,7 @@ import {defineConfig} from 'vite';
 export default defineConfig({
     clearScreen: false,
     server: {
-        port: 5174,
+        port: 5178,
         strictPort: true,
         proxy: {'/api': {target: process.env.AMBREIA_API ?? 'http://127.0.0.1:8080', changeOrigin: true}}
     }

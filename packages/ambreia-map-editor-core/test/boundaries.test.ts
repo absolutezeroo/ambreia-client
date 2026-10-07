@@ -27,6 +27,7 @@ test('Zone.generated.ts matches the emulator schema', {skip: !existsSync(resolve
     const {generate} = await import('../tools/gen-zone-types.mjs');
     const schema = JSON.parse(readFileSync(resolve(root, '../../../vortex-rpg-emulator/schemas/zone.schema.json'), 'utf8'));
 
-    assert.equal(await generate(schema), readFileSync(join(root, 'src/zone/Zone.generated.ts'), 'utf8'),
+    // Git may check the file out with CRLF: only the content counts.
+    assert.equal(await generate(schema), readFileSync(join(root, 'src/zone/Zone.generated.ts'), 'utf8').replace(/\r\n/g, '\n'),
         'stale: run pnpm --filter @ambreia/map-editor-core gen:types');
 });
