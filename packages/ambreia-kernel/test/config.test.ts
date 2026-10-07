@@ -106,3 +106,15 @@ test('config.json that is not JSON is named', () =>
     assert.throws(() => parseConfigJson('{"app": '), (error: unknown) =>
         error instanceof ConfigError && error.issues[0].startsWith('config.json: '));
 });
+
+test('a misspelt key is named, not dropped: the feature would stay on without a word', () =>
+{
+    assert.throws(() => load({name: 'config.json', values: {'room-ui': {enabeld: false}, app: {server: {hots: 'x'}}}}), (error: unknown) =>
+    {
+        assert.ok(error instanceof ConfigError);
+        assert.ok(error.issues.some(issue => issue.startsWith('room-ui: ') && issue.includes('enabeld')), error.issues.join('\n'));
+        assert.ok(error.issues.some(issue => issue.startsWith('app.server: ') && issue.includes('hots')), error.issues.join('\n'));
+
+        return true;
+    });
+});

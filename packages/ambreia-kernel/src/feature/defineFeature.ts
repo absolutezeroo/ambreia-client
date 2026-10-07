@@ -30,6 +30,11 @@ export interface IFeature<S extends z.ZodObject = z.ZodObject, H = unknown>
     readonly id: string;
     readonly config?: S;
     readonly provides?: readonly IID<any>[];
+    /**
+     * Set when the host cannot run without the feature, with the reason: switching it off is then
+     * a boot error naming it, rather than a client that throws later (the login, for one).
+     */
+    readonly essential?: string;
     create(feature: IFeatureContext<z.infer<S>, H>): FeatureProduct | Promise<FeatureProduct>;
     /**
      * Runs once what create() made is attached, and is awaited before the next feature is made:

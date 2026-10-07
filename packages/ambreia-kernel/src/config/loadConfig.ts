@@ -92,7 +92,8 @@ export function loadConfig(sources: readonly IConfigSource[], sections: Readonly
     for(const [id, schema] of sections)
     {
         // Every section can be switched off (§5.3); the kernel adds the field, a feature never does.
-        parsed.set(id, parse(id, schema.extend({enabled: z.boolean().default(true)}), merged[id] ?? {}));
+        // Strict: Zod drops unknown keys by default, so `"enabeld": false` left the feature on in silence.
+        parsed.set(id, parse(id, schema.extend({enabled: z.boolean().default(true)}).strict(), merged[id] ?? {}));
     }
 
     if(issues.length > 0) throw new ConfigError(issues);

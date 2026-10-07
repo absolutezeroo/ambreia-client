@@ -72,6 +72,7 @@ export function emptyManagers(): IEngineManagers
  */
 const Configuration = feature({
     id: 'configuration',
+    essential: 'every manager after it reads it',
     provides: [IID_HabboConfigurationManager],
     create: ({context, host}) =>
     {
@@ -102,6 +103,7 @@ const Configuration = feature({
 /** The socket: the server from `app.server`, the ticket from `?sso=`. */
 const Communication = feature({
     id: 'communication',
+    essential: 'the client has no server without it',
     provides: [IID_HabboCommunicationManager],
     create: ({context, host}) =>
     {
@@ -124,6 +126,7 @@ const Communication = feature({
 /** The login flow and the incoming messages it handles. */
 const CommunicationDemo = feature({
     id: 'communication-demo',
+    essential: 'the client logs in through it (Vortex.connect)',
     create: ({context, app, host}) =>
     {
         const demo = new HabboCommunicationDemo(context);

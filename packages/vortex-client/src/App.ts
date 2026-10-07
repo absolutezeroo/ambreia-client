@@ -974,7 +974,8 @@ export class VortexApp
             throw error;
         }
 
-        this._startLink = kernelConfig.app.startLink ?? null;
+        // `??=`: a link the site posted while config.json was loading is newer than `?link=`.
+        this._startLink ??= kernelConfig.app.startLink ?? null;
 
         // 1. Load bundles, then bootstrap engine with AS3 embedded configuration assets
         const CORE_RATIO = 0.6;

@@ -156,3 +156,20 @@ test('create receives the host, and afterAttach runs once attached, before the n
     assert.equal(seenHost, host);
     assert.deepEqual(order, ['create first', 'after first', 'create second']);
 });
+
+test('an essential feature switched off stops the boot before anything is made, with its reason', async () =>
+{
+    let made = false;
+    const login = defineFeature({id: 'login', essential: 'the client logs in through it', create: () => null});
+    const other = defineFeature({id: 'other', create: () => { made = true; return null; }});
+    const features = [other, login];
+
+    await assert.rejects(bootFeatures(new CoreComponentContext(), features, config(features, {login: {enabled: false}})), (error: unknown) =>
+    {
+        assert.ok(error instanceof FeatureDependencyError);
+        assert.deepEqual(error.issues, ['Feature "login" cannot be switched off: the client logs in through it']);
+
+        return true;
+    });
+    assert.equal(made, false);
+});

@@ -52,6 +52,12 @@ export async function bootFeatures<H>(context: CoreComponentContext, features: r
     const reports: IFeatureReport[] = [];
     const requiring: Array<{id: string; requires: IID[]}> = [];
     const disabledProviders = new Map<IID, string>();
+    const switchedOff = features
+        .filter(feature => feature.essential !== undefined && !config.section(feature.id).enabled)
+        .map(feature => `Feature "${feature.id}" cannot be switched off: ${feature.essential}`);
+
+    // Before anything is made: an essential feature's partners use it in their afterAttach.
+    if(switchedOff.length > 0) throw new FeatureDependencyError(switchedOff);
 
     for(const feature of features)
     {

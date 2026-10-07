@@ -3,9 +3,10 @@ import {z} from 'zod';
 /**
  * The `app` section (spec §5): what the client needs before any feature — where the server is,
  * and what the page was opened with. Defaults computed from the page come from browserSources().
+ * Strict, like every section: a misspelt key is an error, not a silently ignored one.
  */
-export const AppSection = z.object({
-    server: z.object({
+export const AppSection = z.strictObject({
+    server: z.strictObject({
         /** A full `ws(s)://` URL, or a host the ports are tried on. */
         host: z.string().min(1),
         ports: z.array(z.number().int().positive()).default([40001])
