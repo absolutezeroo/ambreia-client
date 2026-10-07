@@ -13,6 +13,8 @@ import type {Container, Ticker} from 'pixi.js';
 import {Sprite, Texture} from 'pixi.js';
 import {Component, ComponentDependency, type IContext, type IUpdateReceiver} from '@core/runtime';
 import {Vortex} from '../../Vortex';
+import {createRoomRegistries} from '@room/object/createRoomRegistries';
+import {registerAllRoomObjects} from './modules/registerAllRoomObjects';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import type {IConnection} from '@ambreia/net/connection/IConnection';
 import type {IRoomEngine} from './IRoomEngine';
@@ -579,8 +581,11 @@ export class RoomEngine extends Component implements IRoomEngine,
     constructor(context: IContext, assetLibrary: IAssetLibrary | null = null) 
     {
         super(context, 0, assetLibrary);
-        this._roomObjectFactory = new RoomObjectFactory();
-        this._visualizationFactory = new RoomObjectVisualizationFactory();
+        // The object types come from registries filled by the room modules (J4).
+        const registries = createRoomRegistries([registerAllRoomObjects]);
+
+        this._roomObjectFactory = new RoomObjectFactory(registries.logics);
+        this._visualizationFactory = new RoomObjectVisualizationFactory(registries.visualizations);
         // AS3's factory reads `assets` off its own Component base; this port's factory is a plain
         // class, so the library is handed to it here (AnimatedPetVisualizationData.commonAssets).
         this._visualizationFactory.assets = assetLibrary;

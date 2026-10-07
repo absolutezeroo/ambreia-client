@@ -33,6 +33,8 @@ import type {IRoomObjectController} from '@room/object/IRoomObjectController';
 import {RoomContentLoadedEvent} from '@room/events/RoomContentLoadedEvent';
 import {RoomContentLoader} from '@habbo/room/RoomContentLoader';
 import {RoomObjectFactory} from '@habbo/room/RoomObjectFactory';
+import {createRoomRegistries} from '@room/object/createRoomRegistries';
+import {registerAllRoomObjects} from '@habbo/room/modules/registerAllRoomObjects';
 import {RoomObjectVisualizationFactory} from '@habbo/room/object/RoomObjectVisualizationFactory';
 import {RoomObjectCategoryEnum} from '@habbo/room/object/RoomObjectCategoryEnum';
 import {RoomVisualizationData} from '@habbo/room/object/visualization/room/RoomVisualizationData';
@@ -97,8 +99,9 @@ export class RoomStack
         context.configuration = configuration;
 
         const contentLoader = new RoomContentLoader();
-        const visualizationFactory = new RoomObjectVisualizationFactory();
-        const objectFactory = new RoomObjectFactory();
+        const registries = createRoomRegistries([registerAllRoomObjects]);
+        const visualizationFactory = new RoomObjectVisualizationFactory(registries.visualizations);
+        const objectFactory = new RoomObjectFactory(registries.logics);
         const roomManager = new RoomManager({
             property: (key: string): string => configuration.getProperty(key),
             flag: (key: string): boolean => configuration.getBoolean(key)
