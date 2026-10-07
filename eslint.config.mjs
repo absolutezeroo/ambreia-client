@@ -336,6 +336,18 @@ export default tseslint.config(
         }
     },
     {
+        files: ['packages/ambreia-map-editor/src/**/*.ts'],
+        rules:
+        {
+            'no-restricted-imports': wall(
+                {
+                    regex: '^@(core|habbo|room|iid|ui)(/|$)|^@ambreia/(?!common/|map-editor-core/)|(^|/)vortex-(engine|client)(/|$)|(^|/)ambreia-[a-z-]+/src(/|$)',
+                    message: `The map editor app builds on @ambreia/map-editor-core and @ambreia/common only (${WALLS_SPEC}).`
+                }
+            )
+        }
+    },
+    {
         files: ['**/*.mjs'],
         languageOptions: { globals: { ...globals.node } }
     },
