@@ -3,6 +3,17 @@ import tseslint from 'typescript-eslint';
 import stylistic from '@stylistic/eslint-plugin';
 import globals from 'globals';
 
+// Layer walls: docs/superpowers/specs/2026-10-07-client-architecture-design.md §3. Only the walls that
+// already hold are listed (measured 2026-10-07); each extraction milestone J1-J6 adds its package's
+// own with `wall()`. Flat config replaces a rule's options when a later block matches the same file,
+// so `wall()` always carries the engine-wide wall instead of relying on the block above it.
+const WALLS_SPEC = 'docs/superpowers/specs/2026-10-07-client-architecture-design.md §3';
+const ENGINE_NEVER_IMPORTS_CLIENT = {
+    regex: '^(@ui|@)/|^vortex-client(/|$)',
+    message: `The engine never imports the client (${WALLS_SPEC}).`
+};
+const wall = (...patterns) => ['error', { patterns: [ENGINE_NEVER_IMPORTS_CLIENT, ...patterns] }];
+
 export default tseslint.config(
     {
         ignores:
@@ -13,7 +24,10 @@ export default tseslint.config(
             '**/sources/**',
             '**/*.d.ts',
             // Generated files: the fix for a generated file is never to edit it.
-            '**/*.generated.ts'
+            '**/*.generated.ts',
+            // The dev server's esbuild output of the engine (vite-plugin-engine-bundle.mjs), gitignored.
+            // It held 1,821 of the 1,828 errors `eslint .` reported on 2026-10-07.
+            '**/.vortex-dev/**'
         ]
     },
     js.configs.recommended,
@@ -142,6 +156,38 @@ export default tseslint.config(
                 { selector: 'method', modifiers: ['protected'], format: ['camelCase'], leadingUnderscore: 'allow' },
                 { selector: 'method', format: ['camelCase'] }
             ]
+        }
+    },
+    {
+        files: ['packages/vortex-engine/src/**/*.ts'],
+        rules: { 'no-restricted-imports': wall() }
+    },
+    {
+        files: ['packages/vortex-engine/src/core/**/*.ts'],
+        rules:
+        {
+            'no-restricted-imports': wall(
+                {
+                    regex: '^@(habbo|room)(/|$)|(^|/)(habbo|room)/',
+                    message: `core/ is the bottom layer: it never imports habbo/ or room/ (${WALLS_SPEC}).`
+                },
+                {
+                    regex: '(^|/)Vortex(Main)?$',
+                    message: `core/ never imports the Vortex entry points (${WALLS_SPEC}).`
+                }
+            )
+        }
+    },
+    {
+        files: ['packages/vortex-engine/src/room/**/*.ts'],
+        rules:
+        {
+            'no-restricted-imports': wall(
+                {
+                    regex: '^@habbo(/|$)|(^|/)habbo/',
+                    message: `room/ is the generic engine: it never imports habbo/ (${WALLS_SPEC}).`
+                }
+            )
         }
     },
     {
