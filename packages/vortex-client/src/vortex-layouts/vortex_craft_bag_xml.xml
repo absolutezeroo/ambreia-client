@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_craft_bag_xml" width="284" height="190" version="0.1">
+  <window>
+    <border x="0" y="0" width="284" height="190" params="16" style="2" name="bag" color="0xefe2c6">
+      <children>
+        <text x="8" y="6" width="200" height="16" params="16" style="3" caption="${vortex.craft.bag}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0x356b1c" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <scrollable_itemgrid_vertical x="8" y="26" width="268" height="156" params="16" style="3" name="bag_grid"/>
+      </children>
+    </border>
+  </window>
+</layout>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_hud_party_xml" width="214" height="296" version="0.1">
+  <window>
+    <container x="0" y="0" width="214" height="296" params="1073741840" style="3" name="hud_party">
+      <children>
+        <itemlist_vertical x="0" y="0" width="214" height="296" params="16" style="3" name="party_list">
+          <children/>
+          <variables>
+            <var key="spacing" value="4" type="int"/>
+          </variables>
+        </itemlist_vertical>
+      </children>
+    </container>
+  </window>
+</layout>

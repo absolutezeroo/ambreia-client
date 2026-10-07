@@ -489,7 +489,8 @@ export class GlazeBoot
     {
         for(const key of imageBundle.listKeys('images/'))
         {
-            const name = key.split('/').pop()!.replace('.png', '');
+            // Same naming as the client's readImageAssets(): a subfolder stays in the name.
+            const name = key.slice('images/'.length).replace(/\.png$/, '');
 
             // Thunk, not a URL — same reason as the client's readImageAssets(): building
             // 2,891 blob URLs up front costs ~580 ms of editor boot for assets the edited

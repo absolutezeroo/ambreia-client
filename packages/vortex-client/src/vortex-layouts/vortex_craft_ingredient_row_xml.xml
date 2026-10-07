@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_craft_ingredient_row_xml" width="344" height="30" version="0.1">
+  <window>
+    <container x="0" y="0" width="344" height="30" params="144" style="3" name="ingredient_row">
+      <children>
+        <border x="0" y="0" width="30" height="30" params="16" style="2" color="0xe4e4dc">
+          <children>
+            <static_bitmap x="7" y="7" width="16" height="16" params="16" style="3" name="ingredient_icon" tags="%23icon">
+              <variables>
+                <var key="asset_uri" value="rpg/plants-crops/icon_53" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="zoom_x" value="0.5" type="Number"/>
+                <var key="zoom_y" value="0.5" type="Number"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <text x="38" y="7" width="224" height="16" params="16" style="3" name="ingredient_name" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="264" y="7" width="54" height="16" params="80" style="3" name="ingredient_count" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0x2b9a00" type="hex"/>
+            <var key="auto_size" value="right" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <static_bitmap x="324" y="7" width="16" height="16" params="16" style="3" name="state_icon" tags="%23icon" color="0x40b030">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/software_signs_checkmark_checkbox_ticked_todo_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+      </children>
+    </container>
+  </window>
+</layout>

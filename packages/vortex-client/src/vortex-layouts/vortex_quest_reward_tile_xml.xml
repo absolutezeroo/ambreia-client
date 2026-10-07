@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_quest_reward_tile_xml" width="128" height="48" version="0.1">
+  <window>
+    <border x="0" y="0" width="128" height="48" params="16" style="2" name="reward_tile" color="0xf2f2ec">
+      <children>
+        <border x="4" y="4" width="40" height="40" params="16" style="2" color="0xe4e4dc">
+          <children>
+            <static_bitmap x="4" y="3" width="32" height="32" params="16" style="3" name="icon" tags="%23icon">
+              <variables>
+                <var key="asset_uri" value="rpg/dungeon-objects/icon_37" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <text x="50" y="8" width="74" height="16" params="16" style="3" name="reward_name" caption="${vortex.ui.gold}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="50" y="25" width="74" height="16" params="16" style="3" name="reward_value" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0x666666" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </border>
+  </window>
+</layout>

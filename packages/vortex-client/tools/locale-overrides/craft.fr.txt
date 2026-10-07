@@ -1,0 +1,59 @@
+# The RPG windows' texts (craft, fr).
+#
+# Every static caption of the vortex_craft_*_xml layouts is a ${key} from this file; captions
+# that carry data (names, numbers, dates) ship empty and are set by the code. `%name%` placeholders
+# are filled through getLocalizationWithParams(key, default, 'name', value, ...).
+#
+# Apply them to a deployed gamedata file with:
+#
+#   node build-gamedata-locale.mjs --overrides=locale-overrides/craft.fr.txt \
+#        --merge-into=<gamedata>/external_flash_texts.json --write
+#
+vortex.craft.bag=Ressources (Sac)
+vortex.craft.bonus=Bonus actuel
+vortex.craft.collect=Récupérer
+vortex.craft.craft=Fabriquer
+vortex.craft.craft_more=Fabriquer +1
+vortex.craft.current=Objet en cours de fabrication
+vortex.craft.harvested=Objets récoltés
+vortex.craft.ingredients=Ingrédients requis
+vortex.craft.ingredients_per_unit=Ingrédients (par unité)
+vortex.craft.jobs=Métiers
+vortex.craft.main_resource=Ressource principale
+vortex.craft.max_reached=Niveau maximum atteint
+vortex.craft.milestones=Paliers de niveau
+vortex.craft.missing=Ingrédients insuffisants
+vortex.craft.orders.abandon=Abandonner
+vortex.craft.orders.accept=Accepter la commande
+vortex.craft.orders.accept_hint=Acceptez cette commande pour la réaliser.
+vortex.craft.orders.all=Toutes les commandes
+vortex.craft.orders.available=Disponible
+vortex.craft.orders.deadline=Délai
+vortex.craft.orders.deliver=Livrer
+vortex.craft.orders.delivered=Livrée
+vortex.craft.orders.empty=Aucune commande pour le moment.
+vortex.craft.orders.objectives=Objectifs de la commande
+vortex.craft.orders.public=Publiques
+vortex.craft.orders.public_order=Commande publique
+vortex.craft.orders.ready=Prête à livrer
+vortex.craft.orders.remaining=%time% restantes
+vortex.craft.quantity=Quantité :
+vortex.craft.queue=File de fabrication
+vortex.craft.queue.count=File de fabrication (%count%/%max%)
+vortex.craft.queue.empty=Aucune fabrication en cours.
+vortex.craft.queue_full=File de fabrication pleine
+vortex.craft.ready=Prêt !
+vortex.craft.recipes.all_categories=Toutes les catégories
+vortex.craft.recipes.search=Rechercher une recette...
+vortex.craft.result=Résultat
+vortex.craft.specialization=Spécialisation
+vortex.craft.speed_up=Accélérer (%cost% gemme)
+vortex.craft.tab.crafting=Fabrication
+vortex.craft.tab.orders=Commandes
+vortex.craft.tab.recipes=Recettes
+vortex.craft.time_per_unit=Temps de fabrication (par unité)
+vortex.craft.title=Métiers / Craft
+vortex.craft.tool=Outil actuel
+vortex.craft.unlocked=Recettes débloquées (%count%/%max%)
+vortex.craft.unlocked.label=Recettes débloquées
+vortex.craft.your_jobs=Vos métiers

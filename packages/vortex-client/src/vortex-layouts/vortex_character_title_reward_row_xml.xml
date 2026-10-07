@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_character_title_reward_row_xml" width="258" height="38" version="0.1">
+  <window>
+    <border x="0" y="0" width="258" height="38" params="16" style="2" name="title_reward_row" color="0xf2f2ec">
+      <children>
+        <static_bitmap x="9" y="12" width="16" height="16" params="16" style="3" name="icon" tags="%23icon" color="0x9ad0f0">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/media_eyeball_vision_shown_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <text x="34" y="3" width="218" height="30" params="16" style="3" name="label" caption="${vortex.character.titles.reward.display}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="multiline" value="true" type="Boolean"/>
+            <var key="word_wrap" value="true" type="Boolean"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </border>
+  </window>
+</layout>

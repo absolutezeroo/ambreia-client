@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_skill_action_slot_xml" width="52" height="68" version="0.1">
+  <window>
+    <container x="0" y="0" width="52" height="68" params="16" style="3" name="action_slot">
+      <children>
+        <border x="0" y="0" width="52" height="52" params="17" style="2" name="slot_box" dynamic_style="reward_track_item" color="0xe4e4dc">
+          <children>
+            <static_bitmap x="10" y="10" width="32" height="32" params="16" style="3" name="slot_icon" tags="%23icon">
+              <variables>
+                <var key="asset_uri" value="rpg/skills/warrior_skill_icon_1" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+            <text visible="false" x="0" y="16" width="52" height="20" params="16" style="3" caption="+">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="16" type="uint"/>
+                <var key="text_color" value="0xa0a098" type="hex"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text visible="false" x="26" y="35" width="24" height="16" params="16" style="3" name="slot_count" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="auto_size" value="right" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+        <text x="0" y="53" width="52" height="16" params="16" style="3" name="slot_key" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="auto_size" value="center" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </container>
+  </window>
+</layout>

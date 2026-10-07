@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_skill_upgrade_row_xml" width="440" height="20" version="0.1">
+  <window>
+    <container x="0" y="0" width="440" height="20" params="144" style="3" name="upgrade_row">
+      <children>
+        <static_bitmap x="2" y="3" width="16" height="16" params="16" style="3" tags="%23icon" color="0x50b030">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/arrows_up_north_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <text x="24" y="2" width="416" height="16" params="16" style="3" name="upgrade_txt" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </container>
+  </window>
+</layout>

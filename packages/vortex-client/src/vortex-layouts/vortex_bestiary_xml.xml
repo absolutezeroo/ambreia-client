@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_bestiary_xml" width="980" height="620" version="0.1">
+  <window>
+    <frame x="0" y="0" width="980" height="620" params="32769" style="3" name="bestiary_window" caption="${vortex.bestiary.title}" color="0x418db0">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <container x="0" y="4" width="974" height="577" params="16" style="3" name="content">
+          <children>
+            <border x="8" y="0" width="196" height="577" params="16" style="2" name="categories" color="0xe4eed8">
+              <children>
+                <text x="8" y="6" width="200" height="16" params="16" style="3" caption="${vortex.achievement.categories}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x3f6420" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <itemlist_vertical x="6" y="28" width="184" height="543" params="16" style="3" name="category_list">
+                  <children/>
+                  <variables>
+                    <var key="spacing" value="4" type="int"/>
+                  </variables>
+                </itemlist_vertical>
+              </children>
+            </border>
+            <border x="212" y="0" width="300" height="577" params="16" style="2" name="creatures">
+              <children>
+                <text x="8" y="6" width="200" height="16" params="16" style="3" caption="${vortex.bestiary.discovered}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x3f6420" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="222" y="6" width="70" height="16" params="16" style="3" name="discovered_count" caption="">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="auto_size" value="right" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <scrollable_itemlist_vertical x="6" y="28" width="288" height="543" params="16" style="3" name="creature_list">
+                  <children/>
+                  <variables>
+                    <var key="spacing" value="3" type="int"/>
+                  </variables>
+                </scrollable_itemlist_vertical>
+              </children>
+            </border>
+            <border x="520" y="0" width="446" height="577" params="16" style="2" name="creature_detail">
+              <children>
+                <border x="8" y="8" width="48" height="48" params="16" style="2" color="0xe4e4dc">
+                  <children>
+                    <static_bitmap x="8" y="8" width="32" height="32" params="16" style="3" name="creature_icon" tags="%23icon">
+                      <variables>
+                        <var key="asset_uri" value="rpg/materials/icon_01" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                  </children>
+                </border>
+                <text x="64" y="8" width="310" height="18" params="16" style="3" name="creature_name" caption="">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="14" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="380" y="10" width="58" height="16" params="16" style="3" name="creature_number" caption="">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="auto_size" value="right" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <itemlist_horizontal x="64" y="30" width="370" height="22" params="16" style="3" name="creature_tags">
+                  <children>
+                    <border x="0" y="0" width="112" height="20" params="16" style="2" name="type_pill" color="0xe3d2f6">
+                      <children>
+                        <text x="0" y="2" width="112" height="16" params="16" style="3" name="type_pill_txt" caption="${vortex.bestiary.type}">
+                          <variables>
+                            <var key="text_style" value="u_bold" type="String"/>
+                            <var key="font_size" value="11" type="uint"/>
+                            <var key="text_color" value="0x6a35a8" type="hex"/>
+                            <var key="auto_size" value="center" type="String"/>
+                            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                          </variables>
+                        </text>
+                      </children>
+                    </border>
+                    <border x="0" y="0" width="104" height="20" params="16" style="2" name="size_pill" color="0xe6e6de">
+                      <children>
+                        <text x="0" y="2" width="104" height="16" params="16" style="3" name="size_pill_txt" caption="${vortex.bestiary.size}">
+                          <variables>
+                            <var key="text_style" value="u_bold" type="String"/>
+                            <var key="font_size" value="11" type="uint"/>
+                            <var key="text_color" value="0x555555" type="hex"/>
+                            <var key="auto_size" value="center" type="String"/>
+                            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                          </variables>
+                        </text>
+                      </children>
+                    </border>
+                  </children>
+                  <variables>
+                    <var key="spacing" value="6" type="int"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </itemlist_horizontal>
+                <border x="8" y="62" width="211" height="170" params="16" style="2" name="stage" color="0xd8e6c8">
+                  <children>
+                    <static_bitmap x="41" y="21" width="128" height="128" params="16" style="3" name="creature_illustration" tags="%23icon">
+                      <variables>
+                        <var key="asset_uri" value="rpg/materials/icon_01" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                        <var key="zoom_x" value="4" type="Number"/>
+                        <var key="zoom_y" value="4" type="Number"/>
+                      </variables>
+                    </static_bitmap>
+                  </children>
+                </border>
+                <text x="227" y="62" width="211" height="86" params="16" style="3" name="creature_desc" caption="">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="multiline" value="true" type="Boolean"/>
+                    <var key="word_wrap" value="true" type="Boolean"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="227" y="152" width="200" height="16" params="16" style="3" caption="${vortex.bestiary.habitat}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x3f6420" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <border x="227" y="170" width="211" height="62" params="17" style="2" name="zone_link" dynamic_style="lifted_hover" color="0xe4e4dc">
+                  <children>
+                    <border x="0" y="0" width="183" height="62" params="16" style="2" color="0x404040">
+                      <children>
+                        <container x="1" y="1" width="181" height="60" params="16" style="3" clipping="true">
+                          <children>
+                            <static_bitmap x="0" y="0" width="153" height="78" params="16" style="3" name="zone_thumb" tags="%23icon">
+                              <variables>
+                                <var key="asset_uri" value="arena_12_preview" type="String"/>
+                                <var key="stretched_x" value="false" type="Boolean"/>
+                                <var key="stretched_y" value="false" type="Boolean"/>
+                                <var key="zoom_x" value="0.8" type="Number"/>
+                                <var key="zoom_y" value="0.8" type="Number"/>
+                              </variables>
+                            </static_bitmap>
+                          </children>
+                        </container>
+                      </children>
+                    </border>
+                    <container x="1" y="41" width="181" height="20" params="16" style="8" color="0xff000000" blend="0.55" background="true"/>
+                    <text x="6" y="43" width="171" height="16" params="16" style="3" name="zone_name" caption="">
+                      <variables>
+                        <var key="text_style" value="u_bold" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="text_color" value="0xffffff" type="hex"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <static_bitmap x="188" y="24" width="16" height="16" params="16" style="3" tags="%23icon">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_right_east_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                  </children>
+                </border>
+                <container x="8" y="240" width="430" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+                <text x="8" y="246" width="200" height="16" params="16" style="3" caption="${vortex.bestiary.loot}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x3f6420" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <itemlist_horizontal x="8" y="266" width="430" height="84" params="16" style="3" name="loot_list">
+                  <children/>
+                  <variables>
+                    <var key="spacing" value="8" type="int"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </itemlist_horizontal>
+                <container x="8" y="358" width="430" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+                <border x="8" y="366" width="110" height="203" params="16" style="2" name="weaknesses" color="0xf2f2ec">
+                  <children>
+                    <text x="8" y="6" width="200" height="16" params="16" style="3" caption="${vortex.bestiary.weaknesses}">
+                      <variables>
+                        <var key="text_style" value="u_bold" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="text_color" value="0x3f6420" type="hex"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <itemlist_vertical x="8" y="26" width="96" height="60" params="16" style="3" name="weakness_list">
+                      <children/>
+                      <variables>
+                        <var key="spacing" value="4" type="int"/>
+                      </variables>
+                    </itemlist_vertical>
+                  </children>
+                </border>
+                <border x="124" y="366" width="110" height="203" params="16" style="2" name="resistances" color="0xf2f2ec">
+                  <children>
+                    <text x="8" y="6" width="200" height="16" params="16" style="3" caption="${vortex.bestiary.resistances}">
+                      <variables>
+                        <var key="text_style" value="u_bold" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="text_color" value="0x3f6420" type="hex"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <itemlist_vertical x="8" y="26" width="96" height="60" params="16" style="3" name="resistance_list">
+                      <children/>
+                      <variables>
+                        <var key="spacing" value="4" type="int"/>
+                      </variables>
+                    </itemlist_vertical>
+                  </children>
+                </border>
+                <border x="240" y="366" width="198" height="203" params="16" style="2" name="tips" color="0xf2f2ec">
+                  <children>
+                    <static_bitmap x="8" y="6" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf0c040">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/software_speech_bubble_information_guide_tutorial_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                    <text x="30" y="6" width="200" height="16" params="16" style="3" caption="${vortex.bestiary.tips}">
+                      <variables>
+                        <var key="text_style" value="u_bold" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="text_color" value="0x3f6420" type="hex"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <itemlist_vertical x="8" y="26" width="182" height="167" params="16" style="3" name="tip_list">
+                      <children/>
+                      <variables>
+                        <var key="spacing" value="2" type="int"/>
+                      </variables>
+                    </itemlist_vertical>
+                  </children>
+                </border>
+              </children>
+            </border>
+          </children>
+        </container>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

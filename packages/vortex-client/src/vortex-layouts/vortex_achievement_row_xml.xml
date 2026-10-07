@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_achievement_row_xml" width="494" height="54" version="0.1">
+  <window>
+    <border x="0" y="0" width="494" height="54" params="17" style="2" name="achievement_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+      <children>
+        <border x="6" y="7" width="40" height="40" params="16" style="2" color="0xe4e4dc">
+          <children>
+            <static_bitmap x="10" y="10" width="20" height="20" params="16" style="3" name="achievement_icon" tags="%23icon">
+              <variables>
+                <var key="asset_uri" value="variablefx_icon_star_power" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <text x="54" y="8" width="220" height="16" params="16" style="3" name="achievement_name" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="54" y="26" width="220" height="16" params="16" style="3" name="achievement_desc" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x666666" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="282" y="20" width="120" height="13" params="0" style="3" name="progress">
+          <children>
+            <shape x="0" y="0" width="120" height="13" params="144" style="3" name="bg" color="0xd8d8d0">
+              <variables>
+                <var key="shape" value="round_rectangle" type="String"/>
+                <var key="radius" value="6" type="Number"/>
+                <var key="stroke_color" value="0xffa0a098" type="hex"/>
+                <var key="stroke_thickness" value="1" type="Number"/>
+              </variables>
+            </shape>
+            <shape x="0" y="0" width="120" height="13" params="16" style="3" name="fill" color="0x6cbb2d">
+              <variables>
+                <var key="shape" value="round_rectangle" type="String"/>
+                <var key="radius" value="6" type="Number"/>
+                <var key="stroke_color" value="0xff4e8a1e" type="hex"/>
+                <var key="stroke_thickness" value="1" type="Number"/>
+              </variables>
+            </shape>
+            <text x="0" y="-1" width="120" height="14" params="16" style="3" name="points" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x222222" type="hex"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </container>
+        <border x="408" y="15" width="24" height="24" params="16" style="2" name="done_box" color="0xc8e8a8">
+          <children>
+            <static_bitmap x="4" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0x40b030">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_signs_checkmark_checkbox_ticked_todo_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <border x="438" y="15" width="50" height="24" params="16" style="2" name="reward_box" color="0xe4e4dc">
+          <children>
+            <static_bitmap x="5" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf0c030">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/rpg_coin_gold_currency_money_gp_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+            <text x="24" y="4" width="24" height="16" params="16" style="3" name="reward_gold" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+      </children>
+    </border>
+  </window>
+</layout>

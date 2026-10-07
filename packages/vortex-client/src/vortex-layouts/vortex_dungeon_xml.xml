@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_dungeon_xml" width="860" height="552" version="0.1">
+  <window>
+    <frame x="0" y="0" width="860" height="552" params="32769" style="3" name="dungeon_window" caption="${vortex.dungeon.title}" color="0x418db0">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <tab_context x="6" y="2" width="840" height="32" params="17" style="3" name="tab_context">
+          <children>
+            <tab_button x="0" y="0" width="190" height="32" params="17" style="3" name="tab_dungeons" caption="${vortex.dungeon.tab.dungeons}" id="1"/>
+            <tab_button x="190" y="0" width="190" height="32" params="17" style="3" name="tab_group_finder" caption="${vortex.dungeon.tab.finder}" id="2"/>
+            <tab_button x="380" y="0" width="190" height="32" params="17" style="3" name="tab_registrations" caption="${vortex.dungeon.tab.registrations}" id="3"/>
+          </children>
+        </tab_context>
+        <container x="0" y="40" width="854" height="470" params="16" style="3" name="tab_content">
+          <children/>
+        </container>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_achievement_tab_titles_xml" width="1114" height="576" version="0.1">
+  <window>
+    <container x="0" y="0" width="1114" height="576" params="16" style="3" name="tab_root">
+      <children>
+        <border x="8" y="0" width="220" height="576" params="16" style="2" name="categories" color="0xf3ead0">
+          <children>
+            <text x="8" y="6" width="200" height="16" params="16" style="3" name="categories_title" caption="${vortex.achievement.categories}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x8a6510" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <itemlist_vertical x="6" y="26" width="208" height="544" params="16" style="3" name="category_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="4" type="int"/>
+              </variables>
+            </itemlist_vertical>
+          </children>
+        </border>
+        <text x="236" y="4" width="240" height="16" params="16" style="3" name="list_title" caption="${vortex.achievement.titles.count}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0x8a6510" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <dropmenu x="608" y="0" width="150" height="24" params="17" style="3" name="rarity_filter" caption="${vortex.ui.all_rarities}"/>
+        <border x="236" y="30" width="522" height="546" params="16" style="2" name="title_list_panel">
+          <children>
+            <scrollable_itemlist_vertical x="6" y="6" width="510" height="534" params="16" style="3" name="title_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="4" type="int"/>
+              </variables>
+            </scrollable_itemlist_vertical>
+          </children>
+        </border>
+        <border x="766" y="0" width="340" height="576" params="16" style="2" name="title_detail">
+          <children>
+            <border x="126" y="8" width="88" height="88" params="16" style="2" color="0xe4e4dc">
+              <children>
+                <static_bitmap x="28" y="28" width="32" height="32" params="16" style="3" name="title_emblem" tags="%23icon">
+                  <variables>
+                    <var key="asset_uri" value="rpg/runes-enchantments/icon_51" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <text x="8" y="102" width="324" height="18" params="16" style="3" name="title_name" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="14" type="uint"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <border x="131" y="124" width="78" height="18" params="16" style="2" name="rarity_pill" color="0xc8e8a8">
+              <children>
+                <text x="0" y="1" width="78" height="16" params="16" style="3" name="rarity_pill_txt" caption="${vortex.rarity.common}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x2b7000" type="hex"/>
+                    <var key="auto_size" value="center" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+            <text x="8" y="148" width="324" height="46" params="16" style="3" name="title_desc" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="multiline" value="true" type="Boolean"/>
+                <var key="word_wrap" value="true" type="Boolean"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container x="8" y="198" width="324" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+            <text x="8" y="204" width="200" height="16" params="16" style="3" caption="${vortex.character.titles.conditions}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x8a6510" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <static_bitmap x="13" y="231" width="16" height="16" params="16" style="3" tags="%23icon" color="0x9ad0f0">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/media_eyeball_vision_shown_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+            <text x="38" y="224" width="284" height="30" params="16" style="3" name="condition_txt" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="multiline" value="true" type="Boolean"/>
+                <var key="word_wrap" value="true" type="Boolean"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container x="8" y="258" width="290" height="13" params="0" style="3" name="condition_progress">
+              <children>
+                <shape x="0" y="0" width="290" height="13" params="144" style="3" name="bg" color="0xd8d8d0">
+                  <variables>
+                    <var key="shape" value="round_rectangle" type="String"/>
+                    <var key="radius" value="6" type="Number"/>
+                    <var key="stroke_color" value="0xffa0a098" type="hex"/>
+                    <var key="stroke_thickness" value="1" type="Number"/>
+                  </variables>
+                </shape>
+                <shape x="0" y="0" width="290" height="13" params="16" style="3" name="fill" color="0x6cbb2d">
+                  <variables>
+                    <var key="shape" value="round_rectangle" type="String"/>
+                    <var key="radius" value="6" type="Number"/>
+                    <var key="stroke_color" value="0xff4e8a1e" type="hex"/>
+                    <var key="stroke_thickness" value="1" type="Number"/>
+                  </variables>
+                </shape>
+                <text x="0" y="-1" width="290" height="14" params="16" style="3" name="points" caption="">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x222222" type="hex"/>
+                    <var key="auto_size" value="center" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </container>
+            <border x="306" y="252" width="26" height="26" params="16" style="2" name="condition_done" color="0xc8e8a8">
+              <children>
+                <static_bitmap x="5" y="5" width="16" height="16" params="16" style="3" tags="%23icon" color="0x40b030">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_signs_checkmark_checkbox_ticked_todo_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <container x="8" y="288" width="324" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+            <text x="8" y="294" width="200" height="16" params="16" style="3" caption="${vortex.ui.reward}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x8a6510" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container x="8" y="312" width="324" height="48" params="16" style="3" name="reward_slot">
+              <children/>
+            </container>
+            <text x="8" y="368" width="200" height="16" params="16" style="3" caption="${vortex.achievement.titles.effect}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x8a6510" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container x="8" y="386" width="324" height="48" params="16" style="3" name="effect_slot">
+              <children/>
+            </container>
+            <button_thick x="8" y="536" width="324" height="28" params="131089" style="6" color="0xd23a2a" name="remove_title_button" caption="${vortex.character.titles.remove}" width_min="324" width_max="324"/>
+            <button_thick visible="false" x="8" y="536" width="324" height="28" params="131089" style="6" color="0x2a8fd6" name="equip_title_button" caption="${vortex.character.titles.equip}" width_min="324" width_max="324"/>
+            <button_thick visible="false" x="8" y="536" width="324" height="28" params="131089" style="3" name="locked_title_button" caption="${vortex.character.titles.locked}" width_min="324" width_max="324"/>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

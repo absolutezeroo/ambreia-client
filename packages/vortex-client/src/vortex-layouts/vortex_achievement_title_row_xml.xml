@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_achievement_title_row_xml" width="494" height="60" version="0.1">
+  <window>
+    <border x="0" y="0" width="494" height="60" params="17" style="2" name="title_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+      <children>
+        <border x="6" y="6" width="48" height="48" params="16" style="2" color="0xe4e4dc">
+          <children>
+            <static_bitmap x="8" y="8" width="32" height="32" params="16" style="3" name="title_emblem" tags="%23icon">
+              <variables>
+                <var key="asset_uri" value="rpg/runes-enchantments/icon_51" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <itemlist_horizontal x="62" y="8" width="300" height="20" params="16" style="3" name="title_line">
+          <children>
+            <text x="0" y="0" width="10" height="16" params="16" style="3" name="title_name" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="12" type="uint"/>
+                <var key="auto_size" value="left" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <border x="0" y="0" width="78" height="18" params="16" style="2" name="rarity_pill" color="0xc8e8a8">
+              <children>
+                <text x="0" y="1" width="78" height="16" params="16" style="3" name="rarity_pill_txt" caption="${vortex.rarity.common}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x2b7000" type="hex"/>
+                    <var key="auto_size" value="center" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+          </children>
+          <variables>
+            <var key="spacing" value="8" type="int"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </itemlist_horizontal>
+        <text x="62" y="34" width="324" height="16" params="16" style="3" name="title_desc" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x666666" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="416" y="18" width="66" height="24" params="16" style="2" name="active_pill" color="0xb8e090">
+          <children>
+            <text x="0" y="4" width="66" height="16" params="16" style="3" name="active_pill_txt" caption="${vortex.ui.active}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x2b7000" type="hex"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+        <button visible="false" x="402" y="17" width="84" height="24" params="131089" style="6" color="0x2a8fd6" name="activate_button" caption="${vortex.ui.activate}" width_min="84" width_max="84"/>
+        <static_bitmap visible="false" x="457" y="22" width="16" height="16" params="16" style="3" name="lock_icon" tags="%23icon" color="0xd8a030">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/tools_crafting_padlock_locked_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+      </children>
+    </border>
+  </window>
+</layout>

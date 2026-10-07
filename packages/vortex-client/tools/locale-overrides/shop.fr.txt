@@ -1,0 +1,25 @@
+# The RPG windows' texts (shop, fr).
+#
+# Every static caption of the vortex_shop_*_xml layouts is a ${key} from this file; captions
+# that carry data (names, numbers, dates) ship empty and are set by the code. `%name%` placeholders
+# are filled through getLocalizationWithParams(key, default, 'name', value, ...).
+#
+# Apply them to a deployed gamedata file with:
+#
+#   node build-gamedata-locale.mjs --overrides=locale-overrides/shop.fr.txt \
+#        --merge-into=<gamedata>/external_flash_texts.json --write
+#
+vortex.shop.buyback=Racheter
+vortex.shop.buyback_info=Les objets que vous avez vendus restent disponibles au rachat pendant une durée limitée. Une fois le délai écoulé, ils sont définitivement supprimés.
+vortex.shop.buyback_price=Prix de rachat
+vortex.shop.category.misc=Divers
+vortex.shop.empty.buyback=Vous n'avez rien vendu récemment.
+vortex.shop.inventory=Votre inventaire
+vortex.shop.max=Max
+vortex.shop.merchant_note=Le marchand reprend cet objet (moins %percent% % de commission).
+vortex.shop.original_price=Prix de vente original
+vortex.shop.recently_sold=Objets récemment vendus
+vortex.shop.sold_on=Vendu le
+vortex.shop.tab.buyback=Rachat
+vortex.shop.title=Boutique
+vortex.shop.total_sale=Prix de vente total

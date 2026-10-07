@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_market_tab_buy_xml" width="1018" height="556" version="0.1">
+  <window>
+    <container x="0" y="0" width="1018" height="556" params="16" style="3" name="tab_root">
+      <children>
+        <border x="8" y="0" width="200" height="556" params="16" style="2" name="categories" color="0xdcefe4">
+          <children>
+            <border x="6" y="8" width="188" height="24" params="16" style="2" color="0xe4e4dc">
+              <children>
+                <static_bitmap x="4" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0x888880">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_magnifier_zoom_looking_magnifying_glass_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <input x="24" y="4" width="158" height="16" params="1" style="0" name="search_input" caption="${vortex.market.search}"/>
+              </children>
+            </border>
+            <itemlist_vertical x="6" y="40" width="188" height="510" params="16" style="3" name="category_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="2" type="int"/>
+              </variables>
+            </itemlist_vertical>
+          </children>
+        </border>
+        <border x="216" y="0" width="486" height="556" params="16" style="2" name="listings">
+          <children>
+            <border x="8" y="8" width="470" height="24" params="16" style="2" name="column_header" color="0xe6e6de">
+              <children>
+                <text x="42" y="4" width="150" height="16" params="16" style="3" caption="${vortex.market.column.item}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="auto_size" value="left" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="198" y="4" width="80" height="16" params="16" style="3" caption="${vortex.market.column.unit_price}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="auto_size" value="left" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="282" y="4" width="46" height="16" params="16" style="3" caption="${vortex.market.column.quantity}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="auto_size" value="center" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="332" y="4" width="90" height="16" params="16" style="3" caption="${vortex.market.column.seller}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="auto_size" value="left" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+            <itemlist_vertical x="8" y="36" width="470" height="480" params="16" style="3" name="listing_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="3" type="int"/>
+              </variables>
+            </itemlist_vertical>
+            <container x="8" y="524" width="470" height="24" params="16" style="3" name="pager_slot">
+              <children/>
+            </container>
+          </children>
+        </border>
+        <border x="710" y="0" width="300" height="556" params="16" style="2" name="item_detail">
+          <children>
+            <container x="8" y="8" width="284" height="84" params="16" style="3" name="item_header_slot">
+              <children/>
+            </container>
+            <container x="8" y="96" width="284" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+            <text x="8" y="102" width="140" height="16" params="16" style="3" caption="${vortex.market.lowest_price}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container x="8" y="118" width="120" height="16" params="16" style="3" name="lowest_price">
+              <children>
+                <static_bitmap x="0" y="0" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf0c030">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/rpg_coin_gold_currency_money_gp_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <text x="18" y="0" width="102" height="16" params="16" style="3" name="lowest_price_txt" caption="">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </container>
+            <text x="160" y="102" width="130" height="16" params="16" style="3" caption="${vortex.market.offers_available}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="160" y="118" width="120" height="16" params="16" style="3" name="offer_count" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container x="8" y="140" width="284" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+            <text x="8" y="146" width="200" height="16" params="16" style="3" caption="${vortex.market.current_offers}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x1f6e4e" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="12" y="164" width="100" height="16" params="16" style="3" caption="${vortex.market.column.unit_price}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="118" y="164" width="80" height="16" params="16" style="3" caption="${vortex.market.column.quantity}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <itemlist_vertical x="8" y="180" width="284" height="150" params="16" style="3" name="offer_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="2" type="int"/>
+              </variables>
+            </itemlist_vertical>
+            <border x="8" y="334" width="284" height="214" params="16" style="2" name="sale_form" color="0xe2f0e7">
+              <children>
+                <text x="8" y="6" width="200" height="16" params="16" style="3" caption="${vortex.market.sell_this}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x1f6e4e" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="8" y="28" width="120" height="16" params="16" style="3" caption="${vortex.market.column.unit_price}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <border x="8" y="44" width="88" height="24" params="16" style="2" color="0xffffff">
+                  <children>
+                    <static_bitmap x="4" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf0c030">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/rpg_coin_gold_currency_money_gp_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                    <input x="24" y="4" width="58" height="16" params="1" style="0" name="price_input" caption="50"/>
+                  </children>
+                </border>
+                <text x="102" y="28" width="60" height="16" params="16" style="3" caption="${vortex.market.column.quantity}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <border x="102" y="44" width="48" height="24" params="16" style="2" color="0xffffff">
+                  <children>
+                    <input x="6" y="4" width="36" height="16" params="1" style="0" name="qty_input" caption="1"/>
+                  </children>
+                </border>
+                <text x="156" y="28" width="120" height="16" params="16" style="3" caption="${vortex.market.duration}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <dropmenu x="156" y="44" width="112" height="24" params="17" style="3" name="duration_menu" caption="${vortex.market.duration.hours}"/>
+                <container x="8" y="78" width="268" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+                <text x="8" y="86" width="160" height="16" params="16" style="3" name="commission_label" caption="${vortex.market.commission}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <container x="8" y="104" width="100" height="16" params="16" style="3" name="commission">
+                  <children>
+                    <static_bitmap x="0" y="0" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf0c030">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/rpg_coin_gold_currency_money_gp_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                    <text x="18" y="0" width="82" height="16" params="16" style="3" name="commission_txt" caption="">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </container>
+                <button_thick x="114" y="92" width="160" height="28" params="131089" style="6" color="0x0aa00" name="sell_button" caption="${vortex.market.sell}" width_min="160" width_max="160"/>
+                <text x="8" y="134" width="268" height="30" params="16" style="3" name="sell_hint" caption="${vortex.market.sell_hint}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="multiline" value="true" type="Boolean"/>
+                    <var key="word_wrap" value="true" type="Boolean"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

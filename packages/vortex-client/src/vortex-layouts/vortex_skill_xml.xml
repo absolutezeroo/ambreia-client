@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_skill_xml" width="870" height="600" version="0.1">
+  <window>
+    <frame x="0" y="0" width="870" height="600" params="32769" style="3" name="skills_window" caption="${vortex.skill.title}" color="0x418db0">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <tab_context x="6" y="2" width="850" height="32" params="17" style="3" name="tab_context">
+          <children>
+            <tab_button x="0" y="0" width="170" height="32" params="17" style="3" name="tab_active" caption="${vortex.skill.tab.active}" id="1"/>
+            <tab_button x="170" y="0" width="170" height="32" params="17" style="3" name="tab_passive" caption="${vortex.skill.tab.passive}" id="2"/>
+            <tab_button x="340" y="0" width="170" height="32" params="17" style="3" name="tab_specs" caption="${vortex.skill.tab.specs}" id="3"/>
+            <tab_button x="510" y="0" width="170" height="32" params="17" style="3" name="tab_shortcuts" caption="${vortex.skill.tab.shortcuts}" id="4"/>
+          </children>
+        </tab_context>
+        <container x="0" y="40" width="864" height="516" params="16" style="3" name="tab_content">
+          <children/>
+        </container>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

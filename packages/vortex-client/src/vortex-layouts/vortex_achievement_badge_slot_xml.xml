@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_achievement_badge_slot_xml" width="94" height="94" version="0.1">
+  <window>
+    <border x="0" y="0" width="94" height="94" params="17" style="2" name="badge_slot" dynamic_style="reward_track_item" color="0xe4e4dc">
+      <children>
+        <widget x="21" y="21" width="52" height="52" params="16" style="3" name="badge_image">
+          <variables>
+            <var key="widget_type" value="badge_image" type="String"/>
+            <var key="badge_image:badge_id" value="ACH_Login1" type="String"/>
+            <var key="badge_image:pivot_point" value="center" type="String"/>
+          </variables>
+        </widget>
+        <static_bitmap visible="false" x="73" y="72" width="16" height="16" params="16" style="3" name="lock_icon" tags="%23icon" color="0xd8a030">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/tools_crafting_padlock_locked_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+      </children>
+    </border>
+  </window>
+</layout>

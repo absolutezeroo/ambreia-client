@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_shop_quantity_max_xml" width="286" height="26" version="0.1">
+  <window>
+    <container x="0" y="0" width="286" height="26" params="144" style="3" name="quantity_max">
+      <children>
+        <container x="0" y="0" width="152" height="26" params="16" style="3" name="quantity_slot">
+          <children/>
+        </container>
+        <button x="158" y="0" width="56" height="24" params="131089" style="3" name="max_button" caption="${vortex.shop.max}" width_min="56" width_max="56"/>
+      </children>
+    </container>
+  </window>
+</layout>

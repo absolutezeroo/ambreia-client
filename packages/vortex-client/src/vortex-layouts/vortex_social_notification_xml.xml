@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_social_notification_xml" width="320" height="50" version="0.1">
+  <window>
+    <border x="0" y="0" width="320" height="50" params="17" style="2" name="notification_row" dynamic_style="lifted_hover" color="0xfbf6e6">
+      <children>
+        <border x="4" y="6" width="38" height="38" params="16" style="2" color="0xe4e4dc">
+          <children>
+            <widget x="2" y="1" width="34" height="36" params="16" style="3" name="head_image">
+              <variables>
+                <var key="widget_type" value="avatar_image" type="String"/>
+                <var key="avatar_image:only_head" value="true" type="Boolean"/>
+                <var key="avatar_image:cropped" value="true" type="Boolean"/>
+              </variables>
+            </widget>
+          </children>
+        </border>
+        <text x="50" y="4" width="190" height="30" params="16" style="3" name="notification_txt" caption="${vortex.notifications.group_invite}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="multiline" value="true" type="Boolean"/>
+            <var key="word_wrap" value="true" type="Boolean"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="50" y="34" width="190" height="16" params="16" style="3" name="notification_time" caption="${vortex.ui.ago.minutes}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x666666" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <shape x="310" y="6" width="9" height="9" params="16" style="3" name="unread_dot" color="0x2a8fd6">
+          <variables>
+            <var key="shape" value="round_rectangle" type="String"/>
+            <var key="radius" value="4" type="Number"/>
+            <var key="stroke_color" value="0xff444444" type="hex"/>
+            <var key="stroke_thickness" value="1" type="Number"/>
+          </variables>
+        </shape>
+        <border x="250" y="13" width="24" height="24" params="17" style="2" name="accept_button" dynamic_style="button" color="0x4caa30">
+          <children>
+            <static_bitmap x="4" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0xffffff">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_signs_checkmark_checkbox_ticked_todo_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <border x="280" y="13" width="24" height="24" params="17" style="2" name="decline_button" dynamic_style="button" color="0xd84040">
+          <children>
+            <static_bitmap x="5" y="5" width="16" height="16" params="16" style="3" tags="%23icon" color="0xffffff">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_signs_maths_multiplication_x_crossout_checkmark_cancel_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+      </children>
+    </border>
+  </window>
+</layout>

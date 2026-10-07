@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_dungeon_listing_row_xml" width="314" height="74" version="0.1">
+  <window>
+    <border x="0" y="0" width="314" height="74" params="17" style="2" name="listing_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+      <children>
+        <border x="4" y="5" width="86" height="44" params="16" style="2" color="0x404040">
+          <children>
+            <container x="1" y="1" width="84" height="42" params="16" style="3" clipping="true">
+              <children>
+                <static_bitmap x="0" y="0" width="84" height="43" params="16" style="3" name="thumb" tags="%23icon">
+                  <variables>
+                    <var key="asset_uri" value="arena_12_preview" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="zoom_x" value="0.44" type="Number"/>
+                    <var key="zoom_y" value="0.44" type="Number"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </container>
+          </children>
+        </border>
+        <border x="4" y="51" width="86" height="18" params="16" style="2" name="difficulty" color="0xb8e090">
+          <children>
+            <text x="0" y="1" width="86" height="16" params="16" style="3" name="difficulty_txt" caption="${vortex.ui.difficulty.normal}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x2b7000" type="hex"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+        <text x="96" y="4" width="124" height="16" params="16" style="3" name="dungeon_name" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <static_bitmap x="94" y="20" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf0c030">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/hats_crown_king_monarch_ruler_emperor_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <text x="112" y="20" width="100" height="16" params="16" style="3" name="leader_name" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="96" y="36" width="90" height="16" params="16" style="3" name="dungeon_levels" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0x666666" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <static_bitmap x="186" y="37" width="16" height="16" params="16" style="3" tags="%23icon" color="0x6aa0e0">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/travel_person_people_three_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <text x="202" y="36" width="24" height="16" params="16" style="3" name="player_count" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <static_bitmap x="232" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0x6a9fd8">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/rpg_item_stat_shield_defense_armor_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <text x="224" y="23" width="30" height="16" params="16" style="3" name="role_count_0" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0x2b9a00" type="hex"/>
+            <var key="auto_size" value="center" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <static_bitmap x="262" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0xe03a3a">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/rpg_stat_hp_health_heart_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <text x="254" y="23" width="30" height="16" params="16" style="3" name="role_count_1" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0xc30000" type="hex"/>
+            <var key="auto_size" value="center" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <static_bitmap x="291" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0xd04a3a">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/rpg_crossed_swords_duel_pvp_combat_battle_war_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <text x="284" y="23" width="30" height="16" params="16" style="3" name="role_count_2" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0xc30000" type="hex"/>
+            <var key="auto_size" value="center" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="96" y="54" width="92" height="16" params="16" style="3" name="note" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x666666" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border visible="false" x="192" y="52" width="116" height="18" params="16" style="2" name="listing_state" color="0xe4e4dc">
+          <children>
+            <text x="0" y="1" width="116" height="16" params="16" style="3" name="listing_state_txt" caption="${vortex.dungeon.listing.full}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+      </children>
+    </border>
+  </window>
+</layout>

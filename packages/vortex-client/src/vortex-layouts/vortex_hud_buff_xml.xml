@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_hud_buff_xml" width="28" height="28" version="0.1">
+  <window>
+    <container x="0" y="0" width="28" height="28" params="16" style="3" name="buff">
+      <children>
+        <border x="0" y="0" width="28" height="28" params="16" style="3" name="buff_box" color="0x201e19" blend="0.8">
+          <children>
+            <static_bitmap x="7" y="6" width="16" height="16" params="16" style="3" name="buff_icon" tags="%23icon" color="0x6a9fd8">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/rpg_item_stat_shield_defense_armor_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

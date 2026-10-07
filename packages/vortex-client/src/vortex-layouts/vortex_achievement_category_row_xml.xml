@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_achievement_category_row_xml" width="208" height="52" version="0.1">
+  <window>
+    <border x="0" y="0" width="208" height="52" params="17" style="2" name="category_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+      <children>
+        <border x="5" y="5" width="42" height="42" params="16" style="2" color="0xe4e4dc">
+          <children>
+            <static_bitmap x="11" y="11" width="20" height="20" params="16" style="3" name="category_icon" tags="%23icon">
+              <variables>
+                <var key="asset_uri" value="variablefx_icon_star_power" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <text x="54" y="9" width="128" height="16" params="16" style="3" name="category_name" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="54" y="26" width="128" height="16" params="16" style="3" name="category_count" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0x666666" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <static_bitmap visible="false" x="186" y="17" width="16" height="16" params="16" style="3" name="selected_arrow" tags="%23icon">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_right_east_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+      </children>
+    </border>
+  </window>
+</layout>

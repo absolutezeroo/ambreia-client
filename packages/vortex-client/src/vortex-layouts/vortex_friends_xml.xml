@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_friends_xml" width="380" height="600" version="0.1">
+  <window>
+    <frame x="0" y="0" width="380" height="600" params="32769" style="3" name="friends_window" caption="${vortex.friends.title}" color="0x418db0">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <tab_context x="6" y="2" width="360" height="32" params="17" style="3" name="tab_context">
+          <children>
+            <tab_button x="0" y="0" width="120" height="32" params="17" style="3" name="tab_friends" caption="${vortex.friends.title}" id="1"/>
+            <tab_button x="120" y="0" width="120" height="32" params="17" style="3" name="tab_requests" caption="${vortex.friends.tab.requests}" id="2"/>
+            <tab_button x="240" y="0" width="120" height="32" params="17" style="3" name="tab_blocked" caption="${vortex.friends.tab.blocked}" id="3"/>
+          </children>
+        </tab_context>
+        <container x="0" y="40" width="374" height="521" params="16" style="3" name="tab_content">
+          <children/>
+        </container>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

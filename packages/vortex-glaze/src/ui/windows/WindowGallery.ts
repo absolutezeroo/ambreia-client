@@ -88,7 +88,7 @@ export class WindowGallery
     {
         const bundle = this._state.runtime.imageBundle;
         const names = bundle.listKeys('images/')
-            .map((k) => k.split('/').pop()!.replace(/\.png$/, ''))
+            .map((k) => k.slice('images/'.length).replace(/\.png$/, ''))
             .sort()
             .slice(0, MAX_IMAGES);
 

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_hud_quest_tracker_xml" width="350" height="180" version="0.1">
+  <window>
+    <container x="0" y="0" width="350" height="180" params="1073741840" style="3" name="hud_quest_tracker">
+      <children>
+        <border x="0" y="0" width="350" height="180" params="16" style="9" name="quest_tracker" color="0x686661">
+          <children>
+            <static_bitmap x="8" y="8" width="16" height="16" params="16" style="3" tags="%23icon" color="0xe8d8a8">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/tools_crafting_writing_parchment_scroll_document_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+            <text x="30" y="8" width="200" height="16" params="16" style="3" name="tracker_title" caption="${vortex.quest.title}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="12" type="uint"/>
+                <var key="text_color" value="0xffffff" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <border x="294" y="4" width="24" height="24" params="17" style="6" name="minimize_button" color="0x55534e" dynamic_style="button">
+              <children>
+                <static_bitmap x="4" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0xffffff">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_signs_maths_minus_subtract_drawback_remove_delete_dash_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <border x="322" y="4" width="24" height="24" params="17" style="6" name="close_button" color="0xc03028" dynamic_style="button">
+              <children>
+                <static_bitmap x="4" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0xffffff">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_signs_maths_multiplication_x_crossout_checkmark_cancel_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <itemlist_vertical x="8" y="34" width="334" height="138" params="16" style="3" name="quest_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="2" type="int"/>
+              </variables>
+            </itemlist_vertical>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

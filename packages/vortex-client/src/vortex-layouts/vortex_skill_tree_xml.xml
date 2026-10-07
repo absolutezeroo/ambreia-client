@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_skill_tree_xml" width="166" height="372" version="0.1">
+  <window>
+    <border x="0" y="0" width="166" height="372" params="17" style="2" name="skill_tree" dynamic_style="lifted_hover" color="0xf8d8c8">
+      <children>
+        <static_bitmap x="16" y="14" width="16" height="16" params="16" style="3" tags="%23icon">
+          <variables>
+            <var key="asset_uri" value="rpg/skills/warrior_skill_icon_5" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="zoom_x" value="0.5" type="Number"/>
+            <var key="zoom_y" value="0.5" type="Number"/>
+          </variables>
+        </static_bitmap>
+        <text x="46" y="6" width="116" height="16" params="16" style="3" name="tree_name" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0xa83a10" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="46" y="22" width="116" height="16" params="16" style="3" name="tree_points" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0x666666" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <static_bitmap x="73" y="69" width="16" height="16" params="16" style="3" tags="%23icon">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_right_east_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <static_bitmap x="41" y="117" width="16" height="16" params="16" style="3" tags="%23icon">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_down_south_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <static_bitmap x="109" y="117" width="16" height="16" params="16" style="3" tags="%23icon">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_down_south_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <static_bitmap x="73" y="149" width="16" height="16" params="16" style="3" tags="%23icon">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_right_east_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <static_bitmap x="41" y="197" width="16" height="16" params="16" style="3" tags="%23icon">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_down_south_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <static_bitmap x="109" y="197" width="16" height="16" params="16" style="3" tags="%23icon">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_down_south_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <static_bitmap x="73" y="229" width="16" height="16" params="16" style="3" tags="%23icon">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_right_east_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <static_bitmap x="41" y="277" width="16" height="16" params="16" style="3" tags="%23icon">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_down_south_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <static_bitmap x="109" y="277" width="16" height="16" params="16" style="3" tags="%23icon">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_down_south_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <static_bitmap x="73" y="309" width="16" height="16" params="16" style="3" tags="%23icon">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_right_east_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <container x="24" y="52" width="118" height="308" params="16" style="3" name="node_slots">
+          <children/>
+        </container>
+      </children>
+    </border>
+  </window>
+</layout>

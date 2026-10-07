@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_bestiary_creature_row_xml" width="272" height="46" version="0.1">
+  <window>
+    <border x="0" y="0" width="272" height="46" params="17" style="2" name="creature_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+      <children>
+        <border x="4" y="4" width="38" height="38" params="16" style="2" color="0xe4e4dc">
+          <children>
+            <static_bitmap x="3" y="3" width="32" height="32" params="16" style="3" name="creature_icon" tags="%23icon">
+              <variables>
+                <var key="asset_uri" value="rpg/materials/icon_01" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <text x="50" y="5" width="182" height="16" params="16" style="3" name="creature_name" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="50" y="23" width="182" height="16" params="16" style="3" name="creature_zone" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x666666" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="244" y="12" width="22" height="22" params="16" style="2" name="known_box" color="0x4caa30">
+          <children>
+            <static_bitmap x="3" y="3" width="16" height="16" params="16" style="3" tags="%23icon" color="0x40b030">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_signs_checkmark_checkbox_ticked_todo_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <border visible="false" x="244" y="12" width="22" height="22" params="16" style="2" name="unknown_box" color="0xe6e6de">
+          <children>
+            <text x="0" y="3" width="22" height="16" params="16" style="3" caption="?">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x888880" type="hex"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+      </children>
+    </border>
+  </window>
+</layout>

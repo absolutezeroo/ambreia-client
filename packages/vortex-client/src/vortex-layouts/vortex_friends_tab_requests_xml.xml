@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_friends_tab_requests_xml" width="374" height="521" version="0.1">
+  <window>
+    <container x="0" y="0" width="374" height="521" params="16" style="3" name="tab_root">
+      <children>
+        <border x="8" y="8" width="358" height="505" params="16" style="2" name="requests" color="0xdce8f4">
+          <children>
+            <scrollable_itemlist_vertical x="6" y="6" width="346" height="493" params="16" style="3" name="request_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="3" type="int"/>
+              </variables>
+            </scrollable_itemlist_vertical>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

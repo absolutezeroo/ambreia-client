@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_market_xml" width="1024" height="640" version="0.1">
+  <window>
+    <frame x="0" y="0" width="1024" height="640" params="32769" style="3" name="market_window" caption="${vortex.market.title}" color="0x418db0">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <tab_context x="6" y="2" width="1004" height="32" params="17" style="3" name="tab_context">
+          <children>
+            <tab_button x="0" y="0" width="170" height="32" params="17" style="3" name="tab_buy" caption="${vortex.market.tab.buy}" id="1"/>
+            <tab_button x="170" y="0" width="170" height="32" params="17" style="3" name="tab_sell" caption="${vortex.market.tab.sell}" id="2"/>
+            <tab_button x="340" y="0" width="170" height="32" params="17" style="3" name="tab_sales" caption="${vortex.market.tab.sales}" id="3"/>
+            <tab_button x="510" y="0" width="170" height="32" params="17" style="3" name="tab_history" caption="${vortex.market.tab.history}" id="4"/>
+          </children>
+        </tab_context>
+        <container x="0" y="40" width="1018" height="556" params="16" style="3" name="tab_content">
+          <children/>
+        </container>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

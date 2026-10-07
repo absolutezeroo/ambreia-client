@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_quest_tab_done_xml" width="734" height="500" version="0.1">
+  <window>
+    <container x="0" y="0" width="734" height="500" params="16" style="3" name="tab_root">
+      <children>
+        <border x="8" y="0" width="300" height="500" params="16" style="2" name="quest_list_panel">
+          <children>
+            <text x="8" y="6" width="200" height="16" params="16" style="3" name="done_count" caption="${vortex.quest.done.title}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x7a4a10" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <dropmenu x="8" y="24" width="136" height="24" params="17" style="3" name="region_filter" caption="${vortex.quest.done.all_regions}"/>
+            <dropmenu x="150" y="24" width="142" height="24" params="17" style="3" name="sort_menu" caption="${vortex.quest.done.sort.recent}"/>
+            <scrollable_itemlist_vertical x="6" y="54" width="288" height="440" params="16" style="3" name="quest_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="3" type="int"/>
+              </variables>
+            </scrollable_itemlist_vertical>
+          </children>
+        </border>
+        <border x="316" y="0" width="410" height="500" params="16" style="2" name="detail">
+          <children>
+            <container x="8" y="6" width="394" height="112" params="16" style="3" name="detail_header">
+              <children/>
+            </container>
+            <container x="8" y="122" width="394" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+            <text x="8" y="128" width="200" height="16" params="16" style="3" name="objective_title" caption="${vortex.ui.objectives.count}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x7a4a10" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <itemlist_vertical x="8" y="146" width="394" height="24" params="16" style="3" name="objective_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="2" type="int"/>
+              </variables>
+            </itemlist_vertical>
+            <container x="8" y="176" width="394" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+            <text x="8" y="182" width="200" height="16" params="16" style="3" caption="${vortex.ui.rewards.obtained}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x7a4a10" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <itemlist_horizontal x="8" y="200" width="394" height="48" params="16" style="3" name="reward_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="5" type="int"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </itemlist_horizontal>
+            <border x="8" y="256" width="394" height="44" params="16" style="2" name="done_banner" color="0xb8e090">
+              <children>
+                <static_bitmap x="14" y="14" width="16" height="16" params="16" style="3" tags="%23icon" color="0x40b030">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_signs_checkmark_checkbox_ticked_todo_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <text x="42" y="5" width="344" height="16" params="16" style="3" name="done_title" caption="${vortex.quest.done.banner}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="12" type="uint"/>
+                    <var key="text_color" value="0x2b7000" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="42" y="23" width="344" height="16" params="16" style="3" name="done_date" caption="${vortex.quest.done.date}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x2b7000" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+            <container x="8" y="310" width="394" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+            <text x="8" y="316" width="200" height="16" params="16" style="3" caption="${vortex.ui.summary}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x7a4a10" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <border x="8" y="334" width="394" height="82" params="16" style="2" color="0xf2f2ec">
+              <children>
+                <text x="8" y="6" width="378" height="70" params="16" style="3" name="summary_txt" caption="">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="multiline" value="true" type="Boolean"/>
+                    <var key="word_wrap" value="true" type="Boolean"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

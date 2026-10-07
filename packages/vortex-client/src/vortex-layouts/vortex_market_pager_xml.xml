@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_market_pager_xml" width="470" height="24" version="0.1">
+  <window>
+    <container x="0" y="0" width="470" height="24" params="144" style="3" name="pager">
+      <children>
+        <border x="165" y="0" width="26" height="24" params="17" style="2" name="prev_button" dynamic_style="button" color="0xe4e4dc">
+          <children>
+            <static_bitmap x="6" y="5" width="16" height="16" params="16" style="3" tags="%23icon">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_left_west_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <text x="195" y="4" width="80" height="16" params="16" style="3" name="page_txt" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="auto_size" value="center" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="279" y="0" width="26" height="24" params="17" style="2" name="next_button" dynamic_style="button" color="0xe4e4dc">
+          <children>
+            <static_bitmap x="4" y="5" width="16" height="16" params="16" style="3" tags="%23icon">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_right_east_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

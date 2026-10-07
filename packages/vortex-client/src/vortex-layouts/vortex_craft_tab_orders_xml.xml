@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_craft_tab_orders_xml" width="924" height="506" version="0.1">
+  <window>
+    <container x="0" y="0" width="924" height="506" params="16" style="3" name="tab_root">
+      <children>
+        <border x="8" y="0" width="360" height="506" params="16" style="2" name="orders">
+          <children>
+            <dropmenu x="8" y="8" width="344" height="24" params="17" style="3" name="order_filter" caption="${vortex.craft.orders.all}"/>
+            <button x="8" y="38" width="83" height="24" params="131089" style="3" name="filter_0" caption="${vortex.ui.all}" width_min="83" width_max="83"/>
+            <button x="95" y="38" width="83" height="24" params="131089" style="3" name="filter_1" caption="${vortex.ui.in_progress}" width_min="83" width_max="83"/>
+            <button x="182" y="38" width="83" height="24" params="131089" style="3" name="filter_2" caption="${vortex.ui.completed}" width_min="83" width_max="83"/>
+            <button x="269" y="38" width="83" height="24" params="131089" style="3" name="filter_3" caption="${vortex.craft.orders.public}" width_min="83" width_max="83"/>
+            <scrollable_itemlist_vertical x="6" y="70" width="348" height="430" params="16" style="3" name="order_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="4" type="int"/>
+              </variables>
+            </scrollable_itemlist_vertical>
+          </children>
+        </border>
+        <border x="376" y="0" width="248" height="506" params="16" style="2" name="order_detail">
+          <children>
+            <text x="8" y="6" width="232" height="34" params="16" style="3" name="order_title" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="12" type="uint"/>
+                <var key="multiline" value="true" type="Boolean"/>
+                <var key="word_wrap" value="true" type="Boolean"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <border x="8" y="44" width="48" height="48" params="16" style="2" color="0xe4e4dc">
+              <children>
+                <static_bitmap x="8" y="8" width="32" height="32" params="16" style="3" name="order_item_icon" tags="%23icon">
+                  <variables>
+                    <var key="asset_uri" value="rpg/consumables-potions/icon_16" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <border x="62" y="48" width="40" height="40" params="16" style="2" color="0xe4e4dc">
+              <children>
+                <widget x="3" y="2" width="34" height="36" params="16" style="3" name="npc_image">
+                  <variables>
+                    <var key="widget_type" value="avatar_image" type="String"/>
+                    <var key="avatar_image:only_head" value="true" type="Boolean"/>
+                    <var key="avatar_image:cropped" value="true" type="Boolean"/>
+                  </variables>
+                </widget>
+              </children>
+            </border>
+            <text x="108" y="52" width="132" height="16" params="16" style="3" name="npc_name" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="108" y="68" width="132" height="16" params="16" style="3" name="npc_role" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="8" y="98" width="232" height="60" params="16" style="3" name="order_desc" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="multiline" value="true" type="Boolean"/>
+                <var key="word_wrap" value="true" type="Boolean"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container x="8" y="164" width="232" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+            <text x="8" y="170" width="200" height="16" params="16" style="3" caption="${vortex.craft.orders.objectives}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x356b1c" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container x="8" y="188" width="232" height="30" params="16" style="3" name="order_objective_slot">
+              <children/>
+            </container>
+            <text x="8" y="222" width="232" height="28" params="16" style="3" name="order_hint" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="multiline" value="true" type="Boolean"/>
+                <var key="word_wrap" value="true" type="Boolean"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container x="8" y="252" width="232" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+            <text x="8" y="258" width="200" height="16" params="16" style="3" caption="${vortex.ui.rewards}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x356b1c" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <static_bitmap x="10" y="278" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf0c030">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/rpg_coin_gold_currency_money_gp_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+            <text x="32" y="278" width="60" height="16" params="16" style="3" name="reward_gold" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="132" y="278" width="108" height="16" params="16" style="3" name="reward_xp" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x1077ac" type="hex"/>
+                <var key="auto_size" value="right" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container x="8" y="302" width="232" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+            <text x="8" y="308" width="200" height="16" params="16" style="3" caption="${vortex.craft.orders.deadline}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x356b1c" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <static_bitmap x="11" y="329" width="16" height="16" params="16" style="3" tags="%23icon" color="0xe0b860">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_hourglass_sand_time_wait_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+            <text x="32" y="328" width="180" height="16" params="16" style="3" name="deadline_txt" caption="${vortex.craft.orders.remaining}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x1077ac" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container x="8" y="352" width="232" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+            <text x="8" y="358" width="200" height="16" params="16" style="3" caption="${vortex.ui.status}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x356b1c" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <border x="8" y="376" width="232" height="22" params="16" style="2" name="order_status" color="0xcfe0f6">
+              <children>
+                <text x="0" y="3" width="232" height="16" params="16" style="3" name="order_status_txt" caption="${vortex.craft.orders.available}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x1077ac" type="hex"/>
+                    <var key="auto_size" value="center" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+            <text x="8" y="402" width="232" height="28" params="16" style="3" name="status_hint" caption="${vortex.craft.orders.accept_hint}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="multiline" value="true" type="Boolean"/>
+                <var key="word_wrap" value="true" type="Boolean"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <button_thick x="8" y="466" width="232" height="28" params="131089" style="6" color="0x0aa00" name="accept_button" caption="${vortex.craft.orders.accept}" width_min="232" width_max="232"/>
+            <button_thick visible="false" x="8" y="466" width="113" height="28" params="131089" style="6" color="0x0aa00" name="deliver_button" caption="${vortex.craft.orders.deliver}" width_min="113" width_max="113"/>
+            <button_thick visible="false" x="127" y="466" width="113" height="28" params="131089" style="3" name="abandon_button" caption="${vortex.craft.orders.abandon}" width_min="113" width_max="113"/>
+          </children>
+        </border>
+        <container x="632" y="0" width="284" height="506" params="16" style="3" name="sidebar_slot">
+          <children/>
+        </container>
+      </children>
+    </container>
+  </window>
+</layout>

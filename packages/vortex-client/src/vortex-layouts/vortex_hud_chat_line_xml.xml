@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_hud_chat_line_xml" width="470" height="16" version="0.1">
+  <window>
+    <itemlist_horizontal x="0" y="0" width="470" height="16" params="16" style="3" name="chat_line">
+      <children>
+        <text x="0" y="0" width="10" height="16" params="16" style="3" name="time_txt" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x9a9890" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="0" y="0" width="10" height="16" params="16" style="3" name="channel_txt" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0xf0a030" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="0" y="0" width="10" height="16" params="16" style="3" name="author_txt" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0xf0a030" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="0" y="0" width="10" height="16" params="16" style="3" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="0" y="0" width="10" height="16" params="16" style="3" name="message_txt" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+      <variables>
+        <var key="spacing" value="4" type="int"/>
+        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+      </variables>
+    </itemlist_horizontal>
+  </window>
+</layout>

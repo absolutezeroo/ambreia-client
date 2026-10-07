@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_guild_tab_settings_xml" width="614" height="541" version="0.1">
+  <window>
+    <container x="0" y="0" width="614" height="541" params="16" style="3" name="tab_root">
+      <children>
+        <container x="8" y="8" width="598" height="60" params="16" style="3" name="guild_header_slot">
+          <children/>
+        </container>
+        <button x="448" y="8" width="158" height="24" params="131089" style="6" color="0x8c8c86" name="change_emblem_button" caption="${vortex.guild.change_emblem}" width_min="158" width_max="158"/>
+        <border x="8" y="76" width="295" height="130" params="16" style="2" name="general_settings">
+          <children>
+            <text x="8" y="6" width="200" height="16" params="16" style="3" caption="${vortex.guild.settings.general}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x2a3c78" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="8" y="32" width="110" height="16" params="16" style="3" caption="${vortex.guild.settings.type}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <dropmenu x="165" y="28" width="122" height="24" params="17" style="3" name="setting_0" caption="${vortex.guild.settings.type.public}"/>
+            <text x="8" y="62" width="110" height="16" params="16" style="3" caption="${vortex.guild.channel.recruitment}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <dropmenu x="165" y="58" width="122" height="24" params="17" style="3" name="setting_1" caption="${vortex.guild.settings.recruitment.open}"/>
+            <text x="8" y="92" width="110" height="16" params="16" style="3" caption="${vortex.guild.settings.min_level}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <dropmenu x="165" y="88" width="122" height="24" params="17" style="3" name="setting_2" caption=""/>
+          </children>
+        </border>
+        <border x="311" y="76" width="295" height="184" params="16" style="2" name="permissions" color="0xe2e6f2">
+          <children>
+            <text x="8" y="6" width="200" height="16" params="16" style="3" caption="${vortex.guild.settings.permissions}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x2a3c78" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="171" y="26" width="40" height="16" params="16" style="3" caption="${vortex.guild.role.leader}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="211" y="26" width="40" height="16" params="16" style="3" caption="${vortex.guild.role.officer}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="251" y="26" width="40" height="16" params="16" style="3" caption="${vortex.guild.role.member}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="8" y="45" width="159" height="16" params="16" style="3" caption="${vortex.guild.perm.invite}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <checkbox x="182" y="44" width="18" height="18" params="17" style="3" name="perm_0_0"/>
+            <checkbox x="222" y="44" width="18" height="18" params="17" style="3" name="perm_0_1"/>
+            <checkbox x="262" y="44" width="18" height="18" params="17" style="3" name="perm_0_2"/>
+            <text x="8" y="67" width="159" height="16" params="16" style="3" caption="${vortex.guild.perm.members}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <checkbox x="182" y="66" width="18" height="18" params="17" style="3" name="perm_1_0"/>
+            <checkbox x="222" y="66" width="18" height="18" params="17" style="3" name="perm_1_1"/>
+            <checkbox x="262" y="66" width="18" height="18" params="17" style="3" name="perm_1_2"/>
+            <text x="8" y="89" width="159" height="16" params="16" style="3" caption="${vortex.guild.perm.motd}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <checkbox x="182" y="88" width="18" height="18" params="17" style="3" name="perm_2_0"/>
+            <checkbox x="222" y="88" width="18" height="18" params="17" style="3" name="perm_2_1"/>
+            <checkbox x="262" y="88" width="18" height="18" params="17" style="3" name="perm_2_2"/>
+            <text x="8" y="111" width="159" height="16" params="16" style="3" caption="${vortex.guild.perm.manage}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <checkbox x="182" y="110" width="18" height="18" params="17" style="3" name="perm_3_0"/>
+            <checkbox x="222" y="110" width="18" height="18" params="17" style="3" name="perm_3_1"/>
+            <checkbox x="262" y="110" width="18" height="18" params="17" style="3" name="perm_3_2"/>
+            <text x="8" y="133" width="159" height="16" params="16" style="3" caption="${vortex.guild.perm.bank}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <checkbox x="182" y="132" width="18" height="18" params="17" style="3" name="perm_4_0"/>
+            <checkbox x="222" y="132" width="18" height="18" params="17" style="3" name="perm_4_1"/>
+            <checkbox x="262" y="132" width="18" height="18" params="17" style="3" name="perm_4_2"/>
+            <text x="8" y="155" width="159" height="16" params="16" style="3" caption="${vortex.guild.perm.emblem}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <checkbox x="182" y="154" width="18" height="18" params="17" style="3" name="perm_5_0"/>
+            <checkbox x="222" y="154" width="18" height="18" params="17" style="3" name="perm_5_1"/>
+            <checkbox x="262" y="154" width="18" height="18" params="17" style="3" name="perm_5_2"/>
+          </children>
+        </border>
+        <border x="8" y="212" width="295" height="140" params="16" style="2" name="roles">
+          <children>
+            <text x="8" y="6" width="200" height="16" params="16" style="3" caption="${vortex.guild.settings.roles}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x2a3c78" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <border x="8" y="28" width="279" height="32" params="17" style="2" name="role_0" dynamic_style="lifted_hover" color="0xf2f2ec">
+              <children>
+                <static_bitmap x="9" y="8" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf0c030">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/hats_crown_king_monarch_ruler_emperor_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <text x="32" y="2" width="225" height="16" params="16" style="3" name="role_name" caption="${vortex.guild.role.leader_count}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="32" y="16" width="225" height="16" params="16" style="3" name="role_desc" caption="${vortex.guild.role.leader_desc}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="9" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <static_bitmap x="256" y="9" width="16" height="16" params="16" style="3" tags="%23icon">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_right_east_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <border x="8" y="64" width="279" height="32" params="17" style="2" name="role_1" dynamic_style="lifted_hover" color="0xf2f2ec">
+              <children>
+                <static_bitmap x="9" y="8" width="16" height="16" params="16" style="3" tags="%23icon" color="0x6a9fd8">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/rpg_item_stat_shield_defense_armor_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <text x="32" y="2" width="225" height="16" params="16" style="3" name="role_name" caption="${vortex.guild.role.officer_count}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="32" y="16" width="225" height="16" params="16" style="3" name="role_desc" caption="${vortex.guild.role.officer_desc}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="9" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <static_bitmap x="256" y="9" width="16" height="16" params="16" style="3" tags="%23icon">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_right_east_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <border x="8" y="100" width="279" height="32" params="17" style="2" name="role_2" dynamic_style="lifted_hover" color="0xf2f2ec">
+              <children>
+                <static_bitmap x="8" y="9" width="16" height="16" params="16" style="3" tags="%23icon" color="0xb0b0a8">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/travel_person_man_single_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <text x="32" y="2" width="225" height="16" params="16" style="3" name="role_name" caption="${vortex.guild.role.member_count}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="32" y="16" width="225" height="16" params="16" style="3" name="role_desc" caption="${vortex.guild.role.member_desc}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="9" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <static_bitmap x="256" y="9" width="16" height="16" params="16" style="3" tags="%23icon">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_right_east_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+          </children>
+        </border>
+        <border x="311" y="266" width="295" height="130" params="16" style="2" name="other_settings">
+          <children>
+            <text x="8" y="6" width="200" height="16" params="16" style="3" caption="${vortex.guild.settings.other}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x2a3c78" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container x="8" y="28" width="279" height="22" params="144" style="3" name="toggle_row">
+              <children>
+                <static_bitmap x="3" y="3" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf0c040">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/travel_bell_notification_ringing_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <text x="26" y="3" width="223" height="16" params="16" style="3" name="opt_0_label" caption="${vortex.guild.opt.notifications}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <checkbox x="257" y="2" width="18" height="18" params="17" style="3" name="opt_0"/>
+              </children>
+            </container>
+            <container x="8" y="52" width="279" height="22" params="144" style="3" name="toggle_row">
+              <children>
+                <static_bitmap x="3" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0x6aa0e0">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/travel_person_people_two_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <text x="26" y="3" width="223" height="16" params="16" style="3" name="opt_1_label" caption="${vortex.guild.opt.applications}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <checkbox x="257" y="2" width="18" height="18" params="17" style="3" name="opt_1"/>
+              </children>
+            </container>
+            <container x="8" y="76" width="279" height="22" params="144" style="3" name="toggle_row">
+              <children>
+                <static_bitmap x="3" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0x9ad0f0">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/media_eyeball_vision_shown_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <text x="26" y="3" width="223" height="16" params="16" style="3" name="opt_2_label" caption="${vortex.guild.opt.directory}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <checkbox x="257" y="2" width="18" height="18" params="17" style="3" name="opt_2"/>
+              </children>
+            </container>
+            <container x="8" y="100" width="279" height="22" params="144" style="3" name="toggle_row">
+              <children>
+                <static_bitmap x="2" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0xe8d8a8">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_clipboard_todo_tasks_done_checkmark_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <text x="26" y="3" width="223" height="16" params="16" style="3" name="opt_3_label" caption="${vortex.guild.opt.allow_applications}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <checkbox x="257" y="2" width="18" height="18" params="17" style="3" name="opt_3"/>
+              </children>
+            </container>
+          </children>
+        </border>
+        <button x="8" y="505" width="195" height="24" params="131089" style="6" color="0x2a8fd6" name="transfer_button" caption="${vortex.guild.transfer}" width_min="195" width_max="195"/>
+        <button x="209" y="505" width="195" height="24" params="131089" style="6" color="0xd23a2a" name="disband_button" caption="${vortex.guild.disband}" width_min="195" width_max="195"/>
+        <button x="410" y="505" width="195" height="24" params="131089" style="6" color="0xd23a2a" name="leave_guild_button" caption="${vortex.guild.leave}" width_min="195" width_max="195"/>
+      </children>
+    </container>
+  </window>
+</layout>

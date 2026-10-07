@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_social_chat_event_xml" width="420" height="22" version="0.1">
+  <window>
+    <container x="0" y="0" width="420" height="22" params="144" style="3" name="chat_event">
+      <children>
+        <static_bitmap x="8" y="3" width="16" height="16" params="16" style="3" tags="%23icon" color="0xb0b0a8">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/rpg_crossed_swords_duel_pvp_combat_battle_war_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <text x="40" y="3" width="330" height="16" params="16" style="3" name="event_txt" caption="${vortex.guild.joined}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0x1077ac" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="376" y="3" width="44" height="16" params="80" style="3" name="event_time" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x666666" type="hex"/>
+            <var key="auto_size" value="right" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </container>
+  </window>
+</layout>

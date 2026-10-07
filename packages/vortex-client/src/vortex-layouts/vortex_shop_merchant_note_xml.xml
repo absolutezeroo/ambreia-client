@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_shop_merchant_note_xml" width="286" height="44" version="0.1">
+  <window>
+    <border x="0" y="0" width="286" height="44" params="16" style="2" name="merchant_note_box" color="0xfbf3e2">
+      <children>
+        <border x="4" y="4" width="36" height="36" params="16" style="2" color="0xe4e4dc">
+          <children>
+            <widget x="2" y="1" width="32" height="34" params="16" style="3" name="merchant_image">
+              <variables>
+                <var key="widget_type" value="avatar_image" type="String"/>
+                <var key="avatar_image:only_head" value="true" type="Boolean"/>
+                <var key="avatar_image:cropped" value="true" type="Boolean"/>
+              </variables>
+            </widget>
+          </children>
+        </border>
+        <text x="48" y="6" width="232" height="32" params="16" style="3" name="merchant_note" caption="${vortex.shop.merchant_note}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="multiline" value="true" type="Boolean"/>
+            <var key="word_wrap" value="true" type="Boolean"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </border>
+  </window>
+</layout>

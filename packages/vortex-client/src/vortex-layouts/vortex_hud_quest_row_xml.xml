@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_hud_quest_row_xml" width="330" height="44" version="0.1">
+  <window>
+    <region x="0" y="0" width="330" height="44" params="1" style="3" dynamic_style="brightness_and_shadow_under" name="quest_row" treshold="0">
+      <children>
+        <static_bitmap x="4" y="5" width="32" height="32" params="16" style="3" name="quest_icon" tags="%23icon">
+          <variables>
+            <var key="asset_uri" value="rpg/dungeon-objects/icon_03" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <text x="42" y="4" width="220" height="16" params="16" style="3" name="quest_title" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0xfac200" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="42" y="22" width="220" height="16" params="16" style="3" name="quest_objective" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0xc8c6c0" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="260" y="22" width="50" height="16" params="16" style="3" name="quest_count" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
+            <var key="auto_size" value="right" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <static_bitmap x="312" y="14" width="16" height="16" params="16" style="3" tags="%23icon" color="0xc8c6c0">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_right_east_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+      </children>
+    </region>
+  </window>
+</layout>

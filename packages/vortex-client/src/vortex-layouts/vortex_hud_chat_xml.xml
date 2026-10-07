@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_hud_chat_xml" width="500" height="230" version="0.1">
+  <window>
+    <container x="0" y="0" width="500" height="230" params="1073741840" style="3" name="hud_chat">
+      <children>
+        <border x="0" y="0" width="500" height="230" params="16" style="9" name="chat" color="0x686661">
+          <children>
+            <button x="8" y="6" width="90" height="24" params="131089" style="6" color="0x55534e" name="chat_tab_0" caption="${vortex.guild.channel.general}" width_min="90" width_max="90"/>
+            <button x="104" y="6" width="90" height="24" params="131089" style="6" color="0x55534e" name="chat_tab_1" caption="${vortex.group.title}" width_min="90" width_max="90"/>
+            <button x="200" y="6" width="90" height="24" params="131089" style="6" color="0x55534e" name="chat_tab_2" caption="${vortex.character.guild}" width_min="90" width_max="90"/>
+            <border x="296" y="6" width="26" height="26" params="17" style="6" name="add_tab_button" color="0x55534e" dynamic_style="button">
+              <children>
+                <static_bitmap x="5" y="5" width="16" height="16" params="16" style="3" tags="%23icon" color="0xffffff">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_signs_maths_plus_addition_bonus_add_new_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <border x="466" y="6" width="26" height="26" params="17" style="6" name="new_window_button" color="0x2a6aa0" dynamic_style="button">
+              <children>
+                <static_bitmap x="5" y="5" width="16" height="16" params="16" style="3" tags="%23icon" color="0xffffff">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_signs_maths_plus_addition_bonus_add_new_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <border x="8" y="38" width="484" height="148" params="16" style="3" name="chat_log_well" color="0x201e19" blend="0.8">
+              <children>
+                <scrollable_itemlist_vertical x="8" y="6" width="468" height="136" params="16" style="3" name="chat_log">
+                  <children/>
+                  <variables>
+                    <var key="spacing" value="4" type="int"/>
+                  </variables>
+                </scrollable_itemlist_vertical>
+              </children>
+            </border>
+            <border x="8" y="192" width="30" height="30" params="17" style="6" name="chat_mode_button" color="0x55534e" dynamic_style="button">
+              <children>
+                <static_bitmap x="7" y="7" width="16" height="16" params="16" style="3" tags="%23icon" color="0xffffff">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_speech_bubble_three_dots_dialogue_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <border x="44" y="192" width="412" height="30" params="16" style="3" color="0x201e19" blend="0.8">
+              <children>
+                <input x="8" y="7" width="396" height="16" params="1" style="0" name="chat_input" caption="${vortex.hud.chat.placeholder}"/>
+              </children>
+            </border>
+            <border x="462" y="192" width="30" height="30" params="17" style="6" name="emoji_button" color="0x55534e" dynamic_style="button">
+              <children>
+                <static_bitmap x="7" y="7" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf0c040">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/emoji_face_smiling_smiley_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_market_listing_row_xml" width="470" height="38" version="0.1">
+  <window>
+    <border x="0" y="0" width="470" height="38" params="17" style="2" name="listing_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+      <children>
+        <border x="3" y="3" width="32" height="32" params="16" style="2" color="0xe4e4dc">
+          <children>
+            <static_bitmap x="0" y="0" width="32" height="32" params="16" style="3" name="item_icon" tags="%23icon">
+              <variables>
+                <var key="asset_uri" value="rpg/gems-materials/icon_16" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <text x="42" y="11" width="150" height="16" params="16" style="3" name="item_name" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="198" y="11" width="80" height="16" params="16" style="3" name="price">
+          <children>
+            <static_bitmap x="0" y="0" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf0c030">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/rpg_coin_gold_currency_money_gp_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+            <text x="18" y="0" width="62" height="16" params="16" style="3" name="price_txt" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </container>
+        <text x="282" y="11" width="46" height="16" params="16" style="3" name="qty_txt" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="auto_size" value="center" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="332" y="11" width="90" height="16" params="16" style="3" name="seller_txt" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border visible="false" x="332" y="9" width="82" height="18" params="16" style="2" name="own_pill" color="0xf5ebc4">
+          <children>
+            <text x="0" y="1" width="82" height="16" params="16" style="3" name="own_pill_txt" caption="${vortex.market.your_offer}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x8a6a10" type="hex"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+        <border x="440" y="8" width="24" height="22" params="17" style="2" name="more_button" dynamic_style="button" color="0xe4e4dc">
+          <children>
+            <text x="0" y="3" width="24" height="16" params="16" style="3" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+      </children>
+    </border>
+  </window>
+</layout>

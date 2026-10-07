@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_hud_buffs_xml" width="68" height="102" version="0.1">
+  <window>
+    <container x="0" y="0" width="68" height="102" params="1073741840" style="3" name="hud_buffs">
+      <children>
+        <border x="0" y="0" width="30" height="30" params="17" style="6" name="buff_add_button" color="0x55534e" dynamic_style="button">
+          <children>
+            <static_bitmap x="7" y="7" width="16" height="16" params="16" style="3" tags="%23icon" color="0xffffff">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_signs_maths_plus_addition_bonus_add_new_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <scrollable_itemgrid_vertical x="0" y="34" width="68" height="68" params="16" style="3" name="buff_grid"/>
+      </children>
+    </container>
+  </window>
+</layout>

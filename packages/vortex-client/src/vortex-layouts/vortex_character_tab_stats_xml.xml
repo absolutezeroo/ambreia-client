@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_character_tab_stats_xml" width="594" height="500" version="0.1">
+  <window>
+    <container x="0" y="0" width="594" height="500" params="16" style="3" name="tab_root">
+      <children>
+        <container x="8" y="0" width="280" height="500" params="16" style="3" name="character_sheet_slot">
+          <children/>
+        </container>
+        <scrollable_itemlist_vertical x="296" y="0" width="290" height="500" params="16" style="3" name="stat_sections">
+          <children>
+            <border x="0" y="0" width="272" height="162" params="16" style="2" name="attributes" color="0xdde8f1">
+              <children>
+                <text x="8" y="5" width="200" height="16" params="16" style="3" caption="${vortex.character.stats.attributes}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x24607f" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <border x="248" y="5" width="16" height="16" params="17" style="2" name="attributes_help" dynamic_style="button" color="0xe4e4dc">
+                  <children>
+                    <text x="0" y="0" width="16" height="16" params="16" style="3" caption="?">
+                      <variables>
+                        <var key="text_style" value="u_bold" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="text_color" value="0x666666" type="hex"/>
+                        <var key="auto_size" value="center" type="String"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </border>
+                <container x="8" y="24" width="256" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+                <itemlist_vertical x="8" y="30" width="256" height="126" params="16" style="3" name="attributes_list">
+                  <children/>
+                  <variables>
+                    <var key="spacing" value="2" type="int"/>
+                  </variables>
+                </itemlist_vertical>
+              </children>
+            </border>
+            <border x="0" y="0" width="272" height="140" params="16" style="2" name="offense">
+              <children>
+                <text x="8" y="5" width="200" height="16" params="16" style="3" caption="${vortex.character.stats.offense}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x24607f" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <border x="248" y="5" width="16" height="16" params="17" style="2" name="offense_help" dynamic_style="button" color="0xe4e4dc">
+                  <children>
+                    <text x="0" y="0" width="16" height="16" params="16" style="3" caption="?">
+                      <variables>
+                        <var key="text_style" value="u_bold" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="text_color" value="0x666666" type="hex"/>
+                        <var key="auto_size" value="center" type="String"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </border>
+                <container x="8" y="24" width="256" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+                <itemlist_vertical x="8" y="30" width="256" height="104" params="16" style="3" name="offense_list">
+                  <children/>
+                  <variables>
+                    <var key="spacing" value="1" type="int"/>
+                  </variables>
+                </itemlist_vertical>
+              </children>
+            </border>
+            <border x="0" y="0" width="272" height="140" params="16" style="2" name="defense">
+              <children>
+                <text x="8" y="5" width="200" height="16" params="16" style="3" caption="${vortex.character.stats.defense}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x24607f" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <border x="248" y="5" width="16" height="16" params="17" style="2" name="defense_help" dynamic_style="button" color="0xe4e4dc">
+                  <children>
+                    <text x="0" y="0" width="16" height="16" params="16" style="3" caption="?">
+                      <variables>
+                        <var key="text_style" value="u_bold" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="text_color" value="0x666666" type="hex"/>
+                        <var key="auto_size" value="center" type="String"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </border>
+                <container x="8" y="24" width="256" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+                <itemlist_vertical x="8" y="30" width="256" height="104" params="16" style="3" name="defense_list">
+                  <children/>
+                  <variables>
+                    <var key="spacing" value="1" type="int"/>
+                  </variables>
+                </itemlist_vertical>
+              </children>
+            </border>
+            <border x="0" y="0" width="272" height="161" params="16" style="2" name="secondary">
+              <children>
+                <text x="8" y="5" width="200" height="16" params="16" style="3" caption="${vortex.character.stats.secondary}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x24607f" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <border x="248" y="5" width="16" height="16" params="17" style="2" name="secondary_help" dynamic_style="button" color="0xe4e4dc">
+                  <children>
+                    <text x="0" y="0" width="16" height="16" params="16" style="3" caption="?">
+                      <variables>
+                        <var key="text_style" value="u_bold" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="text_color" value="0x666666" type="hex"/>
+                        <var key="auto_size" value="center" type="String"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </border>
+                <container x="8" y="24" width="256" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+                <itemlist_vertical x="8" y="30" width="256" height="125" params="16" style="3" name="secondary_list">
+                  <children/>
+                  <variables>
+                    <var key="spacing" value="1" type="int"/>
+                  </variables>
+                </itemlist_vertical>
+              </children>
+            </border>
+          </children>
+          <variables>
+            <var key="spacing" value="6" type="int"/>
+          </variables>
+        </scrollable_itemlist_vertical>
+      </children>
+    </container>
+  </window>
+</layout>

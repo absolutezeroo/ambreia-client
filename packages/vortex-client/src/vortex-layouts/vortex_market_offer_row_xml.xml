@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_market_offer_row_xml" width="284" height="28" version="0.1">
+  <window>
+    <container x="0" y="0" width="284" height="28" params="144" style="3" name="offer_row">
+      <children>
+        <container x="4" y="6" width="80" height="16" params="16" style="3" name="price">
+          <children>
+            <static_bitmap x="0" y="0" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf0c030">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/rpg_coin_gold_currency_money_gp_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+            <text x="18" y="0" width="62" height="16" params="16" style="3" name="price_txt" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </container>
+        <text x="110" y="6" width="60" height="16" params="16" style="3" name="qty_txt" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <button x="198" y="1" width="84" height="24" params="131089" style="6" color="0x2a8fd6" name="buy_button" caption="${vortex.market.tab.buy}" width_min="84" width_max="84"/>
+      </children>
+    </container>
+  </window>
+</layout>

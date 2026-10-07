@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_guild_tab_chat_xml" width="614" height="541" version="0.1">
+  <window>
+    <container x="0" y="0" width="614" height="541" params="16" style="3" name="tab_root">
+      <children>
+        <container x="8" y="8" width="598" height="60" params="16" style="3" name="guild_header_slot">
+          <children/>
+        </container>
+        <button x="8" y="72" width="145" height="24" params="131089" style="6" color="0x8c8c86" name="channel_0" caption="${vortex.guild.channel.general}" width_min="145" width_max="145"/>
+        <button x="159" y="72" width="145" height="24" params="131089" style="6" color="0x8c8c86" name="channel_1" caption="${vortex.guild.channel.announcements}" width_min="145" width_max="145"/>
+        <button x="310" y="72" width="145" height="24" params="131089" style="6" color="0x8c8c86" name="channel_2" caption="${vortex.guild.channel.events}" width_min="145" width_max="145"/>
+        <button x="461" y="72" width="145" height="24" params="131089" style="6" color="0x8c8c86" name="channel_3" caption="${vortex.guild.channel.recruitment}" width_min="145" width_max="145"/>
+        <border x="8" y="104" width="598" height="56" params="16" style="2" name="pinned" color="0xfbf0d0">
+          <children>
+            <static_bitmap x="10" y="12" width="16" height="16" params="16" style="3" tags="%23icon" color="0xe0a030">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/travel_bell_handle_town_crier_news_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+            <text x="34" y="4" width="200" height="16" params="16" style="3" name="pinned_title" caption="${vortex.guild.pinned_by}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0xb07a10" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="478" y="4" width="112" height="16" params="16" style="3" name="pinned_date" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="auto_size" value="right" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="34" y="22" width="554" height="30" params="16" style="3" name="pinned_txt" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="multiline" value="true" type="Boolean"/>
+                <var key="word_wrap" value="true" type="Boolean"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+        <border x="8" y="166" width="598" height="331" params="16" style="2" name="messages" color="0xe2e6f2">
+          <children>
+            <scrollable_itemlist_vertical x="8" y="6" width="582" height="319" params="16" style="3" name="message_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="4" type="int"/>
+              </variables>
+            </scrollable_itemlist_vertical>
+          </children>
+        </border>
+        <border x="8" y="503" width="558" height="30" params="16" style="2" color="0xffffff">
+          <children>
+            <input x="8" y="7" width="518" height="16" params="1" style="0" name="message_input" caption="${vortex.guild.write}"/>
+            <static_bitmap x="534" y="7" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf0c040">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/emoji_face_smiling_smiley_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <border x="572" y="503" width="30" height="30" params="17" style="2" name="send_button" dynamic_style="button" color="0x2a8fd6">
+          <children>
+            <static_bitmap x="7" y="8" width="16" height="16" params="16" style="3" tags="%23icon" color="0xffffff">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_email_message_send_paper_plane_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

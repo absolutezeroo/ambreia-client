@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_achievement_tab_badges_xml" width="1114" height="576" version="0.1">
+  <window>
+    <container x="0" y="0" width="1114" height="576" params="16" style="3" name="tab_root">
+      <children>
+        <border x="8" y="0" width="220" height="576" params="16" style="2" name="categories" color="0xf3ead0">
+          <children>
+            <text x="8" y="6" width="200" height="16" params="16" style="3" name="categories_title" caption="${vortex.achievement.badge_families}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x8a6510" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <itemlist_vertical x="6" y="26" width="208" height="544" params="16" style="3" name="category_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="4" type="int"/>
+              </variables>
+            </itemlist_vertical>
+          </children>
+        </border>
+        <text x="236" y="4" width="240" height="16" params="16" style="3" name="list_title" caption="${vortex.achievement.badges.all}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0x8a6510" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="458" y="0" width="160" height="24" params="16" style="2" color="0xe4e4dc">
+          <children>
+            <input x="6" y="4" width="148" height="16" params="1" style="0" name="search_input" caption="${vortex.achievement.badges.search}"/>
+          </children>
+        </border>
+        <dropmenu x="624" y="0" width="134" height="24" params="17" style="3" name="rarity_filter" caption="${vortex.ui.all_rarities}"/>
+        <border x="236" y="30" width="522" height="546" params="16" style="2" name="badge_grid_panel">
+          <children>
+            <scrollable_itemgrid_vertical x="6" y="6" width="510" height="534" params="16" style="3" name="badge_grid"/>
+          </children>
+        </border>
+        <border x="766" y="0" width="340" height="576" params="16" style="2" name="badge_detail">
+          <children>
+            <border x="120" y="8" width="100" height="100" params="16" style="2" color="0xe4e4dc">
+              <children>
+                <widget x="25" y="25" width="50" height="50" params="16" style="3" name="badge_image">
+                  <variables>
+                    <var key="widget_type" value="badge_image" type="String"/>
+                    <var key="badge_image:pivot_point" value="center" type="String"/>
+                    <var key="badge_image:zoom_x" value="2" type="Number"/>
+                    <var key="badge_image:zoom_y" value="2" type="Number"/>
+                  </variables>
+                </widget>
+              </children>
+            </border>
+            <text x="8" y="114" width="324" height="18" params="16" style="3" name="badge_name" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="14" type="uint"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <border x="131" y="136" width="78" height="18" params="16" style="2" name="rarity_pill" color="0xc8e8a8">
+              <children>
+                <text x="0" y="1" width="78" height="16" params="16" style="3" name="rarity_pill_txt" caption="${vortex.rarity.common}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x2b7000" type="hex"/>
+                    <var key="auto_size" value="center" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+            <text x="8" y="160" width="324" height="46" params="16" style="3" name="badge_desc" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="multiline" value="true" type="Boolean"/>
+                <var key="word_wrap" value="true" type="Boolean"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container x="8" y="212" width="324" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+            <text x="8" y="218" width="200" height="16" params="16" style="3" caption="${vortex.ui.conditions}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x8a6510" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <border x="8" y="236" width="324" height="30" params="16" style="2" name="condition_box" color="0xf2f2ec">
+              <children>
+                <static_bitmap x="8" y="7" width="16" height="16" params="16" style="3" name="condition_icon" tags="%23icon" color="0x40b030">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_signs_checkmark_checkbox_ticked_todo_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <text x="32" y="7" width="284" height="16" params="16" style="3" name="condition_txt" caption="">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+            <text x="8" y="274" width="200" height="16" params="16" style="3" caption="${vortex.ui.status}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x8a6510" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <border x="8" y="292" width="324" height="42" params="16" style="2" name="state_unlocked" color="0xd8f0c0">
+              <children>
+                <static_bitmap x="10" y="13" width="16" height="16" params="16" style="3" tags="%23icon" color="0x40b030">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_signs_checkmark_checkbox_ticked_todo_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <text x="36" y="4" width="280" height="16" params="16" style="3" name="state_title" caption="${vortex.ui.unlocked}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x2b7000" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="36" y="21" width="280" height="16" params="16" style="3" name="state_desc" caption="${vortex.ui.date_at}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x2b7000" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+            <border visible="false" x="8" y="292" width="324" height="42" params="16" style="2" name="state_locked" color="0xe6e6e0">
+              <children>
+                <static_bitmap x="11" y="13" width="16" height="16" params="16" style="3" tags="%23icon" color="0xd8a030">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/tools_crafting_padlock_locked_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <text x="36" y="4" width="280" height="16" params="16" style="3" name="state_title" caption="${vortex.ui.locked}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="36" y="21" width="280" height="16" params="16" style="3" name="state_desc" caption="${vortex.achievement.badges.locked_desc}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+            <text x="8" y="342" width="200" height="16" params="16" style="3" caption="${vortex.ui.effect}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x8a6510" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container x="8" y="360" width="324" height="48" params="16" style="3" name="effect_slot">
+              <children/>
+            </container>
+            <button_thick x="8" y="536" width="324" height="28" params="131089" style="3" name="remove_badge_button" caption="${vortex.achievement.badges.remove}" width_min="324" width_max="324"/>
+            <button_thick visible="false" x="8" y="536" width="324" height="28" params="131089" style="6" color="0x2a8fd6" name="show_badge_button" caption="${vortex.achievement.badges.show}" width_min="324" width_max="324"/>
+            <button_thick visible="false" x="8" y="536" width="324" height="28" params="131089" style="3" name="locked_badge_button" caption="${vortex.achievement.badges.locked}" width_min="324" width_max="324"/>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

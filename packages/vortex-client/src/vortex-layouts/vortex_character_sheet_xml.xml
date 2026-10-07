@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_character_sheet_xml" width="280" height="500" version="0.1">
+  <window>
+    <container x="0" y="0" width="280" height="500" params="16" style="3" name="character_sheet">
+      <children>
+        <text x="0" y="2" width="260" height="16" params="16" style="3" caption="${vortex.ui.equipment}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0x24607f" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="0" y="22" width="280" height="188" params="16" style="2" name="equipment" color="0xd3e3ef">
+          <children>
+            <border x="8" y="8" width="52" height="40" params="17" style="2" name="slot_head" dynamic_style="lifted_hover" color="0xe4e4dc">
+              <children>
+                <static_bitmap x="10" y="4" width="32" height="32" params="16" style="3" name="slot_head_icon" tags="%23icon">
+                  <variables>
+                    <var key="asset_uri" value="rpg/armor/icon_01" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <border x="8" y="52" width="52" height="40" params="17" style="2" name="slot_neck" dynamic_style="lifted_hover" color="0xe4e4dc">
+              <children>
+                <static_bitmap x="10" y="4" width="32" height="32" params="16" style="3" name="slot_neck_icon" tags="%23icon">
+                  <variables>
+                    <var key="asset_uri" value="rpg/fish-loot/icon_25" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <border x="8" y="96" width="52" height="40" params="17" style="2" name="slot_face" dynamic_style="lifted_hover" color="0xe4e4dc">
+              <children>
+                <static_bitmap x="10" y="4" width="32" height="32" params="16" style="3" name="slot_face_icon" tags="%23icon">
+                  <variables>
+                    <var key="asset_uri" value="rpg/armor/icon_36" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <border x="8" y="140" width="52" height="40" params="17" style="2" name="slot_belt" dynamic_style="lifted_hover" color="0xe4e4dc">
+              <children>
+                <static_bitmap x="10" y="4" width="32" height="32" params="16" style="3" name="slot_belt_icon" tags="%23icon">
+                  <variables>
+                    <var key="asset_uri" value="rpg/armor/icon_04" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <static_bitmap x="104" y="106" width="73" height="57" params="16" style="3" name="platform" tags="%23icon">
+              <variables>
+                <var key="asset_uri" value="avatar_editor_generic_platform" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+            <widget x="95" y="10" width="90" height="160" params="16" style="3" name="avatar_image">
+              <variables>
+                <var key="widget_type" value="avatar_image" type="String"/>
+              </variables>
+            </widget>
+            <border x="220" y="8" width="52" height="40" params="17" style="2" name="slot_hat" dynamic_style="lifted_hover" color="0xe4e4dc">
+              <children>
+                <static_bitmap x="10" y="4" width="32" height="32" params="16" style="3" name="slot_hat_icon" tags="%23icon">
+                  <variables>
+                    <var key="asset_uri" value="rpg/armor/icon_44" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <border x="220" y="52" width="52" height="40" params="17" style="2" name="slot_torso" dynamic_style="lifted_hover" color="0xe4e4dc">
+              <children>
+                <static_bitmap x="10" y="4" width="32" height="32" params="16" style="3" name="slot_torso_icon" tags="%23icon">
+                  <variables>
+                    <var key="asset_uri" value="rpg/armor/icon_08" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <border x="220" y="96" width="52" height="40" params="17" style="2" name="slot_legs" dynamic_style="lifted_hover" color="0xe4e4dc">
+              <children>
+                <static_bitmap x="11" y="2" width="32" height="32" params="16" style="3" name="slot_legs_icon" tags="%23icon">
+                  <variables>
+                    <var key="asset_uri" value="rpg/armor/icon_32" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <border x="220" y="140" width="52" height="40" params="17" style="2" name="slot_feet" dynamic_style="lifted_hover" color="0xe4e4dc">
+              <children>
+                <static_bitmap x="11" y="4" width="32" height="32" params="16" style="3" name="slot_feet_icon" tags="%23icon">
+                  <variables>
+                    <var key="asset_uri" value="rpg/armor/icon_16" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+          </children>
+        </border>
+        <text x="0" y="218" width="260" height="16" params="16" style="3" name="summary_title" caption="${vortex.ui.statistics}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0x24607f" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="0" y="238" width="280" height="262" params="16" style="2" name="summary">
+          <children>
+            <itemlist_vertical x="10" y="10" width="260" height="242" params="16" style="3" name="summary_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="6" type="int"/>
+              </variables>
+            </itemlist_vertical>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

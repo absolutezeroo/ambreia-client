@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_character_xml" width="600" height="584" version="0.1">
+  <window>
+    <frame x="0" y="0" width="600" height="584" params="32769" style="3" name="character_window" caption="${vortex.character.title}" color="0x418db0">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <tab_context x="6" y="2" width="580" height="32" params="17" style="3" name="tab_context">
+          <children>
+            <tab_button x="0" y="0" width="140" height="32" params="17" style="3" name="tab_overview" caption="${vortex.character.tab.overview}" id="1"/>
+            <tab_button x="140" y="0" width="140" height="32" params="17" style="3" name="tab_stats" caption="${vortex.ui.statistics}" id="2"/>
+            <tab_button x="280" y="0" width="140" height="32" params="17" style="3" name="tab_titles" caption="${vortex.character.tab.titles}" id="3"/>
+            <tab_button x="420" y="0" width="140" height="32" params="17" style="3" name="tab_reputation" caption="${vortex.reputation.title}" id="4"/>
+          </children>
+        </tab_context>
+        <container x="0" y="40" width="594" height="500" params="16" style="3" name="tab_content">
+          <children/>
+        </container>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_guild_tab_members_xml" width="614" height="541" version="0.1">
+  <window>
+    <container x="0" y="0" width="614" height="541" params="16" style="3" name="tab_root">
+      <children>
+        <container x="8" y="8" width="598" height="60" params="16" style="3" name="guild_header_slot">
+          <children/>
+        </container>
+        <text x="8" y="76" width="200" height="16" params="16" style="3" name="members_title" caption="${vortex.guild.members}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0x2a3c78" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <dropmenu x="446" y="72" width="160" height="24" params="17" style="3" name="role_filter" caption="${vortex.guild.role_filter_all}"/>
+        <border x="8" y="102" width="598" height="431" params="16" style="2" name="members" color="0xe2e6f2">
+          <children>
+            <border x="8" y="6" width="582" height="24" params="16" style="2" name="column_header" color="0xe6e6de">
+              <children>
+                <text x="38" y="4" width="80" height="16" params="16" style="3" caption="${vortex.guild.column.player}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="auto_size" value="left" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="128" y="4" width="80" height="16" params="16" style="3" caption="${vortex.guild.column.role}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="auto_size" value="left" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="212" y="4" width="30" height="16" params="16" style="3" caption="${vortex.guild.column.level}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="auto_size" value="center" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="250" y="4" width="80" height="16" params="16" style="3" caption="${vortex.ui.status}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="auto_size" value="left" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="336" y="4" width="90" height="16" params="16" style="3" caption="${vortex.guild.column.last_login}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="auto_size" value="left" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="430" y="4" width="90" height="16" params="16" style="3" caption="${vortex.guild.column.contribution}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="auto_size" value="left" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+            <itemlist_vertical x="8" y="34" width="582" height="361" params="16" style="3" name="member_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="2" type="int"/>
+              </variables>
+            </itemlist_vertical>
+            <container x="8" y="399" width="582" height="24" params="16" style="3" name="pager_slot">
+              <children/>
+            </container>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

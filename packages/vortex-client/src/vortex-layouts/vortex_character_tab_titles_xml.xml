@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_character_tab_titles_xml" width="594" height="500" version="0.1">
+  <window>
+    <container x="0" y="0" width="594" height="500" params="16" style="3" name="tab_root">
+      <children>
+        <text x="8" y="2" width="260" height="16" params="16" style="3" caption="${vortex.character.titles.owned}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0x24607f" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="228" y="2" width="60" height="16" params="16" style="3" name="title_count" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="auto_size" value="right" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="8" y="22" width="280" height="478" params="16" style="2">
+          <children>
+            <scrollable_itemlist_vertical x="6" y="6" width="268" height="466" params="16" style="3" name="title_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="4" type="int"/>
+              </variables>
+            </scrollable_itemlist_vertical>
+          </children>
+        </border>
+        <text x="296" y="2" width="260" height="16" params="16" style="3" caption="${vortex.character.titles.details}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0x24607f" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="296" y="22" width="290" height="444" params="16" style="2" name="title_detail">
+          <children>
+            <border x="8" y="8" width="56" height="56" params="16" style="2" name="title_emblem" color="0xe4e4dc">
+              <children>
+                <static_bitmap x="14" y="15" width="28" height="27" params="16" style="3" name="title_emblem_icon" tags="%23icon">
+                  <variables>
+                    <var key="asset_uri" value="extended_profile_icon_star_gem" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <text x="74" y="8" width="208" height="18" params="16" style="3" name="title_name" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="14" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <itemlist_horizontal x="74" y="28" width="180" height="16" params="16" style="3" name="category_list">
+              <children>
+                <text x="0" y="0" width="10" height="16" params="16" style="3" name="category_txt" caption="">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="auto_size" value="left" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="0" y="0" width="8" height="16" params="16" style="3" caption="%C2%B7">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="auto_size" value="left" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="0" y="0" width="10" height="16" params="16" style="3" name="rarity_txt" caption="${vortex.rarity.rare}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x1077ac" type="hex"/>
+                    <var key="auto_size" value="left" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+              <variables>
+                <var key="spacing" value="3" type="int"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </itemlist_horizontal>
+            <text x="74" y="46" width="208" height="30" params="16" style="3" name="title_desc" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="multiline" value="true" type="Boolean"/>
+                <var key="word_wrap" value="true" type="Boolean"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <border x="8" y="82" width="274" height="50" params="16" style="2" name="state_active" color="0xd8f0c0">
+              <children>
+                <static_bitmap x="10" y="17" width="16" height="16" params="16" style="3" tags="%23icon" color="0x40b030">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_signs_checkmark_checkbox_ticked_todo_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <text x="36" y="6" width="230" height="16" params="16" style="3" name="state_title" caption="${vortex.character.titles.active_now}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x2b7000" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="36" y="22" width="230" height="24" params="16" style="3" name="state_desc" caption="${vortex.character.titles.active_desc}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x2b7000" type="hex"/>
+                    <var key="multiline" value="true" type="Boolean"/>
+                    <var key="word_wrap" value="true" type="Boolean"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+            <border visible="false" x="8" y="82" width="274" height="50" params="16" style="2" name="state_owned" color="0xdde8f1">
+              <children>
+                <static_bitmap x="10" y="17" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf8d030">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/rpg_magic_sparkles_enchantment_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <text x="36" y="6" width="230" height="16" params="16" style="3" name="state_title" caption="${vortex.character.titles.owned_state}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x24607f" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="36" y="22" width="230" height="24" params="16" style="3" name="state_desc" caption="${vortex.character.titles.owned_desc}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x24607f" type="hex"/>
+                    <var key="multiline" value="true" type="Boolean"/>
+                    <var key="word_wrap" value="true" type="Boolean"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+            <border visible="false" x="8" y="82" width="274" height="50" params="16" style="2" name="state_locked" color="0xe6e6e0">
+              <children>
+                <static_bitmap x="11" y="17" width="16" height="16" params="16" style="3" tags="%23icon" color="0xd8a030">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/tools_crafting_padlock_locked_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <text x="36" y="6" width="230" height="16" params="16" style="3" name="state_title" caption="${vortex.character.titles.locked}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="36" y="22" width="230" height="24" params="16" style="3" name="state_desc" caption="${vortex.character.titles.locked_desc}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="multiline" value="true" type="Boolean"/>
+                    <var key="word_wrap" value="true" type="Boolean"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+            <container x="8" y="142" width="274" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+            <text x="8" y="148" width="200" height="16" params="16" style="3" caption="${vortex.character.titles.conditions}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x24607f" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <itemlist_vertical x="8" y="168" width="274" height="64" params="16" style="3" name="condition_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="2" type="int"/>
+              </variables>
+            </itemlist_vertical>
+            <container x="8" y="240" width="274" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+            <text x="8" y="246" width="200" height="16" params="16" style="3" caption="${vortex.ui.rewards}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x24607f" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <itemlist_vertical x="8" y="266" width="274" height="80" params="16" style="3" name="reward_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="4" type="int"/>
+              </variables>
+            </itemlist_vertical>
+          </children>
+        </border>
+        <button_thick x="296" y="472" width="290" height="28" params="131089" style="6" color="0xd23a2a" name="remove_title_button" caption="${vortex.character.titles.remove}" width_min="290" width_max="290"/>
+        <button_thick visible="false" x="296" y="472" width="290" height="28" params="131089" style="6" color="0x2a8fd6" name="equip_title_button" caption="${vortex.character.titles.equip}" width_min="290" width_max="290"/>
+        <button_thick visible="false" x="296" y="472" width="290" height="28" params="131089" style="3" name="locked_title_button" caption="${vortex.character.titles.locked}" width_min="290" width_max="290"/>
+      </children>
+    </container>
+  </window>
+</layout>

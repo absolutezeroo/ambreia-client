@@ -1,0 +1,53 @@
+# The RPG windows' texts (skill, en).
+#
+# Every static caption of the vortex_skill_*_xml layouts is a ${key} from this file; captions
+# that carry data (names, numbers, dates) ship empty and are set by the code. `%name%` placeholders
+# are filled through getLocalizationWithParams(key, default, 'name', value, ...).
+#
+# Apply them to a deployed gamedata file with:
+#
+#   node build-gamedata-locale.mjs --overrides=locale-overrides/skill.en.txt \
+#        --merge-into=<gamedata>/external_flash_texts.json --write
+#
+vortex.skill.action_bar=Action bar
+vortex.skill.action_bar.hint=Drag a skill from the grid to assign it to a shortcut.
+vortex.skill.action_bar.main=Main action bar
+vortex.skill.base_damage=Base damage
+vortex.skill.cooldown=Cooldown
+vortex.skill.cooldown.short=Cooldown
+vortex.skill.current_effect=Current effect
+vortex.skill.damage=Damage
+vortex.skill.mana_cost=Mana cost
+vortex.skill.next_level=Next level (%level%/%max%)
+vortex.skill.not_enough_gold=Not enough gold
+vortex.skill.passive.desc=Passive skills are always active and apply to your character automatically. Upgrade them to raise your stats and unlock new bonuses.
+vortex.skill.passive.title=Passive skills
+vortex.skill.range=Range
+vortex.skill.search=Search a skill...
+vortex.skill.shortcuts.assigned_key=Assigned key
+vortex.skill.shortcuts.available=Available skills and items
+vortex.skill.shortcuts.clear=Clear all
+vortex.skill.shortcuts.defaults=Restore defaults
+vortex.skill.shortcuts.extra=Extra shortcuts
+vortex.skill.shortcuts.out_of_combat=Allow use out of combat
+vortex.skill.shortcuts.quick_hint=Drop a skill or an item here to bind it to a key.
+vortex.skill.shortcuts.quick_slots=Quick slots
+vortex.skill.shortcuts.reset=Reset shortcuts
+vortex.skill.shortcuts.selected=Selected shortcut
+vortex.skill.shortcuts.settings=Shortcut settings
+vortex.skill.shortcuts.show=Show shortcuts on screen
+vortex.skill.shortcuts.swap=Swap bars with Shift + 1-8
+vortex.skill.shortcuts.unassign=Unassign
+vortex.skill.specs.add_point=Add 1 point
+vortex.skill.specs.character_level=Character level: %level%
+vortex.skill.specs.max_rank=Maximum rank reached
+vortex.skill.specs.no_point=No point available
+vortex.skill.specs.points=Specialisation points: %count%
+vortex.skill.specs.reset_all=Reset all
+vortex.skill.tab.active=Active
+vortex.skill.tab.passive=Passive
+vortex.skill.tab.shortcuts=Shortcuts
+vortex.skill.tab.specs=Specialisations
+vortex.skill.title=Skills
+vortex.skill.upgrade=Upgrade (%cost%)
+vortex.skill.upgrade_cost=Upgrade cost

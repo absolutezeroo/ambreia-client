@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_skill_node_xml" width="50" height="68" version="0.1">
+  <window>
+    <container x="0" y="0" width="50" height="68" params="16" style="3" name="skill_node">
+      <children>
+        <border x="0" y="0" width="50" height="50" params="17" style="2" name="node_box" dynamic_style="reward_track_item" color="0xfbfbf8">
+          <children>
+            <static_bitmap x="9" y="9" width="32" height="32" params="16" style="3" name="node_icon" tags="%23icon">
+              <variables>
+                <var key="asset_uri" value="rpg/skills/warrior_skill_icon_1" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+            <static_bitmap visible="false" x="18" y="17" width="16" height="16" params="16" style="3" name="lock_icon" tags="%23icon" color="0xd8a030">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/tools_crafting_padlock_locked_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <border x="5" y="52" width="40" height="16" params="16" style="2" name="node_count_box" color="0xffffff">
+          <children>
+            <text x="0" y="0" width="40" height="16" params="16" style="3" name="node_count" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x2b9a00" type="hex"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_achievement_info_line_xml" width="324" height="48" version="0.1">
+  <window>
+    <border x="0" y="0" width="324" height="48" params="16" style="2" name="info_line" color="0xf2f2ec">
+      <children>
+        <border x="5" y="5" width="38" height="38" params="16" style="2" color="0xe4e4dc">
+          <children>
+            <static_bitmap x="3" y="3" width="32" height="32" params="16" style="3" name="info_icon" tags="%23icon">
+              <variables>
+                <var key="asset_uri" value="rpg/runes-enchantments/icon_51" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <text x="50" y="5" width="244" height="16" params="16" style="3" name="info_title" caption="${vortex.achievement.badges.effect_profile}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="50" y="21" width="244" height="26" params="16" style="3" name="info_desc" caption="${vortex.achievement.badges.effect_profile_desc}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x666666" type="hex"/>
+            <var key="multiline" value="true" type="Boolean"/>
+            <var key="word_wrap" value="true" type="Boolean"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <static_bitmap visible="false" x="300" y="16" width="16" height="16" params="16" style="3" name="done_icon" tags="%23icon" color="0x40b030">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/software_signs_checkmark_checkbox_ticked_todo_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+      </children>
+    </border>
+  </window>
+</layout>

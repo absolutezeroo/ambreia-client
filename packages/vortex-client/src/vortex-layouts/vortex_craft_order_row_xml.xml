@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_craft_order_row_xml" width="332" height="62" version="0.1">
+  <window>
+    <border x="0" y="0" width="332" height="62" params="17" style="2" name="order_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+      <children>
+        <border x="5" y="5" width="44" height="44" params="16" style="2" name="npc" color="0xe4e4dc">
+          <children>
+            <widget x="5" y="4" width="34" height="36" params="16" style="3" name="npc_image">
+              <variables>
+                <var key="widget_type" value="avatar_image" type="String"/>
+                <var key="avatar_image:only_head" value="true" type="Boolean"/>
+                <var key="avatar_image:cropped" value="true" type="Boolean"/>
+              </variables>
+            </widget>
+          </children>
+        </border>
+        <text x="56" y="4" width="162" height="16" params="16" style="3" name="npc_name" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border visible="false" x="224" y="4" width="80" height="18" params="16" style="2" name="order_state" color="0xcfe0f6">
+          <children>
+            <text x="0" y="1" width="80" height="16" params="16" style="3" name="order_state_txt" caption="${vortex.ui.in_progress}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x1077ac" type="hex"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+        <text x="56" y="20" width="242" height="16" params="16" style="3" name="order_title" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x666666" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <static_bitmap x="58" y="40" width="16" height="16" params="16" style="3" name="item_icon" tags="%23icon">
+          <variables>
+            <var key="asset_uri" value="rpg/consumables-potions/icon_16" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="zoom_x" value="0.5" type="Number"/>
+            <var key="zoom_y" value="0.5" type="Number"/>
+          </variables>
+        </static_bitmap>
+        <text x="78" y="40" width="40" height="16" params="16" style="3" name="order_progress" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <static_bitmap x="126" y="40" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf0c030">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/rpg_coin_gold_currency_money_gp_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <text x="146" y="40" width="50" height="16" params="16" style="3" name="order_gold" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <static_bitmap x="233" y="41" width="16" height="16" params="16" style="3" tags="%23icon" color="0xe0b860">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/software_hourglass_sand_time_wait_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <text x="252" y="40" width="50" height="16" params="16" style="3" name="order_time" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0x1077ac" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="308" y="20" width="18" height="22" params="17" style="2" name="open_button" dynamic_style="button" color="0xe4e4dc">
+          <children>
+            <static_bitmap x="1" y="2" width="16" height="16" params="16" style="3" tags="%23icon">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_right_east_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+      </children>
+    </border>
+  </window>
+</layout>

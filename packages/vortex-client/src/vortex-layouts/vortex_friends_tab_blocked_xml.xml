@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_friends_tab_blocked_xml" width="374" height="521" version="0.1">
+  <window>
+    <container x="0" y="0" width="374" height="521" params="16" style="3" name="tab_root">
+      <children>
+        <border x="8" y="8" width="358" height="24" params="16" style="2" color="0xe4e4dc">
+          <children>
+            <static_bitmap x="4" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0x888880">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_magnifier_zoom_looking_magnifying_glass_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+            <input x="24" y="4" width="328" height="16" params="1" style="0" name="search_input" caption="${vortex.friends.search_blocked}"/>
+          </children>
+        </border>
+        <border x="8" y="40" width="358" height="473" params="16" style="2" name="blocked" color="0xf2e0dc">
+          <children>
+            <static_bitmap x="11" y="9" width="16" height="16" params="16" style="3" tags="%23icon" color="0xd84040">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_sign_crossout_cancel_forbidden_illegal_1_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+            <text x="32" y="8" width="200" height="16" params="16" style="3" name="blocked_count" caption="${vortex.friends.blocked_count}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <scrollable_itemlist_vertical x="6" y="30" width="346" height="437" params="16" style="3" name="blocked_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="3" type="int"/>
+              </variables>
+            </scrollable_itemlist_vertical>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_skill_cost_row_xml" width="200" height="24" version="0.1">
+  <window>
+    <container x="0" y="0" width="200" height="24" params="144" style="3" name="cost_row">
+      <children>
+        <static_bitmap x="4" y="4" width="16" height="16" params="16" style="3" name="cost_icon" tags="%23icon" color="0xf0c030">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/rpg_coin_gold_currency_money_gp_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <text x="30" y="4" width="170" height="16" params="16" style="3" name="cost_txt" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </container>
+  </window>
+</layout>

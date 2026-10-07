@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_character_title_row_xml" width="252" height="48" version="0.1">
+  <window>
+    <border x="0" y="0" width="252" height="48" params="17" style="2" name="title_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+      <children>
+        <border x="4" y="4" width="40" height="40" params="16" style="2" color="0xe4e4dc">
+          <children>
+            <static_bitmap x="10" y="10" width="20" height="20" params="16" style="3" name="icon" tags="%23icon">
+              <variables>
+                <var key="asset_uri" value="variablefx_icon_star_power" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <text x="52" y="6" width="142" height="16" params="16" style="3" name="title_name" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0x999999" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <itemlist_horizontal x="52" y="24" width="180" height="16" params="16" style="3" name="category_list">
+          <children>
+            <text x="0" y="0" width="10" height="16" params="16" style="3" name="category_txt" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="auto_size" value="left" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="0" y="0" width="8" height="16" params="16" style="3" caption="%C2%B7">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="auto_size" value="left" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="0" y="0" width="10" height="16" params="16" style="3" name="rarity_txt" caption="${vortex.rarity.rare}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x1077ac" type="hex"/>
+                <var key="auto_size" value="left" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+          <variables>
+            <var key="spacing" value="3" type="int"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </itemlist_horizontal>
+        <static_bitmap x="227" y="16" width="16" height="16" params="16" style="3" name="lock_icon" tags="%23icon" color="0xd8a030">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/tools_crafting_padlock_locked_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+      </children>
+    </border>
+  </window>
+</layout>

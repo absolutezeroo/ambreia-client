@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_market_category_row_xml" width="188" height="42" version="0.1">
+  <window>
+    <border x="0" y="0" width="188" height="42" params="17" style="2" name="category_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+      <children>
+        <static_bitmap x="6" y="4" width="32" height="32" params="16" style="3" name="category_icon" tags="%23icon">
+          <variables>
+            <var key="asset_uri" value="rpg/dungeon-objects/icon_24" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <text x="46" y="12" width="138" height="16" params="16" style="3" name="category_name" caption="${vortex.market.category.all}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </border>
+  </window>
+</layout>

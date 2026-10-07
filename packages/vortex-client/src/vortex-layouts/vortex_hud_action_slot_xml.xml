@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_hud_action_slot_xml" width="46" height="62" version="0.1">
+  <window>
+    <container x="0" y="0" width="46" height="62" params="16" style="3" name="action_slot">
+      <children>
+        <border x="0" y="0" width="46" height="46" params="17" style="3" name="slot_box" color="0x201e19" blend="0.8" dynamic_style="reward_track_item">
+          <children>
+            <static_bitmap x="7" y="7" width="32" height="32" params="16" style="3" name="slot_icon" tags="%23icon">
+              <variables>
+                <var key="asset_uri" value="rpg/skills/warrior_skill_icon_1" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+            <container visible="false" x="0" y="0" width="46" height="46" params="16" style="8" name="cooldown_veil" color="0xff000000" blend="0.55" background="true"/>
+            <text visible="false" x="0" y="14" width="46" height="18" params="16" style="3" name="cooldown_txt" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="14" type="uint"/>
+                <var key="text_color" value="0xffffff" type="hex"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text visible="false" x="20" y="30" width="24" height="16" params="16" style="3" name="slot_count" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0xffffff" type="hex"/>
+                <var key="auto_size" value="right" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+        <text x="0" y="47" width="46" height="16" params="16" style="3" name="slot_key" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
+            <var key="auto_size" value="center" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </container>
+  </window>
+</layout>

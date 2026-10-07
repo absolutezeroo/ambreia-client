@@ -1,0 +1,98 @@
+# The RPG windows' texts (market, en).
+#
+# Every static caption of the vortex_market_*_xml layouts is a ${key} from this file; captions
+# that carry data (names, numbers, dates) ship empty and are set by the code. `%name%` placeholders
+# are filled through getLocalizationWithParams(key, default, 'name', value, ...).
+#
+# Apply them to a deployed gamedata file with:
+#
+#   node build-gamedata-locale.mjs --overrides=locale-overrides/market.en.txt \
+#        --merge-into=<gamedata>/external_flash_texts.json --write
+#
+vortex.market.available=/ %count% available
+vortex.market.average_price=Recent average price
+vortex.market.category.all=All items
+vortex.market.category.consumables=Consumables
+vortex.market.category.cosmetics=Cosmetics
+vortex.market.category.furniture=Furniture
+vortex.market.category.materials=Materials
+vortex.market.category.other=Other
+vortex.market.category.resources=Resources
+vortex.market.clear=Clear
+vortex.market.collect_gold=Collect gold
+vortex.market.collect_items=Collect items
+vortex.market.column.date=Date and time
+vortex.market.column.item=Item
+vortex.market.column.other_party=Other party
+vortex.market.column.price=Price
+vortex.market.column.quantity=Quantity
+vortex.market.column.quantity_short=Qty
+vortex.market.column.seller=Seller
+vortex.market.column.sold=Sold
+vortex.market.column.time=Time
+vortex.market.column.total=Total price
+vortex.market.column.type=Type
+vortex.market.column.unit_price=Unit price
+vortex.market.column.unit_price_short=Unit
+vortex.market.commission=Fee (%percent%%)
+vortex.market.current_offers=Current offers
+vortex.market.duration=Sale duration
+vortex.market.duration.hours=%count% hours
+vortex.market.edit_price=Change price
+vortex.market.empty.category=No item on sale in this category.
+vortex.market.empty.sales=You have no active sale.
+vortex.market.estimated_revenue=Estimated revenue
+vortex.market.expires_on=Expires on
+vortex.market.history.all=All
+vortex.market.history.balance=Balance
+vortex.market.history.buy=Purchase
+vortex.market.history.buys=Purchases
+vortex.market.history.count=Transactions: %count%
+vortex.market.history.days=%count% days
+vortex.market.history.details=Transaction details
+vortex.market.history.earned=Earned
+vortex.market.history.sales=Sales
+vortex.market.history.sell=Sale
+vortex.market.history.sort.recent=Newest first
+vortex.market.history.spent=Spent
+vortex.market.history.summary=Your transactions
+vortex.market.history.today=Today
+vortex.market.inventory=My inventory
+vortex.market.listed_on=Listed on
+vortex.market.listing_fee=Listing fee (%percent%%)
+vortex.market.lowest_now=Lowest price now
+vortex.market.lowest_price=Lowest price
+vortex.market.no_offer=No offer yet.
+vortex.market.no_offer_hint=Your item is listed in the auction house. It is withdrawn automatically when the sale expires.
+vortex.market.offers_available=Offers available
+vortex.market.on_sale_count=(%count% on sale)
+vortex.market.owned=Owned
+vortex.market.potential_gain=Potential total gain
+vortex.market.rarity=Rarity
+vortex.market.sale_price=Unit sale price
+vortex.market.sale_quantity=Quantity to sell
+vortex.market.sales.all=All my sales
+vortex.market.sales.expired=Expired
+vortex.market.sales.sold=Sold
+vortex.market.sales.withdrawn=Withdrawn
+vortex.market.search=Search an item...
+vortex.market.search_sales=Search my sales...
+vortex.market.sell=Put on sale
+vortex.market.sell_hint=Every player will see your offer in the auction house.
+vortex.market.sell_this=Sell this item
+vortex.market.sold_left=Sold / Left
+vortex.market.staged=Items to sell (%count%/%max%)
+vortex.market.status.expired=Expired
+vortex.market.status.on_sale=On sale
+vortex.market.status.withdrawn=Withdrawn
+vortex.market.suggested_price=Suggested price
+vortex.market.tab.buy=Buy
+vortex.market.tab.history=History
+vortex.market.tab.sales=My sales
+vortex.market.tab.sell=Sell
+vortex.market.time_left=Time left
+vortex.market.title=Auction house
+vortex.market.total_quantity=Total quantity
+vortex.market.unstage_all=Remove all
+vortex.market.withdraw=Withdraw
+vortex.market.your_offer=Your offer

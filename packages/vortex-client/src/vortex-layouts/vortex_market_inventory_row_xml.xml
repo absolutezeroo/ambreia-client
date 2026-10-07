@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_market_inventory_row_xml" width="240" height="38" version="0.1">
+  <window>
+    <border x="0" y="0" width="240" height="38" params="17" style="2" name="inventory_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+      <children>
+        <border x="3" y="3" width="32" height="32" params="16" style="2" color="0xe4e4dc">
+          <children>
+            <static_bitmap x="0" y="0" width="32" height="32" params="16" style="3" name="item_icon" tags="%23icon">
+              <variables>
+                <var key="asset_uri" value="rpg/gems-materials/icon_16" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <text x="42" y="11" width="150" height="16" params="16" style="3" name="item_name" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="196" y="11" width="38" height="16" params="16" style="3" name="qty_txt" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="auto_size" value="right" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </border>
+  </window>
+</layout>

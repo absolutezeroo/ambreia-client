@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_character_tab_overview_xml" width="594" height="500" version="0.1">
+  <window>
+    <container x="0" y="0" width="594" height="500" params="16" style="3" name="tab_root">
+      <children>
+        <container x="8" y="0" width="280" height="500" params="16" style="3" name="character_sheet_slot">
+          <children/>
+        </container>
+        <text x="296" y="2" width="260" height="16" params="16" style="3" caption="${vortex.ui.informations}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0x24607f" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="296" y="22" width="290" height="132" params="16" style="2" name="info">
+          <children>
+            <border x="8" y="8" width="44" height="44" params="16" style="2" color="0xe4e4dc">
+              <children>
+                <widget x="5" y="4" width="33" height="34" params="16" style="3" name="head_image">
+                  <variables>
+                    <var key="widget_type" value="avatar_image" type="String"/>
+                    <var key="avatar_image:only_head" value="true" type="Boolean"/>
+                    <var key="avatar_image:cropped" value="true" type="Boolean"/>
+                  </variables>
+                </widget>
+              </children>
+            </border>
+            <text x="62" y="11" width="180" height="18" params="16" style="3" name="name_txt" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="14" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="62" y="32" width="180" height="16" params="16" style="3" name="level_txt" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0xff8133" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <region x="262" y="10" width="20" height="20" params="17" style="3" dynamic_style="button" name="edit_name" treshold="0">
+              <children>
+                <static_bitmap x="2" y="2" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf0c040">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/tools_crafting_graphic_design_pencil_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </region>
+            <container x="8" y="60" width="274" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+            <text x="8" y="68" width="80" height="16" params="16" style="3" caption="${vortex.character.class}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="88" y="68" width="160" height="16" params="16" style="3" name="class_txt" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="8" y="88" width="80" height="16" params="16" style="3" caption="${vortex.character.active_title}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="88" y="88" width="160" height="16" params="16" style="3" name="title_txt" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <region x="262" y="86" width="20" height="20" params="17" style="3" dynamic_style="button" name="edit_title" treshold="0">
+              <children>
+                <static_bitmap x="2" y="2" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf0c040">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/tools_crafting_graphic_design_pencil_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </region>
+            <text x="8" y="108" width="80" height="16" params="16" style="3" caption="${vortex.character.guild}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <link x="88" y="108" width="160" height="16" params="1" style="3" name="guild_link" caption="" treshold="0">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x1077ac" type="hex"/>
+                <var key="underline" value="true" type="Boolean"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </link>
+          </children>
+        </border>
+        <text x="296" y="162" width="260" height="16" params="16" style="3" caption="${vortex.character.title_section}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0x24607f" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="296" y="182" width="290" height="76" params="16" style="2" name="active_title" color="0xf5ebc4">
+          <children>
+            <border x="8" y="10" width="40" height="40" params="16" style="2" name="active_title_emblem" color="0xe4e4dc">
+              <children>
+                <static_bitmap x="6" y="7" width="28" height="27" params="16" style="3" name="active_title_emblem_icon" tags="%23icon">
+                  <variables>
+                    <var key="asset_uri" value="extended_profile_icon_star_gem" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <text x="56" y="9" width="160" height="16" params="16" style="3" name="title_name" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <border x="230" y="7" width="52" height="20" params="16" style="2" name="title_state" color="0xb8e090">
+              <children>
+                <text x="0" y="2" width="52" height="16" params="16" style="3" name="title_state_txt" caption="${vortex.ui.active}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x2b7000" type="hex"/>
+                    <var key="auto_size" value="center" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+            <text x="56" y="27" width="226" height="30" params="16" style="3" name="title_desc" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="multiline" value="true" type="Boolean"/>
+                <var key="word_wrap" value="true" type="Boolean"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <link x="140" y="56" width="142" height="16" params="1" style="3" name="all_titles_link" caption="${vortex.character.titles.see_all}" treshold="0">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x1077ac" type="hex"/>
+                <var key="auto_size" value="right" type="String"/>
+                <var key="underline" value="true" type="Boolean"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </link>
+          </children>
+        </border>
+        <text x="296" y="266" width="260" height="16" params="16" style="3" caption="${vortex.reputation.title}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0x24607f" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="296" y="286" width="290" height="214" params="16" style="2" name="reputation">
+          <children>
+            <itemlist_vertical x="8" y="8" width="274" height="200" params="16" style="3" name="faction_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="6" type="int"/>
+              </variables>
+            </itemlist_vertical>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

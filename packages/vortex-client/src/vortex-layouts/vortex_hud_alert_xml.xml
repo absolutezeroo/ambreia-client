@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_hud_alert_xml" width="460" height="40" version="0.1">
+  <window>
+    <container x="0" y="0" width="460" height="40" params="1073741840" style="3" name="hud_alert">
+      <children>
+        <border x="0" y="0" width="460" height="40" params="16" style="9" name="alert" color="0xb02818">
+          <children>
+            <static_bitmap x="10" y="4" width="32" height="32" params="16" style="3" tags="%23icon" color="0xffffff">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_warning_sign_triangle_exclaimation_mark_error_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="zoom_x" value="2" type="Number"/>
+                <var key="zoom_y" value="2" type="Number"/>
+              </variables>
+            </static_bitmap>
+            <text x="50" y="11" width="400" height="18" params="16" style="3" name="alert_txt" caption="${vortex.hud.alert.incoming}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="13" type="uint"/>
+                <var key="text_color" value="0xffffff" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

@@ -435,8 +435,11 @@ async function readImageAssets(imageBundle: AssetBundle, layoutNames: ReadonlySe
 
     for(const key of imageBundle.listKeys('images/'))
     {
-        // Extract asset name: 'images/icons_toolbar_reception_normal.png' → 'icons_toolbar_reception_normal'
-        const name = key.split('/').pop()!.replace('.png', '');
+        // Extract asset name: 'images/icons_toolbar_reception_normal.png' → 'icons_toolbar_reception_normal'.
+        // A subfolder stays in the name ('images/rpg/skills/x.png' → 'rpg/skills/x'): the RPG icon
+        // sets reuse file names across folders (icon_00…icon_63 in each), so the bare file name
+        // would let the last folder overwrite the others.
+        const name = key.slice('images/'.length).replace(/\.png$/, '');
 
         // Registered as a thunk, not a URL. Every *name* still goes in before the engine boots
         // (that is what `hasAsset()` and the pre-bootstrap registration need — see

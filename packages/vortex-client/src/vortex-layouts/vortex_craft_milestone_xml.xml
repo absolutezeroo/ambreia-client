@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_craft_milestone_xml" width="122" height="92" version="0.1">
+  <window>
+    <border x="0" y="0" width="122" height="92" params="16" style="2" name="milestone" color="0xe0f0d0">
+      <children>
+        <text x="0" y="4" width="122" height="16" params="16" style="3" name="milestone_level" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="auto_size" value="center" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <static_bitmap x="53" y="20" width="16" height="16" params="16" style="3" name="state_icon" tags="%23icon" color="0x40b030">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/software_signs_checkmark_checkbox_ticked_todo_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <static_bitmap x="53" y="41" width="16" height="16" params="16" style="3" name="milestone_icon" tags="%23icon" color="0xb08050">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/tools_crafting_profession_woodcutting_lumber_trees_wood_chopping_axe_hatchet_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <text x="4" y="62" width="114" height="28" params="16" style="3" name="milestone_label" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="auto_size" value="center" type="String"/>
+            <var key="multiline" value="true" type="Boolean"/>
+            <var key="word_wrap" value="true" type="Boolean"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </border>
+  </window>
+</layout>
