@@ -426,3 +426,41 @@ git ls-files '*.ts' | wc -l
 git add -A -- docs
 git commit -m "m0: bilan du ménage client" -- docs
 ```
+
+---
+
+### Task 12 : Protocole RPG — retirer les champs et noms morts (serveur + client ensemble)
+
+Décision du propriétaire (2026-10-06) : les deux M0 gardent volontairement la forme des messages et écrivent des valeurs fixes (`false`/`0`/`""`) dans les champs des features retirées, pour que le client non nettoyé lise encore le serveur nettoyé. Une fois les deux M0 terminés, ces champs n'ont plus de raison d'exister : le protocole du fork diverge volontairement du client Habbo officiel (spec §3.4).
+
+Prérequis : Tâche 11 de ce plan verte, et le bilan du M0 serveur (`vortex-rpg-emulator/docs/superpowers/plans/2026-10-05-m0-menage-serveur.bilan.md` ou la description de sa PR) qui liste les champs réseau figés.
+
+**Règle :** un message = un commit **dans chacun des deux dépôts**, faits ensemble : retirer le champ dans le serializer serveur (`vortex-rpg-emulator/Vortex.Revisions/Revision20260701/Serializers/**`), dans le parser client (`packages/vortex-engine/src/habbo/communication/messages/parser/**`) et dans le test de forme réseau serveur (`Vortex.Revisions.Tests/**`, adapter les octets attendus). Un message dont il ne reste rien d'utile (ex. `RoomRatingMessageComposer`, envoyé à l'entrée en room avec `CanRate = false`) est supprimé des deux côtés, avec son envoi serveur et son event client.
+
+- [ ] **Step 1 : inventaire**
+
+Partir de la liste du bilan serveur, puis la compléter :
+```bash
+# côté serveur : valeurs figées écrites par les serializers et handlers gardés
+cd ../vortex-rpg-emulator && git log --oneline main..m0-menage
+grep -rnE "(Wired|Breed|Harvest|Revive|Plant|CanRate|Camera)[A-Za-z]* = (false|0|\"\")" --include=*.cs Vortex.PacketHandlers Vortex.Rooms Vortex.Revisions | grep -v /Tests/
+```
+Point de départ connu : préférences du compte (5 champs wired, `VariableSyntaxMode`, `UiStyle`), `RoomRating` (`CanRate`), statut et infos de pet (`CanBreed`, `CanHarvest`, `CanRevive`, `HasBreedingPermission`, champs plante et bien-être), perk caméra à la connexion. Écrire l'inventaire (message, champ, fichier serveur, fichier client) dans le ledger de la tâche avant de toucher au code.
+
+- [ ] **Step 2 : un message à la fois**
+
+Pour chaque message : serveur (serializer + test de forme réseau + appelants qui remplissaient le champ), client (parser + consommateurs du getter), puis `dotnet build Vortex.Main/Vortex.Main.csproj -t:VortexCloudFastCheck` côté serveur et les 4 commandes de vérification côté client. Les ids de header d'un message gardé ne changent pas.
+
+- [ ] **Step 3 : noms morts côté serveur**
+
+Dans `vortex-rpg-emulator` : renommer les types gardés qui portent encore « Wired » sans rapport avec les wired (`WiredGameStartedEvent`, `WiredGameEndedEvent`, `WiredTeamScoreChangedEvent`, `ScoreReason.Wired`, `GameAuraSet.Wired`, `ActionContext.Wired`/`CreateForWired`…) et retirer les valeurs d'enum gardées seulement pour la base historique (`CommerceOperation.WiredChestContract`, `VaultRewardCategoryType.WiredChest`, `WordFilterSource.Wired`, colonnes `FurnitureEntity.WiredChestEntityId`/`JukeboxEntityId` et leurs filtres) : la migration `InitialCreate` du M0 serveur part d'une base neuve, rien de persisté ne les porte. Cela demande une nouvelle migration EF.
+
+- [ ] **Step 4 : vérifier**
+
+Serveur : `VortexCloudFastCheck` vert. Client : les 4 commandes vertes. Refaire le parcours de fumée de la Tâche 11 : console du client sans erreur de lecture de message.
+
+```bash
+# client
+git add -A -- packages docs && git commit -m "m0: protocole RPG sans champs morts" -- packages docs
+# serveur : un commit nommant ses chemins, même message
+```
