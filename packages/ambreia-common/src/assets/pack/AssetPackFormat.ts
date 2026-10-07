@@ -51,7 +51,8 @@ export class AssetPackWriter
         this._index = {v: PACK_VERSION, kind, items: {}, images: []};
     }
 
-    addItem(name: string, manifest: Record<string, unknown>, images: readonly IPackImageInput[]): void
+    /** Adds a piece; returns its compressed manifest, so a build can check it decodes back. */
+    addItem(name: string, manifest: Record<string, unknown>, images: readonly IPackImageInput[]): Uint8Array
     {
         if(this._index.items[name]) throw new Error(`Pack: "${name}" is added twice`);
 
@@ -77,6 +78,14 @@ export class AssetPackWriter
 
             entries.push([image.entryName, at]);
         }
+
+        return compressed;
+    }
+
+    /** Whether an image with this key is stored already (later pieces only point at it). */
+    hasImage(key: string): boolean
+    {
+        return this._imageByKey.has(key);
     }
 
     finish(): Uint8Array
