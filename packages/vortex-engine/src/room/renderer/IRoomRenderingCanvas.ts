@@ -11,7 +11,7 @@
 import type {Container, Renderer} from 'pixi.js';
 import type {IRoomGeometry} from '../utils/IRoomGeometry';
 import type {IRoomRenderingCanvasMouseListener} from './IRoomRenderingCanvasMouseListener';
-import type {RoomObjectSpriteData} from '../data/RoomObjectSpriteData';
+import type {RoomObjectSpriteData} from '@ambreia/common/graphics/RoomObjectSpriteData';
 
 export interface IRoomRenderingCanvas
 {

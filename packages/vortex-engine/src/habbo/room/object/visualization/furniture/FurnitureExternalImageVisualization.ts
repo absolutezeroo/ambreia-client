@@ -14,7 +14,7 @@
  * AS3 loads the resolved thumbnail URL through `flash.display.Loader`; that happens one class up,
  * in `FurnitureDynamicThumbnailVisualization` (see its header for the browser-side substitution).
  */
-import type {IGraphicAsset} from '@room/object/visualization/utils/IGraphicAsset';
+import type {IGraphicAsset} from '@ambreia/common/graphics/IGraphicAsset';
 import type {IRoomObjectSprite} from '@room/object/visualization/IRoomObjectSprite';
 import {RoomObjectVariableEnum} from '@habbo/room/object/RoomObjectVariableEnum';
 import {Logger} from '@ambreia/common/utils/Logger';

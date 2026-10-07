@@ -15,7 +15,7 @@
  * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/furniture/FurnitureWaterAreaVisualization.as
  */
 import type {Texture} from 'pixi.js';
-import type {IGraphicAsset} from '@room/object/visualization/utils/IGraphicAsset';
+import type {IGraphicAsset} from '@ambreia/common/graphics/IGraphicAsset';
 import {RoomObjectVariableEnum} from '@habbo/room/object/RoomObjectVariableEnum';
 import {AnimatedFurnitureVisualization} from './AnimatedFurnitureVisualization';
 import {ShoreMaskCreatorUtility} from './ShoreMaskCreatorUtility';

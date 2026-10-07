@@ -5,7 +5,7 @@
  *
  * Individual particle with position, velocity (verlet), lifetime, and fade.
  */
-import type {IGraphicAsset} from '@room/object/visualization/utils/IGraphicAsset';
+import type {IGraphicAsset} from '@ambreia/common/graphics/IGraphicAsset';
 
 export class FurnitureParticleSystemParticle
 {

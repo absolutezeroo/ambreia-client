@@ -1,6 +1,6 @@
 import type {IAssetLibrary, NitroAsset} from '@core/assets';
-import type {IGraphicAsset} from '@room/object/visualization/utils/IGraphicAsset';
-import {GraphicAssetCollection} from '@room/object/visualization/utils/GraphicAssetCollection';
+import type {IGraphicAsset} from '@ambreia/common/graphics/IGraphicAsset';
+import {GraphicAssetCollection} from '@ambreia/common/graphics/GraphicAssetCollection';
 import {AssetAlias} from './AssetAlias';
 
 /**

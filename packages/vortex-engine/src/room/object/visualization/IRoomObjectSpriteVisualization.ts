@@ -9,8 +9,8 @@
  */
 import type {IRoomObjectVisualization} from './IRoomObjectVisualization';
 import type {IRoomObjectSprite} from './IRoomObjectSprite';
-import type {IGraphicAssetCollection} from './utils/IGraphicAssetCollection';
-import type {RoomObjectSpriteData} from '@room/data/RoomObjectSpriteData';
+import type {IGraphicAssetCollection} from '@ambreia/common/graphics/IGraphicAssetCollection';
+import type {RoomObjectSpriteData} from '@ambreia/common/graphics/RoomObjectSpriteData';
 
 export interface IRoomObjectSpriteVisualization extends IRoomObjectVisualization
 {

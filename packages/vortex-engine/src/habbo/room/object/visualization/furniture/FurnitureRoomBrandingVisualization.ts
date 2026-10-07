@@ -7,7 +7,7 @@
  * Loads images from asset collection and creates state-dependent variants.
  */
 import type {IRoomObjectSprite} from '@room/object/visualization/IRoomObjectSprite';
-import type {IGraphicAsset} from '@room/object/visualization/utils/IGraphicAsset';
+import type {IGraphicAsset} from '@ambreia/common/graphics/IGraphicAsset';
 import {FurnitureVisualization} from './FurnitureVisualization';
 import {Texture} from 'pixi.js';
 

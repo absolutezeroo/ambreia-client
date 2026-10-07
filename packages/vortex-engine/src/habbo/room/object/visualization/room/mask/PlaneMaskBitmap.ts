@@ -5,7 +5,7 @@
  *
  * Data object storing one bitmap mask with normalized coordinate bounds.
  */
-import type {IGraphicAsset} from '@room/object/visualization/utils/IGraphicAsset';
+import type {IGraphicAsset} from '@ambreia/common/graphics/IGraphicAsset';
 
 export class PlaneMaskBitmap
 {

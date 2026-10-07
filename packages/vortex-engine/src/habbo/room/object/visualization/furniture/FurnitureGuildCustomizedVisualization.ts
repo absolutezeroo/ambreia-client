@@ -7,7 +7,7 @@
  * Handles isometric thumbnail projection per direction.
  */
 import type {Texture} from 'pixi.js';
-import type {IGraphicAsset} from '@room/object/visualization/utils/IGraphicAsset';
+import type {IGraphicAsset} from '@ambreia/common/graphics/IGraphicAsset';
 import {AnimatedFurnitureVisualization} from './AnimatedFurnitureVisualization';
 
 export class FurnitureGuildCustomizedVisualization extends AnimatedFurnitureVisualization

@@ -144,3 +144,18 @@ test('moves into two different packages in one run reach each other by package n
 
     assert.deepEqual(next(p, 'eng/src/room/R.ts'), ['../avatar/A -> @x/avatar/A']);
 });
+
+test('a moved file that imported its destination package by name now reaches it relatively', () =>
+{
+    const p = planMoves({
+        root: project({
+            'eng/src/room/G.ts': "import type {D} from '@x/common/D';\n",
+            'common/src/D.ts': 'export interface D {}\n'
+        }),
+        scan: ['eng/src', 'common/src'],
+        aliases: ALIASES,
+        moves: [{ from: 'eng/src/room/G.ts', to: 'common/src/graphics/G.ts', specifier: '@x/common/graphics/G' }]
+    });
+
+    assert.deepEqual(next(p, 'eng/src/room/G.ts'), ['@x/common/D -> ../D']);
+});

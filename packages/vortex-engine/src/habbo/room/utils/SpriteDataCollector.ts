@@ -5,7 +5,7 @@ import {RoomEngine, type IRoomEngineRectangle} from '@habbo/room/RoomEngine';
 import type {RoomRenderingCanvas} from '@habbo/room/renderer/RoomRenderingCanvas';
 import {PlaneDrawingData} from '@habbo/room/object/visualization/room/PlaneDrawingData';
 import type {IPlaneDrawingData} from '@room/object/visualization/IPlaneDrawingData';
-import type {RoomObjectSpriteData} from '@room/data/RoomObjectSpriteData';
+import type {RoomObjectSpriteData} from '@ambreia/common/graphics/RoomObjectSpriteData';
 import type {IRoomObjectSpriteVisualization} from '@room/object/visualization/IRoomObjectSpriteVisualization';
 import {RoomObjectCategoryEnum} from '@habbo/room/object/RoomObjectCategoryEnum';
 import type {RoomPlane} from '@habbo/room/object/visualization/room/RoomPlane';

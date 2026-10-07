@@ -9,7 +9,7 @@
  * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/furniture/FurnitureMannequinVisualization.as
  */
 import type {IRoomObjectVisualizationData} from '@room/object/visualization/IRoomObjectVisualizationData';
-import type {RoomObjectSpriteData} from '@room/data/RoomObjectSpriteData';
+import type {RoomObjectSpriteData} from '@ambreia/common/graphics/RoomObjectSpriteData';
 import type {IAvatarImage} from '@habbo/avatar/IAvatarImage';
 import type {IAvatarImageListener} from '@habbo/avatar/IAvatarImageListener';
 import {RoomObjectVariableEnum} from '@habbo/room/object/RoomObjectVariableEnum';

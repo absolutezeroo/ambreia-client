@@ -6,7 +6,7 @@
  * Interface for managing collections of graphic assets with palette support and reference counting.
  */
 import type {Texture} from 'pixi.js';
-import type {IDisposable} from '@ambreia/common/IDisposable';
+import type {IDisposable} from '../IDisposable';
 import type {IGraphicAsset} from './IGraphicAsset';
 
 export interface IGraphicAssetCollection extends IDisposable

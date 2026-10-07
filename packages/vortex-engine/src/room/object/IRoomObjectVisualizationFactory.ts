@@ -10,7 +10,7 @@
  */
 import type {IRoomObjectVisualization} from './visualization/IRoomObjectVisualization';
 import type {IRoomObjectVisualizationData} from './visualization/IRoomObjectVisualizationData';
-import type {IGraphicAssetCollection} from './visualization/utils/IGraphicAssetCollection';
+import type {IGraphicAssetCollection} from '@ambreia/common/graphics/IGraphicAssetCollection';
 
 export interface IRoomObjectVisualizationFactory
 {

@@ -12,7 +12,7 @@ import type {IAvatarEffectListener} from './IAvatarEffectListener';
 import type {IFigureData} from './structure/IFigureData';
 import {ErrorReportStorage} from '@ambreia/common/utils/ErrorReportStorage';
 import {AvatarStructure} from './AvatarStructure';
-import type {IGraphicAsset} from '@room/object/visualization/utils/IGraphicAsset';
+import type {IGraphicAsset} from '@ambreia/common/graphics/IGraphicAsset';
 import {AssetAliasCollection} from './alias/AssetAliasCollection';
 import {AvatarFigureContainer} from './AvatarFigureContainer';
 import {AvatarImage} from './AvatarImage';

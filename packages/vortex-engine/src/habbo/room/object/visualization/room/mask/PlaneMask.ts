@@ -6,7 +6,7 @@
  * Manager for mask visualizations at different sizes.
  * Maps size → PlaneMaskVisualization and caches current visualization.
  */
-import type {IGraphicAsset} from '@room/object/visualization/utils/IGraphicAsset';
+import type {IGraphicAsset} from '@ambreia/common/graphics/IGraphicAsset';
 import type {IVector3d} from '@room/utils/IVector3d';
 import {PlaneMaskVisualization} from './PlaneMaskVisualization';
 

@@ -14,7 +14,7 @@ import type {IRoomContentLoader, RoomContentData} from '@room/IRoomContentLoader
 import type {IRoomObject} from '@room/object/IRoomObject';
 import type {IRoomObjectController} from '@room/object/IRoomObjectController';
 import type {IRoomObjectVisualizationFactory} from '@room/object/IRoomObjectVisualizationFactory';
-import type {IGraphicAssetCollection} from '@room/object/visualization/utils/IGraphicAssetCollection';
+import type {IGraphicAssetCollection} from '@ambreia/common/graphics/IGraphicAssetCollection';
 import type {IAsset} from '@ambreia/common/assets/IAsset';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import {AssetLibraryCollection} from '@core/assets/AssetLibraryCollection';

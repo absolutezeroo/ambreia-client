@@ -7,7 +7,7 @@
  * and sprite delegation.
  */
 import {Texture} from 'pixi.js';
-import type {IGraphicAsset} from '@room/object/visualization/utils/IGraphicAsset';
+import type {IGraphicAsset} from '@ambreia/common/graphics/IGraphicAsset';
 import type {IRoomObjectSprite} from '@room/object/visualization/IRoomObjectSprite';
 import type {AnimatedFurnitureVisualization} from './AnimatedFurnitureVisualization';
 import {FurnitureParticleSystemEmitter} from './FurnitureParticleSystemEmitter';

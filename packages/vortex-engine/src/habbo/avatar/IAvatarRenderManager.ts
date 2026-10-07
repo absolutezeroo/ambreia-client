@@ -6,7 +6,7 @@ import type {IAvatarImage} from './IAvatarImage';
 import type {IAvatarImageListener} from './IAvatarImageListener';
 import type {IAvatarEffectListener} from './IAvatarEffectListener';
 import type {IFigureData} from './structure/IFigureData';
-import type {IGraphicAsset} from '@room/object/visualization/utils/IGraphicAsset';
+import type {IGraphicAsset} from '@ambreia/common/graphics/IGraphicAsset';
 
 /**
  * Interface for the avatar render manager component.

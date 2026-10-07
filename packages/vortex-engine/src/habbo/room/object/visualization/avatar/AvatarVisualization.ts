@@ -27,7 +27,7 @@ import type {IAvatarImageListener} from '@habbo/avatar/IAvatarImageListener';
 import type {IAvatarEffectListener} from '@habbo/avatar/IAvatarEffectListener';
 import type {IAvatarPartSpriteSet} from '@habbo/avatar/AvatarPartSprite';
 import type {IRoomObjectSprite} from '@room/object/visualization/IRoomObjectSprite';
-import {RoomObjectSpriteData} from '@room/data/RoomObjectSpriteData';
+import {RoomObjectSpriteData} from '@ambreia/common/graphics/RoomObjectSpriteData';
 import {AvatarRenderMode} from '@habbo/avatar/AvatarRenderMode';
 import type {IAvatarAddition} from './additions/IAvatarAddition';
 import {RoomObjectSpriteVisualization} from '@room/object/visualization/RoomObjectSpriteVisualization';

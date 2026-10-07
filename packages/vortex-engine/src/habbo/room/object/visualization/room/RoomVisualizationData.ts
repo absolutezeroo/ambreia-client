@@ -13,7 +13,7 @@ import {WallAdRasterizer} from './rasterizer/basic/WallAdRasterizer';
 import {LandscapeRasterizer} from './rasterizer/animated/LandscapeRasterizer';
 import type {IAssetRoomVisualizationData} from './rasterizer/basic/PlaneRasterizerTypes';
 import {PlaneMaskManager} from './mask/PlaneMaskManager';
-import type {IGraphicAssetCollection} from '@room/object/visualization/utils/IGraphicAssetCollection';
+import type {IGraphicAssetCollection} from '@ambreia/common/graphics/IGraphicAssetCollection';
 import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('habbo.room.object.visualization.room.RoomVisualizationData');

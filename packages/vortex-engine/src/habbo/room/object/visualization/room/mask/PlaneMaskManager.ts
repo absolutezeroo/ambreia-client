@@ -6,7 +6,7 @@
  * Parses mask configuration (JSON adapted from XML), creates PlaneMask objects,
  * and applies mask bitmaps to plane drawing.
  */
-import type {IGraphicAssetCollection} from '@room/object/visualization/utils/IGraphicAssetCollection';
+import type {IGraphicAssetCollection} from '@ambreia/common/graphics/IGraphicAssetCollection';
 import type {IVector3d} from '@room/utils/IVector3d';
 import {PlaneMask} from './PlaneMask';
 

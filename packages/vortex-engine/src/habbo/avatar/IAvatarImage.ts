@@ -5,8 +5,8 @@ import type {ISpriteDataContainer} from './animation/ISpriteDataContainer';
 import type {IAvatarFigureContainer} from './IAvatarFigureContainer';
 import type {IPartColor} from './structure/figure/IPartColor';
 import type {IAvatarPartSpriteSet} from './AvatarPartSprite';
-import type {IGraphicAsset} from '@room/object/visualization/utils/IGraphicAsset';
-import type {RoomObjectSpriteData} from '@room/data/RoomObjectSpriteData';
+import type {IGraphicAsset} from '@ambreia/common/graphics/IGraphicAsset';
+import type {RoomObjectSpriteData} from '@ambreia/common/graphics/RoomObjectSpriteData';
 
 /**
  * Interface for avatar images that can be rendered.

@@ -24,7 +24,7 @@ import {AvatarImageDirectionCache} from './AvatarImageDirectionCache';
 import {AvatarImageBodyPartContainer} from '../AvatarImageBodyPartContainer';
 import type {IColorTransformData} from './ImageData';
 import {ImageData} from './ImageData';
-import {RoomObjectSpriteData} from '@room/data/RoomObjectSpriteData';
+import {RoomObjectSpriteData} from '@ambreia/common/graphics/RoomObjectSpriteData';
 
 /**
  * Main cache manager for avatar image rendering.

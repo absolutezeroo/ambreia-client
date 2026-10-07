@@ -40,7 +40,7 @@ import {RoomCullingMode} from './RoomCullingMode';
 import {RoomObjectUserTypes} from '@habbo/room/object/RoomObjectUserTypes';
 import {RoomObjectVariableEnum} from '@habbo/room/object/RoomObjectVariableEnum';
 import type {IVector3d} from '@room/utils/IVector3d';
-import {RoomObjectSpriteData} from '@room/data/RoomObjectSpriteData';
+import {RoomObjectSpriteData} from '@ambreia/common/graphics/RoomObjectSpriteData';
 import type {IRoomObjectSprite} from '@room/object/visualization/IRoomObjectSprite';
 import {StringUtil} from '@habbo/utils/StringUtil';
 import {Canvas} from '@habbo/utils/Canvas';

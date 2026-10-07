@@ -14,7 +14,7 @@
 import {Texture} from 'pixi.js';
 import type {IRoomGeometry} from '@room/utils/IRoomGeometry';
 import type {IRoomObjectVisualizationData} from '@room/object/visualization/IRoomObjectVisualizationData';
-import type {IGraphicAsset} from '@room/object/visualization/utils/IGraphicAsset';
+import type {IGraphicAsset} from '@ambreia/common/graphics/IGraphicAsset';
 import {AnimationStateData} from '../data/AnimationStateData';
 import type {AnimationFrame} from '../data/AnimationFrame';
 import {AnimatedFurnitureVisualization} from '../furniture/AnimatedFurnitureVisualization';

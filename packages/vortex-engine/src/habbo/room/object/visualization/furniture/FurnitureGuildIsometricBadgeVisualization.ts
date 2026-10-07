@@ -6,7 +6,7 @@
  * Guild-customized furniture with two custom colors and badge thumbnail.
  */
 import type {IRoomObjectSprite} from '@room/object/visualization/IRoomObjectSprite';
-import type {IGraphicAsset} from '@room/object/visualization/utils/IGraphicAsset';
+import type {IGraphicAsset} from '@ambreia/common/graphics/IGraphicAsset';
 import {FurnitureGuildCustomizedVisualization} from './FurnitureGuildCustomizedVisualization';
 
 export class FurnitureGuildIsometricBadgeVisualization extends FurnitureGuildCustomizedVisualization

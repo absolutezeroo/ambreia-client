@@ -6,7 +6,7 @@
  * Displays user badges on furniture with auto-centering.
  */
 import type {IRoomObjectSprite} from '@room/object/visualization/IRoomObjectSprite';
-import type {IGraphicAsset} from '@room/object/visualization/utils/IGraphicAsset';
+import type {IGraphicAsset} from '@ambreia/common/graphics/IGraphicAsset';
 import {AnimatedFurnitureVisualization} from './AnimatedFurnitureVisualization';
 
 export class FurnitureBadgeDisplayVisualization extends AnimatedFurnitureVisualization

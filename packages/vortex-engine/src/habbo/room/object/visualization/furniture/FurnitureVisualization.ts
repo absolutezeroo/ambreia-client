@@ -11,7 +11,7 @@
 import type {IRoomGeometry} from '@room/utils/IRoomGeometry';
 import type {IRoomObjectSprite} from '@room/object/visualization/IRoomObjectSprite';
 import type {IRoomObjectVisualizationData} from '@room/object/visualization/IRoomObjectVisualizationData';
-import type {IGraphicAsset} from '@room/object/visualization/utils/IGraphicAsset';
+import type {IGraphicAsset} from '@ambreia/common/graphics/IGraphicAsset';
 import {RoomObjectSpriteVisualization} from '@room/object/visualization/RoomObjectSpriteVisualization';
 import {FurnitureVisualizationData} from './FurnitureVisualizationData';
 

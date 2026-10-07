@@ -1,8 +1,8 @@
 import {Texture} from 'pixi.js';
 import type {AvatarStructure} from './AvatarStructure';
 import type {AssetAliasCollection} from './alias/AssetAliasCollection';
-import type {IGraphicAsset} from '@room/object/visualization/utils/IGraphicAsset';
-import type {RoomObjectSpriteData} from '@room/data/RoomObjectSpriteData';
+import type {IGraphicAsset} from '@ambreia/common/graphics/IGraphicAsset';
+import type {RoomObjectSpriteData} from '@ambreia/common/graphics/RoomObjectSpriteData';
 import {AvatarFigureContainer} from './AvatarFigureContainer';
 import type {IAvatarImage} from './IAvatarImage';
 import type {IAvatarFigureContainer} from './IAvatarFigureContainer';

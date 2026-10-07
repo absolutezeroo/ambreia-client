@@ -11,7 +11,7 @@ import type {EventEmitter} from 'eventemitter3';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import type {IDisposable} from '@ambreia/common/IDisposable';
 import type {IRoomObject} from './object/IRoomObject';
-import type {IGraphicAssetCollection} from './object/visualization/utils/IGraphicAssetCollection';
+import type {IGraphicAssetCollection} from '@ambreia/common/graphics/IGraphicAssetCollection';
 
 export type RoomContentData = Record<string, unknown>;
 

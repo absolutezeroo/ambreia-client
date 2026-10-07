@@ -15,8 +15,8 @@ import {ColorConverter} from '@room/utils/ColorConverter';
 import type {IRoomObjectSprite} from './IRoomObjectSprite';
 import type {IRoomObjectSpriteVisualization} from './IRoomObjectSpriteVisualization';
 import type {IRoomObjectVisualizationData} from './IRoomObjectVisualizationData';
-import type {IGraphicAssetCollection} from './utils/IGraphicAssetCollection';
-import type {RoomObjectSpriteData} from '@room/data/RoomObjectSpriteData';
+import type {IGraphicAssetCollection} from '@ambreia/common/graphics/IGraphicAssetCollection';
+import type {RoomObjectSpriteData} from '@ambreia/common/graphics/RoomObjectSpriteData';
 import {RoomObjectSprite} from './RoomObjectSprite';
 import {Vortex} from '../../../Vortex';
 

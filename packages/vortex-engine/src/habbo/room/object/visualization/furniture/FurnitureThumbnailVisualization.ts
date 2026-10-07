@@ -17,7 +17,7 @@
  * only, never for behavior — the body ported below is WIN63's.
  */
 import {Texture} from 'pixi.js';
-import type {IGraphicAsset} from '@room/object/visualization/utils/IGraphicAsset';
+import type {IGraphicAsset} from '@ambreia/common/graphics/IGraphicAsset';
 import {AnimatedFurnitureVisualization} from './AnimatedFurnitureVisualization';
 
 export class FurnitureThumbnailVisualization extends AnimatedFurnitureVisualization

@@ -207,7 +207,7 @@ import {
 import {RoomUserData} from '@habbo/communication/messages/incoming/room/engine/RoomUserData';
 import {RoomObjectMouseEvent} from '@room/events/RoomObjectMouseEvent';
 import {OrderedMap} from '@ambreia/common/utils/OrderedMap';
-import {GraphicAssetCollection} from '@room/object/visualization/utils/GraphicAssetCollection';
+import {GraphicAssetCollection} from '@ambreia/common/graphics/GraphicAssetCollection';
 
 const log = Logger.getLogger('habbo.room.RoomEngine');
 

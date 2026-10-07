@@ -5,7 +5,7 @@
  *
  * Container of PlaneMaskBitmaps. Finds applicable asset by normalized position.
  */
-import type {IGraphicAsset} from '@room/object/visualization/utils/IGraphicAsset';
+import type {IGraphicAsset} from '@ambreia/common/graphics/IGraphicAsset';
 import type {IVector3d} from '@room/utils/IVector3d';
 import {PlaneMaskBitmap} from './PlaneMaskBitmap';
 

@@ -70,6 +70,13 @@ export function planMoves({ root, scan, aliases, moves })
     };
     // `@scope/name/sub` → `@scope/name`.
     const packageOf = g => moves[g].specifier.split('/').slice(0, 2).join('/');
+    // The package's source folder: `to` minus the part of `specifier` after the package name.
+    const sourceRootOf = g =>
+    {
+        const sub = moves[g].specifier.slice(packageOf(g).length);
+        const to = stripTs(moves[g].to);
+        return to.slice(0, to.length - sub.length);
+    };
     const relativeTo = (file, target) =>
     {
         const rel = posix(path.relative(path.dirname(newPath(file)), stripTs(newPath(target))));
@@ -77,6 +84,12 @@ export function planMoves({ root, scan, aliases, moves })
     };
 
     const rewrites = new Map();
+    const record = (file, spec, next) =>
+    {
+        if(next === null || next === spec) return;
+        if(!rewrites.has(file)) rewrites.set(file, []);
+        rewrites.get(file).push({ spec, next });
+    };
     const violations = [];
     const files = [...new Set(scan.flatMap(dir => listFiles(root, dir)))];
 
@@ -88,6 +101,17 @@ export function planMoves({ root, scan, aliases, moves })
         for(const m of text.matchAll(SPEC_RE))
         {
             const spec = m[3];
+
+            // A file moving INTO a package may already import that package by name; once inside,
+            // the self-reference has to become relative like any other import within the package.
+            if(gFile >= 0 && spec.startsWith(packageOf(gFile) + '/'))
+            {
+                const own = resolveSpec(root, file, spec, { [packageOf(gFile)]: sourceRootOf(gFile) });
+
+                if(own !== null) record(file, spec, relativeTo(file, own));
+                continue;
+            }
+
             const target = resolveSpec(root, file, spec, aliases);
 
             if(target === null) continue;
@@ -110,11 +134,7 @@ export function planMoves({ root, scan, aliases, moves })
             }
             else next = specifierFor(target);
 
-            if(next !== null && next !== spec)
-            {
-                if(!rewrites.has(file)) rewrites.set(file, []);
-                rewrites.get(file).push({ spec, next });
-            }
+            record(file, spec, next);
         }
     }
 

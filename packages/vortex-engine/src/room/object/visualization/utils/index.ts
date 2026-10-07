@@ -1,8 +1,8 @@
 // Exports
-export {GraphicAsset} from './GraphicAsset';
-export {GraphicAssetCollection} from './GraphicAssetCollection';
-export {GraphicAssetPalette} from './GraphicAssetPalette';
+export {GraphicAsset} from '@ambreia/common/graphics/GraphicAsset';
+export {GraphicAssetCollection} from '@ambreia/common/graphics/GraphicAssetCollection';
+export {GraphicAssetPalette} from '@ambreia/common/graphics/GraphicAssetPalette';
 
 // Types
-export type {IGraphicAsset} from './IGraphicAsset';
-export type {IGraphicAssetCollection} from './IGraphicAssetCollection';
+export type {IGraphicAsset} from '@ambreia/common/graphics/IGraphicAsset';
+export type {IGraphicAssetCollection} from '@ambreia/common/graphics/IGraphicAssetCollection';

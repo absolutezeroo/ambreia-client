@@ -17,8 +17,8 @@
  * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/furniture/ShoreMaskCreatorUtility.as
  */
 import {Texture} from 'pixi.js';
-import type {IGraphicAsset} from '@room/object/visualization/utils/IGraphicAsset';
-import type {IGraphicAssetCollection} from '@room/object/visualization/utils/IGraphicAssetCollection';
+import type {IGraphicAsset} from '@ambreia/common/graphics/IGraphicAsset';
+import type {IGraphicAssetCollection} from '@ambreia/common/graphics/IGraphicAssetCollection';
 import {Rasterizer} from '@room/utils/Rasterizer';
 
 export class ShoreMaskCreatorUtility
