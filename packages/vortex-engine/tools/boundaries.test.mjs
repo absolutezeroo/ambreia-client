@@ -51,6 +51,25 @@ test('core: room/ and the Vortex entry points are refused', async () =>
     assert.equal(entry.length, 1);
 });
 
+test('core: the IVortex/IVortexMain interfaces are refused too (they import habbo)', async () =>
+{
+    const vortex = await wallHits("import type {IVortex} from '../IVortex';\nexport type {IVortex};\n",
+        'packages/vortex-engine/src/core/Probe.ts');
+    const main = await wallHits("import type {IVortexMain} from '../../IVortexMain';\nexport type {IVortexMain};\n",
+        'packages/vortex-engine/src/core/runtime/Probe.ts');
+
+    assert.equal(vortex.length, 1);
+    assert.equal(main.length, 1);
+});
+
+test('engine: a relative path into the client is refused', async () =>
+{
+    const hits = await wallHits("import {App} from '../../../../vortex-client/src/App';\nexport {App};\n",
+        'packages/vortex-engine/src/habbo/room/Probe.ts');
+
+    assert.equal(hits.length, 1);
+});
+
 test('core: the client wall still holds inside core', async () =>
 {
     const hits = await wallHits("import {X} from '@ui/window/X';\nexport {X};\n",

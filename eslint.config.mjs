@@ -9,7 +9,7 @@ import globals from 'globals';
 // so `wall()` always carries the engine-wide wall instead of relying on the block above it.
 const WALLS_SPEC = 'docs/superpowers/specs/2026-10-07-client-architecture-design.md §3';
 const ENGINE_NEVER_IMPORTS_CLIENT = {
-    regex: '^(@ui|@)/|^vortex-client(/|$)',
+    regex: '^(@ui|@)/|(^|/)vortex-client(/|$)',
     message: `The engine never imports the client (${WALLS_SPEC}).`
 };
 const wall = (...patterns) => ['error', { patterns: [ENGINE_NEVER_IMPORTS_CLIENT, ...patterns] }];
@@ -172,8 +172,8 @@ export default tseslint.config(
                     message: `core/ is the bottom layer: it never imports habbo/ or room/ (${WALLS_SPEC}).`
                 },
                 {
-                    regex: '(^|/)Vortex(Main)?$',
-                    message: `core/ never imports the Vortex entry points (${WALLS_SPEC}).`
+                    regex: '(^|/)I?Vortex(Main)?(\\.ts)?$',
+                    message: `core/ never imports the Vortex entry points or their interfaces (${WALLS_SPEC}).`
                 }
             )
         }
