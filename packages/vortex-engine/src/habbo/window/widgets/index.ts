@@ -4,7 +4,7 @@
 // Exports
 export {AvatarImageWidget} from './AvatarImageWidget';
 export {BadgeImageWidget} from './BadgeImageWidget';
-export {BalloonWidget} from './BalloonWidget';
+export {BalloonWidget} from '@ambreia/ui/kit/widgets/BalloonWidget';
 export {CountdownWidget} from '@ambreia/ui/kit/widgets/CountdownWidget';
 export {FurnitureImageWidget} from './FurnitureImageWidget';
 export {HoverBitmapWidget} from '@ambreia/ui/kit/widgets/HoverBitmapWidget';

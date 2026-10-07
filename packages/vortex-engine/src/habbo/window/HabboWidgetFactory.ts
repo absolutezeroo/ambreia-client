@@ -4,7 +4,7 @@ import type {IHabboWindowManager} from './IHabboWindowManager';
 import {Logger} from '@ambreia/common/utils/Logger';
 import {AvatarImageWidget} from './widgets/AvatarImageWidget';
 import {BadgeImageWidget} from './widgets/BadgeImageWidget';
-import {BalloonWidget} from './widgets/BalloonWidget';
+import {BalloonWidget} from '@ambreia/ui/kit/widgets/BalloonWidget';
 import {CountdownWidget} from '@ambreia/ui/kit/widgets/CountdownWidget';
 import {FurnitureImageWidget} from './widgets/FurnitureImageWidget';
 import {HoverBitmapWidget} from '@ambreia/ui/kit/widgets/HoverBitmapWidget';

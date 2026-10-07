@@ -1,14 +1,13 @@
-import type {IWidget} from '@ambreia/ui/kit/widgets/IWidget';
-import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
-import type {IWindowManager} from '@ambreia/ui/kit/IWindowManager';
-import type {IWindow} from '@ambreia/ui/IWindow';
-import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
-import {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
-import {WindowEvent} from '@ambreia/ui/events/WindowEvent';
-import type {WindowEventListener} from '@ambreia/ui/events/WindowEventDispatcher';
-import type {IIterator} from '@ambreia/ui/utils/IIterator';
-import {BalloonArrowPivot} from '@ambreia/ui/kit/enum/BalloonArrowPivot';
-import {MathUtils} from '@habbo/utils/MathUtils';
+import type {IWidget} from './IWidget';
+import type {IWidgetWindow} from '../../components/IWidgetWindow';
+import type {IWindowManager} from '../IWindowManager';
+import type {IWindow} from '../../IWindow';
+import type {IWindowContainer} from '../../IWindowContainer';
+import {PropertyStruct} from '../../utils/PropertyStruct';
+import {WindowEvent} from '../../events/WindowEvent';
+import type {WindowEventListener} from '../../events/WindowEventDispatcher';
+import type {IIterator} from '../../utils/IIterator';
+import {BalloonArrowPivot} from '../enum/BalloonArrowPivot';
 
 /**
  * Balloon / speech bubble widget.
@@ -335,10 +334,11 @@ export class BalloonWidget implements IWidget
         else if(position === BalloonArrowPivot.MAXIMUM) offset = along - BalloonWidget.ARROW_FREE_PADDING - BalloonWidget.ARROW_WIDTH;
         else offset = (along - BalloonWidget.ARROW_WIDTH) / 2;
 
-        const slide = MathUtils.clamp(
-            offset + this._arrowDisplacement,
+        // AS3 clamps through MathUtils.clamp() (habbo/utils/_SafeCls_2916.as), inlined here so the
+        // kit does not reach for the engine's MathUtils.
+        const slide = Math.max(
             BalloonWidget.ARROW_FREE_PADDING,
-            along - BalloonWidget.ARROW_FREE_PADDING
+            Math.min(along - BalloonWidget.ARROW_FREE_PADDING, offset + this._arrowDisplacement)
         );
 
         this._resizing = true;
