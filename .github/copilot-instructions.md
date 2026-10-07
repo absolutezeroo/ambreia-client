@@ -293,7 +293,8 @@ authority on every message; `sources/HABBO-ARCTURUS-DAYBREAK/` is not this proje
 6. **A new message uses the new style** (spec §6, `@ambreia/net/style/MessageMap`): a plain class, an
    `IIncomingParser` or `IOutgoingSerializer`, an `IMessageHandler`, and a `MessageMap` per domain
    installed on the connection (`map.install(connection)`, `map.send(connection, message)`). A header
-   an inherited event already serves is refused at install: take it out of `HabboMessages` first.
+   an inherited event already serves is refused at install: take it out of `HabboMessages` and add
+   it to `@ambreia/protocol/NewStyleHeaders` (the registration tests accept either style, never both).
 
 ## Rule: Room engine rules
 
