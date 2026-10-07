@@ -102,7 +102,7 @@ x=a+b                   // WRONG
 
 ### AS3 correspondence
 
-Names MUST match the AS3 except when TypeScript convention requires a change:
+Inherited classes keep their AS3 name, except when TypeScript convention requires a change:
 
 ```
 AS3: RoomSessionManager      → TS: RoomSessionManager       (identical)
@@ -428,7 +428,7 @@ source_as_win63/habbo/session/
 
 ### Full AS3 port
 
-ALL AS3 files are ported — both logic and display classes. The Flash UI system (windows, dialogs, display components) is faithfully ported using PixiJS. Flash XML layouts ship as XML, verbatim from the dump, and are parsed at runtime.
+The client was ported in full from the AS3 — both logic and display classes, the Flash UI system included, using PixiJS. Since 2026-10-07 inherited code is restructured rather than re-ported (`docs/superpowers/specs/2026-10-07-client-architecture-design.md` §10). Flash XML layouts still ship as XML, verbatim from the dump, and are parsed at runtime.
 
 ### AS3 → TypeScript mapping
 

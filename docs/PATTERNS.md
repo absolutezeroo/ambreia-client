@@ -138,7 +138,7 @@ export class RoomInfoParser implements IMessageParser
 - Implements `IMessageParser` with `flush()` and `parse(wrapper)`
 - `flush()` resets ALL fields to their default values and returns `true`
 - `parse()` checks `if(!wrapper) return false` first
-- The read order in `parse()` MUST match exactly the server's send order (see AS3)
+- The read order in `parse()` MUST match exactly the server's send order (see the emulator's serializer for that message, `vortex-rpg-emulator/Vortex.Revisions/Revision20260701/Serializers/`)
 - Public getters for each parsed field
 - No business logic in the parser — just data extraction
 
@@ -405,7 +405,7 @@ export class RoomDataParser
 ### Rules
 
 - Constructor takes an `IMessageDataWrapper` and reads the data
-- Read order MUST match exactly the AS3
+- Read order MUST match exactly the emulator's serializer for that message
 - Public getters, no setters (immutable after construction)
 - May have a static `parse()` method if the AS3 has one
 
@@ -435,7 +435,7 @@ export interface IRoomManager
 ### Rules
 
 - `I` + PascalCase prefix
-- Must match exactly the AS3 public methods
+- Mirrors the public methods of its implementation (for an inherited class, those of its AS3 origin)
 - Separate file from the implementation (`IRoomManager.ts` ≠ `RoomManager.ts`)
 
 ---
@@ -516,7 +516,7 @@ export class NavigatorSearchResultsView
 
 ### Rules
 
-- Port the AS3 UI class hierarchy faithfully (IWindow, IFrameWindow, etc.)
+- Keep the inherited UI class hierarchy (IWindow, IFrameWindow, etc.): the window system is extracted, not rewritten (`docs/superpowers/specs/2026-10-07-client-architecture-design.md` §3)
 - Flash XML layouts ship as XML and are parsed at runtime (`WindowXmlAssetParser`)
 - UI classes listen to engine events via EventEmitter3
 - UI classes have `dispose()` that cleans up listeners and display objects
