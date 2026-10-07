@@ -179,3 +179,17 @@ test('glaze: ui and common are allowed, the engine and the client are refused', 
     assert.equal(client.length, 1);
     assert.equal(net.length, 1);
 });
+
+test('iso: common and avatar are allowed, the engine and ui are refused', async () =>
+{
+    const at = 'packages/ambreia-iso/src/Probe.ts';
+    const common = await wallHits("import {Logger} from '@ambreia/common/utils/Logger';\nexport {Logger};\n", at);
+    const avatar = await wallHits("import {AvatarImage} from '@ambreia/avatar/AvatarImage';\nexport {AvatarImage};\n", at);
+    const engine = await wallHits("import {RoomEngine} from '@habbo/room/RoomEngine';\nexport {RoomEngine};\n", at);
+    const ui = await wallHits("import {WindowManager} from '@ambreia/ui/kit/WindowManager';\nexport {WindowManager};\n", at);
+
+    assert.equal(common.length, 0);
+    assert.equal(avatar.length, 0);
+    assert.equal(engine.length, 1);
+    assert.equal(ui.length, 1);
+});

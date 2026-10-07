@@ -1,0 +1,22 @@
+{
+  "name": "@ambreia/iso",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Ambreia isometric room engine: rooms, objects, renderer, furniture, avatars and effects in a room",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "dependencies": {
+    "@ambreia/avatar": "workspace:*",
+    "@ambreia/common": "workspace:*",
+    "eventemitter3": "^5.0.1",
+    "pixi.js": "^8.6.6"
+  },
+  "devDependencies": {
+    "@napi-rs/canvas": "^0.1.71",
+    "linkedom": "^0.18.9",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.0"
+  }
+}

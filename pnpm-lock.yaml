@@ -81,6 +81,34 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
+  packages/ambreia-iso:
+    dependencies:
+      '@ambreia/avatar':
+        specifier: workspace:*
+        version: link:../ambreia-avatar
+      '@ambreia/common':
+        specifier: workspace:*
+        version: link:../ambreia-common
+      eventemitter3:
+        specifier: ^5.0.1
+        version: 5.0.4
+      pixi.js:
+        specifier: ^8.6.6
+        version: 8.16.0
+    devDependencies:
+      '@napi-rs/canvas':
+        specifier: ^0.1.71
+        version: 0.1.100
+      linkedom:
+        specifier: ^0.18.9
+        version: 0.18.13
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+      vite:
+        specifier: ^6.0.0
+        version: 6.4.3(@types/node@22.19.10)(jiti@2.7.0)(lightningcss@1.33.0)(sass-embedded@1.97.3)(sass@1.97.3)(tsx@4.23.0)(yaml@2.9.0)
+
   packages/ambreia-net:
     dependencies:
       '@ambreia/common':
@@ -121,6 +149,9 @@ importers:
       '@ambreia/common':
         specifier: workspace:*
         version: link:../ambreia-common
+      '@ambreia/iso':
+        specifier: workspace:*
+        version: link:../ambreia-iso
       '@ambreia/net':
         specifier: workspace:*
         version: link:../ambreia-net
@@ -170,6 +201,9 @@ importers:
       '@ambreia/common':
         specifier: workspace:*
         version: link:../ambreia-common
+      '@ambreia/iso':
+        specifier: workspace:*
+        version: link:../ambreia-iso
       '@ambreia/net':
         specifier: workspace:*
         version: link:../ambreia-net
@@ -232,6 +266,9 @@ importers:
       '@ambreia/common':
         specifier: workspace:*
         version: link:../ambreia-common
+      '@ambreia/iso':
+        specifier: workspace:*
+        version: link:../ambreia-iso
       '@ambreia/net':
         specifier: workspace:*
         version: link:../ambreia-net
