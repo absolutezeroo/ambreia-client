@@ -405,6 +405,19 @@ export class VortexMain implements IVortexMain
 
         await this.prepareCore(config);
 
+        // A fingerprint of the boot, read by the dev tools and by J5's before/after comparison:
+        // what was attached in which order, what still waits, every configuration property.
+        // TS-only: introspection, read-only.
+        (globalThis as unknown as {__ambreia?: Record<string, unknown>}).__ambreia = {
+            ...((globalThis as unknown as {__ambreia?: Record<string, unknown>}).__ambreia ?? {}),
+            boot: () => ({
+                attached: (Core.instance as CoreComponentContext | null)?.describeAttached() ?? [],
+                locked: (Core.instance as CoreComponentContext | null)?.describeLockedComponents() ?? [],
+                configuration: [...((this._configurationManager as unknown as {_configurationData?: Map<string, string>})?._configurationData ?? new Map()).entries()].sort(([a], [b]) => a.localeCompare(b)),
+                progress: [...this._progressLog]
+            })
+        };
+
         this.addInitializationProgressListeners();
     }
 
@@ -1040,6 +1053,9 @@ export class VortexMain implements IVortexMain
      * @see sources/WIN63-202607011411-782849652/src/binaryData/HabboAir.as updateProgressBar()
      */
     // AS3: .../src/binaryData/HabboAir.as::updateProgressBar()
+    // TS-only: the bar's successive values, for the boot fingerprint (window.__ambreia.boot).
+    private readonly _progressLog: number[] = [];
+
     private updateProgressBar(): void 
     {
         if(this._loadingScreen != null) 
@@ -1047,6 +1063,7 @@ export class VortexMain implements IVortexMain
             const progress = VortexMain.CORE_RATIO + (((this._completedInitSteps + this._loadedFiles) / this._totalInitSteps) * (1 - VortexMain.CORE_RATIO));
 
             this._loadingScreen.updateLoadingBar(progress);
+            this._progressLog.push(Math.round(progress * 1000) / 1000);
         }
     }
 

@@ -47,7 +47,7 @@ export interface IKernelReport
  * FeatureDependencyError, naming the feature, the interface and the disabled feature that would
  * have provided it, where the DI alone would leave the component locked in silence.
  */
-export async function bootFeatures(context: CoreComponentContext, features: readonly IFeature<any>[], config: IKernelConfig): Promise<IKernelReport>
+export async function bootFeatures<H>(context: CoreComponentContext, features: readonly IFeature<any, H>[], config: IKernelConfig, host?: H): Promise<IKernelReport>
 {
     const reports: IFeatureReport[] = [];
     const requiring: Array<{id: string; requires: IID[]}> = [];
@@ -66,8 +66,11 @@ export async function bootFeatures(context: CoreComponentContext, features: read
             continue;
         }
 
-        const product = await feature.create({context, config: section, app: config.app});
+        const made = {context, config: section, app: config.app, host: host as H};
+        const product = await feature.create(made);
         const requires = attach(context, feature, provides, product);
+
+        await feature.afterAttach?.(product, made);
 
         requiring.push({id: feature.id, requires});
         reports.push(report(feature.id, true, provides, requires, () => stateOf(context, provides, product)));
@@ -94,7 +97,7 @@ export async function bootFeatures(context: CoreComponentContext, features: read
 }
 
 /** Registers the product and returns what it requires. */
-function attach(context: CoreComponentContext, feature: IFeature<any>, provides: IID[], product: FeatureProduct): IID[]
+function attach<H>(context: CoreComponentContext, feature: IFeature<any, H>, provides: IID[], product: FeatureProduct): IID[]
 {
     if(product === null) return [];
 

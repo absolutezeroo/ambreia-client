@@ -131,3 +131,28 @@ test('the report names what each feature provides and waits on, and passes it it
     assert.deepEqual(report.features.map(f => [f.id, f.provides, f.requires]), [['a', ['IID_A'], []], ['b', ['IID_B'], ['IID_A']], ['tuned', [], []]]);
     assert.deepEqual(seen, {limit: 7, enabled: true});
 });
+
+test('create receives the host, and afterAttach runs once attached, before the next feature', async () =>
+{
+    const order: string[] = [];
+    const host = {name: 'client'};
+    let seenHost: unknown = null;
+    const first = defineFeature({
+        id: 'first',
+        provides: [IID_A],
+        create: ({host: given}) => { seenHost = given; order.push('create first'); return new A(new CoreComponentContext()); },
+        afterAttach: async (product, {context}) =>
+        {
+            assert.ok(product instanceof A);
+            assert.ok(context.providedInterfaces().has(IID_A));
+            await flush();
+            order.push('after first');
+        }
+    });
+    const second = defineFeature({id: 'second', create: () => { order.push('create second'); return null; }});
+
+    await bootFeatures(new CoreComponentContext(), [first, second], config([first, second]), host);
+
+    assert.equal(seenHost, host);
+    assert.deepEqual(order, ['create first', 'after first', 'create second']);
+});
