@@ -10,8 +10,6 @@
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 import type {IAssetLibrary} from '@core/assets/IAssetLibrary';
 import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';
-import type {IHabboCatalog} from '@habbo/catalog/IHabboCatalog';
-import type {IHabboFriendList} from '@habbo/friendlist/IHabboFriendList';
 import type {IRoomWidgetMessageListener} from '@habbo/ui/IRoomWidgetMessageListener';
 import type {ContextInfoView} from './ContextInfoView';
 
@@ -24,10 +22,6 @@ export interface IContextMenuParentWidget
     readonly localizations: IHabboLocalizationManager | null;
     // AS3: .../src/com/sulake/habbo/ui/widget/contextmenu/_SafeCls_1870.as::get messageListener()
     readonly messageListener: IRoomWidgetMessageListener | null;
-    // AS3: .../src/com/sulake/habbo/ui/widget/contextmenu/_SafeCls_1870.as::get catalog()
-    readonly catalog: IHabboCatalog | null;
-    // AS3: .../src/com/sulake/habbo/ui/widget/contextmenu/_SafeCls_1870.as::get friendList()
-    readonly friendList: IHabboFriendList | null;
 
     // AS3: _SafeCls_1870.as::removeView()
     removeView(view: ContextInfoView, animate: boolean): void;

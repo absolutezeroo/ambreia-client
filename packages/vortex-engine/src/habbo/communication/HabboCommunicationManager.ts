@@ -1,3 +1,4 @@
+import {HabboErrorVariableEnum} from './enum/HabboErrorVariableEnum';
 import {Component, ComponentDependency, type IContext} from '@core/runtime';
 import {ArcFour} from '@habbo/communication/encryption/ArcFour';
 import {DiffieHellman} from '@habbo/communication/encryption/DiffieHellman';
@@ -21,7 +22,6 @@ import type {IHabboWebApiSession} from './IHabboWebApiSession';
 import {HabboWebApiSession} from './HabboWebApiSession';
 import {IID_CoreCommunicationManager} from "@iid/IIDCoreCommunicationManager";
 import {ErrorReportStorage} from '@core/utils/ErrorReportStorage';
-import {HabboErrorVariableEnum} from '@habbo/tracking/HabboErrorVariableEnum';
 
 const log = Logger.getLogger('habbo.communication.HabboCommunicationManager');
 

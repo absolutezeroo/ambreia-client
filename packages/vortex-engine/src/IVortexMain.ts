@@ -1,9 +1,6 @@
 import type {IDisposable} from "@core";
 import type {IHabboCommunicationDemo, IHabboCommunicationManager} from "@habbo/communication";
 import type {IHabboLocalizationManager} from "@habbo/localization";
-import type {IHabboNavigator, IHabboNewNavigator} from "@habbo/navigator";
-import type {IHabboInventory} from "@habbo/inventory";
-import type {IHabboCatalog} from "@habbo/catalog";
 import type {IHabboConfigurationManager} from "@habbo/configuration";
 import type {IRoomManager} from "@room";
 import type {IRoomSessionManager, ISessionDataManager} from "@habbo/session";
@@ -11,16 +8,12 @@ import type {IRoomEngine} from "@habbo/room";
 import type {IVortexConfig} from "./Vortex";
 import type {IRoomMessageHandler} from "@habbo/room/IRoomMessageHandler";
 import type {IHabboWindowManager} from "@habbo/window/IHabboWindowManager";
-import type {IHabboToolbar} from "@habbo/toolbar/IHabboToolbar";
 import type {IAssetLibrary} from "@core/assets/IAssetLibrary";
 import type {Application} from 'pixi.js';
+import type {HabboAvatarEditorManager} from "@habbo/avatar/HabboAvatarEditorManager";
 
 export interface IVortexMain extends IDisposable
 {
-    readonly navigator: IHabboNavigator;
-    readonly newNavigator: IHabboNewNavigator;
-    readonly inventory: IHabboInventory;
-    readonly catalog: IHabboCatalog;
     readonly configurationManager: IHabboConfigurationManager;
     readonly communicationDemo: IHabboCommunicationDemo;
     readonly roomManager: IRoomManager;
@@ -31,8 +24,8 @@ export interface IVortexMain extends IDisposable
     readonly sessionDataManager: ISessionDataManager;
     readonly habboCommunication: IHabboCommunicationManager;
     readonly windowManager: IHabboWindowManager;
-    readonly toolbar: IHabboToolbar;
     readonly assets: IAssetLibrary;
+    readonly avatarEditor: HabboAvatarEditorManager | null;
 
     /**
 	 * Initialize the engine orchestrator.
@@ -49,7 +42,7 @@ export interface IVortexMain extends IDisposable
 	 *
 	 * Order follows AS3 HabboAirMain.as prepareCore() sequence:
 	 * Config → Communication → Demo → Localization → RoomManager → RoomSessionManager
-	 * → SessionDataManager → Navigator → Inventory → RoomEngine → RoomMessageHandler
+	 * → SessionDataManager → RoomEngine → RoomMessageHandler
 	 *
 	 * @see sources/WIN63-202607011411-782849652/src/binaryData/HabboAir.as prepareCore()
 	 */
@@ -61,14 +54,7 @@ export interface IVortexMain extends IDisposable
     initLocalization(): void;
 
     /**
-	 * Initialize the Friend Bar (landing view, etc.)
-	 * Must be called AFTER window layouts are registered.
+	 * Construct the avatar editor. Must be called AFTER window layouts are registered.
 	 */
-    initFriendBar(): void;
-
-    /**
-	 * Initialize the friend list window component.
-	 * Must be called AFTER window layouts are registered.
-	 */
-    initFriendList(): void;
+    initAvatarEditor(): void;
 }

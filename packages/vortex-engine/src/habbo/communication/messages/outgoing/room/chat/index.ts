@@ -3,4 +3,3 @@ export * from './ShoutMessageComposer';
 export * from './WhisperMessageComposer';
 export * from './StartTypingMessageComposer';
 export * from './CancelTypingMessageComposer';
-export * from './SetChatPreferencesMessageComposer';

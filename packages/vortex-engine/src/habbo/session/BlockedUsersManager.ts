@@ -1,7 +1,6 @@
 import type {IMessageEvent} from '@core/communication/messages/IMessageEvent';
 import type {IMessageComposer} from '@core/communication/messages/IMessageComposer';
 import type {IHabboCommunicationManager} from '../communication/IHabboCommunicationManager';
-import type {IHabboNotifications} from '../notifications/IHabboNotifications';
 import {
     BlockListInitComposer,
     BlockUserMessageComposer,
@@ -21,19 +20,16 @@ export class BlockedUsersManager
 {
     private _communication: IHabboCommunicationManager | null;
     private _sendCallback: ((composer: IMessageComposer<unknown[]>) => void) | null;
-    private _notifications: IHabboNotifications | null;
     private _blockedUserIds: Set<number> = new Set();
     private _messageEvents: IMessageEvent[] = [];
 
     constructor(
         communication: IHabboCommunicationManager | null,
-        sendCallback: ((composer: IMessageComposer<unknown[]>) => void) | null,
-        notifications: IHabboNotifications | null
+        sendCallback: ((composer: IMessageComposer<unknown[]>) => void) | null
     )
     {
         this._communication = communication;
         this._sendCallback = sendCallback;
-        this._notifications = notifications;
 
         this.registerMessageEvents();
     }
@@ -82,7 +78,6 @@ export class BlockedUsersManager
         this._blockedUserIds.clear();
         this._communication = null;
         this._sendCallback = null;
-        this._notifications = null;
     }
 
     private registerMessageEvents(): void
@@ -114,13 +109,13 @@ export class BlockedUsersManager
         switch(event.result)
         {
             case BlockUserUpdateMessageEvent.UNBLOCKED:
+                // AS3 also toasts '${notification.unblocked_player}'; notifications left with the core cut.
                 this.removeUserFromBlockList(event.userId);
-                this._notifications?.addItem('${notification.unblocked_player}', 'info');
                 break;
 
             case BlockUserUpdateMessageEvent.BLOCKED:
+                // AS3 also toasts '${notification.blocked_player}'; notifications left with the core cut.
                 this.addUserToBlockList(event.userId);
-                this._notifications?.addItem('${notification.blocked_player}', 'info');
                 break;
         }
     }

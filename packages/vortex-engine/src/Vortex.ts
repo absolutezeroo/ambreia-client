@@ -16,16 +16,11 @@ import type {IRoomSessionManager} from '@habbo/session/IRoomSessionManager';
 import type {HabboCommunicationManager} from '@habbo/communication/HabboCommunicationManager';
 import type {RoomEngine} from '@habbo/room';
 import type {IAvatarRenderManager} from '@habbo/avatar/IAvatarRenderManager';
-import type {IHabboNavigator} from '@habbo/navigator/IHabboNavigator';
-import type {IHabboNewNavigator} from '@habbo/navigator/IHabboNewNavigator';
-import type {IHabboInventory} from '@habbo/inventory/IHabboInventory';
-import type {IHabboCatalog} from '@habbo/catalog/IHabboCatalog';
 import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
-import type {IHabboToolbar} from '@habbo/toolbar/IHabboToolbar';
-import type {IHabboFurniEditor} from '@habbo/vortex/furnieditor/IHabboFurniEditor';
 import type {IAssetLibrary} from '@core/assets/IAssetLibrary';
 import type {IRoomUI} from '@habbo/ui/IRoomUI';
+import {AvatarEditorIdEnum} from '@habbo/avatar/enum/AvatarEditorIdEnum';
 import type {IVortex} from './IVortex';
 import type {IVortexLoadingScreen} from './IVortexLoadingScreen';
 
@@ -359,26 +354,6 @@ export class Vortex implements IVortex
         return this._habboMain!.roomSessionManager;
     }
 
-    get navigator(): IHabboNavigator
-    {
-        return this._habboMain!.navigator;
-    }
-
-    get newNavigator(): IHabboNewNavigator
-    {
-        return this._habboMain!.newNavigator;
-    }
-
-    get inventory(): IHabboInventory
-    {
-        return this._habboMain!.inventory;
-    }
-
-    get catalog(): IHabboCatalog
-    {
-        return this._habboMain!.catalog;
-    }
-
     // AS3: sources/win63_version/habbo/communication/demo/class_467.as::get localization()
     get localization(): IHabboLocalizationManager
     {
@@ -389,20 +364,6 @@ export class Vortex implements IVortex
     get windowManager(): IHabboWindowManager
     {
         return this._habboMain!.windowManager;
-    }
-
-    /**
-     * The Vortex furni editor (staff tool, not from AS3). Null before bootstrap completes, and
-     * inert until the server grants `room.furni.edit` during the handshake.
-     */
-    get furniEditor(): IHabboFurniEditor | null
-    {
-        return this._habboMain?.furniEditor ?? null;
-    }
-
-    get toolbar(): IHabboToolbar
-    {
-        return this._habboMain!.toolbar;
     }
 
     get assets(): IAssetLibrary
@@ -480,21 +441,19 @@ export class Vortex implements IVortex
     }
 
     /**
-	 * Initialize the Friend Bar (landing view, etc.)
-	 * Must be called AFTER window layouts are registered.
+	 * Construct the avatar editor. Must be called AFTER window layouts are registered.
 	 */
-    initFriendBar(): void
+    // TS-only: replaces initFriendBar()/initFriendList(), removed with the core cut (2026-10-07).
+    initAvatarEditor(): void
     {
-        this._habboMain!.initFriendBar();
+        this._habboMain!.initAvatarEditor();
     }
 
-    /**
-	 * Initialize the friend list window component (friends, requests, search).
-	 * Must be called AFTER window layouts are registered.
-	 */
-    initFriendList(): void
+    // TS-only: dev entry point for the avatar editor while no HUD opens it —
+    //   `Vortex.instance.openAvatarEditor()` from the console (App.ts exposes `window.Vortex`).
+    openAvatarEditor(): void
     {
-        this._habboMain!.initFriendList();
+        this._habboMain?.avatarEditor?.openEditor(AvatarEditorIdEnum.MAIN_EDITOR, null, null, true);
     }
 
     /**

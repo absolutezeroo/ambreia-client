@@ -9,7 +9,6 @@ import {HabboClubLevelEnum, hasClub as clubLevelHasClub, hasVip as clubLevelHasV
 import {IID_HabboCommunicationManager} from '@iid/IIDHabboCommunicationManager';
 import {IID_HabboConfigurationManager} from '@iid/IIDHabboConfigurationManager';
 import {IID_HabboLocalizationManager} from '@iid/IIDHabboLocalizationManager';
-import {IID_HabboNotifications} from '@iid/IIDHabboNotifications';
 import {IID_HabboWindowManager} from '@iid/IIDHabboWindowManager';
 import {IID_RoomSessionManager} from '@iid/IIDRoomSessionManager';
 import {FurnitureDataParser} from './furniture/FurnitureDataParser';
@@ -19,7 +18,6 @@ import {BadgeImageManager} from './BadgeImageManager';
 import {FurniIconImageManager} from './FurniIconImageManager';
 
 import type {IHabboLocalizationManager} from '../localization/IHabboLocalizationManager';
-import type {IHabboNotifications} from '../notifications/IHabboNotifications';
 import type {IHabboWindowManager} from '../window/IHabboWindowManager';
 import type {IFurnitureData} from './furniture/IFurnitureData';
 import type {IFurniDataListener} from './furniture/IFurniDataListener';
@@ -206,8 +204,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
     private _windowManager: IHabboWindowManager | null = null;
     // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::_localization
     private _localization: IHabboLocalizationManager | null = null;
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::_notifications
-    private _notifications: IHabboNotifications | null = null;
     // Furniture data - owned by SessionDataManager (AS3 pattern)
     // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::_floorItems
     private _floorItems: Map<number, IFurnitureData> = new Map();
@@ -255,12 +251,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
     get localization(): IHabboLocalizationManager | null
     {
         return this._localization;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::get notifications()
-    get notifications(): IHabboNotifications | null
-    {
-        return this._notifications;
     }
 
     // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::_newFurniDataHash
@@ -746,14 +736,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
                 (manager: IRoomSessionManager | null) =>
                 {
                     this._roomSessionManager = manager;
-                },
-                false
-            ),
-            new ComponentDependency(
-                IID_HabboNotifications,
-                (manager: IHabboNotifications | null) =>
-                {
-                    this._notifications = manager;
                 },
                 false
             ),
@@ -1401,7 +1383,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
         this._roomSessionManager = null;
         this._windowManager = null;
         this._localization = null;
-        this._notifications = null;
         this._nftChatStyleIds.clear();
         this._purchasableChatStyleIds.clear();
 
@@ -1484,7 +1465,7 @@ export class SessionDataManager extends Component implements ISessionDataManager
         this._userDataManager.connection = this._communicationManager?.connection ?? null;
         this._perkManager = new PerkManager(this);
         this._ignoredUsersManager = new IgnoredUsersManager(this._communicationManager, sendCallback);
-        this._blockedUsersManager = new BlockedUsersManager(this._communicationManager, sendCallback, this._notifications);
+        this._blockedUsersManager = new BlockedUsersManager(this._communicationManager, sendCallback);
         this._groupInfoManager = new HabboGroupInfoManager(this._communicationManager, sendCallback);
 
         this._ignoredUsersManager.initIgnoreList();

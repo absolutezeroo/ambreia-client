@@ -4,7 +4,6 @@ import type {IMessageComposer} from '@core/communication/messages/IMessageCompos
 import type {IRoomSession, RoomSessionStateType} from './IRoomSession';
 import {RoomSessionState} from './IRoomSession';
 import type {RoomModerationSettings} from '../communication/messages/incoming/navigator';
-import type {IHabboTracking} from '../tracking/IHabboTracking';
 import {
     AmbassadorAlertMessageComposer,
     AssignRightsMessageComposer,
@@ -77,21 +76,6 @@ export class RoomSession implements IRoomSession
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/session/RoomSession.as::_chatTrackingId
     private _chatTrackingId: number = 0;
     private _chatTrackingMap: Map<number, number> = new Map();
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::_habboTracking
-    private _habboTracking: IHabboTracking | null = null;
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::get habboTracking()
-    get habboTracking(): IHabboTracking | null
-    {
-        return this._habboTracking;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::set habboTracking()
-    set habboTracking(value: IHabboTracking | null)
-    {
-        this._habboTracking = value;
-    }
-
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/session/RoomSession.as::_userDataManager
     private _userDataManager: UserDataManager = new UserDataManager();
 
@@ -507,7 +491,6 @@ export class RoomSession implements IRoomSession
     dispose(): void
     {
         this._connection = null;
-        this._habboTracking = null;
 
         if(this._openConnectionComposer !== null)
         {
@@ -579,22 +562,9 @@ export class RoomSession implements IRoomSession
     receivedChatWithTrackingId(trackingId: number): void
     {
         // AS3 uses remove(), which drops the entry whether or not it reports lag.
-        const sentTime = this._chatTrackingMap.get(trackingId);
-
         this._chatTrackingMap.delete(trackingId);
 
-        if(sentTime !== undefined)
-        {
-            const now = Date.now();
-
-            if(now - sentTime > 2500 && this._habboTracking !== null)
-            {
-                // AS3 hands the *current time* to chatLagDetected, not the elapsed lag:
-                // LagWarningLogger.reportWarningsAsNeeded() compares it against the last report
-                // time and stores it as the new one. Passing the delta would break that throttle.
-                this._habboTracking.chatLagDetected(now);
-            }
-        }
+        // AS3 reports chat lag over 2.5 s to HabboTracking here; tracking left with the core cut.
     }
 
     // AS3: .../src/com/sulake/habbo/session/RoomSession.as::sendAvatarExpressionMessage()
@@ -886,12 +856,9 @@ export class RoomSession implements IRoomSession
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/RoomSession.as::trackEventLogOncePerSession()
-    trackEventLogOncePerSession(category: string, type: string, action: string): void
+    // DEVIATION: AS3 delegates to HabboTracking, which left with the core cut (2026-10-07); kept as
+    //   a no-op so its callers need no change.
+    trackEventLogOncePerSession(_category: string, _type: string, _action: string): void
     {
-        // AS3 delegates to HabboTracking, whose once-per-session dedup lives on the
-        // tracker and so persists across room sessions. The old body deduped in a
-        // RoomSession-local map that was cleared when the room ended, so the same event
-        // re-logged on every room entry — per-room, not per-client-session.
-        this._habboTracking?.trackEventLogOncePerSession(category, type, action);
     }
 }

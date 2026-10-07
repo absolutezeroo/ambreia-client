@@ -40,17 +40,15 @@ export class ProductCategoryMapping
      * The name defaults to the player's, which is what makes the preview read as "this is what
      * *you* would look like saying something".
      */
+    // DEVIATION: AS3 renders the bubble through the free-flow chat, which left with the core cut
+    //   (2026-10-07); there is no chat style to preview, so the answer is always null.
     // AS3: .../src/com/sulake/habbo/window/utils/_SafeCls_4273.as::createChatItemPreview()
     public static createChatItemPreview(
-        windowManager: IHabboWindowManager | null,
-        styleId: number,
-        username: string | null = null
+        _windowManager: IHabboWindowManager | null,
+        _styleId: number,
+        _username: string | null = null
     ): ImageBitmap | null
     {
-        if(windowManager === null) return null;
-
-        const name = username ?? windowManager.sessionDataManager?.userName ?? '';
-
-        return windowManager.freeFlowChat?.createPreviewBitmap(name, styleId) ?? null;
+        return null;
     }
 }

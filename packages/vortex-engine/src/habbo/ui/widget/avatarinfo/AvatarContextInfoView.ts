@@ -8,8 +8,6 @@
  */
 import type {IWindowContainer} from '@core/window/IWindowContainer';
 import type {ITextWindow} from '@core/window/components/ITextWindow';
-import type {IStaticBitmapWrapperWindow} from '@core/window/components/IStaticBitmapWrapperWindow';
-import {RelationshipStatusEnum} from '@habbo/friendlist/RelationshipStatusEnum';
 import {ContextInfoView} from '../contextmenu/ContextInfoView';
 import type {IScreenRectangle} from '../contextmenu/ContextInfoView';
 
@@ -136,8 +134,8 @@ export class AvatarContextInfoView extends ContextInfoView
             nameWindow.caption = this._userName;
         }
 
-        this.updateRelationshipStatus();
-
+        // AS3 calls updateRelationshipStatus() here for the friend-relationship badge; the friend
+        // list left with the core cut (2026-10-07), so the badge stays empty.
         const changeNameContainer = this._window.findChildByName('change_name_container');
 
         if(changeNameContainer)
@@ -164,21 +162,5 @@ export class AvatarContextInfoView extends ContextInfoView
         }
 
         return offset;
-    }
-
-    // AS3: .../src/com/sulake/habbo/ui/widget/avatarinfo/AvatarContextInfoView.as::updateRelationshipStatus()
-    protected updateRelationshipStatus(): void
-    {
-        const friendList = this._widget.friendList;
-
-        if(friendList === null) return;
-
-        const badge = this._window?.findChildByName('relationship_status') as IStaticBitmapWrapperWindow | null;
-
-        if(badge == null) return;
-
-        badge.assetUri = 'relationship_status_' + RelationshipStatusEnum.statusAsString(
-            friendList.getRelationshipStatus(this.userId)
-        );
     }
 }

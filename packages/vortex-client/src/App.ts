@@ -5,9 +5,6 @@ import {SiteChannel} from './SiteChannel';
 import {HabboCommunicationManagerEvent} from '@habbo/communication/enum/HabboCommunicationManagerEvent';
 import {AssetTypeDeclaration} from '@core/assets/AssetTypeDeclaration';
 import {UnknownAsset} from '@core/assets/UnknownAsset';
-import {SoundAsset} from '@core/assets/SoundAsset';
-import {SoundContext} from '@habbo/sound/SoundContext';
-import {HabboToolbarEnum} from '@habbo/toolbar/HabboToolbarEnum';
 import {RoomEngineEvent} from '@habbo/room/events/RoomEngineEvent';
 import type {AssetUrlSource} from '@core/window/IResourceManager';
 import type {ISkinData} from '@core/window';
@@ -24,9 +21,6 @@ import type {RoomUI} from '@habbo/ui/RoomUI';
 import type {RoomDesktop} from '@habbo/ui/RoomDesktop';
 import type {VortexLoadingScreen} from './VortexLoadingScreen';
 import {AssetBundle} from './AssetBundle';
-import {OnBoardingHcFlow} from './onBoardingHc/OnBoardingHcFlow';
-import {Stage} from './onBoardingHcUi/display/Stage';
-import {LoginAssets} from './onBoardingHcUi/LoginAssets';
 import {installWindowDebugger} from './debugger/WindowDebuggerOverlay';
 import {
     type IWindowLayoutXmlData,
@@ -356,19 +350,6 @@ async function registerChatStyleImageAssets(vortex: Vortex, imageBundle: AssetBu
 }
 
 /**
- * Registers the client's embedded sound effects, decoded, under the exact names
- * `HabboSoundManagerFlash10.getSoundByAssetName()` asks for.
- *
- * The mp3s ride in the non-image bundle (like the webfonts above) and are extracted from
- * the dump by `tools/import-crypted-sounds.mjs`, which names each file after its *Com.as
- * field — so the bundle key's stem *is* the asset name, with no `_mp3` suffix. Decoding is
- * done here rather than lazily because `SoundAsset.content` is read synchronously at the
- * moment a sound plays; 21 short files is well under a frame's worth of work in parallel.
- *
- * AS3 has no equivalent: there the mp3s are `[Embed]`s inside HabboSoundManagerFlash10Com,
- * already `flash.media.Sound` objects by the time the library is handed over.
- */
-/**
  * Reads every window layout for the *asset library*, keyed by its file basename.
  *
  * The layouts already go into the window manager's widget-layout registry (see
@@ -573,42 +554,6 @@ function readLayoutImageNames(layouts: Map<string, string>): Set<string>
     log.debug(`Layouts name ${names.size} image assets`);
 
     return names;
-}
-
-async function registerSoundAssets(vortex: Vortex, xmlBundle: AssetBundle): Promise<void>
-{
-    const keys = xmlBundle.listKeys('sounds/').filter((key) => key.endsWith('.mp3'));
-
-    if(keys.length === 0)
-    {
-        log.warn('No sound assets in the bundle - the client will be silent. Run `pnpm import:crypted-sounds`, then rebuild the bundle.');
-
-        return;
-    }
-
-    const declaration = vortex.assets.getAssetTypeDeclarationByMimeType('sound/mp3')
-        ?? new AssetTypeDeclaration('sound/mp3', SoundAsset);
-
-    await Promise.all(keys.map(async (key) =>
-    {
-        const bytes = xmlBundle.getBytes(key);
-
-        if(bytes === null) return;
-
-        // decodeAudioData() detaches the buffer it is given, and the bundle's bytes are a
-        // view onto one shared ArrayBuffer holding every asset - so it gets a copy.
-        const buffer = await SoundContext.decode(bytes.slice().buffer as ArrayBuffer);
-
-        if(buffer === null) return;
-
-        const assetName = key.slice('sounds/'.length, -'.mp3'.length);
-        const asset = new SoundAsset(declaration, assetName);
-
-        asset.setUnknownContent(buffer);
-        vortex.assets.setAsset(assetName, asset, true);
-    }));
-
-    log.debug(`Registered ${keys.length} sound assets`);
 }
 
 function readEmbeddedAvatarXmlAsset(bundle: AssetBundle, bundleKeys: string[], assetName: string): string | null
@@ -1136,10 +1081,6 @@ export class VortexApp
         // embeddedConfigurations.
         await registerChatStyleImageAssets(vortex, imageBundle, xmlBundle);
 
-        // The sound manager reads these synchronously through Component.assets the first
-        // time anything calls playSound().
-        await registerSoundAssets(vortex, xmlBundle);
-
         return vortex;
     }
 
@@ -1466,16 +1407,9 @@ export class VortexApp
         // IVortexWindowAssets and are in place before the first component is constructed.
         // See readImageAssets()/readLibraryLayouts().
 
-        // 8. Initialize the Friend Bar (landing view) — desktops are now sized
-        vortex.initFriendBar();
-
-        // 8b. Initialize the friend list window component. Separate from the friend bar,
-        // and its own SWF in AS3 (HabboFriendListCom). Same ordering constraint: its views
-        // are built from registered layouts.
-        vortex.initFriendList();
-
-        // 9. Activate the toolbar (hotel view by default)
-        vortex.toolbar.setToolbarState(HabboToolbarEnum.TOOLBAR_STATE_HOTEL_VIEW);
+        // 8. The avatar editor builds its windows from registered layouts, so it comes after them.
+        // (The friend bar, friend list and toolbar that used to start here left with the core cut.)
+        vortex.initAvatarEditor();
 
         // 10. Listen for room state changes to track when we are in a room
         this.setupRoomStateTracking();
@@ -1486,61 +1420,6 @@ export class VortexApp
         // 12. Start input and render loop
         this.setupMouseEvents();
         this.startRenderLoop();
-
-        // 13. New-user flow, if the server asked for it.
-        this.startOnBoardingIfRequired(vortex);
-    }
-
-    /**
-     * Runs the onboarding flow when the server's login actions call for it.
-     *
-     * AS3: HabboLandingView.as::onAvatarRendererReady() — `isOnboardingRequired(suggestedLoginActions)`
-     * is `actions.indexOf(0) >= 0 || actions.indexOf(1) >= 0`, i.e. "change your name" or "pick a
-     * room". AS3 hangs this off the landing view because that is the component holding the avatar
-     * renderer; here it lives with the other client-side flows, since the flow is display code and
-     * the engine may not reach into it.
-     *
-     * The toolbar is hidden for the duration, as `HabboLandingView.activate()` does.
-     */
-    private startOnBoardingIfRequired(vortex: typeof Vortex.instance): void
-    {
-        const actions = (vortex.habboCommunication.suggestedLoginActions ?? []) as number[];
-
-        if(actions.indexOf(OnBoardingHcFlow.AVATAR_NAME_CHANGE) < 0
-            && actions.indexOf(OnBoardingHcFlow.NEW_ROOM_SELECT) < 0)
-        {
-            return;
-        }
-
-        const container = document.getElementById('vortex-ui');
-
-        if(!container)
-        {
-            log.warn('No #vortex-ui container to mount the onboarding flow in');
-
-            return;
-        }
-
-        void LoginAssets.load(this._imageBundle!).then(() =>
-        {
-            const stage = new Stage(container);
-            const flow = new OnBoardingHcFlow(
-                vortex.windowManager.avatarRenderer,
-                vortex.localization,
-                vortex.habboCommunication
-            );
-
-            vortex.toolbar.setToolbarState(HabboToolbarEnum.TOOLBAR_STATE_HIDDEN);
-            stage.addChild(flow);
-            flow.setHcVisibility(false);
-            flow.init(actions);
-            flow.flowEvents.once(OnBoardingHcFlow.NEW_USER_FLOW_FINISHED_EVENT, () =>
-            {
-                flow.dispose();
-                stage.dispose();
-                vortex.toolbar.setToolbarState(HabboToolbarEnum.TOOLBAR_STATE_HOTEL_VIEW);
-            });
-        });
     }
 
     /**

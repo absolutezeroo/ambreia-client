@@ -76,9 +76,6 @@ import {FurnitureRentableSpaceLogic} from './object/logic/furniture/FurnitureRen
 import {FurnitureChangeStateWhenStepOnLogic} from './object/logic/furniture/FurnitureChangeStateWhenStepOnLogic';
 import {FurnitureVimeoLogic} from './object/logic/furniture/FurnitureVimeoLogic';
 import {FurnitureCraftingGizmoLogic} from './object/logic/furniture/FurnitureCraftingGizmoLogic';
-// Vortex-only: the fishing spot's logic lives under src/vortex/, not in the ported tree.
-import {FurnitureFishingSignLogic} from '@habbo/vortex/fishing/room/FurnitureFishingSignLogic';
-import {FurnitureFishingSpotLogic} from '@habbo/vortex/fishing/room/FurnitureFishingSpotLogic';
 
 type LogicConstructor = new () => IRoomObjectEventHandler;
 
@@ -505,18 +502,6 @@ export class RoomObjectFactory implements IRoomObjectFactory
 
             case RoomObjectLogicEnum.FURNITURE_CRAFTING_GIZMO:
                 LogicClass = FurnitureCraftingGizmoLogic;
-
-                break;
-
-            // TS-only: Vortex-only fishing system — see docs/vortex-original/fishing.md §2.3.
-            case RoomObjectLogicEnum.VORTEX_FISHING_SPOT:
-                LogicClass = FurnitureFishingSpotLogic;
-
-                break;
-
-            // TS-only: Vortex-only fishing system — the sign, which opens the book. §1 and §15.
-            case RoomObjectLogicEnum.VORTEX_FISHING_SIGN:
-                LogicClass = FurnitureFishingSignLogic;
 
                 break;
 

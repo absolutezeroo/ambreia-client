@@ -1,3 +1,4 @@
+import {ActivityPointTypeEnum} from '../utils/ActivityPointTypeEnum';
 import type {IWidget} from './IWidget';
 import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
 import type {IHabboWindowManager} from '../IHabboWindowManager';
@@ -10,7 +11,6 @@ import type {IAvatarImageListener} from '@habbo/avatar/IAvatarImageListener';
 import type {PropertyStruct} from '@core/window/utils/PropertyStruct';
 import type {IProductDisplayInfo} from './IProductDisplayInfo';
 import {ImageResult} from '@habbo/room/ImageResult';
-import {ActivityPointTypeEnum} from '@habbo/catalog/purse/ActivityPointTypeEnum';
 import {ProductCategoryMapping} from '../utils/ProductCategoryMapping';
 import {Logger} from '@core/utils/Logger';
 import type {BadgeImageWidget} from './BadgeImageWidget';
@@ -220,11 +220,10 @@ export class ProductIconWidget implements IWidget, IGetImageListener, IAvatarIma
                 this.setImageResult(result ?? null);
                 break;
             }
-            case 2: { // pixel effect
-                const data = windowManager.catalog?.getPixelEffectIcon(parseInt(info.itemTypeId, 10)) ?? null;
+            case 2: { // pixel effect — the icons came from the catalog, which left with the core cut
                 const result = new ImageResult();
 
-                result.data = data;
+                result.data = null;
                 this.setImageResult(result);
                 break;
             }
@@ -257,11 +256,10 @@ export class ProductIconWidget implements IWidget, IGetImageListener, IAvatarIma
 
                 break;
             }
-            case 9: { // chat style selector preview
-                const style = windowManager.freeFlowChat?.chatStyleLibrary?.getStyle(parseInt(info.itemTypeId, 10)) ?? null;
+            case 9: { // chat style selector preview — chat styles left with the core cut
                 const result = new ImageResult();
 
-                result.data = style?.selectorPreview ?? null;
+                result.data = null;
                 this.setImageResult(result);
                 break;
             }

@@ -1,6 +1,6 @@
+import type {PetFigureData} from './PetFigureData';
 import type {IMessageParser} from '@core/communication/messages/IMessageParser';
 import type {IMessageDataWrapper} from '@core/communication/messages/IMessageDataWrapper';
-import type {PetFigureData} from '@habbo/inventory/pets/PetFigureData';
 import {parsePetFigureData} from '@habbo/communication/messages/incoming/notifications/PetFigureDataParser';
 
 /**

@@ -2,11 +2,8 @@ import {EventEmitter} from 'eventemitter3';
 import {Component, ComponentDependency, type IContext} from '@core/runtime';
 import {IID_RoomEngine} from '@iid/IIDRoomEngine';
 import {IID_HabboConfigurationManager} from '@iid/IIDHabboConfigurationManager';
-import {IID_HabboFreeFlowChat} from '@iid/IIDHabboFreeFlowChat';
 import {IID_AvatarRenderManager} from '@iid/IIDAvatarRenderManager';
 import type {IHabboCommunicationManager} from '../communication/IHabboCommunicationManager';
-import type {IHabboTracking} from '../tracking/IHabboTracking';
-import type {IHabboFreeFlowChat} from '../freeflowchat/IHabboFreeFlowChat';
 import type {IAvatarRenderManager} from '../avatar/IAvatarRenderManager';
 import type {IRoomSessionManager} from './IRoomSessionManager';
 import type {IRoomHandlerListener} from './IRoomHandlerListener';
@@ -32,7 +29,6 @@ import {RoomEngineEvent} from '../room/events/RoomEngineEvent';
 import {Logger} from '@core/utils/Logger';
 import type {IRoomEngine} from '@habbo/room';
 import {IID_HabboCommunicationManager} from "@iid/IIDHabboCommunicationManager";
-import {IID_HabboTracking} from '@iid/IIDHabboTracking';
 
 const log = Logger.getLogger('habbo.session.RoomSessionManager');
 
@@ -79,10 +75,6 @@ export class RoomSessionManager extends Component implements IRoomSessionManager
     private _communication: IHabboCommunicationManager | null = null;
     // AS3: .../src/com/sulake/habbo/session/RoomSessionManager.as::_roomEngine
     private _roomEngine: IRoomEngine | null = null;
-    // AS3: .../src/com/sulake/habbo/session/RoomSessionManager.as::_habboTracking
-    private _habboTracking: IHabboTracking | null = null;
-    // AS3: .../src/com/sulake/habbo/session/RoomSessionManager.as::_freeFlowChat
-    private _freeFlowChat: IHabboFreeFlowChat | null = null;
     // AS3: .../src/com/sulake/habbo/session/RoomSessionManager.as::_avatarRenderer
     private _avatarRenderer: IAvatarRenderManager | null = null;
     // AS3: .../src/com/sulake/habbo/session/RoomSessionManager.as::_handlers
@@ -139,23 +131,6 @@ export class RoomSessionManager extends Component implements IRoomSessionManager
                     this._communication = manager;
                 },
                 true
-            ),
-            // AS3 gates this on `(flags & 3) == 0`, which is true for the default flags = 0.
-            new ComponentDependency(
-                IID_HabboTracking,
-                (tracking: IHabboTracking | null) =>
-                {
-                    this._habboTracking = tracking;
-                },
-                true
-            ),
-            new ComponentDependency(
-                IID_HabboFreeFlowChat,
-                (chat: IHabboFreeFlowChat | null) =>
-                {
-                    this._freeFlowChat = chat;
-                },
-                false
             ),
             // AS3 declares this with a null setter — it only waits for the manager to exist.
             new ComponentDependency(IID_HabboConfigurationManager, null, true),
@@ -313,11 +288,6 @@ export class RoomSessionManager extends Component implements IRoomSessionManager
             session.connection = this._communication.connection;
         }
 
-        if(this._habboTracking)
-        {
-            session.habboTracking = this._habboTracking;
-        }
-
         const key = this.getRoomIdentifier(session.roomId);
 
         this._sessions.set(key, session);
@@ -391,11 +361,6 @@ export class RoomSessionManager extends Component implements IRoomSessionManager
             session = new RoomSession();
             session.roomId = oldRoomId;
             session.skipOpc = true;
-
-            if(this._habboTracking)
-            {
-                session.habboTracking = this._habboTracking;
-            }
 
             this.createSession(session);
         }
@@ -522,12 +487,6 @@ export class RoomSessionManager extends Component implements IRoomSessionManager
         if(this._communication?.connection)
         {
             session.connection = this._communication.connection;
-        }
-
-        // Propagate tracking to session
-        if(this._habboTracking)
-        {
-            session.habboTracking = this._habboTracking;
         }
 
         this._sessions.set(key, session);

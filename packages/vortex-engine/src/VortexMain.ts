@@ -4,39 +4,14 @@ import {HabboCommunicationManager} from '@habbo/communication/HabboCommunication
 import {HabboCommunicationDemo} from '@habbo/communication/demo/HabboCommunicationDemo';
 import {HabboLocalizationManager} from '@habbo/localization/HabboLocalizationManager';
 import {WindowParser} from '@core/window/utils/WindowParser';
-import {HabboNavigator} from '@habbo/navigator/HabboNavigator';
-import {HabboNewNavigator} from '@habbo/navigator/HabboNewNavigator';
-import {HabboInventory} from '@habbo/inventory/HabboInventory';
-import {HabboCatalog} from '@habbo/catalog/HabboCatalog';
-import {HabboClubCenter} from '@habbo/catalog/clubcenter/HabboClubCenter';
-import {HabboFishing} from '@habbo/vortex/fishing/HabboFishing';
-import {HabboDiscordManager} from '@habbo/discord/HabboDiscordManager';
-import {HabboFurniEditor} from '@habbo/vortex/furnieditor/HabboFurniEditor';
-import type {IHabboFurniEditor} from '@habbo/vortex/furnieditor/IHabboFurniEditor';
 import {RoomEngine, RoomMessageHandler} from '@habbo/room';
 import {HabboRoomRendererFactory} from '@habbo/room/renderer/HabboRoomRendererFactory';
 import {RoomManager} from '@room/RoomManager';
 import {RoomSessionManager} from '@habbo/session/RoomSessionManager';
 import {RoomSessionEvent} from '@habbo/session/events/RoomSessionEvent';
 import {SessionDataManager} from '@habbo/session/SessionDataManager';
-import {HabboCampaigns} from '@habbo/campaign/HabboCampaigns';
-import {HabboNuxDialogs} from '@habbo/nux/HabboNuxDialogs';
-import {HabboPhoneNumber} from '@habbo/phonenumber/HabboPhoneNumber';
-import {AdManager} from '@habbo/advertisement/AdManager';
-import {HabboTracking} from '@habbo/tracking/HabboTracking';
-import {HabboGroupsManager} from '@habbo/groups/HabboGroupsManager';
-import {HabboNotifications} from '@habbo/notifications/HabboNotifications';
-import {HabboSoundManagerFlash10} from '@habbo/sound/HabboSoundManagerFlash10';
-import {HabboToolbar} from '@habbo/toolbar/HabboToolbar';
-import {HabboQuestEngine} from '@habbo/quest/HabboQuestEngine';
-import {HabboHelp} from '@habbo/help/HabboHelp';
-import {ModerationManager} from '@habbo/moderation/ModerationManager';
-import {HabboFreeFlowChat} from '@habbo/freeflowchat/HabboFreeFlowChat';
 import {AvatarRenderManager} from '@habbo/avatar/AvatarRenderManager';
 import {HabboWindowManager} from '@habbo/window/HabboWindowManager';
-import {HabboFriendBar} from '@habbo/friendbar/HabboFriendBar';
-import {HabboFriendList} from '@habbo/friendlist/HabboFriendList';
-import {HabboMessenger} from '@habbo/messenger/HabboMessenger';
 import {RoomUI} from '@habbo/ui/RoomUI';
 import {Core} from '@core/Core';
 import {AssetLibrary} from '@core/assets/AssetLibrary';
@@ -53,19 +28,9 @@ import type {IVortexConfig, IVortexWindowAssets} from './Vortex';
 import {Vortex} from './Vortex';
 
 import {PacketLogger} from '@core/communication/PacketLogger';
-import {IID_HabboAdManager} from '@iid/IIDHabboAdManager';
-import {IID_HabboCampaigns} from '@iid/IIDHabboCampaigns';
-import {IID_HabboNuxDialogs} from '@iid/IIDHabboNuxDialogs';
-import {IID_HabboPhoneNumber} from '@iid/IIDHabboPhoneNumber';
-import {IID_HabboGroupsManager} from '@iid/IIDHabboGroupsManager';
-import {IID_HabboNotifications} from '@iid/IIDHabboNotifications';
-import {IID_HabboSoundManager} from '@iid/IIDHabboSoundManager';
 import {IID_HabboCommunicationManager} from '@iid/IIDHabboCommunicationManager';
 import {IID_HabboConfigurationManager} from '@iid/IIDHabboConfigurationManager';
 import {IID_HabboLocalizationManager} from '@iid/IIDHabboLocalizationManager';
-import {IID_HabboNavigator} from '@iid/IIDHabboNavigator';
-import {IID_HabboNewNavigator} from '@iid/IIDHabboNewNavigator';
-import {IID_HabboInventory} from '@iid/IIDHabboInventory';
 import {IID_RoomEngine} from '@iid/IIDRoomEngine';
 import {IID_RoomRendererFactory} from '@iid/IIDRoomRendererFactory';
 import {IID_RoomManager} from '@iid/IIDRoomManager';
@@ -82,25 +47,8 @@ import type {IHabboConfigurationManager} from '@habbo/configuration/IHabboConfig
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 import type {IAssetLibrary} from '@core/assets/IAssetLibrary';
 import type {ISessionDataManager} from '@habbo/session/ISessionDataManager';
-import type {IHabboToolbar} from '@habbo/toolbar/IHabboToolbar';
-import type {IHabboCatalog} from '@habbo/catalog/IHabboCatalog';
-import type {IHabboClubCenter} from '@habbo/catalog/clubcenter/IHabboClubCenter';
-import {IID_HabboToolbar} from '@iid/IIDHabboToolbar';
-import {IID_HabboCatalog} from '@iid/IIDHabboCatalog';
-import {IID_HabboQuestEngine} from '@iid/IIDHabboQuestEngine';
-import {IID_HabboHelp} from '@iid/IIDHabboHelp';
 import {IID_HabboAvatarEditor} from '@iid/IIDHabboAvatarEditor';
 import {HabboAvatarEditorManager} from '@habbo/avatar/HabboAvatarEditorManager';
-import {IID_HabboModeration} from '@iid/IIDHabboModeration';
-import {IID_HabboClubCenter} from '@iid/IIDHabboClubCenter';
-import {IID_HabboFurniEditor} from '@iid/IIDHabboFurniEditor';
-import {IID_HabboFishing} from '@iid/IIDHabboFishing';
-import {IID_HabboDiscordManager} from '@iid/IIDHabboDiscordManager';
-import {IID_HabboTracking} from '@iid/IIDHabboTracking';
-import {IID_HabboFriendBar} from '@iid/IIDHabboFriendBar';
-import {IID_HabboFriendList} from '@iid/IIDHabboFriendList';
-import {IID_HabboMessenger} from '@iid/IIDHabboMessenger';
-import {IID_HabboFreeFlowChat} from '@iid/IIDHabboFreeFlowChat';
 import type {IVortexMain} from "./IVortexMain";
 import type {IVortexLoadingScreen} from './IVortexLoadingScreen';
 import type {Application, Ticker} from 'pixi.js';
@@ -225,23 +173,6 @@ export class VortexMain implements IVortexMain
     private _bootFinalized: boolean = false;
     private _habboCommunicationManager: HabboCommunicationManager | null = null;
     private _localizationManager: HabboLocalizationManager | null = null;
-    private _campaigns: HabboCampaigns | null = null;
-
-    private _nuxDialogs: HabboNuxDialogs | null = null;
-
-    private _phoneNumber: HabboPhoneNumber | null = null;
-    private _discordManager: HabboDiscordManager | null = null;
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::_adManager
-    private _adManager: AdManager | null = null;
-    private _tracking: HabboTracking | null = null;
-    private _groupsManager: HabboGroupsManager | null = null;
-    private _notifications: HabboNotifications | null = null;
-    private _soundManager: HabboSoundManagerFlash10 | null = null;
-    // AS3: .../src/com/sulake/habbo/window/HabboWindowManagerComponent.as::_freeFlowChat
-    private _freeFlowChat: HabboFreeFlowChat | null = null;
-    private _friendBar: HabboFriendBar | null = null;
-    private _messenger: HabboMessenger | null = null;
-    private _friendList: HabboFriendList | null = null;
 
     /**
      * AS3: HabboAirMain(_arg_1:IHabboLoadingScreen, _arg_2:Dictionary)
@@ -272,32 +203,6 @@ export class VortexMain implements IVortexMain
         return this._assets;
     }
 
-    // AS3: .../src/com/sulake/habbo/window/HabboWindowManagerComponent.as::_catalog
-    private _catalog: HabboCatalog | null = null;
-
-    // AS3: .../src/com/sulake/habbo/window/HabboWindowManagerComponent.as::get catalog()
-    get catalog(): IHabboCatalog 
-    {
-        if(!this._catalog) 
-        {
-            throw new Error('[HabboMain] Not initialized');
-        }
-
-        return this._catalog;
-    }
-
-    private _clubCenter: HabboClubCenter | null = null;
-
-    get clubCenter(): IHabboClubCenter 
-    {
-        if(!this._clubCenter) 
-        {
-            throw new Error('[HabboMain] Not initialized');
-        }
-
-        return this._clubCenter;
-    }
-
     private _roomUI: RoomUI | null = null;
 
     get roomUI(): RoomUI 
@@ -310,22 +215,13 @@ export class VortexMain implements IVortexMain
         return this._roomUI;
     }
 
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::_toolbar
-    private _toolbar: HabboToolbar | null = null;
-    private _questEngine: HabboQuestEngine | null = null;
-    private _habboHelp: HabboHelp | null = null;
-    private _moderation: ModerationManager | null = null;
     private _avatarEditor: HabboAvatarEditorManager | null = null;
 
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::get toolbar()
-    get toolbar(): IHabboToolbar 
+    // TS-only: the toolbar and the own-avatar menu that opened the editor are gone (core cut,
+    //   2026-10-07); this getter is the editor's entry point until the RPG HUD exists.
+    get avatarEditor(): HabboAvatarEditorManager | null
     {
-        if(!this._toolbar) 
-        {
-            throw new Error('[HabboMain] Not initialized');
-        }
-
-        return this._toolbar;
+        return this._avatarEditor;
     }
 
     private _avatarRenderManager: AvatarRenderManager | null = null;
@@ -354,18 +250,6 @@ export class VortexMain implements IVortexMain
         return this._windowManager;
     }
 
-    private _furniEditor: HabboFurniEditor | null = null;
-    private _fishing: HabboFishing | null = null;
-
-    /**
-     * The Vortex furni editor (staff tool, not from AS3). Null until prepareCore() has run.
-     * Consumers must tolerate null and must check `canEdit` before offering any UI.
-     */
-    get furniEditor(): IHabboFurniEditor | null
-    {
-        return this._furniEditor;
-    }
-
     // AS3: sources/PRODUCTION-201601012205-226667486/src/Habbo.as::_disposed
     protected _disposed: boolean = false;
 
@@ -373,42 +257,6 @@ export class VortexMain implements IVortexMain
     get disposed(): boolean
     {
         return this._disposed;
-    }
-
-    private _navigator: HabboNavigator | null = null;
-
-    get navigator(): HabboNavigator 
-    {
-        if(!this._navigator) 
-        {
-            throw new Error('[HabboMain] Not initialized');
-        }
-
-        return this._navigator;
-    }
-
-    private _newNavigator: HabboNewNavigator | null = null;
-
-    get newNavigator(): HabboNewNavigator 
-    {
-        if(!this._newNavigator) 
-        {
-            throw new Error('[HabboMain] Not initialized');
-        }
-
-        return this._newNavigator;
-    }
-
-    private _inventory: HabboInventory | null = null;
-
-    get inventory(): HabboInventory 
-    {
-        if(!this._inventory) 
-        {
-            throw new Error('[HabboMain] Not initialized');
-        }
-
-        return this._inventory;
     }
 
     private _configurationManager: HabboConfigurationManager | null = null;
@@ -592,28 +440,11 @@ export class VortexMain implements IVortexMain
         this._roomMessageHandler = null;
 
         // Nullify Habbo manager refs (inverse init order)
-        this._clubCenter = null;
-        this._moderation = null;
-        this._habboHelp = null;
-        this._messenger = null;
-        this._friendList = null;
-        this._friendBar = null;
+        this._avatarEditor = null;
         this._roomUI = null;
         this._windowManager = null;
-        this._freeFlowChat = null;
-        this._toolbar = null;
-        this._catalog = null;
-        this._furniEditor = null;
-        this._notifications = null;
-        this._groupsManager = null;
-        this._tracking = null;
-        this._adManager = null;
-        this._campaigns = null;
         this._avatarRenderManager = null;
         this._roomEngine = null;
-        this._inventory = null;
-        this._newNavigator = null;
-        this._navigator = null;
         this._sessionDataManager = null;
         this._roomSessionManager = null;
         this._roomManager = null;
@@ -777,19 +608,7 @@ export class VortexMain implements IVortexMain
         this._sessionDataManager = new SessionDataManager(ctx);
         ctx.attachComponent(this._sessionDataManager, [IID_SessionDataManager]);
 
-        // 8. Navigator (legacy)
-        this._navigator = new HabboNavigator(ctx, 0, this._assets);
-        ctx.attachComponent(this._navigator, [IID_HabboNavigator]);
-
-        // 9. New Navigator
-        this._newNavigator = new HabboNewNavigator(ctx);
-        ctx.attachComponent(this._newNavigator, [IID_HabboNewNavigator]);
-
-        // 10. Inventory
-        // The asset library is what AS3's HabboInventoryCom SWF supplies; without it the trade
-        // window's credit tile has no icon to resolve.
-        this._inventory = new HabboInventory(ctx, 0, this._assets);
-        ctx.attachComponent(this._inventory, [IID_HabboInventory]);
+        // 8-10 (navigator, new navigator, inventory) left with the core cut (2026-10-07).
 
         // 11. Room Engine (depends on RoomManager via IID_RoomManager)
         this._roomEngine = new RoomEngine(ctx, this._assets);
@@ -799,86 +618,9 @@ export class VortexMain implements IVortexMain
         this._avatarRenderManager = new AvatarRenderManager(ctx);
         ctx.attachComponent(this._avatarRenderManager, [IID_AvatarRenderManager]);
 
-        // 12b. Phone number (SMS identity verification)
-        // AS3 attaches this against IIDHabboPhoneNumber from HabboToolbar.as:152 — the first of
-        // the three the toolbar's constructor puts up, before NUX and the calendar. It depends on
-        // IID_HabboToolbar, which is only attached at step 12j below; the DI resolves it then,
-        // exactly as AS3 does (the toolbar attaches this from inside its own constructor).
-        this._phoneNumber = new HabboPhoneNumber(ctx);
-        ctx.attachComponent(this._phoneNumber, [IID_HabboPhoneNumber]);
-
-        // 12c. NUX dialogs
-        // AS3 attaches this against IIDHabboNuxDialogs from HabboToolbar.as:154, immediately
-        // before the campaign calendar below — same constructor, same order.
-        this._nuxDialogs = new HabboNuxDialogs(ctx);
-        ctx.attachComponent(this._nuxDialogs, [IID_HabboNuxDialogs]);
-
-        // 12d. Campaign Calendar
-        // AS3 attaches this against IIDHabboCampaigns from HabboToolbar.as:155.
-        this._campaigns = new HabboCampaigns(ctx);
-        ctx.attachComponent(this._campaigns, [IID_HabboCampaigns]);
-
-        // 12e. Advertisement Manager
-        // AS3 registers this via the HabboAdManagerCom SWF library; this port constructs it
-        // directly, so the IID has to be announced here or nothing can resolve it.
-        this._adManager = new AdManager(ctx);
-        ctx.attachComponent(this._adManager, [IID_HabboAdManager]);
-
-        // 12f. Tracking
-        this._tracking = new HabboTracking(ctx);
-        ctx.attachComponent(this._tracking, [IID_HabboTracking]);
-
-        // 12g. Groups Manager
-        // AS3 registers this via the HabboGroupsCom SWF library. Consumers waiting on the IID:
-        // HabboCatalog.ts:481, RoomUI.ts:310.
-        // The asset library is what AS3's HabboGroupsCom SWF supplies; without it
-        // Component.assets stays null and every getButtonImage()/ColorGridCtrl bitmap
-        // lookup in the group windows returns nothing.
-        this._groupsManager = new HabboGroupsManager(ctx, 0, this._assets);
-        ctx.attachComponent(this._groupsManager, [IID_HabboGroupsManager]);
-
-        // 12h. Notifications
-        // AS3 registers this via the HabboNotificationsCom SWF library. Consumers waiting on the
-        // IID: HabboQuestEngine.ts:194, SessionDataManager.ts:715.
-        // `this._assets` is load-bearing, as it is for the sound manager below: the singular
-        // controller reads `habbo_notifications_config_xml` out of this library in its own
-        // constructor, and a notification whose type is not in that config is refused. Without
-        // the library there is no config, and every notification the client raises is dropped.
-        this._notifications = new HabboNotifications(ctx, 0, this._assets);
-        ctx.attachComponent(this._notifications, [IID_HabboNotifications]);
-
-        // 12f-bis. Sound manager
-        // AS3 registers this via the HabboSoundManagerFlash10Com SWF library, whose asset
-        // library is where the 21 embedded mp3s live — hence `this._assets`, without which
-        // every getAssetByName() below it returns null and the client is silent.
-        // Consumers waiting on the IID: HabboToolbar.ts:474, HabboMessenger's two playSound
-        // calls. It queues its own dependencies rather than declaring them, so the attach
-        // order does not matter here.
-        this._soundManager = new HabboSoundManagerFlash10(ctx, 0, this._assets);
-        ctx.attachComponent(this._soundManager, [IID_HabboSoundManager]);
-
-        // 12i. Catalog
-        this._catalog = new HabboCatalog(ctx, this._assets);
-        ctx.attachComponent(this._catalog, [IID_HabboCatalog]);
-
-        // 12j. Toolbar
-        // AS3 hands it the asset library (`HabboToolbar(context, flags, assets)`) and it needs it:
-        // SettingsExtension and the settings views build their windows from layouts they read out
-        // of `assets` by name.
-        this._toolbar = new HabboToolbar(ctx, 0, this._assets);
-        ctx.attachComponent(this._toolbar, [IID_HabboToolbar]);
-
-        // 12h-bis. Quest engine (achievements / quests). AS3 registers this via the
-        // HabboQuestEngineCom SWF library; the port never instantiated it, so the whole
-        // quest/achievement system (and consumers like HabboLandingView's optional
-        // IID_HabboQuestEngine) stayed dormant. Attached after the toolbar so its optional
-        // IID_HabboToolbar dependency resolves.
-        this._questEngine = new HabboQuestEngine(ctx, 0, this._assets);
-        ctx.attachComponent(this._questEngine, [IID_HabboQuestEngine]);
-
-        // 12k. FreeFlowChat
-        this._freeFlowChat = new HabboFreeFlowChat(ctx, 0, this._assets);
-        ctx.attachComponent(this._freeFlowChat, [IID_HabboFreeFlowChat]);
+        // 12b-12k (phone number, NUX, campaigns, ads, tracking, groups, notifications, sound,
+        // catalog, toolbar, quests, chat) left with the core cut (2026-10-07); the git tag
+        // `pre-noyau-client` keeps them.
 
         // 12l. Window Manager
         this._windowManager = new HabboWindowManager(ctx);
@@ -889,37 +631,7 @@ export class VortexMain implements IVortexMain
         this._roomUI = new RoomUI(ctx, 0, this._assets);
         ctx.attachComponent(this._roomUI, [IID_RoomUI]);
 
-        // 12n. Habbo Club Center
-        this._clubCenter = new HabboClubCenter(ctx);
-        ctx.attachComponent(this._clubCenter, [IID_HabboClubCenter]);
-
-        // 12p. Furni editor (Vortex-specific, not from AS3). Attached after the window manager,
-        // which it depends on. Its own capability flag arrives during the handshake, so until the
-        // server says otherwise it stays inert and offers no UI.
-        this._furniEditor = new HabboFurniEditor(ctx);
-        ctx.attachComponent(this._furniEditor, [IID_HabboFurniEditor]);
-
-        // 12q. Fishing (Vortex-specific, not from AS3). Attached after the communication manager it
-        // depends on. It subscribes to seven incoming messages and holds what the server pushes;
-        // with no server support it simply never hears any of them and stays inert.
-        // See docs/vortex-original/fishing.md.
-        // The asset library is not optional decoration: `Component.assets` is what the Fish-O-Pedia
-        // reads its species artwork and its stars out of, and constructed without one every
-        // `getAssetByName()` answers null — a book of empty cards, with a warning per fish and no
-        // error. Every other component on this list that draws anything is given the same one.
-        this._fishing = new HabboFishing(ctx, 0, this._assets);
-        ctx.attachComponent(this._fishing, [IID_HabboFishing]);
-
-        // 12s. Discord Rich Presence. AS3 attaches this from its own SWF bootstrap
-        // (`HabboDiscordManagerBootstrap`, listed in `HabboDiscordCom.requiredClasses`), which this
-        // port replaces with a direct construction — the same treatment `AdManager` gets above.
-        // It goes last on purpose: its constructor builds `HabboActivityDetection`, which queues
-        // seven interfaces including the toolbar, free-flow chat and the room engine, all attached
-        // above.
-        // The asset library is what `DiscordSettingsView` reads `discord_settings_xml` out of;
-        // without one the settings window builds nothing and only warns.
-        this._discordManager = new HabboDiscordManager(ctx, 0, this._assets);
-        ctx.attachComponent(this._discordManager, [IID_HabboDiscordManager]);
+        // 12n-12s (club center, furni editor, fishing, Discord) left with the core cut (2026-10-07).
 
         // Set PixiJS stage on room engine for rendering
         this._roomEngine.setStage(this._application!.stage);
@@ -969,105 +681,23 @@ export class VortexMain implements IVortexMain
     }
 
     /**
-     * Initialize the Friend Bar (landing view, friend bar view, etc.)
+     * Constructs the avatar editor. Must be called after the window layouts are registered by the
+     * client layer, because the editor builds its windows from them.
      *
-     * Must be called AFTER window layouts are registered by the client layer,
-     * because the landing view builds its window from a registered layout.
-     *
-     * @see sources/win63_version/habbo/friendbar/HabboFriendBar.as
+     * The core cut (2026-10-07) removed the friend bar, friend list, messenger, help and moderation
+     * that this step used to construct alongside it (initFriendBar/initFriendList); the editor stays.
      */
-    initFriendBar(): void
+    // TS-only: replaces initFriendList(), which built the editor last among the social managers.
+    initAvatarEditor(): void
     {
         const ctx = Core.instance as CoreComponentContext;
 
-        // The asset library is not optional decoration: HabboFriendBar hands it straight
-        // down to HabboFriendBarData, HabboFriendBarView and HabboLandingView, and the
-        // view pushes it into `Tab.assets`/`Token.ASSETS`, which every slot reads its
-        // icons through. Constructed without one, `Component.assets` stays null and every
-        // lookup returns null before it ever touches the library — the same oversight
-        // already fixed for HabboGroupsManager (see "fix(assets): give the groups manager
-        // an asset library"), and the reason HabboCatalog/HabboGroupsManager above are
-        // constructed with `this._assets`.
-        this._friendBar = new HabboFriendBar(ctx, 0, this._assets);
-        ctx.attachComponent(this._friendBar, [IID_HabboFriendBar]);
-
-        log.debug('Friend Bar initialized');
-    }
-
-    /**
-     * Initialize the friend list (the friends/requests/search window).
-     *
-     * A separate component from the friend bar, and a separate SWF in AS3:
-     * `HabboAir.as` prepares `HabboFriendListCom` right after the navigator and long
-     * before `HabboFriendBarCom`. Nothing in this port constructed it at all until now,
-     * so `IID_HabboFriendList` resolved to null for every dependent — the group profile's
-     * "add friend" button and the infostand's friend state among them.
-     *
-     * Must be called after the window layouts are registered, like the friend bar: the
-     * component itself builds no window at construction, but the first message it handles
-     * (`MessengerInit`) creates `FriendListView` and its three tabs.
-     *
-     * @see sources/WIN63-202607011411-782849652/src/binaryData/HabboAir.as
-     */
-    initFriendList(): void
-    {
-        const ctx = Core.instance as CoreComponentContext;
-
-        // Same as the friend bar above: HabboFriendList.getButtonImage() reads every
-        // toolbar/row bitmap off `Component.assets`, which stays null when no library is
-        // passed. AS3 hands it HabboFriendListCom's own.
-        this._friendList = new HabboFriendList(ctx, 0, this._assets);
-        ctx.attachComponent(this._friendList, [IID_HabboFriendList]);
-
-        // The messenger, attached after the friend list it depends on. Nothing provided
-        // IID_HabboMessenger before this: HabboFriendBarData and FriendCategories both
-        // reach for it, and its absence is what forced null-guards through the friend
-        // list's domain layer. AS3 prepares HabboMessengerCom right after
-        // HabboFriendListCom for the same reason.
-        this._messenger = new HabboMessenger(ctx, 0, this._assets);
-        ctx.attachComponent(this._messenger, [IID_HabboMessenger]);
-
-        // Help (call for help, FAQ, guide sessions). AS3 registers this via the HabboHelpCom SWF
-        // library; the port never instantiated it, so all 696 lines of HabboHelp and the 19 files
-        // under habbo/help sat dormant - the same shape as the quest engine above. Five components
-        // declare IID_HabboHelp and all five declare it optional, which is why nothing ever failed
-        // loudly: HabboNavigator, HabboNewNavigator, HabboMessenger, HabboNotifications and
-        // HabboLandingView simply held null forever. Attached after the messenger so its own
-        // optional dependencies (toolbar, navigator, friend list, tracking) are already up; its
-        // one hard dependency is the communication manager.
-        this._habboHelp = new HabboHelp(ctx);
-        ctx.attachComponent(this._habboHelp, [IID_HabboHelp]);
-
-        // Moderation (ModeratorInit and the rest of the moderation message set). Same shape as the
-        // help component above: everything under habbo/moderation was ported — the manager, the
-        // issue manager, the message handler, the parsers — and nothing ever constructed it, so
-        // IID_HabboModeration was declared and never provided. Every moderation message the server
-        // sent logged "No registered handler", because registering the message *event* only maps an
-        // id to a parser; the callback comes from ModerationMessageHandler, which lives in
-        // initComponent(). AS3 registers this via the HabboModerationCom SWF library, and its two
-        // consumers (RoomUI, HabboFreeFlowChat) take it as an optional dependency.
-        //
-        // Attached after the help component so its own hard dependencies are already up: the
-        // communication manager (line 670) and the session data manager (line 712).
-        // The asset library is not optional here: every mod-tool window is built through
-        // `ModerationManager.getXmlWindow()`, which reads `this.assets`. Constructed without one it
-        // stays null, `getAssetByName()` is never reached, and all eleven windows silently fail to
-        // build — `IssueHandler.show()` even returns early on exactly that check.
-        this._moderation = new ModerationManager(ctx, 0, this._assets);
-        ctx.attachComponent(this._moderation, [IID_HabboModeration]);
-
-        // The avatar editor. Same shape again: IID_HabboAvatarEditor was declared in `iid/` and
-        // provided by nothing, so five components (HabboCatalog, HabboLandingView, RoomUI,
-        // MeMenuWidgetHandler via the room desktop, and FurnitureClothingChangeWidgetHandler) held
-        // null forever and every "change clothes" path was a no-op.
-        //
-        // Attached last of the managers so its five optional dependencies are already up: the
-        // avatar renderer, the communication manager, the inventory, the catalogue and the session.
-        // AS3 registers it via HabboAvatarEditorManagerBootstrap.
+        // AS3 registers it via HabboAvatarEditorManagerBootstrap. Its optional dependencies are the
+        // avatar renderer, the communication manager and the session, all attached in prepareCore().
         this._avatarEditor = new HabboAvatarEditorManager(ctx, 0, this._assets);
         ctx.attachComponent(this._avatarEditor, [IID_HabboAvatarEditor]);
 
-        log.debug('Friend List initialized');
+        log.debug('Avatar editor initialized');
     }
 
     /**

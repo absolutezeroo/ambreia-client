@@ -50,17 +50,6 @@ export interface IRoomUI
     set visible(value: boolean);
 
     /**
-	 * Triggers bottom bar resize.
-	 */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/IRoomUI.as::triggerbottomBarResize()
-    triggerbottomBarResize(): void;
-
-    /**
-	 * TS alias kept for existing callers; delegates to the AS3-named API.
-	 */
-    triggerBottomBarResize(): void;
-
-    /**
 	 * Whether the point a mouse event happened at is covered by a context menu or dialog, in which
 	 * case a room-canvas click must propagate to it instead of selecting an avatar.
 	 */

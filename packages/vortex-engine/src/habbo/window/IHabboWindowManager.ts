@@ -22,8 +22,6 @@ import type {IHabboCommunicationManager} from '@habbo/communication/IHabboCommun
 import type {ISessionDataManager} from '@habbo/session/ISessionDataManager';
 import type {IRoomEngine} from '@habbo/room/IRoomEngine';
 import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';
-import type {IHabboCatalog} from '@habbo/catalog/IHabboCatalog';
-import type {IHabboFreeFlowChat} from '@habbo/freeflowchat/IHabboFreeFlowChat';
 import type {IHabboConfigurationManager} from '@habbo/configuration/IHabboConfigurationManager';
 import type {AlertDialogCallback, IAlertDialog} from './utils/AlertDialog';
 import type {IAlertDialogWithLink} from './utils/AlertDialogWithLink';
@@ -61,10 +59,6 @@ export interface IHabboWindowManager extends IDisposable {
     readonly localization: IHabboLocalizationManager | null;
     // AS3: sources/win63_version/habbo/window/class_38.as::habboPagesStyleSheet
     readonly habboPagesStyleSheet: unknown | null;
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/HabboWindowManagerComponent.as::get catalog()
-    readonly catalog: IHabboCatalog | null;
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/HabboWindowManagerComponent.as::get freeFlowChat()
-    readonly freeFlowChat: IHabboFreeFlowChat | null;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/HabboWindowManagerComponent.as (context.configuration)
     readonly configuration: IHabboConfigurationManager | null;
 

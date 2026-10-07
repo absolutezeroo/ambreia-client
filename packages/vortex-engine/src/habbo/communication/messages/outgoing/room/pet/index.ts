@@ -7,4 +7,3 @@ export * from './GetPetCommandsComposer';
 export * from './UseProductForPetComposer';
 export * from './MovePetMessageComposer';
 export * from './GetPetInfoMessageComposer';
-export * from './PetSelectedMessageComposer';

@@ -26,19 +26,8 @@ import type {ISessionDataManager} from '@habbo/session/ISessionDataManager';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 import type {IHabboConfigurationManager} from '@habbo/configuration/IHabboConfigurationManager';
 import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';
-import type {IHabboToolbar} from '@habbo/toolbar/IHabboToolbar';
-import type {IHabboCatalog} from '@habbo/catalog/IHabboCatalog';
 import type {IAvatarRenderManager} from '@habbo/avatar/IAvatarRenderManager';
-import type {IHabboInventory} from '@habbo/inventory/IHabboInventory';
-import type {IHabboFurniEditor} from '@habbo/vortex/furnieditor/IHabboFurniEditor';
-import type {IHabboHelp} from '@habbo/help/IHabboHelp';
-import type {IHabboTracking} from '@habbo/tracking/IHabboTracking';
-import type {IHabboGroupsManager} from '@habbo/groups/IHabboGroupsManager';
-import type {IHabboFriendList} from '@habbo/friendlist/IHabboFriendList';
-import type {IHabboFreeFlowChat} from '@habbo/freeflowchat/IHabboFreeFlowChat';
-import type {IHabboNavigator} from '@habbo/navigator/IHabboNavigator';
 import type {IHabboCommunicationManager} from '@habbo/communication/IHabboCommunicationManager';
-import type {IHabboModeration} from '@habbo/moderation/IHabboModeration';
 import type {IDesktopWindow} from '@core/window/components/IDesktopWindow';
 import type {IRoomObject} from '@room/object/IRoomObject';
 import type {IUserData} from '@habbo/session/IUserData';
@@ -51,7 +40,6 @@ import {RoomEngineRoomAdEvent} from '@habbo/room/events/RoomEngineRoomAdEvent';
 import {RoomObjectVariableEnum} from '@habbo/room/object/RoomObjectVariableEnum';
 import {RoomObjectCategoryEnum} from '@habbo/room/object/RoomObjectCategoryEnum';
 import {RoomObjectOperationEnum} from '@habbo/room/object/RoomObjectOperationEnum';
-import {HabboToolbarEvent} from '@habbo/toolbar/events/HabboToolbarEvent';
 import type {IRoomDesktop} from './IRoomDesktop';
 import type {IRoomWidgetMessageListener} from './IRoomWidgetMessageListener';
 import type {IRoomWidgetHandlerContainer} from './IRoomWidgetHandlerContainer';
@@ -62,66 +50,18 @@ import {ColorTransitioner} from '@room/utils/ColorTransitioner';
 import {RoomEngineEvent} from '@habbo/room/events/RoomEngineEvent';
 import {RoomEngineObjectEvent} from '@habbo/room/events/RoomEngineObjectEvent';
 import {RoomWidgetRoomObjectUpdateEvent} from './widget/events/RoomWidgetRoomObjectUpdateEvent';
-import {RoomWidgetRoomViewUpdateEvent} from './widget/events/RoomWidgetRoomViewUpdateEvent';
 import type {RoomEngineObjectPlacedEvent} from '@habbo/room/events/RoomEngineObjectPlacedEvent';
 import {RoomWidgetRoomObjectPlaceEvent} from './widget/events/RoomWidgetRoomObjectPlaceEvent';
 import {RoomDesktopMouseZoomEnableEvent} from './widget/events/RoomDesktopMouseZoomEnableEvent';
 import {PerkAllowancesMessageEvent} from '@habbo/communication/messages/incoming/perk/PerkAllowancesMessageEvent';
 import type {PerkAllowancesMessageEventParser} from '@habbo/communication/messages/parser/perk/PerkAllowancesMessageEventParser';
 import {PerkType} from '@habbo/communication/enum/PerkType';
-import {InfoStandWidgetHandler} from './handler/InfoStandWidgetHandler';
-import {RoomToolsWidgetHandler} from './handler/RoomToolsWidgetHandler';
-import {EffectsWidgetHandler} from './handler/EffectsWidgetHandler';
 import {AvatarInfoWidgetHandler} from './handler/AvatarInfoWidgetHandler';
 import type {AvatarInfoWidget} from './widget/avatarinfo/AvatarInfoWidget';
-import {CustomUserNotificationWidgetHandler} from './handler/CustomUserNotificationWidgetHandler';
-import {RentableSpaceWidgetHandler} from './handler/RentableSpaceWidgetHandler';
-import {CraftingWidgetHandler} from './handler/CraftingWidgetHandler';
 // Vortex-only: the fishing handler lives under src/vortex/, not in the ported tree.
-import type {HabboFishing} from '@habbo/vortex/fishing/HabboFishing';
-import {FishingSignWidgetHandler} from '@habbo/vortex/fishing/ui/FishingSignWidgetHandler';
-import {FishingSpotWidgetHandler} from '@habbo/vortex/fishing/ui/FishingSpotWidgetHandler';
-import {YoutubeDisplayWidgetHandler} from './handler/YoutubeDisplayWidgetHandler';
-import {VimeoDisplayWidgetHandler} from './handler/VimeoDisplayWidgetHandler';
-import {ChatInputWidgetHandler} from './handler/ChatInputWidgetHandler';
-import {FurnitureTrophyWidgetHandler} from './handler/FurnitureTrophyWidgetHandler';
-import {FurnitureStickieWidgetHandler} from './handler/FurnitureStickieWidgetHandler';
-import {SpamWallPostItWidgetHandler} from './handler/SpamWallPostItWidgetHandler';
-import {FurnitureDimmerWidgetHandler} from './handler/FurnitureDimmerWidgetHandler';
-import {FurniturePresentWidgetHandler} from './handler/FurniturePresentWidgetHandler';
-import {MannequinWidgetHandler} from './handler/MannequinWidgetHandler';
-import {FriendFurniEngravingWidgetHandler} from './handler/FriendFurniEngravingWidgetHandler';
-import {FriendFurniConfirmWidgetHandler} from './handler/FriendFurniConfirmWidgetHandler';
-import {CustomStackHeightWidgetHandler} from './handler/CustomStackHeightWidgetHandler';
-import {FurnitureRoomLinkHandler} from './handler/FurnitureRoomLinkHandler';
-import {FurnitureClothingChangeWidgetHandler} from './handler/FurnitureClothingChangeWidgetHandler';
-import {PlaceholderWidgetHandler} from './handler/PlaceholderWidgetHandler';
-import {FurnitureBackgroundColorWidgetHandler} from './handler/FurnitureBackgroundColorWidgetHandler';
-import {FurnitureCreditWidgetHandler} from './handler/FurnitureCreditWidgetHandler';
-import {FurnitureEcotronBoxWidgetHandler} from './handler/FurnitureEcotronBoxWidgetHandler';
-import {PetPackageFurniWidgetHandler} from './handler/PetPackageFurniWidgetHandler';
-import {DoorbellWidgetHandler} from './handler/DoorbellWidgetHandler';
-import {InternalLinkWidgetHandler} from './handler/InternalLinkWidgetHandler';
 import {LoadingBarWidgetHandler} from './handler/LoadingBarWidgetHandler';
-import {FurnitureAreaHideWidgetHandler} from './handler/FurnitureAreaHideWidgetHandler';
-import {ConversionPointWidgetHandler} from './handler/ConversionPointWidgetHandler';
-import type {IHabboSoundManager} from '@habbo/sound/IHabboSoundManager';
-import type {IHabboQuestEngine} from '@habbo/quest/IHabboQuestEngine';
-import type {IAdManager} from '@habbo/advertisement/IAdManager';
 import type {IHabboAvatarEditor} from '@habbo/avatar/IHabboAvatarEditor';
-import type {IHabboMessenger} from '@habbo/messenger/IHabboMessenger';
-import {ExternalImageWidgetHandler} from './handler/ExternalImageWidgetHandler';
-import {UiHelpBubbleWidgetHandler} from './handler/UiHelpBubbleWidgetHandler';
-import {MeMenuWidgetHandler} from './handler/MeMenuWidgetHandler';
 import {ObjectLocationRequestHandler} from './handler/ObjectLocationRequestHandler';
-import {FriendRequestWidgetHandler} from './handler/FriendRequestWidgetHandler';
-import {HighScoreDisplayWidgetHandler} from './handler/HighScoreDisplayWidgetHandler';
-import {UserChooserWidgetHandler} from './handler/UserChooserWidgetHandler';
-import {FurniChooserWidgetHandler} from './handler/FurniChooserWidgetHandler';
-import {FurnitureBadgeDisplayWidgetHandler} from './handler/FurnitureBadgeDisplayWidgetHandler';
-import {FriendRequestEvent} from '@habbo/friendlist/events/FriendRequestEvent';
-import {RoomQueueWidgetHandler} from './handler/RoomQueueWidgetHandler';
-import {FurnitureContextMenuWidgetHandler} from './handler/FurnitureContextMenuWidgetHandler';
 import {RoomWidgetFurniToWidgetMessage} from './widget/messages/RoomWidgetFurniToWidgetMessage';
 import {RoomEngineToWidgetEvent} from '@habbo/room/events/RoomEngineToWidgetEvent';
 import type {IRoomWidget} from './widget/IRoomWidget';
@@ -439,34 +379,6 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
         this._localization = value;
     }
 
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::toolbar
-    private _toolbar: IHabboToolbar | null = null;
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::get toolbar()
-    public get toolbar(): IHabboToolbar | null 
-    {
-        return this._toolbar;
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::set toolbar()
-    public set toolbar(value: IHabboToolbar | null) 
-    {
-        if(this._toolbar) 
-        {
-            this._toolbar.toolbarEvents.off(HabboToolbarEvent.ICON_ZOOM, this.onToolbarEvent);
-        }
-
-        this._toolbar = value;
-
-        if(this._toolbar) 
-        {
-            this._toolbar.toolbarEvents.on(HabboToolbarEvent.ICON_ZOOM, this.onToolbarEvent);
-        }
-    }
-
-    // AS3: .../src/com/sulake/habbo/ui/RoomDesktop.as::_catalog
-    private _catalog: IHabboCatalog | null = null;
-
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/IRoomWidgetHandlerContainer.as::get avatarRenderManager()
     private _avatarRenderManager: IAvatarRenderManager | null = null;
 
@@ -482,124 +394,6 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
         this._avatarRenderManager = value;
     }
 
-    // TS-only: Vortex-only fishing system. Pushed by RoomUI beside `catalog` and `inventory`.
-    private _fishing: HabboFishing | null = null;
-
-    // TS-only: Vortex-only fishing system — no AS3 counterpart.
-    public get fishing(): HabboFishing | null
-    {
-        return this._fishing;
-    }
-
-    // TS-only: Vortex-only fishing system — no AS3 counterpart.
-    public set fishing(value: HabboFishing | null)
-    {
-        this._fishing = value;
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/IRoomWidgetHandlerContainer.as::get catalog()
-    public get catalog(): IHabboCatalog | null
-    {
-        return this._catalog;
-    }
-
-    // AS3: .../src/com/sulake/habbo/ui/RoomDesktop.as::set catalog()
-    public set catalog(value: IHabboCatalog | null)
-    {
-        this._catalog = value;
-    }
-
-    // AS3: .../src/com/sulake/habbo/ui/RoomDesktop.as::_inventory
-    private _inventory: IHabboInventory | null = null;
-
-    // NOT from AS3: Vortex-only furni editor. Consumed by InfoStandFurniView to decide whether to
-    // offer its button. See IRoomWidgetHandlerContainer for why it is injected rather than imported.
-    private _furniEditor: IHabboFurniEditor | null = null;
-
-    public get furniEditor(): IHabboFurniEditor | null
-    {
-        return this._furniEditor;
-    }
-
-    public set furniEditor(value: IHabboFurniEditor | null)
-    {
-        this._furniEditor = value;
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/IRoomWidgetHandlerContainer.as::get inventory()
-    // Consumed by the effects widget (container.inventory.getAvatarEffects(), setEffectSelected/Deselected).
-    public get inventory(): IHabboInventory | null
-    {
-        return this._inventory;
-    }
-
-    // AS3: .../src/com/sulake/habbo/ui/RoomDesktop.as::set inventory()
-    public set inventory(value: IHabboInventory | null)
-    {
-        this._inventory = value;
-    }
-
-    // AS3: .../src/com/sulake/habbo/ui/RoomDesktop.as::_habboHelp
-    private _habboHelp: IHabboHelp | null = null;
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/IRoomWidgetHandlerContainer.as::get habboHelp()
-    // Consumed by the own-avatar bubble's "change name" button.
-    public get habboHelp(): IHabboHelp | null
-    {
-        return this._habboHelp;
-    }
-
-    // AS3: .../src/com/sulake/habbo/ui/RoomDesktop.as::set habboHelp()
-    public set habboHelp(value: IHabboHelp | null)
-    {
-        this._habboHelp = value;
-    }
-
-    // AS3: .../src/com/sulake/habbo/ui/RoomDesktop.as::_questEngine
-    private _questEngine: IHabboQuestEngine | null = null;
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/IRoomWidgetHandlerContainer.as::get questEngine()
-    public get questEngine(): IHabboQuestEngine | null
-    {
-        return this._questEngine;
-    }
-
-    // AS3: .../src/com/sulake/habbo/ui/RoomDesktop.as::set questEngine()
-    public set questEngine(value: IHabboQuestEngine | null)
-    {
-        this._questEngine = value;
-    }
-
-    // AS3: .../src/com/sulake/habbo/ui/RoomDesktop.as::_soundManager
-    private _soundManager: IHabboSoundManager | null = null;
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/IRoomWidgetHandlerContainer.as::get soundManager()
-    public get soundManager(): IHabboSoundManager | null
-    {
-        return this._soundManager;
-    }
-
-    // AS3: .../src/com/sulake/habbo/ui/RoomDesktop.as::set soundManager()
-    public set soundManager(value: IHabboSoundManager | null)
-    {
-        this._soundManager = value;
-    }
-
-    // AS3: .../src/com/sulake/habbo/ui/RoomDesktop.as::_messenger
-    private _messenger: IHabboMessenger | null = null;
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/IRoomWidgetHandlerContainer.as::get messenger()
-    public get messenger(): IHabboMessenger | null
-    {
-        return this._messenger;
-    }
-
-    // AS3: .../src/com/sulake/habbo/ui/RoomDesktop.as::set messenger()
-    public set messenger(value: IHabboMessenger | null)
-    {
-        this._messenger = value;
-    }
-
     // AS3: .../src/com/sulake/habbo/ui/RoomDesktop.as::_avatarEditor
     private _avatarEditor: IHabboAvatarEditor | null = null;
 
@@ -613,97 +407,6 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
     public set avatarEditor(value: IHabboAvatarEditor | null)
     {
         this._avatarEditor = value;
-    }
-
-    // AS3: .../src/com/sulake/habbo/ui/RoomDesktop.as::_habboTracking
-    private _habboTracking: IHabboTracking | null = null;
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/IRoomWidgetHandlerContainer.as::get habboTracking()
-    public get habboTracking(): IHabboTracking | null 
-    {
-        return this._habboTracking;
-    }
-
-    // AS3: .../src/com/sulake/habbo/ui/RoomDesktop.as::set habboTracking()
-    public set habboTracking(value: IHabboTracking | null) 
-    {
-        this._habboTracking = value;
-    }
-
-    // AS3: .../src/com/sulake/habbo/ui/RoomDesktop.as::_habboGroupsManager
-    private _habboGroupsManager: IHabboGroupsManager | null = null;
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/IRoomWidgetHandlerContainer.as::get habboGroupsManager()
-    public get habboGroupsManager(): IHabboGroupsManager | null 
-    {
-        return this._habboGroupsManager;
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/IRoomWidgetHandlerContainer.as::set habboGroupsManager()
-    public set habboGroupsManager(value: IHabboGroupsManager | null) 
-    {
-        this._habboGroupsManager = value;
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/IRoomWidgetHandlerContainer.as::friendList
-    private _friendList: IHabboFriendList | null = null;
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/IRoomWidgetHandlerContainer.as::get friendList()
-    public get friendList(): IHabboFriendList | null 
-    {
-        return this._friendList;
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/IRoomWidgetHandlerContainer.as::set friendList()
-    // AS3: RoomDesktop.as:430-437 — the setter also subscribes. This is the *only* route by
-    // which FRE_ACCEPTED/FRE_DECLINED reach a widget handler: they come off the friend-list
-    // component's own bus, not the room session's, so `RoomUI`'s session-event table cannot
-    // carry them. `FriendRequestWidgetHandler` claims both.
-    public set friendList(value: IHabboFriendList | null)
-    {
-        if(this._friendList !== null)
-        {
-            this._friendList.events.off(FriendRequestEvent.ACCEPTED, this.processEvent, this);
-            this._friendList.events.off(FriendRequestEvent.DECLINED, this.processEvent, this);
-        }
-
-        this._friendList = value;
-
-        if(this._friendList !== null)
-        {
-            this._friendList.events.on(FriendRequestEvent.ACCEPTED, this.processEvent, this);
-            this._friendList.events.on(FriendRequestEvent.DECLINED, this.processEvent, this);
-        }
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::_freeFlowChat
-    private _freeFlowChat: IHabboFreeFlowChat | null = null;
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::get freeFlowChat()
-    public get freeFlowChat(): IHabboFreeFlowChat | null 
-    {
-        return this._freeFlowChat;
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::set freeFlowChat()
-    public set freeFlowChat(value: IHabboFreeFlowChat | null) 
-    {
-        this._freeFlowChat = value;
-    }
-
-    // AS3: .../src/com/sulake/habbo/ui/RoomDesktop.as::_navigator
-    private _navigator: IHabboNavigator | null = null;
-
-    // AS3: .../src/com/sulake/habbo/ui/RoomDesktop.as::get navigator()
-    public get navigator(): IHabboNavigator | null 
-    {
-        return this._navigator;
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::_navigator (private field, not part of IRoomWidgetHandlerContainer)
-    public set navigator(value: IHabboNavigator | null) 
-    {
-        this._navigator = value;
     }
 
     // AS3: .../src/com/sulake/habbo/ui/RoomDesktop.as::_communicationManager
@@ -766,23 +469,6 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
     public set roomWidgetFactory(value: IRoomWidgetFactory | null) 
     {
         this._widgetFactory = value;
-    }
-
-    // AS3 declares `moderation` on IRoomWidgetHandlerContainer; RoomUI DI-resolves the component
-    // and injects it into every desktop.
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::get moderation()
-    private _moderation: IHabboModeration | null = null;
-
-    // AS3: .../src/com/sulake/habbo/ui/RoomDesktop.as::get moderation()
-    public get moderation(): IHabboModeration | null
-    {
-        return this._moderation;
-    }
-
-    // AS3: RoomDesktop.as::set moderation()
-    public set moderation(value: IHabboModeration | null)
-    {
-        this._moderation = value;
     }
 
     /**
@@ -858,27 +544,6 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
 
         roomView.removeChild(container);
         container.dispose();
-    }
-
-    /** Write-only in AS3 too: the desktop holds it solely to answer `requestInterstitial()`. */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::_adManager
-    private _adManager: IAdManager | null = null;
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::set adManager()
-    public set adManager(value: IAdManager | null)
-    {
-        this._adManager = value;
-    }
-
-    /**
-	 * Asks the ad manager to run a full-screen interstitial.
-	 *
-	 * Does nothing without one, as AS3 does — a hotel with no ad subsystem simply never shows one.
-	 */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::requestInterstitial()
-    public requestInterstitial(): void
-    {
-        this._adManager?.showInterstitial();
     }
 
     /**
@@ -1185,10 +850,8 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
      *
      * Builds the handler, then hands it to RoomWidgetFactory.
      */
-    // DEVIATION: AS3 also builds the handlers for the photo camera, the room-thumbnail camera and
-    //   the jukebox playlist editor; the RPG fork removed photos and jukebox music.
-    // DEVIATION: AS3 also builds the RWE_ROOM_POLL and RWE_WORD_QUIZZ handlers; the RPG fork removed
-    //   polls and the word quiz.
+    // DEVIATION: AS3 builds ~40 widget handlers here; since the core cut (2026-10-07) only the name
+    //   bubble, the loading bar and the object-location answer remain (git tag pre-noyau-client).
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::createWidget()
     public createWidget(type: string): void 
     {
@@ -1203,228 +866,20 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
 
         switch(type) 
         {
-            case 'RWE_INFOSTAND':
-                // DEVIATION: AS3 passes `_soundManager.musicController`, for the jukebox and song-disk
-                //   views; the RPG fork removed jukebox music.
-                handler = new InfoStandWidgetHandler();
-                break;
-            case 'RWE_ROOM_TOOLS': {
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as:885-890
-                const roomToolsHandler = new RoomToolsWidgetHandler();
-
-                roomToolsHandler.communicationManager = this._communicationManager;
-                roomToolsHandler.navigator = this._navigator;
-                handler = roomToolsHandler;
-                break;
-            }
-            case 'RWE_CHAT_INPUT_WIDGET':
-                handler = new ChatInputWidgetHandler();
-                break;
-            case 'RWE_EFFECTS':
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as:848
-                handler = new EffectsWidgetHandler();
-                break;
             case 'RWE_AVATAR_INFO':
                 // Derived name: `createWidgetHandler` is declared in no AS3 tree — the trace points
                 // at the class it belongs to, but the identifier itself is this port's.
                 // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::createWidgetHandler()
                 handler = new AvatarInfoWidgetHandler();
                 break;
-            case 'RWE_FURNI_TROPHY_WIDGET':
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as:792
-                handler = new FurnitureTrophyWidgetHandler();
-                break;
-            case 'RWE_CUSTOM_USER_NOTIFICATION':
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as:870
-                handler = new CustomUserNotificationWidgetHandler();
-                break;
-            case 'RWE_CRAFTING':
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as:921-922
-                handler = new CraftingWidgetHandler(this);
-                break;
-
-            // TS-only: Vortex-only fishing system — no AS3 counterpart.
-            //   See docs/vortex-original/fishing.md §2.3.
-            case 'RWE_FISHING_SPOT':
-                handler = new FishingSpotWidgetHandler();
-                break;
-
-            // TS-only: Vortex-only fishing system — the sign. It builds no widget of its own; the
-            //   handler opens the book `HabboFishing` owns. See fishing.md §1 and §15.
-            case 'RWE_FISHING_SIGN':
-                handler = new FishingSignWidgetHandler();
-                break;
-            case 'RWE_YOUTUBE':
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as:897-898
-                handler = new YoutubeDisplayWidgetHandler();
-                break;
-            case 'RWE_RENTABLESPACE':
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as:900
-                handler = new RentableSpaceWidgetHandler();
-                break;
-            case 'RWE_VIMEO':
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as:903-904
-                handler = new VimeoDisplayWidgetHandler();
-                break;
-            // AS3: RoomDesktop.as::createWidgetHandler() "RWE_ROOM_QUEUE"
-            case 'RWE_ROOM_QUEUE':
-                handler = new RoomQueueWidgetHandler();
-                break;
-            // AS3: RoomDesktop.as::createWidgetHandler() "RWE_DOORBELL"
-            case 'RWE_DOORBELL':
-                handler = new DoorbellWidgetHandler();
-                break;
-            // AS3: RoomDesktop.as:886-888 "RWE_INTERNAL_LINK". The factory has no case for this
-            // type in AS3 either — the handler is the whole feature, see InternalLinkWidgetHandler.
-            case 'RWE_INTERNAL_LINK':
-                handler = new InternalLinkWidgetHandler();
-                break;
-            // AS3: RoomDesktop.as:867-869 "RWE_AREA_HIDE"
-            case 'RWE_AREA_HIDE':
-                handler = new FurnitureAreaHideWidgetHandler();
-                break;
-            // AS3: RoomDesktop.as:807-809 "RWE_LOADINGBAR"
             case 'RWE_LOADINGBAR':
                 handler = new LoadingBarWidgetHandler();
-                break;
-            // AS3: RoomDesktop.as:873-875 "RWE_FURNI_ACHIEVEMENT_RESOLUTION_ENGRAVING"
-            case 'RWE_FURNI_ACHIEVEMENT_RESOLUTION_ENGRAVING':
-                handler = new FurnitureBadgeDisplayWidgetHandler();
-                break;
-            // AS3: RoomDesktop.as:816-818 "RWE_FURNI_CHOOSER"
-            case 'RWE_FURNI_CHOOSER':
-                handler = new FurniChooserWidgetHandler();
-                break;
-            // AS3: RoomDesktop.as:819-821 "RWE_USER_CHOOSER"
-            case 'RWE_USER_CHOOSER':
-                handler = new UserChooserWidgetHandler();
-                break;
-            // AS3: RoomDesktop.as:883-885 "RWE_HIGH_SCORE_DISPLAY"
-            case 'RWE_HIGH_SCORE_DISPLAY':
-                handler = new HighScoreDisplayWidgetHandler();
-                break;
-            // AS3: RoomDesktop.as::createWidgetHandler() "RWE_FRIEND_REQUEST"
-            case 'RWE_FRIEND_REQUEST':
-                handler = new FriendRequestWidgetHandler();
                 break;
             // AS3: RoomDesktop.as:858-860 "RWE_LOCATION_WIDGET". No widget behind it — the
             // handler answers a message synchronously and is the whole feature.
             case 'RWE_LOCATION_WIDGET':
                 handler = new ObjectLocationRequestHandler();
                 break;
-            // AS3: RoomDesktop.as:912-914 "RWE_EXTERNAL_IMAGE"
-            case 'RWE_EXTERNAL_IMAGE':
-                handler = new ExternalImageWidgetHandler();
-                break;
-            // AS3: RoomDesktop.as::createWidgetHandler() "RWE_ME_MENU"
-            case 'RWE_ME_MENU':
-                handler = new MeMenuWidgetHandler();
-                break;
-            // AS3: RoomDesktop.as:915-917 "RWE_UI_HELP_BUBBLE"
-            case 'RWE_UI_HELP_BUBBLE':
-                handler = new UiHelpBubbleWidgetHandler();
-                break;
-            // AS3: RoomDesktop.as::createWidgetHandler() "RWE_CONVERSION_TRACKING"
-            case 'RWE_CONVERSION_TRACKING':
-                handler = new ConversionPointWidgetHandler();
-                break;
-            case 'RWE_FURNI_PET_PACKAGE_WIDGET':
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as:798
-                handler = new PetPackageFurniWidgetHandler();
-                break;
-            case 'RWE_FURNI_ECOTRONBOX_WIDGET':
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as:795
-                handler = new FurnitureEcotronBoxWidgetHandler();
-                break;
-            case 'RWE_FURNI_CREDIT_WIDGET':
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as:783
-                handler = new FurnitureCreditWidgetHandler();
-                break;
-            case 'RWE_ROOM_BACKGROUND_COLOR':
-                // Derived name: `createWidgetHandler` is declared in no AS3 tree — the trace points
-                // at the class it belongs to, but the identifier itself is this port's.
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::createWidgetHandler()
-                handler = new FurnitureBackgroundColorWidgetHandler();
-                break;
-            case 'RWE_FURNI_PLACEHOLDER':
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as:780
-                handler = new PlaceholderWidgetHandler();
-                break;
-            case 'RWE_FURNI_STICKIE_WIDGET':
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as:786
-                handler = new FurnitureStickieWidgetHandler();
-                break;
-            case 'RWE_SPAMWALL_POSTIT_WIDGET':
-            {
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as:843
-                // This one owns a message event, so it needs the connection the moment it is
-                // built - the open request is a server push, not a room-engine translation.
-                const spamWallHandler = new SpamWallPostItWidgetHandler();
-
-                spamWallHandler.connection = this._connection;
-                handler = spamWallHandler;
-                break;
-            }
-            case 'RWE_ROOM_DIMMER':
-                // Derived name: `createWidgetHandler` is declared in no AS3 tree — the trace points
-                // at the class it belongs to, but the identifier itself is this port's.
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::createWidgetHandler()
-                handler = new FurnitureDimmerWidgetHandler();
-                break;
-            case 'RWE_FURNI_PRESENT_WIDGET':
-                // Derived name: `createWidgetHandler` is declared in no AS3 tree — the trace points
-                // at the class it belongs to, but the identifier itself is this port's.
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::createWidgetHandler()
-                handler = new FurniturePresentWidgetHandler();
-                break;
-            case 'RWE_MANNEQUIN':
-                // Derived name: `createWidgetHandler` is declared in no AS3 tree — the trace points
-                // at the class it belongs to, but the identifier itself is this port's.
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::createWidgetHandler()
-                handler = new MannequinWidgetHandler();
-                break;
-            case 'RWE_FRIEND_FURNI_ENGRAVING':
-                // Derived name: `createWidgetHandler` is declared in no AS3 tree — the trace points
-                // at the class it belongs to, but the identifier itself is this port's.
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::createWidgetHandler()
-                handler = new FriendFurniEngravingWidgetHandler();
-                break;
-            case 'RWE_CLOTHING_CHANGE':
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as:828-830
-                handler = new FurnitureClothingChangeWidgetHandler();
-                break;
-            case 'RWE_CUSTOM_STACK_HEIGHT':
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as:894-895
-                handler = new CustomStackHeightWidgetHandler();
-                break;
-            case 'RWE_ROOM_LINK': {
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as:889-891
-                // — handed the communication manager on construction, which is where it
-                // registers its GetGuestRoomResult listener.
-                const roomLinkHandler = new FurnitureRoomLinkHandler();
-
-                roomLinkHandler.communicationManager = this._communicationManager;
-                handler = roomLinkHandler;
-                break;
-            }
-            case 'RWE_FRIEND_FURNI_CONFIRM': {
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as:876-878
-                // — this one is handed the connection at construction, because it registers its
-                // three incoming messages itself rather than waiting on a room-engine event.
-                const confirmHandler = new FriendFurniConfirmWidgetHandler();
-
-                confirmHandler.connection = this._connection;
-                handler = confirmHandler;
-                break;
-            }
-            case 'RWE_FURNITURE_CONTEXT_MENU': {
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as:853-857
-                const contextMenuHandler = new FurnitureContextMenuWidgetHandler();
-
-                contextMenuHandler.connection = this._connection;
-                handler = contextMenuHandler;
-                break;
-            }
             default:
                 log.debug(`Widget creation requested: ${type} (stub)`);
 
@@ -1494,26 +949,6 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
         if(widget.mainWindow)
         {
             this._layoutManager.addWidgetWindow(type, widget.mainWindow);
-        }
-
-        // The chat input is the one widget that changes how much of the screen the room gets, so
-        // AS3 announces the new rectangle after adding it — and only after that one.
-        //
-        // Nothing listens for it, in this port or in the AS3: `RWRVUE_ROOM_VIEW_SIZE_CHANGED`
-        // appears in `RoomDesktop.as` and in the event class and nowhere else. It is dispatched
-        // because the desktop's event bus is public and a widget may subscribe; leaving the
-        // dispatch out is what made `RoomWidgetRoomViewUpdateEvent` a class nothing could reach.
-        if(type === 'RWE_CHAT_INPUT_WIDGET')
-        {
-            const viewRect = this._layoutManager.roomViewRect;
-
-            if(viewRect)
-            {
-                this._desktopEvents.emit(
-                    RoomWidgetRoomViewUpdateEvent.ROOM_VIEW_SIZE_CHANGED,
-                    new RoomWidgetRoomViewUpdateEvent(RoomWidgetRoomViewUpdateEvent.ROOM_VIEW_SIZE_CHANGED, viewRect)
-                );
-            }
         }
 
         log.debug(`Widget created: ${type}`);
@@ -1792,19 +1227,6 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
                 if(!this.isFurnitureSelectionDisabled(event))
                 {
                     translatedType = RoomWidgetRoomObjectUpdateEvent.OBJECT_SELECTED;
-                }
-
-                // Selecting an avatar in the room is what arms the mod tool's "User info" button.
-                // AS3 runs this outside the selection-disabled guard above, and `type == 1` skips
-                // bots and pets, whose webID the moderation tool cannot look up.
-                if(this._moderation !== null && event.category === RoomObjectCategoryEnum.OBJECT_CATEGORY_USER)
-                {
-                    const selectedUser = this._session?.userDataManager?.getUserDataByIndex(event.objectId) ?? null;
-
-                    if(selectedUser !== null && selectedUser.type === 1)
-                    {
-                        this._moderation.userSelected(selectedUser.webID, selectedUser.name);
-                    }
                 }
 
                 break;
@@ -2159,12 +1581,6 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
 
         log.debug(`Disposing RoomDesktop for room ${this._session.roomId}`);
 
-        if(this._toolbar)
-        {
-            this._toolbar.toolbarEvents.off(HabboToolbarEvent.ICON_ZOOM, this.onToolbarEvent);
-            this._toolbar = null;
-        }
-
         if(this._roomAdTooltip !== null)
         {
             this._roomAdTooltip.dispose();
@@ -2198,14 +1614,6 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
         this._widgetEventHandlers.clear();
         this._updateListeners.length = 0;
 
-        // AS3: RoomDesktop.as:633-638 — the other half of the friendList setter's subscription.
-        if(this._friendList !== null)
-        {
-            this._friendList.events.off(FriendRequestEvent.ACCEPTED, this.processEvent, this);
-            this._friendList.events.off(FriendRequestEvent.DECLINED, this.processEvent, this);
-            this._friendList = null;
-        }
-
         if(this._canvasWrapper) 
         {
             this._canvasWrapper.removeEventListener(WindowMouseEvent.CLICK, this.canvasWindowEventHandler);
@@ -2238,7 +1646,6 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
         this._roomSessionManager = null;
         this._config = null;
         this._localization = null;
-        this._toolbar = null;
         this._widgetFactory = null;
         this._canvasWrapper = null;
         this._roomViewWindow = null;
@@ -2436,15 +1843,6 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
         this._roomCanvasDisplayObject.y = globalPosition.y;
         this._roomCanvasDisplayObject.visible = this._visible && this._canvasWrapper.visible;
     }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::onToolbarEvent()
-    private onToolbarEvent = (event: HabboToolbarEvent): void => 
-    {
-        if(event.type === HabboToolbarEvent.ICON_ZOOM) 
-        {
-            this.toggleZoom();
-        }
-    };
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::toggleZoom()
     private toggleZoom(): void 

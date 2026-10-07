@@ -74,12 +74,6 @@ export const RoomObjectLogicEnum = {
     FURNITURE_EDITABLE_INTERNAL_LINK: 'furniture_editable_internal_link',
     FURNITURE_EDITABLE_ROOM_LINK: 'furniture_editable_room_link',
     FURNITURE_CRAFTING_GIZMO: 'furniture_crafting_gizmo',
-    // TS-only: Vortex-only fishing system — no AS3 counterpart. The value is the `logic` field a
-    // fishing-spot furni carries in furnidata. See docs/vortex-original/fishing.md §2.3.
-    VORTEX_FISHING_SPOT: 'vortex_fishing_spot',
-    // TS-only: Vortex-only fishing system. The sign is a furni of its own, not part of the spot —
-    // clicking it opens the Fish-O-Pedia. See docs/vortex-original/fishing.md §1 and §15.
-    VORTEX_FISHING_SIGN: 'vortex_fishing_sign',
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/RoomObjectLogicEnum.as::FURNITURE_NFT_CREDIT
     FURNITURE_NFT_CREDIT: 'furniture_nft_credit',
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/RoomObjectLogicEnum.as:138

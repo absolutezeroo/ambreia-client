@@ -4,15 +4,11 @@
 export {GenericErrorEnum} from './GenericErrorEnum';
 export {HabboClubLevelEnum, hasClub, hasVip,} from './HabboClubLevelEnum';
 export {RoomControllerLevelEnum} from './RoomControllerLevelEnum';
-export {RoomTradingLevelEnum, getLocalizationKey,} from './RoomTradingLevelEnum';
 export {SecurityLevelEnum} from './SecurityLevelEnum';
-export {TalentEnum, getTalentTypes,} from './TalentEnum';
 export {UIFlagsEnum} from './UIFlagsEnum';
 
 // Types
 export type {GenericError} from './GenericErrorEnum';
 export type {HabboClubLevel} from './HabboClubLevelEnum';
 export type {RoomControllerLevel} from './RoomControllerLevelEnum';
-export type {RoomTradingLevel} from './RoomTradingLevelEnum';
 export type {SecurityLevel} from './SecurityLevelEnum';
-export type {TalentType} from './TalentEnum';

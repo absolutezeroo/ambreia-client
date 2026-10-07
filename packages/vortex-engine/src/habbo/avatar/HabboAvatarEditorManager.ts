@@ -4,9 +4,7 @@ import type {IContext} from '@core/runtime';
 import type {IConnection} from '@core/communication/connection/IConnection';
 import type {ILinkEventTracker} from '@core/runtime/events/ILinkEventTracker';
 import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IHabboCatalog} from '@habbo/catalog/IHabboCatalog';
 import type {IHabboCommunicationManager} from '@habbo/communication/IHabboCommunicationManager';
-import type {IHabboInventory} from '@habbo/inventory/IHabboInventory';
 import type {ISessionDataManager} from '@habbo/session/ISessionDataManager';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 import type {IAvatarRenderManager} from './IAvatarRenderManager';
@@ -22,9 +20,7 @@ import {Component, ComponentDependency} from '@core/runtime';
 import {Logger} from '@core/utils/Logger';
 import {OrderedMap} from '@core/utils/OrderedMap';
 import {IID_AvatarRenderManager} from '@iid/IIDAvatarRenderManager';
-import {IID_HabboCatalog} from '@iid/IIDHabboCatalog';
 import {IID_HabboCommunicationManager} from '@iid/IIDHabboCommunicationManager';
-import {IID_HabboInventory} from '@iid/IIDHabboInventory';
 import {IID_HabboWindowManager} from '@iid/IIDHabboWindowManager';
 import {IID_SessionDataManager} from '@iid/IIDSessionDataManager';
 import {IID_RoomSessionManager} from '@iid/IIDRoomSessionManager';
@@ -65,9 +61,6 @@ export class HabboAvatarEditorManager extends Component
     // AS3: .../avatar/HabboAvatarEditorManager.as::_avatarRenderManager
     private _avatarRenderManager: IAvatarRenderManager | null = null;
 
-    // AS3: .../avatar/HabboAvatarEditorManager.as::_inventory
-    private _inventory: IHabboInventory | null = null;
-
     // AS3: .../avatar/HabboAvatarEditorManager.as::get roomDesktop()
     // The two together stand in for AS3's `_roomUI.desktop` — see the dependency's own note.
     private _roomSessionManager: IRoomSessionManager | null = null;
@@ -75,9 +68,6 @@ export class HabboAvatarEditorManager extends Component
 
     // AS3: .../avatar/HabboAvatarEditorManager.as::_communication
     private _communication: IHabboCommunicationManager | null = null;
-
-    // AS3: .../avatar/HabboAvatarEditorManager.as::_catalog
-    private _catalog: IHabboCatalog | null = null;
 
     // AS3: .../avatar/HabboAvatarEditorManager.as::_sessionData
     private _sessionData: ISessionDataManager | null = null;
@@ -117,10 +107,11 @@ export class HabboAvatarEditorManager extends Component
         return this._windowManager;
     }
 
+    // DEVIATION: AS3 opens the catalog page; the catalog left with the core cut (2026-10-07), so
+    //   the editor's "buy" links do nothing until a shop exists again.
     // AS3: .../src/com/sulake/habbo/catalog/IHabboCatalog.as::openCatalogPage()
-    public openCatalogPage(pageName: string): void
+    public openCatalogPage(_pageName: string): void
     {
-        this._catalog?.openCatalogPage(pageName);
     }
 
     // AS3: .../src/com/sulake/habbo/localization/IHabboLocalizationManager.as::getLocalization()
@@ -161,17 +152,17 @@ export class HabboAvatarEditorManager extends Component
     // AS3: .../avatar/HabboAvatarEditorManager.as::get inventory()
     public get inventory(): IFigureSetOwnership | null
     {
-        // Returned null until 2026-08-15, which reported every sellable clothing item as unowned
-        // and therefore hid it. `HabboInventory` answers this off the figure-set ids message (1231),
-        // which nothing had subscribed.
-        return this._inventory;
+        // DEVIATION: AS3 answers from the inventory, which left with the core cut (2026-10-07). With
+        //   no answer every sellable clothing item counts as unowned and is hidden, as it was before
+        //   2026-08-15; it comes back with the character/item system (F2).
+        return null;
     }
 
     // AS3: .../avatar/HabboAvatarEditorManager.as::get inventory()
     // The effect half of the same manager; separate because the two surfaces are unrelated.
     public get effectInventory(): IHabboAvatarEditorHost['effectInventory']
     {
-        return this._inventory;
+        return null;
     }
 
     // AS3: .../avatar/HabboAvatarEditorManager.as::get linkPattern()
@@ -282,7 +273,7 @@ export class HabboAvatarEditorManager extends Component
         {
             const figureData = editor.figureData;
 
-            if(figureData !== null) figureData.avatarEffectType = this._inventory?.getLastActivatedEffect() ?? -1;
+            if(figureData !== null) figureData.avatarEffectType = -1;
         }
 
         switch(editorId)
@@ -328,16 +319,17 @@ export class HabboAvatarEditorManager extends Component
         this.loadOwnAvatarInEditor(AvatarEditorIdEnum.MAIN_EDITOR);
     }
 
+    // DEVIATION: AS3 asks the catalog; with no catalog since the core cut (2026-10-07) nobody has club.
     // AS3: .../src/com/sulake/habbo/catalog/IHabboCatalog.as::verifyClubLevel()
     public verifyClubLevel(): boolean
     {
-        return this._catalog?.verifyClubLevel() ?? false;
+        return false;
     }
 
+    // DEVIATION: AS3 opens the club center, which left with the catalog in the core cut (2026-10-07).
     // AS3: .../src/com/sulake/habbo/catalog/IHabboCatalog.as::openClubCenter()
     public openClubCenter(): void
     {
-        this._catalog?.openClubCenter();
     }
 
     // AS3: .../src/com/sulake/habbo/avatar/_SafeCls_581.as::getMandatoryAvatarPartSetIds()
@@ -450,16 +442,6 @@ export class HabboAvatarEditorManager extends Component
             new ComponentDependency(
                 IID_HabboCommunicationManager,
                 (manager: IHabboCommunicationManager | null) => { this._communication = manager; },
-                false
-            ),
-            new ComponentDependency(
-                IID_HabboInventory,
-                (inventory: IHabboInventory | null) => { this._inventory = inventory; },
-                false
-            ),
-            new ComponentDependency(
-                IID_HabboCatalog,
-                (catalog: IHabboCatalog | null) => { this._catalog = catalog; },
                 false
             ),
             new ComponentDependency(

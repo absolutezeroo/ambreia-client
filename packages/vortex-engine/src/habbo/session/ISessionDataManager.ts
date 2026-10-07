@@ -4,7 +4,6 @@ import type {IWindow} from '@core/window/IWindow';
 import type {IMessageComposer} from '@core/communication/messages/IMessageComposer';
 import type {IHabboCommunicationManager} from '../communication/IHabboCommunicationManager';
 import type {IHabboLocalizationManager} from '../localization/IHabboLocalizationManager';
-import type {IHabboNotifications} from '../notifications/IHabboNotifications';
 import type {IHabboWindowManager} from '../window/IHabboWindowManager';
 import type {IAvatarEffect} from '../communication/messages/parser/inventory/AvatarEffectsMessageParser';
 import type {IUserDataManager} from './IUserDataManager';
@@ -35,7 +34,6 @@ export interface ISessionDataManager extends IDisposable
     readonly roomSessionManager: IRoomSessionManager | null;
     readonly windowManager: IHabboWindowManager | null;
     readonly localization: IHabboLocalizationManager | null;
-    readonly notifications: IHabboNotifications | null;
 
     // System status
     // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::get systemOpen()

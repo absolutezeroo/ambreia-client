@@ -58,7 +58,6 @@ import type {IRoomObjectVisualizationFactory} from '@room/object/IRoomObjectVisu
 import type {RoomRenderingCanvas} from './renderer/RoomRenderingCanvas';
 import type {IStuffData} from './object/data/IStuffData';
 import type {IGetImageListener} from './IGetImageListener';
-import {HabboToolbarIconEnum} from '@habbo/toolbar/HabboToolbarIconEnum';
 import {ImageResult} from './ImageResult';
 import type {ISelectedRoomObjectData} from './ISelectedRoomObjectData';
 
@@ -103,10 +102,6 @@ import {RoomVisualizationData} from './object/visualization/room/RoomVisualizati
 import type {IAssetRoomVisualizationData} from './object/visualization/room/rasterizer/basic/PlaneRasterizerTypes';
 import type {NitroAsset} from '@core/assets/NitroAsset';
 import {IID_HabboConfigurationManager} from '@iid/IIDHabboConfigurationManager';
-import {IID_HabboAdManager} from '@iid/IIDHabboAdManager';
-import type {IAdManager} from '@habbo/advertisement/IAdManager';
-import {AdEvent} from '@habbo/advertisement/events/AdEvent';
-import {RoomObjectRoomAdUpdateMessage} from './messages/RoomObjectRoomAdUpdateMessage';
 import {IID_HabboWindowManager} from '@iid/IIDHabboWindowManager';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 import type {IHabboConfigurationManager} from '@habbo/configuration/IHabboConfigurationManager';
@@ -114,11 +109,8 @@ import {IID_SessionDataManager} from '@iid/IIDSessionDataManager';
 import type {ISessionDataManager} from '@habbo/session/ISessionDataManager';
 import {IID_AvatarRenderManager} from '@iid/IIDAvatarRenderManager';
 import type {IAvatarRenderManager} from '@habbo/avatar/IAvatarRenderManager';
-import {IID_HabboToolbar} from '@iid/IIDHabboToolbar';
-import {IID_HabboCatalog} from '@iid/IIDHabboCatalog';
 import {BadgeImageReadyEvent} from '@habbo/session/events/BadgeImageReadyEvent';
 import {RoomObjectGroupBadgeUpdateMessage} from './messages/RoomObjectGroupBadgeUpdateMessage';
-import type {IHabboCatalog} from '@habbo/catalog/IHabboCatalog';
 import {RoomObjectRoomAdEvent} from './events/RoomObjectRoomAdEvent';
 import {RoomObjectBadgeAssetEvent} from './events/RoomObjectBadgeAssetEvent';
 import {RoomObjectDimmerStateUpdateEvent} from './events/RoomObjectDimmerStateUpdateEvent';
@@ -127,7 +119,6 @@ import {RoomObjectFurniIconAssetEvent} from './events/RoomObjectFurniIconAssetEv
 import {RoomObjectFurniIconUpdateMessage} from './messages/RoomObjectFurniIconUpdateMessage';
 import {FurniIconImageReadyEvent} from '@habbo/session/events/FurniIconImageReadyEvent';
 import {RoomEngineRoomAdEvent} from './events/RoomEngineRoomAdEvent';
-import type {IHabboToolbar} from '@habbo/toolbar/IHabboToolbar';
 import {EventEmitter} from 'eventemitter3';
 import {RoomContentLoader} from './RoomContentLoader';
 import type {PetColorResult} from './PetColorResult';
@@ -424,10 +415,6 @@ export class RoomEngine extends Component implements IRoomEngine,
     private _blittedTextureCount: number = 0;
     private _configurationManager: IHabboConfigurationManager | null = null;
     private _sessionDataManager: ISessionDataManager | null = null;
-    private _toolbar: IHabboToolbar | null = null;
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::_catalog
-    // Derived name: obfuscated in the primary tree; the getter it backs is readable.
-    private _catalog: IHabboCatalog | null = null;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::_pendingBadgeObjects
     // Derived name: obfuscated in the primary tree. Objects waiting on a badge image,
     // keyed by badge id; the BADGE_IMAGE_READY listener is attached only while it is
@@ -793,37 +780,6 @@ export class RoomEngine extends Component implements IRoomEngine,
                 },
                 false // Optional - needed for avatar visualization
             ),
-            // Optional in AS3 too. AS3 attaches its three listeners through the dependency's own
-            // event-descriptor array; this port's ComponentDependency has no such array, so they
-            // are attached in the setter instead — same three events, same callbacks.
-            // AS3: .../src/com/sulake/habbo/room/_SafeCls_90.as::dependencies (IIDHabboAdManager)
-            new ComponentDependency(
-                IID_HabboAdManager,
-                (adManager: IAdManager | null) =>
-                {
-                    this._adManager = adManager;
-
-                    adManager?.adEvents.on(AdEvent.ROOM_AD_IMAGE_LOADED, this.onRoomAdImageLoaded);
-                    adManager?.adEvents.on(AdEvent.ROOM_AD_IMAGE_LOADING_FAILED, this.onRoomAdImageLoaded);
-                },
-                false
-            ),
-            new ComponentDependency(
-                IID_HabboToolbar,
-                (toolbar: IHabboToolbar | null) => 
-                {
-                    this._toolbar = toolbar;
-                },
-                false // Optional - needed for the pickup-to-inventory icon animation
-            ),
-            new ComponentDependency(
-                IID_HabboCatalog,
-                (catalog: IHabboCatalog | null) => 
-                {
-                    this._catalog = catalog;
-                },
-                false // Optional - only used to open a CATALOG_PAGE: room-ad link
-            ),
             new ComponentDependency(
                 IID_RoomSessionManager,
                 (manager: IRoomSessionManager | null) =>
@@ -834,10 +790,6 @@ export class RoomEngine extends Component implements IRoomEngine,
             ),
         ];
     }
-
-    /** Null in a hotel with no ad subsystem, which is why every use of it is guarded. */
-    // AS3: .../src/com/sulake/habbo/room/_SafeCls_90.as::_adManager
-    private _adManager: IAdManager | null = null;
 
     /**
      * A click on an avatar. Outside game mode AS3 does nothing here — the avatar's own selection
@@ -923,12 +875,6 @@ export class RoomEngine extends Component implements IRoomEngine,
     get configuration(): IHabboConfigurationManager | null
     {
         return this._configurationManager;
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::get toolbar()
-    get toolbar(): IHabboToolbar | null
-    {
-        return this._toolbar;
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::get roomSessionManager()
@@ -3199,11 +3145,6 @@ export class RoomEngine extends Component implements IRoomEngine,
                     this._connection.send(new PickupObjectMessageComposer(objectId, category));
                 }
 
-                if(object && (category === RoomObjectCategoryEnum.OBJECT_CATEGORY_FURNITURE || category === RoomObjectCategoryEnum.OBJECT_CATEGORY_WALL)) 
-                {
-                    this.animatePickupToInventory(objectId, category, object);
-                }
-
                 return this.disposeRoomObject(this._activeRoomId, objectId, category);
             }
             // AS3: _SafeCls_1821.as::modifyRoomObject() "OBJECT_MOVE" case
@@ -4626,24 +4567,19 @@ export class RoomEngine extends Component implements IRoomEngine,
     }
 
     /**
-     * Removes a floor item, and — when the local player is the one who picked it up — flies its
-     * icon into the inventory button on the way out.
-     *
-     * The animation has to be started *before* the object is disposed: both the screen position it
-     * flies from and the type/extras the icon is built from come off the room object's model.
+     * Removes a floor item. AS3 also flies its icon into the inventory button when the local player
+     * picked it up (`pickerId`); that animation left with the core cut (2026-10-07).
      */
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/room/RoomEngine.as::disposeObjectFurniture()
     disposeObjectFurniture(
         roomId: number,
         id: number,
-        pickerId: number = -1,
+        _pickerId: number = -1,
         refresh: boolean = false
     ): boolean
     {
         // AS3 drops the pending entry first, before anything else in the method.
         this.getFurnitureDataWithId(roomId, id);
-
-        this.playPickupAnimation(roomId, id, pickerId);
 
         const success = this.disposeRoomObject(roomId, id, RoomObjectCategoryEnum.OBJECT_CATEGORY_FURNITURE);
 
@@ -4657,68 +4593,6 @@ export class RoomEngine extends Component implements IRoomEngine,
         if(success && refresh) this.refreshTileObjectMap(roomId, 'RoomEngine.disposeObjectFurniture()');
 
         return success;
-    }
-
-    /**
-     * The "furni flies into your inventory" animation.
-     *
-     * Four things have to hold before it plays, and each rules out a case where it would be wrong:
-     * the picker is the local player (someone else's pickup goes into *their* inventory), the object
-     * is still on screen, and its own model does not ask to be picked up silently. (AS3 also skips
-     * the Builders Club and wired-temporary id ranges, which have no inventory item behind them; the
-     * RPG fork removed both.)
-     *
-     * Where this necessarily differs from AS3: `getFurnitureIcon()` there returns a BitmapData that
-     * is readable on the spot, while this port's `ImageResult` converts a Texture to an ImageBitmap
-     * asynchronously, so `data` is null at this point for anything not already cached. The listener
-     * covers both — a warm icon comes back on `data` and starts the flight immediately, a cold one
-     * arrives at `imageReady()` a frame or two later and starts it then. The object is long gone by
-     * then, which is exactly why the *start position* is captured up front rather than looked up in
-     * the callback.
-     */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::disposeObjectFurniture()
-    private playPickupAnimation(roomId: number, id: number, pickerId: number): void
-    {
-        const toolbar = this._toolbar;
-
-        if(toolbar === null || this._sessionDataManager === null) return;
-        if(pickerId !== this._sessionDataManager.userId) return;
-
-        const object = this.getRoomObject(roomId, id, RoomObjectCategoryEnum.OBJECT_CATEGORY_FURNITURE);
-
-        if(object === null) return;
-
-        const screenLocation = this.getRoomObjectScreenLocation(
-            roomId, id, RoomObjectCategoryEnum.OBJECT_CATEGORY_FURNITURE
-        );
-
-        if(screenLocation === null) return;
-
-        const model = object.getModel();
-
-        if(model === null) return;
-        if(model.getNumber(RoomObjectVariableEnum.FURNITURE_DISABLE_PICKING_ANIMATION) === 1) return;
-
-        const typeId = model.getNumber(RoomObjectVariableEnum.FURNITURE_TYPE_ID);
-        const extras = model.getString(RoomObjectVariableEnum.FURNITURE_EXTRAS);
-        const dataFormat = model.getNumber(RoomObjectVariableEnum.FURNITURE_DATA_FORMAT);
-        const stuffData = StuffDataFactory.getStuffDataForType(dataFormat);
-        const startX = screenLocation.x;
-        const startY = screenLocation.y;
-        const listener: IGetImageListener = {
-            imageReady: (_imageId: number, data: ImageBitmap | null): void =>
-            {
-                if(data !== null) toolbar.createTransitionToIcon(HabboToolbarIconEnum.INVENTORY, data, startX, startY);
-            },
-            imageFailed: (): void =>
-            {
-                // Nothing to do: a missing icon costs the animation, not the pickup.
-            },
-        };
-
-        const icon = this.getFurnitureIcon(typeId, listener, extras, stuffData);
-
-        if(icon.data !== null) toolbar.createTransitionToIcon(HabboToolbarIconEnum.INVENTORY, icon.data, startX, startY);
     }
 
     /**
@@ -5045,21 +4919,19 @@ export class RoomEngine extends Component implements IRoomEngine,
 
     /**
 	 * The wall sibling of `disposeObjectFurniture()`, and it had none of what makes that one more
-	 * than a delete: no fly-to-inventory animation, no room-window update, no mouse-cursor
-	 * release. All three are AS3's, and the last one leaks — the object keeps owning a hand cursor
+	 * than a delete: no room-window update, no mouse-cursor
+	 * release. Both are AS3's, and the second one leaks — the object keeps owning a hand cursor
 	 * after it is gone.
 	 */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::disposeObjectWallItem()
     disposeObjectWallItem(
         roomId: number,
         id: number,
-        pickerId: number = -1
+        _pickerId: number = -1
     ): boolean
     {
         // AS3 drops the pending entry first, before anything else in the method.
         this.getWallItemDataWithId(roomId, id);
-
-        this.playWallItemPickupAnimation(roomId, id, pickerId);
 
         const success = this.disposeRoomObject(roomId, id, RoomObjectCategoryEnum.OBJECT_CATEGORY_WALL);
 
@@ -5067,57 +4939,6 @@ export class RoomEngine extends Component implements IRoomEngine,
         this.removeButtonMouseCursorOwner(roomId, RoomObjectCategoryEnum.OBJECT_CATEGORY_WALL, id);
 
         return success;
-    }
-
-    /**
-	 * Same animation as `playPickupAnimation()`, with the two differences AS3 makes for a wall
-	 * item: the icon comes from `getWallItemIcon()`, and the exclusion is by TYPE rather than by a
-	 * model flag — a post-it and an external image have no inventory icon to fly.
-	 */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::disposeObjectWallItem()
-    private playWallItemPickupAnimation(roomId: number, id: number, pickerId: number): void
-    {
-        const toolbar = this._toolbar;
-
-        if(toolbar === null || this._sessionDataManager === null) return;
-        if(pickerId !== this._sessionDataManager.userId) return;
-
-        const object = this.getRoomObject(roomId, id, RoomObjectCategoryEnum.OBJECT_CATEGORY_WALL);
-
-        if(object === null) return;
-
-        const type = object.getType();
-
-        if(type.indexOf('post_it') !== -1 || type.indexOf('external_image_wallitem') !== -1) return;
-
-        const screenLocation = this.getRoomObjectScreenLocation(
-            roomId, id, RoomObjectCategoryEnum.OBJECT_CATEGORY_WALL
-        );
-
-        if(screenLocation === null) return;
-
-        const model = object.getModel();
-
-        if(model === null) return;
-
-        const typeId = model.getNumber(RoomObjectVariableEnum.FURNITURE_TYPE_ID);
-        const furnitureData = model.getString(RoomObjectVariableEnum.FURNITURE_DATA);
-        const startX = screenLocation.x;
-        const startY = screenLocation.y;
-        const listener: IGetImageListener = {
-            imageReady: (_imageId: number, data: ImageBitmap | null): void =>
-            {
-                if(data !== null) toolbar.createTransitionToIcon(HabboToolbarIconEnum.INVENTORY, data, startX, startY);
-            },
-            imageFailed: (): void =>
-            {
-                // Nothing to do: a missing icon costs the animation, not the pickup.
-            },
-        };
-
-        const icon = this.getWallItemIcon(typeId, listener, furnitureData);
-
-        if(icon.data !== null) toolbar.createTransitionToIcon(HabboToolbarIconEnum.INVENTORY, icon.data, startX, startY);
     }
 
     addObjectUser(
@@ -7524,54 +7345,10 @@ export class RoomEngine extends Component implements IRoomEngine,
      * subsystem and a hotel without one simply shows blank billboards.
      */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::requestRoomAdImage()
-    requestRoomAdImage(roomId: number, objectId: number, objectCategory: number, imageURL: string, clickURL: string): void
+    // DEVIATION: AS3 asks the ad manager, which left with the core cut (2026-10-07); billboards stay blank.
+    requestRoomAdImage(_roomId: number, _objectId: number, _objectCategory: number, _imageURL: string, _clickURL: string): void
     {
-        this._adManager?.loadRoomAdImage(roomId, objectId, objectCategory, imageURL, clickURL);
     }
-
-    /**
-     * The picture came back — register it, then tell the billboard to use it.
-     *
-     * The asset is registered under the *image URL*, which is the name the visualization looks
-     * the sprite up by, and it goes in before the update message so the lookup cannot miss.
-     * A failure takes the same path with a null image: the billboard needs telling either way.
-     */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::onRoomAdImageLoaded()
-    private onRoomAdImageLoaded = (event: AdEvent): void =>
-    {
-        const room = this.getRoomInstance(event.roomId);
-
-        if(room === null) return;
-
-        const object = room.getObject(
-            event.objectId, RoomObjectCategoryEnum.OBJECT_CATEGORY_FURNITURE) as IRoomObjectController | null;
-        const eventHandler = object?.getEventHandler() ?? null;
-
-        if(object == null || eventHandler === null) return;
-
-        if(event.image !== null)
-        {
-            this._contentLoader.addGraphicAsset(object.getType(), event.imageUrl, Texture.from(event.image), true);
-        }
-
-        let messageType: string | null = null;
-
-        switch(event.type)
-        {
-            case AdEvent.ROOM_AD_IMAGE_LOADED:
-                messageType = RoomObjectRoomAdUpdateMessage.ROOM_BILLBOARD_IMAGE_LOADED;
-                break;
-
-            case AdEvent.ROOM_AD_IMAGE_LOADING_FAILED:
-                messageType = RoomObjectRoomAdUpdateMessage.ROOM_BILLBOARD_LOADING_FAILED;
-                break;
-        }
-
-        if(messageType === null) return;
-
-        eventHandler.processUpdateMessage(new RoomObjectRoomAdUpdateMessage(
-            messageType, event.imageUrl, event.clickUrl, event.objectId, event.image));
-    };
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::getRoomInstanceData()
     private getRoomInstanceData(roomId: number): IRoomEngineRoomInstanceData
@@ -7772,41 +7549,6 @@ export class RoomEngine extends Component implements IRoomEngine,
         }
 
         return point;
-    }
-
-    // flying icon.
-    private animatePickupToInventory(objectId: number, category: number, object: IRoomObject): void 
-    {
-        if(!this._toolbar) return;
-
-        const screenLocation = this.getRoomObjectScreenLocation(this._activeRoomId, objectId, category);
-
-        if(!screenLocation) return;
-
-        const model = object.getModel();
-        const typeId = model.getNumber('furniture_type_id');
-        const extras = category === RoomObjectCategoryEnum.OBJECT_CATEGORY_WALL
-            ? model.getString('furniture_data')
-            : model.getString('furniture_extras');
-
-        const listener: IGetImageListener = {
-            imageReady: (_id: number, data: ImageBitmap | null) => 
-            {
-                if(data) this._toolbar?.createTransitionToIcon('HTIE_ICON_INVENTORY', data, screenLocation.x, screenLocation.y);
-            },
-            imageFailed: () => 
-            {
-            }
-        };
-
-        const result = category === RoomObjectCategoryEnum.OBJECT_CATEGORY_WALL
-            ? this.getWallItemIcon(typeId, listener, extras)
-            : this.getFurnitureIcon(typeId, listener, extras);
-
-        if(result.id === 0 && result.data) 
-        {
-            this._toolbar.createTransitionToIcon('HTIE_ICON_INVENTORY', result.data, screenLocation.x, screenLocation.y);
-        }
     }
 
     private onTickerUpdate = (): void =>
@@ -8336,29 +8078,15 @@ export class RoomEngine extends Component implements IRoomEngine,
             {
                 case RoomObjectRoomAdEvent.ROOM_AD_FURNI_CLICK:
                     this.events.emit(event.type, event);
-
-                    if(this._toolbar !== null)
-                    {
-                        // DEVIATION: AS3 first maps the `NAVIGATOR_GAMES` click url onto the toolbar's games
-                        //   window; the RPG fork removed Snow War and the games icon, so it is an ordinary link.
-                        if(event.clickUrl) this.context?.createLinkEvent(event.clickUrl);
-                    }
+                    // AS3 follows the ad's click url through the toolbar here; the toolbar left with the core cut.
 
                     engineType = RoomEngineRoomAdEvent.FURNI_CLICK;
                     break;
 
                 case RoomObjectRoomAdEvent.ROOM_AD_FURNI_DOUBLE_CLICK:
-                {
-                    const prefix = 'CATALOG_PAGE:';
-
-                    if(this._catalog !== null && event.clickUrl?.startsWith(prefix))
-                    {
-                        this._catalog.openCatalogPage(event.clickUrl.substring(prefix.length));
-                    }
-
+                    // AS3 opens a CATALOG_PAGE: link here; the catalog left with the core cut.
                     engineType = RoomEngineRoomAdEvent.FURNI_DOUBLE_CLICK;
                     break;
-                }
 
                 case RoomObjectRoomAdEvent.ROOM_AD_TOOLTIP_SHOW:
                     engineType = RoomEngineRoomAdEvent.TOOLTIP_SHOW;
@@ -8368,8 +8096,7 @@ export class RoomEngine extends Component implements IRoomEngine,
                     engineType = RoomEngineRoomAdEvent.TOOLTIP_HIDE;
                     break;
 
-                // The only case with no engine event of its own: it starts a load instead, and
-                // the answer comes back through onRoomAdImageLoaded().
+                // The only case with no engine event of its own: it starts a load instead.
                 // AS3: .../src/com/sulake/habbo/room/_SafeCls_1821.as::handleObjectRoomAdEvent()
                 case RoomObjectRoomAdEvent.ROOM_AD_LOAD_IMAGE:
                     this.requestRoomAdImage(

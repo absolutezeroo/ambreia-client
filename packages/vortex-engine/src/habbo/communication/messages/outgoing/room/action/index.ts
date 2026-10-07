@@ -1,5 +1,4 @@
 export * from './KickUserMessageComposer';
-export * from './MuteAllInRoomComposer';
 export * from './BanUserWithDurationMessageComposer';
 export * from './MuteUserMessageComposer';
 export * from './UnmuteUserMessageComposer';

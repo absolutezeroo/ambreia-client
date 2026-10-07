@@ -1,1 +1,0 @@
-export {GetCreditsInfoComposer} from './GetCreditsInfoComposer';

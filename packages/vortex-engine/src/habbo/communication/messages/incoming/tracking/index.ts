@@ -1,1 +1,0 @@
-export {LatencyPingResponseMessageEvent} from './LatencyPingResponseMessageEvent';
