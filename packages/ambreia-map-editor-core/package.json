@@ -1,0 +1,17 @@
+{
+  "name": "@ambreia/map-editor-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Zone document, history, selection, layers, local validation and API client of the Ambreia map editor",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "gen:types": "node tools/gen-zone-types.mjs"
+  },
+  "devDependencies": {
+    "json-schema-to-typescript": "^15.0.4",
+    "typescript": "^5.7.2"
+  }
+}
