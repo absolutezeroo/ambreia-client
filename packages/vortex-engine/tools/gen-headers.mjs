@@ -2,15 +2,20 @@
 // Writes src/habbo/communication/Headers.generated.ts from the emulator's Headers.cs, or with
 // --check verifies the committed copy still matches it (run by .husky/pre-commit).
 // docs/superpowers/specs/2026-10-07-client-architecture-design.md §6.
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseHeadersCs, renderHeadersTs, sameContent } from './lib/headers.mjs';
+import { emulatorCandidates, parseHeadersCs, renderHeadersTs, sameContent } from './lib/headers.mjs';
 
 const ENGINE = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const REPO = resolve(ENGINE, '..', '..');
-const EMULATOR = process.env.VORTEX_EMULATOR_DIR ?? resolve(REPO, '..', 'vortex-rpg-emulator');
-const SOURCE = join(EMULATOR, 'Vortex.Revisions', 'Revision20260701', 'Headers.cs');
+const HEADERS_CS = join('Vortex.Revisions', 'Revision20260701', 'Headers.cs');
+const dotGit = join(REPO, '.git');
+const candidates = process.env.VORTEX_EMULATOR_DIR
+    ? [process.env.VORTEX_EMULATOR_DIR]
+    : emulatorCandidates(REPO, existsSync(dotGit) && !statSync(dotGit).isDirectory() ? readFileSync(dotGit, 'utf8') : null);
+const EMULATOR = candidates.find(dir => existsSync(join(dir, HEADERS_CS))) ?? candidates[0];
+const SOURCE = join(EMULATOR, HEADERS_CS);
 const TARGET = join(ENGINE, 'src', 'habbo', 'communication', 'Headers.generated.ts');
 const check = process.argv.includes('--check');
 

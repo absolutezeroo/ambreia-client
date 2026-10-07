@@ -1,6 +1,7 @@
 // Parses the emulator's Headers.cs and renders the client's Headers.generated.ts.
 // The emulator is the source of truth for message ids:
 // docs/superpowers/specs/2026-10-07-client-architecture-design.md §6.
+import { dirname, join, resolve } from 'node:path';
 
 const CLASS_RE = /^\s*(?:internal|public)\s+static\s+class\s+(\w+)/;
 const CONST_RE = /^\s*public\s+const\s+int\s+(\w+)\s*=\s*(-?\d+)\s*;/;
@@ -93,6 +94,28 @@ export function renderHeadersTs(parsed)
         renderBlock('Incoming', 'Server to client: the emulator\'s MessageComposer constants.', parsed.incoming),
         renderBlock('Outgoing', 'Client to server: the emulator\'s MessageEvent constants.', parsed.outgoing)
     ].join('\n');
+}
+
+// Where to look for the emulator checkout, in order. A linked worktree (e.g. .claude/worktrees/x)
+// has a `.git` file pointing into the main checkout's .git/worktrees/; without the second candidate
+// the check would silently skip in every worktree.
+export function emulatorCandidates(repoDir, dotGitText)
+{
+    const candidates = [join(dirname(repoDir), 'vortex-rpg-emulator')];
+    const pointer = dotGitText?.match(/^gitdir:\s*(.+?)[\\/]\.git[\\/]worktrees[\\/]/m);
+
+    if(pointer)
+    {
+        const main = resolve(pointer[1]);
+        const candidate = join(dirname(main), 'vortex-rpg-emulator');
+
+        if(!candidates.includes(candidate))
+        {
+            candidates.push(candidate);
+        }
+    }
+
+    return candidates;
 }
 
 export function sameContent(a, b)
