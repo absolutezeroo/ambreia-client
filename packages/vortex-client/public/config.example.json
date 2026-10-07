@@ -1,9 +1,20 @@
 {
   "app": {
-    "server": { "host": "wss://jeu.exemple.fr/ws", "ports": [40001] }
+    "server": {
+      "host": "wss://jeu.exemple.fr/ws",
+      "ports": [
+        40001
+      ]
+    }
   },
   "legacy": {
     "url.prefix": "https://jeu.exemple.fr"
   },
-  "room-ui": { "enabled": true }
+  "room-ui": {
+    "enabled": true
+  },
+  "asset-packs": {
+    "clothing": "${url.prefix}/packs/clothing.ambreia",
+    "furniture": "${url.prefix}/packs/furniture.ambreia"
+  }
 }
