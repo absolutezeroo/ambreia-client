@@ -34,3 +34,11 @@ paths:
 - **Shipped assets can lag the primary dump**: check before assuming a code gap.
   `src/assets/configurations/HabboAvatarGeometry.xml` has 9 bodyparts and no `order-*` attributes
   where the WIN63 dump has 11 (`petl`/`petr`).
+- **`.ambreia` packs stand in for directories of `.nitro`** (plan `docs/superpowers/plans/2026-10-08-asset-packs.md`).
+  `build-asset-pack.ts` writes one (lossless WebP checked per pixel, manifests through
+  `ManifestCodec`, a full read-back; unreadable bundles listed in `<pack>.report.json`). The
+  `asset-packs` feature mounts `config.json` → `asset-packs.{clothing,furniture}` on the avatar /
+  furniture download directories; `NitroBundleLoader` reads a mounted piece with one HTTP Range and
+  falls back to the `.nitro` when the pack lacks it or the server ignores Range. Image *data* is
+  identical; browsers premultiply PNG and WebP alpha with different rounding, so semi-transparent
+  pixels can render ±1/255 apart.

@@ -21,6 +21,7 @@ pnpm build                   # production build of the client (tsc + vite)
 pnpm gen:headers             # regenerate message ids from the emulator's Headers.cs
 pnpm sync:agents             # regenerate AGENTS.md / copilot-instructions.md from this file + rules
 node install.mjs             # unpack assets (vortex-client-assets.zip); --pack to rebuild the zip
+pnpm --filter vortex-client build:pack <dir of .nitro> <out.ambreia>   # lossless .ambreia pack (see rules/assets.md)
 ```
 
 ## Done means verified
@@ -35,7 +36,7 @@ node install.mjs             # unpack assets (vortex-client-assets.zip); --pack 
 
 | Package | What it is |
 |---|---|
-| `packages/ambreia-common` | `@ambreia/common`: Logger, utilities, asset loading, reactive — imports no other Ambreia package |
+| `packages/ambreia-common` | `@ambreia/common`: Logger, utilities, asset loading (incl. `.ambreia` packs: `assets/pack/`), reactive — imports no other Ambreia package |
 | `packages/ambreia-net` | `@ambreia/net`: WebSocket transport, encryption, wire format, registry, packet tap, the new message style (`style/MessageMap`) — imports `@ambreia/common` only |
 | `packages/ambreia-avatar` | `@ambreia/avatar`: avatar renderer (not the editor), built from typed options; runs in Node (`tools/render-avatar.mjs`) — imports `@ambreia/common` only |
 | `packages/ambreia-ui` | `@ambreia/ui`: window system (`src/`), generic kit (`src/kit/`: plain `WindowManager`, `WidgetRegistry`, dialogs, generic widgets), XML parsers (`src/assets/`); `pnpm --filter @ambreia/ui sandbox` shows it alone — imports `@ambreia/common` only |
@@ -267,6 +268,14 @@ _Applies to: `packages/vortex-client/tools/**`, `packages/vortex-client/src/asse
 - **Shipped assets can lag the primary dump**: check before assuming a code gap.
   `src/assets/configurations/HabboAvatarGeometry.xml` has 9 bodyparts and no `order-*` attributes
   where the WIN63 dump has 11 (`petl`/`petr`).
+- **`.ambreia` packs stand in for directories of `.nitro`** (plan `docs/superpowers/plans/2026-10-08-asset-packs.md`).
+  `build-asset-pack.ts` writes one (lossless WebP checked per pixel, manifests through
+  `ManifestCodec`, a full read-back; unreadable bundles listed in `<pack>.report.json`). The
+  `asset-packs` feature mounts `config.json` → `asset-packs.{clothing,furniture}` on the avatar /
+  furniture download directories; `NitroBundleLoader` reads a mounted piece with one HTTP Range and
+  falls back to the `.nitro` when the pack lacks it or the server ignores Range. Image *data* is
+  identical; browsers premultiply PNG and WebP alpha with different rounding, so semi-transparent
+  pixels can render ±1/255 apart.
 
 ## Rule: Wire protocol / communication rules
 

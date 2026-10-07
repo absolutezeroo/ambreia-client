@@ -14,7 +14,8 @@ export default defineConfig({
         proxy: {
             '/gamedata': {target: ASSETS, changeOrigin: true},
             '/dcr': {target: ASSETS, changeOrigin: true},
-            '/gordon': {target: ASSETS, changeOrigin: true}
+            '/gordon': {target: ASSETS, changeOrigin: true},
+            '/packs': {target: ASSETS, changeOrigin: true}
         }
     }
 });
