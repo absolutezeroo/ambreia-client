@@ -27,7 +27,6 @@ import type {Canvas} from '@napi-rs/canvas';
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {CoreComponentContext} from '@core/runtime/CoreComponentContext';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
-import {IID_RoomManager} from '@iid/IIDRoomManager';
 import {RoomManager} from '@room/RoomManager';
 import type {IRoomInstance} from '@room/IRoomInstance';
 import type {IRoomObjectController} from '@room/object/IRoomObjectController';
@@ -40,7 +39,7 @@ import {RoomVisualizationData} from '@habbo/room/object/visualization/room/RoomV
 import type {NitroAsset} from '@ambreia/common/assets/NitroAsset';
 import {FurnitureDataParser} from '@habbo/session/furniture/FurnitureDataParser';
 import type {IFurnitureData} from '@habbo/session/furniture/IFurnitureData';
-import type {ISessionDataManager} from '@habbo/session/ISessionDataManager';
+import type {IFurniDataSource} from '@habbo/room/IRoomContentConfiguration';
 import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';
 import type {HabboConfigurationManager} from '@habbo/configuration/HabboConfigurationManager';
 
@@ -92,16 +91,18 @@ export class RoomStack
         configuration: HabboConfigurationManager
     ): Promise<RoomStack>
     {
-        // `RoomManager.createRoomObject()` reads `context.configuration` for the three external
-        // image base URLs it pushes into every visualization. On the client that field is set
-        // during bootstrap; nothing sets it here, and an unset one silently gives every
+        // `RoomManager.createRoomObject()` reads the three external image base URLs it pushes
+        // into every visualization through these options; empty ones silently give every
         // visualization empty base URLs.
         context.configuration = configuration;
 
         const contentLoader = new RoomContentLoader();
         const visualizationFactory = new RoomObjectVisualizationFactory();
         const objectFactory = new RoomObjectFactory();
-        const roomManager = new RoomManager(context);
+        const roomManager = new RoomManager({
+            property: (key: string): string => configuration.getProperty(key),
+            flag: (key: string): boolean => configuration.getBoolean(key)
+        });
 
         // `RoomEngine`'s own wiring (`_visualizationFactory.assets = assetLibrary`). Furniture
         // never reads it, which is why this parameter sat unused; a pet does —
@@ -113,7 +114,7 @@ export class RoomStack
 
         await stack.loadFurniData(configuration);
 
-        contentLoader.sessionDataManager = stack.createFurniDataSource();
+        contentLoader.furniDataSource = stack.createFurniDataSource();
         contentLoader.visualizationFactory = visualizationFactory;
         // Two arguments, not three: `initialize()` stopped taking an asset library when content
         // types got one collection each. The stray one was landing in `configurationManager`,
@@ -139,12 +140,8 @@ export class RoomStack
             roomManager.addObjectUpdateCategory(category);
         }
 
-        context.attachComponent(roomManager, [IID_RoomManager]);
-
-        // `Component` defers initComponent() to a microtask, and `initialize()` buffers itself
-        // until that has run. Yielding once here means the call below takes the real path
-        // instead of the pending one.
-        await Promise.resolve();
+        // Where AS3 ran initComponent(): without it `initialize()` buffers itself.
+        roomManager.start();
 
         // A downloaded bundle is only *queued* by `onContentLoaded()`; what actually builds its
         // graphic asset collection and re-initializes the objects waiting on it is
@@ -450,18 +447,16 @@ export class RoomStack
     }
 
     /**
-	 * The two methods `RoomContentLoader.initFurnitureData()` calls on its session data
-	 * manager, and nothing else. Cast rather than implemented: `ISessionDataManager` declares
-	 * well over a hundred members, and stubbing them all would hide which two actually matter.
+	 * The two methods `RoomContentLoader.initFurnitureData()` calls on its furnidata source.
 	 */
-    private createFurniDataSource(): ISessionDataManager
+    private createFurniDataSource(): IFurniDataSource
     {
         const source = {
             getFurniData: (): IFurnitureData[] => [...this._floorItems.values(), ...this._wallItems.values()],
             removeFurniDataListener: (): void => {}
         };
 
-        return source as unknown as ISessionDataManager;
+        return source;
     }
 }
 

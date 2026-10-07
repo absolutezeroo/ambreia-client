@@ -767,7 +767,7 @@ export class RoomEngine extends Component implements IRoomEngine,
 
                     if(sessionData) 
                     {
-                        this._contentLoader.sessionDataManager = sessionData;
+                        this._contentLoader.furniDataSource = sessionData;
                     }
                 },
                 false // Optional - needed for furniture className lookup
@@ -9950,7 +9950,7 @@ export class RoomEngine extends Component implements IRoomEngine,
 
         if(this._sessionDataManager)
         {
-            this._contentLoader.sessionDataManager = this._sessionDataManager;
+            this._contentLoader.furniDataSource = this._sessionDataManager;
         }
 
         // AS3: _roomManager categories and content loader are set here; initialize() waits for RCL_LOADER_READY.

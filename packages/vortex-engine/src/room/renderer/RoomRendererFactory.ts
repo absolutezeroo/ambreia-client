@@ -7,18 +7,13 @@
  *
  * @see sources/PRODUCTION-201601012205-226667486/src/com/sulake/room/renderer/RoomRendererFactory.as
  */
-import {Component, type IContext} from '@core/runtime';
 import type {IRoomRendererFactory} from './IRoomRendererFactory';
 import type {IRoomRenderer} from './IRoomRenderer';
 import {RoomRenderer} from './RoomRenderer';
 
-export class RoomRendererFactory extends Component implements IRoomRendererFactory
+// DEVIATION: a Component in AS3; a plain class registered with attachInstance since J4.
+export class RoomRendererFactory implements IRoomRendererFactory
 {
-    constructor(context: IContext)
-    {
-        super(context);
-    }
-
     /**
 	 * Create a new room renderer.
 	 *

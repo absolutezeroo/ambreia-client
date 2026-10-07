@@ -8,8 +8,8 @@
  *
  * @see sources/win63_version/room/RoomManager.as
  */
-import {Component, type IContext} from '@core/runtime';
-import {Logger} from '@core';
+import {EventEmitter} from 'eventemitter3';
+import {Logger} from '@ambreia/common/utils/Logger';
 import type {IRoomManager} from './IRoomManager';
 import type {IRoomInstance} from './IRoomInstance';
 import type {IRoomInstanceContainer} from './IRoomInstanceContainer';
@@ -39,8 +39,23 @@ export const RoomManagerState = {
     INITIALIZED: 3,
 } as const;
 
-export class RoomManager extends Component implements IRoomManager, IRoomInstanceContainer
+/** What the host tells the room manager: the external-content URLs a visualization may need. */
+export interface IRoomManagerOptions
 {
+    /** A configuration property (`stories.image_url_base`, `extra_data_service_url`). */
+    property(key: string): string;
+    /** A boolean configuration flag (`extra_data_batches_enabled`). */
+    flag(key: string): boolean;
+}
+
+// DEVIATION: AS3's RoomManager is a Component; here a plain class built from its options, which
+//   the host starts (start()) where AS3 ran initComponent() (spec §3 rule 1, J4).
+export class RoomManager implements IRoomManager, IRoomInstanceContainer
+{
+    // TS-only: was the Component's; the content loader reports to it.
+    private readonly _events: EventEmitter = new EventEmitter();
+    private readonly _options: IRoomManagerOptions;
+    private _disposed: boolean = false;
     /**
     * Content processing time limit per frame (ms).
     *
@@ -84,9 +99,9 @@ export class RoomManager extends Component implements IRoomManager, IRoomInstanc
     private _loadedContentTypes: string[] = [];
     private _skipContentProcessing: boolean = false;
 
-    constructor(context: IContext)
+    constructor(options: IRoomManagerOptions)
     {
-        super(context);
+        this._options = options;
 
         // AS3 registers the content-load listeners in its constructor (lines 68-70),
         // once and for the object's whole life. The old code registered them inside
@@ -119,18 +134,29 @@ export class RoomManager extends Component implements IRoomManager, IRoomInstanc
     private _state: number = RoomManagerState.LOADING;
 
     /**
-	 * Pending init data — stored when initialize() is called before initComponent().
+	 * Pending init data — stored when initialize() is called before start().
 	 *
 	 * @see AS3 RoomManager var_3149
 	 */
     private _pendingInitData: unknown = null;
 
     /**
-	 * Pending listener — stored when initialize() is called before initComponent().
+	 * Pending listener — stored when initialize() is called before start().
 	 *
 	 * @see AS3 RoomManager var_85
 	 */
     private _pendingListener: IRoomManagerListener | null = null;
+
+    // TS-only: see _events.
+    get events(): EventEmitter
+    {
+        return this._events;
+    }
+
+    get disposed(): boolean
+    {
+        return this._disposed;
+    }
 
     get state(): number
     {
@@ -157,8 +183,7 @@ export class RoomManager extends Component implements IRoomManager, IRoomInstanc
 	 * registers it against those IIDs at runtime.
 	 *
 	 * This port has no component-library loader — libraries are ES modules resolved at build time
-	 * (see CoreComponentContext.loadLibraries()) — and RoomObjectFactory is a plain class, not a
-	 * Component. Declaring the AS3 dependencies here would block on IIDs nothing ever announces and
+	 * (see CoreComponentContext.loadLibraries()) — and RoomObjectFactory is a plain class, as this one is since J4. Declaring the AS3 dependencies here would block on IIDs nothing ever announces and
 	 * RoomManager would never initialize. RoomEngine pushes both factories in from its own
 	 * IID_RoomManager callback instead (RoomEngine.ts:273-291).
 	 *
@@ -173,14 +198,16 @@ export class RoomManager extends Component implements IRoomManager, IRoomInstanc
     }
 
     /**
-	 * Called when the component is unlocked (all DI dependencies resolved).
+	 * Called by the host once the manager is registered (the engine: `ready` of attachInstance;
+	 * where AS3 ran initComponent() on unlock).
 	 *
 	 * Sets state to LOADED and processes any pending initialize() call
-	 * that arrived before the component was ready.
+	 * that arrived before the manager was ready.
 	 *
 	 * @see AS3 RoomManager.initComponent() lines 96-106
 	 */
-    protected override initComponent(): void
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/room/RoomManager.as::initComponent()
+    start(): void
     {
         this._state = RoomManagerState.LOADED;
 
@@ -540,9 +567,9 @@ export class RoomManager extends Component implements IRoomManager, IRoomInstanc
                 spriteViz.assetCollection = assetCollection;
                 // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/room/RoomManager.as::createRoomObject() (line 343)
                 spriteViz.setExternalBaseUrls(
-                    this.context.configuration?.getProperty('stories.image_url_base') ?? '',
-                    this.context.configuration?.getProperty('extra_data_service_url') ?? '',
-                    this.context.configuration?.getBoolean('extra_data_batches_enabled') ?? false
+                    this._options.property('stories.image_url_base'),
+                    this._options.property('extra_data_service_url'),
+                    this._options.flag('extra_data_batches_enabled')
                 );
 
                 // Get or create cached visualization data
@@ -619,9 +646,11 @@ export class RoomManager extends Component implements IRoomManager, IRoomInstanc
         throw new Error('[RoomManager] No object factory available');
     }
 
-    override dispose(): void
+    dispose(): void
     {
-        if(this.disposed) return;
+        if(this._disposed) return;
+
+        this._disposed = true;
 
         // Remove event listeners
         this.events.off(RoomContentLoadedEvent.CONTENT_LOAD_SUCCESS, this.onContentLoaded, this);
@@ -648,8 +677,7 @@ export class RoomManager extends Component implements IRoomManager, IRoomInstanc
         this._updateCategories.clear();
         this._pendingTypes.clear();
         this._loadedContentTypes.length = 0;
-
-        super.dispose();
+        this._events.removeAllListeners();
     }
 
     /**
@@ -869,9 +897,9 @@ export class RoomManager extends Component implements IRoomManager, IRoomInstanc
                             spriteViz.assetCollection = this._contentLoader.getGraphicAssetCollection(contentType);
                             // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/room/RoomManager.as (line 560)
                             spriteViz.setExternalBaseUrls(
-                                this.context.configuration?.getProperty('stories.image_url_base') ?? '',
-                                this.context.configuration?.getProperty('extra_data_service_url') ?? '',
-                                this.context.configuration?.getBoolean('extra_data_batches_enabled') ?? false
+                                this._options.property('stories.image_url_base'),
+                                this._options.property('extra_data_service_url'),
+                                this._options.flag('extra_data_batches_enabled')
                             );
                             const vizData = this._visualizationFactory.getRoomObjectVisualizationData(
                                 contentType, visualizationType, visualizationConfig

@@ -18,9 +18,7 @@ import type {IGraphicAssetCollection} from '@ambreia/common/graphics/IGraphicAss
 import type {IAsset} from '@ambreia/common/assets/IAsset';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import {AssetLibraryCollection} from '@ambreia/common/assets/AssetLibraryCollection';
-import {Core} from '@core/Core';
-import type {IHabboConfigurationManager} from '@habbo/configuration/IHabboConfigurationManager';
-import type {ISessionDataManager} from '@habbo/session/ISessionDataManager';
+import type {IFurniDataSource, IRoomContentConfiguration} from './IRoomContentConfiguration';
 import type {IFurnitureData} from '@habbo/session/furniture/IFurnitureData';
 import type {IFurniDataListener} from '@habbo/session/furniture/IFurniDataListener';
 import type {IRoomContentListener} from './IRoomContentListener';
@@ -203,7 +201,7 @@ export class RoomContentLoader implements IRoomContentLoader, IFurniDataListener
     // AS3: sources/win63_version/habbo/room/class_1835.as::_lastAssetCompressionTime
     private _lastAssetCompressionTime: number = 0;
 
-    private _configurationManager: IHabboConfigurationManager | null = null;
+    private _configurationManager: IRoomContentConfiguration | null = null;
     private _loadedTypes: Map<string, boolean> = new Map();
     private _loadingTypes: Map<string, Promise<void>> = new Map();
 
@@ -253,15 +251,16 @@ export class RoomContentLoader implements IRoomContentLoader, IFurniDataListener
     }
 
     // AS3: sources/win63_version/habbo/room/class_1835.as::_sessionDataManager
-    private _sessionDataManager: ISessionDataManager | null = null;
+    private _furniDataSource: IFurniDataSource | null = null;
 
     /**
 	 * @see AS3 RoomContentLoader.set sessionDataManager (line 157)
 	 */
+    // DEVIATION: AS3 takes the session data manager; only its furnidata is read, so any source does.
     // AS3: sources/win63_version/habbo/room/class_1835.as::set sessionDataManager()
-    set sessionDataManager(manager: ISessionDataManager)
+    set furniDataSource(source: IFurniDataSource)
     {
-        this._sessionDataManager = manager;
+        this._furniDataSource = source;
 
         if(this._pendingFurniData)
         {
@@ -284,12 +283,12 @@ export class RoomContentLoader implements IRoomContentLoader, IFurniDataListener
 	 *
 	 * @see AS3 RoomContentLoader.initialize() lines 181-192
 	 */
-    // AS3 takes `(IEventDispatcher, IHabboConfigurationManager)` and no asset library: it builds one
+    // AS3 takes `(IEventDispatcher, IRoomContentConfiguration)` and no asset library: it builds one
     // AssetLibraryCollection per content type in addAssetLibraryCollection() and never holds a
     // library of its own. The port's third parameter existed only to feed the shared-library design
     // that made two content types share one asset namespace, so it goes with it.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_2288.as::initialize()
-    initialize(stateEvents: EventEmitter, configurationManager: IHabboConfigurationManager): void
+    initialize(stateEvents: EventEmitter, configurationManager: IRoomContentConfiguration): void
     {
         this._stateEvents = stateEvents;
         this._configurationManager = configurationManager;
@@ -364,7 +363,7 @@ export class RoomContentLoader implements IRoomContentLoader, IFurniDataListener
         this._visualizationFactory = null;
         this._iconAssets = null;
         this._iconListener = null;
-        this._sessionDataManager = null;
+        this._furniDataSource = null;
         this._configurationManager = null;
     }
 
@@ -1137,13 +1136,13 @@ export class RoomContentLoader implements IRoomContentLoader, IFurniDataListener
     // AS3: sources/win63_version/habbo/room/class_1835.as::initFurnitureData()
     private initFurnitureData(): void
     {
-        if(this._sessionDataManager === null)
+        if(this._furniDataSource === null)
         {
             this._pendingFurniData = true;
             return;
         }
 
-        const furniData = this._sessionDataManager.getFurniData(this);
+        const furniData = this._furniDataSource.getFurniData(this);
 
         // AS3: getFurniData returns null when data isn't ready.
         // Our TS version returns [] (empty array, truthy in JS).
@@ -1153,7 +1152,7 @@ export class RoomContentLoader implements IRoomContentLoader, IFurniDataListener
             return;
         }
 
-        this._sessionDataManager.removeFurniDataListener(this);
+        this._furniDataSource.removeFurniDataListener(this);
 
         this.populateFurniData(furniData);
 
@@ -1169,7 +1168,7 @@ export class RoomContentLoader implements IRoomContentLoader, IFurniDataListener
 	 * @see AS3 RoomContentLoader.initPetData() lines 771-781
 	 */
     // AS3: sources/win63_version/habbo/room/class_1835.as::initPetData()
-    private initPetData(configurationManager: IHabboConfigurationManager): void
+    private initPetData(configurationManager: IRoomContentConfiguration): void
     {
         const petConfig = configurationManager.getProperty('pet.configuration');
 
@@ -1725,13 +1724,6 @@ export class RoomContentLoader implements IRoomContentLoader, IFurniDataListener
         if(existing !== null)
         {
             return existing;
-        }
-
-        const context = Core.instance;
-
-        if(context === null)
-        {
-            return null;
         }
 
         const libraryName = this.getAssetLibraryName(contentType);
