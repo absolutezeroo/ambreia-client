@@ -11,19 +11,10 @@ import {
     parseWindowLayoutXml
 } from '@ambreia/ui/assets/WindowXmlAssetParser';
 import {GlazeConfigurationStub} from './GlazeConfigurationStub';
+import {registerGameWidgetPlaceholders} from './GameWidgetPlaceholder';
 import {GlazeLocalizationStub} from './GlazeLocalizationStub';
 
 const log = Logger.getLogger('glaze.boot.GlazeBoot');
-
-/**
- * The engine's game widgets (registerHabboWidgets in vortex-engine), which need the avatar
- * renderer, room engine or session Glaze does not have. Registered as placeholders so the
- * `widget_type` list stays complete; test/widget-types.test.ts keeps this list in step.
- */
-export const GLAZE_GAME_WIDGET_TYPES: readonly string[] = [
-    'avatar_image', 'badge_image', 'furniture_image', 'illumina_chat_bubble', 'pet_image',
-    'product_icon', 'product_image', 'room_previewer', 'updating_timestamp'
-];
 
 /**
  * The element description's asset name (see vortex-client App.ts).
@@ -131,8 +122,8 @@ export interface IGlazeRuntime
  * communication, room engine, catalog, avatar rendering, furnidata, DI, or even a PixiJS stage.
  * So this builds a bare `WindowManager` with a localisation and a configuration stub, and updates
  * it from its own `requestAnimationFrame` ticker. The game widgets (avatar, badge, furni…) are
- * registered as empty placeholders: Glaze can still offer and lay them out, but draws nothing in
- * them, as it did when they were built with no game services. Windows composite onto a 2D
+ * placeholders that draw nothing but keep their properties (GameWidgetPlaceholder), so Glaze can
+ * still offer them, lay them out and save them unchanged. Windows composite onto a 2D
  * `OffscreenCanvas` via `compositeToBuffer` — the editor blits that onto its own
  * canvas — so PixiJS is never involved.
  *
@@ -206,7 +197,7 @@ export class GlazeBoot
         const configuration = new GlazeConfigurationStub();
         const windowManager = new WindowManager({interpolate: (text: string): string => configuration.interpolate(text)});
 
-        for(const type of GLAZE_GAME_WIDGET_TYPES) windowManager.widgets.register(type, () => null);
+        registerGameWidgetPlaceholders(windowManager);
 
         windowManager.setLocalization(new GlazeLocalizationStub());
         windowManager.initialize();

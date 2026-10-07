@@ -1,33 +1,12 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {setPlatform} from '@ambreia/common/platform/Platform';
-import {parseHTML} from 'linkedom';
-import {createCanvas} from '@napi-rs/canvas';
-import {nodePlatform} from '../../ambreia-avatar/tools/node-platform.mjs';
-import {WindowManager} from '../src/kit/WindowManager';
+import {nodeWindowManager} from './node-window-host';
+import type {WindowManager} from '../src/kit/WindowManager';
 import type {IWindowUpdateReceiver} from '../src/IWindowUpdateReceiver';
-
-// The window system without the engine: no Component, no DI, only the host's options (spec §11).
-// It stays browser-side (plan D4): the cursor, the XML walk and the drawing read `document`,
-// `Element` and `OffscreenCanvas`, given here by linkedom and @napi-rs/canvas.
-setPlatform(nodePlatform());
-const dom = parseHTML('<html><body></body></html>');
-Object.assign(globalThis, {
-    document: dom.document,
-    Document: dom.Document,
-    Element: dom.Element,
-    OffscreenCanvas: function OffscreenCanvas(width: number, height: number) { return createCanvas(Math.max(1, width), Math.max(1, height)); }
-});
-
-const host = {width: 800, height: 600, addEventListener: (): void => undefined, removeEventListener: (): void => undefined};
 
 function manager(): WindowManager
 {
-    const wm = new WindowManager({interpolate: (text: string) => text, resizeHost: host});
-
-    wm.initialize();
-
-    return wm;
+    return nodeWindowManager();
 }
 
 function receiver(): IWindowUpdateReceiver & { calls: number }
@@ -71,6 +50,36 @@ test('a registered layout builds into a window of that name', () =>
     const window = wm.buildWidgetLayout('probe_xml');
 
     assert.equal(window?.name, 'probe');
+
+    wm.dispose();
+});
+
+test('a receiver that throws does not stop the others or the frame', () =>
+{
+    const wm = manager();
+    const broken = {disposed: false, update(): void { throw new Error('boom'); }, dispose(): void { this.disposed = true; }};
+    const r = receiver();
+
+    wm.registerUpdateReceiver(broken, 0);
+    wm.registerUpdateReceiver(r, 0);
+
+    assert.doesNotThrow(() => wm.update(16));
+    assert.equal(r.calls, 1);
+
+    wm.dispose();
+});
+
+test('a receiver that removes itself during update does not make the next one skip a frame', () =>
+{
+    const wm = manager();
+    const first = {disposed: false, update(): void { wm.removeUpdateReceiver(first); }, dispose(): void { this.disposed = true; }};
+    const r = receiver();
+
+    wm.registerUpdateReceiver(first, 0);
+    wm.registerUpdateReceiver(r, 0);
+    wm.update(16);
+
+    assert.equal(r.calls, 1);
 
     wm.dispose();
 });

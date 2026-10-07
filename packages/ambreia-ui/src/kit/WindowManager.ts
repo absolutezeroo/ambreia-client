@@ -916,10 +916,30 @@ export class WindowManager implements IWindowManager
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/HabboWindowManagerComponent.as::update()
     public update(deltaTime: number): void 
     {
-        for(const receiver of [...this._updateReceivers])
+        // By index, not over a copy: nothing is allocated per frame, and a receiver that removes
+        // itself (or is disposed) does not make the next one skip its update.
+        for(let i = 0; i < this._updateReceivers.length; i++)
         {
-            if(receiver.disposed) this.removeUpdateReceiver(receiver);
-            else receiver.update(deltaTime);
+            const receiver = this._updateReceivers[i];
+
+            if(receiver.disposed)
+            {
+                this._updateReceivers.splice(i--, 1);
+                continue;
+            }
+
+            // The core's loop, which drove these before J3, skips a receiver that throws and lets
+            // the rest tick; one broken widget must not stop the frame and freeze every window.
+            try
+            {
+                receiver.update(deltaTime);
+            }
+            catch (error)
+            {
+                log.error(`Window update receiver ${receiver.constructor.name} failed`, error);
+            }
+
+            if(this._updateReceivers[i] !== receiver) i--;
         }
 
         // AS3: only emits TRACKING_EVENT_INPUT when there are queued input events
