@@ -38,6 +38,9 @@ export interface IFeature<S extends z.ZodObject = z.ZodObject, H = unknown>
     afterAttach?(product: FeatureProduct, feature: IFeatureContext<z.infer<S>, H>): void | Promise<void>;
 }
 
+/** A feature of a given host, any section: what a host's feature list is typed with. */
+export type HostFeature<H> = IFeature<z.ZodObject, H>;
+
 export function defineFeature<S extends z.ZodObject = z.ZodObject, H = unknown>(feature: IFeature<S, H>): IFeature<S, H>
 {
     return feature;

@@ -1,4 +1,10 @@
 import type {IVortexConfig, IVortexWindowAssets} from 'vortex-engine';
+import {ENGINE_FEATURES} from 'vortex-engine';
+import {loadConfig, ConfigError} from '@ambreia/kernel/config/loadConfig';
+import type {IKernelConfig} from '@ambreia/kernel/config/loadConfig';
+import {browserSources, parseConfigJson} from '@ambreia/kernel/config/browserSources';
+import {featureSections} from '@ambreia/kernel/feature/defineFeature';
+import {FeatureDependencyError} from '@ambreia/kernel/feature/bootFeatures';
 import {Vortex} from 'vortex-engine';
 import {FRAME_CHANNEL_UI, FrameTimings} from '@ambreia/common/utils/FrameTimings';
 import {SiteChannel} from './SiteChannel';
@@ -594,11 +600,45 @@ function parseLayoutEntries(raw: string, source: string, baseName: string): IWin
     return parseWindowLayoutXml(raw, baseName, source);
 }
 
-declare global 
+/**
+ * The client's configuration, before anything of the game loads (spec §5): defaults computed from
+ * the page, the deployment's config.json (none = defaults), then ?sso= and ?link=. Validated and
+ * frozen; a ConfigError lists every faulty field.
+ */
+async function loadClientConfig(): Promise<IKernelConfig>
 {
-    interface Window {
-        VortexConfig?: IVortexConfig;
+    const response = await fetch(`${import.meta.env.BASE_URL}config.json`).catch(() => null);
+    const text = response !== null && response.ok && (response.headers.get('content-type') ?? '').includes('json') ? await response.text() : null;
+    const {config, warnings} = loadConfig(browserSources(window.location, parseConfigJson(text)), featureSections(ENGINE_FEATURES));
+
+    for(const warning of warnings) log.warn(warning);
+
+    return config;
+}
+
+/**
+ * The client cannot start: an invalid configuration or a feature waiting on one that is missing.
+ * Shown instead of the hotel, with every reason, so a deployment mistake is read, not guessed.
+ */
+function showBootError(title: string, lines: readonly string[]): void
+{
+    const panel = document.createElement('div');
+
+    panel.style.cssText = 'position:fixed;inset:0;z-index:2147483647;background:#1b1e24;color:#e8e8ec;font:14px monospace;padding:32px;overflow:auto';
+    panel.innerHTML = `<h2 style="margin:0 0 16px;font:bold 18px sans-serif">${title}</h2>`;
+
+    const list = document.createElement('ul');
+
+    for(const line of lines)
+    {
+        const item = document.createElement('li');
+
+        item.textContent = line;
+        list.appendChild(item);
     }
+
+    panel.appendChild(list);
+    document.body.appendChild(panel);
 }
 
 /**
@@ -846,6 +886,9 @@ export class VortexApp
     /** True between `setAuthenticated` and the next disconnect: when a link may actually be fired. */
     private _authenticated: boolean = false;
 
+    // TS-only: the link to fire once authenticated: `?link=`, or one the site posted while booting.
+    private _startLink: string | null = null;
+
     /** The `message` listener installed by `installLinkChannel`, kept so `dispose()` can remove it. */
     private _linkChannel: ((event: MessageEvent) => void) | null = null;
 
@@ -913,6 +956,26 @@ export class VortexApp
         // post the moment the iframe exists, which is several seconds before the engine does.
         this.installLinkChannel();
 
+        let kernelConfig: IKernelConfig;
+
+        try
+        {
+            kernelConfig = await loadClientConfig();
+        }
+        catch (error)
+        {
+            if(error instanceof ConfigError)
+            {
+                showBootError('The configuration is invalid', error.issues);
+
+                return;
+            }
+
+            throw error;
+        }
+
+        this._startLink = kernelConfig.app.startLink ?? null;
+
         // 1. Load bundles, then bootstrap engine with AS3 embedded configuration assets
         const CORE_RATIO = 0.6;
         const bundleProgress =
@@ -948,11 +1011,8 @@ export class VortexApp
 
         const bundledConfigurations = readEmbeddedConfigurationAssets(xmlBundle);
         const vortexConfig: IVortexConfig = {
-            ...(window.VortexConfig ?? {}),
-            embeddedConfigurations: {
-                ...bundledConfigurations,
-                ...(window.VortexConfig?.embeddedConfigurations ?? {}),
-            },
+            kernel: kernelConfig,
+            embeddedConfigurations: bundledConfigurations,
         };
 
         this._imageBundle = imageBundle;
@@ -972,7 +1032,7 @@ export class VortexApp
         //   visitor skip the terms and birthdate the site's registration form asks for. Nothing
         //   here calls it, so it is a redirect, not a screen.
         // AS3: sources/WIN63-202607011411-782849652/src/binaryData/HabboAir.as::createLoginFlowOrLoadingScreen()
-        const configuredTicket = window.VortexConfig?.connection?.ssoTicket;
+        const configuredTicket = kernelConfig.app.sso;
 
         if(!configuredTicket)
         {
@@ -989,12 +1049,28 @@ export class VortexApp
             return;
         }
 
-        const vortex = await this.bootstrapEngine(vortexConfig);
+        let vortex: typeof Vortex.instance;
+
+        try
+        {
+            vortex = await this.bootstrapEngine(vortexConfig);
+        }
+        catch (error)
+        {
+            if(error instanceof FeatureDependencyError)
+            {
+                showBootError('A feature is missing what it needs', error.issues);
+
+                return;
+            }
+
+            throw error;
+        }
 
         // AS3: the SSO ticket reaches the client through FlashVars either way — HabboAir
         // writes the one the login flow produced back into the same Dictionary
         // (`_SafeStr_4998["sso.token"] = _loginFlow.ssoToken`) before starting the core.
-        const ssoTicket = window.VortexConfig?.connection?.ssoTicket;
+        const ssoTicket = kernelConfig.app.sso;
 
         if(ssoTicket)
         {
@@ -1353,7 +1429,7 @@ export class VortexApp
             // exists, which is why the instance is read here and not captured.
             if(!this._authenticated || !Vortex.hasInstance)
             {
-                if(window.VortexConfig) window.VortexConfig.startLink = data.link;
+                this._startLink = data.link;
 
                 return;
             }
@@ -1365,7 +1441,7 @@ export class VortexApp
     }
 
     /**
-     * Fires `VortexConfig.startLink` once, the moment the session is authenticated.
+     * Fires the start link (`?link=`, or one the site posted during the boot) once, the moment the session is authenticated.
      *
      * That moment is the point: `navigator/goto/42` reaches a tracker that sends a composer, and a
      * composer sent before the handshake completes is a composer nobody reads. `setAuthenticated`
@@ -1379,11 +1455,11 @@ export class VortexApp
     //   has no counterpart because the Flash client took it in FlashVars.
     private fireStartLink(vortex: typeof Vortex.instance): void
     {
-        const link = window.VortexConfig?.startLink;
+        const link = this._startLink;
 
-        if(typeof link !== 'string' || link.length === 0) return;
+        if(link === null || link.length === 0) return;
 
-        if(window.VortexConfig) window.VortexConfig.startLink = undefined;
+        this._startLink = null;
 
         vortex.context.createLinkEvent(link);
     }

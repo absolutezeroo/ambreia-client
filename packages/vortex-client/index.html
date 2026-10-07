@@ -9,45 +9,8 @@
 
 <div id="vortex-ui"></div>
 
-<script type="module">
-    const existingConfig = window.VortexConfig ?? {};
-    const existingConnection = existingConfig.connection ?? {};
-
-    // `?sso=<ticket>` is how the CMS hands the client a session it already authenticated
-    // (the website repository, pages/HotelPage.svelte), and it is the same mechanism the real hotel
-    // uses: habbo.com puts the ticket in the client's FlashVars rather than making the visitor sign
-    // in twice. With no ticket the client runs its own login flow, exactly as before — see
-    // App.ts::init(), which branches on connection.ssoTicket.
-    const query = new URLSearchParams(window.location.search);
-    const ssoTicket = query.get('sso');
-
-    // `?link=<internal link>` is the other half of that handover: `navigator/goto/42`,
-    // `habboUI/open/hccenter`. habbo.com builds the same strings on the site side
-    // (`hotelReportLink = "/hotel?link=navigator/report/" + id + "/" + btoa(name)`), and every
-    // feature already registers an ILinkEventTracker for them — so this adds no vocabulary, only a
-    // way in. Fired once the session is authenticated; see App.ts::installConnectionActions().
-    const startLink = query.get('link');
-
-    window.VortexConfig = {
-        ...existingConfig,
-        ...(startLink ? {startLink} : {}),
-        connection: {
-            // Served from this machine, dial it directly. Served from anywhere else — a phone on the
-            // LAN, a Cloudflare tunnel — dial the socket back through the SAME origin the page came
-            // from, which vortex-web proxies at /ws. A hardcoded 127.0.0.1 is the visitor's own
-            // loopback, and a tunnel has no second port to hand out anyway.
-            //
-            // SocketConnection accepts a full ws://|wss:// URL as `host` and ignores `ports` then.
-            host: ['localhost', '127.0.0.1'].includes(window.location.hostname)
-                ? 'ws://ourvjasausgxlxmrunm7ys1w.72.60.91.223.sslip.io'
-                : `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws`,
-            ports: [40001],
-            ...existingConnection,
-            // Last, so the ticket for THIS visit wins over anything a host page hardcoded.
-            ...(ssoTicket ? {ssoTicket} : {}),
-        }
-    };
-</script>
+<!-- The configuration (server, ?sso=, ?link=) is loaded by the kernel since J5: defaults from this
+     page, then config.json, then the URL (App.ts loadClientConfig(), @ambreia/kernel/config). -->
 
 <script src="./src/index.ts" type="module"></script>
 </body>

@@ -1,19 +1,19 @@
 import {EventEmitter} from 'eventemitter3';
-import {HabboConfigurationManager} from '@habbo/configuration/HabboConfigurationManager';
-import {HabboCommunicationManager} from '@habbo/communication/HabboCommunicationManager';
-import {HabboCommunicationDemo} from '@habbo/communication/demo/HabboCommunicationDemo';
-import {HabboLocalizationManager} from '@habbo/localization/HabboLocalizationManager';
+import type {HabboConfigurationManager} from '@habbo/configuration/HabboConfigurationManager';
+import type {HabboCommunicationManager} from '@habbo/communication/HabboCommunicationManager';
+import type {HabboCommunicationDemo} from '@habbo/communication/demo/HabboCommunicationDemo';
+import type {HabboLocalizationManager} from '@habbo/localization/HabboLocalizationManager';
 import {WindowParser} from '@ambreia/ui/utils/WindowParser';
-import {RoomEngine, RoomMessageHandler} from '@habbo/room';
-import {HabboRoomRendererFactory} from '@ambreia/iso/scene/renderer/HabboRoomRendererFactory';
-import {RoomManager} from '@ambreia/iso/RoomManager';
+import type {RoomEngine} from '@habbo/room';
+import { RoomMessageHandler} from '@habbo/room';
+import type {RoomManager} from '@ambreia/iso/RoomManager';
 import {setTextureExtractor} from '@ambreia/iso/renderer/TextureExtractor';
-import {RoomSessionManager} from '@habbo/session/RoomSessionManager';
+import type {RoomSessionManager} from '@habbo/session/RoomSessionManager';
 import {RoomSessionEvent} from '@habbo/session/events/RoomSessionEvent';
-import {SessionDataManager} from '@habbo/session/SessionDataManager';
-import {AvatarRenderManager} from '@ambreia/avatar/AvatarRenderManager';
-import {HabboWindowManager} from '@habbo/window/HabboWindowManager';
-import {RoomUI} from '@habbo/ui/RoomUI';
+import type {SessionDataManager} from '@habbo/session/SessionDataManager';
+import type {AvatarRenderManager} from '@ambreia/avatar/AvatarRenderManager';
+import type {HabboWindowManager} from '@habbo/window/HabboWindowManager';
+import type {RoomUI} from '@habbo/ui/RoomUI';
 import {Core} from '@ambreia/kernel/Core';
 import {AssetLibrary} from '@ambreia/common/assets/AssetLibrary';
 import {AssetTypeDeclaration} from '@ambreia/common/assets/AssetTypeDeclaration';
@@ -27,23 +27,15 @@ import {Logger} from '@ambreia/common/utils/Logger';
 import {FrameTimings} from '@ambreia/common/utils/FrameTimings';
 import type {IVortexConfig, IVortexWindowAssets} from './Vortex';
 import {Vortex} from './Vortex';
+import {bootFeatures} from '@ambreia/kernel/feature/bootFeatures';
+import type {IKernelReport} from '@ambreia/kernel/feature/bootFeatures';
+import {ENGINE_FEATURES, emptyManagers} from './features';
+import type {IEngineHost} from './features';
 
 import {PacketLogger} from '@ambreia/net/PacketLogger';
-import {IID_HabboCommunicationManager} from '@iid/IIDHabboCommunicationManager';
-import {IID_HabboConfigurationManager} from '@iid/IIDHabboConfigurationManager';
-import {IID_HabboLocalizationManager} from '@iid/IIDHabboLocalizationManager';
-import {IID_RoomEngine} from '@iid/IIDRoomEngine';
-import {IID_RoomRendererFactory} from '@iid/IIDRoomRendererFactory';
-import {IID_RoomManager} from '@iid/IIDRoomManager';
-import {IID_RoomSessionManager} from '@iid/IIDRoomSessionManager';
-import {IID_SessionDataManager} from '@iid/IIDSessionDataManager';
-import {IID_AvatarRenderManager} from '@iid/IIDAvatarRenderManager';
-import {IID_HabboWindowManager} from '@iid/IIDHabboWindowManager';
-import {IID_RoomUI} from '@iid/IIDRoomUI';
 import {IID_AssetLibrary} from '@ambreia/kernel/iid/IIDAssetLibrary';
 import {IID_CoreCommunicationManager} from '@iid/IIDCoreCommunicationManager';
 import {IID_Core} from '@ambreia/kernel/iid/IIDCore';
-import {HabboProperty} from '@habbo/configuration';
 import type {IHabboConfigurationManager} from '@habbo/configuration/IHabboConfigurationManager';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
@@ -205,6 +197,15 @@ export class VortexMain implements IVortexMain
     }
 
     private _roomUI: RoomUI | null = null;
+
+    // TS-only: what the kernel booted (J5), for the dev tools (window.__ambreia.kernel).
+    private _kernelReport: IKernelReport | null = null;
+
+    /** The features as the kernel booted them: id, provides, waits on, state (read live). */
+    get kernelReport(): IKernelReport | null
+    {
+        return this._kernelReport;
+    }
 
     get roomUI(): RoomUI 
     {
@@ -393,7 +394,7 @@ export class VortexMain implements IVortexMain
      *
      * @see sources/WIN63-202607011411-782849652/src/binaryData/HabboAir.as prepareCore()
      */
-    async init(application: Application, config?: IVortexConfig): Promise<void>
+    async init(application: Application, config: IVortexConfig): Promise<void>
     {
         this._application = application;
 
@@ -410,6 +411,7 @@ export class VortexMain implements IVortexMain
         // TS-only: introspection, read-only.
         (globalThis as unknown as {__ambreia?: Record<string, unknown>}).__ambreia = {
             ...((globalThis as unknown as {__ambreia?: Record<string, unknown>}).__ambreia ?? {}),
+            kernel: () => this._kernelReport?.features.map(feature => ({...feature, state: feature.state()})) ?? [],
             boot: () => ({
                 attached: (Core.instance as CoreComponentContext | null)?.describeAttached() ?? [],
                 locked: (Core.instance as CoreComponentContext | null)?.describeLockedComponents() ?? [],
@@ -488,7 +490,7 @@ export class VortexMain implements IVortexMain
      * @see sources/WIN63-202607011411-782849652/src/binaryData/HabboAir.as prepareCore()
      */
     // AS3: .../src/binaryData/HabboAir.as::prepareCore()
-    async prepareCore(config?: IVortexConfig): Promise<void> 
+    async prepareCore(config: IVortexConfig): Promise<void> 
     {
         const ctx = Core.instantiate(
             CoreSetup.FRAME_UPDATE_SIMPLE
@@ -542,158 +544,51 @@ export class VortexMain implements IVortexMain
 
         ctx.initialize();
 
-        // 1. Configuration Manager (must be first - other managers depend on it)
-        this._configurationManager = new HabboConfigurationManager(ctx);
-        this._configurationManager.setEmbeddedConfigurationAssets(config?.embeddedConfigurations ?? {});
-        ctx.attachComponent(this._configurationManager, [IID_HabboConfigurationManager]);
-
-        // The Component base defers initComponent to a microtask; wait for resetAll()
-        // so embedded AS3 TextAsset configurations are parsed before downloads.
-        await Promise.resolve();
-
-        // Set external variables URL if provided (must be set before download)
-        if(config?.configurationUrl) 
-        {
-            this._configurationManager.setProperty(HabboProperty.EXTERNAL_VARIABLES, config.configurationUrl);
-        }
-
-        // Load external configuration
-        await this._configurationManager.initConfigurationDownload();
-
-        // Set configuration properties from config object (after download so resetAll doesn't clear them)
-        if(config?.configuration) 
-        {
-            for(const [key, value] of Object.entries(config.configuration)) 
-            {
-                this._configurationManager.setProperty(key, value);
-            }
-        }
-
-        // Also pick up top-level string properties as configuration overrides
-        if(config) 
-        {
-            const reservedKeys = new Set(['background', 'resizeTo', 'antialias', 'resolution', 'canvas', 'connection', 'configurationUrl', 'configuration', 'embeddedConfigurations']);
-
-            for(const [key, value] of Object.entries(config)) 
-            {
-                if(!reservedKeys.has(key) && typeof value === 'string') 
-                {
-                    this._configurationManager.setProperty(key, value);
-                }
-            }
-        }
-
-        // 2. Habbo Communication Manager (depends on CoreCommunicationManager from core)
-        this._habboCommunicationManager = new HabboCommunicationManager(ctx);
-        ctx.attachComponent(this._habboCommunicationManager, [IID_HabboCommunicationManager]);
-
-        // Configure connection if provided
-        if(config?.connection) 
-        {
-            this._habboCommunicationManager.configure(config.connection);
-        }
-
-        // 3. Communication Demo (manages login flow, IncomingMessages)
-        this._communicationDemo = new HabboCommunicationDemo(ctx);
-
-        if(config?.connection?.ssoTicket) 
-        {
-            this._communicationDemo.ssoTicket = config.connection.ssoTicket;
-        }
-
-        ctx.attachComponent(this._communicationDemo, []);
-
-        // 4. Localization Manager
-        this._localizationManager = new HabboLocalizationManager(ctx);
-
-        ctx.attachComponent(this._localizationManager, [IID_HabboLocalizationManager]);
-
-        this._localizationManager.setConfigurationManager(this._configurationManager);
-        this._localizationManager.setCommunicationManager(this._habboCommunicationManager);
-
-        // 5. Room Manager (must be registered before RoomEngine)
-        // Plain classes since J4 (spec §3 rule 1); start() is where AS3 ran initComponent().
-        const roomManager = new RoomManager({
-            property: (key: string): string => ctx.configuration?.getProperty(key) ?? '',
-            flag: (key: string): boolean => ctx.configuration?.getBoolean(key) ?? false
-        });
-        this._roomManager = roomManager;
-        ctx.attachInstance(IID_RoomManager, roomManager, {ready: () => roomManager.start()});
-
-        // 5b. Room Renderer Factory
-        // AS3: RoomEngine depends on IIDRoomRendererFactory and calls createRenderer().
-        ctx.attachInstance(IID_RoomRendererFactory, new HabboRoomRendererFactory());
-
-        // 6. Room Session Manager
-        this._roomSessionManager = new RoomSessionManager(ctx);
-        ctx.attachComponent(this._roomSessionManager, [IID_RoomSessionManager]);
-
-        // 7. Session Data Manager (manages user data after authentication)
-        // AS3: HabboSessionDataManagerLib - depends on HabboCommunicationManager via IID
-        this._sessionDataManager = new SessionDataManager(ctx);
-        ctx.attachComponent(this._sessionDataManager, [IID_SessionDataManager]);
-
-        // 8-10 (navigator, new navigator, inventory) left with the core cut (2026-10-07).
-
-        // 11. Room Engine (depends on RoomManager via IID_RoomManager)
-        this._roomEngine = new RoomEngine(ctx, this._assets);
-        ctx.attachComponent(this._roomEngine, [IID_RoomEngine]);
-
-        // 12a. Avatar Render Manager
-        // 12a. Avatar Render Manager. A plain class since J2 (spec §3 rule 1): built from the four
-        // configuration keys once the configuration is complete — what its DI dependency on the
-        // configuration used to wait for — and registered as an instance.
-        const configuration = this._configurationManager;
-        const startAvatarRendering = (): void =>
-        {
-            if(this._avatarRenderManager !== null || configuration === null) return;
-
-            this._avatarRenderManager = new AvatarRenderManager({
-                assets: this._assets!,
-                downloadUrl: configuration.getProperty('flash.dynamic.avatar.download.url'),
-                downloadNameTemplate: configuration.getProperty('flash.dynamic.avatar.download.name.template'),
-                figureMapUrl: configuration.getProperty('flash.dynamic.avatar.download.configuration'),
-                figurePartListUrl: configuration.getProperty('external.figurepartlist.txt'),
-                onLibraryLoaded: name => Core.instance?.updateLoadingProcess(name, 'complete')
-            });
-            ctx.attachInstance(IID_AvatarRenderManager, this._avatarRenderManager);
+        // The managers are features since J5 (spec §4): declared in features/index.ts, created in
+        // the order prepareCore() attached them, with their dependencies checked before the boot
+        // goes on. A required dependency nobody provides throws here, naming the feature.
+        const made = emptyManagers();
+        const host: IEngineHost = {
+            assets: this._assets,
+            embeddedConfigurations: config.embeddedConfigurations ?? {},
+            legacy: config.kernel.legacy,
+            onWindowManager: windowManager => this.applyWindowAssets(config.windowAssets ?? null, windowManager),
+            made
         };
 
-        if(configuration?.isInitialized()) startAvatarRendering();
-        else configuration?.events.once('complete', startAvatarRendering);
+        this._kernelReport = await bootFeatures(ctx, ENGINE_FEATURES, config.kernel, host);
 
-        // 12b-12k (phone number, NUX, campaigns, ads, tracking, groups, notifications, sound,
-        // catalog, toolbar, quests, chat) left with the core cut (2026-10-07); the git tag
-        // `pre-noyau-client` keeps them.
+        this._configurationManager = made.configuration;
+        this._habboCommunicationManager = made.communication;
+        this._communicationDemo = made.demo;
+        this._localizationManager = made.localization;
+        this._roomManager = made.roomManager;
+        this._roomSessionManager = made.roomSession;
+        this._sessionDataManager = made.sessionData;
+        this._roomEngine = made.roomEngine;
+        this._windowManager = made.windowManager;
+        this._roomUI = made.roomUI;
 
-        // 12l. Window Manager
-        // A plain class since J3 (spec §3 rule 1): its six services come in as dependencies of the
-        // attach, and it builds its contexts once they have resolved, as initComponent() did.
-        const windowManager = new HabboWindowManager(ctx, {
-            interpolate: (text: string): string => ctx.configuration?.interpolate(text) ?? text
-        });
-        this._windowManager = windowManager;
-        this.applyWindowAssets(config?.windowAssets ?? null);
-        ctx.attachInstance(IID_HabboWindowManager, windowManager, {
-            dependencies: windowManager.createDependencies(),
-            ready: () => windowManager.initialize(),
-            update: (deltaTime: number) => windowManager.update(deltaTime),
-            updatePriority: 0
-        });
-
-        // 12m. Room UI
-        this._roomUI = new RoomUI(ctx, 0, this._assets);
-        ctx.attachComponent(this._roomUI, [IID_RoomUI]);
+        // Read once the configuration completes: the feature registers it then.
+        made.configuration?.events.once('complete', () => { this._avatarRenderManager = made.avatarRenderer; });
+        this._avatarRenderManager = made.avatarRenderer;
 
         // 12n-12s (club center, furni editor, fishing, Discord) left with the core cut (2026-10-07).
 
+        // With room-engine switched off there is no room to draw or feed.
+        const roomEngine = made.roomEngine;
+
+        if(roomEngine === null) return;
+
         // Set PixiJS stage on room engine for rendering
-        this._roomEngine.setStage(this._application!.stage);
-        this._roomEngine.setCanvasElement(this._application!.canvas as HTMLCanvasElement);
-        this._roomEngine.setTicker(this._application!.ticker);
+        roomEngine.setStage(this._application!.stage);
+        roomEngine.setCanvasElement(this._application!.canvas as HTMLCanvasElement);
+        roomEngine.setTicker(this._application!.ticker);
 
         // 12. Room Message Handler - bridges communication to room engine
-        this._roomMessageHandler = new RoomMessageHandler(this._roomEngine);
+        const roomMessageHandler = new RoomMessageHandler(roomEngine);
+
+        this._roomMessageHandler = roomMessageHandler;
 
         // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::onRoomSessionEvent()
         // AS3's RoomEngine owns/constructs the message handler directly (`var_761 = new
@@ -727,10 +622,12 @@ export class VortexMain implements IVortexMain
         // Wire RoomMessageHandler to the connection.
         await Promise.resolve();
 
-        if(this._habboCommunicationManager.connection) 
+        const connection = made.communication?.connection ?? null;
+
+        if(connection) 
         {
-            this._roomMessageHandler.connection = this._habboCommunicationManager.connection;
-            this._roomEngine.connection = this._habboCommunicationManager.connection;
+            roomMessageHandler.connection = connection;
+            roomEngine.connection = connection;
         }
     }
 
@@ -1007,9 +904,9 @@ export class VortexMain implements IVortexMain
         );
     }
 
-    private applyWindowAssets(windowAssets: IVortexWindowAssets | null): void
+    private applyWindowAssets(windowAssets: IVortexWindowAssets | null, windowManager: HabboWindowManager): void
     {
-        if(!windowAssets || !this._windowManager)
+        if(!windowAssets)
         {
             return;
         }
@@ -1021,25 +918,25 @@ export class VortexMain implements IVortexMain
         {
             for(const [name, url] of windowAssets.imageUrls)
             {
-                this._windowManager.registerAssetUrl(name, url);
+                windowManager.registerAssetUrl(name, url);
             }
         }
 
         if(windowAssets.elementDescription)
         {
-            this._windowManager.loadElementDescription(windowAssets.elementDescription);
+            windowManager.loadElementDescription(windowAssets.elementDescription);
         }
 
         if(windowAssets.skins)
         {
-            this._windowManager.loadSkinAssets(windowAssets.skins, windowAssets.atlases ?? new Map());
+            windowManager.loadSkinAssets(windowAssets.skins, windowAssets.atlases ?? new Map());
         }
 
         if(windowAssets.layouts)
         {
             for(const [name, xml] of windowAssets.layouts)
             {
-                this._windowManager.registerWidgetLayout(name, xml);
+                windowManager.registerWidgetLayout(name, xml);
             }
         }
     }
