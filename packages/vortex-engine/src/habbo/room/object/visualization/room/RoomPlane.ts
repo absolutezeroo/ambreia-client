@@ -18,7 +18,7 @@ import {Randomizer} from './utils/Randomizer';
 import type {PlaneMaskManager} from './mask/PlaneMaskManager';
 import {PlaneDrawingData} from './PlaneDrawingData';
 import {PlaneVisualizationLayer} from './rasterizer/basic/PlaneVisualizationLayer';
-import {Canvas} from '@habbo/utils/Canvas';
+import {Canvas} from '@ambreia/common/utils/Canvas';
 import {Logger} from '@core';
 
 const log = Logger.getLogger('habbo.room.object.visualization.room.RoomPlane');

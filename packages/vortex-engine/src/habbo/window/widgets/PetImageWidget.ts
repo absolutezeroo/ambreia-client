@@ -10,7 +10,7 @@ import type {IGetImageListener} from '@habbo/room/IGetImageListener';
 import type {IAssetReceiver} from '@ambreia/ui/IAssetReceiver';
 import type {IBitmapWrapperWindow} from '@ambreia/ui/components/IBitmapWrapperWindow';
 import {OrderedMap} from '@ambreia/common/utils/OrderedMap';
-import {PetFigureData} from '@habbo/avatar/pets/PetFigureData';
+import {PetFigureData} from '@ambreia/avatar/pets/PetFigureData';
 import {Vector3d} from '@room/utils/Vector3d';
 
 /**

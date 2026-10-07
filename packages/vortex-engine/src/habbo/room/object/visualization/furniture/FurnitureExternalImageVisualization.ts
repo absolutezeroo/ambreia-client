@@ -18,7 +18,7 @@ import type {IGraphicAsset} from '@ambreia/common/graphics/IGraphicAsset';
 import type {IRoomObjectSprite} from '@room/object/visualization/IRoomObjectSprite';
 import {RoomObjectVariableEnum} from '@habbo/room/object/RoomObjectVariableEnum';
 import {Logger} from '@ambreia/common/utils/Logger';
-import {Vortex} from '../../../../../Vortex';
+import {extractCanvas} from '@room/renderer/TextureExtractor';
 import {FurnitureDynamicThumbnailVisualization} from './FurnitureDynamicThumbnailVisualization';
 import {ExtraDataManager} from '../data/ExtraDataManager';
 
@@ -262,7 +262,7 @@ export class FurnitureExternalImageVisualization extends FurnitureDynamicThumbna
 
         try
         {
-            return Vortex.instance.application.renderer.extract.canvas(asset.texture) as HTMLCanvasElement;
+            return extractCanvas(asset.texture);
         }
         catch
         {

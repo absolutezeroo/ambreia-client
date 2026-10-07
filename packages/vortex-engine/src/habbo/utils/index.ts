@@ -8,7 +8,7 @@ export {FriendlyTime} from './FriendlyTime';
 export {HabboWebTools} from './HabboWebTools';
 export {MathUtils} from './MathUtils';
 export {PlatformUtils} from './PlatformUtils';
-export {StringUtil} from './StringUtil';
+export {StringUtil} from '@ambreia/common/utils/StringUtil';
 export * from './animation';
 
 // Types

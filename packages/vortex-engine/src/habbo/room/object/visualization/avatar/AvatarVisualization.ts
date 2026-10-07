@@ -36,7 +36,7 @@ import {RoomObjectSpriteType} from '@room/object/enum/RoomObjectSpriteType';
 import {AlphaTolerance} from '@room/object/enum/AlphaTolerance';
 import {AvatarSetType} from '@ambreia/avatar/enum/AvatarSetType';
 import {AvatarAction} from '@ambreia/avatar/enum/AvatarAction';
-import {AvatarGuideStatus} from '@habbo/avatar/enum/AvatarGuideStatus';
+import {AvatarGuideStatus} from '@ambreia/avatar/enum/AvatarGuideStatus';
 import type {AvatarVisualizationData} from './AvatarVisualizationData';
 import {FloatingIdleZ} from './additions/FloatingIdleZ';
 import {MutedBubble} from './additions/MutedBubble';

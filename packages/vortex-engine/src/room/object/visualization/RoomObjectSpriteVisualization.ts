@@ -18,7 +18,7 @@ import type {IRoomObjectVisualizationData} from './IRoomObjectVisualizationData'
 import type {IGraphicAssetCollection} from '@ambreia/common/graphics/IGraphicAssetCollection';
 import type {RoomObjectSpriteData} from '@ambreia/common/graphics/RoomObjectSpriteData';
 import {RoomObjectSprite} from './RoomObjectSprite';
-import {Vortex} from '../../../Vortex';
+import {extractCanvas} from '../../renderer/TextureExtractor';
 
 let visualizationInstanceCounter = 0;
 
@@ -164,7 +164,7 @@ export class RoomObjectSpriteVisualization implements IRoomObjectSpriteVisualiza
     // renderer dependency). PixiJS needs a live Renderer to rasterize, so this builds a
     // throwaway Container of plain Sprites (position/tint/alpha/blendMode/flip mirroring
     // AS3's Matrix+ColorTransform math exactly) and reads it back via
-    // Vortex.instance.application.renderer.extract.canvas() - the same synchronous
+    // the host's renderer (extractCanvas(), see TextureExtractor) - the same synchronous
     // texture-to-canvas mechanism RoomEngine.pixiTextureToCanvas() already uses.
     getImage(backgroundColor: number, _originalId: number): HTMLCanvasElement | null
     {
@@ -215,7 +215,7 @@ export class RoomObjectSpriteVisualization implements IRoomObjectSpriteVisualiza
     {
         try
         {
-            return Vortex.instance.application.renderer.extract.canvas(container) as HTMLCanvasElement;
+            return extractCanvas(container);
         }
         catch
         {
@@ -265,8 +265,10 @@ export class RoomObjectSpriteVisualization implements IRoomObjectSpriteVisualiza
     {
         try
         {
-            const source = this.textureFrameToCanvas(texture)
-                ?? Vortex.instance.application.renderer.extract.canvas(texture) as HTMLCanvasElement;
+            const source = this.textureFrameToCanvas(texture) ?? extractCanvas(texture);
+
+            if(source === null) return null;
+
             const width = source.width;
             const height = source.height;
 

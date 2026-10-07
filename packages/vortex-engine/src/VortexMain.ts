@@ -7,6 +7,7 @@ import {WindowParser} from '@ambreia/ui/utils/WindowParser';
 import {RoomEngine, RoomMessageHandler} from '@habbo/room';
 import {HabboRoomRendererFactory} from '@habbo/room/renderer/HabboRoomRendererFactory';
 import {RoomManager} from '@room/RoomManager';
+import {setTextureExtractor} from '@room/renderer/TextureExtractor';
 import {RoomSessionManager} from '@habbo/session/RoomSessionManager';
 import {RoomSessionEvent} from '@habbo/session/events/RoomSessionEvent';
 import {SessionDataManager} from '@habbo/session/SessionDataManager';
@@ -396,6 +397,9 @@ export class VortexMain implements IVortexMain
     {
         this._application = application;
 
+        // The room renderer reads sprites back through this; it has no renderer of its own (J4).
+        setTextureExtractor(target => application.renderer.extract.canvas(target) as HTMLCanvasElement);
+
         // Console-only tracing; records nothing to the log until __packets.on() is called.
         PacketLogger.install();
 
@@ -457,6 +461,7 @@ export class VortexMain implements IVortexMain
         this._assets = null;
 
         // Do NOT dispose Core or Application — owned by Vortex shell
+        setTextureExtractor(null);
         this._application = null;
     }
 

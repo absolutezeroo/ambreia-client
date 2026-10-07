@@ -9,7 +9,7 @@
 import type {IRoomObjectSprite} from '@room/object/visualization/IRoomObjectSprite';
 import type {IAvatarAddition} from './IAvatarAddition';
 import type {AvatarVisualization} from '../AvatarVisualization';
-import {AvatarGuideStatus} from '@habbo/avatar/enum/AvatarGuideStatus';
+import {AvatarGuideStatus} from '@ambreia/avatar/enum/AvatarGuideStatus';
 
 export class GuideStatusBubble implements IAvatarAddition 
 {

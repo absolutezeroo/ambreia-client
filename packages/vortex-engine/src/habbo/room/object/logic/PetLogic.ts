@@ -21,7 +21,7 @@ import {RoomObjectAvatarSelectedMessage} from '../../messages/RoomObjectAvatarSe
 import {RoomObjectAvatarFigureUpdateMessage} from '../../messages/RoomObjectAvatarFigureUpdateMessage';
 import {RoomObjectAvatarPetGestureUpdateMessage} from '../../messages/RoomObjectAvatarPetGestureUpdateMessage';
 import {RoomObjectAvatarExperienceUpdateMessage} from '../../messages/RoomObjectAvatarExperienceUpdateMessage';
-import {PetFigureData} from '@habbo/avatar/pets/PetFigureData';
+import {PetFigureData} from '@ambreia/avatar/pets/PetFigureData';
 
 export class PetLogic extends MovingObjectLogic
 {

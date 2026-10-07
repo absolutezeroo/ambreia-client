@@ -89,7 +89,7 @@ import type {IVector3d} from '@room/utils/IVector3d';
 import {Vector3d} from '@room/utils/Vector3d';
 import {RoomCamera} from './utils/RoomCamera';
 import type {FurniStackingHeightMap} from './utils/FurniStackingHeightMap';
-import {PetFigureData as AvatarPetFigureData, PetFigureData} from '@habbo/avatar/pets/PetFigureData';
+import {PetFigureData as AvatarPetFigureData, PetFigureData} from '@ambreia/avatar/pets/PetFigureData';
 import type {IRoomObjectModelController} from '@room/object/IRoomObjectModelController';
 import {SelectedRoomObjectData} from './utils/SelectedRoomObjectData';
 import {TileObjectMap} from './utils/TileObjectMap';

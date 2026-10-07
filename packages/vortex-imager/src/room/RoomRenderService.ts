@@ -26,7 +26,7 @@ import {RoomObjectRoomUpdateMessage} from '@habbo/room/messages/RoomObjectRoomUp
 import {RoomObjectRoomMaskUpdateMessage} from '@habbo/room/messages/RoomObjectRoomMaskUpdateMessage';
 import {RoomObjectDataUpdateMessage} from '@habbo/room/messages/RoomObjectDataUpdateMessage';
 import {LegacyStuffData} from '@habbo/room/object/data/LegacyStuffData';
-import {PetFigureData} from '@habbo/avatar/pets/PetFigureData';
+import {PetFigureData} from '@ambreia/avatar/pets/PetFigureData';
 import type {RoomStack} from './RoomStack';
 import type {IFurnitureRequest, IPetRequest, IRoomRequest, ImagerQuery} from './FurnitureRequest';
 import {RoomNotFoundError, RoomRequestError} from './FurnitureRequest';

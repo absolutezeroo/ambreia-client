@@ -42,8 +42,8 @@ import {RoomObjectVariableEnum} from '@habbo/room/object/RoomObjectVariableEnum'
 import type {IVector3d} from '@room/utils/IVector3d';
 import {RoomObjectSpriteData} from '@ambreia/common/graphics/RoomObjectSpriteData';
 import type {IRoomObjectSprite} from '@room/object/visualization/IRoomObjectSprite';
-import {StringUtil} from '@habbo/utils/StringUtil';
-import {Canvas} from '@habbo/utils/Canvas';
+import {StringUtil} from '@ambreia/common/utils/StringUtil';
+import {Canvas} from '@ambreia/common/utils/Canvas';
 
 export type {IRoomRenderingCanvasMouseListener};
 
