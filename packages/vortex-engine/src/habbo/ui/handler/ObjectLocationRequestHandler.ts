@@ -3,7 +3,7 @@ import type {IRoomWidgetHandlerContainer} from '../IRoomWidgetHandlerContainer';
 import type {RoomWidgetMessage} from '../widget/messages/RoomWidgetMessage';
 import type {RoomWidgetUpdateEvent} from '../widget/events/RoomWidgetUpdateEvent';
 import type {IRoomEngineRectangle} from '@habbo/room/RoomEngine';
-import {RoomObjectCategoryEnum} from '@habbo/room/object/RoomObjectCategoryEnum';
+import {RoomObjectCategoryEnum} from '@ambreia/iso/scene/object/RoomObjectCategoryEnum';
 import {RoomWidgetGetObjectLocationMessage} from '../widget/messages/RoomWidgetGetObjectLocationMessage';
 import {RoomWidgetUserLocationUpdateEvent} from '../widget/events/RoomWidgetUserLocationUpdateEvent';
 import {Logger} from '@ambreia/common/utils/Logger';

@@ -5,8 +5,8 @@
  *
  * Data structure for floor furniture objects.
  */
-import type {IStuffData} from '@habbo/room/object/data/IStuffData';
-import {LegacyStuffData} from '@habbo/room/object/data/LegacyStuffData';
+import type {IStuffData} from '@ambreia/iso/scene/object/data/IStuffData';
+import {LegacyStuffData} from '@ambreia/iso/scene/object/data/LegacyStuffData';
 
 export class FurnitureFloorData
 {

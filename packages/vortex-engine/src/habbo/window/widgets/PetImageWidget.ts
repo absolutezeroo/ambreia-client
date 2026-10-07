@@ -6,12 +6,12 @@ import type {IWindow} from '@ambreia/ui/IWindow';
 import {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
 import type {IIterator} from '@ambreia/ui/utils/IIterator';
 import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
-import type {IGetImageListener} from '@habbo/room/IGetImageListener';
+import type {IGetImageListener} from '@ambreia/iso/scene/IGetImageListener';
 import type {IAssetReceiver} from '@ambreia/ui/IAssetReceiver';
 import type {IBitmapWrapperWindow} from '@ambreia/ui/components/IBitmapWrapperWindow';
 import {OrderedMap} from '@ambreia/common/utils/OrderedMap';
-import {PetFigureData} from '@habbo/avatar/pets/PetFigureData';
-import {Vector3d} from '@room/utils/Vector3d';
+import {PetFigureData} from '@ambreia/avatar/pets/PetFigureData';
+import {Vector3d} from '@ambreia/iso/utils/Vector3d';
 
 /**
  * Pet image rendering widget.

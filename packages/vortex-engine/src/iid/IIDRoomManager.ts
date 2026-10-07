@@ -1,5 +1,5 @@
 import {createIID} from '@core/runtime/IID';
-import type {IRoomManager} from '@room/IRoomManager';
+import type {IRoomManager} from '@ambreia/iso/IRoomManager';
 
 /**
  * IID for Room Manager

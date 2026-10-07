@@ -18,7 +18,7 @@
  */
 import {createCanvas} from '@napi-rs/canvas';
 import type {Canvas, SKRSContext2D} from '@napi-rs/canvas';
-import {ColorConverter} from '@room/utils/ColorConverter';
+import {ColorConverter} from '@ambreia/iso/utils/ColorConverter';
 
 /** The lightness at which a pixel stops being treated as darkness to be dissolved. */
 const MID_LIGHTNESS = 128;

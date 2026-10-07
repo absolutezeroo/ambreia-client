@@ -37,7 +37,8 @@ node install.mjs             # unpack assets (vortex-client-assets.zip); --pack 
 | `packages/ambreia-net` | `@ambreia/net`: WebSocket transport, encryption, wire format, registry, packet tap — imports `@ambreia/common` only |
 | `packages/ambreia-avatar` | `@ambreia/avatar`: avatar renderer (not the editor), built from typed options; runs in Node (`tools/render-avatar.mjs`) — imports `@ambreia/common` only |
 | `packages/ambreia-ui` | `@ambreia/ui`: window system (`src/`), generic kit (`src/kit/`: plain `WindowManager`, `WidgetRegistry`, dialogs, generic widgets), XML parsers (`src/assets/`); `pnpm --filter @ambreia/ui sandbox` shows it alone — imports `@ambreia/common` only |
-| `packages/vortex-engine` | Engine: `core/` (runtime/DI, the DI wrappers `AssetLibrary` and `CoreCommunicationManager`), `room/` (generic room engine), `habbo/` (game core: `avatar` incl. the editor, `communication`, `configuration`, `localization`, `room`, `session`, `ui` (room desktop, name bubble), `window` (the game windows and widgets: `HabboWindowManager extends WindowManager`)), `iid/` (DI symbols) |
+| `packages/ambreia-iso` | `@ambreia/iso`: room engine — core (`src/`), `scene/`, `furniture/`, `avatar/`, `effects/`, each with its `register*` module; `IsoStage` loads a room out of session (zone format); `pnpm --filter @ambreia/iso sandbox` — imports `@ambreia/common` and `@ambreia/avatar` only |
+| `packages/vortex-engine` | Engine: `core/` (runtime/DI, the DI wrappers `AssetLibrary` and `CoreCommunicationManager`), `habbo/` (game core: `avatar` incl. the editor, `communication`, `configuration`, `localization`, `room` (RoomEngine, the message handler: the game glue over `iso`), `session`, `ui` (room desktop, name bubble), `window` (the game windows and widgets: `HabboWindowManager extends WindowManager`)), `iid/` (DI symbols) |
 | `packages/vortex-client` | App shell: boot (`src/App.ts`), display classes, assets, `src/vortex-layouts/` (new window XML) |
 | `packages/vortex-glaze` | Live window-layout editor — imports `@ambreia/ui` and `@ambreia/common` only (ESLint wall) |
 | `packages/vortex-imager` | Server-side avatar/furni/room renderer reusing the engine |
@@ -50,7 +51,7 @@ Browser globals (canvas, image decode, XML) go through `platform()` of `@ambreia
 a Node tool calls `setPlatform()` first (see `packages/ambreia-avatar/tools/node-platform.mjs`). Engine
 packages are plain classes; the DI registers them with `context.attachInstance(iid, instance, {dependencies, ready, update})`.
 `@ambreia/ui` (the package) is not `@ui/` (the client's alias for its own `src/`).
-Aliases: `@core/` `@habbo/` `@room/` `@iid/` → engine `src/`; in the client also `@ui/` and `@/` → client
+Aliases: `@core/` `@habbo/` `@iid/` → engine `src/` (`@room` went with J4); in the client also `@ui/` and `@/` → client
 `src/`. Target: engines become packages `@vortex/common`, `net`, `avatar`, `iso`, `ui`, then `kernel`,
 `protocol`, `game` (spec §3, milestones J1–J6).
 

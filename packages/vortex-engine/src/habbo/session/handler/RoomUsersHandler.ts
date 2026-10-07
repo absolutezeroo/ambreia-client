@@ -2,7 +2,7 @@ import type {IConnection} from '@ambreia/net/connection/IConnection';
 import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
 import type {IRoomHandlerListener} from '../IRoomHandlerListener';
 import {BaseHandler} from './BaseHandler';
-import {RoomShakingEffect} from '@room/utils/RoomShakingEffect';
+import {RoomShakingEffect} from '@ambreia/iso/utils/RoomShakingEffect';
 
 // Message events
 import {UsersMessageEvent} from '../../communication/messages/incoming/room/engine/UsersMessageEvent';

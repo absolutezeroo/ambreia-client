@@ -1,3 +1,4 @@
+import {Core} from '@core/Core';
 import {Component, ComponentDependency, type IContext} from '@core/runtime';
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {IWindow} from '@ambreia/ui/IWindow';
@@ -11,7 +12,7 @@ import {IID_HabboConfigurationManager} from '@iid/IIDHabboConfigurationManager';
 import {IID_HabboLocalizationManager} from '@iid/IIDHabboLocalizationManager';
 import {IID_HabboWindowManager} from '@iid/IIDHabboWindowManager';
 import {IID_RoomSessionManager} from '@iid/IIDRoomSessionManager';
-import {FurnitureDataParser} from './furniture/FurnitureDataParser';
+import {FurnitureDataParser} from '@ambreia/iso/furniture/data/FurnitureDataParser';
 import {ProductDataParser} from './product/ProductDataParser';
 import {BadgeInfo} from './BadgeInfo';
 import {BadgeImageManager} from './BadgeImageManager';
@@ -19,8 +20,8 @@ import {FurniIconImageManager} from './FurniIconImageManager';
 
 import type {IHabboLocalizationManager} from '../localization/IHabboLocalizationManager';
 import type {IHabboWindowManager} from '../window/IHabboWindowManager';
-import type {IFurnitureData} from './furniture/IFurnitureData';
-import type {IFurniDataListener} from './furniture/IFurniDataListener';
+import type {IFurnitureData} from '@ambreia/iso/furniture/data/IFurnitureData';
+import type {IFurniDataListener} from '@ambreia/iso/furniture/data/IFurniDataListener';
 import type {IProductData} from './product/IProductData';
 import type {IProductDataListener} from './product/IProductDataListener';
 import type {IRoomSessionManager} from './IRoomSessionManager';
@@ -1491,13 +1492,21 @@ export class SessionDataManager extends Component implements ISessionDataManager
             this._loadingFurnitureDataParser = null;
         }
 
+        // Silence here costs hours: the symptom is every furniture name in the client going blank.
+        if(this._localization === null)
+        {
+            log.error('No localization manager: furniture names will be empty everywhere. '
+                + 'SessionDataManager must inject it before furnidata parses.');
+        }
+
         this._loadingFurnitureDataParser = new FurnitureDataParser(
             this._floorItems,
             this._wallItems,
             this._floorItemsByName,
             this._wallItemsByName,
             this._localization,
-            critical
+            critical,
+            (message, isCritical, id) => Core.error(message, isCritical, id)
         );
 
         this._loadingFurnitureDataParser.events.on('FDP_furniture_data_ready', () =>

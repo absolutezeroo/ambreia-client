@@ -4,4 +4,4 @@
 export * from './basic';
 
 // Types
-export type {IPlaneRasterizer} from './IPlaneRasterizer';
+export type {IPlaneRasterizer} from '@ambreia/iso/scene/object/visualization/room/rasterizer/IPlaneRasterizer';

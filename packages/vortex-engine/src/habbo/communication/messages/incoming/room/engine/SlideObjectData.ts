@@ -5,7 +5,7 @@
  *
  * Data class for sliding object (roller) movement.
  */
-import type {IVector3d} from '@room/utils/IVector3d';
+import type {IVector3d} from '@ambreia/iso/utils/IVector3d';
 
 export class SlideObjectData
 {

@@ -8,7 +8,7 @@
 import type {IMessageParser} from '@ambreia/net/messages/IMessageParser';
 import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
 import {SlideObjectData} from '@habbo/communication/messages/incoming/room/engine/SlideObjectData';
-import {Vector3d} from '@room/utils/Vector3d';
+import {Vector3d} from '@ambreia/iso/utils/Vector3d';
 
 export class SlideObjectBundleMessageParser implements IMessageParser
 {

@@ -28,23 +28,6 @@ const EXTERNAL = [
     'lru-cache'
 ];
 
-/**
- * Redirects the engine's `Vortex` singleton to `src/shim/vortex.ts`.
- *
- * A plugin rather than an `alias` entry because the three importers use relative specifiers
- * (`from '../../../Vortex'`), and `alias` matches the specifier as written, not where it
- * resolves to. Every one of them wants `application.renderer.extract` — a path the imager
- * never takes — and leaving the import alone pulls `VortexMain`, and with it the whole client
- * bootstrap, into the bundle.
- */
-const vortexSingletonStub = {
-    name: 'vortex-singleton-stub',
-    setup(build)
-    {
-        build.onResolve({filter: /(^|[\\/])Vortex$/}, () => ({path: resolve(ROOT, 'src/shim/vortex.ts')}));
-    }
-};
-
 const options = {
     entryPoints: [resolve(ROOT, 'src/index.ts')],
     outfile: resolve(ROOT, 'dist/index.js'),
@@ -58,8 +41,7 @@ const options = {
     tsconfig: resolve(ROOT, 'tsconfig.json'),
     alias: {
         'pixi.js': resolve(ROOT, 'src/shim/pixi.ts')
-    },
-    plugins: [vortexSingletonStub]
+    }
 };
 
 if(process.argv.includes('--watch'))

@@ -7,6 +7,7 @@
   "dependencies": {
     "@ambreia/avatar": "workspace:*",
     "@ambreia/common": "workspace:*",
+    "@ambreia/iso": "workspace:*",
     "@ambreia/net": "workspace:*",
     "@ambreia/ui": "workspace:*",
     "eventemitter3": "^5.0.1",

@@ -6,8 +6,8 @@
  * Utility class for parsing furniture data from messages.
  */
 import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
-import type {IStuffData} from '@habbo/room/object/data/IStuffData';
-import {StuffDataFactory} from '@habbo/room/object/data/StuffDataFactory';
+import type {IStuffData} from '@ambreia/iso/scene/object/data/IStuffData';
+import {StuffDataFactory} from '@ambreia/iso/scene/object/data/StuffDataFactory';
 import {FurnitureFloorData} from '@habbo/communication/messages/incoming/room/engine/FurnitureFloorData';
 
 export class FurnitureDataParser

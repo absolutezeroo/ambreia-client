@@ -18,6 +18,7 @@
   "dependencies": {
     "@ambreia/avatar": "workspace:*",
     "@ambreia/common": "workspace:*",
+    "@ambreia/iso": "workspace:*",
     "@ambreia/net": "workspace:*",
     "@ambreia/ui": "workspace:*",
     "@napi-rs/canvas": "^0.1.71",

@@ -9,10 +9,10 @@
 import type {IConnection} from '@ambreia/net/connection/IConnection';
 import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
 import type {IRoomCreator} from './IRoomCreator';
-import {Vector3d} from '@room/utils/Vector3d';
-import type {IVector3d} from '@room/utils/IVector3d';
-import {RoomObjectUserTypes, getUserTypeName} from '@habbo/room/object/RoomObjectUserTypes';
-import {FurniStackingHeightMap} from './utils/FurniStackingHeightMap';
+import {Vector3d} from '@ambreia/iso/utils/Vector3d';
+import type {IVector3d} from '@ambreia/iso/utils/IVector3d';
+import {RoomObjectUserTypes, getUserTypeName} from '@ambreia/iso/scene/object/RoomObjectUserTypes';
+import {FurniStackingHeightMap} from '@ambreia/iso/scene/utils/FurniStackingHeightMap';
 
 // Message Events - Room Session
 import {RoomReadyMessageEvent} from '../communication/messages/incoming/room/session/RoomReadyMessageEvent';
@@ -51,9 +51,9 @@ import type {ObjectRemoveConfirmMessageParser} from '../communication/messages/p
 import {PickupObjectMessageComposer} from '../communication/messages/outgoing/room/engine/PickupObjectMessageComposer';
 import {SpecialRoomEffectMessageEvent} from '../communication/messages/incoming/room/engine/SpecialRoomEffectMessageEvent';
 import type {SpecialRoomEffectMessageParser} from '../communication/messages/parser/room/engine/SpecialRoomEffectMessageParser';
-import {RoomRotatingEffect} from '@room/utils/RoomRotatingEffect';
-import {RoomShakingEffect} from '@room/utils/RoomShakingEffect';
-import {RoomEngineZoomEvent} from './events/RoomEngineZoomEvent';
+import {RoomRotatingEffect} from '@ambreia/iso/utils/RoomRotatingEffect';
+import {RoomShakingEffect} from '@ambreia/iso/utils/RoomShakingEffect';
+import {RoomEngineZoomEvent} from '@ambreia/iso/scene/events/RoomEngineZoomEvent';
 import {PetExperienceEvent} from '../communication/messages/incoming/room/pet/PetExperienceEvent';
 import type {PetExperienceEventParser} from '../communication/messages/parser/room/pet/PetExperienceEventParser';
 import {PetFigureUpdateEvent} from '../communication/messages/incoming/room/pet/PetFigureUpdateEvent';
@@ -77,7 +77,7 @@ import type {ItemRemoveMultipleMessageParser} from '../communication/messages/pa
 import {ObjectRemoveMultipleMessageEvent} from '../communication/messages/incoming/room/engine/ObjectRemoveMultipleMessageEvent';
 import type {ObjectRemoveMultipleMessageParser} from '../communication/messages/parser/room/engine/ObjectRemoveMultipleMessageParser';
 import type {DiceValueMessageParser} from '../communication/messages/parser/room/engine/DiceValueMessageParser';
-import {LegacyStuffData} from '@habbo/room/object/data/LegacyStuffData';
+import {LegacyStuffData} from '@ambreia/iso/scene/object/data/LegacyStuffData';
 import {ItemsMessageEvent} from '../communication/messages/incoming/room/engine/ItemsMessageEvent';
 import {ItemAddMessageEvent} from '../communication/messages/incoming/room/engine/ItemAddMessageEvent';
 import {ItemUpdateMessageEvent} from '../communication/messages/incoming/room/engine/ItemUpdateMessageEvent';
@@ -183,15 +183,15 @@ import type {
 } from '../communication/messages/parser/room/action/UserChangeMessageEventParser';
 
 // Room Object Variables
-import {RoomObjectVariableEnum} from './object/RoomObjectVariableEnum';
+import {RoomObjectVariableEnum} from '@ambreia/iso/scene/object/RoomObjectVariableEnum';
 
 // Room Entry Tile
 import {RoomEntryTileMessageEvent} from '../communication/messages/incoming/room/layout/RoomEntryTileMessageEvent';
 import type {RoomEntryTileMessageParser} from '../communication/messages/parser/room/layout/RoomEntryTileMessageParser';
 
 // Room Object
-import {RoomPlaneParser} from './object/RoomPlaneParser';
-import type {LegacyWallGeometry} from './utils/LegacyWallGeometry';
+import {RoomPlaneParser} from '@ambreia/iso/scene/object/RoomPlaneParser';
+import type {LegacyWallGeometry} from '@ambreia/iso/scene/utils/LegacyWallGeometry';
 import {Logger} from "@core";
 import type {IRoomMessageHandler} from "@habbo/room/IRoomMessageHandler";
 

@@ -13,7 +13,7 @@ import type {WindowEventListener} from '@ambreia/ui/events/WindowEventDispatcher
 import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
 import {RoomPreviewer} from '@habbo/room/preview/RoomPreviewer';
 import {PreviewCanvasStack} from '@habbo/room/preview/PreviewCanvasStack';
-import {RoomEngineEvent} from '@habbo/room/events/RoomEngineEvent';
+import {RoomEngineEvent} from '@ambreia/iso/scene/events/RoomEngineEvent';
 import type {IIterator} from '@ambreia/ui/utils/IIterator';
 import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
 

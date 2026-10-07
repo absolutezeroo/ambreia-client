@@ -5,8 +5,9 @@ import {HabboCommunicationDemo} from '@habbo/communication/demo/HabboCommunicati
 import {HabboLocalizationManager} from '@habbo/localization/HabboLocalizationManager';
 import {WindowParser} from '@ambreia/ui/utils/WindowParser';
 import {RoomEngine, RoomMessageHandler} from '@habbo/room';
-import {HabboRoomRendererFactory} from '@habbo/room/renderer/HabboRoomRendererFactory';
-import {RoomManager} from '@room/RoomManager';
+import {HabboRoomRendererFactory} from '@ambreia/iso/scene/renderer/HabboRoomRendererFactory';
+import {RoomManager} from '@ambreia/iso/RoomManager';
+import {setTextureExtractor} from '@ambreia/iso/renderer/TextureExtractor';
 import {RoomSessionManager} from '@habbo/session/RoomSessionManager';
 import {RoomSessionEvent} from '@habbo/session/events/RoomSessionEvent';
 import {SessionDataManager} from '@habbo/session/SessionDataManager';
@@ -396,6 +397,9 @@ export class VortexMain implements IVortexMain
     {
         this._application = application;
 
+        // The room renderer reads sprites back through this; it has no renderer of its own (J4).
+        setTextureExtractor(target => application.renderer.extract.canvas(target) as HTMLCanvasElement);
+
         // Console-only tracing; records nothing to the log until __packets.on() is called.
         PacketLogger.install();
 
@@ -449,6 +453,7 @@ export class VortexMain implements IVortexMain
         this._roomEngine = null;
         this._sessionDataManager = null;
         this._roomSessionManager = null;
+        this._roomManager?.dispose();
         this._roomManager = null;
         this._localizationManager = null;
         this._communicationDemo = null;
@@ -457,6 +462,7 @@ export class VortexMain implements IVortexMain
         this._assets = null;
 
         // Do NOT dispose Core or Application — owned by Vortex shell
+        setTextureExtractor(null);
         this._application = null;
     }
 
@@ -593,13 +599,17 @@ export class VortexMain implements IVortexMain
         this._localizationManager.setCommunicationManager(this._habboCommunicationManager);
 
         // 5. Room Manager (must be registered before RoomEngine)
-        this._roomManager = new RoomManager(ctx);
-        ctx.attachComponent(this._roomManager, [IID_RoomManager]);
+        // Plain classes since J4 (spec §3 rule 1); start() is where AS3 ran initComponent().
+        const roomManager = new RoomManager({
+            property: (key: string): string => ctx.configuration?.getProperty(key) ?? '',
+            flag: (key: string): boolean => ctx.configuration?.getBoolean(key) ?? false
+        });
+        this._roomManager = roomManager;
+        ctx.attachInstance(IID_RoomManager, roomManager, {ready: () => roomManager.start()});
 
         // 5b. Room Renderer Factory
         // AS3: RoomEngine depends on IIDRoomRendererFactory and calls createRenderer().
-        const roomRendererFactory = new HabboRoomRendererFactory(ctx);
-        ctx.attachComponent(roomRendererFactory, [IID_RoomRendererFactory]);
+        ctx.attachInstance(IID_RoomRendererFactory, new HabboRoomRendererFactory());
 
         // 6. Room Session Manager
         this._roomSessionManager = new RoomSessionManager(ctx);

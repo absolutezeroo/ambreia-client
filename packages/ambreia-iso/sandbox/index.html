@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>@ambreia/iso sandbox</title>
+    <style>
+        html, body { margin: 0; height: 100%; background: #20242c; color: #dde; font: 13px sans-serif; overflow: hidden; }
+        #bar { position: fixed; top: 8px; left: 8px; z-index: 1; display: flex; gap: 8px; align-items: center; }
+        #bar a { color: #9cf; }
+        #host { position: fixed; inset: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <div id="bar">
+        <a href="?">pixi host</a>
+        <a href="?modules=scene,furniture,avatars">without effects</a>
+        <a href="?host=canvas">canvas host (map editor)</a>
+        <span id="pick"></span>
+    </div>
+    <div id="host"></div>
+    <script type="module" src="./main.ts"></script>
+</body>
+</html>

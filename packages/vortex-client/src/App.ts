@@ -5,7 +5,7 @@ import {SiteChannel} from './SiteChannel';
 import {HabboCommunicationManagerEvent} from '@habbo/communication/enum/HabboCommunicationManagerEvent';
 import {AssetTypeDeclaration} from '@ambreia/common/assets/AssetTypeDeclaration';
 import {UnknownAsset} from '@ambreia/common/assets/UnknownAsset';
-import {RoomEngineEvent} from '@habbo/room/events/RoomEngineEvent';
+import {RoomEngineEvent} from '@ambreia/iso/scene/events/RoomEngineEvent';
 import type {AssetUrlSource} from '@ambreia/ui/IResourceManager';
 import type {ISkinData} from '@ambreia/ui/index';
 import {mergeElementDescription, mergeSkin} from '@ambreia/ui/assets/SkinMerge';

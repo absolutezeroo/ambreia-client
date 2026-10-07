@@ -2,7 +2,7 @@ import type {IDisposable} from "@core";
 import type {IHabboCommunicationDemo, IHabboCommunicationManager} from "@habbo/communication";
 import type {IHabboLocalizationManager} from "@habbo/localization";
 import type {IHabboConfigurationManager} from "@habbo/configuration";
-import type {IRoomManager} from "@room";
+import type {IRoomManager} from "@ambreia/iso/IRoomManager";
 import type {IRoomSessionManager, ISessionDataManager} from "@habbo/session";
 import type {IRoomEngine} from "@habbo/room";
 import type {IVortexConfig} from "./Vortex";
