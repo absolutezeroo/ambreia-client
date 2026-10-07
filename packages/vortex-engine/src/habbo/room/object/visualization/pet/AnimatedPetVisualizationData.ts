@@ -13,7 +13,7 @@
  *
  * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/pet/AnimatedPetVisualizationData.as
  */
-import type {IAssetLibrary} from '@core/assets/IAssetLibrary';
+import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import type {SizeData} from '../data/SizeData';
 import {AnimationSizeData} from '../data/AnimationSizeData';
 import {AnimatedFurnitureVisualizationData} from '../furniture/AnimatedFurnitureVisualizationData';

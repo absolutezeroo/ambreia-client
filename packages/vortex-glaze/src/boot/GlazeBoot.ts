@@ -1,6 +1,6 @@
 import {Core} from '@core/Core';
 import type {CoreComponentContext} from '@core/runtime/CoreComponentContext';
-import {Logger, LogLevel} from '@core/utils/Logger';
+import {Logger, LogLevel} from '@ambreia/common/utils/Logger';
 import {HabboWindowManager} from '@habbo/window';
 import type {IHabboWindowManager, IElementDescriptionData} from '@habbo/window';
 import type {ISkinData} from '@core/window';

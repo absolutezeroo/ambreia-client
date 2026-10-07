@@ -4,7 +4,7 @@ import type {WindowEvent} from '@core/window/events/WindowEvent';
 import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
 import {WindowTreeInspector} from '@core/window/debugger';
 import type {IWindowDebugNode} from '@core/window/debugger';
-import {signal, computed, effect, onCleanup, type Scope, type SignalReader} from '@core/reactive';
+import {signal, computed, effect, onCleanup, type Scope, type SignalReader} from '@ambreia/common/reactive/index';
 import {createWindowScope, bind, on, each, type IReconcilableList} from '@core/window/reactive';
 import {type EditorState} from '../../state/EditorState';
 import {signalsOf, type EditorSignals} from '../../state/EditorSignals';

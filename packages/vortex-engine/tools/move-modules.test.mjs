@@ -92,3 +92,37 @@ test('a single-file move maps to its full specifier', () =>
     assert.deepEqual(next(p, 'eng/src/core/runtime/index.ts'), ['./IDisposable -> @c/IDisposable']);
     assert.deepEqual(p.moved, [['eng/src/core/runtime/IDisposable.ts', 'common/src/IDisposable.ts']]);
 });
+
+test('a source folder named assets is moved like any other', () =>
+{
+    const p = planMoves({
+        root: project({
+            'eng/src/core/assets/IAsset.ts': 'export interface IAsset {}\n',
+            'eng/src/a.ts': "import type {IAsset} from '@core/assets/IAsset';\n"
+        }),
+        scan: ['eng/src'],
+        aliases: ALIASES,
+        moves: [{ from: 'eng/src/core/assets', to: 'common/src/assets', specifier: '@c/assets' }]
+    });
+
+    assert.deepEqual(p.moved, [['eng/src/core/assets/IAsset.ts', 'common/src/assets/IAsset.ts']]);
+    assert.deepEqual(next(p, 'eng/src/a.ts'), ['@core/assets/IAsset -> @c/assets/IAsset']);
+});
+
+test('a moved file reaches a file of another move in the same run by a relative path', () =>
+{
+    const p = planMoves({
+        root: project({
+            'eng/src/core/assets/A.ts': "import {Logger} from '../utils/Logger';\n",
+            'eng/src/core/utils/Logger.ts': 'export class Logger {}\n'
+        }),
+        scan: ['eng/src'],
+        aliases: ALIASES,
+        moves: [
+            { from: 'eng/src/core/utils', to: 'common/src/utils', specifier: '@c/utils' },
+            { from: 'eng/src/core/assets', to: 'common/src/assets', specifier: '@c/assets' }
+        ]
+    });
+
+    assert.deepEqual(p.rewrites.get('eng/src/core/assets/A.ts') ?? [], []);
+});

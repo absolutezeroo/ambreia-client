@@ -44,7 +44,9 @@ function listFiles(root, dir)
 
         if(e.isDirectory())
         {
-            if(!['node_modules', 'assets', '.vortex-dev'].includes(e.name)) out.push(...listFiles(root, rel));
+            // Only the client's asset tree is skipped (thousands of XML/PNG files, no source): a source
+            // folder may be called assets too (core/assets).
+            if(!['node_modules', '.vortex-dev'].includes(e.name) && !rel.endsWith('vortex-client/src/assets')) out.push(...listFiles(root, rel));
         }
         else if(rel.endsWith('.ts') && !rel.endsWith('.d.ts')) out.push(rel);
     }
@@ -97,7 +99,9 @@ export function planMoves({ root, scan, aliases, moves })
                 continue;
             }
 
-            if(gFile === gTarget) next = spec.startsWith('.') ? null : relativeTo(file, target);
+            // Moved files reach each other relatively: one run moves into one package, and a
+            // package importing itself by name needs a rootDir tsc cannot infer.
+            if(gFile >= 0) next = gFile === gTarget && spec.startsWith('.') ? null : relativeTo(file, target);
             else next = specifierFor(target);
 
             if(next !== null && next !== spec)
@@ -146,7 +150,7 @@ if(process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.met
     const plan = planMoves({
         root,
         moves,
-        scan: [E, 'packages/vortex-engine/test', C, 'packages/vortex-glaze/src', 'packages/vortex-imager/src', 'packages/vortex-common/src', 'packages/vortex-net/src'],
+        scan: [E, 'packages/vortex-engine/test', C, 'packages/vortex-glaze/src', 'packages/vortex-imager/src', 'packages/ambreia-common/src', 'packages/ambreia-net/src'],
         aliases: { '@core': `${E}/core`, '@habbo': `${E}/habbo`, '@room': `${E}/room`, '@iid': `${E}/iid`, '@ui': C, '@': C, '@client': C }
     });
     const count = [...plan.rewrites.values()].reduce((n, l) => n + l.length, 0);

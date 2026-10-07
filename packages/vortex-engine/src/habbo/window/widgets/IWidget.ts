@@ -1,4 +1,4 @@
-import type {IDisposable} from '@core/runtime/IDisposable';
+import type {IDisposable} from '@ambreia/common/IDisposable';
 import type {IIterable} from '@core/window/utils/IIterable';
 import type {PropertyStruct} from '@core/window/utils/PropertyStruct';
 

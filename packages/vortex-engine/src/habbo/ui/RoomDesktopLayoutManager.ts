@@ -10,7 +10,7 @@
  * Manages the window layout for a room desktop. Builds the layout window tree
  * from JSON and provides access to named containers for widget placement.
  */
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import type {IWindow} from '@core/window/IWindow';
 import type {IWindowContainer} from '@core/window/IWindowContainer';
 import type {IDisplayObjectWrapper} from '@core/window/components/IDisplayObjectWrapper';

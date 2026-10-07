@@ -8,7 +8,7 @@ import type {WindowEvent} from '@core/window/events/WindowEvent';
 import type {HabboAvatarEditor} from './HabboAvatarEditor';
 import type {IAvatarEditorGridView} from './common/ICategoryView';
 import type {IAvatarEditorView} from './view/IAvatarEditorView';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import {AvatarEditorGridView} from './common/AvatarEditorGridView';
 import {AvatarEditorGridViewEffects} from './effects/AvatarEditorGridViewEffects';
 import {AvatarEditorNameChangeView} from './view/AvatarEditorNameChangeView';

@@ -1,4 +1,4 @@
-import type {IDisposable} from '@core/runtime';
+import type {IDisposable} from '../../IDisposable';
 import type {EventEmitter} from 'eventemitter3';
 
 /**

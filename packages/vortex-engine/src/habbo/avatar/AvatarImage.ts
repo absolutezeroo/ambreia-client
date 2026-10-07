@@ -19,7 +19,7 @@ import {AvatarImageCache} from './cache/AvatarImageCache';
 import {ActiveActionData} from './actions/ActiveActionData';
 import {AvatarAction} from './enum/AvatarAction';
 import {AvatarScaleType} from './enum/AvatarScaleType';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('habbo.avatar.AvatarImage');
 

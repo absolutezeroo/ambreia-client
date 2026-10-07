@@ -1,6 +1,6 @@
 import type {DefaultAttStruct} from '../utils/DefaultAttStruct';
 import type {ISkinRenderer} from './renderer/ISkinRenderer';
-import type {IDisposable} from "../../runtime/IDisposable";
+import type {IDisposable} from "@ambreia/common/IDisposable";
 
 /**
  * Interface for a container of skin renderers indexed by window type and style.

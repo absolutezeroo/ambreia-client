@@ -1,4 +1,4 @@
-import {signal, type SignalReader} from '@core/reactive';
+import {signal, type SignalReader} from '@ambreia/common/reactive/index';
 import {EditorEvents, type EditorState} from './EditorState';
 
 /**

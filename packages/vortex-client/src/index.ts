@@ -1,4 +1,4 @@
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import {VortexLoadingScreen} from './VortexLoadingScreen';
 import {VortexApp} from './App';
 import {installBugReporter} from './BugReporter';

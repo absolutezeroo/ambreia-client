@@ -1,4 +1,4 @@
-import type {IAsset} from '@core/assets/IAsset';
+import type {IAsset} from '@ambreia/common/assets/IAsset';
 import type EventEmitter from 'eventemitter3';
 import type {AnimationManager} from './animation/AnimationManager';
 import type {IAvatarFigureContainer} from './IAvatarFigureContainer';

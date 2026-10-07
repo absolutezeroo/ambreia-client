@@ -1,6 +1,6 @@
 import type {IWindow} from '../IWindow';
 import type {WindowEvent} from '../events/WindowEvent';
-import {effect, onCleanup} from '../../reactive/Effect';
+import {effect, onCleanup} from '@ambreia/common/reactive/Effect';
 
 // No `AS3:` traces in this file: nothing here was ported. Window adapter of the
 // TS-only reactive layer (docs/REACTIVE-UI.md §6).

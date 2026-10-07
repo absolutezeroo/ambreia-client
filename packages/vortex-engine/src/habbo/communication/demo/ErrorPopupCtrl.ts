@@ -14,7 +14,7 @@ import type {IModalDialog} from '@habbo/window/utils/IModalDialog';
 import {IID_HabboWindowManager} from '@iid/IIDHabboWindowManager';
 import {IID_HabboLocalizationManager} from '@iid/IIDHabboLocalizationManager';
 import {IID_SessionDataManager} from '@iid/IIDSessionDataManager';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
 
 const log = Logger.getLogger('habbo.communication.demo.ErrorPopupCtrl');

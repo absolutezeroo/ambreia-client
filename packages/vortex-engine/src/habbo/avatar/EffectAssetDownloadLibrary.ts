@@ -1,7 +1,7 @@
 import EventEmitter from 'eventemitter3';
 import type {AssetLoaderEvent, IAssetLibrary, NitroAsset} from '@core/assets';
 import {AssetLoaderEventType} from '@core/assets';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('habbo.avatar.EffectAssetDownloadLibrary');
 

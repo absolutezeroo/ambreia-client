@@ -4,7 +4,7 @@ import type {WindowEvent} from '@core/window/events/WindowEvent';
 import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
 import {TYPE_NAME_TO_CODE} from '@core/window/enum/WindowType';
 import {WindowParam} from '@core/window/enum/WindowParam';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import {addWidget} from '../../ops/StructuralOps';
 import {type EditorState} from '../../state/EditorState';
 import {closesOnHeaderButton, fitPopupToDesktop} from './PopupChrome';

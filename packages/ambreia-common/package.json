@@ -1,0 +1,19 @@
+{
+  "name": "@ambreia/common",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Logger, utilities, asset loading and reactive primitives shared by every Ambreia package",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "dependencies": {
+    "eventemitter3": "^5.0.1",
+    "pako": "^2.1.0",
+    "pixi.js": "^8.6.6"
+  },
+  "devDependencies": {
+    "@types/pako": "^2.0.3",
+    "typescript": "^5.7.2"
+  }
+}

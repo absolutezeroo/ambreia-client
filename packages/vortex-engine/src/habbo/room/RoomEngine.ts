@@ -13,7 +13,7 @@ import type {Container, Ticker} from 'pixi.js';
 import {Sprite, Texture} from 'pixi.js';
 import {Component, ComponentDependency, type IContext, type IUpdateReceiver} from '@core/runtime';
 import {Vortex} from '../../Vortex';
-import type {IAssetLibrary} from '@core/assets/IAssetLibrary';
+import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import type {IConnection} from '@core/communication/connection/IConnection';
 import type {IRoomEngine} from './IRoomEngine';
 import {RoomAreaSelectionManager} from './utils/RoomAreaSelectionManager';
@@ -100,7 +100,7 @@ import {RoomData} from './utils/RoomData';
 import {Logger} from "@core";
 import {RoomVisualizationData} from './object/visualization/room/RoomVisualizationData';
 import type {IAssetRoomVisualizationData} from './object/visualization/room/rasterizer/basic/PlaneRasterizerTypes';
-import type {NitroAsset} from '@core/assets/NitroAsset';
+import type {NitroAsset} from '@ambreia/common/assets/NitroAsset';
 import {IID_HabboConfigurationManager} from '@iid/IIDHabboConfigurationManager';
 import {IID_HabboWindowManager} from '@iid/IIDHabboWindowManager';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
@@ -206,7 +206,7 @@ import {
 } from '@habbo/communication/messages/outgoing/room/furniture';
 import {RoomUserData} from '@habbo/communication/messages/incoming/room/engine/RoomUserData';
 import {RoomObjectMouseEvent} from '@room/events/RoomObjectMouseEvent';
-import {OrderedMap} from '@core/utils/OrderedMap';
+import {OrderedMap} from '@ambreia/common/utils/OrderedMap';
 import {GraphicAssetCollection} from '@room/object/visualization/utils/GraphicAssetCollection';
 
 const log = Logger.getLogger('habbo.room.RoomEngine');

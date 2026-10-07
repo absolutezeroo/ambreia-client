@@ -9,8 +9,8 @@
  * the room display lifecycle.
  */
 import {Component, ComponentDependency, type IContext, type IUpdateReceiver} from '@core/runtime';
-import type {IAssetLibrary} from '@core/assets/IAssetLibrary';
-import {Logger} from '@core/utils/Logger';
+import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 // DI identifiers
 import {IID_AvatarRenderManager} from '@iid/IIDAvatarRenderManager';

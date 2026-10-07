@@ -1,5 +1,5 @@
 import type {EffectComputation} from './Effect';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '../utils/Logger';
 
 const log = Logger.getLogger('core.reactive.Scheduler');
 

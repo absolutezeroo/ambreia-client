@@ -1,5 +1,5 @@
 import type {IWindow} from '@core/window/IWindow';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import type {GlazeLayoutName, GlazeSlot} from './GlazeLayoutSlots';
 
 const log = Logger.getLogger('glaze.ui.LayoutSlots');

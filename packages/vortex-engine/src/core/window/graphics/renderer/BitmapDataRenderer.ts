@@ -1,5 +1,5 @@
 import type {IWindow} from '../../IWindow';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import {PivotPoint} from '../../enum/PivotPoint';
 import {SkinRenderer} from './SkinRenderer';
 

@@ -1,4 +1,4 @@
-import type {IDisposable} from '@core/runtime/IDisposable';
+import type {IDisposable} from '../IDisposable';
 
 /**
  * Insertion-ordered key/value store with index-based access, matching AS3's

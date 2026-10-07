@@ -3,7 +3,7 @@ import type {PropertyStruct} from './utils/PropertyStruct';
 import type {IWindowContext} from './IWindowContext';
 import type {WindowEvent} from './events/WindowEvent';
 import type {WindowEventListener} from './events/WindowEventDispatcher';
-import type {IDisposable} from "../runtime/IDisposable";
+import type {IDisposable} from "@ambreia/common/IDisposable";
 
 /**
  * Core window interface.

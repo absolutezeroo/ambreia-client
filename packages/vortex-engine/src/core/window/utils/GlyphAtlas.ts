@@ -1,4 +1,4 @@
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 /**
  * The text engine the atlas draws through, injected by the client.

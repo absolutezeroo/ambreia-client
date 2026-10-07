@@ -1,12 +1,12 @@
-# J1 — `@vortex/common` + `@vortex/net` Implementation Plan
+# J1 — `@ambreia/common` + `@ambreia/net` Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal :** sortir du moteur les deux premiers paquets autonomes — `@vortex/common` (utilitaires, logger,
-chargement d'assets, réactif) et `@vortex/net` (transport, chiffrement, format filaire, registre) — et
+**Goal :** sortir du moteur les deux premiers paquets autonomes — `@ambreia/common` (utilitaires, logger,
+chargement d'assets, réactif) et `@ambreia/net` (transport, chiffrement, format filaire, registre) — et
 donner à `net` son point d'écoute et d'injection pour l'inspecteur de paquets.
 
-**Architecture :** deux paquets de workspace (`packages/vortex-common`, `packages/vortex-net`) consommés
+**Architecture :** deux paquets de workspace (`packages/ambreia-common`, `packages/ambreia-net`) consommés
 par leurs sources TypeScript via `exports` (`"./*": "./src/*.ts"`) : pas d'étape de build, pas d'alias
 à recopier dans cinq configs. Les fichiers sont déplacés par `git mv` et les ~1 070 imports réécrits par
 un codemod testé (`move-modules.mjs`), réutilisable pour J2–J6. Ce qui dépend du DI (`AssetLibrary`,
@@ -23,7 +23,7 @@ dev), Vite 6, ESLint 10 (`no-restricted-imports`), `node:test` + `tsx`.
 - « À la fin de chaque jalon, le client compile, démarre et on entre dans une room. » (§9)
 - « Les moteurs (`common`, `net`, `avatar`, `iso`, `ui`) n'importent jamais `kernel`, `protocol` ni
   `game`. Ils n'utilisent pas le DI : classes à constructeur simple, dépendances passées en paramètre. » (§3)
-- `@vortex/common` vient de `core/utils`, `core/assets`, `core/reactive` ; `@vortex/net` de
+- `@ambreia/common` vient de `core/utils`, `core/assets`, `core/reactive` ; `@ambreia/net` de
   `core/communication`, « tel quel (connexion, chiffrement, format, registre) ». (§3, §6)
 - J1 preuve : « `pnpm build`, `pnpm dev` OK, rechargement dev pas plus lent qu'avant ». (§9)
 - J1 test propre : « Aller-retour écrivain/lecteur du format filaire (int, short, string, booléen,
@@ -42,18 +42,18 @@ dev), Vite 6, ESLint 10 (`no-restricted-imports`), `node:test` + `tsx`.
 |---|---|---|
 | D1 | **Un seul esbuild** pour tous les paquets dans le bundle de dev (§12 n° 2) | Un seul graphe = une seule instance de `Logger`, `FrameTimings`, `ErrorReportStorage` ; `outbase` passe à `packages/`. Un esbuild par paquet dupliquerait ces singletons ou demanderait des externals croisés. |
 | D2 | Paquets consommés **par leurs sources** via `exports` | Même modèle que `vortex-engine` (`main: src/index.ts`) ; Vite, esbuild, tsc (`bundler`) et tsx le résolvent tous ; aucune liste d'alias à maintenir. |
-| D3 | **Chemins profonds uniquement** (`@vortex/common/utils/Logger`), pas de baril racine | J2 demande des « imports `@vortex/common` ciblés (pas tous les chargeurs) ». Un baril de dossier s'importe par `…/utils/index`. |
+| D3 | **Chemins profonds uniquement** (`@ambreia/common/utils/Logger`), pas de baril racine | J2 demande des « imports `@ambreia/common` ciblés (pas tous les chargeurs) ». Un baril de dossier s'importe par `…/utils/index`. |
 | D4 | `AssetLibrary`, `AssetLibraryCollection` (des `Component`) et `CoreCommunicationManager` + son interface **restent dans le moteur** ; leurs barils `core/assets/index.ts` et `core/communication/index.ts` aussi | Règle §3 : pas de DI dans un moteur. Les rendre autonomes demande un fournisseur d'assets injecté — c'est le travail de J2 (avatar) et J5 (kernel). |
-| D5 | `IDisposable` descend dans `@vortex/common` | C'est la seule autre dépendance du code déplacé vers `core/runtime`. |
+| D5 | `IDisposable` descend dans `@ambreia/common` | C'est la seule autre dépendance du code déplacé vers `core/runtime`. |
 | D6 | Le point d'écoute est une **API** de `IConnection` (`setPacketTap`, `injectIncoming`) ; rien ne l'active en production | L'inspecteur (outil de dev, §8) l'installera ; le build de production ne contient aucun outil (§7.6). |
 
 ## Review Focus
 
-1. **Deux instances d'un singleton de `common`** : un fichier client qui importe `@vortex/common/…`
+1. **Deux instances d'un singleton de `common`** : un fichier client qui importe `@ambreia/common/…`
    directement, servi par Vite à côté du bundle esbuild qui en contient une copie → niveaux de log ou
    compteurs de frame séparés. Attendu : une seule instance. Pin : Task 3, step 9 (zéro requête vers
-   `vortex-common/src` en dev).
-2. **Glaze ou l'imager ne résolvent plus `@vortex/*`** (pnpm strict : dépendance non déclarée).
+   `ambreia-common/src` en dev).
+2. **Glaze ou l'imager ne résolvent plus `@ambreia/*`** (pnpm strict : dépendance non déclarée).
    Attendu : les deux construisent. Pin : Task 3 step 9 et Task 4 step 8 (`pnpm --filter vortex-glaze
    build`, `pnpm imager:build`).
 3. **Un fichier déplacé importe encore le moteur** (codemod incomplet, import relatif oublié).
@@ -98,7 +98,7 @@ node .claude/skills/run-vortex-client/driver.mjs "goto http://localhost:5173/cli
   `applyMoves(root, plan)` (réécrit puis `git mv`) ; CLI `node packages/vortex-engine/tools/move-modules.mjs <moves.json> [--apply]`.
 - Un `move` vaut `{from, to, specifier, except?}` : `from`/`to` sont des chemins depuis la racine
   (fichier ou dossier), `specifier` le nom sous lequel la cible s'importe après le déplacement
-  (`@vortex/common/utils` pour un dossier, `@vortex/common/IDisposable` pour un fichier), `except` des
+  (`@ambreia/common/utils` pour un dossier, `@ambreia/common/IDisposable` pour un fichier), `except` des
   chemins sous `from` qui restent.
 
 - [ ] **Step 1 : écrire le test.**
@@ -355,7 +355,7 @@ if(process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.met
     const plan = planMoves({
         root,
         moves,
-        scan: [E, 'packages/vortex-engine/test', C, 'packages/vortex-glaze/src', 'packages/vortex-imager/src', 'packages/vortex-common/src', 'packages/vortex-net/src'],
+        scan: [E, 'packages/vortex-engine/test', C, 'packages/vortex-glaze/src', 'packages/vortex-imager/src', 'packages/ambreia-common/src', 'packages/ambreia-net/src'],
         aliases: { '@core': `${E}/core`, '@habbo': `${E}/habbo`, '@room': `${E}/room`, '@iid': `${E}/iid`, '@ui': C, '@': C, '@client': C }
     });
     const count = [...plan.rewrites.values()].reduce((n, l) => n + l.length, 0);
@@ -396,11 +396,11 @@ git commit -m "j1: codemod move-modules (déplace des fichiers et réécrit leur
 test('common: the engine and every other Vortex package are refused', async () =>
 {
     const core = await wallHits("import {Component} from '@core/runtime/Component';\nexport {Component};\n",
-        'packages/vortex-common/src/utils/Probe.ts');
-    const net = await wallHits("import {ByteArray} from '@vortex/net/util/ByteArray';\nexport {ByteArray};\n",
-        'packages/vortex-common/src/utils/Probe.ts');
+        'packages/ambreia-common/src/utils/Probe.ts');
+    const net = await wallHits("import {ByteArray} from '@ambreia/net/util/ByteArray';\nexport {ByteArray};\n",
+        'packages/ambreia-common/src/utils/Probe.ts');
     const relative = await wallHits("import {Vortex} from '../../../vortex-engine/src/Vortex';\nexport {Vortex};\n",
-        'packages/vortex-common/src/utils/Probe.ts');
+        'packages/ambreia-common/src/utils/Probe.ts');
 
     assert.equal(core.length, 1);
     assert.equal(net.length, 1);
@@ -409,10 +409,10 @@ test('common: the engine and every other Vortex package are refused', async () =
 
 test('net: common is allowed, the engine is refused', async () =>
 {
-    const common = await wallHits("import {Logger} from '@vortex/common/utils/Logger';\nexport {Logger};\n",
-        'packages/vortex-net/src/connection/Probe.ts');
+    const common = await wallHits("import {Logger} from '@ambreia/common/utils/Logger';\nexport {Logger};\n",
+        'packages/ambreia-net/src/connection/Probe.ts');
     const core = await wallHits("import {Component} from '@core/runtime/Component';\nexport {Component};\n",
-        'packages/vortex-net/src/connection/Probe.ts');
+        'packages/ambreia-net/src/connection/Probe.ts');
 
     assert.equal(common.length, 0);
     assert.equal(core.length, 1);
@@ -425,25 +425,25 @@ test('net: common is allowed, the engine is refused', async () =>
 
 ```js
     {
-        files: ['packages/vortex-common/src/**/*.ts'],
+        files: ['packages/ambreia-common/src/**/*.ts'],
         rules:
         {
             'no-restricted-imports': wall(
                 {
-                    regex: '^@(core|habbo|room|iid|ui)(/|$)|^@vortex/|(^|/)vortex-(engine|net|client)(/|$)',
-                    message: `@vortex/common is the bottom package: it imports no other Vortex package (${WALLS_SPEC}).`
+                    regex: '^@(core|habbo|room|iid|ui)(/|$)|^@ambreia/|(^|/)vortex-(engine|net|client)(/|$)',
+                    message: `@ambreia/common is the bottom package: it imports no other Vortex package (${WALLS_SPEC}).`
                 }
             )
         }
     },
     {
-        files: ['packages/vortex-net/src/**/*.ts'],
+        files: ['packages/ambreia-net/src/**/*.ts'],
         rules:
         {
             'no-restricted-imports': wall(
                 {
-                    regex: '^@(core|habbo|room|iid|ui)(/|$)|^@vortex/(?!common/)|(^|/)vortex-(engine|client)(/|$)',
-                    message: `@vortex/net depends on @vortex/common only (${WALLS_SPEC}).`
+                    regex: '^@(core|habbo|room|iid|ui)(/|$)|^@ambreia/(?!common/)|(^|/)vortex-(engine|client)(/|$)',
+                    message: `@ambreia/net depends on @ambreia/common only (${WALLS_SPEC}).`
                 }
             )
         }
@@ -451,31 +451,31 @@ test('net: common is allowed, the engine is refused', async () =>
 ```
 
 - [ ] **Step 4 :** `node --test packages/vortex-engine/tools/boundaries.test.mjs` → PASS ; `pnpm test` vert.
-- [ ] **Step 5 : commit** `j1: murs ESLint de @vortex/common et @vortex/net` en nommant
+- [ ] **Step 5 : commit** `j1: murs ESLint de @ambreia/common et @ambreia/net` en nommant
   `eslint.config.mjs packages/vortex-engine/tools/boundaries.test.mjs`.
 
 ---
 
-### Task 3 : `@vortex/common`
+### Task 3 : `@ambreia/common`
 
 **Files :**
-- Create : `packages/vortex-common/package.json`, `packages/vortex-common/tsconfig.json`, `.superpowers/sdd/2026-10-07-j1-common-net/moves-common.json` (non commité)
-- Move (codemod) : `packages/vortex-engine/src/core/{utils,reactive}/**`, `core/assets/**` sauf `AssetLibrary.ts`, `AssetLibraryCollection.ts`, `index.ts`, et `core/runtime/IDisposable.ts` → `packages/vortex-common/src/…`
+- Create : `packages/ambreia-common/package.json`, `packages/ambreia-common/tsconfig.json`, `.superpowers/sdd/2026-10-07-j1-common-net/moves-common.json` (non commité)
+- Move (codemod) : `packages/vortex-engine/src/core/{utils,reactive}/**`, `core/assets/**` sauf `AssetLibrary.ts`, `AssetLibraryCollection.ts`, `index.ts`, et `core/runtime/IDisposable.ts` → `packages/ambreia-common/src/…`
 - Modify : les 4 fichiers d'assets qui importent `IDisposable` par le baril ; `package.json` de `vortex-engine`, `vortex-client`, `vortex-glaze`, `vortex-imager` ; `package.json` racine (`typecheck`) ; `packages/vortex-client/tools/vite-plugin-engine-bundle.mjs` ; `pnpm-lock.yaml`
 - Modify (codemod) : tous les importeurs
 
 **Interfaces :**
-- Produces : le paquet `@vortex/common`, importé en chemins profonds : `@vortex/common/utils/Logger`,
-  `@vortex/common/assets/IAssetLibrary`, `@vortex/common/reactive/Signal`, `@vortex/common/IDisposable`,
+- Produces : le paquet `@ambreia/common`, importé en chemins profonds : `@ambreia/common/utils/Logger`,
+  `@ambreia/common/assets/IAssetLibrary`, `@ambreia/common/reactive/Signal`, `@ambreia/common/IDisposable`,
   barils par `…/utils/index`. Le moteur garde `@core/assets` (baril) avec `AssetLibrary`,
   `AssetLibraryEvents`, `AssetLibraryCollection`.
 
 - [ ] **Step 1 : le paquet.**
 
 ```json
-// packages/vortex-common/package.json
+// packages/ambreia-common/package.json
 {
-  "name": "@vortex/common",
+  "name": "@ambreia/common",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -496,7 +496,7 @@ test('net: common is allowed, the engine is refused', async () =>
 ```
 
 ```json
-// packages/vortex-common/tsconfig.json
+// packages/ambreia-common/tsconfig.json
 {
     "extends": "../../tsconfig.json",
     "compilerOptions": {
@@ -506,7 +506,7 @@ test('net: common is allowed, the engine is refused', async () =>
 }
 ```
 
-  Ajouter `"@vortex/common": "workspace:*"` aux `dependencies` de `vortex-engine`, `vortex-client`,
+  Ajouter `"@ambreia/common": "workspace:*"` aux `dependencies` de `vortex-engine`, `vortex-client`,
   `vortex-glaze` et `vortex-imager`. Puis `pnpm install --offline` → `Done`.
 
 - [ ] **Step 2 : la seule dépendance au runtime qui passe par un baril.** Dans
@@ -519,10 +519,10 @@ test('net: common is allowed, the engine is refused', async () =>
 
 ```json
 [
-  {"from": "packages/vortex-engine/src/core/runtime/IDisposable.ts", "to": "packages/vortex-common/src/IDisposable.ts", "specifier": "@vortex/common/IDisposable"},
-  {"from": "packages/vortex-engine/src/core/utils", "to": "packages/vortex-common/src/utils", "specifier": "@vortex/common/utils"},
-  {"from": "packages/vortex-engine/src/core/reactive", "to": "packages/vortex-common/src/reactive", "specifier": "@vortex/common/reactive"},
-  {"from": "packages/vortex-engine/src/core/assets", "to": "packages/vortex-common/src/assets", "specifier": "@vortex/common/assets",
+  {"from": "packages/vortex-engine/src/core/runtime/IDisposable.ts", "to": "packages/ambreia-common/src/IDisposable.ts", "specifier": "@ambreia/common/IDisposable"},
+  {"from": "packages/vortex-engine/src/core/utils", "to": "packages/ambreia-common/src/utils", "specifier": "@ambreia/common/utils"},
+  {"from": "packages/vortex-engine/src/core/reactive", "to": "packages/ambreia-common/src/reactive", "specifier": "@ambreia/common/reactive"},
+  {"from": "packages/vortex-engine/src/core/assets", "to": "packages/ambreia-common/src/assets", "specifier": "@ambreia/common/assets",
    "except": ["packages/vortex-engine/src/core/assets/AssetLibrary.ts", "packages/vortex-engine/src/core/assets/AssetLibraryCollection.ts", "packages/vortex-engine/src/core/assets/index.ts"]}
 ]
 ```
@@ -540,8 +540,8 @@ test('net: common is allowed, the engine is refused', async () =>
 
 ```js
 // Engine and workspace-package specifiers a client file may import. Kept in sync with ALIAS_TARGETS.
-const ENGINE_ALIAS_RE = /^(?:@(?:core|habbo|room|iid)|@vortex\/(?:common|net))(\/|$)/;
-const ENGINE_SPEC_RE = /from\s*['"]((?:@(?:core|habbo|room|iid)|@vortex\/(?:common|net))(?:\/[^'"]*)?|vortex-engine)['"]|import\s*\(\s*['"]((?:@(?:core|habbo|room|iid)|@vortex\/(?:common|net))(?:\/[^'"]*)?|vortex-engine)['"]\s*\)/g;
+const ENGINE_ALIAS_RE = /^(?:@(?:core|habbo|room|iid)|@ambreia\/(?:common|net))(\/|$)/;
+const ENGINE_SPEC_RE = /from\s*['"]((?:@(?:core|habbo|room|iid)|@ambreia\/(?:common|net))(?:\/[^'"]*)?|vortex-engine)['"]|import\s*\(\s*['"]((?:@(?:core|habbo|room|iid)|@ambreia\/(?:common|net))(?:\/[^'"]*)?|vortex-engine)['"]\s*\)/g;
 ```
 
   et dans `engineBundle()` :
@@ -557,10 +557,10 @@ const ENGINE_SPEC_RE = /from\s*['"]((?:@(?:core|habbo|room|iid)|@vortex\/(?:comm
 			'@habbo': ENGINE_SRC + '/habbo',
 			'@room': ENGINE_SRC + '/room',
 			'@iid': ENGINE_SRC + '/iid',
-			'@vortex/common': PACKAGES + '/vortex-common/src',
-			'@vortex/net': PACKAGES + '/vortex-net/src'
+			'@ambreia/common': PACKAGES + '/ambreia-common/src',
+			'@ambreia/net': PACKAGES + '/ambreia-net/src'
 		};
-	const SOURCE_ROOTS = [ENGINE_SRC, PACKAGES + '/vortex-common/src', PACKAGES + '/vortex-net/src'];
+	const SOURCE_ROOTS = [ENGINE_SRC, PACKAGES + '/ambreia-common/src', PACKAGES + '/ambreia-net/src'];
 ```
 
   `resolveEngineSpec()` : remplacer le calcul de `key` par
@@ -569,14 +569,14 @@ const ENGINE_SPEC_RE = /from\s*['"]((?:@(?:core|habbo|room|iid)|@vortex\/(?:comm
   `rebuildContext()` : `outbase: PACKAGES` et
   `nextOutputs.set(spec, OUT_DIR + '/' + norm(relative(PACKAGES, file)).replace(/\.ts$/, '.js'));`.
   `resolveId()` : `if (importer && SOURCE_ROOTS.some((root) => norm(importer).startsWith(root))) return null;`.
-  Mettre à jour le commentaire de tête (« every `@core`/`@habbo`/`@room`/`@iid`/`@vortex/*`… »).
+  Mettre à jour le commentaire de tête (« every `@core`/`@habbo`/`@room`/`@iid`/`@ambreia/*`… »).
 
 - [ ] **Step 6 : barils et script.** `packages/vortex-engine/src/core/assets/index.ts` exporte déjà
-  le reste par `@vortex/common/assets/…` (réécrit par le codemod) : le relire, il doit garder
+  le reste par `@ambreia/common/assets/…` (réécrit par le codemod) : le relire, il doit garder
   `AssetLibrary`, `AssetLibraryEvents`, `AssetLibraryCollection`. Dans le `package.json` racine,
-  ajouter à `typecheck` : `&& pnpm --filter @vortex/common exec tsc --noEmit`.
+  ajouter à `typecheck` : `&& pnpm --filter @ambreia/common exec tsc --noEmit`.
 
-- [ ] **Step 7 :** `pnpm --filter @vortex/common exec tsc --noEmit` → 0 erreur (prouve qu'aucun
+- [ ] **Step 7 :** `pnpm --filter @ambreia/common exec tsc --noEmit` → 0 erreur (prouve qu'aucun
   fichier de `common` n'atteint le moteur) ; `pnpm typecheck` → 0 erreur ;
   `node node_modules/eslint/bin/eslint.js "packages/*/src/**/*.ts"` → 0 erreur.
 - [ ] **Step 8 :** `pnpm check` vert ; `pnpm build` vert ; `pnpm --filter vortex-glaze build` vert ;
@@ -590,28 +590,28 @@ node .claude/skills/run-vortex-client/driver.mjs "goto http://localhost:5173/cli
 
   Expected : `errors` vide ; `0` (tout `common` arrive par `.vortex-dev`, aucun module source servi
   à part). Arrêter `pnpm dev`.
-- [ ] **Step 10 : commit** `j1: @vortex/common sort du moteur (utils, assets, reactive, IDisposable)`
-  en nommant `packages/vortex-common packages/vortex-engine packages/vortex-client packages/vortex-glaze packages/vortex-imager package.json pnpm-lock.yaml`.
+- [ ] **Step 10 : commit** `j1: @ambreia/common sort du moteur (utils, assets, reactive, IDisposable)`
+  en nommant `packages/ambreia-common packages/vortex-engine packages/vortex-client packages/vortex-glaze packages/vortex-imager package.json pnpm-lock.yaml`.
 
 ---
 
-### Task 4 : `@vortex/net` et son test d'aller-retour
+### Task 4 : `@ambreia/net` et son test d'aller-retour
 
 **Files :**
-- Create : `packages/vortex-net/package.json`, `packages/vortex-net/tsconfig.json`, `packages/vortex-net/test/wire-format.test.ts`, `.superpowers/sdd/2026-10-07-j1-common-net/moves-net.json` (non commité)
-- Move (codemod) : `packages/vortex-engine/src/core/communication/**` sauf `CoreCommunicationManager.ts`, `ICoreCommunicationManager.ts`, `index.ts` → `packages/vortex-net/src/…`
-- Move : `packages/vortex-engine/test/unknown-message-warnings.test.ts` → `packages/vortex-net/test/`
+- Create : `packages/ambreia-net/package.json`, `packages/ambreia-net/tsconfig.json`, `packages/ambreia-net/test/wire-format.test.ts`, `.superpowers/sdd/2026-10-07-j1-common-net/moves-net.json` (non commité)
+- Move (codemod) : `packages/vortex-engine/src/core/communication/**` sauf `CoreCommunicationManager.ts`, `ICoreCommunicationManager.ts`, `index.ts` → `packages/ambreia-net/src/…`
+- Move : `packages/vortex-engine/test/unknown-message-warnings.test.ts` → `packages/ambreia-net/test/`
 - Modify : `package.json` de `vortex-engine`, `vortex-client`, `vortex-glaze`, `vortex-imager` ; racine (`typecheck`, `test`) ; `pnpm-lock.yaml`
 
 **Interfaces :**
-- Consumes : `@vortex/common` (Task 3), le plugin déjà configuré pour `@vortex/net` (Task 3 step 5).
-- Produces : `@vortex/net/connection/SocketConnection`, `@vortex/net/connection/IConnection`,
-  `@vortex/net/wireformat/WireFormatter`, `@vortex/net/messages/*`, `@vortex/net/util/ByteArray`, etc.
+- Consumes : `@ambreia/common` (Task 3), le plugin déjà configuré pour `@ambreia/net` (Task 3 step 5).
+- Produces : `@ambreia/net/connection/SocketConnection`, `@ambreia/net/connection/IConnection`,
+  `@ambreia/net/wireformat/WireFormatter`, `@ambreia/net/messages/*`, `@ambreia/net/util/ByteArray`, etc.
 
 - [ ] **Step 1 : le test (rouge tant que le paquet n'existe pas).**
 
 ```ts
-// packages/vortex-net/test/wire-format.test.ts
+// packages/ambreia-net/test/wire-format.test.ts
 // Spec §11, J1: what the client writes, the client reads back — int, short, string, boolean, list.
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
@@ -664,15 +664,15 @@ test('two frames in one buffer split into two messages, a partial third waits', 
 });
 ```
 
-  `node node_modules/tsx/dist/cli.mjs --tsconfig packages/vortex-engine/tsconfig.json --test packages/vortex-net/test/wire-format.test.ts`
-  Expected : FAIL, `Cannot find module …/vortex-net/src/wireformat/WireFormatter`.
+  `node node_modules/tsx/dist/cli.mjs --tsconfig packages/vortex-engine/tsconfig.json --test packages/ambreia-net/test/wire-format.test.ts`
+  Expected : FAIL, `Cannot find module …/ambreia-net/src/wireformat/WireFormatter`.
 
 - [ ] **Step 2 : le paquet.**
 
 ```json
-// packages/vortex-net/package.json
+// packages/ambreia-net/package.json
 {
-  "name": "@vortex/net",
+  "name": "@ambreia/net",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -681,7 +681,7 @@ test('two frames in one buffer split into two messages, a partial third waits', 
     "./*": "./src/*.ts"
   },
   "dependencies": {
-    "@vortex/common": "workspace:*",
+    "@ambreia/common": "workspace:*",
     "eventemitter3": "^5.0.1"
   },
   "devDependencies": {
@@ -690,7 +690,7 @@ test('two frames in one buffer split into two messages, a partial third waits', 
 }
 ```
 
-  `tsconfig.json` identique à celui de `common`. Ajouter `"@vortex/net": "workspace:*"` aux
+  `tsconfig.json` identique à celui de `common`. Ajouter `"@ambreia/net": "workspace:*"` aux
   `dependencies` de `vortex-engine`, `vortex-client`, `vortex-glaze`, `vortex-imager` ;
   `pnpm install --offline`.
 
@@ -698,7 +698,7 @@ test('two frames in one buffer split into two messages, a partial third waits', 
 
 ```json
 [
-  {"from": "packages/vortex-engine/src/core/communication", "to": "packages/vortex-net/src", "specifier": "@vortex/net",
+  {"from": "packages/vortex-engine/src/core/communication", "to": "packages/ambreia-net/src", "specifier": "@ambreia/net",
    "except": ["packages/vortex-engine/src/core/communication/CoreCommunicationManager.ts", "packages/vortex-engine/src/core/communication/ICoreCommunicationManager.ts", "packages/vortex-engine/src/core/communication/index.ts"]}
 ]
 ```
@@ -708,29 +708,29 @@ test('two frames in one buffer split into two messages, a partial third waits', 
   `CoreCommunicationManager.ts ICoreCommunicationManager.ts index.ts`.
 
 - [ ] **Step 4 : le test de la coupe suit son code.**
-  `git mv packages/vortex-engine/test/unknown-message-warnings.test.ts packages/vortex-net/test/` ;
-  remplacer dans ce fichier chaque `'@vortex/net/` par `'../src/` (le codemod a réécrit ses imports
+  `git mv packages/vortex-engine/test/unknown-message-warnings.test.ts packages/ambreia-net/test/` ;
+  remplacer dans ce fichier chaque `'@ambreia/net/` par `'../src/` (le codemod a réécrit ses imports
   relatifs en spécificateurs du paquet) ; supprimer `packages/vortex-engine/test` s'il est vide.
 
-- [ ] **Step 5 :** `node node_modules/tsx/dist/cli.mjs --tsconfig packages/vortex-engine/tsconfig.json --test "packages/vortex-net/test/*.test.ts"`
+- [ ] **Step 5 :** `node node_modules/tsx/dist/cli.mjs --tsconfig packages/vortex-engine/tsconfig.json --test "packages/ambreia-net/test/*.test.ts"`
   → PASS 4/4.
-- [ ] **Step 6 :** ajouter `&& pnpm --filter @vortex/net exec tsc --noEmit` au `typecheck` racine ;
-  `pnpm --filter @vortex/net exec tsc --noEmit` → 0 erreur ; `pnpm typecheck` → 0 ; eslint sur
+- [ ] **Step 6 :** ajouter `&& pnpm --filter @ambreia/net exec tsc --noEmit` au `typecheck` racine ;
+  `pnpm --filter @ambreia/net exec tsc --noEmit` → 0 erreur ; `pnpm typecheck` → 0 ; eslint sur
   `packages/*/src/**/*.ts` → 0 erreur.
 - [ ] **Step 7 :** `pnpm check` vert (la commande `test` racine prend déjà `packages/*/test/**/*.test.ts`).
 - [ ] **Step 8 :** `pnpm build`, `pnpm --filter vortex-glaze build`, `pnpm imager:build` verts ; `pnpm dev`
   + driver comme Task 3 step 9 → `errors` vide, `0`.
-- [ ] **Step 9 : commit** `j1: @vortex/net sort du moteur (transport, chiffrement, format, registre)`
-  en nommant `packages/vortex-net packages/vortex-engine packages/vortex-client packages/vortex-glaze packages/vortex-imager package.json pnpm-lock.yaml`.
+- [ ] **Step 9 : commit** `j1: @ambreia/net sort du moteur (transport, chiffrement, format, registre)`
+  en nommant `packages/ambreia-net packages/vortex-engine packages/vortex-client packages/vortex-glaze packages/vortex-imager package.json pnpm-lock.yaml`.
 
 ---
 
 ### Task 5 : Point d'écoute et d'injection de `net`
 
 **Files :**
-- Create : `packages/vortex-net/src/connection/IPacketTap.ts`
-- Modify : `packages/vortex-net/src/connection/IConnection.ts`, `packages/vortex-net/src/connection/SocketConnection.ts`
-- Test : `packages/vortex-net/test/packet-tap.test.ts`
+- Create : `packages/ambreia-net/src/connection/IPacketTap.ts`
+- Modify : `packages/ambreia-net/src/connection/IConnection.ts`, `packages/ambreia-net/src/connection/SocketConnection.ts`
+- Test : `packages/ambreia-net/test/packet-tap.test.ts`
 
 **Interfaces :**
 - Produces :
@@ -749,7 +749,7 @@ injectIncoming(messageId: number, values: unknown[]): void;
 - [ ] **Step 1 : les tests.**
 
 ```ts
-// packages/vortex-net/test/packet-tap.test.ts
+// packages/ambreia-net/test/packet-tap.test.ts
 // Spec §8: net lets a dev tool listen to, edit, drop and inject packets.
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
@@ -884,13 +884,13 @@ test('the tap sees outgoing values, can edit them or drop the message', () =>
 });
 ```
 
-- [ ] **Step 2 :** `node node_modules/tsx/dist/cli.mjs --tsconfig packages/vortex-engine/tsconfig.json --test packages/vortex-net/test/packet-tap.test.ts`
+- [ ] **Step 2 :** `node node_modules/tsx/dist/cli.mjs --tsconfig packages/vortex-engine/tsconfig.json --test packages/ambreia-net/test/packet-tap.test.ts`
   → FAIL (`injectIncoming is not a function`).
 
 - [ ] **Step 3 : l'interface.**
 
 ```ts
-// packages/vortex-net/src/connection/IPacketTap.ts
+// packages/ambreia-net/src/connection/IPacketTap.ts
 import type {IMessageDataWrapper} from '../messages/IMessageDataWrapper';
 
 /**
@@ -981,8 +981,8 @@ export interface IPacketTap
 ```
 
 - [ ] **Step 5 :** les tests de Step 2 → PASS 4/4 ; `pnpm check` vert ; eslint sur les trois fichiers sans erreur.
-- [ ] **Step 6 : commit** `j1: point d'écoute et d'injection de @vortex/net (outil de paquets, dev)`
-  en nommant `packages/vortex-net/src/connection/IPacketTap.ts packages/vortex-net/src/connection/IConnection.ts packages/vortex-net/src/connection/SocketConnection.ts packages/vortex-net/test/packet-tap.test.ts`.
+- [ ] **Step 6 : commit** `j1: point d'écoute et d'injection de @ambreia/net (outil de paquets, dev)`
+  en nommant `packages/ambreia-net/src/connection/IPacketTap.ts packages/ambreia-net/src/connection/IConnection.ts packages/ambreia-net/src/connection/SocketConnection.ts packages/ambreia-net/test/packet-tap.test.ts`.
 
 ---
 
@@ -990,7 +990,7 @@ export interface IPacketTap
 
 **Files :**
 - Modify : `CLAUDE.md` (carte, alias), `.claude/rules/vite-dev.md`, `.claude/rules/communication.md`
-  (chemins `core/communication/` → `packages/vortex-net/`), `docs/superpowers/specs/2026-10-07-client-architecture-design.md`
+  (chemins `core/communication/` → `packages/ambreia-net/`), `docs/superpowers/specs/2026-10-07-client-architecture-design.md`
   (§9 J1 fait, §12 n° 2 tranchée), `AGENTS.md` + `.github/copilot-instructions.md` (générés)
 - Create : `docs/superpowers/plans/2026-10-07-j1-common-net.bilan.md`
 
@@ -1005,14 +1005,14 @@ export interface IPacketTap
   rechargement ≤ base + 10 % (bruit de mesure) ; le nombre de requêtes peut varier de quelques
   unités. Écrire les deux mesures au bilan.
 - [ ] **Step 3 : documentation.**
-  - `CLAUDE.md`, table « Map » : deux lignes `packages/vortex-common` (« Logger, utilities, asset
-    loading, reactive — imports nothing from Vortex ») et `packages/vortex-net` (« WebSocket transport,
-    encryption, wire format, registry, packet tap — imports `@vortex/common` only ») ; paragraphe des
-    alias : « `@vortex/common/*` and `@vortex/net/*` are real workspace packages (deep imports, no root
+  - `CLAUDE.md`, table « Map » : deux lignes `packages/ambreia-common` (« Logger, utilities, asset
+    loading, reactive — imports nothing from Vortex ») et `packages/ambreia-net` (« WebSocket transport,
+    encryption, wire format, registry, packet tap — imports `@ambreia/common` only ») ; paragraphe des
+    alias : « `@ambreia/common/*` and `@ambreia/net/*` are real workspace packages (deep imports, no root
     barrel) ».
-  - `.claude/rules/vite-dev.md` : le bundle couvre aussi `@vortex/common` et `@vortex/net` (un seul
+  - `.claude/rules/vite-dev.md` : le bundle couvre aussi `@ambreia/common` et `@ambreia/net` (un seul
     esbuild, `outbase` = `packages/`) ; ajouter `packages/vortex-*/package.json` au déclencheur `paths`.
-  - `.claude/rules/communication.md` : la ligne de tête cite `packages/vortex-net/` au lieu de
+  - `.claude/rules/communication.md` : la ligne de tête cite `packages/ambreia-net/` au lieu de
     `core/communication/` ; ajouter ce chemin à ses `paths`.
   - Spec : §9 ligne J1 suivie de « — fait le 2026-10-07 (bilan …) » ; §12 n° 2 : « Tranché (plan J1) :
     un seul esbuild pour tous les paquets ».

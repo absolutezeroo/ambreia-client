@@ -1,4 +1,4 @@
-import type {IDisposable} from '@core/runtime/IDisposable';
+import type {IDisposable} from '@ambreia/common/IDisposable';
 import type {IIconWindow} from '@core/window/components/IIconWindow';
 
 /**

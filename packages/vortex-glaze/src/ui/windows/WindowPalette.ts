@@ -3,7 +3,7 @@ import type {WindowController} from '@core/window/WindowController';
 import type {WindowEvent} from '@core/window/events/WindowEvent';
 import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
 import {TYPE_NAME_TO_CODE} from '@core/window/enum/WindowType';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import {addWidget} from '../../ops/StructuralOps';
 import {assertCatalogCoverage, catalogByCategory, type IWidgetSpec} from '../../ops/WidgetCatalog';
 import {type EditorState} from '../../state/EditorState';

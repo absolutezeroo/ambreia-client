@@ -1,7 +1,7 @@
 import type {IEncryptedLocalStorage} from './IEncryptedLocalStorage';
 import {MD5} from '../../hurlant/crypto/hash/MD5';
 import {Hex} from '../../hurlant/util/Hex';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('habbo.utils.CommunicationUtils');
 

@@ -14,7 +14,7 @@
  */
 import Fastify from 'fastify';
 import type {FastifyInstance, FastifyReply} from 'fastify';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import type {IImagerConfig} from './config';
 import type {AvatarRenderService} from './avatar/AvatarRenderService';
 import type {BadgeRenderService} from './badge/BadgeRenderService';

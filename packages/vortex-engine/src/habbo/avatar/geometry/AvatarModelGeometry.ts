@@ -4,7 +4,7 @@ import {AvatarSet} from './AvatarSet';
 import {GeometryBodyPart} from './GeometryBodyPart';
 import {Matrix4x4} from './Matrix4x4';
 import {Vector3D} from './Vector3D';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import {
     getXmlAttribute,
     getXmlChildElements,

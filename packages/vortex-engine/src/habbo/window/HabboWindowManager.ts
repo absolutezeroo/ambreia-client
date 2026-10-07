@@ -1,5 +1,5 @@
 import {Component} from '@core/runtime/Component';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import {ElementRegistry} from './ElementRegistry';
 import {HabboWindowTrackingEvent} from './enum/HabboWindowTrackingEvent';
 import type {IHabboWindowManager} from './IHabboWindowManager';
@@ -43,7 +43,7 @@ import {ThemeManager} from './theme/ThemeManager';
 import {ServiceManager} from '@core/window/services/ServiceManager';
 import {HabboWidgetFactory} from './HabboWidgetFactory';
 import {ComponentDependency} from '@core/runtime/ComponentDependency';
-import {ErrorReportStorage} from '@core/utils/ErrorReportStorage';
+import {ErrorReportStorage} from '@ambreia/common/utils/ErrorReportStorage';
 import {IID_AvatarRenderManager} from '@iid/IIDAvatarRenderManager';
 import {IID_HabboCommunicationManager} from '@iid/IIDHabboCommunicationManager';
 import {IID_HabboLocalizationManager} from '@iid/IIDHabboLocalizationManager';
@@ -57,7 +57,7 @@ import type {IHabboConfigurationManager} from '@habbo/configuration/IHabboConfig
 import type {ISessionDataManager} from '@habbo/session/ISessionDataManager';
 import type {IRoomEngine} from '@habbo/room/IRoomEngine';
 import type {IContext} from '@core/runtime/IContext';
-import type {IAssetLibrary} from '@core/assets/IAssetLibrary';
+import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import type {IModalDialog} from './utils/IModalDialog';
 import {ModalDialog} from './utils/ModalDialog';
 import {ResourceManager} from './ResourceManager';

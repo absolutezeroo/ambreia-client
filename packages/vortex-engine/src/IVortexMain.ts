@@ -8,7 +8,7 @@ import type {IRoomEngine} from "@habbo/room";
 import type {IVortexConfig} from "./Vortex";
 import type {IRoomMessageHandler} from "@habbo/room/IRoomMessageHandler";
 import type {IHabboWindowManager} from "@habbo/window/IHabboWindowManager";
-import type {IAssetLibrary} from "@core/assets/IAssetLibrary";
+import type {IAssetLibrary} from "@ambreia/common/assets/IAssetLibrary";
 import type {Application} from 'pixi.js';
 import type {HabboAvatarEditorManager} from "@habbo/avatar/HabboAvatarEditorManager";
 

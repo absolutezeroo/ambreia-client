@@ -9,7 +9,7 @@ import {AnimatedFurnitureVisualization} from './AnimatedFurnitureVisualization';
 import {FurnitureParticleSystem} from './FurnitureParticleSystem';
 import type {IParticleSystemData} from './FurnitureParticleSystem';
 import {RoomObjectVariableEnum} from '@habbo/room/object/RoomObjectVariableEnum';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('habbo.room.object.visualization.furniture.FurnitureFireworksVisualization');
 

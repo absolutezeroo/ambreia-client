@@ -1,7 +1,7 @@
 import type {IMessageComposer} from './IMessageComposer';
 import type {ComposerClass, EventClass, IMessageConfiguration} from './IMessageConfiguration';
 import type {IMessageEvent} from './IMessageEvent';
-import {Logger} from '../../utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('core.communication.messages.MessageRegistry');
 

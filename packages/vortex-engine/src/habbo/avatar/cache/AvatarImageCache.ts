@@ -7,7 +7,7 @@ import {
     AVATAR_COUNTER_UNCACHEABLE,
     FRAME_CHANNEL_AVATAR_COMPOSE,
     FrameTimings
-} from '@core/utils/FrameTimings';
+} from '@ambreia/common/utils/FrameTimings';
 import type {AvatarStructure} from '../AvatarStructure';
 import type {AssetAliasCollection} from '../alias/AssetAliasCollection';
 import type {IAvatarImage} from '../IAvatarImage';

@@ -5,7 +5,7 @@
  *
  * Interface for visualization data that can initialize visualizations.
  */
-import type {IDisposable} from '@core/runtime/IDisposable';
+import type {IDisposable} from '@ambreia/common/IDisposable';
 
 export interface IRoomObjectVisualizationData extends IDisposable
 {

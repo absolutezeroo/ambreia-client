@@ -1,4 +1,4 @@
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import type {IConnection} from '@core/communication/connection/IConnection';
 import type {IMessageComposer} from '@core/communication/messages/IMessageComposer';
 import type {IRoomSession, RoomSessionStateType} from './IRoomSession';

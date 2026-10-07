@@ -4,7 +4,7 @@ import {SkinLayoutEntity} from './SkinLayoutEntity';
 import {BitmapSkinTemplate} from './BitmapSkinTemplate';
 import {BitmapSkinTemplateEntity} from './BitmapSkinTemplateEntity';
 import type {SkinTemplateEntity} from './SkinTemplateEntity';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('core.window.graphics.renderer.BitmapSkinParser');
 

@@ -4,7 +4,7 @@ import type {WindowEvent} from '@core/window/events/WindowEvent';
 import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
 import type {IHabboWindowManager} from '@habbo/window';
 import type {EditorState} from '../../state/EditorState';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import type {GlazeLayoutName} from '../GlazeLayoutSlots';
 import {slotsOf} from '../LayoutSlots';
 

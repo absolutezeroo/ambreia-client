@@ -1,7 +1,7 @@
 import EventEmitter from 'eventemitter3';
 import type {IStructureData} from './IStructureData';
 import {parseXmlDocument} from './AvatarXmlUtils';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('habbo.avatar.structure.AvatarStructureDownload');
 

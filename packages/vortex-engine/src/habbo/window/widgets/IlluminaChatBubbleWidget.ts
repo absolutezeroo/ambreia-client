@@ -9,7 +9,7 @@ import type {ITextWindow} from '@core/window/components/ITextWindow';
 import type {IAvatarImageWidget} from './IAvatarImageWidget';
 import type {UpdatingTimeStampWidget} from './UpdatingTimeStampWidget';
 import {ChatBubbleMessage} from './ChatBubbleMessage';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import {GetExtendedProfileMessageComposer} from '@habbo/communication/messages/outgoing/users/GetExtendedProfileMessageComposer';
 import type {WindowEvent} from '@core/window/events/WindowEvent';
 import type {IIterator} from '@core/window/utils/IIterator';

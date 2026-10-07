@@ -67,7 +67,7 @@ import type {GamePlayerValueMessageParser} from '../communication/messages/parse
 import {HanditemConfigurationMessageEvent} from '../communication/messages/incoming/room/session/HanditemConfigurationMessageEvent';
 import type {HanditemConfigurationMessageParser} from '../communication/messages/parser/room/session/HanditemConfigurationMessageParser';
 import {WindowEvent} from '@core/window/events/WindowEvent';
-import type {IDisposable} from '@core/runtime/IDisposable';
+import type {IDisposable} from '@ambreia/common/IDisposable';
 import {GuideSessionStartedMessageEvent} from '../communication/messages/incoming/help/GuideSessionStartedMessageEvent';
 import {GuideSessionEndedMessageEvent} from '../communication/messages/incoming/help/GuideSessionEndedMessageEvent';
 import {GuideSessionErrorMessageEvent} from '../communication/messages/incoming/help/GuideSessionErrorMessageEvent';

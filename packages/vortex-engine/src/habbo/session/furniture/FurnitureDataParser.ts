@@ -1,11 +1,11 @@
 import {EventEmitter} from 'eventemitter3';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import {AssetLibrary} from '@core/assets/AssetLibrary';
-import {AssetLoaderEventType} from '@core/assets/loaders/AssetLoaderEvent';
+import {AssetLoaderEventType} from '@ambreia/common/assets/loaders/AssetLoaderEvent';
 import {Core} from '@core/Core';
 import {FurnitureData} from './FurnitureData';
 
-import type {AssetLoaderEvent} from '@core/assets/loaders/AssetLoaderEvent';
+import type {AssetLoaderEvent} from '@ambreia/common/assets/loaders/AssetLoaderEvent';
 import type {IContext} from '@core/runtime/IContext';
 import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';
 import type {IFurnitureData} from './IFurnitureData';

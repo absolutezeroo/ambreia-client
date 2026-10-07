@@ -2,7 +2,7 @@ import type {IMessageEvent} from '@core/communication/messages/IMessageEvent';
 import type {CategoryData} from '../common/CategoryData';
 import type {ICategoryModel} from '../common/ICategoryModel';
 import type {ICategoryModelOwner} from '../common/ICategoryModelOwner';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import {CategoryBaseModel} from '../common/CategoryBaseModel';
 import {FigureData} from '../figuredata/FigureData';
 import type {HotLooksMessageParser} from '@habbo/communication/messages/parser/hotlooks/HotLooksMessageParser';

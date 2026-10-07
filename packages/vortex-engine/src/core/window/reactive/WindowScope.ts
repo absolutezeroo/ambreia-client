@@ -1,6 +1,6 @@
 import type {IWindow} from '../IWindow';
 import {WindowEvent} from '../events/WindowEvent';
-import {Scope, getCurrentScope} from '../../reactive/Effect';
+import {Scope, getCurrentScope} from '@ambreia/common/reactive/Effect';
 
 // No `AS3:` traces in this file: nothing here was ported. Window adapter of the
 // TS-only reactive layer (docs/REACTIVE-UI.md §6).

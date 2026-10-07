@@ -1,11 +1,11 @@
 import {EventEmitter} from 'eventemitter3';
 import {getIIDName, type IID} from './IID';
-import type {IDisposable} from './IDisposable';
+import type {IDisposable} from '@ambreia/common/IDisposable';
 import type {IContext, InterfaceCallback, IUpdateReceiver} from './IContext';
 import type {ComponentDependency} from './ComponentDependency';
 import {LockEvent} from './events/LockEvent';
 import type {AssetLoaderStruct, IAsset, IAssetLibrary} from '@core/assets';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('core.runtime.Component');
 

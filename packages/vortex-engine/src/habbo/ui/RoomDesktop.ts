@@ -10,8 +10,8 @@
  * Implements IRoomDesktop, IRoomWidgetMessageListener, IRoomWidgetHandlerContainer.
  */
 import {EventEmitter} from 'eventemitter3';
-import {Logger} from '@core/utils/Logger';
-import type {IAssetLibrary} from '@core/assets/IAssetLibrary';
+import {Logger} from '@ambreia/common/utils/Logger';
+import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import type {IConnection} from '@core/communication/connection/IConnection';
 import type {IWindow} from '@core/window/IWindow';
 import type {IWindowContainer} from '@core/window/IWindowContainer';

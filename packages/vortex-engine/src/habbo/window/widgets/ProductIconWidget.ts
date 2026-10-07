@@ -12,7 +12,7 @@ import type {PropertyStruct} from '@core/window/utils/PropertyStruct';
 import type {IProductDisplayInfo} from './IProductDisplayInfo';
 import {ImageResult} from '@habbo/room/ImageResult';
 import {ProductCategoryMapping} from '../utils/ProductCategoryMapping';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import type {BadgeImageWidget} from './BadgeImageWidget';
 import type {PetImageWidget} from './PetImageWidget';
 import type {IIterator} from '@core/window/utils/IIterator';

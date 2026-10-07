@@ -10,7 +10,7 @@ import type {IAssetReceiver} from '@core/window/IAssetReceiver';
 import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
 import {PropertyStruct} from '@core/window/utils/PropertyStruct';
 import {AvatarRenderEvent} from '@habbo/avatar/enum/AvatarRenderEvent';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import {
     GetExtendedProfileMessageComposer
 } from '@habbo/communication/messages/outgoing/users/GetExtendedProfileMessageComposer';

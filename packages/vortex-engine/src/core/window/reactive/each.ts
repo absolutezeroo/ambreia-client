@@ -1,8 +1,8 @@
 import type {IWindow} from '../IWindow';
-import {Scope, effect, untrack} from '../../reactive/Effect';
-import {signal} from '../../reactive/Signal';
-import type {SignalReader, SignalWriter} from '../../reactive/Signal';
-import {Logger} from '@core/utils/Logger';
+import {Scope, effect, untrack} from '@ambreia/common/reactive/Effect';
+import {signal} from '@ambreia/common/reactive/Signal';
+import type {SignalReader, SignalWriter} from '@ambreia/common/reactive/Signal';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('core.window.reactive.each');
 

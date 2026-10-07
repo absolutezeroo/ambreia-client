@@ -1,4 +1,4 @@
-import type {IDisposable} from '@core/runtime/IDisposable';
+import type {IDisposable} from '@ambreia/common/IDisposable';
 import type {IDesktopWindow} from './components/IDesktopWindow';
 import type {WindowEvent} from './events/WindowEvent';
 import type {IWindow} from './IWindow';

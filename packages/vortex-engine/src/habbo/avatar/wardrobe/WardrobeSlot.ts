@@ -5,7 +5,7 @@ import type {WindowEvent} from '@core/window/events/WindowEvent';
 import type {HabboAvatarEditor} from '../HabboAvatarEditor';
 import type {IAvatarImageListener} from '../IAvatarImageListener';
 import type {IOutfit} from '../IOutfit';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import {AvatarTextureUtils} from '../AvatarTextureUtils';
 import {FigureData} from '../figuredata/FigureData';
 

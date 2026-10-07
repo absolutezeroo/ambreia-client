@@ -4,7 +4,7 @@ import type {IKeyExchange} from '@core/communication/handshake/IKeyExchange';
 import {CryptoTools} from '@core/communication/encryption/CryptoTools';
 import {RSA} from '@core/communication/encryption/RSA';
 import type {SocketConnection} from '@core/communication/connection/SocketConnection';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import type {HabboCommunicationDemo} from './HabboCommunicationDemo';
 import type {IHabboCommunicationManager} from '../IHabboCommunicationManager';
 import {HabboCommunicationEvent} from '../enum/HabboCommunicationEvent';

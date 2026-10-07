@@ -11,7 +11,7 @@
 import type {IRoomObjectVisualizationFactory} from '@room/object/IRoomObjectVisualizationFactory';
 import type {IRoomObjectVisualization} from '@room/object/visualization/IRoomObjectVisualization';
 import type {IRoomObjectVisualizationData} from '@room/object/visualization/IRoomObjectVisualizationData';
-import type {IAssetLibrary} from '@core/assets/IAssetLibrary';
+import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import type {IGraphicAssetCollection} from '@room/object/visualization/utils/IGraphicAssetCollection';
 import type {IAvatarRenderManager} from '@habbo/avatar/IAvatarRenderManager';
 import {GraphicAssetCollection} from '@room/object/visualization/utils/GraphicAssetCollection';

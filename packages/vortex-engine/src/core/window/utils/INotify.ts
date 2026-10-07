@@ -1,4 +1,4 @@
-import type {IDisposable} from '../../runtime/IDisposable';
+import type {IDisposable} from '@ambreia/common/IDisposable';
 
 /**
  * A notification: a title, a summary, and the callback fired when it is acted

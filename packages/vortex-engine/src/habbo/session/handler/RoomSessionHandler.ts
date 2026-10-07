@@ -4,7 +4,7 @@ import type {IRoomHandlerListener} from '../IRoomHandlerListener';
 import {BaseHandler} from './BaseHandler';
 import {RoomSessionDoorbellEvent} from '../events/RoomSessionDoorbellEvent';
 import {RoomSessionQueueEvent} from '../events/RoomSessionQueueEvent';
-import {ErrorReportStorage} from '@core/utils/ErrorReportStorage';
+import {ErrorReportStorage} from '@ambreia/common/utils/ErrorReportStorage';
 
 // Message events
 import {
@@ -50,7 +50,7 @@ import type {
 import type {RoomForwardMessageParser} from '../../communication/messages/parser/room/session/RoomForwardMessageParser';
 import type {CantConnectMessageParser} from '../../communication/messages/parser/room/session/CantConnectMessageParser';
 
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('habbo.session.handler.RoomSessionHandler');
 

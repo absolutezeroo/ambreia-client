@@ -8,8 +8,8 @@
  * @see sources/win63_version/room/IRoomContentLoader.as
  */
 import type {EventEmitter} from 'eventemitter3';
-import type {IAssetLibrary} from '@core/assets/IAssetLibrary';
-import type {IDisposable} from '@core/runtime/IDisposable';
+import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
+import type {IDisposable} from '@ambreia/common/IDisposable';
 import type {IRoomObject} from './object/IRoomObject';
 import type {IGraphicAssetCollection} from './object/visualization/utils/IGraphicAssetCollection';
 

@@ -3,7 +3,7 @@ import type {RoomPreviewer} from '@habbo/room/preview/RoomPreviewer';
 import type {IAvatarImageListener} from '../IAvatarImageListener';
 import type {IFigureDataView} from './IFigureDataView';
 import type {FigureData} from './FigureData';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import {AvatarTextureUtils} from '../AvatarTextureUtils';
 
 const log = Logger.getLogger('habbo.avatar.figuredata.FigureDataView');

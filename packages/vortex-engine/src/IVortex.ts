@@ -1,6 +1,6 @@
 import type {CoreComponentContext} from '@core/runtime/CoreComponentContext';
 import type {ICoreCommunicationManager} from '@core/communication/ICoreCommunicationManager';
-import type {IDisposable} from '@core/runtime/IDisposable';
+import type {IDisposable} from '@ambreia/common/IDisposable';
 import type {Application, Renderer} from 'pixi.js';
 import type {IHabboConfigurationManager} from '@habbo/configuration';
 import type {HabboCommunicationManager} from '@habbo/communication';
@@ -8,7 +8,7 @@ import type {RoomEngine} from '@habbo/room';
 import type {IRoomSessionManager, ISessionDataManager} from '@habbo/session';
 import type {IHabboLocalizationManager} from '@habbo/localization';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
-import type {IAssetLibrary} from '@core/assets/IAssetLibrary';
+import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import type {IVortexConfig} from './Vortex';
 import type {IVortexLoadingScreen} from './IVortexLoadingScreen';
 

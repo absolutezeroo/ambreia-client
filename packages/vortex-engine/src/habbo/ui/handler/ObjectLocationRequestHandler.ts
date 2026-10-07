@@ -6,7 +6,7 @@ import type {IRoomEngineRectangle} from '@habbo/room/RoomEngine';
 import {RoomObjectCategoryEnum} from '@habbo/room/object/RoomObjectCategoryEnum';
 import {RoomWidgetGetObjectLocationMessage} from '../widget/messages/RoomWidgetGetObjectLocationMessage';
 import {RoomWidgetUserLocationUpdateEvent} from '../widget/events/RoomWidgetUserLocationUpdateEvent';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('habbo.ui.handler.ObjectLocationRequestHandler');
 

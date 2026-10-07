@@ -1,4 +1,4 @@
-import type {IDisposable} from './IDisposable';
+import type {IDisposable} from '@ambreia/common/IDisposable';
 import type {InterfaceCallback} from './IContext';
 import type {IID} from './IID';
 

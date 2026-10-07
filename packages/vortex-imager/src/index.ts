@@ -13,7 +13,7 @@ const config = loadConfig();
 
 installGlobals({assetsRoot: config.assetsRoot, assetsBaseUrl: config.assetsBaseUrl});
 
-const {Logger, LogLevel} = await import('@core/utils/Logger');
+const {Logger, LogLevel} = await import('@ambreia/common/utils/Logger');
 const {AvatarRenderService} = await import('./avatar/AvatarRenderService');
 const {BadgeRenderService} = await import('./badge/BadgeRenderService');
 const {RoomStack} = await import('./room/RoomStack');

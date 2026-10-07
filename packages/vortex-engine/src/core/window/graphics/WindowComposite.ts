@@ -5,7 +5,7 @@ import type {IGraphicContext} from './IGraphicContext';
 import {applyInnerGlows, windowFiltersToCss, windowInnerGlowFilters} from './WindowFilterCss';
 import {WindowType} from '../enum/WindowType';
 import {WindowParam} from '../enum/WindowParam';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('core.window.WindowComposite');
 

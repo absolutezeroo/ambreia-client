@@ -1,5 +1,5 @@
 import type {IWindow} from '../IWindow';
-import type {IDisposable} from "../../runtime/IDisposable";
+import type {IDisposable} from "@ambreia/common/IDisposable";
 
 /**
  * Interface for parsing XML window layout definitions and constructing window trees.

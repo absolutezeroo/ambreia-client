@@ -1,7 +1,7 @@
 import type {IWindow} from './IWindow';
 import type {IWindowParser} from './utils/IWindowParser';
 import type {IResourceManager} from './IResourceManager';
-import type {IDisposable} from "../runtime/IDisposable";
+import type {IDisposable} from "@ambreia/common/IDisposable";
 import type {IInputEventTracker} from './IInputEventTracker';
 import type {ILinkEventTracker} from '../runtime/events/ILinkEventTracker';
 import type {IInternalWindowServices} from './services/IInternalWindowServices';

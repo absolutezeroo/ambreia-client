@@ -1,5 +1,5 @@
 import type {IWindow} from '../../IWindow';
-import type {IDisposable} from "../../../runtime/IDisposable";
+import type {IDisposable} from "@ambreia/common/IDisposable";
 import type {SkinLayout} from './SkinLayout';
 import type {SkinTemplate} from './SkinTemplate';
 

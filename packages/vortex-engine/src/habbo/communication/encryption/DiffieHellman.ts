@@ -1,5 +1,5 @@
 import type {IKeyExchange} from '@core/communication/handshake/IKeyExchange';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('habbo.communication.encryption.DiffieHellman');
 

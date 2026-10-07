@@ -1,4 +1,4 @@
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import type {BCFloorPlanEditor} from './BCFloorPlanEditor';
 import type {FloorPlanCache, IPlanPoint} from './FloorPlanCache';
 

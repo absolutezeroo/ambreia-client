@@ -1,9 +1,9 @@
-import {Logger} from '@core/utils/Logger';
-import {FrameTimings} from '@core/utils/FrameTimings';
-import {FrameTimingsReporter} from '@core/utils/FrameTimingsReporter';
-import {SelfProfiler} from '@core/utils/SelfProfiler';
-import type {IProfileResult} from '@core/utils/SelfProfiler';
-import type {IFrameTimingsRun, IFrameTimingsSample} from '@core/utils/FrameTimingsReporter';
+import {Logger} from '@ambreia/common/utils/Logger';
+import {FrameTimings} from '@ambreia/common/utils/FrameTimings';
+import {FrameTimingsReporter} from '@ambreia/common/utils/FrameTimingsReporter';
+import {SelfProfiler} from '@ambreia/common/utils/SelfProfiler';
+import type {IProfileResult} from '@ambreia/common/utils/SelfProfiler';
+import type {IFrameTimingsRun, IFrameTimingsSample} from '@ambreia/common/utils/FrameTimingsReporter';
 import {Vector3d} from '@room/utils/Vector3d';
 import type {IVector3d} from '@room/utils/IVector3d';
 import type {IRoomEngine} from '../IRoomEngine';

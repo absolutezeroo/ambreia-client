@@ -13,7 +13,7 @@
  * AS3 loads with `flash.net.URLLoader`; this port uses `fetch()`, the browser equivalent already
  * used for the individual (non-batched) request in `FurnitureExternalImageVisualization`.
  */
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import type {FurnitureExternalImageVisualization} from '../furniture/FurnitureExternalImageVisualization';
 
 const log = Logger.getLogger('habbo.room.object.visualization.data.ExtraDataManager');

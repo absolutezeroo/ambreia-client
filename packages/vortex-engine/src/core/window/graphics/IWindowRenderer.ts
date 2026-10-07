@@ -1,6 +1,6 @@
 import type {IWindow} from '../IWindow';
 import type {IWindowContext} from '../IWindowContext';
-import type {IDisposable} from "../../runtime/IDisposable";
+import type {IDisposable} from "@ambreia/common/IDisposable";
 
 /**
  * Interface for the window rendering pipeline.

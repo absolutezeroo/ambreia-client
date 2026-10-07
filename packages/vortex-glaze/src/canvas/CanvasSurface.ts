@@ -4,7 +4,7 @@ import type {WindowController} from '@core/window/WindowController';
 import type {WindowMouseOperator} from '@core/window/services/WindowMouseOperator';
 import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
 import {NativeWheelDelta} from '@core/window/utils/NativeWheelDelta';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('glaze.canvas.CanvasSurface');
 

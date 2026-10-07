@@ -1,4 +1,4 @@
-import type {IDisposable} from '@core/runtime/IDisposable';
+import type {IDisposable} from '@ambreia/common/IDisposable';
 import type {IUpdateReceiver} from '@core/runtime/IContext';
 import type {IElementDescriptionData} from './IElementDescriptor';
 import type {ElementRegistry} from './ElementRegistry';

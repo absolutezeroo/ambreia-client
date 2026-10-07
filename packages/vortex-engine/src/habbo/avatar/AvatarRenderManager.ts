@@ -1,4 +1,4 @@
-import type {IAsset} from '@core/assets/IAsset';
+import type {IAsset} from '@ambreia/common/assets/IAsset';
 import {Component, ComponentDependency, type IContext} from '@core/runtime';
 import {IID_HabboConfigurationManager} from '@iid/IIDHabboConfigurationManager';
 import {IID_AssetLibrary} from '@iid/IIDAssetLibrary';
@@ -10,7 +10,7 @@ import type {IAvatarFigureContainer} from './IAvatarFigureContainer';
 import type {IAvatarImageListener} from './IAvatarImageListener';
 import type {IAvatarEffectListener} from './IAvatarEffectListener';
 import type {IFigureData} from './structure/IFigureData';
-import {ErrorReportStorage} from '@core/utils/ErrorReportStorage';
+import {ErrorReportStorage} from '@ambreia/common/utils/ErrorReportStorage';
 import {AvatarStructure} from './AvatarStructure';
 import type {IGraphicAsset} from '@room/object/visualization/utils/IGraphicAsset';
 import {AssetAliasCollection} from './alias/AssetAliasCollection';
@@ -25,7 +25,7 @@ import {AvatarRenderEvent} from './enum/AvatarRenderEvent';
 import {AvatarStructureDownload} from './structure/AvatarStructureDownload';
 import type {IStructureData} from './structure/IStructureData';
 import {parseXmlDocument} from './structure/AvatarXmlUtils';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('habbo.avatar.AvatarRenderManager');
 

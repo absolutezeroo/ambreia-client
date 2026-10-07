@@ -11,7 +11,7 @@
  */
 import {createCanvas, loadImage} from '@napi-rs/canvas';
 import type {Canvas, Image, SKRSContext2D} from '@napi-rs/canvas';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import type {IBadgeLayer} from './BadgeCode';
 import {parseBadgeCode} from './BadgeCode';
 import type {Database, IBadgePartRow} from '../db/Database';

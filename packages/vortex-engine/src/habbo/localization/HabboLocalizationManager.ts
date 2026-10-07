@@ -1,5 +1,5 @@
 import type {IContext} from '@core/runtime';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import {Core} from '@core/Core';
 import {CoreLocalizationManager} from '@core/localization';
 import type {IHabboConfigurationManager} from '@habbo/configuration/IHabboConfigurationManager';

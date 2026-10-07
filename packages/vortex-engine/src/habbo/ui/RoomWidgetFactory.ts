@@ -7,7 +7,7 @@
  * (RWE_AVATAR_INFO) and the room loading bar (RWE_LOADINGBAR). Every other AS3 `RWE_*` case built
  * a hotel feature the server no longer serves; the git tag `pre-noyau-client` keeps them.
  */
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import type {IRoomWidgetFactory} from './IRoomWidgetFactory';
 import type {IRoomWidgetHandler} from './IRoomWidgetHandler';
 import type {RoomUI} from './RoomUI';

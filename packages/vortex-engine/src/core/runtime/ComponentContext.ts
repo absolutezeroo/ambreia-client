@@ -3,7 +3,7 @@ import type {IContext, InterfaceCallback, IUpdateReceiver} from './IContext';
 import type {ICoreConfiguration} from './ICoreConfiguration';
 import type {ILinkEventTracker} from './events/ILinkEventTracker';
 import {Component, ComponentEvents, ComponentFlags} from './Component';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('core.runtime.ComponentContext');
 

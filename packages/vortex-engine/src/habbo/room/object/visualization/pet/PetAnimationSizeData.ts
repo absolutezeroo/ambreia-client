@@ -1,5 +1,5 @@
-import {OrderedMap} from '@core/utils/OrderedMap';
-import {Logger} from '@core/utils/Logger';
+import {OrderedMap} from '@ambreia/common/utils/OrderedMap';
+import {Logger} from '@ambreia/common/utils/Logger';
 import {AnimationSizeData} from '../data/AnimationSizeData';
 
 const log = Logger.getLogger('habbo.room.object.visualization.pet.PetAnimationSizeData');

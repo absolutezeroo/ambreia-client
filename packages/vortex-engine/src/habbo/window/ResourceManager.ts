@@ -1,4 +1,4 @@
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import type {AssetUrlSource, IResourceManager} from '@core/window/IResourceManager';
 import type {IAssetReceiver} from '@core/window/IAssetReceiver';
 import type {IHabboWindowManager} from './IHabboWindowManager';

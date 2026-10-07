@@ -14,10 +14,10 @@ import {WindowColorPicker} from './ui/windows/WindowColorPicker';
 import {GlazeShortcuts} from './input/GlazeShortcuts';
 import {layoutPngDataUrl} from './ops/ScreenshotOps';
 import {importLayoutXml} from './ops/LayoutSerializer';
-import {Scheduler} from '@core/reactive';
-import type {IFlushEmitter} from '@core/reactive';
+import {Scheduler} from '@ambreia/common/reactive/index';
+import type {IFlushEmitter} from '@ambreia/common/reactive/index';
 import {HabboWindowTrackingEvent} from '@habbo/window/enum/HabboWindowTrackingEvent';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('glaze.main');
 

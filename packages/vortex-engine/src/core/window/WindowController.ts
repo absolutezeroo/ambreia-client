@@ -18,7 +18,7 @@ import {WindowParam} from './enum/WindowParam';
 import {DynamicStyleManager} from './dynamicstyle/DynamicStyleManager';
 import {resolveLocalizationTokens} from './utils/WindowParser';
 import {hitTestAlpha, isDrawBuffer} from './utils/BitmapHitTest';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('core.window.WindowController');
 

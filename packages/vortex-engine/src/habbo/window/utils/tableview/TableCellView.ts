@@ -1,5 +1,5 @@
-import {Logger} from '@core/utils/Logger';
-import type {IDisposable} from '@core/runtime/IDisposable';
+import {Logger} from '@ambreia/common/utils/Logger';
+import type {IDisposable} from '@ambreia/common/IDisposable';
 import type {IWindow} from '@core/window/IWindow';
 import type {IWindowContainer} from '@core/window/IWindowContainer';
 import type {IRegionWindow} from '@core/window/components/IRegionWindow';

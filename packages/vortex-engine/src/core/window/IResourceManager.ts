@@ -1,5 +1,5 @@
 import type {IAssetReceiver} from './IAssetReceiver';
-import type {IDisposable} from "../runtime/IDisposable";
+import type {IDisposable} from "@ambreia/common/IDisposable";
 
 /**
  * Where a lazily-loaded asset's URL comes from: either the URL itself, or a thunk called

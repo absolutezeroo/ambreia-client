@@ -1,4 +1,4 @@
-import type {IDisposable} from '@core/runtime/IDisposable';
+import type {IDisposable} from '@ambreia/common/IDisposable';
 import type {IWindowContainer} from '@core/window/IWindowContainer';
 import type {IBitmapWrapperWindow} from '@core/window/components/IBitmapWrapperWindow';
 import type {ITextWindow} from '@core/window/components/ITextWindow';

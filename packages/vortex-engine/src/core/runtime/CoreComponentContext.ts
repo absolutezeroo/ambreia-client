@@ -10,7 +10,7 @@ import type {Component} from './Component';
 import {DefaultErrorReporter} from './DefaultErrorReporter';
 import {Exception} from './exceptions/Exception';
 import {LibraryProgressEvent} from './events/LibraryProgressEvent';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('core.runtime.CoreComponentContext');
 

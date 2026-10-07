@@ -16,7 +16,7 @@ import {RoomWidgetBase} from '@habbo/ui/widget/RoomWidgetBase';
 import type {IRoomWidgetHandler} from '@habbo/ui/IRoomWidgetHandler';
 import type {IRoomWidgetHandlerContainer} from '@habbo/ui/IRoomWidgetHandlerContainer';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
-import type {IAssetLibrary} from '@core/assets/IAssetLibrary';
+import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';
 import type {IHabboConfigurationManager} from '@habbo/configuration/IHabboConfigurationManager';
 import type {IUpdateReceiver} from '@core/runtime/IContext';
@@ -31,7 +31,7 @@ import type {EventEmitter} from 'eventemitter3';
 import {UserNameView} from './UserNameView';
 import type {IUserData} from '@habbo/session/IUserData';
 import type {AvatarInfoWidgetHandler} from '@habbo/ui/handler/AvatarInfoWidgetHandler';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('habbo.ui.widget.avatarinfo.AvatarInfoWidget');
 

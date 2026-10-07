@@ -2,7 +2,7 @@ import {Component, ComponentDependency, ComponentEvents} from '@core/runtime';
 import type {IContext} from '@core/runtime';
 import {ErrorEvent} from '@core/runtime/events/ErrorEvent';
 import {ErrorPopupCtrl} from './ErrorPopupCtrl';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import type {IConnection} from '@core/communication/connection/IConnection';
 import {isRoomViewerMode} from '@habbo/configuration/enum/HabboComponentFlags';
 import {IncomingMessages} from './IncomingMessages';

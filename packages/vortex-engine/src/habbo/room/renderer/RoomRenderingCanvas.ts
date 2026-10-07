@@ -20,7 +20,7 @@ import {
     FRAME_CHANNEL_ROOM_SPRITES,
     FRAME_CHANNEL_UI,
     FrameTimings
-} from '@core/utils/FrameTimings';
+} from '@ambreia/common/utils/FrameTimings';
 import type {IRoomObjectSpriteVisualization} from '@room/object/visualization/IRoomObjectSpriteVisualization';
 import type {IRoomObject} from '@room/object/IRoomObject';
 import type {IRoomRenderingCanvas as IRoomRenderingCanvasInterface} from '@room/renderer/IRoomRenderingCanvas';

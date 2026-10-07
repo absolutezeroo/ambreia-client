@@ -10,7 +10,7 @@
  * [HabboWebApiRoute] metadata annotations for route mapping.
  * In TypeScript, uses the Fetch API and a static WEB_API_ROUTES map.
  */
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import type {IApiListener} from './IApiListener';
 import type {IHabboWebApiListener} from './IHabboWebApiListener';
 import type {IHabboWebApiSession} from './IHabboWebApiSession';

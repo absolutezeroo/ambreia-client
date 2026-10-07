@@ -5,7 +5,7 @@
  *
  * Factory interface for creating room widgets.
  */
-import type {IDisposable} from '@core/runtime/IDisposable';
+import type {IDisposable} from '@ambreia/common/IDisposable';
 import type {IRoomWidgetHandler} from './IRoomWidgetHandler';
 
 export interface IRoomWidgetFactory extends IDisposable

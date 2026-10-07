@@ -11,7 +11,7 @@
  */
 import {createPool} from 'mysql2/promise';
 import type {Pool, RowDataPacket} from 'mysql2/promise';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import type {IDatabaseConfig} from '../config';
 
 const log = Logger.getLogger('imager.db.Database');

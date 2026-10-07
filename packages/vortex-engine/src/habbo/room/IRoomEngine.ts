@@ -7,7 +7,7 @@
  */
 import type {Container, Ticker} from 'pixi.js';
 import type {EventEmitter} from 'eventemitter3';
-import type {IDisposable} from '@core/runtime/IDisposable';
+import type {IDisposable} from '@ambreia/common/IDisposable';
 import type {IRoomInstance} from '@room/IRoomInstance';
 import type {IRoomGeometry} from '@room/utils/IRoomGeometry';
 import type {IRoomObject} from '@room/object/IRoomObject';

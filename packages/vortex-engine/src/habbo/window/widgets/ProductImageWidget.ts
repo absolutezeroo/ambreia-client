@@ -11,7 +11,7 @@ import {PropertyStruct} from '@core/window/utils/PropertyStruct';
 import {ImageResult} from '@habbo/room/ImageResult';
 import {ProductCategoryMapping} from '../utils/ProductCategoryMapping';
 import {PIVOT_NAMES, pivotFromName} from '@core/window/enum/PivotPoint';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import type {BadgeImageWidget} from './BadgeImageWidget';
 import type {PetImageWidget} from './PetImageWidget';
 import type {AvatarImageWidget} from './AvatarImageWidget';

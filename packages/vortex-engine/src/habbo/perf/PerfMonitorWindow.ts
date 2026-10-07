@@ -1,4 +1,4 @@
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import type {IWindow} from '@core/window/IWindow';
 import type {IWindowContainer} from '@core/window/IWindowContainer';
 import type {IBitmapWrapperWindow} from '@core/window/components/IBitmapWrapperWindow';
@@ -9,15 +9,15 @@ import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 import type {IRoomEngine} from '@habbo/room/IRoomEngine';
 import {RoomObjectCategoryEnum} from '@habbo/room/object/RoomObjectCategoryEnum';
 import {RoomStressTest} from '@habbo/room/utils/RoomStressTest';
-import type {IProfileResult} from '@core/utils/SelfProfiler';
-import {SelfProfiler} from '@core/utils/SelfProfiler';
+import type {IProfileResult} from '@ambreia/common/utils/SelfProfiler';
+import {SelfProfiler} from '@ambreia/common/utils/SelfProfiler';
 import {
     FRAME_CHANNEL_NET,
     FRAME_CHANNEL_PIXI,
     FRAME_CHANNEL_ROOM_OBJECTS,
     FRAME_CHANNEL_UI,
     FrameTimings
-} from '@core/utils/FrameTimings';
+} from '@ambreia/common/utils/FrameTimings';
 import {PERF_MONITOR_LAYOUT_NAME, PERF_MONITOR_TABS} from './PerfMonitorLayout';
 import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
 

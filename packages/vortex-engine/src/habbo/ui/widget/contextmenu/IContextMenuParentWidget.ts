@@ -8,7 +8,7 @@
  * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/contextmenu/_SafeCls_1870.as
  */
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
-import type {IAssetLibrary} from '@core/assets/IAssetLibrary';
+import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';
 import type {IRoomWidgetMessageListener} from '@habbo/ui/IRoomWidgetMessageListener';
 import type {ContextInfoView} from './ContextInfoView';

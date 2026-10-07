@@ -6,7 +6,7 @@ import type {AvatarStructure} from './AvatarStructure';
 import type {AssetAliasCollection} from './alias/AssetAliasCollection';
 import {AvatarAssetDownloadLibrary} from './AvatarAssetDownloadLibrary';
 import {Core} from '@core/Core';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('habbo.avatar.AvatarAssetDownloadManager');
 

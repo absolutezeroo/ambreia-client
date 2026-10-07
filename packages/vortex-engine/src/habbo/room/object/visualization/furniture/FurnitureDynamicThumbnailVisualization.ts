@@ -24,7 +24,7 @@
  * it) - this port keeps that exact race rather than adding a staleness check AS3 does not have.
  */
 import {Texture} from 'pixi.js';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import {FurnitureThumbnailVisualization} from './FurnitureThumbnailVisualization';
 
 const log = Logger.getLogger('habbo.room.object.visualization.furniture.FurnitureDynamicThumbnailVisualization');

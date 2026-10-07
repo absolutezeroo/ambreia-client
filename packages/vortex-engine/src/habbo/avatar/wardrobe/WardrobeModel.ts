@@ -2,8 +2,8 @@ import type {IWindowContainer} from '@core/window/IWindowContainer';
 import type {WardrobeOutfit} from '@habbo/communication/messages/parser/wardrobe/WardrobeOutfit';
 import type {HabboAvatarEditor} from '../HabboAvatarEditor';
 import type {ISideContentModel} from '../common/ISideContent';
-import {ErrorReportStorage} from '@core/utils/ErrorReportStorage';
-import {OrderedMap} from '@core/utils/OrderedMap';
+import {ErrorReportStorage} from '@ambreia/common/utils/ErrorReportStorage';
+import {OrderedMap} from '@ambreia/common/utils/OrderedMap';
 import {WardrobeSlot} from './WardrobeSlot';
 import {WardrobeView} from './WardrobeView';
 

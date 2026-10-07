@@ -1,7 +1,7 @@
 import type {EventEmitter} from 'eventemitter3';
 import type {IAssetLibrary} from '@core/assets';
-import {AssetBitmap} from '@core/assets/AssetBitmap';
-import {Logger} from '@core/utils/Logger';
+import {AssetBitmap} from '@ambreia/common/assets/AssetBitmap';
+import {Logger} from '@ambreia/common/utils/Logger';
 import type {IFurnitureData} from './furniture/IFurnitureData';
 import {FurniIconImageReadyEvent} from './events/FurniIconImageReadyEvent';
 

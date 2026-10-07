@@ -2,7 +2,7 @@ import {HabboErrorVariableEnum} from './enum/HabboErrorVariableEnum';
 import {Component, ComponentDependency, type IContext} from '@core/runtime';
 import {ArcFour} from '@habbo/communication/encryption/ArcFour';
 import {DiffieHellman} from '@habbo/communication/encryption/DiffieHellman';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import {HabboMessages} from './HabboMessages';
 import type { HabboCommunicationEventType} from './enum/HabboCommunicationEvent';
 import {HabboCommunicationEvent} from './enum/HabboCommunicationEvent';
@@ -21,7 +21,7 @@ import type {IHabboWebApiListener} from './IHabboWebApiListener';
 import type {IHabboWebApiSession} from './IHabboWebApiSession';
 import {HabboWebApiSession} from './HabboWebApiSession';
 import {IID_CoreCommunicationManager} from "@iid/IIDCoreCommunicationManager";
-import {ErrorReportStorage} from '@core/utils/ErrorReportStorage';
+import {ErrorReportStorage} from '@ambreia/common/utils/ErrorReportStorage';
 
 const log = Logger.getLogger('habbo.communication.HabboCommunicationManager');
 

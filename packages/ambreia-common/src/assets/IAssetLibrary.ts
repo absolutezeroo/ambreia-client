@@ -1,4 +1,4 @@
-import type {IDisposable} from '@core/runtime';
+import type {IDisposable} from '../IDisposable';
 import type {IAsset} from './IAsset';
 import type {AssetTypeDeclaration} from './AssetTypeDeclaration';
 import type {AssetLoaderStruct} from './AssetLoaderStruct';

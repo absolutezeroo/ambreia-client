@@ -1,6 +1,6 @@
 import {Assets, Texture} from 'pixi.js';
 import {BinaryFileLoader} from './BinaryFileLoader';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '../../utils/Logger';
 
 /**
  * BitmapFileLoader

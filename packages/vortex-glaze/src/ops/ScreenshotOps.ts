@@ -1,4 +1,4 @@
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import type {EditorState} from '../state/EditorState';
 
 const log = Logger.getLogger('glaze.ops.ScreenshotOps');

@@ -6,8 +6,8 @@ import {SkinPreviewRenderer, WindowTreeInspector} from '@core/window/debugger';
 import {TextStyleManager} from '@core/window/utils/TextStyleManager';
 import {GlyphAtlas} from '@core/window/utils/GlyphAtlas';
 import {TYPE_CODE_TO_NAME, WindowType} from '@core/window/enum/WindowType';
-import type {ILogRecord} from '@core/utils/Logger';
-import {Logger, LogLevel} from '@core/utils/Logger';
+import type {ILogRecord} from '@ambreia/common/utils/Logger';
+import {Logger, LogLevel} from '@ambreia/common/utils/Logger';
 import type {IElementDescriptor} from '@habbo/window/IElementDescriptor';
 import type {ILinkEventTracker} from '@core/runtime/events';
 

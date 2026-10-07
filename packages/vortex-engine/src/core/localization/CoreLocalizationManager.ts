@@ -1,5 +1,5 @@
 import {Component, type IContext} from '@core/runtime';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import type {ICoreLocalizationManager} from './ICoreLocalizationManager';
 import type {ILocalizable} from './ILocalizable';
 import type {ILocalization} from './ILocalization';

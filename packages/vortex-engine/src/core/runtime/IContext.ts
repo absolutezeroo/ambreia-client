@@ -1,9 +1,9 @@
 import type {EventEmitter} from 'eventemitter3';
 import type {IID} from './IID';
-import type {IDisposable} from './IDisposable';
+import type {IDisposable} from '@ambreia/common/IDisposable';
 import type {ICoreConfiguration} from './ICoreConfiguration';
 import type {Component} from './Component';
-import type {IAssetLibrary} from '@core/assets/IAssetLibrary';
+import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import type {ILinkEventTracker} from './events/ILinkEventTracker';
 
 /**

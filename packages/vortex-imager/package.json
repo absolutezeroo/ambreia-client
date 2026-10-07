@@ -16,6 +16,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@ambreia/common": "workspace:*",
     "@napi-rs/canvas": "^0.1.71",
     "eventemitter3": "^5.0.1",
     "fastify": "^5.2.0",

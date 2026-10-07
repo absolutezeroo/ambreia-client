@@ -9,7 +9,7 @@ import {EmptyIterator} from '@core/window/iterators/EmptyIterator';
 import type {IGetImageListener} from '@habbo/room/IGetImageListener';
 import type {IAssetReceiver} from '@core/window/IAssetReceiver';
 import type {IBitmapWrapperWindow} from '@core/window/components/IBitmapWrapperWindow';
-import {OrderedMap} from '@core/utils/OrderedMap';
+import {OrderedMap} from '@ambreia/common/utils/OrderedMap';
 import {PetFigureData} from '@habbo/avatar/pets/PetFigureData';
 import {Vector3d} from '@room/utils/Vector3d';
 

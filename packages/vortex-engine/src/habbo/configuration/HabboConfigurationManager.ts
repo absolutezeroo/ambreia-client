@@ -1,5 +1,5 @@
 import {Component, ComponentDependency, type IContext, type ICore} from '@core/runtime';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import type {IHabboConfigurationManager} from './IHabboConfigurationManager';
 import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';
 import {IID_HabboLocalizationManager} from '@iid/IIDHabboLocalizationManager';

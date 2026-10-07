@@ -14,7 +14,7 @@ import type {IAvatarEditorGridColorItem, IAvatarEditorGridPartItem} from './comm
 import type {IFigureSetOwnership} from './common/IFigureSetOwnership';
 import type {ISideContentModel} from './common/ISideContent';
 import type {IHabboAvatarEditorHost} from './IHabboAvatarEditorHost';
-import {OrderedMap} from '@core/utils/OrderedMap';
+import {OrderedMap} from '@ambreia/common/utils/OrderedMap';
 import {AvatarEditorIdEnum} from './enum/AvatarEditorIdEnum';
 import {AvatarEditorView} from './AvatarEditorView';
 import {AvatarUpdateEvent} from './events/AvatarUpdateEvent';

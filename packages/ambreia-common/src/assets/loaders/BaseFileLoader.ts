@@ -1,5 +1,5 @@
 import {EventEmitter} from 'eventemitter3';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '../../utils/Logger';
 import type {IAssetLoader} from './IAssetLoader';
 import {AssetLoaderErrorCodes} from './IAssetLoader';
 import {AssetLoaderEvent, AssetLoaderEventType} from './AssetLoaderEvent';

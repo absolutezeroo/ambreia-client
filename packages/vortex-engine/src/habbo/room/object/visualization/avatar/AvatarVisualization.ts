@@ -17,7 +17,7 @@
  */
 import {Texture} from 'pixi.js';
 
-import type {IAsset} from '@core/assets/IAsset';
+import type {IAsset} from '@ambreia/common/assets/IAsset';
 import type {IRoomGeometry} from '@room/utils/IRoomGeometry';
 import type {IRoomObjectModel} from '@room/object/IRoomObjectModel';
 import type {IRoomObject} from '@room/object/IRoomObject';

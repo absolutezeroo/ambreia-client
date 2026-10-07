@@ -12,7 +12,7 @@ import type {IGetImageListener} from '@habbo/room/IGetImageListener';
 import type {IStuffData} from '@habbo/room/object/data/IStuffData';
 import type {IAssetReceiver} from '@core/window/IAssetReceiver';
 import type {IBitmapWrapperWindow} from '@core/window/components/IBitmapWrapperWindow';
-import {OrderedMap} from '@core/utils/OrderedMap';
+import {OrderedMap} from '@ambreia/common/utils/OrderedMap';
 import {Vector3d} from '@room/utils/Vector3d';
 
 /**

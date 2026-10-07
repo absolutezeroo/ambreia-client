@@ -10,8 +10,8 @@ import type {TextStyle} from '../utils/TextStyle';
 import {TextMargins} from '../utils/TextMargins';
 import {quoteFontFamilyList, measureFontLineHeight} from '../utils/CanvasFontString';
 import {GlyphAtlas} from '../utils/GlyphAtlas';
-import {OrderedMap} from '@core/utils/OrderedMap';
-import {XMLVariableParser} from '@core/utils/XMLVariableParser';
+import {OrderedMap} from '@ambreia/common/utils/OrderedMap';
+import {XMLVariableParser} from '@ambreia/common/utils/XMLVariableParser';
 
 type MeasureContext = OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D;
 

@@ -10,7 +10,7 @@
 // revalidations over HTTP/1.1, which caps at 6 parallel connections. Measured on this repo:
 // 15.2s first load, 5.9s reload.
 //
-// This plugin hands the engine to esbuild instead: every `@core`/`@habbo`/`@room`/`@iid`/
+// This plugin hands the engine to esbuild instead: every `@core`/`@habbo`/`@room`/`@iid`/`@ambreia/*`/
 // `vortex-engine` specifier the client imports becomes an esbuild entry point, code-split into
 // shared chunks, rebuilt on watch. The browser then fetches ~185 modules instead of ~4,000.
 // Measured after: 0.97s first load, 0.18-0.30s reload, ~1-2s for an engine edit (rebuild included).
@@ -29,9 +29,9 @@ const esbuild = require('esbuild');
 
 const OUT_DIR_NAME = '.vortex-dev';
 
-// Engine specifiers a client file may import. Kept in sync with the aliases in vite.config.ts.
-const ENGINE_ALIAS_RE = /^@(core|habbo|room|iid)(\/|$)/;
-const ENGINE_SPEC_RE = /from\s*['"](@(?:core|habbo|room|iid)(?:\/[^'"]*)?|vortex-engine)['"]|import\s*\(\s*['"](@(?:core|habbo|room|iid)(?:\/[^'"]*)?|vortex-engine)['"]\s*\)/g;
+// Engine and workspace-package specifiers a client file may import. Kept in sync with ALIAS_TARGETS.
+const ENGINE_ALIAS_RE = /^(?:@(?:core|habbo|room|iid)|@ambreia\/(?:common|net))(\/|$)/;
+const ENGINE_SPEC_RE = /from\s*['"]((?:@(?:core|habbo|room|iid)|@ambreia\/(?:common|net))(?:\/[^'"]*)?|vortex-engine)['"]|import\s*\(\s*['"]((?:@(?:core|habbo|room|iid)|@ambreia\/(?:common|net))(?:\/[^'"]*)?|vortex-engine)['"]\s*\)/g;
 
 // Only externalise what the client imports too, so there is exactly one instance of it at
 // runtime. `pako` is engine-only and pnpm does not expose it to resolution from the client
@@ -48,13 +48,20 @@ export function engineBundle(options)
 	const ENGINE_SRC = ENGINE_ROOT + '/src';
 	const OUT_DIR = CLIENT_ROOT + '/' + OUT_DIR_NAME;
 
+	// One esbuild graph for the engine AND the workspace packages it is being split into
+	// (spec §12 n° 2): one graph is one instance of Logger, FrameTimings and the other singletons.
+	const PACKAGES = norm(join(options.engineRoot, '..'));
+
 	const ALIAS_TARGETS =
 		{
 			'@core': ENGINE_SRC + '/core',
 			'@habbo': ENGINE_SRC + '/habbo',
 			'@room': ENGINE_SRC + '/room',
-			'@iid': ENGINE_SRC + '/iid'
+			'@iid': ENGINE_SRC + '/iid',
+			'@ambreia/common': PACKAGES + '/ambreia-common/src',
+			'@ambreia/net': PACKAGES + '/ambreia-net/src'
 		};
+	const SOURCE_ROOTS = [ENGINE_SRC, PACKAGES + '/ambreia-common/src', PACKAGES + '/ambreia-net/src'];
 
 	function firstExistingFile(base)
 	{
@@ -78,8 +85,8 @@ export function engineBundle(options)
 		if (spec === 'vortex-engine') return firstExistingFile(ENGINE_SRC + '/index');
 		if (!ENGINE_ALIAS_RE.test(spec)) return null;
 
-		const key = '@' + spec.slice(1).split('/')[0];
-		if (!ALIAS_TARGETS[key]) return null;
+		const key = Object.keys(ALIAS_TARGETS).find((k) => spec === k || spec.startsWith(k + '/'));
+		if (!key) return null;
 
 		return firstExistingFile(ALIAS_TARGETS[key] + spec.slice(key.length));
 	}
@@ -197,7 +204,7 @@ export function engineBundle(options)
 			}
 
 			entryPoints.push(file);
-			nextOutputs.set(spec, OUT_DIR + '/' + norm(relative(ENGINE_SRC, file)).replace(/\.ts$/, '.js'));
+			nextOutputs.set(spec, OUT_DIR + '/' + norm(relative(PACKAGES, file)).replace(/\.ts$/, '.js'));
 		}
 
 		if (context) await context.dispose();
@@ -210,7 +217,7 @@ export function engineBundle(options)
 
 		context = await esbuild.context({
 			entryPoints,
-			outbase: ENGINE_SRC,
+			outbase: PACKAGES,
 			outdir: OUT_DIR,
 			entryNames: '[dir]/[name]',
 			chunkNames: 'chunks/[name]-[hash]',
@@ -302,7 +309,7 @@ export function engineBundle(options)
 			if (source !== 'vortex-engine' && !ENGINE_ALIAS_RE.test(source)) return null;
 
 			// Engine-internal imports are already inlined by esbuild; only client files get here.
-			if (importer && norm(importer).startsWith(ENGINE_SRC)) return null;
+			if (importer && SOURCE_ROOTS.some((root) => norm(importer).startsWith(root))) return null;
 
 			await ready;
 

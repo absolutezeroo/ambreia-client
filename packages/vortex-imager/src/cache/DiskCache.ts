@@ -15,7 +15,7 @@
 import {createHash} from 'node:crypto';
 import {mkdir, readFile, rename, writeFile} from 'node:fs/promises';
 import {dirname, join} from 'node:path';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('imager.cache.DiskCache');
 

@@ -16,7 +16,7 @@
  *   is the only thing separating "ask the user which avatar" from "reuse the stored one".
  */
 import {EventEmitter} from 'eventemitter3';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import {CommunicationUtils} from '@habbo/utils/CommunicationUtils';
 import type {IHabboCommunicationManager} from '../IHabboCommunicationManager';
 import type {IHabboWebApiListener} from '../IHabboWebApiListener';

@@ -1,6 +1,6 @@
 import type {IWindow} from '@core/window/IWindow';
 import type {WindowController} from '@core/window/WindowController';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import {cloneSelected, deleteSelected} from '../ops/StructuralOps';
 import {copySelected, cutSelected, pasteClipboard} from '../ops/ClipboardOps';
 import {saveLayout} from '../ops/LayoutSerializer';

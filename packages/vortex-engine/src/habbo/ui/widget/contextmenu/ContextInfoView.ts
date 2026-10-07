@@ -11,7 +11,7 @@
 import type {IWindow} from '@core/window/IWindow';
 import type {IWindowContainer} from '@core/window/IWindowContainer';
 import type {WindowEvent} from '@core/window/events/WindowEvent';
-import type {BitmapDataAsset} from '@core/assets/BitmapDataAsset';
+import type {BitmapDataAsset} from '@ambreia/common/assets/BitmapDataAsset';
 import {FixedSizeStack} from '@habbo/utils/FixedSizeStack';
 import {RoomWidgetUserActionMessage} from '../messages/RoomWidgetUserActionMessage';
 import type {IContextMenuParentWidget} from './IContextMenuParentWidget';

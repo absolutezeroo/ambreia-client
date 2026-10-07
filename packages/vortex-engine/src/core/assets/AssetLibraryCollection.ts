@@ -1,10 +1,10 @@
 import {EventEmitter} from 'eventemitter3';
 import {Component, type IContext} from '@core/runtime';
-import type {IAsset} from './IAsset';
-import type {IAssetLibrary} from './IAssetLibrary';
+import type {IAsset} from '@ambreia/common/assets/IAsset';
+import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import {AssetLibrary, AssetLibraryEvents} from './AssetLibrary';
-import type {AssetTypeDeclaration} from './AssetTypeDeclaration';
-import type {AssetLoaderStruct} from './AssetLoaderStruct';
+import type {AssetTypeDeclaration} from '@ambreia/common/assets/AssetTypeDeclaration';
+import type {AssetLoaderStruct} from '@ambreia/common/assets/AssetLoaderStruct';
 
 /**
  * AssetLibraryCollection

@@ -4,7 +4,7 @@ import type {IAsset} from './IAsset';
 import type {AssetTypeDeclaration} from './AssetTypeDeclaration';
 import type {IAssetData} from './loaders/NitroBundleLoader';
 import {NitroBundleLoader} from './loaders/NitroBundleLoader';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '../utils/Logger';
 
 /**
  * NitroAsset

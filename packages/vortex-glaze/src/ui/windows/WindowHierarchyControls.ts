@@ -2,7 +2,7 @@ import type {IWindow} from '@core/window/IWindow';
 import type {WindowController} from '@core/window/WindowController';
 import type {WindowEvent} from '@core/window/events/WindowEvent';
 import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
-import {effect, signal, type Scope, type SignalReader} from '@core/reactive';
+import {effect, signal, type Scope, type SignalReader} from '@ambreia/common/reactive/index';
 import {createWindowScope} from '@core/window/reactive';
 import {type EditorState} from '../../state/EditorState';
 import {addChildOfType, cloneSelected, convertSelected, deleteSelected, reorderSelected, wrapSelected} from '../../ops/StructuralOps';

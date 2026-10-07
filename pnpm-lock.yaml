@@ -40,8 +40,30 @@ importers:
         specifier: ^2.9.0
         version: 2.9.0
 
+  packages/ambreia-common:
+    dependencies:
+      eventemitter3:
+        specifier: ^5.0.1
+        version: 5.0.4
+      pako:
+        specifier: ^2.1.0
+        version: 2.1.0
+      pixi.js:
+        specifier: ^8.6.6
+        version: 8.16.0
+    devDependencies:
+      '@types/pako':
+        specifier: ^2.0.3
+        version: 2.0.4
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
   packages/vortex-client:
     dependencies:
+      '@ambreia/common':
+        specifier: workspace:*
+        version: link:../ambreia-common
       eventemitter3:
         specifier: ^5.0.1
         version: 5.0.4
@@ -79,6 +101,9 @@ importers:
 
   packages/vortex-engine:
     dependencies:
+      '@ambreia/common':
+        specifier: workspace:*
+        version: link:../ambreia-common
       eventemitter3:
         specifier: ^5.0.1
         version: 5.0.4
@@ -104,6 +129,9 @@ importers:
 
   packages/vortex-glaze:
     dependencies:
+      '@ambreia/common':
+        specifier: workspace:*
+        version: link:../ambreia-common
       eventemitter3:
         specifier: ^5.0.1
         version: 5.0.4
@@ -129,6 +157,9 @@ importers:
 
   packages/vortex-imager:
     dependencies:
+      '@ambreia/common':
+        specifier: workspace:*
+        version: link:../ambreia-common
       '@napi-rs/canvas':
         specifier: ^0.1.71
         version: 0.1.100

@@ -1,4 +1,4 @@
-import type {IDisposable} from "../runtime/IDisposable";
+import type {IDisposable} from "@ambreia/common/IDisposable";
 
 /**
  * Interface for objects that can receive loaded bitmap assets.

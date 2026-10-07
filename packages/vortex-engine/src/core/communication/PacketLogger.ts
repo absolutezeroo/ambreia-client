@@ -1,4 +1,4 @@
-import {Logger, LogLevel} from '@core/utils/Logger';
+import {Logger, LogLevel} from '@ambreia/common/utils/Logger';
 
 const NAMESPACE = 'core.communication.PacketLogger';
 

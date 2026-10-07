@@ -17,7 +17,7 @@ import {join} from 'node:path';
 import {Core} from '@core/Core';
 import type {CoreComponentContext} from '@core/runtime/CoreComponentContext';
 import {AssetLibrary, AssetTypeDeclaration, XmlAsset} from '@core/assets';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import {IID_Core} from '@iid/IIDCore';
 import {IID_AssetLibrary} from '@iid/IIDAssetLibrary';
 import {IID_HabboConfigurationManager} from '@iid/IIDHabboConfigurationManager';

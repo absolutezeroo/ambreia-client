@@ -5,7 +5,7 @@
  *
  * Interface for room widget handlers that process messages and events.
  */
-import type {IDisposable} from '@core/runtime/IDisposable';
+import type {IDisposable} from '@ambreia/common/IDisposable';
 import type {IRoomWidgetHandlerContainer} from './IRoomWidgetHandlerContainer';
 
 export interface IRoomWidgetHandler extends IDisposable

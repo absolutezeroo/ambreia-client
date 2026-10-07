@@ -1,4 +1,4 @@
-import type {IDisposable} from '@core/runtime/IDisposable';
+import type {IDisposable} from '@ambreia/common/IDisposable';
 import type {IEncryption} from '../encryption/IEncryption';
 import type {IMessageComposer} from '../messages/IMessageComposer';
 import type {IMessageEvent} from '../messages/IMessageEvent';

@@ -1,5 +1,5 @@
 import {Component, ComponentDependency, type IContext} from '@core/runtime';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import type {IWindow} from '@core/window/IWindow';
 import type {IMessageEvent} from '@core/communication/messages/IMessageEvent';
 import type {IMessageComposer} from '@core/communication/messages/IMessageComposer';
@@ -180,7 +180,7 @@ import {HabboGroupInfoManager} from './HabboGroupInfoManager';
 import {PerkType} from '../communication/enum/PerkType';
 import {HabboWebTools} from '@habbo/utils/HabboWebTools';
 import {WindowEvent} from '@core/window/events/WindowEvent';
-import type {IDisposable} from '@core/runtime/IDisposable';
+import type {IDisposable} from '@ambreia/common/IDisposable';
 
 const log = Logger.getLogger('habbo.session.SessionDataManager');
 

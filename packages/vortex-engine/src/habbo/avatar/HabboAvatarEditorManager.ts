@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- Component.dependencies is declared Array<ComponentDependency<any>>; matching it keeps the typed IID setters. */
-import type {IAssetLibrary} from '@core/assets/IAssetLibrary';
+import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import type {IContext} from '@core/runtime';
 import type {IConnection} from '@core/communication/connection/IConnection';
 import type {ILinkEventTracker} from '@core/runtime/events/ILinkEventTracker';
@@ -17,8 +17,8 @@ import type {IHabboAvatarEditor} from './IHabboAvatarEditor';
 import type {IHabboAvatarEditorHost} from './IHabboAvatarEditorHost';
 import type {IAvatarEditorMessageHandler} from './IAvatarEditorMessageHandler';
 import {Component, ComponentDependency} from '@core/runtime';
-import {Logger} from '@core/utils/Logger';
-import {OrderedMap} from '@core/utils/OrderedMap';
+import {Logger} from '@ambreia/common/utils/Logger';
+import {OrderedMap} from '@ambreia/common/utils/OrderedMap';
 import {IID_AvatarRenderManager} from '@iid/IIDAvatarRenderManager';
 import {IID_HabboCommunicationManager} from '@iid/IIDHabboCommunicationManager';
 import {IID_HabboWindowManager} from '@iid/IIDHabboWindowManager';

@@ -17,7 +17,7 @@
 import type {IGraphicAsset} from '@room/object/visualization/utils/IGraphicAsset';
 import type {IRoomObjectSprite} from '@room/object/visualization/IRoomObjectSprite';
 import {RoomObjectVariableEnum} from '@habbo/room/object/RoomObjectVariableEnum';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import {Vortex} from '../../../../../Vortex';
 import {FurnitureDynamicThumbnailVisualization} from './FurnitureDynamicThumbnailVisualization';
 import {ExtraDataManager} from '../data/ExtraDataManager';

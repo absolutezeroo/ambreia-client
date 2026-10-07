@@ -1,4 +1,4 @@
-import type {IDisposable} from '@core/runtime/IDisposable';
+import type {IDisposable} from '@ambreia/common/IDisposable';
 import type {ByteArray} from '../util/ByteArray';
 import type {IMessageDataWrapper} from '../messages/IMessageDataWrapper';
 import type {IConnection} from '../connection/IConnection';

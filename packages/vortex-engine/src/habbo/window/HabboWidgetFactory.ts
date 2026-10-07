@@ -1,7 +1,7 @@
 import type {IWidgetFactory} from '@core/window/IWidgetFactory';
 import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
 import type {IHabboWindowManager} from './IHabboWindowManager';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import {AvatarImageWidget} from './widgets/AvatarImageWidget';
 import {BadgeImageWidget} from './widgets/BadgeImageWidget';
 import {BalloonWidget} from './widgets/BalloonWidget';

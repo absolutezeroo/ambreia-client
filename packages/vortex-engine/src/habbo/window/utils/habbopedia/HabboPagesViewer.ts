@@ -7,12 +7,12 @@ import type {IFrameWindow} from '@core/window/components/IFrameWindow';
 import type {ITextWindow} from '@core/window/components/ITextWindow';
 import type {IScrollbarWindow} from '@core/window/components/IScrollbarWindow';
 import type {ILinkEventTracker} from '@core/runtime/events/ILinkEventTracker';
-import type {AssetLoaderStruct} from '@core/assets/AssetLoaderStruct';
-import {AssetLoaderEvent} from '@core/assets/loaders/AssetLoaderEvent';
+import type {AssetLoaderStruct} from '@ambreia/common/assets/AssetLoaderStruct';
+import {AssetLoaderEvent} from '@ambreia/common/assets/loaders/AssetLoaderEvent';
 import {WindowEvent} from '@core/window/events/WindowEvent';
 import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
 import {HabboWebTools} from '@habbo/utils/HabboWebTools';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('habbo.window.utils.habbopedia.HabboPagesViewer');
 

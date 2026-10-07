@@ -5,7 +5,7 @@ import type {
 } from '@core/communication/messages/IMessageConfiguration';
 import {
     Logger,
-} from '@core/utils/Logger';
+} from '@ambreia/common/utils/Logger';
 
 // Incoming Events - Handshake
 import {

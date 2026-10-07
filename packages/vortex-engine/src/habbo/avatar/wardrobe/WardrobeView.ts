@@ -3,7 +3,7 @@ import type {IWindowContainer} from '@core/window/IWindowContainer';
 import type {IItemListWindow} from '@core/window/components/IItemListWindow';
 import type {ISideContentView} from '../common/ISideContent';
 import type {WardrobeModel} from './WardrobeModel';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('habbo.avatar.wardrobe.WardrobeView');
 

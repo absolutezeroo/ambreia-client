@@ -1,5 +1,5 @@
 import {EventEmitter} from 'eventemitter3';
-import type {IDisposable} from '@core/runtime';
+import type {IDisposable} from '../IDisposable';
 import type {IAssetLoader} from './loaders/IAssetLoader';
 
 /**

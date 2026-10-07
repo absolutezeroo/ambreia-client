@@ -1,4 +1,4 @@
-import type {IDisposable} from '@core/runtime/IDisposable';
+import type {IDisposable} from '@ambreia/common/IDisposable';
 import type {IConnection} from './connection/IConnection';
 import type {IConnectionCallback} from './connection/IConnectionCallback';
 

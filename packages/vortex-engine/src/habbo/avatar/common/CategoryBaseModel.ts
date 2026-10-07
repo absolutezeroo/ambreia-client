@@ -4,7 +4,7 @@ import type {ICategoryModel} from './ICategoryModel';
 import type {ICategoryModelOwner} from './ICategoryModelOwner';
 import type {ICategoryView} from './ICategoryView';
 import type {IFigureSetOwnership} from './IFigureSetOwnership';
-import {OrderedMap} from '@core/utils/OrderedMap';
+import {OrderedMap} from '@ambreia/common/utils/OrderedMap';
 
 /**
  * What every editor page has in common: a lazily-built `CategoryData` per part type it owns, the

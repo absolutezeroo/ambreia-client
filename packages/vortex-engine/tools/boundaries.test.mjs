@@ -105,11 +105,11 @@ test('habbo: core and room are allowed', async () =>
 test('common: the engine and every other Vortex package are refused', async () =>
 {
     const core = await wallHits("import {Component} from '@core/runtime/Component';\nexport {Component};\n",
-        'packages/vortex-common/src/utils/Probe.ts');
-    const net = await wallHits("import {ByteArray} from '@vortex/net/util/ByteArray';\nexport {ByteArray};\n",
-        'packages/vortex-common/src/utils/Probe.ts');
+        'packages/ambreia-common/src/utils/Probe.ts');
+    const net = await wallHits("import {ByteArray} from '@ambreia/net/util/ByteArray';\nexport {ByteArray};\n",
+        'packages/ambreia-common/src/utils/Probe.ts');
     const relative = await wallHits("import {Vortex} from '../../../vortex-engine/src/Vortex';\nexport {Vortex};\n",
-        'packages/vortex-common/src/utils/Probe.ts');
+        'packages/ambreia-common/src/utils/Probe.ts');
 
     assert.equal(core.length, 1);
     assert.equal(net.length, 1);
@@ -118,10 +118,10 @@ test('common: the engine and every other Vortex package are refused', async () =
 
 test('net: common is allowed, the engine is refused', async () =>
 {
-    const common = await wallHits("import {Logger} from '@vortex/common/utils/Logger';\nexport {Logger};\n",
-        'packages/vortex-net/src/connection/Probe.ts');
+    const common = await wallHits("import {Logger} from '@ambreia/common/utils/Logger';\nexport {Logger};\n",
+        'packages/ambreia-net/src/connection/Probe.ts');
     const core = await wallHits("import {Component} from '@core/runtime/Component';\nexport {Component};\n",
-        'packages/vortex-net/src/connection/Probe.ts');
+        'packages/ambreia-net/src/connection/Probe.ts');
 
     assert.equal(common.length, 0);
     assert.equal(core.length, 1);

@@ -2,7 +2,7 @@ import {Texture} from 'pixi.js';
 import type {ILazyAsset} from './ILazyAsset';
 import type {IAsset} from './IAsset';
 import type {AssetTypeDeclaration} from './AssetTypeDeclaration';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '../utils/Logger';
 
 const log = Logger.getLogger('core.assets.BitmapDataAsset');
 

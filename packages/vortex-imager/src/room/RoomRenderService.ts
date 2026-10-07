@@ -13,7 +13,7 @@
  * @see packages/vortex-engine/src/habbo/room/renderer/RoomRenderingCanvas.ts
  * @see packages/vortex-engine/src/habbo/room/RoomEngine.ts
  */
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import {Vector3d} from '@room/utils/Vector3d';
 import {RoomGeometry} from '@room/utils/RoomGeometry';
 import type {IRoomObjectController} from '@room/object/IRoomObjectController';

@@ -1,4 +1,4 @@
-import type {IDisposable} from '@core/runtime/IDisposable';
+import type {IDisposable} from '@ambreia/common/IDisposable';
 import type {ITableObject} from './ITableObject';
 import type {TableRowView} from './TableRowView';
 

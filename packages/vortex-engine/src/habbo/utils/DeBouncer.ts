@@ -1,4 +1,4 @@
-import type {IDisposable} from '@core/runtime/IDisposable';
+import type {IDisposable} from '@ambreia/common/IDisposable';
 
 /**
  * DeBouncer — coalesces rapid trigger() calls into a single deferred callback. trigger() fires the

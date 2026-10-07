@@ -1,6 +1,6 @@
 import type {ICoreErrorReporter} from './ICoreErrorReporter';
 import type {ICoreErrorLogger} from './ICoreErrorLogger';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('core.runtime.DefaultErrorReporter');
 

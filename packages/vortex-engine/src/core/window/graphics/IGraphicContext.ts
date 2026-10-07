@@ -1,4 +1,4 @@
-import type {IDisposable} from "../../runtime/IDisposable";
+import type {IDisposable} from "@ambreia/common/IDisposable";
 
 /**
  * Interface for a graphic context: a node of the window system's own render

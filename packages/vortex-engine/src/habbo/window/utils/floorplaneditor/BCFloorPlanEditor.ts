@@ -1,4 +1,4 @@
-import type {IDisposable} from '@core/runtime/IDisposable';
+import type {IDisposable} from '@ambreia/common/IDisposable';
 import {RoomEngineEvent} from '@habbo/room/events/RoomEngineEvent';
 import type {IUpdateReceiver} from '@core/runtime/IContext';
 import type {IMessageEvent} from '@core/communication/messages/IMessageEvent';
@@ -14,7 +14,7 @@ import type {IAvatarImageWidget} from '@habbo/window/widgets/IAvatarImageWidget'
 import type {WindowEvent} from '@core/window/events/WindowEvent';
 import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
 import {WindowState} from '@core/window/enum/WindowState';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 import {
     FloorHeightMapMessageEvent

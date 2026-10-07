@@ -1,7 +1,7 @@
 import {Spritesheet, Texture} from 'pixi.js';
 import {inflate} from 'pako';
 import {BinaryFileLoader} from './BinaryFileLoader';
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '../../utils/Logger';
 
 /**
  * Nitro bundle asset data interface
