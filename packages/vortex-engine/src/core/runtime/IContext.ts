@@ -3,6 +3,7 @@ import type {IID} from './IID';
 import type {IDisposable} from '@ambreia/common/IDisposable';
 import type {ICoreConfiguration} from './ICoreConfiguration';
 import type {Component} from './Component';
+import type {ComponentDependency} from './ComponentDependency';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import type {ILinkEventTracker} from './events/ILinkEventTracker';
 
@@ -84,7 +85,7 @@ export interface IContext extends IDisposable
     attachComponent(component: Component, interfaces: IID[], instance?: unknown): void;
 
     // TS-only: registers a plain object (an engine package's class) under `iid`.
-    attachInstance<T>(iid: IID<T>, instance: T): void;
+    attachInstance<T>(iid: IID<T>, instance: T, options?: IAttachInstanceOptions): void;
 
     /**
 	 * Detach a component from this context
@@ -193,6 +194,16 @@ export interface IContext extends IDisposable
  *
  * Based on AS3: com.sulake.core.runtime.IUpdateReceiver
  */
+// TS-only: see attachInstance().
+export interface IAttachInstanceOptions
+{
+    /** Resolved before the instance is announced, like a Component's own dependencies. */
+    dependencies?: Array<ComponentDependency<any>>;
+    /** Called every frame through the context's update loop, once the dependencies are there. */
+    update?: (deltaTime: number) => void;
+    updatePriority?: number;
+}
+
 export interface IUpdateReceiver extends IDisposable
 {
     /**

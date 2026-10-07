@@ -1,5 +1,6 @@
 import {getIIDName, type IID} from './IID';
-import type {IContext, InterfaceCallback, IUpdateReceiver} from './IContext';
+import type {IAttachInstanceOptions, IContext, InterfaceCallback, IUpdateReceiver} from './IContext';
+import type {ComponentDependency} from './ComponentDependency';
 import type {ICoreConfiguration} from './ICoreConfiguration';
 import type {ILinkEventTracker} from './events/ILinkEventTracker';
 import {Component, ComponentEvents, ComponentFlags} from './Component';
@@ -600,9 +601,39 @@ export class ComponentContext extends Component implements IContext
     // TS-only: the DI wrapper of an engine package (spec §3 rule 1). The package's object is a plain
     //   class; a bare carrier Component holds it under `iid`, and every request receives the object
     //   (announceInterfaceAvailability() reads it back through the carrier's queueInterface()).
-    attachInstance<T>(iid: IID<T>, instance: T): void
+    attachInstance<T>(iid: IID<T>, instance: T, options: IAttachInstanceOptions = {}): void
     {
-        this.attachComponent(new Component(this), [iid], instance);
+        const dependencies = options.dependencies ?? [];
+
+        // Component reads `dependencies` in its constructor, before a subclass field exists, so the
+        // carrier's class captures the list itself. With dependencies the carrier starts locked and
+        // the instance is announced once they resolve, exactly like a Component's own interfaces.
+        const Carrier = class extends Component
+        {
+            protected override get dependencies(): Array<ComponentDependency<any>>
+            {
+                return dependencies;
+            }
+        };
+        const carrier = new Carrier(this);
+
+        this.attachComponent(carrier, [iid], instance);
+
+        if(!options.update) return;
+
+        const update = options.update;
+        const receiver: IUpdateReceiver = {
+            get disposed(): boolean
+            {
+                return carrier.disposed;
+            },
+            dispose: (): void => undefined,
+            update: (deltaTime: number): void => update(deltaTime)
+        };
+        const start = (): void => this.registerUpdateReceiver(receiver, options.updatePriority ?? 0);
+
+        if(carrier.locked) carrier.events.once(ComponentEvents.INTERNAL_UNLOCKED, start);
+        else start();
     }
 
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/core/runtime/ComponentContext.as::announceInterfaceAvailability()
