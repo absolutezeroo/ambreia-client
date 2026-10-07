@@ -22,7 +22,7 @@ class A extends Component {}
 // exist: the required flag has to be a literal of the class, not a constructor parameter.
 class BRequired extends Component
 {
-    protected override get dependencies(): Array<ComponentDependency<any>>
+    protected override get dependencies(): Array<ComponentDependency<unknown>>
     {
         return super.dependencies.concat([new ComponentDependency(IID_A, () => {}, true)]);
     }
@@ -30,7 +30,7 @@ class BRequired extends Component
 
 class BOptional extends Component
 {
-    protected override get dependencies(): Array<ComponentDependency<any>>
+    protected override get dependencies(): Array<ComponentDependency<unknown>>
     {
         return super.dependencies.concat([new ComponentDependency(IID_A, () => {}, false)]);
     }
@@ -40,7 +40,7 @@ const featureA = defineFeature({id: 'a', provides: [IID_A], create: ({context}) 
 const featureB = (required = true): IFeature => defineFeature({id: 'b', provides: [IID_B], create: ({context}) => (required ? new BRequired(context) : new BOptional(context))});
 const flush = (): Promise<void> => new Promise(resolve => setTimeout(resolve, 0));
 
-function config(features: readonly IFeature<any>[], values: Record<string, unknown> = {}): ReturnType<typeof loadConfig>['config']
+function config(features: readonly IFeature[], values: Record<string, unknown> = {}): ReturnType<typeof loadConfig>['config']
 {
     const sources: IConfigSource[] = [{name: 'defaults', values: {app: {server: {host: 'ws://test'}}}}, {name: 'config.json', values}];
 
