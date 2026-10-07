@@ -14,12 +14,12 @@
  */
 import {readFile} from 'node:fs/promises';
 import {join} from 'node:path';
-import {Core} from '@core/Core';
-import type {CoreComponentContext} from '@core/runtime/CoreComponentContext';
+import {Core} from '@ambreia/kernel/Core';
+import type {CoreComponentContext} from '@ambreia/kernel/runtime/CoreComponentContext';
 import {AssetLibrary, AssetTypeDeclaration, XmlAsset} from '@core/assets';
 import {Logger} from '@ambreia/common/utils/Logger';
-import {IID_Core} from '@iid/IIDCore';
-import {IID_AssetLibrary} from '@iid/IIDAssetLibrary';
+import {IID_Core} from '@ambreia/kernel/iid/IIDCore';
+import {IID_AssetLibrary} from '@ambreia/kernel/iid/IIDAssetLibrary';
 import {IID_HabboConfigurationManager} from '@iid/IIDHabboConfigurationManager';
 import {IID_AvatarRenderManager} from '@iid/IIDAvatarRenderManager';
 import {HabboConfigurationManager} from '@habbo/configuration/HabboConfigurationManager';

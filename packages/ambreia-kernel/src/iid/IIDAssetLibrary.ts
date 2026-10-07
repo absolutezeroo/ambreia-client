@@ -1,5 +1,5 @@
-import {createIID} from "@core/runtime/IID";
-import type {IAssetLibrary} from '@core/assets';
+import {createIID} from "../runtime/IID";
+import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 
 /**
  * TS-only DI bridge for the shared AssetLibrary instance.

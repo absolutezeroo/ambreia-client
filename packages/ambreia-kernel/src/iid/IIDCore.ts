@@ -1,5 +1,5 @@
-import {createIID} from '@core/runtime/IID';
-import type {ICore} from '@core/runtime/ICore';
+import {createIID} from '../runtime/IID';
+import type {ICore} from '../runtime/ICore';
 
 /**
  * IID for Core

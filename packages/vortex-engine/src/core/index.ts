@@ -4,4 +4,4 @@ export * from './communication';
 export * from './localization';
 export * from './runtime';
 export * from '@ambreia/common/utils/index';
-export * from './Core';
+export * from '@ambreia/kernel/Core';

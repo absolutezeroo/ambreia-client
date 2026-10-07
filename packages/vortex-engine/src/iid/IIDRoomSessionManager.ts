@@ -1,4 +1,4 @@
-import {createIID} from "@core/runtime/IID";
+import {createIID} from "@ambreia/kernel/runtime/IID";
 import type {IRoomSessionManager} from '@habbo/session/IRoomSessionManager';
 
 /**

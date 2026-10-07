@@ -1,4 +1,4 @@
-import type {CoreComponentContext} from '@core/runtime/CoreComponentContext';
+import type {CoreComponentContext} from '@ambreia/kernel/runtime/CoreComponentContext';
 import type {ICoreCommunicationManager} from '@core/communication/ICoreCommunicationManager';
 import type {IDisposable} from '@ambreia/common/IDisposable';
 import type {Application, Renderer} from 'pixi.js';

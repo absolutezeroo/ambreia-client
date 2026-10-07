@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {Component, ComponentDependency, type IContext} from '@core/runtime';
-import type {ErrorEvent} from '@core/runtime/events/ErrorEvent';
+import type {ErrorEvent} from '@ambreia/kernel/runtime/events/ErrorEvent';
 import type {IWindow} from '@ambreia/ui/IWindow';
 import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 import type {IItemListWindow} from '@ambreia/ui/components/IItemListWindow';

@@ -4,7 +4,9 @@ import type {IDisposable} from '@ambreia/common/IDisposable';
 import type {IContext, InterfaceCallback, IUpdateReceiver} from './IContext';
 import type {ComponentDependency} from './ComponentDependency';
 import {LockEvent} from './events/LockEvent';
-import type {AssetLoaderStruct, IAsset, IAssetLibrary} from '@core/assets';
+import type {AssetLoaderStruct} from '@ambreia/common/assets/AssetLoaderStruct';
+import type {IAsset} from '@ambreia/common/assets/IAsset';
+import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('core.runtime.Component');
@@ -521,6 +523,16 @@ export class Component implements IDisposable
     getProvidedInterfaces(): IID[]
     {
         return Array.from(this._interfaces.keys());
+    }
+
+    /**
+     * The IIDs this component cannot start without: its required dependencies. The kernel checks
+     * each has a provider before the boot goes on (spec §4, J5).
+     */
+    // TS-only: AS3 resolves its dependency graph at compile time.
+    get requiredDependencies(): IID[]
+    {
+        return this.dependencies.filter(dependency => dependency.required).map(dependency => dependency.identifier);
     }
 
     /**

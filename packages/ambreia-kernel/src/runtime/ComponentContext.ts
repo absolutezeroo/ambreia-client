@@ -151,6 +151,31 @@ export class ComponentContext extends Component implements IContext
 	 */
     // AS3: .../src/com/sulake/core/runtime/_SafeCls_56.as::attachComponent()
     // `instance` is TS-only: see attachInstance().
+    /** The attached components, in attach order, with what they provide and whether they wait. */
+    // TS-only: boot introspection (J5).
+    describeAttached(): Array<{name: string; interfaces: string[]; locked: boolean}>
+    {
+        return this._attachedComponents.filter(component => !component.disposed).map(component => ({
+            name: component.constructor.name,
+            interfaces: component.getProvidedInterfaces().map(getIIDName),
+            locked: component.locked
+        }));
+    }
+
+    /** Every IID something in this context provides: its own and its attached components'. */
+    // TS-only: the kernel's dependency check (J5).
+    providedInterfaces(): Set<IID>
+    {
+        const provided = new Set<IID>(this.getProvidedInterfaces());
+
+        for(const component of this._attachedComponents)
+        {
+            if(!component.disposed) for(const iid of component.getProvidedInterfaces()) provided.add(iid);
+        }
+
+        return provided;
+    }
+
     attachComponent(component: Component, interfaces: IID[], instance?: unknown): void
     {
         if(this.disposed) return;

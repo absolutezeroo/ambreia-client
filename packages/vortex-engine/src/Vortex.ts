@@ -1,11 +1,11 @@
 import {EventEmitter} from 'eventemitter3';
 import {Application, TextureSource} from 'pixi.js';
-import {Core} from '@core/Core';
+import {Core} from '@ambreia/kernel/Core';
 import {VortexMain} from './VortexMain';
 import {IID_CoreCommunicationManager} from '@iid/IIDCoreCommunicationManager';
 import {Logger} from '@ambreia/common/utils/Logger';
 import {FRAME_CHANNEL_PIXI, FrameTimings} from '@ambreia/common/utils/FrameTimings';
-import type {CoreComponentContext} from '@core/runtime/CoreComponentContext';
+import type {CoreComponentContext} from '@ambreia/kernel/runtime/CoreComponentContext';
 import type {AssetUrlSource} from '@ambreia/ui/IResourceManager';
 import type {IElementDescriptionData} from '@ambreia/ui/kit/IElementDescriptor';
 import type {ISkinData} from '@ambreia/ui/graphics/renderer/BitmapSkinParser';
@@ -113,16 +113,16 @@ export interface IVortexWindowAssets
 /**
  * Vortex configuration
  */
+import type {IKernelConfig} from '@ambreia/kernel/config/loadConfig';
+
 export interface IVortexConfig extends IVortexCoreConfig
 {
-    /** Connection configuration */
-    connection?: IConnectionConfig;
-
-    /** URL to load external configuration from (external_variables.txt) */
-    configurationUrl?: string;
-
-    /** Configuration object (alternative to URL) */
-    configuration?: Record<string, string>;
+    /**
+     * The configuration, loaded, validated and frozen by the kernel before the boot (spec §5):
+     * `app` (server, ?sso, ?link), `legacy` (the old key=value properties) and one section per
+     * feature. Replaces `connection`, `configuration`, `configurationUrl` and the top-level keys.
+     */
+    kernel: IKernelConfig;
 
     /** AS3 embedded text/XML asset contents keyed by asset name. */
     embeddedConfigurations?: Record<string, string>;
@@ -140,20 +140,6 @@ export interface IVortexConfig extends IVortexCoreConfig
      */
     windowAssets?: IVortexWindowAssets;
 
-    /**
-     * An internal link to fire once the session is authenticated — `navigator/goto/42`,
-     * `habboUI/open/hccenter`, `navigator/report/42/VGVzdA==`.
-     *
-     * The same strings every feature already registers an `ILinkEventTracker` for, so this adds no
-     * vocabulary of its own: it is the entry point the WEBSITE needs. habbo.com builds exactly these
-     * (`hotelReportLink = "/hotel?link=navigator/report/" + uniqueId + "/" + btoa(name)`), and
-     * without somewhere to hand one in, its "enter this appart" button can only open the hotel and
-     * drop the visitor in their own room.
-     */
-    startLink?: string;
-
-    /** Allow arbitrary configuration properties at the top level */
-    [key: string]: unknown;
 }
 
 /**
@@ -383,7 +369,7 @@ export class Vortex implements IVortex
 	 *
 	 * @see sources/WIN63-202607011411-782849652/src/binaryData/HabboAir.as finalizePreloading()
 	 */
-    public static async bootstrap(config?: IVortexConfig, loadingScreen?: IVortexLoadingScreen): Promise<Vortex>
+    public static async bootstrap(config: IVortexConfig, loadingScreen?: IVortexLoadingScreen): Promise<Vortex>
     {
         const instance = this.instance;
 
@@ -550,7 +536,7 @@ export class Vortex implements IVortex
 	 * @see sources/WIN63-202607011411-782849652/src/binaryData/HabboAir.as tryInit(), finalizePreloading()
 	 * @see sources/WIN63-202607011411-782849652/src/binaryData/HabboAir.as prepareCore()
 	 */
-    async init(config?: IVortexConfig, loadingScreen?: IVortexLoadingScreen): Promise<void>
+    async init(config: IVortexConfig, loadingScreen?: IVortexLoadingScreen): Promise<void>
     {
         if(this._ready)
         {

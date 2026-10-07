@@ -1,6 +1,6 @@
 import type {IDisposable} from '@ambreia/common/IDisposable';
 import {RoomEngineEvent} from '@ambreia/iso/scene/events/RoomEngineEvent';
-import type {IUpdateReceiver} from '@core/runtime/IContext';
+import type {IUpdateReceiver} from '@ambreia/kernel/runtime/IContext';
 import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
 import type {IWindow} from '@ambreia/ui/IWindow';
 import type {IFrameWindow} from '@ambreia/ui/components/IFrameWindow';

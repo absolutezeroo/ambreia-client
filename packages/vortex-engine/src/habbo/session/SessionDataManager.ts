@@ -1,4 +1,4 @@
-import {Core} from '@core/Core';
+import {Core} from '@ambreia/kernel/Core';
 import {Component, ComponentDependency, type IContext} from '@core/runtime';
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {IWindow} from '@ambreia/ui/IWindow';

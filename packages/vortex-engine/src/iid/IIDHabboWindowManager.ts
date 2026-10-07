@@ -1,4 +1,4 @@
-import {createIID} from "@core/runtime/IID";
+import {createIID} from "@ambreia/kernel/runtime/IID";
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 
 /**

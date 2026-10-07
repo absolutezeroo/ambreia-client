@@ -19,7 +19,7 @@ import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';
 import type {IHabboConfigurationManager} from '@habbo/configuration/IHabboConfigurationManager';
-import type {IUpdateReceiver} from '@core/runtime/IContext';
+import type {IUpdateReceiver} from '@ambreia/kernel/runtime/IContext';
 import {RoomObjectCategoryEnum} from '@ambreia/iso/scene/object/RoomObjectCategoryEnum';
 import {RoomEngineObjectEvent} from '@ambreia/iso/scene/events/RoomEngineObjectEvent';
 import {RoomWidgetRoomObjectUpdateEvent} from '@habbo/ui/widget/events/RoomWidgetRoomObjectUpdateEvent';

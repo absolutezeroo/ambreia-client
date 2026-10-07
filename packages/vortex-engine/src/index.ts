@@ -10,6 +10,8 @@ export * from './core/communication';
 // Main
 export * from './Vortex';
 export * from './VortexMain';
+export {ENGINE_FEATURES} from './features';
+export type {IEngineHost, IEngineManagers} from './features';
 
 // Main Types
 export type {IVortex} from './IVortex';

@@ -3,8 +3,8 @@ import type {IWindowManagerOptions} from '@ambreia/ui/kit/IWindowManagerOptions'
 import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 import type {IHabboWindowManager} from './IHabboWindowManager';
 import {registerHabboWidgets} from './HabboWidgetFactory';
-import {ComponentDependency} from '@core/runtime/ComponentDependency';
-import type {IContext} from '@core/runtime/IContext';
+import {ComponentDependency} from '@ambreia/kernel/runtime/ComponentDependency';
+import type {IContext} from '@ambreia/kernel/runtime/IContext';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import {IID_AvatarRenderManager} from '@iid/IIDAvatarRenderManager';
 import {IID_HabboCommunicationManager} from '@iid/IIDHabboCommunicationManager';

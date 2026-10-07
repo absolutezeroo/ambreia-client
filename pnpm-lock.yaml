@@ -109,6 +109,22 @@ importers:
         specifier: ^6.0.0
         version: 6.4.3(@types/node@22.19.10)(jiti@2.7.0)(lightningcss@1.33.0)(sass-embedded@1.97.3)(sass@1.97.3)(tsx@4.23.0)(yaml@2.9.0)
 
+  packages/ambreia-kernel:
+    dependencies:
+      '@ambreia/common':
+        specifier: workspace:*
+        version: link:../ambreia-common
+      eventemitter3:
+        specifier: ^5.0.1
+        version: 5.0.4
+      zod:
+        specifier: ^4.6.5
+        version: 4.6.5
+    devDependencies:
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
   packages/ambreia-net:
     dependencies:
       '@ambreia/common':
@@ -152,6 +168,9 @@ importers:
       '@ambreia/iso':
         specifier: workspace:*
         version: link:../ambreia-iso
+      '@ambreia/kernel':
+        specifier: workspace:*
+        version: link:../ambreia-kernel
       '@ambreia/net':
         specifier: workspace:*
         version: link:../ambreia-net
@@ -204,6 +223,9 @@ importers:
       '@ambreia/iso':
         specifier: workspace:*
         version: link:../ambreia-iso
+      '@ambreia/kernel':
+        specifier: workspace:*
+        version: link:../ambreia-kernel
       '@ambreia/net':
         specifier: workspace:*
         version: link:../ambreia-net
@@ -269,6 +291,9 @@ importers:
       '@ambreia/iso':
         specifier: workspace:*
         version: link:../ambreia-iso
+      '@ambreia/kernel':
+        specifier: workspace:*
+        version: link:../ambreia-kernel
       '@ambreia/net':
         specifier: workspace:*
         version: link:../ambreia-net
@@ -2679,6 +2704,9 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
+  zod@4.6.5:
+    resolution: {integrity: sha512-v5l/aFXZQeai4awLbOpSoHecE9UiMrnfx75tEXLjNonXVARxQ5mOeipTjROUchszUNCqnE+hqAMujRsRHsut2Q==}
+
 snapshots:
 
   '@bufbuild/protobuf@2.12.1': {}
@@ -4615,3 +4643,5 @@ snapshots:
   yaml@2.9.0: {}
 
   yocto-queue@0.1.0: {}
+
+  zod@4.6.5: {}

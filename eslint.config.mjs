@@ -239,6 +239,20 @@ export default tseslint.config(
         }
     },
     {
+        // The kernel (DI, config, features) sits under the game and over nothing but common: the
+        // engines never import it, and it never imports them or the game (spec §3).
+        files: ['packages/ambreia-kernel/src/**/*.ts'],
+        rules:
+        {
+            'no-restricted-imports': wall(
+                {
+                    regex: '^@(core|habbo|room|iid|ui)(/|$)|^@ambreia/(?!common/)|(^|/)vortex-(engine|client)(/|$)|(^|/)ambreia-[a-z]+/src(/|$)',
+                    message: `@ambreia/kernel depends on @ambreia/common only (${WALLS_SPEC}).`
+                }
+            )
+        }
+    },
+    {
         files: ['packages/ambreia-iso/src/**/*.ts'],
         rules:
         {

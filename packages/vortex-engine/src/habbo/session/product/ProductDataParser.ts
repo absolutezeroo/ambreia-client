@@ -2,7 +2,7 @@ import {EventEmitter} from 'eventemitter3';
 import {Logger} from '@ambreia/common/utils/Logger';
 import {AssetLibrary} from '@ambreia/common/assets/AssetLibrary';
 import {AssetLoaderEventType} from '@ambreia/common/assets/loaders/AssetLoaderEvent';
-import {Core} from '@core/Core';
+import {Core} from '@ambreia/kernel/Core';
 import {ProductData} from './ProductData';
 
 import type {AssetLoaderEvent} from '@ambreia/common/assets/loaders/AssetLoaderEvent';

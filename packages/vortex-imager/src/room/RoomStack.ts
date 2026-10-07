@@ -25,7 +25,7 @@ import {EventEmitter} from 'eventemitter3';
 import {createCanvas} from '@napi-rs/canvas';
 import type {Canvas} from '@napi-rs/canvas';
 import {Logger} from '@ambreia/common/utils/Logger';
-import type {CoreComponentContext} from '@core/runtime/CoreComponentContext';
+import type {CoreComponentContext} from '@ambreia/kernel/runtime/CoreComponentContext';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import {RoomManager} from '@ambreia/iso/RoomManager';
 import type {IRoomInstance} from '@ambreia/iso/IRoomInstance';
