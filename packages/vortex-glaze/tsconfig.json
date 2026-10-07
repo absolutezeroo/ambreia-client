@@ -3,20 +3,10 @@
     "compilerOptions": {
         "baseUrl": ".",
         "paths": {
-            "@core/*": ["../vortex-engine/src/core/*"],
-            "@core": ["../vortex-engine/src/core"],
-            "@habbo/*": ["../vortex-engine/src/habbo/*"],
-            "@habbo": ["../vortex-engine/src/habbo"],
-            "@room/*": ["../vortex-engine/src/room/*"],
-            "@room": ["../vortex-engine/src/room"],
-            "@iid/*": ["../vortex-engine/src/iid/*"],
-            "@iid": ["../vortex-engine/src/iid"],
-            "@client/*": ["../vortex-client/src/*"],
-            "@client": ["../vortex-client/src"],
             "@ui/*": ["src/*"],
             "@/*": ["src/*"]
         },
         "outDir": "dist"
     },
-    "include": ["src/**/*", "../vortex-engine/src/**/*"]
+    "include": ["src/**/*"]
 }

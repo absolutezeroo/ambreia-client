@@ -3,14 +3,14 @@
 
 // Exports
 export {CoreLocalizationManager} from './CoreLocalizationManager';
-export {GameDataResources} from './GameDataResources';
+export {GameDataResources} from '@ambreia/common/localization/GameDataResources';
 export {Localization} from './Localization';
 export {LocalizationDefinition} from './LocalizationDefinition';
 export {LocalizationEvent} from './LocalizationEvent';
 
 // Types
 export type {ILocalizationManagerEvents, ICoreLocalizationManager,} from './ICoreLocalizationManager';
-export type {IGameDataResources} from './IGameDataResources';
+export type {IGameDataResources} from '@ambreia/common/localization/IGameDataResources';
 export type {ILocalizable} from './ILocalizable';
 export type {ILocalization} from './ILocalization';
 export type {ILocalizationDefinition} from './ILocalizationDefinition';

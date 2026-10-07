@@ -1,7 +1,7 @@
-import {TYPE_NAME_TO_CODE} from '@ambreia/ui/enum/WindowType';
-import type {ISkinData} from '@ambreia/ui/graphics/renderer/BitmapSkinParser';
-import {SkinLayoutEntity} from '@ambreia/ui/graphics/renderer/SkinLayoutEntity';
-import type {IElementDescriptionData} from '@ambreia/ui/kit/IElementDescriptor';
+import {TYPE_NAME_TO_CODE} from '../enum/WindowType';
+import type {ISkinData} from '../graphics/renderer/BitmapSkinParser';
+import {SkinLayoutEntity} from '../graphics/renderer/SkinLayoutEntity';
+import type {IElementDescriptionData} from '../kit/IElementDescriptor';
 
 // TS-only: AS3 kept a layout in the `IAsset` it was loaded from and handed the XML straight
 //   to `WindowParser`; the port carries the same three fields to the same place.

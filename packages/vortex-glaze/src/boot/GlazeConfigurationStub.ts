@@ -1,17 +1,14 @@
-import type {ICoreConfiguration} from '@core/runtime/ICoreConfiguration';
-
 /**
  * GlazeConfigurationStub — the property source behind `${…}` in a layout's `asset_uri`.
  *
  * **Without it every externally-hosted image in a layout renders as nothing.** 189 of the shipped
  * layouts write `asset_uri` as `${image.library.url}guilds/group_bg.png`, and `ResourceManager`
- * resolves that through `windowManager.interpolate()` → `Component.interpolate()` →
- * `context.configuration`. Glaze deliberately skips the real `HabboConfigurationManager` (it drags
- * in the communication manager and the external-variables download), so `configuration` was null,
- * `interpolate()` returned `''`, and the loader was handed an empty URI — no request, no image, no
- * warning. Window backgrounds, badges and every other CDN-hosted bitmap silently vanished, while
- * the skin atlases (which are in the local bundle) kept rendering, so the layouts looked
- * half-drawn rather than broken.
+ * resolves that through `windowManager.interpolate()`, which GlazeBoot points at this stub. Glaze
+ * deliberately skips the real `HabboConfigurationManager` (it drags in the communication manager
+ * and the external-variables download); before this stub `interpolate()` returned `''` and the
+ * loader was handed an empty URI — no request, no image, no warning. Window backgrounds, badges and
+ * every other CDN-hosted bitmap silently vanished, while the skin atlases (which are in the local
+ * bundle) kept rendering, so the layouts looked half-drawn rather than broken.
  *
  * Only the three URL properties layouts actually reference are seeded; the rest of `${…}` in the
  * XML are localization keys, which `GlazeLocalizationStub` answers instead. The values mirror the
@@ -22,7 +19,7 @@ import type {ICoreConfiguration} from '@core/runtime/ICoreConfiguration';
  * all-or-nothing failure**: one unknown key blanks the whole string rather than leaving it partly
  * expanded. Diverging there would make Glaze render URIs the client never would.
  */
-export class GlazeConfigurationStub implements ICoreConfiguration
+export class GlazeConfigurationStub
 {
     /** Matches `HabboConfigurationManager.INTERPOLATION_DEPTH_LIMIT`. */
     private static readonly INTERPOLATION_DEPTH_LIMIT: number = 3;

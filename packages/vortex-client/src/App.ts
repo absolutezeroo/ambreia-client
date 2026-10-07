@@ -8,6 +8,7 @@ import {UnknownAsset} from '@ambreia/common/assets/UnknownAsset';
 import {RoomEngineEvent} from '@habbo/room/events/RoomEngineEvent';
 import type {AssetUrlSource} from '@ambreia/ui/IResourceManager';
 import type {ISkinData} from '@ambreia/ui/index';
+import {mergeElementDescription, mergeSkin} from '@ambreia/ui/assets/SkinMerge';
 import type {IWindow} from '@ambreia/ui/IWindow';
 import type {WindowController} from '@ambreia/ui/WindowController';
 import {WindowContext} from '@ambreia/ui/WindowContext';
@@ -20,14 +21,14 @@ import type {IElementDescriptionData} from '@habbo/window';
 import type {RoomUI} from '@habbo/ui/RoomUI';
 import type {RoomDesktop} from '@habbo/ui/RoomDesktop';
 import type {VortexLoadingScreen} from './VortexLoadingScreen';
-import {AssetBundle} from './AssetBundle';
+import {AssetBundle} from '@ambreia/common/assets/AssetBundle';
 import {installWindowDebugger} from './debugger/WindowDebuggerOverlay';
 import {
     type IWindowLayoutXmlData,
     parseElementDescriptionXml,
     parseSkinXml,
     parseWindowLayoutXml
-} from './window/WindowXmlAssetParser';
+} from '@ambreia/ui/assets/WindowXmlAssetParser';
 import './_index.scss';
 
 const log = Logger.getLogger('client.App');
@@ -1472,7 +1473,7 @@ export class VortexApp
                 {
                     const authored = parseElementDescriptionFromBundle(xml, path);
 
-                    if(authored) elementDescription = VortexApp.mergeElementDescription(elementDescription ?? base, authored);
+                    if(authored) elementDescription = mergeElementDescription(elementDescription ?? base, authored);
                     else log.warn(`Vortex element description did not parse, ignored: ${path}`);
 
                     continue;
@@ -1480,7 +1481,7 @@ export class VortexApp
 
                 const skin = parseSkinFromBundle(xml, name, path);
 
-                if(skin) sink.set(skin.id, VortexApp.mergeSkin(sink.get(skin.id) ?? null, skin));
+                if(skin) sink.set(skin.id, mergeSkin(sink.get(skin.id) ?? null, skin));
                 else log.warn(`Vortex skin has no <skin> root element, ignored: ${path}`);
             }
             catch (error)
@@ -1490,88 +1491,6 @@ export class VortexApp
         }
 
         return elementDescription;
-    }
-
-    /**
-     * Merges an authored skin over the dump's skin of the same id: templates, layouts and states
-     * with a name the dump already has replace it, the rest are appended, and everything the
-     * authored file is silent about is kept.
-     *
-     * With no dump skin of that id — a brand-new Vortex skin — the authored one is the whole of it.
-     *
-     * @param base - the dump's skin, or null when this id is new
-     * @param authored - the file read out of src/vortex-skins/
-     * @returns the skin to register under this id
-     */
-    private static mergeSkin(base: ISkinData | null, authored: ISkinData): ISkinData
-    {
-        if(!base) return authored;
-
-        // The dump's `name`/`source` are kept: they identify where the bulk of the skin came from,
-        // and an authored fragment carrying only two templates is not a better answer to that.
-        return {
-            id: base.id,
-            name: base.name,
-            source: base.source,
-            variables: {...base.variables, ...authored.variables},
-            templates: VortexApp.mergeByKey(base.templates, authored.templates, (entry) => entry.name),
-            layouts: VortexApp.mergeByKey(base.layouts, authored.layouts, (entry) => entry.name),
-            states: VortexApp.mergeByKey(base.states, authored.states, (entry) => entry.name)
-        };
-    }
-
-    /**
-     * Merges an authored element description over the dump's, keyed by (typeId, style) — the pair
-     * ElementDescriptorRegistry itself looks a descriptor up by, so two entries agreeing on it are
-     * the same entry and the authored one wins.
-     *
-     * @param base - the dump's element description, or null if it failed to load
-     * @param authored - the file read out of src/vortex-skins/
-     * @returns the element description to hand the window manager
-     */
-    private static mergeElementDescription(base: IElementDescriptionData | null, authored: IElementDescriptionData): IElementDescriptionData
-    {
-        if(!base) return authored;
-
-        return {
-            id: base.id,
-            source: base.source,
-            elements: VortexApp.mergeByKey(base.elements, authored.elements, (entry) => `${entry.typeId}/${entry.style}`)
-        };
-    }
-
-    /**
-     * Base list with `authored` applied over it: an authored entry whose key already exists
-     * replaces that entry **in place**, so the dump's ordering is preserved, and any remaining
-     * authored entry is appended in the order it was written.
-     *
-     * Order matters here: both the skin renderer and the descriptor registry keep the first entry
-     * for a key they meet, so appending a replacement instead of substituting it would leave the
-     * dump's version winning and the authored one dead — visible as nothing at all.
-     */
-    private static mergeByKey<T>(base: T[], authored: T[], key: (entry: T) => string): T[]
-    {
-        const byKey = new Map(authored.map((entry) => [key(entry), entry]));
-        const used = new Set<string>();
-
-        const merged = base.map((entry) =>
-        {
-            const k = key(entry);
-            const replacement = byKey.get(k);
-
-            if(!replacement) return entry;
-
-            used.add(k);
-
-            return replacement;
-        });
-
-        for(const entry of authored)
-        {
-            if(!used.has(key(entry))) merged.push(entry);
-        }
-
-        return merged;
     }
 
     /**

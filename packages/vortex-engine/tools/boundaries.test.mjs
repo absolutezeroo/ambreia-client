@@ -165,3 +165,17 @@ test('ui: common is allowed, the engine and the other packages are refused', asy
     assert.equal(engine.length, 1);
     assert.equal(avatar.length, 1);
 });
+
+test('glaze: ui and common are allowed, the engine and the client are refused', async () =>
+{
+    const at = 'packages/vortex-glaze/src/Probe.ts';
+    const ui = await wallHits("import {WindowManager} from '@ambreia/ui/kit/WindowManager';\nexport {WindowManager};\n", at);
+    const engine = await wallHits("import {HabboWindowManager} from '@habbo/window/HabboWindowManager';\nexport {HabboWindowManager};\n", at);
+    const client = await wallHits("import {App} from '@client/App';\nexport {App};\n", at);
+    const net = await wallHits("import {ByteArray} from '@ambreia/net/util/ByteArray';\nexport {ByteArray};\n", at);
+
+    assert.equal(ui.length, 0);
+    assert.equal(engine.length, 1);
+    assert.equal(client.length, 1);
+    assert.equal(net.length, 1);
+});

@@ -2,7 +2,7 @@ import type {IWindow} from '@ambreia/ui/IWindow';
 import type {WindowController} from '@ambreia/ui/WindowController';
 import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
-import type {IHabboWindowManager} from '@habbo/window';
+import type {IWindowManager} from '@ambreia/ui/kit/IWindowManager';
 import type {EditorState} from '../../state/EditorState';
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {GlazeLayoutName} from '../GlazeLayoutSlots';
@@ -51,7 +51,7 @@ interface IBitmapLike { bitmapData: ImageBitmap | null; invalidate(): void; }
 export class GlazeChrome
 {
     private readonly _state: EditorState;
-    private readonly _wm: IHabboWindowManager;
+    private readonly _wm: IWindowManager;
 
     private _toolbar: IWindow | null = null;
     private _hierarchy: IWindow | null = null;

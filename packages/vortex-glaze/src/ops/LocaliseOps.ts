@@ -1,5 +1,5 @@
 import {WindowParser} from '@ambreia/ui/utils/WindowParser';
-import {GameDataResources} from '@core/localization';
+import {GameDataResources} from '@ambreia/common/localization/GameDataResources';
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {EditorState} from '../state/EditorState';
 

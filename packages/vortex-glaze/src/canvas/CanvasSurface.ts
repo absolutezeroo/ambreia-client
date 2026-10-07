@@ -1,4 +1,4 @@
-import type {IHabboWindowManager} from '@habbo/window';
+import type {IWindowManager} from '@ambreia/ui/kit/IWindowManager';
 import type {IWindow} from '@ambreia/ui/IWindow';
 import type {WindowController} from '@ambreia/ui/WindowController';
 import type {WindowMouseOperator} from '@ambreia/ui/services/WindowMouseOperator';
@@ -23,7 +23,7 @@ const log = Logger.getLogger('glaze.canvas.CanvasSurface');
  */
 export class CanvasSurface
 {
-    private readonly _windowManager: IHabboWindowManager;
+    private readonly _windowManager: IWindowManager;
     private readonly _host: HTMLElement;
 
     private _canvas: HTMLCanvasElement | null = null;
@@ -46,7 +46,7 @@ export class CanvasSurface
 
     private readonly _globalPosScratch = {x: 0, y: 0};
 
-    public constructor(windowManager: IHabboWindowManager, host: HTMLElement)
+    public constructor(windowManager: IWindowManager, host: HTMLElement)
     {
         this._windowManager = windowManager;
         this._host = host;

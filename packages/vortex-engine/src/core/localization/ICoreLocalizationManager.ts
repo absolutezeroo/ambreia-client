@@ -2,7 +2,7 @@ import type {EventEmitter} from 'eventemitter3';
 import type {ILocalizable} from './ILocalizable';
 import type {ILocalization} from './ILocalization';
 import type {ILocalizationDefinition} from './ILocalizationDefinition';
-import type {IGameDataResources} from './IGameDataResources';
+import type {IGameDataResources} from '@ambreia/common/localization/IGameDataResources';
 
 /**
  * Events emitted by the localization manager

@@ -112,6 +112,9 @@ importers:
       typescript:
         specifier: ^5.7.2
         version: 5.9.3
+      vite:
+        specifier: ^6.0.0
+        version: 6.4.3(@types/node@22.19.10)(jiti@2.7.0)(lightningcss@1.33.0)(sass-embedded@1.97.3)(sass@1.97.3)(tsx@4.23.0)(yaml@2.9.0)
 
   packages/vortex-client:
     dependencies:
@@ -201,9 +204,6 @@ importers:
       '@ambreia/common':
         specifier: workspace:*
         version: link:../ambreia-common
-      '@ambreia/net':
-        specifier: workspace:*
-        version: link:../ambreia-net
       '@ambreia/ui':
         specifier: workspace:*
         version: link:../ambreia-ui
@@ -213,12 +213,6 @@ importers:
       pixi.js:
         specifier: ^8.6.6
         version: 8.16.0
-      vortex-client:
-        specifier: workspace:*
-        version: link:../vortex-client
-      vortex-engine:
-        specifier: workspace:*
-        version: link:../vortex-engine
     devDependencies:
       '@types/node':
         specifier: ^22.10.0
