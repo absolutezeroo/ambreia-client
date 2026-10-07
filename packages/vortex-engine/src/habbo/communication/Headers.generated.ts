@@ -67,5 +67,7 @@ export const Outgoing = {
     QuitMessageEvent: 3061,
     SSOTicketMessageEvent: 882,
     UniqueIDMessageEvent: 2309,
+    UseFurnitureMessageEvent: 3353,
+    UseWallItemMessageEvent: 3590,
     VersionCheckMessageEvent: 3584,
 } as const;
