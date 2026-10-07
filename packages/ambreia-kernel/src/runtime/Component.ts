@@ -526,6 +526,16 @@ export class Component implements IDisposable
     }
 
     /**
+     * The IIDs this component cannot start without: its required dependencies. The kernel checks
+     * each has a provider before the boot goes on (spec §4, J5).
+     */
+    // TS-only: AS3 resolves its dependency graph at compile time.
+    get requiredDependencies(): IID[]
+    {
+        return this.dependencies.filter(dependency => dependency.required).map(dependency => dependency.identifier);
+    }
+
+    /**
 	 * Check if a configuration property exists
 	 */
     // AS3: .../src/com/sulake/core/runtime/_SafeCls_50.as::propertyExists()
