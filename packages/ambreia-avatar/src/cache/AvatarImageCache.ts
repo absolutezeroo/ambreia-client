@@ -1142,6 +1142,19 @@ export class AvatarImageCache
             // Determine if we need draw-time flip (AS3 line 638: XOR of global + per-part)
             const needsFlip = (isFlipped && !imageData.flipH) || (!isFlipped && imageData.flipH);
 
+            // DEVIATION: AS3 copies an untrimmed Flash bitmap into the part's box. A Nitro bundle
+            //   trims transparent margins: `frame` is the surviving rectangle and `trim` where it was
+            //   cut from inside the box (`texture.orig`, what the asset offsets are measured against).
+            //   The frame is drawn at that offset and at its own size — what a PixiJS sprite does —
+            //   instead of being stretched over the whole box, which blurred every trimmed part.
+            const trimmed = texture as {trim?: {x: number; y: number} | null; orig?: {width: number} | null};
+            const trim = trimmed.trim ?? null;
+            const boxWidth = trimmed.orig?.width ?? imageData.rect.width;
+            const partWidth = trim ? frame.width : imageData.rect.width;
+            const partHeight = trim ? frame.height : imageData.rect.height;
+            const partX = trim ? drawX + (needsFlip ? boxWidth - trim.x - frame.width : trim.x) : drawX;
+            const partY = trim ? drawY + trim.y : drawY;
+
             // `save()`/`restore()` only around the branch that actually changes the transform.
             //
             // They used to wrap all three. A DevTools profile of a 100-avatar run — the first one
@@ -1160,10 +1173,10 @@ export class AvatarImageCache
                     ctx,
                     source as CanvasImageSource,
                     frame,
-                    drawX,
-                    drawY,
-                    imageData.rect.width,
-                    imageData.rect.height,
+                    partX,
+                    partY,
+                    partWidth,
+                    partHeight,
                     imageData.colorTransform ?? AvatarImageCache.IDENTITY_COLOR_TRANSFORM,
                     true
                 );
@@ -1171,7 +1184,7 @@ export class AvatarImageCache
             else if(imageData.colorTransform)
             {
                 // Draw with color transform (AS3 lines 651-658)
-                this.drawWithColorTransform(ctx, source as CanvasImageSource, frame, drawX, drawY, imageData.rect.width, imageData.rect.height, imageData.colorTransform);
+                this.drawWithColorTransform(ctx, source as CanvasImageSource, frame, partX, partY, partWidth, partHeight, imageData.colorTransform);
             }
             else
             {
@@ -1179,7 +1192,7 @@ export class AvatarImageCache
                 ctx.drawImage(
                     source as CanvasImageSource,
                     frame.x, frame.y, frame.width, frame.height,
-                    drawX, drawY, imageData.rect.width, imageData.rect.height
+                    partX, partY, partWidth, partHeight
                 );
             }
         }
