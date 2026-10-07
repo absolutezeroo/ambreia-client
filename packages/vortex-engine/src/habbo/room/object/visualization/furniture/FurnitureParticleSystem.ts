@@ -11,8 +11,9 @@ import type {IGraphicAsset} from '@ambreia/common/graphics/IGraphicAsset';
 import type {IRoomObjectSprite} from '@room/object/visualization/IRoomObjectSprite';
 import type {AnimatedFurnitureVisualization} from './AnimatedFurnitureVisualization';
 import {FurnitureParticleSystemEmitter} from './FurnitureParticleSystemEmitter';
+import type {IFurnitureParticleSystem, IParticleSystemData} from './IFurnitureParticleSystem';
 
-export class FurnitureParticleSystem
+export class FurnitureParticleSystem implements IFurnitureParticleSystem
 {
     // AS3: .../src/com/sulake/habbo/room/object/visualization/furniture/FurnitureParticleSystem.as::_emitters
     private _emitters: Map<number, FurnitureParticleSystemEmitter> = new Map();
@@ -512,44 +513,4 @@ export class FurnitureParticleSystem
         // canvas is the wrong size and `updateCanvas()` must allocate again.
         this.releaseCanvas();
     }
-}
-
-/**
- * One `particlesystem` as the furni bundle carries it, under `logic.particleSystems`.
- *
- * Verified against every fireworks furni in the shipped set (30 of them, 2,504 systems): these
- * are all the keys that occur, the numbers are numbers and `isEmitter`/`fade` are booleans.
- * `bgColor` occurs nowhere, which is why the AS3 default matters.
- */
-// TS-only: AS3 reads an `XML` here; the port's asset pipeline delivers the same tree as JSON.
-export interface IParticleSystemData
-{
-    size?: number;
-    canvasId?: number;
-    offsetY?: number;
-    blend?: number;
-    bgColor?: string;
-    emitters?: Array<{
-        id?: number;
-        name?: string;
-        spriteId?: number;
-        maxNumParticles?: number;
-        particlesPerFrame?: number;
-        burstPulse?: number;
-        fuseTime?: number;
-        simulation?: {
-            force?: number;
-            direction?: number;
-            gravity?: number;
-            airFriction?: number;
-            shape?: string;
-            energy?: number;
-        };
-        particles?: Array<{
-            lifeTime?: number;
-            isEmitter?: boolean;
-            fade?: boolean;
-            frames?: string[];
-        }>;
-    }>;
 }

@@ -38,15 +38,18 @@ import {AvatarSetType} from '@ambreia/avatar/enum/AvatarSetType';
 import {AvatarAction} from '@ambreia/avatar/enum/AvatarAction';
 import {AvatarGuideStatus} from '@ambreia/avatar/enum/AvatarGuideStatus';
 import type {AvatarVisualizationData} from './AvatarVisualizationData';
-import {FloatingIdleZ} from './additions/FloatingIdleZ';
-import {MutedBubble} from './additions/MutedBubble';
-import {TypingBubble} from './additions/TypingBubble';
-import {GuideStatusBubble} from './additions/GuideStatusBubble';
-import {NumberBubble} from './additions/NumberBubble';
-import {ExpressionAdditionFactory} from './additions/ExpressionAdditionFactory';
+import type {IAvatarAdditionFactory, ITypingAddition} from './additions/IAvatarAdditionFactory';
 
 export class AvatarVisualization extends RoomObjectSpriteVisualization implements IAvatarImageListener, IAvatarEffectListener 
 {
+    /**
+     * Builds the additions (bubbles, hearts, Zs). Set by the effects module (registerEffects); null
+     * draws none, and the avatar is otherwise unchanged (J4).
+     */
+    // ponytail: process-wide; per room stage if two stages ever need different effect sets.
+    // TS-only: AS3 constructs the additions inline.
+    public static additions: IAvatarAdditionFactory | null = null;
+
     /** String tag for the main avatar sprite data container. */
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/room/object/visualization/avatar/AvatarVisualization.as::AVATAR
     private static readonly AVATAR: string = 'avatar';
@@ -997,13 +1000,13 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
             }
 
             // Sleeping idle Z addition
-            const idleAddition = this.getAddition(AvatarVisualization.ADDITION_ID_IDLE_BUBBLE) as FloatingIdleZ | null;
+            const idleAddition = this.getAddition(AvatarVisualization.ADDITION_ID_IDLE_BUBBLE) as IAvatarAddition | null;
 
             if(this._isSleeping) 
             {
-                if(!idleAddition) 
+                if(!idleAddition && AvatarVisualization.additions) 
                 {
-                    this.addAddition(new FloatingIdleZ(AvatarVisualization.ADDITION_ID_IDLE_BUBBLE, this));
+                    this.addAddition(AvatarVisualization.additions.idle(AvatarVisualization.ADDITION_ID_IDLE_BUBBLE, this));
                 }
 
                 changed = true;
@@ -1018,13 +1021,13 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
 
             // Muted bubble addition
             boolValue = model.getNumber(RoomObjectVariableEnum.AVATAR_IS_MUTED) > 0;
-            const mutedAddition = this.getAddition(AvatarVisualization.ADDITION_ID_MUTED_BUBBLE) as MutedBubble | null;
+            const mutedAddition = this.getAddition(AvatarVisualization.ADDITION_ID_MUTED_BUBBLE) as IAvatarAddition | null;
 
             if(boolValue) 
             {
-                if(!mutedAddition) 
+                if(!mutedAddition && AvatarVisualization.additions) 
                 {
-                    this.addAddition(new MutedBubble(AvatarVisualization.ADDITION_ID_MUTED_BUBBLE, this));
+                    this.addAddition(AvatarVisualization.additions.muted(AvatarVisualization.ADDITION_ID_MUTED_BUBBLE, this));
                 }
 
                 this.removeAddition(AvatarVisualization.ADDITION_ID_TYPING_BUBBLE);
@@ -1040,13 +1043,13 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
 
                 // Typing bubble addition (only if not muted)
                 boolValue = model.getNumber(RoomObjectVariableEnum.AVATAR_IS_TYPING) > 0;
-                const typingAddition = this.getAddition(AvatarVisualization.ADDITION_ID_TYPING_BUBBLE) as TypingBubble | null;
+                const typingAddition = this.getAddition(AvatarVisualization.ADDITION_ID_TYPING_BUBBLE) as ITypingAddition | null;
 
                 if(boolValue) 
                 {
-                    if(!typingAddition) 
+                    if(!typingAddition && AvatarVisualization.additions) 
                     {
-                        this.addAddition(new TypingBubble(AvatarVisualization.ADDITION_ID_TYPING_BUBBLE, this));
+                        this.addAddition(AvatarVisualization.additions.typing(AvatarVisualization.ADDITION_ID_TYPING_BUBBLE, this));
                     }
 
                     changed = true;
@@ -1066,12 +1069,12 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
             if(numValue !== AvatarGuideStatus.NONE) 
             {
                 this.removeAddition(AvatarVisualization.ADDITION_ID_GUIDE_STATUS_BUBBLE);
-                this.addAddition(new GuideStatusBubble(AvatarVisualization.ADDITION_ID_GUIDE_STATUS_BUBBLE, this, numValue));
+                if(AvatarVisualization.additions) this.addAddition(AvatarVisualization.additions.guide(AvatarVisualization.ADDITION_ID_GUIDE_STATUS_BUBBLE, this, numValue));
                 changed = true;
             }
             else 
             {
-                if(this.getAddition(AvatarVisualization.ADDITION_ID_GUIDE_STATUS_BUBBLE) as GuideStatusBubble | null) 
+                if(this.getAddition(AvatarVisualization.ADDITION_ID_GUIDE_STATUS_BUBBLE) as IAvatarAddition | null) 
                 {
                     this.removeAddition(AvatarVisualization.ADDITION_ID_GUIDE_STATUS_BUBBLE);
                     changed = true;
@@ -1080,13 +1083,13 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
 
             // Number bubble addition
             numValue = model.getNumber(RoomObjectVariableEnum.AVATAR_NUMBER_VALUE) | 0;
-            const numberAddition = this.getAddition(AvatarVisualization.ADDITION_ID_NUMBER_BUBBLE) as NumberBubble | null;
+            const numberAddition = this.getAddition(AvatarVisualization.ADDITION_ID_NUMBER_BUBBLE) as IAvatarAddition | null;
 
             if(numValue > 0) 
             {
-                if(!numberAddition) 
+                if(!numberAddition && AvatarVisualization.additions) 
                 {
-                    this.addAddition(new NumberBubble(AvatarVisualization.ADDITION_ID_NUMBER_BUBBLE, numValue, this));
+                    this.addAddition(AvatarVisualization.additions.number(AvatarVisualization.ADDITION_ID_NUMBER_BUBBLE, this, numValue));
                 }
 
                 changed = true;
@@ -1105,9 +1108,9 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
 
             if(numValue > 0) 
             {
-                if(!expressionAddition) 
+                if(!expressionAddition && AvatarVisualization.additions) 
                 {
-                    const newExpression = ExpressionAdditionFactory.make(AvatarVisualization.ADDITION_ID_EXPRESSION, numValue, this);
+                    const newExpression = AvatarVisualization.additions.expression(AvatarVisualization.ADDITION_ID_EXPRESSION, numValue, this);
 
                     if(newExpression) 
                     {
@@ -1791,7 +1794,7 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
         }
 
         // Update typing bubble depth
-        const typingAddition = this.getAddition(AvatarVisualization.ADDITION_ID_TYPING_BUBBLE) as TypingBubble | null;
+        const typingAddition = this.getAddition(AvatarVisualization.ADDITION_ID_TYPING_BUBBLE) as ITypingAddition | null;
 
         if(typingAddition) 
         {

@@ -6,8 +6,7 @@
  * Fireworks furniture that delegates particle effects to FurnitureParticleSystem.
  */
 import {AnimatedFurnitureVisualization} from './AnimatedFurnitureVisualization';
-import {FurnitureParticleSystem} from './FurnitureParticleSystem';
-import type {IParticleSystemData} from './FurnitureParticleSystem';
+import type {IFurnitureParticleSystem, IParticleSystemData} from './IFurnitureParticleSystem';
 import {RoomObjectVariableEnum} from '@habbo/room/object/RoomObjectVariableEnum';
 import {Logger} from '@ambreia/common/utils/Logger';
 
@@ -15,9 +14,14 @@ const log = Logger.getLogger('habbo.room.object.visualization.furniture.Furnitur
 
 export class FurnitureFireworksVisualization extends AnimatedFurnitureVisualization
 {
+    /** Builds the particles; set by the effects module (registerEffects), null draws none (J4). */
+    // ponytail: process-wide; per room stage if two stages ever need different effect sets.
+    // TS-only: AS3 constructs FurnitureParticleSystem inline in readDefinition().
+    public static particleSystems: ((visualization: FurnitureFireworksVisualization) => IFurnitureParticleSystem) | null = null;
+
     // AS3: .../src/com/sulake/habbo/room/object/visualization/furniture/FurnitureFireworksVisualization.as::_particleSystems
-    private _particleSystems: Map<number, FurnitureParticleSystem> | null = null;
-    private _activeParticleSystem: FurnitureParticleSystem | null = null;
+    private _particleSystems: Map<number, IFurnitureParticleSystem> | null = null;
+    private _activeParticleSystem: IFurnitureParticleSystem | null = null;
 
     override dispose(): void
     {
@@ -43,7 +47,7 @@ export class FurnitureFireworksVisualization extends AnimatedFurnitureVisualizat
             {
                 this.readDefinition();
 
-                const systems = this._particleSystems as Map<number, FurnitureParticleSystem> | null;
+                const systems = this._particleSystems as Map<number, IFurnitureParticleSystem> | null;
 
                 if(systems !== null)
                 {
@@ -130,6 +134,11 @@ export class FurnitureFireworksVisualization extends AnimatedFurnitureVisualizat
             return;
         }
 
+        const create = FurnitureFireworksVisualization.particleSystems;
+
+        // No effects module: the furni is drawn, animated and wrapped, without its particles.
+        if(create === null) return;
+
         const dataStr = model.getString(RoomObjectVariableEnum.FURNITURE_FIREWORKS_DATA);
 
         if(dataStr === null || dataStr.length === 0)
@@ -167,7 +176,7 @@ export class FurnitureFireworksVisualization extends AnimatedFurnitureVisualizat
                 continue;
             }
 
-            const system = new FurnitureParticleSystem(this);
+            const system = create(this);
 
             system.parseData(systemData);
             this._particleSystems.set(Number(systemData.size), system);

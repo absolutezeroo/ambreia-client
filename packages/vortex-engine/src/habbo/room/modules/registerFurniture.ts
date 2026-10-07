@@ -1,7 +1,5 @@
 import {RoomObjectLogicEnum} from '@habbo/room/object/RoomObjectLogicEnum';
 import {RoomObjectVisualizationEnum} from '@habbo/room/object/RoomObjectVisualizationEnum';
-import {AvatarLogic} from '@habbo/room/object/logic/AvatarLogic';
-import {PetLogic} from '@habbo/room/object/logic/PetLogic';
 import {FurnitureAchievementResolutionLogic} from '@habbo/room/object/logic/furniture/FurnitureAchievementResolutionLogic';
 import {FurnitureAreaHideLogic} from '@habbo/room/object/logic/furniture/FurnitureAreaHideLogic';
 import {FurnitureBadgeDisplayLogic} from '@habbo/room/object/logic/furniture/FurnitureBadgeDisplayLogic';
@@ -59,11 +57,6 @@ import {FurnitureWelcomeGiftLogic} from '@habbo/room/object/logic/furniture/Furn
 import {FurnitureWildwestWantedLogic} from '@habbo/room/object/logic/furniture/FurnitureWildwestWantedLogic';
 import {FurnitureWindowLogic} from '@habbo/room/object/logic/furniture/FurnitureWindowLogic';
 import {FurnitureYoutubeLogic} from '@habbo/room/object/logic/furniture/FurnitureYoutubeLogic';
-import {RoomLogic} from '@habbo/room/object/logic/room/RoomLogic';
-import {RoomTileCursorLogic} from '@habbo/room/object/logic/room/RoomTileCursorLogic';
-import {SelectionArrowLogic} from '@habbo/room/object/logic/room/SelectionArrowLogic';
-import {AvatarVisualization} from '@habbo/room/object/visualization/avatar/AvatarVisualization';
-import {AvatarVisualizationData} from '@habbo/room/object/visualization/avatar/AvatarVisualizationData';
 import {AnimatedFurnitureVisualization} from '@habbo/room/object/visualization/furniture/AnimatedFurnitureVisualization';
 import {AnimatedFurnitureVisualizationData} from '@habbo/room/object/visualization/furniture/AnimatedFurnitureVisualizationData';
 import {AvatarFurnitureVisualizationData} from '@habbo/room/object/visualization/furniture/AvatarFurnitureVisualizationData';
@@ -91,33 +84,22 @@ import {FurnitureSoundblockVisualization} from '@habbo/room/object/visualization
 import {FurnitureStickieVisualization} from '@habbo/room/object/visualization/furniture/FurnitureStickieVisualization';
 import {FurnitureValRandomizerVisualization} from '@habbo/room/object/visualization/furniture/FurnitureValRandomizerVisualization';
 import {FurnitureVisualization} from '@habbo/room/object/visualization/furniture/FurnitureVisualization';
-import {FurnitureVisualizationData} from '@habbo/room/object/visualization/furniture/FurnitureVisualizationData';
 import {FurnitureVoteCounterVisualization} from '@habbo/room/object/visualization/furniture/FurnitureVoteCounterVisualization';
 import {FurnitureVoteMajorityVisualization} from '@habbo/room/object/visualization/furniture/FurnitureVoteMajorityVisualization';
 import {FurnitureWaterAreaVisualization} from '@habbo/room/object/visualization/furniture/FurnitureWaterAreaVisualization';
 import {FurnitureYoutubeVisualization} from '@habbo/room/object/visualization/furniture/FurnitureYoutubeVisualization';
-import {AnimatedPetVisualization} from '@habbo/room/object/visualization/pet/AnimatedPetVisualization';
-import {AnimatedPetVisualizationData} from '@habbo/room/object/visualization/pet/AnimatedPetVisualizationData';
-import {RoomVisualization} from '@habbo/room/object/visualization/room/RoomVisualization';
-import {TileCursorVisualization} from '@habbo/room/object/visualization/room/TileCursorVisualization';
 import type {IIsoRegistries} from '@room/object/IIsoRegistries';
 
 /**
- * Every room object type the engine builds, registered at once: the two switches of
- * RoomObjectFactory and RoomObjectVisualizationFactory as they stood before J4, comments included.
- * J4 Task 4 splits this into the scene, furniture, avatar and effect modules.
+ * Furniture: every furniture_* logic and visualization, including the fireworks (drawn without
+ * their particles unless registerEffects() runs too) and the mannequin.
  */
-export function registerAllRoomObjects(registries: IIsoRegistries): void
+export function registerFurniture(registries: IIsoRegistries): void
 {
-    // Logics (AS3: RoomObjectFactory.createRoomObjectLogic()).
     registries.logics.register(RoomObjectLogicEnum.FURNITURE_BASIC, () => new FurnitureLogic());
     registries.logics.register(RoomObjectLogicEnum.FURNITURE_MULTISTATE, () => new FurnitureMultiStateLogic());
     registries.logics.register(RoomObjectLogicEnum.FURNITURE_MULTIHEIGHT, () => new FurnitureMultiHeightLogic());
     registries.logics.register(RoomObjectLogicEnum.FURNITURE_PLACEHOLDER, () => new FurniturePlaceholderLogic());
-    registries.logics.register(RoomObjectLogicEnum.USER, () => new AvatarLogic());
-    registries.logics.register(RoomObjectLogicEnum.BOT, () => new AvatarLogic());
-    registries.logics.register(RoomObjectLogicEnum.RENTABLE_BOT, () => new AvatarLogic());
-    registries.logics.register(RoomObjectLogicEnum.PET, () => new PetLogic());
     registries.logics.register(RoomObjectLogicEnum.FURNITURE_RANDOMSTATE, () => new FurnitureRandomStateLogic());
     registries.logics.register(RoomObjectLogicEnum.FURNITURE_CREDIT, () => new FurnitureCreditLogic());
     registries.logics.register(RoomObjectLogicEnum.FURNITURE_STICKIE, () => new FurnitureStickieLogic());
@@ -138,8 +120,6 @@ export function registerAllRoomObjects(registries: IIsoRegistries): void
     registries.logics.register(RoomObjectLogicEnum.FURNITURE_PLANET_SYSTEM, () => new FurniturePlanetSystemLogic());
     registries.logics.register(RoomObjectLogicEnum.FURNITURE_WINDOW, () => new FurnitureWindowLogic());
     registries.logics.register(RoomObjectLogicEnum.FURNITURE_ROOMDIMMER, () => new FurnitureRoomDimmerLogic());
-    registries.logics.register(RoomObjectLogicEnum.ROOM_TILE_CURSOR, () => new RoomTileCursorLogic());
-    registries.logics.register(RoomObjectLogicEnum.SELECTION_ARROW, () => new SelectionArrowLogic());
     // DEVIATION: AS3 builds the sound-machine / jukebox furniture logics here. The RPG
     //   fork removed jukebox music, but furnidata can still name these two types, so they get
     //   those logics' own base, FurnitureMultiStateLogic: a furni that still toggles its state.
@@ -159,7 +139,6 @@ export function registerAllRoomObjects(registries: IIsoRegistries): void
     registries.logics.register(RoomObjectLogicEnum.FURNITURE_BG, () => new FurnitureRoomBackgroundLogic());
     registries.logics.register(RoomObjectLogicEnum.FURNITURE_WELCOME_GIFT, () => new FurnitureWelcomeGiftLogic());
     registries.logics.register(RoomObjectLogicEnum.FURNITURE_FLOOR_HOLE, () => new FurnitureFloorHoleLogic());
-    registries.logics.register(RoomObjectLogicEnum.ROOM, () => new RoomLogic());
     registries.logics.register(RoomObjectLogicEnum.FURNITURE_MANNEQUIN, () => new FurnitureMannequinLogic());
     registries.logics.register(RoomObjectLogicEnum.FURNITURE_GUILD_CUSTOMIZED, () => new FurnitureGuildCustomizedLogic());
     registries.logics.register(RoomObjectLogicEnum.FURNITURE_GROUP_FORUM_TERMINAL, () => new FurnitureGroupForumTerminalLogic());
@@ -203,12 +182,6 @@ export function registerAllRoomObjects(registries: IIsoRegistries): void
     //   they get the NFT logics' own base, FurnitureLogic: a plain furni, like the chests above.
     registries.logics.register(RoomObjectLogicEnum.FURNITURE_NFT_CREDIT, () => new FurnitureLogic());
     registries.logics.register(RoomObjectLogicEnum.FURNITURE_NFT_REWARD_BOX, () => new FurnitureLogic());
-
-    // Visualizations (AS3: RoomObjectVisualizationFactory.createRoomObjectVisualization()).
-    // Room
-    registries.visualizations.register(RoomObjectVisualizationEnum.ROOM, () => new RoomVisualization());
-    // Tile cursor
-    registries.visualizations.register(RoomObjectVisualizationEnum.TILE_CURSOR, () => new TileCursorVisualization());
     // Furniture - static
     registries.visualizations.register(RoomObjectVisualizationEnum.FURNITURE_STATIC, () => new FurnitureVisualization());
     // Furniture - animated
@@ -250,28 +223,7 @@ export function registerAllRoomObjects(registries: IIsoRegistries): void
     registries.visualizations.register(RoomObjectVisualizationEnum.FURNITURE_MANNEQUIN, () => new FurnitureMannequinVisualization());
     registries.visualizations.register(RoomObjectVisualizationEnum.FURNITURE_WATER_AREA, () => new FurnitureWaterAreaVisualization());
     registries.visualizations.register(RoomObjectVisualizationEnum.FURNITURE_PLANET_SYSTEM, () => new FurniturePlanetSystemVisualization());
-    // Avatar types
-    registries.visualizations.register(RoomObjectVisualizationEnum.USER, () => new AvatarVisualization());
-    registries.visualizations.register(RoomObjectVisualizationEnum.BOT, () => new AvatarVisualization());
-    registries.visualizations.register(RoomObjectVisualizationEnum.RENTABLE_BOT, () => new AvatarVisualization());
-    // Pets
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/RoomObjectVisualizationFactory.as
-    // `case "pet_animated": _loc3_ = AnimatedPetVisualization; break;` - this case was
-    // simply missing from the port, so every pet resolved to null here, which made
-    // RoomEngine.getGenericRoomObjectImage() bail on its `visualization === null` guard
-    // and return id = -1 for every pet image request.
-    registries.visualizations.register(RoomObjectVisualizationEnum.PET_ANIMATED, () => new AnimatedPetVisualization());
-
-    // Visualization data (AS3: RoomObjectVisualizationFactory.getRoomObjectVisualizationData()).
-    registries.visualizations.setDefaultData(() => new FurnitureVisualizationData());
-    // AS3: `case "pet_animated": _loc8_ = AnimatedPetVisualizationData; break;` - a pet gets its own
-    // data class, separate from the user/bot/rentable_bot one (this port once folded the two,
-    // handing every pet an AvatarVisualizationData).
-    registries.visualizations.registerData(RoomObjectVisualizationEnum.PET_ANIMATED, () => new AnimatedPetVisualizationData());
     registries.visualizations.registerData(RoomObjectVisualizationEnum.FURNITURE_MANNEQUIN, () => new AvatarFurnitureVisualizationData());
-    registries.visualizations.registerData('user', () => new AvatarVisualizationData());
-    registries.visualizations.registerData('bot', () => new AvatarVisualizationData());
-    registries.visualizations.registerData('rentable_bot', () => new AvatarVisualizationData());
     // The types AS3 gives AnimatedFurnitureVisualizationData; the chests among them matter: a plain
     // FurnitureVisualizationData cannot parse an animated visualization and the chest then threw
     // on every frame (getRoomObjectVisualizationData(), AS3 lines 232-283).
@@ -299,5 +251,4 @@ export function registerAllRoomObjects(registries: IIsoRegistries): void
     registries.visualizations.registerData('furniture_badge_display', () => new AnimatedFurnitureVisualizationData());
     registries.visualizations.registerData('furniture_external_image', () => new AnimatedFurnitureVisualizationData());
     registries.visualizations.registerData('furniture_youtube', () => new AnimatedFurnitureVisualizationData());
-    registries.visualizations.registerData('tile_cursor', () => new AnimatedFurnitureVisualizationData());
 }

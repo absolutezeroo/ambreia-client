@@ -34,7 +34,7 @@ import {RoomContentLoadedEvent} from '@room/events/RoomContentLoadedEvent';
 import {RoomContentLoader} from '@habbo/room/RoomContentLoader';
 import {RoomObjectFactory} from '@habbo/room/RoomObjectFactory';
 import {createRoomRegistries} from '@room/object/createRoomRegistries';
-import {registerAllRoomObjects} from '@habbo/room/modules/registerAllRoomObjects';
+import {DEFAULT_ROOM_MODULES} from '@habbo/room/modules/defaultRoomModules';
 import {RoomObjectVisualizationFactory} from '@habbo/room/object/RoomObjectVisualizationFactory';
 import {RoomObjectCategoryEnum} from '@habbo/room/object/RoomObjectCategoryEnum';
 import {RoomVisualizationData} from '@habbo/room/object/visualization/room/RoomVisualizationData';
@@ -99,7 +99,7 @@ export class RoomStack
         context.configuration = configuration;
 
         const contentLoader = new RoomContentLoader();
-        const registries = createRoomRegistries([registerAllRoomObjects]);
+        const registries = createRoomRegistries(DEFAULT_ROOM_MODULES);
         const visualizationFactory = new RoomObjectVisualizationFactory(registries.visualizations);
         const objectFactory = new RoomObjectFactory(registries.logics);
         const roomManager = new RoomManager({

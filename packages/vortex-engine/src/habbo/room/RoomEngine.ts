@@ -14,7 +14,7 @@ import {Sprite, Texture} from 'pixi.js';
 import {Component, ComponentDependency, type IContext, type IUpdateReceiver} from '@core/runtime';
 import {Vortex} from '../../Vortex';
 import {createRoomRegistries} from '@room/object/createRoomRegistries';
-import {registerAllRoomObjects} from './modules/registerAllRoomObjects';
+import {DEFAULT_ROOM_MODULES} from './modules/defaultRoomModules';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import type {IConnection} from '@ambreia/net/connection/IConnection';
 import type {IRoomEngine} from './IRoomEngine';
@@ -582,7 +582,7 @@ export class RoomEngine extends Component implements IRoomEngine,
     {
         super(context, 0, assetLibrary);
         // The object types come from registries filled by the room modules (J4).
-        const registries = createRoomRegistries([registerAllRoomObjects]);
+        const registries = createRoomRegistries(DEFAULT_ROOM_MODULES);
 
         this._roomObjectFactory = new RoomObjectFactory(registries.logics);
         this._visualizationFactory = new RoomObjectVisualizationFactory(registries.visualizations);

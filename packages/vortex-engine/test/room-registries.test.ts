@@ -1,10 +1,17 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {RoomObjectLogicRegistry} from '@room/object/RoomObjectLogicRegistry';
-import {RoomObjectVisualizationRegistry} from '@room/object/RoomObjectVisualizationRegistry';
+import type {RoomObjectLogicRegistry} from '@room/object/RoomObjectLogicRegistry';
+import type {RoomObjectVisualizationRegistry} from '@room/object/RoomObjectVisualizationRegistry';
 import {RoomObjectFactory} from '@habbo/room/RoomObjectFactory';
 import {RoomObjectVisualizationFactory} from '@habbo/room/object/RoomObjectVisualizationFactory';
-import {registerAllRoomObjects} from '@habbo/room/modules/registerAllRoomObjects';
+import {createRoomRegistries} from '@room/object/createRoomRegistries';
+import {DEFAULT_ROOM_MODULES} from '@habbo/room/modules/defaultRoomModules';
+import {registerScene} from '@habbo/room/modules/registerScene';
+import {registerFurniture} from '@habbo/room/modules/registerFurniture';
+import {registerAvatars} from '@habbo/room/modules/registerAvatars';
+import {registerEffects} from '@habbo/room/modules/registerEffects';
+import {AvatarVisualization} from '@habbo/room/object/visualization/avatar/AvatarVisualization';
+import {FurnitureFireworksVisualization} from '@habbo/room/object/visualization/furniture/FurnitureFireworksVisualization';
 
 // Every type the two switches built before J4 (relevé 2026-10-07, by running them over every enum
 // value), and the class each one gave: the registries must give exactly these.
@@ -127,11 +134,7 @@ const VISUALIZATIONS: Record<string, string> = {
 
 function registries(): {logics: RoomObjectLogicRegistry; visualizations: RoomObjectVisualizationRegistry}
 {
-    const r = {logics: new RoomObjectLogicRegistry(), visualizations: new RoomObjectVisualizationRegistry()};
-
-    registerAllRoomObjects(r);
-
-    return r;
+    return createRoomRegistries(DEFAULT_ROOM_MODULES);
 }
 
 test('every logic type builds the class it built before', () =>
@@ -179,4 +182,31 @@ test('each content gets the data class getRoomObjectVisualizationData() gave it'
     assert.equal(dataOf('furniture_mannequin'), 'AvatarFurnitureVisualizationData');
     assert.equal(dataOf('user'), 'AvatarVisualizationData');
     assert.equal(dataOf('rentable_bot'), 'AvatarVisualizationData');
+});
+
+test('the default modules are the scene, furniture, avatars and effects, in that order', () =>
+{
+    assert.deepEqual(DEFAULT_ROOM_MODULES, [registerScene, registerFurniture, registerAvatars, registerEffects]);
+});
+
+test('without the effects module, avatars get no additions and fireworks no particles', () =>
+{
+    AvatarVisualization.additions = null;
+    FurnitureFireworksVisualization.particleSystems = null;
+
+    const r = createRoomRegistries([registerScene, registerFurniture, registerAvatars]);
+
+    assert.equal(AvatarVisualization.additions, null);
+    assert.equal(FurnitureFireworksVisualization.particleSystems, null);
+    // The fireworks are still furniture: drawn, wrapped, animated.
+    assert.equal(r.visualizations.create('furniture_fireworks')?.constructor.name, 'FurnitureFireworksVisualization');
+    assert.equal(r.visualizations.create('user')?.constructor.name, 'AvatarVisualization');
+});
+
+test('the effects module gives avatars their additions and fireworks their particles', () =>
+{
+    createRoomRegistries([registerEffects]);
+
+    assert.equal(AvatarVisualization.additions?.constructor.name, 'AvatarAdditionFactory');
+    assert.equal(typeof FurnitureFireworksVisualization.particleSystems, 'function');
 });
