@@ -2,11 +2,12 @@
 paths:
   - "**/window/**"
   - "**/widgets/**"
+  - "packages/ambreia-ui/**"
 ---
 
 # UI / window system rules
 
-You are editing the ported Flash UI/window system (`core/window/`, `habbo/window/`, `habbo/*/widgets/`, client `window/`).
+You are editing the ported Flash UI/window system: `@ambreia/ui` (`packages/ambreia-ui/src`, its generic kit in `src/kit/`), the game windows in the engine's `habbo/window/` and `habbo/*/widgets/`, and the client's `window/`.
 
 1. See `docs/PATTERNS.md` → "UI Window (ported from Flash)" and "Component Lifecycle" for the expected class shape. Quick shape reminder: UI Windows are ported from the AS3 `IWindow`/`IFrameWindow` hierarchy using PixiJS + the XML layouts described in rule 3.
 2. Never override `get events()` in a Component subclass — it breaks the DI event system. Use a differently named property (e.g. `sessionEvents`).
