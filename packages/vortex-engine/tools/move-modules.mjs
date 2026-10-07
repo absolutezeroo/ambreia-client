@@ -89,7 +89,7 @@ export function planMoves({ root, scan, aliases, moves })
             if(target === null) continue;
 
             const gTarget = groupOf(target);
-            let next = null;
+            let next;
 
             if(gTarget < 0)
             {
