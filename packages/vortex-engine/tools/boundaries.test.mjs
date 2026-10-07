@@ -193,3 +193,25 @@ test('iso: common and avatar are allowed, the engine and ui are refused', async 
     assert.equal(engine.length, 1);
     assert.equal(ui.length, 1);
 });
+
+test('kernel: common is allowed, the game and the engines are refused', async () =>
+{
+    const at = 'packages/ambreia-kernel/src/Probe.ts';
+    const common = await wallHits("import {Logger} from '@ambreia/common/utils/Logger';\nexport {Logger};\n", at);
+    const game = await wallHits("import {RoomEngine} from '@habbo/room/RoomEngine';\nexport {RoomEngine};\n", at);
+    const ui = await wallHits("import {WindowManager} from '@ambreia/ui/kit/WindowManager';\nexport {WindowManager};\n", at);
+
+    assert.equal(common.length, 0);
+    assert.equal(game.length, 1);
+    assert.equal(ui.length, 1);
+});
+
+test('engines never import the kernel (spec §3 rule 1)', async () =>
+{
+    const spec = "import {Component} from '@ambreia/kernel/runtime/Component';\nexport {Component};\n";
+
+    for(const engine of ['ambreia-common', 'ambreia-net', 'ambreia-avatar', 'ambreia-iso', 'ambreia-ui'])
+    {
+        assert.equal((await wallHits(spec, `packages/${engine}/src/Probe.ts`)).length, 1, engine);
+    }
+});

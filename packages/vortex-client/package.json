@@ -20,6 +20,7 @@
   "dependencies": {
     "@ambreia/common": "workspace:*",
     "@ambreia/iso": "workspace:*",
+    "@ambreia/kernel": "workspace:*",
     "@ambreia/net": "workspace:*",
     "@ambreia/ui": "workspace:*",
     "eventemitter3": "^5.0.1",
