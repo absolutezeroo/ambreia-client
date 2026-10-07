@@ -18,9 +18,11 @@
   "dependencies": {
     "@ambreia/avatar": "workspace:*",
     "@ambreia/common": "workspace:*",
+    "@ambreia/game": "workspace:*",
     "@ambreia/iso": "workspace:*",
     "@ambreia/kernel": "workspace:*",
     "@ambreia/net": "workspace:*",
+    "@ambreia/protocol": "workspace:*",
     "@ambreia/ui": "workspace:*",
     "@napi-rs/canvas": "^0.1.71",
     "eventemitter3": "^5.0.1",

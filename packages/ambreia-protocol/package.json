@@ -1,0 +1,18 @@
+{
+  "name": "@ambreia/protocol",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Ambreia protocol: the server's message ids, the messages, their parsers and composers",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "dependencies": {
+    "@ambreia/common": "workspace:*",
+    "@ambreia/iso": "workspace:*",
+    "@ambreia/net": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}
