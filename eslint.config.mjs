@@ -191,6 +191,30 @@ export default tseslint.config(
         }
     },
     {
+        files: ['packages/vortex-common/src/**/*.ts'],
+        rules:
+        {
+            'no-restricted-imports': wall(
+                {
+                    regex: '^@(core|habbo|room|iid|ui)(/|$)|^@vortex/|(^|/)vortex-(engine|net|client)(/|$)',
+                    message: `@vortex/common is the bottom package: it imports no other Vortex package (${WALLS_SPEC}).`
+                }
+            )
+        }
+    },
+    {
+        files: ['packages/vortex-net/src/**/*.ts'],
+        rules:
+        {
+            'no-restricted-imports': wall(
+                {
+                    regex: '^@(core|habbo|room|iid|ui)(/|$)|^@vortex/(?!common/)|(^|/)vortex-(engine|client)(/|$)',
+                    message: `@vortex/net depends on @vortex/common only (${WALLS_SPEC}).`
+                }
+            )
+        }
+    },
+    {
         files: ['**/*.mjs'],
         languageOptions: { globals: { ...globals.node } }
     },
