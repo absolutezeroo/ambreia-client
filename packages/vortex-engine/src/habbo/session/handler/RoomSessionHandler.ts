@@ -26,6 +26,9 @@ import {
 import {
     FlatAccessDeniedMessageEvent
 } from '../../communication/messages/incoming/navigator/FlatAccessDeniedMessageEvent';
+import {RoomForwardMessageEvent} from '../../communication/messages/incoming/room/session/RoomForwardMessageEvent';
+import {CantConnectMessageEvent} from '../../communication/messages/incoming/room/session/CantConnectMessageEvent';
+import {QuitMessageComposer} from '../../communication/messages/outgoing/room/session/QuitMessageComposer';
 
 // Parsers
 import type {
@@ -44,6 +47,8 @@ import type {
 import type {
     YouAreSpectatorMessageParser
 } from '../../communication/messages/parser/room/session/YouAreSpectatorMessageParser';
+import type {RoomForwardMessageParser} from '../../communication/messages/parser/room/session/RoomForwardMessageParser';
+import type {CantConnectMessageParser} from '../../communication/messages/parser/room/session/CantConnectMessageParser';
 
 import {Logger} from '@core/utils/Logger';
 
@@ -87,6 +92,8 @@ export class RoomSessionHandler extends BaseHandler
         this.addMessageEvent(connection, new FlatAccessDeniedMessageEvent(this.onFlatAccessDenied.bind(this)));
         this.addMessageEvent(connection, new RoomQueueStatusMessageEvent(this.onRoomQueueStatus.bind(this)));
         this.addMessageEvent(connection, new YouAreSpectatorMessageEvent(this.onYouAreSpectator.bind(this)));
+        this.addMessageEvent(connection, new RoomForwardMessageEvent(this.onRoomForward.bind(this)));
+        this.addMessageEvent(connection, new CantConnectMessageEvent(this.onCantConnect.bind(this)));
     }
 
     override dispose(): void
@@ -302,5 +309,37 @@ export class RoomSessionHandler extends BaseHandler
         }
 
         session.isSpectatorMode = true;
+    }
+
+    /**
+     * The server sends this right after the SSO login with the start room, and whenever it moves
+     * the player: it never puts anyone in a room itself, the client connects.
+     */
+    // DEVIATION: AS3's navigator asks GetGuestRoom first and enters on the answer; GetGuestRoom is not
+    //   in the core-cut contract (2026-10-07), so the session enters the room directly.
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/navigator/_SafeCls_1951.as::onRoomForward()
+    private onRoomForward(event: IMessageEvent): void
+    {
+        const parser = event?.parser as RoomForwardMessageParser | null;
+
+        if(!parser || !this.listener) return;
+
+        log.debug(`Room forward: ${parser.roomId}`);
+        this.listener.gotoRoom(parser.roomId);
+    }
+
+    /** The entry failed (full, banned, blocked, queue error); RoomUI tells the player why. */
+    // DEVIATION: AS3's navigator also sends the player back to reception through the toolbar; both
+    //   left with the core cut, so the pending session is simply dropped.
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/navigator/_SafeCls_1951.as::onCantConnect()
+    private onCantConnect(event: IMessageEvent): void
+    {
+        const parser = event?.parser as CantConnectMessageParser | null;
+
+        if(!parser) return;
+
+        log.warn(`Cannot enter room ${this.roomId}: reason ${parser.reason}`);
+        this.connection?.send(new QuitMessageComposer());
+        this.listener?.sessionUpdate(this.roomId, RoomSessionHandlerState.RS_DISCONNECTED);
     }
 }

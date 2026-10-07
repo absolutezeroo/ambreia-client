@@ -37,4 +37,8 @@ export interface IRoomHandlerListener
 	 */
     // AS3: .../src/com/sulake/habbo/session/IRoomHandlerListener.as::getSession()
     getSession(roomId: number): IRoomSession | null;
+
+    // TS-only: AS3's navigator answered RoomForward by entering the room; the navigator left with the
+    //   core cut (2026-10-07), so RoomSessionHandler does it through the manager.
+    gotoRoom(roomId: number): boolean;
 }

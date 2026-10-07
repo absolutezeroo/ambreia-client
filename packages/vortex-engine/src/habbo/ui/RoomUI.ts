@@ -33,6 +33,11 @@ import type {IHabboConfigurationManager} from '@habbo/configuration/IHabboConfig
 import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';
 import type {IAvatarRenderManager} from '@habbo/avatar/IAvatarRenderManager';
 import type {IHabboCommunicationManager} from '@habbo/communication/IHabboCommunicationManager';
+import type {IMessageEvent} from '@core/communication/messages/IMessageEvent';
+import {CantConnectMessageEvent} from '@habbo/communication/messages/incoming/room/session/CantConnectMessageEvent';
+import type {CantConnectMessageParser} from '@habbo/communication/messages/parser/room/session/CantConnectMessageParser';
+import {NotificationDialogMessageEvent} from '@habbo/communication/messages/incoming/notifications/NotificationDialogMessageEvent';
+import type {NotificationDialogMessageEventParser} from '@habbo/communication/messages/parser/notifications/NotificationDialogMessageEventParser';
 import type {IRoomSession} from '@habbo/session/IRoomSession';
 
 // Events
@@ -257,7 +262,14 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
     /**
      * The communication manager, used to construct widgets that need it (e.g. room tools).
      */
-    public get communicationManager(): IHabboCommunicationManager | null 
+    // TS-only: the navigator and the notifications component answered these two with an alert; both
+    //   left with the core cut (2026-10-07), and RoomUI is the kept component with a window manager.
+    private readonly _alertMessageEvents: IMessageEvent[] = [
+        new CantConnectMessageEvent(this.onCantConnect.bind(this)),
+        new NotificationDialogMessageEvent(this.onNotificationDialog.bind(this)),
+    ];
+
+    public get communicationManager(): IHabboCommunicationManager | null
     {
         return this._communicationManager;
     }
@@ -464,8 +476,14 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
             ),
             new ComponentDependency(
                 IID_HabboCommunicationManager,
-                (communicationManager: IHabboCommunicationManager | null) => 
+                (communicationManager: IHabboCommunicationManager | null) =>
                 {
+                    for(const event of this._alertMessageEvents)
+                    {
+                        this._communicationManager?.removeHabboConnectionMessageEvent(event);
+                        communicationManager?.addHabboConnectionMessageEvent(event);
+                    }
+
                     this._communicationManager = communicationManager;
 
                     for(const desktop of this._desktops.values()) 
@@ -638,6 +656,11 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
             }
         }
 
+        for(const event of this._alertMessageEvents)
+        {
+            this._communicationManager?.removeHabboConnectionMessageEvent(event);
+        }
+
         // Dispose all desktops
         for(const desktop of this._desktops.values())
         {
@@ -732,6 +755,52 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
         }
 
         this._windowManager?.alert(errorTitle, errorMessage, 0, (dialog) => dialog.dispose());
+    }
+
+    /** AS3 reads the reason one lower than it is sent: 1 is "room full", 3 a queue error, 4 banned, 5 blocked. */
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/navigator/_SafeCls_1951.as::onCantConnect()
+    private onCantConnect(event: IMessageEvent): void
+    {
+        const parser = event?.parser as CantConnectMessageParser | null;
+
+        if(!parser) return;
+
+        let caption = '${room.queue.error.title}';
+        let text = '${room.queue.error.title}';
+
+        switch(parser.reason - 1)
+        {
+            case 0:
+                caption = '${navigator.guestroomfull.title}';
+                text = '${navigator.guestroomfull.text}';
+                break;
+            case 2:
+                text = `\${room.queue.error.${parser.parameter}}`;
+                break;
+            case 3:
+                caption = '${navigator.banned.title}';
+                text = '${navigator.banned.text}';
+                break;
+            case 4:
+                caption = '${navigator.blocked.title}';
+                text = '${navigator.blocked.text}';
+                break;
+        }
+
+        this._windowManager?.alert(caption, text, 0, (dialog) => dialog.dispose());
+    }
+
+    // DEVIATION: AS3 hands the dialog to the notifications component, which picks a bubble, a window or
+    //   nothing per type from external_variables; that component left with the core cut (2026-10-07),
+    //   so every dialog becomes a plain alert of its `message` parameter.
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/notifications/_SafeCls_1951.as::onNotificationDialogMessageEvent()
+    private onNotificationDialog(event: IMessageEvent): void
+    {
+        const message = (event?.parser as NotificationDialogMessageEventParser | null)?.parameters.get('message');
+
+        if(!message) return;
+
+        this._windowManager?.alert('${generic.alert.title}', message, 0, (dialog) => dialog.dispose());
     }
 
     // AS3: .../src/com/sulake/habbo/ui/RoomUI.as::roomSessionStateEventHandler()
