@@ -56,12 +56,9 @@ import {RoomDesktopMouseZoomEnableEvent} from './widget/events/RoomDesktopMouseZ
 import {PerkAllowancesMessageEvent} from '@ambreia/protocol/incoming/perk/PerkAllowancesMessageEvent';
 import type {PerkAllowancesMessageEventParser} from '@ambreia/protocol/parser/perk/PerkAllowancesMessageEventParser';
 import {PerkType} from '../communication/enum/PerkType';
-import {AvatarInfoWidgetHandler} from './handler/AvatarInfoWidgetHandler';
 import type {AvatarInfoWidget} from './widget/avatarinfo/AvatarInfoWidget';
 // Vortex-only: the fishing handler lives under src/vortex/, not in the ported tree.
-import {LoadingBarWidgetHandler} from './handler/LoadingBarWidgetHandler';
 import type {IHabboAvatarEditor} from '../avatar/IHabboAvatarEditor';
-import {ObjectLocationRequestHandler} from './handler/ObjectLocationRequestHandler';
 import {RoomWidgetFurniToWidgetMessage} from './widget/messages/RoomWidgetFurniToWidgetMessage';
 import {RoomEngineToWidgetEvent} from '@ambreia/iso/scene/events/RoomEngineToWidgetEvent';
 import type {IRoomWidget} from './widget/IRoomWidget';
@@ -850,8 +847,8 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
      *
      * Builds the handler, then hands it to RoomWidgetFactory.
      */
-    // DEVIATION: AS3 builds ~40 widget handlers here; since the core cut (2026-10-07) only the name
-    //   bubble, the loading bar and the object-location answer remain (git tag pre-noyau-client).
+    // DEVIATION: AS3 builds ~40 widget handlers in a switch here; the enabled features declare
+    //   theirs since J6 (RoomWidgetRegistry), and the factory builds handler and widget alike.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::createWidget()
     public createWidget(type: string): void 
     {
@@ -862,29 +859,11 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
             return;
         }
 
-        let handler: IRoomWidgetHandler;
+        // The handler, then the widget, come from the feature that declares the type (J6);
+        // none declares it → null, already warned by the registry.
+        const handler = this._widgetFactory?.createHandler(type) ?? null;
 
-        switch(type) 
-        {
-            case 'RWE_AVATAR_INFO':
-                // Derived name: `createWidgetHandler` is declared in no AS3 tree — the trace points
-                // at the class it belongs to, but the identifier itself is this port's.
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomDesktop.as::createWidgetHandler()
-                handler = new AvatarInfoWidgetHandler();
-                break;
-            case 'RWE_LOADINGBAR':
-                handler = new LoadingBarWidgetHandler();
-                break;
-            // AS3: RoomDesktop.as:858-860 "RWE_LOCATION_WIDGET". No widget behind it — the
-            // handler answers a message synchronously and is the whole feature.
-            case 'RWE_LOCATION_WIDGET':
-                handler = new ObjectLocationRequestHandler();
-                break;
-            default:
-                log.debug(`Widget creation requested: ${type} (stub)`);
-
-                return;
-        }
+        if(!handler) return;
 
         handler.container = this;
 

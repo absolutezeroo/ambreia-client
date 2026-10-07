@@ -29,7 +29,8 @@ import type {IVortexConfig, IVortexWindowAssets} from './Vortex';
 import {Vortex} from './Vortex';
 import {bootFeatures} from '@ambreia/kernel/feature/bootFeatures';
 import type {IKernelReport} from '@ambreia/kernel/feature/bootFeatures';
-import {ENGINE_FEATURES, emptyManagers} from '@ambreia/game/features/index';
+import {GAME_FEATURES, emptyManagers} from '@ambreia/game/features/index';
+import {roomWidgetRegistry} from '@ambreia/game/features/GameFeature';
 import type {IEngineHost} from '@ambreia/game/features/index';
 
 import {PacketLogger} from '@ambreia/net/PacketLogger';
@@ -554,10 +555,11 @@ export class VortexMain implements IVortexMain
             legacy: config.kernel.legacy,
             onWindowManager: windowManager => this.applyWindowAssets(config.windowAssets ?? null, windowManager),
             renderer: () => Vortex.instance?.application?.renderer ?? null,
+            roomWidgets: roomWidgetRegistry(GAME_FEATURES, config.kernel),
             made
         };
 
-        this._kernelReport = await bootFeatures(ctx, ENGINE_FEATURES, config.kernel, host);
+        this._kernelReport = await bootFeatures(ctx, GAME_FEATURES, config.kernel, host);
 
         this._configurationManager = made.configuration;
         this._habboCommunicationManager = made.communication;

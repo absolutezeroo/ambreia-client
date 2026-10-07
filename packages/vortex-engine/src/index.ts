@@ -10,7 +10,8 @@ export * from '@ambreia/game/core/communication/index';
 // Main
 export * from './Vortex';
 export * from './VortexMain';
-export {ENGINE_FEATURES} from '@ambreia/game/features/index';
+export {GAME_FEATURES} from '@ambreia/game/features/index';
+export {featureImages} from '@ambreia/game/features/GameFeature';
 export type {IEngineHost, IEngineManagers} from '@ambreia/game/features/index';
 
 // Main Types

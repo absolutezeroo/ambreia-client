@@ -1,14 +1,14 @@
 import type EventEmitter from 'eventemitter3';
 import type {IWindow} from '@ambreia/ui/IWindow';
 import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
-import type {IHabboWindowManager} from '../../../window/IHabboWindowManager';
+import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
-import type {IHabboLocalizationManager} from '../../../localization/IHabboLocalizationManager';
-import type {IHabboConfigurationManager} from '../../../configuration/IHabboConfigurationManager';
+import type {IHabboLocalizationManager} from '../../localization/IHabboLocalizationManager';
+import type {IHabboConfigurationManager} from '../../configuration/IHabboConfigurationManager';
 import {Logger} from '@ambreia/common/utils/Logger';
-import type {IRoomWidgetHandler} from '../../IRoomWidgetHandler';
-import {RoomWidgetBase} from '../RoomWidgetBase';
-import {RoomWidgetLoadingBarUpdateEvent} from '../events/RoomWidgetLoadingBarUpdateEvent';
+import type {IRoomWidgetHandler} from '../../ui/IRoomWidgetHandler';
+import {RoomWidgetBase} from '../../ui/widget/RoomWidgetBase';
+import {RoomWidgetLoadingBarUpdateEvent} from '../../ui/widget/events/RoomWidgetLoadingBarUpdateEvent';
 
 const log = Logger.getLogger('habbo.ui.widget.loadingbar.LoadingBarWidget');
 

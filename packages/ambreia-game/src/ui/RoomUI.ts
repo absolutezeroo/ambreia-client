@@ -61,6 +61,7 @@ import type {IRoomUI} from './IRoomUI';
 import type {IRoomDesktop} from './IRoomDesktop';
 import {RoomDesktop} from './RoomDesktop';
 import {RoomWidgetFactory} from './RoomWidgetFactory';
+import {RoomWidgetRegistry} from './RoomWidgetRegistry';
 import {HideRoomWidgetEvent} from './widget/events/HideRoomWidgetEvent';
 import type {IDisplayObjectWrapper} from '@ambreia/ui/components/IDisplayObjectWrapper';
 
@@ -203,11 +204,11 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
     private _desktops: Map<string, RoomDesktop> = new Map();
     private _currentDesktop: RoomDesktop | null = null;
 
-    constructor(context: IContext, flags: number = 0, assetLibrary: IAssetLibrary | null = null) 
+    constructor(context: IContext, flags: number = 0, assetLibrary: IAssetLibrary | null = null, roomWidgets: RoomWidgetRegistry = new RoomWidgetRegistry())
     {
         super(context, flags, assetLibrary);
 
-        this._widgetFactory = new RoomWidgetFactory(this);
+        this._widgetFactory = new RoomWidgetFactory(this, roomWidgets);
         this.registerUpdateReceiver(this, 0);
     }
 

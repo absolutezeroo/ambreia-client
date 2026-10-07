@@ -19,4 +19,7 @@ export interface IRoomWidgetFactory extends IDisposable
 	 */
     // AS3: .../src/com/sulake/habbo/ui/IRoomWidgetFactory.as::createWidget()
     createWidget(type: string, handler: IRoomWidgetHandler): unknown | null;
+
+    /** The handler of a widget type, or null when no enabled feature declares it. */
+    createHandler(type: string): IRoomWidgetHandler | null;
 }

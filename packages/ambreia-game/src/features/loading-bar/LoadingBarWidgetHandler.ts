@@ -1,8 +1,8 @@
-import type {IRoomWidgetHandler} from '../IRoomWidgetHandler';
-import type {IRoomWidgetHandlerContainer} from '../IRoomWidgetHandlerContainer';
-import type {RoomWidgetMessage} from '../widget/messages/RoomWidgetMessage';
-import type {RoomWidgetUpdateEvent} from '../widget/events/RoomWidgetUpdateEvent';
-import {RoomWidgetLoadingBarUpdateEvent} from '../widget/events/RoomWidgetLoadingBarUpdateEvent';
+import type {IRoomWidgetHandler} from '../../ui/IRoomWidgetHandler';
+import type {IRoomWidgetHandlerContainer} from '../../ui/IRoomWidgetHandlerContainer';
+import type {RoomWidgetMessage} from '../../ui/widget/messages/RoomWidgetMessage';
+import type {RoomWidgetUpdateEvent} from '../../ui/widget/events/RoomWidgetUpdateEvent';
+import {RoomWidgetLoadingBarUpdateEvent} from '../../ui/widget/events/RoomWidgetLoadingBarUpdateEvent';
 
 /**
  * Passes the loading bar's show/hide event straight through to the widget bus.

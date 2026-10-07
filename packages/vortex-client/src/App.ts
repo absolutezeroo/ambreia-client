@@ -1,5 +1,5 @@
 import type {IVortexConfig, IVortexWindowAssets} from 'vortex-engine';
-import {ENGINE_FEATURES} from 'vortex-engine';
+import {GAME_FEATURES, featureImages} from 'vortex-engine';
 import {loadConfig, ConfigError} from '@ambreia/kernel/config/loadConfig';
 import type {IKernelConfig} from '@ambreia/kernel/config/loadConfig';
 import {browserSources, parseConfigJson} from '@ambreia/kernel/config/browserSources';
@@ -403,7 +403,8 @@ async function registerChatStyleImageAssets(vortex: Vortex, imageBundle: AssetBu
  *   and WardrobeSlot asks for the empty-slot artwork. Without these the palettes render
  *   white and the remove tile renders nothing - exactly the silent failure this comment
  *   warns about.
- * - LIBRARY_IMAGE_NAMES: the rest, one-off lookups by exact name.
+ * - `featureImages`: the rest, one-off lookups by exact name, declared by the feature that reads
+ *   them (`IGameFeature.images`, J6).
  *
  * That list grows once per feature that reads a bitmap from the library, which is a standing
  * trap: a missing entry does not fail loudly, it just renders nothing. The current set was found
@@ -412,7 +413,7 @@ async function registerChatStyleImageAssets(vortex: Vortex, imageBundle: AssetBu
  *
  * @see sources/win63_version/habbo/window/ResourceManager.as
  */
-async function readImageAssets(imageBundle: AssetBundle, layoutNames: ReadonlySet<string>): Promise<{
+async function readImageAssets(imageBundle: AssetBundle, layoutNames: ReadonlySet<string>, featureNames: ReadonlySet<string>): Promise<{
     imageUrls: Map<string, AssetUrlSource>;
     libraryImages: Map<string, ImageBitmap>;
 }>
@@ -451,8 +452,9 @@ async function readImageAssets(imageBundle: AssetBundle, layoutNames: ReadonlySe
         //    and of 57 `avatar_editor_*` only 29, so dropping these would blank the rest.
         //    `sign_icon_*` is NOT here — all seven are layout-named, which is the point.
         //
-        // 3. `LIBRARY_IMAGE_NAMES` — one-off `getAssetByName('…')` calls in code, which no rule can
-        //    derive. Almost none of them appear in a layout; that list has to stay explicit.
+        // 3. `featureNames` — one-off `getAssetByName('…')` calls in code, which no rule can
+        //    derive: each enabled feature declares the ones it reads (IGameFeature.images). The
+        //    85 names listed here before J6 served modules the core cut removed; none was read.
         //
         // Deliberately in none of the three: `s_fish_area_*`, `h_fishing_rod_*`, `sh_*`,
         // `h_hooked_*`. They are room sprites — the spot furni, the rod, the splash — which the room
@@ -470,7 +472,7 @@ async function readImageAssets(imageBundle: AssetBundle, layoutNames: ReadonlySe
             // `AvatarVisualization.getAvatarRendererAsset()` asks the library for the result. Thirty
             // images between them.
             || name.startsWith('user_') || name.startsWith('number_')
-            || LIBRARY_IMAGE_NAMES.has(name))
+            || featureNames.has(name))
         {
             decodes.push(imageBundle.getImageBitmap(key).then((bitmap) =>
             {
@@ -609,7 +611,7 @@ async function loadClientConfig(): Promise<IKernelConfig>
 {
     const response = await fetch(`${import.meta.env.BASE_URL}config.json`).catch(() => null);
     const text = response !== null && response.ok && (response.headers.get('content-type') ?? '').includes('json') ? await response.text() : null;
-    const {config, warnings} = loadConfig(browserSources(window.location, parseConfigJson(text)), featureSections(ENGINE_FEATURES));
+    const {config, warnings} = loadConfig(browserSources(window.location, parseConfigJson(text)), featureSections(GAME_FEATURES));
 
     for(const warning of warnings) log.warn(warning);
 
@@ -653,152 +655,6 @@ function showBootError(title: string, lines: readonly string[]): void
  * This mirrors the AS3 pattern where WindowRenderer composed everything into a
  * single BitmapData displayed as a Bitmap on the Stage.
  */
-/**
- * Images that some ported class fetches from the asset library by exact name, rather than
- * through the window manager's URL registry. Prefix families are handled inline in
- * readImageAssets(); this is for the one-offs.
- *
- * - dimmer_slider_*: BackgroundColorWidgetSlider's track and thumb.
- * - stickie_*: StickieFurniWidget's blank note, close and delete buttons.
- * - thumb_up: ExtraInfoPromoItem in the catalog's bundle purchase display.
- * - the friend list block: every bitmap HabboFriendList.getButtonImage() resolves, which is
- *   every `*_png` field of `binaryData/HabboFriendListCom.as` — that file is the authority,
- *   not a grep of call sites, because AS3 loads them from that component's own library.
- *   Tab headers (hdr_*), the category arrows, the footer buttons and the row buttons.
- */
-const LIBRARY_IMAGE_NAMES: ReadonlySet<string> = new Set([
-    // HabboFreeFlowChatCom.as — the chat-history tray. Every one is read by a *variable*
-    // (`createBitmapSprite(chatFlow, name)`, `createSlice(chatFlow, name, grid)`), so the grep
-    // this file prescribes cannot see them: the literal is at the call site, not inside the
-    // `getAssetByName()` call. The `*Com.as` field names are the authority, as for the friend
-    // list below. Without them the tray opens as a bare dark column: no bar, no handle — and no
-    // handle means no hit area, so the only way to shut it again is the room-tools button.
-    // `room_change` is the older miss of the set: `getRoomChangeBitmap()` has answered null since
-    // it was written, so every room-change divider drew its timestamp and name over nothing.
-    'close_x',
-    'room_change',
-    'scrollbar_back',
-    'scrollbar_thumb',
-    'tray_bar',
-    'tray_handle_close',
-    'tray_handle_open',
-
-    // Second sweep, over `refreshButton(container, name, ...)` rather than
-    // `getAssetByName('<literal>')`. The prescribed grep cannot see these: the
-    // name is an argument that HabboNavigator.getButtonImage() resolves, so no
-    // literal lookup exists to grep. Every icon in the in-room room-info view
-    // is in here.
-    'create_room',
-    'doormode_doorbell_small',
-    'doormode_invisible_small',
-    'doormode_password_small',
-    'favourite',
-    'group_base_icon',
-    'home',
-    'icon_weblink',
-    'make_favourite',
-    'make_home',
-    'navi_room_icon',
-    'popup_arrow_down',
-    'remove_rights',
-
-    // Found by the sweep this file's own comment prescribes — every literal
-    // getAssetByName() in the monorepo, intersected with the images bundle,
-    // minus what was already listed. Twenty names came back: each of them had
-    // a PNG shipping, a call site reading it, and no library entry, so each
-    // rendered nothing at all. The infostand's house icon is what exposed them.
-    'dimmer_color_button',
-    'dimmer_color_frame',
-    'dimmer_color_selected',
-    'dimmer_info',
-    'extend_hilite',
-    'gift_icon_background',
-    'gift_incognito',
-    'icon_home',
-    'inventory_furni_icon_credits',
-    'memenu_settings_slider_base',
-    'memenu_settings_slider_button',
-    'small_pen',
-    'sounds_off_color',
-    'sounds_off_white',
-    'sounds_on_color',
-    'sounds_on_white',
-    'use_product_preview_bg',
-
-    'dimmer_slider_base',
-    'dimmer_slider_button',
-
-    // HabboCatalog.getSubscriptionProductIcon(): the icon every subscription product renders
-    // with. `fx_icon_*` (its sibling) is already covered by the prefix rule above. The RPG fork
-    // removed the mint-token products, and with them `minting_token_large`.
-    'icon_hc',
-
-    // ProductContainer.setAddOnIcon(): the add-on marker on an offer that bundles a badge / chat
-    // style or the ninja effect. Read through the method's parameter, so the literal grep missed
-    // them; without them the null asset threw and took the whole catalog page down with it.
-    'catalog_icon_badge_included',
-    'catalog_icon_ninja_effect_included',
-    'stickie_blanco',
-    'stickie_close',
-    'stickie_remove',
-    'thumb_up',
-
-    // HabboFriendListCom.as
-    'arrow_down_black',
-    'arrow_down_white',
-    'arrow_right_black',
-    'arrow_right_white',
-    'ask_for_friend',
-    'follow_friend',
-    'hdr_friend_requests',
-    'hdr_friends',
-    'hdr_hilite',
-    'hdr_search',
-    'minimail',
-    'offline',
-    'open_edit_ctgs',
-    'open_homepage',
-    'open_inbox',
-    'open_minimail',
-    'opened_to_web',
-    'popup_arrow_left',
-    'popup_arrow_right',
-    'remove_friend',
-    'room_invite',
-    'search',
-    'start_chat',
-
-    // HabboFriendBarCom.as — the icons the bar's slots read by exact name.
-    // `find_friends_icon` is declared in that component but was never extracted into
-    // src/assets/images/, so AddFriendsTab shows no icon; AS3 guards the lookup the same
-    // way, so this is a missing asset rather than a code gap.
-    'add_friends_icon',
-    'plus_friend_icon',
-    'find_friends_icon',
-
-    // HabboNotificationsCom.as — the icons `habbo_notifications_config_xml` names per
-    // notification type. SingularNotificationController resolves each one to a bitmap at
-    // startup and hands it to the bubble; a missing entry costs the notification its icon and
-    // nothing else, which is the silent failure this list exists to prevent.
-    'if_icon_temp',
-    'if_icon_hc',
-    'if_icon_vip',
-    'if_icon_recycler',
-    'if_icon_ltd',
-    'if_icon_earning',
-
-    // The rod-quality indicator in the Fishopedia's header, one sprite per tier.
-    'fishing_skill_level_0',
-    'fishing_skill_level_1',
-    'fishing_skill_level_2',
-    'fishing_skill_level_3',
-    'fishing_skill_level_4',
-    'fishing_skill_level_5',
-
-    // The Fish Token, beside its count in the same header.
-    'icon_fish_token',
-]);
-
 export class VortexApp 
 {
     /**
@@ -1137,7 +993,7 @@ export class VortexApp
         // HabboWindowManager owns them at construction the way AS3's does (its third
         // constructor argument is the already-filled AssetLibrary). See IVortexWindowAssets.
         const vortex = await Vortex.bootstrap(
-            {...vortexConfig, windowAssets: await this.readWindowAssets(imageBundle, xmlBundle)},
+            {...vortexConfig, windowAssets: await this.readWindowAssets(imageBundle, xmlBundle, featureImages(GAME_FEATURES, vortexConfig.kernel))},
             this._loadingScreen ?? undefined
         );
 
@@ -1170,7 +1026,7 @@ export class VortexApp
      * manager afterwards, which is what AS3 does by handing HabboWindowManagerComponent its
      * AssetLibrary as a constructor argument.
      */
-    private async readWindowAssets(imageBundle: AssetBundle, xmlBundle: AssetBundle): Promise<IVortexWindowAssets>
+    private async readWindowAssets(imageBundle: AssetBundle, xmlBundle: AssetBundle, featureNames: ReadonlySet<string>): Promise<IVortexWindowAssets>
     {
         const windowAssets: IVortexWindowAssets = {};
 
@@ -1312,7 +1168,8 @@ export class VortexApp
         // because they name images too.
         const {imageUrls, libraryImages} = await readImageAssets(
             imageBundle,
-            readLayoutImageNames(new Map([...windowAssets.libraryLayouts, ...windowAssets.layouts]))
+            readLayoutImageNames(new Map([...windowAssets.libraryLayouts, ...windowAssets.layouts])),
+            featureNames
         );
 
         windowAssets.imageUrls = imageUrls;

@@ -1,5 +1,4 @@
 import type {Renderer} from 'pixi.js';
-import type {HostFeature} from '@ambreia/kernel/feature/defineFeature';
 import type {AssetLibrary} from '@ambreia/common/assets/AssetLibrary';
 import {RoomManager} from '@ambreia/iso/RoomManager';
 import {HabboRoomRendererFactory} from '@ambreia/iso/scene/renderer/HabboRoomRendererFactory';
@@ -15,6 +14,11 @@ import {SessionDataManager} from '../session/SessionDataManager';
 import {RoomEngine} from '../room/RoomEngine';
 import {HabboWindowManager} from '../window/HabboWindowManager';
 import {RoomUI} from '../ui/RoomUI';
+import type {RoomWidgetRegistry} from '../ui/RoomWidgetRegistry';
+import {ObjectLocationRequestHandler} from '../ui/handler/ObjectLocationRequestHandler';
+import type {IGameFeature} from './GameFeature';
+import {AvatarInfoFeature} from './avatar-info/feature';
+import {LoadingBarFeature} from './loading-bar/feature';
 import {IID_HabboConfigurationManager} from '../iid/IIDHabboConfigurationManager';
 import {IID_HabboCommunicationManager} from '../iid/IIDHabboCommunicationManager';
 import {IID_HabboLocalizationManager} from '../iid/IIDHabboLocalizationManager';
@@ -55,11 +59,13 @@ export interface IEngineHost
     onWindowManager(windowManager: HabboWindowManager): void;
     /** The application's renderer once it exists (screenshots); the game does not own it. */
     renderer(): Renderer | null;
+    /** The room widgets the enabled features declare (roomWidgetRegistry()), for RoomUI. */
+    readonly roomWidgets: RoomWidgetRegistry;
     readonly made: IEngineManagers;
 }
 
-/** Declares an engine feature: its host is the engine's (IEngineHost). */
-const feature = (declaration: HostFeature<IEngineHost>): HostFeature<IEngineHost> => declaration;
+/** Declares a game feature: its host is the engine shell's (IEngineHost). */
+const feature = (declaration: IGameFeature): IGameFeature => declaration;
 
 export function emptyManagers(): IEngineManagers
 {
@@ -266,15 +272,19 @@ const Windows = feature({
 const RoomUserInterface = feature({
     id: 'room-ui',
     provides: [IID_RoomUI],
-    create: ({context, host}) => (host.made.roomUI = new RoomUI(context, 0, host.assets))
+    create: ({context, host}) => (host.made.roomUI = new RoomUI(context, 0, host.assets, host.roomWidgets)),
+    // AS3 RWE_LOCATION_WIDGET: a handler and no widget, answering where a room object is on screen.
+    roomWidgets: {RWE_LOCATION_WIDGET: {handler: () => new ObjectLocationRequestHandler()}}
 });
 
 /**
- * The engine's features, in the order prepareCore() attached them (spec §4: a feature is a
+ * The game's features, in the order prepareCore() attached them (spec §4: a feature is a
  * declaration and a line here). The avatar editor is not one yet: the client builds it after its
  * window layouts are registered (VortexMain.initAvatarEditor()).
  */
-export const ENGINE_FEATURES: readonly HostFeature<IEngineHost>[] = [
+export const GAME_FEATURES: readonly IGameFeature[] = [
     Configuration, Communication, CommunicationDemo, Localization, Rooms, RoomRenderers, RoomSessions,
-    SessionData, RoomEngines, AvatarRenderer, Windows, RoomUserInterface
+    SessionData, RoomEngines, AvatarRenderer, Windows, RoomUserInterface,
+    AvatarInfoFeature,
+    LoadingBarFeature
 ];
