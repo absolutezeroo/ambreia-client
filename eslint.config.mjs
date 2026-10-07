@@ -341,8 +341,8 @@ export default tseslint.config(
         {
             'no-restricted-imports': wall(
                 {
-                    regex: '^@(core|habbo|room|iid|ui)(/|$)|^@ambreia/(?!common/|map-editor-core/)|(^|/)vortex-(engine|client)(/|$)|(^|/)ambreia-[a-z-]+/src(/|$)',
-                    message: `The map editor app builds on @ambreia/map-editor-core and @ambreia/common only (${WALLS_SPEC}).`
+                    regex: '^@(core|habbo|room|iid|ui)(/|$)|^@ambreia/(?!common/|map-editor-core/|ui/)|(^|/)vortex-(engine|client)(/|$)|(^|/)ambreia-[a-z-]+/src(/|$)',
+                    message: `The map editor app builds on @ambreia/map-editor-core, @ambreia/ui and @ambreia/common only (${WALLS_SPEC}).`
                 }
             )
         }

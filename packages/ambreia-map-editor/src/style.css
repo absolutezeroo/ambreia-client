@@ -288,3 +288,8 @@ kbd {
 .journal .clickable:hover { background: var(--accent-soft); }
 .journal .current { font-weight: 700; color: var(--title-b); }
 .journal .undone { color: var(--muted); text-decoration: line-through; }
+
+/* The editor's windows: one canvas, the whole window. */
+#stage { position: fixed; inset: 0; background: #0f1f33; }
+#stage[hidden], #app[hidden] { display: none; }
+.window-canvas { display: block; }

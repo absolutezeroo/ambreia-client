@@ -141,9 +141,15 @@ importers:
         version: 0.18.13
   packages/ambreia-map-editor:
     dependencies:
+      '@ambreia/common':
+        specifier: workspace:*
+        version: link:../ambreia-common
       '@ambreia/map-editor-core':
         specifier: workspace:*
         version: link:../ambreia-map-editor-core
+      '@ambreia/ui':
+        specifier: workspace:*
+        version: link:../ambreia-ui
       '@tauri-apps/plugin-opener':
         specifier: ^2.2.0
         version: 2.7.0

@@ -1,2 +1,5 @@
-/** The layers the first editor shows; the RPG layers join when their panels exist. */
-export type LayerName = 'floor' | 'door' | 'decor' | 'wallDecor';
+/**
+ * The layers of the owner's layout (bottom panel): the floor carries the door and the entries, the
+ * mobis carry the wall mobis, the zones carry the areas and the passages.
+ */
+export type LayerName = 'floor' | 'decor' | 'npcs' | 'spawns' | 'zones' | 'triggers' | 'ambience';

@@ -2,9 +2,9 @@ import type {ZoneDecorObject} from '../zone/Zone.generated';
 import type {IEditorCommand} from './IEditorCommand';
 import {updateDecor} from './updateDecor';
 
-type DecorPatch = Partial<Pick<ZoneDecorObject, 'interaction' | 'tag' | 'collision' | 'state'>>;
+type DecorPatch = Partial<Pick<ZoneDecorObject, 'interaction' | 'tag' | 'collision' | 'state' | 'rotation'>>;
 
-/** The inspector's furni fields: interaction, tag, collision overrides, state. */
+/** The inspector's furni fields: interaction, tag, collision overrides, state, rotation. */
 export const patchDecor = (id: string, patch: DecorPatch): IEditorCommand => ({
     label: `Propriétés de ${id}`,
     apply: doc => updateDecor(doc, new Set([id]), o =>

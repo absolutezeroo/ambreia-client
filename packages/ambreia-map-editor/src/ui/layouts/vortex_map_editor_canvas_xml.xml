@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The editor's own: a canvas the code draws (mini-map), sized to the slot it is put in. Param 1
+     makes it a hit target so a click on it reaches the code. -->
+<layout name="vortex_map_editor_canvas_xml" width="100" height="100" version="0.1">
+  <window>
+    <display_object_wrapper x="0" y="0" width="100" height="100" params="1" name="canvas_host"/>
+  </window>
+</layout>

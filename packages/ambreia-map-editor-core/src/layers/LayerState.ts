@@ -3,7 +3,7 @@ import type {LayerName} from './LayerName';
 /** Visible and locked per layer: editor state, never saved in the document. */
 export class LayerState
 {
-    static readonly NAMES: readonly LayerName[] = ['floor', 'door', 'decor', 'wallDecor'];
+    static readonly NAMES: readonly LayerName[] = ['floor', 'decor', 'npcs', 'spawns', 'zones', 'triggers', 'ambience'];
 
     private readonly _hidden = new Set<LayerName>();
     private readonly _locked = new Set<LayerName>();

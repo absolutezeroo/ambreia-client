@@ -17,7 +17,7 @@ const WALL_HEIGHT = 3.6 * STEP;
  */
 export class IsoView
 {
-    onPointer: (kind: PointerKind, pick: IPick, e: PointerEvent) => void = () => undefined;
+    onPointer: (kind: PointerKind, pick: IPick, e: MouseEvent) => void = () => undefined;
     /** The camera moved or zoomed: the mini-map and the zoom readout follow. */
     onViewChange: () => void = () => undefined;
 
@@ -28,17 +28,33 @@ export class IsoView
     private _oy = 0;
     private _pan: {x: number; y: number} | null = null;
     private _fitted = false;
+    private _width = 1;
+    private _height = 1;
 
-    constructor(private readonly _canvas: HTMLCanvasElement)
+    /**
+     * The view draws into its own canvas, which is not in the page: the window system shows it in
+     * the owner's viewport (a display object wrapper) and the host forwards the pointer, in the
+     * view's own coordinates.
+     */
+    readonly canvas = document.createElement('canvas');
+
+    constructor()
     {
-        this._ctx = _canvas.getContext('2d')!;
+        this._ctx = this.canvas.getContext('2d')!;
+    }
 
-        new ResizeObserver(() => this.resize()).observe(_canvas.parentElement!);
-        _canvas.addEventListener('contextmenu', e => e.preventDefault());
-        _canvas.addEventListener('wheel', e => this.wheel(e), {passive: false});
-        _canvas.addEventListener('pointerdown', e => this.pointer('down', e));
-        _canvas.addEventListener('pointermove', e => this.pointer('move', e));
-        _canvas.addEventListener('pointerup', e => this.pointer('up', e));
+    /** The size of the window that shows the view. */
+    setSize(width: number, height: number): void
+    {
+        if(width === this._width && height === this._height) return;
+
+        this._width = Math.max(1, Math.round(width));
+        this._height = Math.max(1, Math.round(height));
+        this.canvas.width = this._width;
+        this.canvas.height = this._height;
+        if(!this._fitted) this.fit();
+        this.draw();
+        this.onViewChange();
     }
 
     get zoom(): number
@@ -49,9 +65,7 @@ export class IsoView
     /** The visible part of the world, in world pixels (the projection's own units). */
     get viewport(): {x: number; y: number; width: number; height: number}
     {
-        const stage = this._canvas.parentElement!;
-
-        return {x: -this._ox / this._zoom, y: -this._oy / this._zoom, width: stage.clientWidth / this._zoom, height: stage.clientHeight / this._zoom};
+        return {x: -this._ox / this._zoom, y: -this._oy / this._zoom, width: this._width / this._zoom, height: this._height / this._zoom};
     }
 
     setModel(model: IViewModel): void
@@ -64,10 +78,9 @@ export class IsoView
     /** Centres the floor in the stage. */
     fit(): void
     {
-        // The stage, not the canvas: the canvas has no size of its own until the first resize.
-        const stage = this._canvas.parentElement!;
+        const stage = {clientWidth: this._width, clientHeight: this._height};
 
-        if(!this._model || !stage.clientWidth) return;
+        if(!this._model || this._width <= 1) return;
 
         const {width, length} = this._model.doc.floor;
         const [cx, cy] = project(width / 2, length / 2, 0);
@@ -89,7 +102,7 @@ export class IsoView
 
     centerOnWorld(wx: number, wy: number): void
     {
-        const stage = this._canvas.parentElement!;
+        const stage = {clientWidth: this._width, clientHeight: this._height};
 
         this._ox = stage.clientWidth / 2 - wx * this._zoom;
         this._oy = stage.clientHeight / 2 - wy * this._zoom;
@@ -100,20 +113,20 @@ export class IsoView
     /** Zooms around the stage centre. */
     setZoom(zoom: number): void
     {
-        const stage = this._canvas.parentElement!;
+        const stage = {clientWidth: this._width, clientHeight: this._height};
 
         this.zoomAt(zoom, stage.clientWidth / 2, stage.clientHeight / 2);
     }
 
-    pick(clientX: number, clientY: number): IPick
+    /** What lies under (x, y), in the view's own coordinates. */
+    pick(x: number, y: number): IPick
     {
         const model = this._model;
 
         if(!model) return {cell: null, objectId: null};
 
-        const rect = this._canvas.getBoundingClientRect();
-        const px = (clientX - rect.left - this._ox) / this._zoom;
-        const py = (clientY - rect.top - this._oy) / this._zoom;
+        const px = (x - this._ox) / this._zoom;
+        const py = (y - this._oy) / this._zoom;
         const floor = model.doc.floor;
         let cell: IPick['cell'] = null;
 
@@ -154,17 +167,15 @@ export class IsoView
     draw(): void
     {
         const ctx = this._ctx;
-        const dpr = window.devicePixelRatio || 1;
-
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.fillStyle = '#10131a';
-        ctx.fillRect(0, 0, this._canvas.width, this._canvas.height);
+        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
         const model = this._model;
 
         if(!model) return;
 
-        ctx.setTransform(dpr * this._zoom, 0, 0, dpr * this._zoom, dpr * this._ox, dpr * this._oy);
+        ctx.setTransform(this._zoom, 0, 0, this._zoom, this._ox, this._oy);
         ctx.imageSmoothingEnabled = false;
 
         const floor = model.doc.floor;
@@ -176,7 +187,7 @@ export class IsoView
             floor.tiles.forEach((t, i) => this.drawTile(model, i % floor.width, Math.floor(i / floor.width), t, i));
         }
 
-        if(model.layers.isVisible('door'))
+        if(model.layers.isVisible('floor'))
         {
             const {x = 0, y = 0} = floor.door;
 
@@ -198,7 +209,7 @@ export class IsoView
             for(const o of this.sortedDecor(model)) this.drawObject(model, o);
         }
 
-        if(model.layers.isVisible('wallDecor'))
+        if(model.layers.isVisible('decor'))
         {
             for(const w of model.doc.wallDecor ?? [])
             {
@@ -498,27 +509,10 @@ export class IsoView
         ctx.fillText(text, cx, cy - HALF_H / 4);
     }
 
-    private resize(): void
+    /** The wheel over the view zooms around the pointer. */
+    wheel(deltaY: number, x: number, y: number): void
     {
-        const parent = this._canvas.parentElement!;
-        const dpr = window.devicePixelRatio || 1;
-
-        this._canvas.width = Math.round(parent.clientWidth * dpr);
-        this._canvas.height = Math.round(parent.clientHeight * dpr);
-        this._canvas.style.width = `${parent.clientWidth}px`;
-        this._canvas.style.height = `${parent.clientHeight}px`;
-        if(!this._fitted) this.fit();
-        this.draw();
-        this.onViewChange();
-    }
-
-    private wheel(e: WheelEvent): void
-    {
-        e.preventDefault();
-
-        const rect = this._canvas.getBoundingClientRect();
-
-        this.zoomAt(this._zoom * (e.deltaY < 0 ? 1.15 : 1 / 1.15), e.clientX - rect.left, e.clientY - rect.top);
+        this.zoomAt(this._zoom * (deltaY < 0 ? 1.15 : 1 / 1.15), x, y);
     }
 
     private zoomAt(target: number, mx: number, my: number): void
@@ -532,13 +526,12 @@ export class IsoView
         this.onViewChange();
     }
 
-    private pointer(kind: PointerKind, e: PointerEvent): void
+    /** A pointer event from the host, in the view's coordinates. Right or middle button pans. */
+    pointer(kind: PointerKind, x: number, y: number, e: MouseEvent): void
     {
-        // Right or middle button pans; the left button belongs to the tools.
         if(kind === 'down' && e.button !== 0)
         {
-            this._pan = {x: e.clientX - this._ox, y: e.clientY - this._oy};
-            this._canvas.setPointerCapture(e.pointerId);
+            this._pan = {x: x - this._ox, y: y - this._oy};
 
             return;
         }
@@ -548,8 +541,8 @@ export class IsoView
             if(kind === 'up') this._pan = null;
             else
             {
-                this._ox = e.clientX - this._pan.x;
-                this._oy = e.clientY - this._pan.y;
+                this._ox = x - this._pan.x;
+                this._oy = y - this._pan.y;
                 this.draw();
                 this.onViewChange();
             }
@@ -557,8 +550,6 @@ export class IsoView
             return;
         }
 
-        if(kind === 'down') this._canvas.setPointerCapture(e.pointerId);
-
-        this.onPointer(kind, this.pick(e.clientX, e.clientY), e);
+        this.onPointer(kind, this.pick(x, y), e);
     }
 }

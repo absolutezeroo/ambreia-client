@@ -4,6 +4,7 @@ export type ToolName =
     | 'move'
     | 'tile-add'
     | 'tile-remove'
+    | 'hole'
     | 'raise'
     | 'lower'
     | 'rect'

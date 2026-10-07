@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The editor's own: the isometric view's host, inserted as the first child of the owner's
+     viewport_slot so the view toolbar and the info box draw over it. Param 1 makes it a hit target:
+     a click that lands on it, and on no window above it, belongs to the view. -->
+<layout name="vortex_map_editor_iso_view_xml" width="632" height="582" version="0.1">
+  <window>
+    <display_object_wrapper x="0" y="0" width="632" height="582" params="1" name="iso_view"/>
+  </window>
+</layout>

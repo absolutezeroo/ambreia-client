@@ -19,19 +19,13 @@ import {validateLocally} from '@ambreia/map-editor-core/validation/validateLocal
 import {fillCells} from '@ambreia/map-editor-core/zone/fillCells';
 import type {ZoneCell, ZoneDocument, ZoneTile} from '@ambreia/map-editor-core/zone/Zone.generated';
 import {nextId, tileAt, tileIndex} from '@ambreia/map-editor-core/zone/zoneGeometry';
-import {$, describe, esc} from '../panels/html';
-import {BottomPanels} from '../panels/BottomPanels';
-import {CategoryRail} from '../panels/CategoryRail';
-import {PropertiesPanel} from '../panels/PropertiesPanel';
-import {SidePanel} from '../panels/SidePanel';
-import {TitleBar} from '../panels/TitleBar';
-import {ViewToolbar} from '../panels/ViewToolbar';
+import {describe} from '../panels/html';
 import {FurnitureSprites} from '../view/FurnitureSprites';
 import type {IPick} from '../view/IPick';
 import type {IViewOptions} from '../view/IViewOptions';
 import {IsoView} from '../view/IsoView';
 import type {Category} from './Category';
-import {FLOOR_TOOLS} from './FLOOR_TOOLS';
+import {TOOL_KEYS} from './TOOL_KEYS';
 import type {IClipboardEntry} from './IClipboardEntry';
 import type {IJournalEntry} from './IJournalEntry';
 import type {ToolName} from './ToolName';
@@ -41,17 +35,17 @@ const GAME_CLIENT = 'http://localhost:5173/';
 type Cell = {readonly x: number; readonly y: number};
 
 /**
- * One open zone, laid out like the owner's mock-ups: title bar and menus, the category rail, a
- * side panel per category, the view and its toolbar, the properties, and the bottom panels.
- * Panels read this object and call its actions; run() resolves when the user goes back to the
- * zone list.
+ * One open zone: the document and its history, the selection, the tools, the layers, and the
+ * actions on them (edit, save, publish, test). It draws nothing itself: the owner's windows
+ * (ui/EditorShell) attach their panels, read this object and call its actions. run() resolves
+ * when the user goes back to the zone list.
  */
 export class EditorApp
 {
     readonly history: EditorHistory;
     readonly layers = new LayerState();
     readonly sprites = new FurnitureSprites();
-    readonly view: IsoView;
+    readonly view = new IsoView();
     readonly options: IViewOptions = {grid: true, heights: false, walls: true, sprites: true};
     readonly journal: IJournalEntry[] = [];
 
@@ -69,7 +63,8 @@ export class EditorApp
     busy = false;
 
     private readonly _furniture: Map<number, IFurniturePaletteEntry>;
-    private readonly _panels: {render(): void}[];
+    private readonly _panels: {render(): void}[] = [];
+    private readonly _viewListeners: (() => void)[] = [];
     private _clipboard: IClipboardEntry | null = null;
     private _stroke = new Map<number, Cell>();
     private _dragFrom: Cell | null = null;
@@ -78,7 +73,6 @@ export class EditorApp
     private _close: () => void = () => undefined;
 
     constructor(
-        private readonly _root: HTMLElement,
         readonly api: EditorApiClient,
         readonly zone: IZoneSummary,
         doc: ZoneDocument,
@@ -90,44 +84,26 @@ export class EditorApp
         this.savedVersion = zone.latestVersion || null;
         this.publishedVersion = zone.publishedVersion;
 
-        _root.innerHTML = `
-            <div class="editor">
-                <header class="titlebar"></header>
-                <nav class="rail"></nav>
-                <aside class="side"></aside>
-                <main class="stage">
-                    <div class="viewbar"></div>
-                    <div class="canvas-wrap"><canvas></canvas><div class="hud"></div></div>
-                </main>
-                <aside class="props"></aside>
-                <footer class="bottom"></footer>
-            </div>`;
-
-        this.view = new IsoView($<HTMLCanvasElement>(_root, 'canvas'));
         this.view.onPointer = (kind, pick, e) => this.pointer(kind, pick, e);
-
-        const bottom = new BottomPanels($(_root, '.bottom'), this);
-
-        this._panels = [
-            new TitleBar($(_root, '.titlebar'), this),
-            new CategoryRail($(_root, '.rail'), this),
-            new SidePanel($(_root, '.side'), this),
-            new ViewToolbar($(_root, '.viewbar'), this),
-            new PropertiesPanel($(_root, '.props'), this),
-            bottom
-        ];
-        this.view.onViewChange = () =>
-        {
-            bottom.renderMiniMap();
-            this._panels[0].render();
-        };
+        this.view.onViewChange = () => this._viewListeners.forEach(l => l());
         this.sprites.onLoad = () => this.drawView();
 
         window.addEventListener('keydown', this.keydown);
         window.addEventListener('beforeunload', this.unload);
 
         this.log(`Zone ${zone.key} ouverte (${this.savedVersion ? `v${this.savedVersion}` : 'nouvelle'}).`);
-        this.refresh();
+    }
+
+    /** A panel to render after each change. */
+    attach(panel: {render(): void}): void
+    {
+        this._panels.push(panel);
+    }
+
+    /** Called when the camera moves or zooms (mini-map, zoom readout). */
+    onViewChange(listener: () => void): void
+    {
+        this._viewListeners.push(listener);
     }
 
     /** Resolves when the user returns to the zone list. */
@@ -194,7 +170,7 @@ export class EditorApp
     {
         this.category = category;
         if(category === 'decor' && !['select', 'move', 'place'].includes(this.tool)) this.tool = 'select';
-        if(category === 'floor' && ['move', 'place'].includes(this.tool)) this.tool = 'select';
+        if(category !== 'decor' && ['move', 'place'].includes(this.tool)) this.tool = 'select';
         this.refresh();
     }
 
@@ -426,7 +402,6 @@ export class EditorApp
     {
         this.drawView();
         for(const panel of this._panels) panel.render();
-        this.updateHud();
     }
 
     // ── Internals ────────────────────────────────────────────────────────────────
@@ -471,11 +446,12 @@ export class EditorApp
         else if(this.category === 'decor' && key === 's') this.setTool('select');
         else
         {
-            const tool = FLOOR_TOOLS.find(t => t.key.toLowerCase() === key);
+            // The floor tools' letters act in the floor category only: elsewhere a letter is not a
+            // reason to leave what the user is doing.
+            const tool = this.category === 'floor' ? TOOL_KEYS[key] : undefined;
 
             if(!tool) return;
-            if(this.category !== 'floor') this.category = 'floor';
-            this.setTool(tool.tool);
+            this.setTool(tool);
         }
 
         e.preventDefault();
@@ -486,7 +462,7 @@ export class EditorApp
         void this.api.unlock(this.zone.key).catch(() => undefined);
     };
 
-    private pointer(kind: 'down' | 'move' | 'up', pick: IPick, e: PointerEvent): void
+    private pointer(kind: 'down' | 'move' | 'up', pick: IPick, e: MouseEvent): void
     {
         this.hover = pick.cell;
 
@@ -498,6 +474,7 @@ export class EditorApp
                 break;
             case 'tile-add':
             case 'tile-remove':
+            case 'hole':
             case 'raise':
             case 'lower':
             case 'block':
@@ -515,21 +492,20 @@ export class EditorApp
                 }
                 break;
             case 'door':
-                if(kind === 'down' && pick.cell && this.layers.isEditable('door')) this.execute(moveDoor(pick.cell.x, pick.cell.y));
+                if(kind === 'down' && pick.cell && this.layers.isEditable('floor')) this.execute(moveDoor(pick.cell.x, pick.cell.y));
                 break;
             case 'spawn':
-                if(kind === 'down' && pick.cell && this.layers.isEditable('door')) this.execute(toggleSpawn(pick.cell.x, pick.cell.y));
+                if(kind === 'down' && pick.cell && this.layers.isEditable('floor')) this.execute(toggleSpawn(pick.cell.x, pick.cell.y));
                 break;
             case 'place':
                 if(kind === 'down' && pick.cell && this.choice && this.layers.isEditable('decor')) this.place(pick.cell, this.choice);
                 break;
         }
 
-        this.updateHud();
         this.drawView();
     }
 
-    private selectTool(kind: 'down' | 'move' | 'up', pick: IPick, e: PointerEvent): void
+    private selectTool(kind: 'down' | 'move' | 'up', pick: IPick, e: MouseEvent): void
     {
         if(kind === 'down')
         {
@@ -578,7 +554,7 @@ export class EditorApp
         }
     }
 
-    private brush(kind: 'down' | 'move' | 'up', pick: IPick, e: PointerEvent): void
+    private brush(kind: 'down' | 'move' | 'up', pick: IPick, e: MouseEvent): void
     {
         if(!this.layers.isEditable('floor')) return;
 
@@ -594,9 +570,10 @@ export class EditorApp
         const [label, change]: [string, (t: ZoneTile) => ZoneTile] =
             this.tool === 'tile-add' ? [`Ajouter case à ${height}`, t => ({...t, hole: false, height})]
                 : this.tool === 'tile-remove' ? ['Supprimer case', t => ({...t, hole: true})]
-                    : this.tool === 'raise' ? ['Monter le sol', t => ({...t, height: (t.height ?? 0) + 1})]
-                        : this.tool === 'lower' ? ['Descendre le sol', t => ({...t, height: (t.height ?? 0) - 1})]
-                            : [e.shiftKey ? 'Rendre marchable' : 'Bloquer', t => ({...t, walkable: e.shiftKey})];
+                    : this.tool === 'hole' ? [e.shiftKey ? 'Boucher' : 'Creuser', t => ({...t, hole: !e.shiftKey})]
+                        : this.tool === 'raise' ? ['Monter le sol', t => ({...t, height: (t.height ?? 0) + 1})]
+                            : this.tool === 'lower' ? ['Descendre le sol', t => ({...t, height: (t.height ?? 0) - 1})]
+                                : [e.shiftKey ? 'Rendre marchable' : 'Bloquer', t => ({...t, walkable: e.shiftKey})];
 
         this._stroke = new Map();
         this.execute(editTiles(`${label} (${cells.length})`, cells, change));
@@ -668,19 +645,5 @@ export class EditorApp
             dragOffset: this.dragOffset(),
             ghost: this.tool === 'place' ? this.choice : null
         });
-    }
-
-    private updateHud(): void
-    {
-        const h = this.hover;
-        const tile = h ? tileAt(this.doc.floor, h.x, h.y) : null;
-        const doc = this.doc;
-
-        $(this._root, '.hud').innerHTML = [
-            `<b>Map :</b> ${esc(doc.settings.id)}`,
-            `<b>Taille :</b> ${doc.floor.width} × ${doc.floor.length}`,
-            `<b>Zoom :</b> ${Math.round(this.view.zoom * 100)} %`,
-            h ? `<b>Case :</b> (${h.x}, ${h.y}) h ${tile?.height ?? 0}${tile?.hole ? ' · trou' : ''}${tile?.walkable === false ? ' · bloquée' : ''}` : '<span class="muted">clic droit : déplacer · molette : zoom</span>'
-        ].join('<br>');
     }
 }
