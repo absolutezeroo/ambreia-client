@@ -4,12 +4,6 @@
         "baseUrl": ".",
         "types": ["node"],
         "paths": {
-            "@core/*": ["../vortex-engine/src/core/*"],
-            "@core": ["../vortex-engine/src/core"],
-            "@habbo/*": ["../vortex-engine/src/habbo/*"],
-            "@habbo": ["../vortex-engine/src/habbo"],
-            "@iid/*": ["../vortex-engine/src/iid/*"],
-            "@iid": ["../vortex-engine/src/iid"],
             "@/*": ["src/*"]
         },
         "outDir": "dist",

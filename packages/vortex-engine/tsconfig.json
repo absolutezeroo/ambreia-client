@@ -2,14 +2,6 @@
     "extends": "../../tsconfig.json",
     "compilerOptions": {
         "baseUrl": ".",
-        "paths": {
-            "@core/*": ["src/core/*"],
-            "@core": ["src/core"],
-            "@habbo/*": ["src/habbo/*"],
-            "@habbo": ["src/habbo"],
-            "@iid/*": ["src/iid/*"],
-            "@iid": ["src/iid"]
-        },
         "outDir": "dist"
     },
     "include": ["src/**/*"]

@@ -335,6 +335,12 @@ importers:
         specifier: ^8.6.6
         version: 8.16.0
     devDependencies:
+      '@ambreia/game':
+        specifier: workspace:*
+        version: link:../ambreia-game
+      '@ambreia/kernel':
+        specifier: workspace:*
+        version: link:../ambreia-kernel
       '@types/node':
         specifier: ^22.10.0
         version: 22.19.10

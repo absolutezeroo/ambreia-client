@@ -42,8 +42,8 @@ import type {NitroAsset} from '@ambreia/common/assets/NitroAsset';
 import {FurnitureDataParser} from '@ambreia/iso/furniture/data/FurnitureDataParser';
 import type {IFurnitureData} from '@ambreia/iso/furniture/data/IFurnitureData';
 import type {IFurniDataSource} from '@ambreia/iso/scene/IRoomContentConfiguration';
-import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';
-import type {HabboConfigurationManager} from '@habbo/configuration/HabboConfigurationManager';
+import type {IHabboLocalizationManager} from '@ambreia/game/localization/IHabboLocalizationManager';
+import type {HabboConfigurationManager} from '@ambreia/game/configuration/HabboConfigurationManager';
 
 const log = Logger.getLogger('imager.room.RoomStack');
 

@@ -1,4 +1,4 @@
-import type {IDisposable} from '@core';
+import type {IDisposable} from '@ambreia/game/core/index';
 
 /**
  * Loading screen interface.

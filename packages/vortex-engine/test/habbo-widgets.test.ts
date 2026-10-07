@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {HabboWindowManager} from '@habbo/window/HabboWindowManager';
+import {HabboWindowManager} from '@ambreia/game/window/HabboWindowManager';
 import type {IContext} from '@ambreia/kernel/runtime/IContext';
 
 // The 25 types of HabboWidgetFactory.WIDGET_REGISTRY before J3 split them between the kit and the

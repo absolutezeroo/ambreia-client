@@ -31,8 +31,8 @@ const OUT_DIR_NAME = '.vortex-dev';
 
 // Engine and workspace-package specifiers a client file may import. Any `@ambreia/<name>` matches,
 // so a new package needs no edit here; workspaceAliases() finds where it lives.
-export const ENGINE_ALIAS_RE = /^(?:@(?:core|habbo|room|iid)|@ambreia\/[a-z-]+)(\/|$)/;
-const ENGINE_SPEC_RE = /from\s*['"]((?:@(?:core|habbo|room|iid)|@ambreia\/[a-z-]+)(?:\/[^'"]*)?|vortex-engine)['"]|import\s*\(\s*['"]((?:@(?:core|habbo|room|iid)|@ambreia\/[a-z-]+)(?:\/[^'"]*)?|vortex-engine)['"]\s*\)/g;
+export const ENGINE_ALIAS_RE = /^(?:@ambreia\/[a-z-]+)(\/|$)/;
+const ENGINE_SPEC_RE = /from\s*['"]((?:@ambreia\/[a-z-]+)(?:\/[^'"]*)?|vortex-engine)['"]|import\s*\(\s*['"]((?:@ambreia\/[a-z-]+)(?:\/[^'"]*)?|vortex-engine)['"]\s*\)/g;
 
 // Only externalise what the client imports too, so there is exactly one instance of it at
 // runtime. `pako` is engine-only and pnpm does not expose it to resolution from the client
@@ -82,9 +82,6 @@ export function engineBundle(options)
 
 	const ALIAS_TARGETS =
 		{
-			'@core': ENGINE_SRC + '/core',
-			'@habbo': ENGINE_SRC + '/habbo',
-			'@iid': ENGINE_SRC + '/iid',
 			...workspaceAliases(PACKAGES)
 		};
 	const SOURCE_ROOTS = [ENGINE_SRC, ...Object.values(workspaceAliases(PACKAGES))];

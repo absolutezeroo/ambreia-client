@@ -1,17 +1,17 @@
 // Core
-export * from './core';
+export * from '@ambreia/game/core/index';
 
 // IIDs
-export * from './iid/index';
+export * from '@ambreia/game/iid/index';
 
 // Communication
-export * from './core/communication';
+export * from '@ambreia/game/core/communication/index';
 
 // Main
 export * from './Vortex';
 export * from './VortexMain';
-export {ENGINE_FEATURES} from './features';
-export type {IEngineHost, IEngineManagers} from './features';
+export {ENGINE_FEATURES} from '@ambreia/game/features/index';
+export type {IEngineHost, IEngineManagers} from '@ambreia/game/features/index';
 
 // Main Types
 export type {IVortex} from './IVortex';

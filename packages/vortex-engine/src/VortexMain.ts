@@ -1,26 +1,26 @@
 import {EventEmitter} from 'eventemitter3';
-import type {HabboConfigurationManager} from '@habbo/configuration/HabboConfigurationManager';
-import type {HabboCommunicationManager} from '@habbo/communication/HabboCommunicationManager';
-import type {HabboCommunicationDemo} from '@habbo/communication/demo/HabboCommunicationDemo';
-import type {HabboLocalizationManager} from '@habbo/localization/HabboLocalizationManager';
+import type {HabboConfigurationManager} from '@ambreia/game/configuration/HabboConfigurationManager';
+import type {HabboCommunicationManager} from '@ambreia/game/communication/HabboCommunicationManager';
+import type {HabboCommunicationDemo} from '@ambreia/game/communication/demo/HabboCommunicationDemo';
+import type {HabboLocalizationManager} from '@ambreia/game/localization/HabboLocalizationManager';
 import {WindowParser} from '@ambreia/ui/utils/WindowParser';
-import type {RoomEngine} from '@habbo/room';
-import { RoomMessageHandler} from '@habbo/room';
+import type {RoomEngine} from '@ambreia/game/room/index';
+import { RoomMessageHandler} from '@ambreia/game/room/index';
 import type {RoomManager} from '@ambreia/iso/RoomManager';
 import {setTextureExtractor} from '@ambreia/iso/renderer/TextureExtractor';
-import type {RoomSessionManager} from '@habbo/session/RoomSessionManager';
-import {RoomSessionEvent} from '@habbo/session/events/RoomSessionEvent';
-import type {SessionDataManager} from '@habbo/session/SessionDataManager';
+import type {RoomSessionManager} from '@ambreia/game/session/RoomSessionManager';
+import {RoomSessionEvent} from '@ambreia/game/session/events/RoomSessionEvent';
+import type {SessionDataManager} from '@ambreia/game/session/SessionDataManager';
 import type {AvatarRenderManager} from '@ambreia/avatar/AvatarRenderManager';
-import type {HabboWindowManager} from '@habbo/window/HabboWindowManager';
-import type {RoomUI} from '@habbo/ui/RoomUI';
+import type {HabboWindowManager} from '@ambreia/game/window/HabboWindowManager';
+import type {RoomUI} from '@ambreia/game/ui/RoomUI';
 import {Core} from '@ambreia/kernel/Core';
 import {AssetLibrary} from '@ambreia/common/assets/AssetLibrary';
 import {AssetTypeDeclaration} from '@ambreia/common/assets/AssetTypeDeclaration';
 import {XmlAsset} from '@ambreia/common/assets/XmlAsset';
 import {TextAsset} from '@ambreia/common/assets/TextAsset';
 import {UnknownAsset} from '@ambreia/common/assets/UnknownAsset';
-import {CoreCommunicationManager} from '@core/communication/CoreCommunicationManager';
+import {CoreCommunicationManager} from '@ambreia/game/core/communication/CoreCommunicationManager';
 import type {CoreComponentContext} from '@ambreia/kernel/runtime/CoreComponentContext';
 import {CoreComponentContextEvents, CoreSetup} from '@ambreia/kernel/runtime/CoreComponentContext';
 import {Logger} from '@ambreia/common/utils/Logger';
@@ -29,19 +29,19 @@ import type {IVortexConfig, IVortexWindowAssets} from './Vortex';
 import {Vortex} from './Vortex';
 import {bootFeatures} from '@ambreia/kernel/feature/bootFeatures';
 import type {IKernelReport} from '@ambreia/kernel/feature/bootFeatures';
-import {ENGINE_FEATURES, emptyManagers} from './features';
-import type {IEngineHost} from './features';
+import {ENGINE_FEATURES, emptyManagers} from '@ambreia/game/features/index';
+import type {IEngineHost} from '@ambreia/game/features/index';
 
 import {PacketLogger} from '@ambreia/net/PacketLogger';
 import {IID_AssetLibrary} from '@ambreia/kernel/iid/IIDAssetLibrary';
-import {IID_CoreCommunicationManager} from '@iid/IIDCoreCommunicationManager';
+import {IID_CoreCommunicationManager} from '@ambreia/game/iid/IIDCoreCommunicationManager';
 import {IID_Core} from '@ambreia/kernel/iid/IIDCore';
-import type {IHabboConfigurationManager} from '@habbo/configuration/IHabboConfigurationManager';
-import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
+import type {IHabboConfigurationManager} from '@ambreia/game/configuration/IHabboConfigurationManager';
+import type {IHabboWindowManager} from '@ambreia/game/window/IHabboWindowManager';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
-import type {ISessionDataManager} from '@habbo/session/ISessionDataManager';
-import {IID_HabboAvatarEditor} from '@iid/IIDHabboAvatarEditor';
-import {HabboAvatarEditorManager} from '@habbo/avatar/HabboAvatarEditorManager';
+import type {ISessionDataManager} from '@ambreia/game/session/ISessionDataManager';
+import {IID_HabboAvatarEditor} from '@ambreia/game/iid/IIDHabboAvatarEditor';
+import {HabboAvatarEditorManager} from '@ambreia/game/avatar/HabboAvatarEditorManager';
 import type {IVortexMain} from "./IVortexMain";
 import type {IVortexLoadingScreen} from './IVortexLoadingScreen';
 import type {Application, Ticker} from 'pixi.js';
@@ -553,6 +553,7 @@ export class VortexMain implements IVortexMain
             embeddedConfigurations: config.embeddedConfigurations ?? {},
             legacy: config.kernel.legacy,
             onWindowManager: windowManager => this.applyWindowAssets(config.windowAssets ?? null, windowManager),
+            renderer: () => Vortex.instance?.application?.renderer ?? null,
             made
         };
 

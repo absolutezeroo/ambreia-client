@@ -4,19 +4,9 @@ import {engineBundle} from './tools/vite-plugin-engine-bundle.mjs';
 import {perfLog} from './tools/vite-plugin-perf-log.mjs';
 import {imagerServer} from '../vortex-imager/tools/vite-plugin-imager.mjs';
 
-const ENGINE_SRC = resolve(__dirname, '../vortex-engine/src');
-
-// In dev, `@core`/`@habbo`/`@room`/`@iid` are resolved by the engineBundle plugin instead of by
-// `resolve.alias`, which serves the whole engine as ~3,970 separate HTTP modules. They cannot be
-// declared here as well: vite:alias runs before user `enforce: 'pre'` plugins, so an alias would
-// rewrite the specifier to the engine source before the plugin ever sees it.
-const engineAliases = (enabled: boolean) => enabled
-    ? {
-        '@core': resolve(ENGINE_SRC, 'core'),
-        '@habbo': resolve(ENGINE_SRC, 'habbo'),
-        '@iid': resolve(ENGINE_SRC, 'iid'),
-    }
-    : {};
+// In dev, the @ambreia/* packages are resolved by the engineBundle plugin; in a build, Vite takes
+// them from the workspace links like any dependency. The engine aliases (@core/@habbo/@iid) went
+// with J6: the game is @ambreia/game.
 
 export default defineConfig(({command}) => ({
     // Serve-only, and only so packages/vortex-web can PROXY this dev server instead of the site
@@ -60,7 +50,6 @@ export default defineConfig(({command}) => ({
         alias: {
             '@/assets': resolve(__dirname, 'src/assets'),
             '@': resolve(__dirname, 'src'),
-            ...engineAliases(command === 'build'),
             '@ui': resolve(__dirname, 'src'),
         },
     },

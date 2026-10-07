@@ -187,7 +187,7 @@ if(process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.met
         root,
         moves,
         scan: [E, 'packages/vortex-engine/test', C, 'packages/vortex-glaze/src', 'packages/vortex-imager/src', 'packages/ambreia-common/src', 'packages/ambreia-net/src', 'packages/ambreia-avatar/src', 'packages/ambreia-ui/src', 'packages/ambreia-iso/src', 'packages/ambreia-kernel/src', 'packages/ambreia-protocol/src', 'packages/ambreia-game/src'],
-        aliases: { '@core': `${E}/core`, '@habbo': `${E}/habbo`, '@room': `${E}/room`, '@iid': `${E}/iid`, '@ui': C, '@': C, '@client': C }
+        aliases: { '@ui': C, '@': C, '@client': C }
     });
     const count = [...plan.rewrites.values()].reduce((n, l) => n + l.length, 0);
 
