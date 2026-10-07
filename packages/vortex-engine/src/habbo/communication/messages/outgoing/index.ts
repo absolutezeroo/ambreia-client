@@ -4,8 +4,6 @@
 // Re-exports
 export * from './friendlist';
 export * from './handshake';
-export * from './catalog';
-export * from './inventory';
 export * from './moderation';
 export * from './room';
 export * from './tracking';

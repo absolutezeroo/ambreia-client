@@ -7,4 +7,3 @@ export * from './avatar';
 export * from './action';
 export * from './furniture';
 export * from './pet';
-export * from './bot';

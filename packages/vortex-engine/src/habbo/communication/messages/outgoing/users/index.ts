@@ -8,7 +8,6 @@ export {GetSelectedBadgesMessageComposer} from './GetSelectedBadgesMessageCompos
 export {GetUserNftChatStylesMessageComposer} from './GetUserNftChatStylesMessageComposer';
 export {IgnoreUserMessageComposer} from './IgnoreUserMessageComposer';
 export {ReplenishRespectMessageComposer} from './ReplenishRespectMessageComposer';
-export {ScrGetKickbackInfoMessageComposer} from './ScrGetKickbackInfoMessageComposer';
 export {UnblockUserMessageComposer} from './UnblockUserMessageComposer';
 export {UnignoreUserMessageComposer} from './UnignoreUserMessageComposer';
 export {GetDailyTasksComposer} from './GetDailyTasksComposer';

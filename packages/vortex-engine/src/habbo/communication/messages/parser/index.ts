@@ -4,7 +4,6 @@
 // Re-exports
 export * from './availability';
 export * from './avatar';
-export * from './competition';
 export * from './error';
 export * from './friendlist';
 export * from './handshake';

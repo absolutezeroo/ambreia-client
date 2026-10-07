@@ -3,7 +3,6 @@ export * from './InfoFeedEnableMessageEvent';
 export * from './PetFigureDataParser';
 export * from './NotificationDialogMessageEvent';
 export * from './RespectNotificationMessageEvent';
-export * from './InfoHotelClosingMessageEvent';
 export * from './AccountSafetyLockStatusChangeMessageEvent';
 export * from './PetRespectFailedEvent';
 export * from './PetRespectNotificationEvent';
