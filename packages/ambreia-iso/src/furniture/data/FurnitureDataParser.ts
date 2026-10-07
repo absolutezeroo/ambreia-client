@@ -2,12 +2,19 @@ import {EventEmitter} from 'eventemitter3';
 import {Logger} from '@ambreia/common/utils/Logger';
 import {AssetLibrary} from '@ambreia/common/assets/AssetLibrary';
 import {AssetLoaderEventType} from '@ambreia/common/assets/loaders/AssetLoaderEvent';
-import {Core} from '@core/Core';
-import {FurnitureData} from '@ambreia/iso/furniture/data/FurnitureData';
+import {FurnitureData} from './FurnitureData';
 
 import type {AssetLoaderEvent} from '@ambreia/common/assets/loaders/AssetLoaderEvent';
-import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';
-import type {IFurnitureData} from '@ambreia/iso/furniture/data/IFurnitureData';
+
+/** Where the furniture names and descriptions go (the client's localisation; none elsewhere). */
+export interface IFurniDataLocalization
+{
+    updateLocalization(key: string, value: string): void;
+}
+
+/** AS3's Core.error(): the client reports a malformed furnidata as a core error. */
+export type FurniDataErrorReporter = (message: string, critical: boolean, id: number) => void;
+import type {IFurnitureData} from './IFurnitureData';
 
 const log = Logger.getLogger('habbo.session.furniture.FurnitureDataParser');
 
@@ -42,7 +49,8 @@ export class FurnitureDataParser
     private _floorItemsByName: Map<string, number[]>;
     private _wallItemsByName: Map<string, number[]>;
     // AS3: .../src/com/sulake/habbo/session/furniture/FurnitureDataParser.as::_localization
-    private _localization: IHabboLocalizationManager | null;
+    private _localization: IFurniDataLocalization | null;
+    private readonly _reportError: FurniDataErrorReporter | null;
     private _critical: boolean;
     private _events: EventEmitter<IFurnitureDataParserEvents> = new EventEmitter();
     private _disposed: boolean = false;
@@ -77,10 +85,12 @@ export class FurnitureDataParser
         wallItems: Map<number, IFurnitureData>,
         floorItemsByName: Map<string, number[]>,
         wallItemsByName: Map<string, number[]>,
-        localization: IHabboLocalizationManager | null,
-        critical: boolean = true
+        localization: IFurniDataLocalization | null,
+        critical: boolean = true,
+        reportError: FurniDataErrorReporter | null = null
     )
     {
+        this._reportError = reportError;
         this._floorItems = floorItems;
         this._wallItems = wallItems;
         this._floorItemsByName = floorItemsByName;
@@ -222,7 +232,9 @@ export class FurnitureDataParser
 
         const err = new Error(`XML furni data was malformed (status ${status})`);
 
-        Core.error('XML furni data was malformed', this._critical, 12);
+        // DEVIATION: AS3 calls Core.error() itself; the host passes it in (reportError), so the
+        //   parser runs where there is no core (iso, the map editor, the imager).
+        this._reportError?.('XML furni data was malformed', this._critical, 12);
         this._events.emit('FDP_furniture_data_error', err);
     }
 
@@ -652,18 +664,10 @@ export class FurnitureDataParser
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/furniture/FurnitureDataParser.as::registerFurnitureLocalization()
     private registerFurnitureLocalization(item: FurnitureData): void
     {
-        // AS3 guards identically (`if(_localization != null)`), so the guard itself is
-        // faithful — but it is silent in both, and silence is what makes a missing
-        // manager cost hours instead of seconds. Logging is the deviation, deliberately:
-        // if this ever fires, the symptom is every furniture name in the client going
-        // blank, and that should not have to be diagnosed from scratch again.
-        if(this._localization === null)
-        {
-            log.error('No localization manager: furniture names will be empty everywhere. '
-                + 'SessionDataManager must inject it before furnidata parses.');
-
-            return;
-        }
+        // AS3 guards identically (`if(_localization != null)`). A host without localisation (iso,
+        // the map editor) passes null on purpose; the client's missing-manager case is reported
+        // where the parser is built, in SessionDataManager.
+        if(this._localization === null) return;
 
         if(item.type === 's')
         {

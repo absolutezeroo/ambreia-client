@@ -39,7 +39,7 @@ import {RoomObjectVisualizationFactory} from '@ambreia/iso/scene/object/RoomObje
 import {RoomObjectCategoryEnum} from '@ambreia/iso/scene/object/RoomObjectCategoryEnum';
 import {RoomVisualizationData} from '@ambreia/iso/scene/object/visualization/room/RoomVisualizationData';
 import type {NitroAsset} from '@ambreia/common/assets/NitroAsset';
-import {FurnitureDataParser} from '@habbo/session/furniture/FurnitureDataParser';
+import {FurnitureDataParser} from '@ambreia/iso/furniture/data/FurnitureDataParser';
 import type {IFurnitureData} from '@ambreia/iso/furniture/data/IFurnitureData';
 import type {IFurniDataSource} from '@ambreia/iso/scene/IRoomContentConfiguration';
 import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';
