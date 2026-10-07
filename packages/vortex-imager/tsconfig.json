@@ -8,8 +8,6 @@
             "@core": ["../vortex-engine/src/core"],
             "@habbo/*": ["../vortex-engine/src/habbo/*"],
             "@habbo": ["../vortex-engine/src/habbo"],
-            "@room/*": ["../vortex-engine/src/room/*"],
-            "@room": ["../vortex-engine/src/room"],
             "@iid/*": ["../vortex-engine/src/iid/*"],
             "@iid": ["../vortex-engine/src/iid"],
             "@/*": ["src/*"]

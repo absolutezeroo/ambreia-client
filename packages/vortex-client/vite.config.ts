@@ -14,7 +14,6 @@ const engineAliases = (enabled: boolean) => enabled
     ? {
         '@core': resolve(ENGINE_SRC, 'core'),
         '@habbo': resolve(ENGINE_SRC, 'habbo'),
-        '@room': resolve(ENGINE_SRC, 'room'),
         '@iid': resolve(ENGINE_SRC, 'iid'),
     }
     : {};

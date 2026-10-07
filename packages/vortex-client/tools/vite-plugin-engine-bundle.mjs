@@ -84,7 +84,6 @@ export function engineBundle(options)
 		{
 			'@core': ENGINE_SRC + '/core',
 			'@habbo': ENGINE_SRC + '/habbo',
-			'@room': ENGINE_SRC + '/room',
 			'@iid': ENGINE_SRC + '/iid',
 			...workspaceAliases(PACKAGES)
 		};

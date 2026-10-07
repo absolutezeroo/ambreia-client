@@ -13,12 +13,12 @@ reload). `tools/vite-plugin-engine-bundle.mjs` hands the engine to esbuild in wa
 (~185 requests, ~1.3 s cold, ~0.45 s reload). It is serve-only; `pnpm build` is untouched.
 
 - **One esbuild graph covers the engine and the workspace packages** (`@ambreia/common`,
-  `@ambreia/net`; `outbase` is `packages/`), so their singletons (`Logger`, `FrameTimings`) exist once.
+  `@ambreia/net`, `ui`, `avatar`, `iso`…; `outbase` is `packages/`), so their singletons (`Logger`, `FrameTimings`) exist once.
   Every `packages/ambreia-*/src` is found on disk (`workspaceAliases()`) and any `@ambreia/<name>`
   specifier is routed to the bundle, so a new package needs no edit; one served by Vite instead would
   be a second copy.
 
-- **`@core`/`@habbo`/`@room`/`@iid` are deliberately absent from `resolve.alias` in dev.** `vite:alias`
+- **`@core`/`@habbo`/`@iid` are deliberately absent from `resolve.alias` in dev.** `vite:alias`
   runs before user `enforce: 'pre'` plugins, so declaring them would rewrite the specifier to engine
   source before the plugin sees it, and the ~3,970 requests come back. They are restored for
   `command === 'build'`.
