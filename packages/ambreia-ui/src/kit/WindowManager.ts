@@ -55,7 +55,7 @@ import {ConfirmDialog} from './utils/ConfirmDialog';
 import type {IWindowManager} from './IWindowManager';
 import type {IWindowManagerOptions} from './IWindowManagerOptions';
 import type {IWindowLocalization} from '../IWindowLocalization';
-import type {IWidgetFactory} from '../IWidgetFactory';
+import {WidgetRegistry, registerKitWidgets} from './WidgetRegistry';
 import type {IWindowUpdateReceiver} from '../IWindowUpdateReceiver';
 
 const log = Logger.getLogger('ui.WindowManager');
@@ -104,7 +104,8 @@ export class WindowManager implements IWindowManager
     private _windowRenderer: WindowRenderer | null = null;
     private _windowComposite: WindowComposite | null = null;
     private _serviceManager: ServiceManager | null = null;
-    private _widgetFactory: IWidgetFactory | null = null;
+    // TS-only: AS3's WidgetClasses map, per manager so a host can add its own widgets.
+    private readonly _widgets: WidgetRegistry = new WidgetRegistry();
     // AS3: .../src/com/sulake/habbo/window/HabboWindowManagerComponent.as::_hintManager
     private _hintManager: HintManager | null = null;
     private _initialized: boolean = false;
@@ -112,6 +113,7 @@ export class WindowManager implements IWindowManager
     constructor(options: IWindowManagerOptions)
     {
         this._options = options;
+        registerKitWidgets(this._widgets, this);
     }
 
     // TS-only: see _events.
@@ -165,18 +167,11 @@ export class WindowManager implements IWindowManager
         if(index >= 0) this._updateReceivers.splice(index, 1);
     }
 
-    /** The widget factory the contexts use; the engine overrides it with the game widgets. */
-    // TS-only: AS3 builds its WidgetFactory inline in initComponent().
-    protected createWidgetFactory(): IWidgetFactory
+    /** The `widget` types this manager builds: the kit's, plus whatever the host registers. */
+    // TS-only: see _widgets.
+    public get widgets(): WidgetRegistry
     {
-        return this._options.widgets ?? {createWidget: () => null};
-    }
-
-    /** The widget types offered by the theme's `widget_type` property. */
-    // TS-only: AS3 reads WidgetClasses.WIDGET_TYPES directly.
-    protected widgetTypes(): readonly string[]
-    {
-        return this._options.widgetTypes ?? [];
+        return this._widgets;
     }
 
     /** What a frame's `?` button opens; nothing here, the engine opens its help pages. */
@@ -319,7 +314,7 @@ export class WindowManager implements IWindowManager
         // Create ThemeManager now that SkinContainer is populated
         this.registerTextRenderersMissingFromElementDescription();
 
-        this._themeManager = new ThemeManager(this._skinContainer, this.widgetTypes());
+        this._themeManager = new ThemeManager(this._skinContainer, this._widgets.types());
 
         log.info(`Element registry loaded: ${data.elements.length} descriptors, ThemeManager initialized`);
     }
@@ -856,7 +851,7 @@ export class WindowManager implements IWindowManager
     // AS3: .../src/com/sulake/habbo/window/HabboWindowManagerComponent.as::createWidget()
     public createWidget(type: string, window: IWidgetWindow): IWidget | null 
     {
-        const widget = this._widgetFactory?.createWidget(type, window) ?? null;
+        const widget = this._widgets.createWidget(type, window) ?? null;
 
         if(!widget) 
         {
@@ -1315,7 +1310,6 @@ export class WindowManager implements IWindowManager
 
         const factory = this as unknown as IWindowFactory;
         const serviceManager = new ServiceManager();
-        const widgetFactory = this.createWidgetFactory();
         const resourceManager = new ResourceManager(this);
         const hintManager = new HintManager(this);
         const resizeHost = this._options.resizeHost ?? {
@@ -1344,7 +1338,6 @@ export class WindowManager implements IWindowManager
         };
 
         this._serviceManager = serviceManager;
-        this._widgetFactory = widgetFactory;
         this._resourceManager = resourceManager;
         this._hintManager = hintManager;
 
@@ -1372,7 +1365,7 @@ export class WindowManager implements IWindowManager
             context.setServices(serviceManager);
 
             // Inject widget factory for WidgetWindowController
-            context.setWidgetFactory(widgetFactory);
+            context.setWidgetFactory(this._widgets);
 
             // Inject resource manager for StaticBitmapWrapperController
             context.setResourceManager(resourceManager);
@@ -1434,8 +1427,6 @@ export class WindowManager implements IWindowManager
             this._serviceManager.dispose();
             this._serviceManager = null;
         }
-
-        this._widgetFactory = null;
 
         if(this._windowComposite)
         {

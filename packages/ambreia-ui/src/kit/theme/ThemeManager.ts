@@ -47,7 +47,7 @@ export class ThemeManager implements IThemeManager
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/theme/ThemeManager.as::ThemeManager()
     // DEVIATION: AS3 reads WidgetClasses.WIDGET_TYPES itself; the widget types are the host's, so
-    //   they are passed in (the engine passes HabboWidgetFactory.WIDGET_TYPES).
+    //   they are passed in (the window manager passes its WidgetRegistry.types()).
     constructor(skinContainer: SkinContainer, widgetTypes: readonly string[] = [])
     {
         this._skinContainer = skinContainer;

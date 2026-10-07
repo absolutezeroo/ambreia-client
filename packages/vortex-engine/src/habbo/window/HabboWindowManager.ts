@@ -1,9 +1,8 @@
 import {WindowManager} from '@ambreia/ui/kit/WindowManager';
 import type {IWindowManagerOptions} from '@ambreia/ui/kit/IWindowManagerOptions';
-import type {IWidgetFactory} from '@ambreia/ui/IWidgetFactory';
 import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 import type {IHabboWindowManager} from './IHabboWindowManager';
-import {HabboWidgetFactory} from './HabboWidgetFactory';
+import {registerHabboWidgets} from './HabboWidgetFactory';
 import {ComponentDependency} from '@core/runtime/ComponentDependency';
 import type {IContext} from '@core/runtime/IContext';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
@@ -41,6 +40,7 @@ export class HabboWindowManager extends WindowManager implements IHabboWindowMan
     {
         super(options);
         this._context = context;
+        registerHabboWidgets(this.widgets, this);
     }
 
     // TS-only: was the Component's; HabboPagesViewer registers its link tracker on it.
@@ -371,18 +371,6 @@ export class HabboWindowManager extends WindowManager implements IHabboWindowMan
                 false
             ),
         ];
-    }
-
-    // TS-only: the game widgets on top of the kit's.
-    protected override createWidgetFactory(): IWidgetFactory
-    {
-        return new HabboWidgetFactory(this);
-    }
-
-    // TS-only: see WindowManager.widgetTypes().
-    protected override widgetTypes(): readonly string[]
-    {
-        return HabboWidgetFactory.WIDGET_TYPES;
     }
 
     public override initialize(): void 
