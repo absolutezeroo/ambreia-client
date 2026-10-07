@@ -1,4 +1,6 @@
-import {Texture} from 'pixi.js';
+import type {Texture} from 'pixi.js';
+import {createOffscreenCanvas} from '@ambreia/common/platform/Platform';
+import {textureFromCanvas} from '@ambreia/common/graphics/textureFromCanvas';
 import type {AvatarStructure} from './AvatarStructure';
 import type {AssetAliasCollection} from './alias/AssetAliasCollection';
 import type {IGraphicAsset} from '@ambreia/common/graphics/IGraphicAsset';
@@ -733,7 +735,7 @@ export class AvatarImage implements IAvatarImage, IAvatarEffectListener
         // Create OffscreenCanvas for compositing (equivalent to AS3 BitmapData)
         const canvasWidth = canvas.width;
         const canvasHeight = canvas.height;
-        const offscreen = new OffscreenCanvas(canvasWidth, canvasHeight);
+        const offscreen = createOffscreenCanvas(canvasWidth, canvasHeight);
         const ctx = offscreen.getContext('2d')!;
 
         let isCacheable = true;
@@ -827,7 +829,7 @@ export class AvatarImage implements IAvatarImage, IAvatarEffectListener
             this._image.destroy();
         }
 
-        const unscaledTexture = Texture.from({resource: offscreen, alphaMode: 'premultiply-alpha-on-upload'});
+        const unscaledTexture = textureFromCanvas(offscreen, 'premultiply-alpha-on-upload');
 
         // Cache the unscaled result if eligible - AS3 caches the full-size bitmap
         // *before* resampling the return value (see resampleCanvas()'s header
@@ -841,7 +843,7 @@ export class AvatarImage implements IAvatarImage, IAvatarEffectListener
         // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/AvatarImage.as::getImage() -
         // `if(param3 != 1) var_48 = class_2495.resampleBitmapData(var_48,param3);`
         this._image = scale !== 1
-            ? Texture.from({resource: AvatarImage.resampleCanvas(offscreen, scale), alphaMode: 'premultiply-alpha-on-upload'})
+            ? textureFromCanvas(AvatarImage.resampleCanvas(offscreen, scale), 'premultiply-alpha-on-upload')
             : unscaledTexture;
         this._fullImageFromCache = false;
         this._needsUpdate = false;
@@ -928,7 +930,7 @@ export class AvatarImage implements IAvatarImage, IAvatarEffectListener
     {
         const width = Math.max(1, Math.round(source.width * scale));
         const height = Math.max(1, Math.round(source.height * scale));
-        const target = new OffscreenCanvas(width, height);
+        const target = createOffscreenCanvas(width, height);
         const ctx = target.getContext('2d')!;
 
         ctx.imageSmoothingEnabled = true;
@@ -1007,7 +1009,7 @@ export class AvatarImage implements IAvatarImage, IAvatarEffectListener
         // Composite body parts then crop to content bounds
         const canvasWidth = canvas.width;
         const canvasHeight = canvas.height;
-        const offscreen = new OffscreenCanvas(canvasWidth, canvasHeight);
+        const offscreen = createOffscreenCanvas(canvasWidth, canvasHeight);
         const ctx = offscreen.getContext('2d')!;
 
         // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/AvatarImage.as::getCroppedImage()
@@ -1061,7 +1063,7 @@ export class AvatarImage implements IAvatarImage, IAvatarEffectListener
 
         const cropWidth = Math.max(1, Math.round(bounds.width));
         const cropHeight = Math.max(1, Math.round(bounds.height));
-        const cropped = new OffscreenCanvas(cropWidth, cropHeight);
+        const cropped = createOffscreenCanvas(cropWidth, cropHeight);
         const croppedCtx = cropped.getContext('2d')!;
 
         croppedCtx.drawImage(
@@ -1074,7 +1076,7 @@ export class AvatarImage implements IAvatarImage, IAvatarEffectListener
         // `if(param2 != 1) _loc12_ = class_2495.resampleBitmapData(_loc12_,param2);`
         const resource = scale !== 1 ? AvatarImage.resampleCanvas(cropped, scale) : cropped;
 
-        return Texture.from({resource, alphaMode: 'premultiply-alpha-on-upload'});
+        return textureFromCanvas(resource, 'premultiply-alpha-on-upload');
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/AvatarImage.as::getCroppedImage() — Rectangle.union()

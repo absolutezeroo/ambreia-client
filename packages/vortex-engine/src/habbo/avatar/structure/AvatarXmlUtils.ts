@@ -1,15 +1,20 @@
 /**
  * Small XML helpers for AS3 avatar data ports.
  * These keep TS parsers close to AS3 XML access patterns: @attributes, direct children, and text().
+ *
+ * The type tests are structural (DOM node types), not `instanceof Document`: Node has no DOM globals,
+ * and the documents its parser returns are not the browser's classes.
  */
+import {platform} from '@ambreia/common/platform/Platform';
+
 export function isXmlDocument(data: unknown): data is Document
 {
-    return typeof Document !== 'undefined' && data instanceof Document;
+    return typeof data === 'object' && data !== null && (data as Node).nodeType === 9;
 }
 
 export function isXmlElement(data: unknown): data is Element
 {
-    return typeof Element !== 'undefined' && data instanceof Element;
+    return typeof data === 'object' && data !== null && (data as Node).nodeType === 1;
 }
 
 export function getXmlRoot(data: unknown): Element | null
@@ -59,12 +64,7 @@ export function getXmlDescendants(element: Element, tagName: string): Element[]
 
 export function parseXmlDocument(text: string): Document | null
 {
-    if(typeof DOMParser === 'undefined')
-    {
-        return null;
-    }
-
-    const document = new DOMParser().parseFromString(text, 'text/xml');
+    const document = platform().parseXml(text);
 
     if(document.getElementsByTagName('parsererror').length > 0)
     {

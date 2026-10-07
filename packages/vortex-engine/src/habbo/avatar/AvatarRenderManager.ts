@@ -12,6 +12,7 @@ import type {IAvatarEffectListener} from './IAvatarEffectListener';
 import type {IFigureData} from './structure/IFigureData';
 import {ErrorReportStorage} from '@ambreia/common/utils/ErrorReportStorage';
 import {AvatarStructure} from './AvatarStructure';
+import {platform} from '@ambreia/common/platform/Platform';
 import type {IGraphicAsset} from '@ambreia/common/graphics/IGraphicAsset';
 import {AssetAliasCollection} from './alias/AssetAliasCollection';
 import {AvatarFigureContainer} from './AvatarFigureContainer';
@@ -836,8 +837,7 @@ export class AvatarRenderManager extends Component implements IAvatarRenderManag
     {
         try 
         {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(xmlText, 'text/xml');
+            const doc = platform().parseXml(xmlText);
             const libElements = doc.querySelectorAll('lib');
 
             if(libElements.length === 0) return null;

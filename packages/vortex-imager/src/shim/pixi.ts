@@ -84,6 +84,15 @@ export type TextureFromSource =
     | TextureSource
     | { resource: TextureResource; alphaMode?: string };
 
+/** `textureFromCanvas()` (@ambreia/common) builds its Node textures on an ImageSource. */
+export class ImageSource extends TextureSource
+{
+    constructor(options: {resource: TextureResource})
+    {
+        super(options.resource);
+    }
+}
+
 export class Texture
 {
     private _source: TextureSource;

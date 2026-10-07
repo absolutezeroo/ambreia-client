@@ -1,6 +1,8 @@
-import {Spritesheet, Texture} from 'pixi.js';
+import {Spritesheet, type Texture} from 'pixi.js';
 import {inflate} from 'pako';
 import {BinaryFileLoader} from './BinaryFileLoader';
+import {platform} from '../../platform/Platform';
+import {textureFromCanvas} from '../../graphics/textureFromCanvas';
 import {Logger} from '../../utils/Logger';
 
 /**
@@ -253,12 +255,11 @@ export class NitroBundleLoader extends BinaryFileLoader
 
         if(pngFile)
         {
-            // Use createImageBitmap to decode the PNG directly from a Blob
-            // (Assets.load with blob URLs fails because PixiJS can't detect the parser)
-            const blob = new Blob([new Uint8Array(pngFile.data)], {type: 'image/png'});
-            const imageBitmap = await createImageBitmap(blob);
+            // Decoded by the platform (createImageBitmap in a browser), not Assets.load: PixiJS
+            // cannot detect a parser for a blob URL.
+            const image = await platform().decodeImage(new Uint8Array(pngFile.data), 'image/png');
 
-            this._baseTexture = Texture.from(imageBitmap);
+            this._baseTexture = textureFromCanvas(image as unknown as {width: number; height: number});
 
             // If there's spritesheet data, parse it
             if(this._jsonData?.spritesheet?.frames)

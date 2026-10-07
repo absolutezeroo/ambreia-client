@@ -1,6 +1,7 @@
 import type {ILazyAsset} from './ILazyAsset';
 import type {IAsset} from './IAsset';
 import type {AssetTypeDeclaration} from './AssetTypeDeclaration';
+import {platform} from '../platform/Platform';
 
 /**
  * XmlAsset
@@ -84,7 +85,6 @@ export class XmlAsset implements ILazyAsset
             return;
         }
 
-        const parser = new DOMParser();
         let xmlString: string;
 
         if(typeof this._unknown === 'string')
@@ -101,9 +101,10 @@ export class XmlAsset implements ILazyAsset
             const decoder = new TextDecoder('utf-8');
             xmlString = decoder.decode(this._unknown);
         }
-        else if(this._unknown instanceof Document)
+        // Structural, not `instanceof Document`: Node has no Document global, and its parser's documents are not the browser's.
+        else if(typeof this._unknown === 'object' && this._unknown !== null && 'documentElement' in this._unknown)
         {
-            this._content = this._unknown;
+            this._content = this._unknown as Document;
             this._unknown = null;
             return;
         }
@@ -118,7 +119,7 @@ export class XmlAsset implements ILazyAsset
             xmlString = String(this._unknown);
         }
 
-        this._content = parser.parseFromString(xmlString, 'text/xml');
+        this._content = platform().parseXml(xmlString);
         this._unknown = null;
     }
 

@@ -6,7 +6,9 @@
  * Manages a collection of graphic assets parsed from Nitro JSON asset bundles.
  * Supports palette colorization and reference counting.
  */
-import {Texture} from 'pixi.js';
+import type {Texture} from 'pixi.js';
+import {platform} from '../platform/Platform';
+import {textureFromCanvas} from './textureFromCanvas';
 import type {IGraphicAsset} from './IGraphicAsset';
 import type {IGraphicAssetCollection} from './IGraphicAssetCollection';
 import {GraphicAsset} from './GraphicAsset';
@@ -623,12 +625,9 @@ export class GraphicAssetCollection implements IGraphicAssetCollection
     {
         try
         {
-            const canvas = document.createElement('canvas');
             const w = texture.width;
             const h = texture.height;
-
-            canvas.width = w;
-            canvas.height = h;
+            const canvas = platform().createCanvas(w, h);
 
             const ctx = canvas.getContext('2d');
 
@@ -662,7 +661,7 @@ export class GraphicAssetCollection implements IGraphicAssetCollection
             palette.colorizePixels(imageData);
             ctx.putImageData(imageData, 0, 0);
 
-            return Texture.from(canvas);
+            return textureFromCanvas(canvas);
         }
         catch
         {

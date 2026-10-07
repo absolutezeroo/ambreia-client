@@ -1,4 +1,5 @@
-import {Texture} from 'pixi.js';
+import {createOffscreenCanvas} from '@ambreia/common/platform/Platform';
+import {textureFromCanvas} from '@ambreia/common/graphics/textureFromCanvas';
 import {
     AVATAR_COUNTER_CACHED,
     AVATAR_COUNTER_COMPOSE,
@@ -1114,7 +1115,7 @@ export class AvatarImageCache
         // `getContext` at 3.7% of a run. The self-profiler then measured the replacement:
         // `transferToImageBitmap` came out at **22.2%**. The trade cost about six times what it
         // saved, so it is reverted. Allocating is the cheap option here.
-        const canvas = new OffscreenCanvas(width, height);
+        const canvas = createOffscreenCanvas(width, height);
         const ctx = canvas.getContext('2d')!;
 
         for(const imageData of imageDataList)
@@ -1183,7 +1184,7 @@ export class AvatarImageCache
             }
         }
 
-        const resultTexture = Texture.from({resource: canvas, alphaMode: 'premultiply-alpha-on-upload'});
+        const resultTexture = textureFromCanvas(canvas, 'premultiply-alpha-on-upload');
 
         return new ImageData(
             resultTexture,
@@ -1334,8 +1335,6 @@ export class AvatarImageCache
         height: number
     ): void
     {
-        if(typeof OffscreenCanvas === 'undefined') return;
-
         let bySource = AvatarImageCache.TRANSFORM_MEMO.get(source);
 
         if(bySource === undefined)
@@ -1355,7 +1354,7 @@ export class AvatarImageCache
         }
 
         // Copied out of the shared scratch surface, which the next call overwrites.
-        const copy = new OffscreenCanvas(width, height);
+        const copy = createOffscreenCanvas(width, height);
         const copyCtx = copy.getContext('2d');
 
         if(copyCtx === null) return;
@@ -1386,8 +1385,6 @@ export class AvatarImageCache
         readFrequently: boolean
     ): { canvas: OffscreenCanvas; context: OffscreenCanvasRenderingContext2D } | null
     {
-        if(typeof OffscreenCanvas === 'undefined') return null;
-
         const slot = readFrequently ? 'cpu' : 'gpu';
         const current = AvatarImageCache.SCRATCH.get(slot) ?? null;
 
@@ -1396,7 +1393,7 @@ export class AvatarImageCache
             return current;
         }
 
-        const canvas = new OffscreenCanvas(
+        const canvas = createOffscreenCanvas(
             Math.max(width, current?.canvas.width ?? 0),
             Math.max(height, current?.canvas.height ?? 0)
         );
