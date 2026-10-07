@@ -1,7 +1,7 @@
-import type {ICore} from '@core/runtime/ICore';
-import type {ICoreErrorReporter} from '@core/runtime/ICoreErrorReporter';
-import {CoreComponentContext, CoreSetup} from '@core/runtime/CoreComponentContext';
-import {DefaultErrorReporter} from '@core/runtime/DefaultErrorReporter';
+import type {ICore} from './runtime/ICore';
+import type {ICoreErrorReporter} from './runtime/ICoreErrorReporter';
+import {CoreComponentContext, CoreSetup} from './runtime/CoreComponentContext';
+import {DefaultErrorReporter} from './runtime/DefaultErrorReporter';
 import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('core.Core');

@@ -1,5 +1,5 @@
 import type {EventEmitter} from 'eventemitter3';
-import type {ICoreConfiguration} from '@core/runtime/ICoreConfiguration';
+import type {ICoreConfiguration} from '@ambreia/kernel/runtime/ICoreConfiguration';
 
 /**
  * Habbo Configuration Manager Events

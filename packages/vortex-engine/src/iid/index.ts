@@ -1,5 +1,5 @@
 // Exports
-export {IID_AssetLibrary} from './IIDAssetLibrary';
+export {IID_AssetLibrary} from '@ambreia/kernel/iid/IIDAssetLibrary';
 export {IID_AvatarRenderManager} from './IIDAvatarRenderManager';
 export {IID_CoreCommunicationManager} from './IIDCoreCommunicationManager';
 export {IID_CoreLocalizationManager} from './IIDCoreLocalizationManager';

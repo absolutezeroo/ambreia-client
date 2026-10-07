@@ -1,8 +1,8 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {CoreComponentContext} from '../src/core/runtime/CoreComponentContext';
-import {createIID} from '../src/core/runtime/IID';
-import {ComponentDependency} from '../src/core/runtime/ComponentDependency';
+import {CoreComponentContext} from '@ambreia/kernel/runtime/CoreComponentContext';
+import {createIID} from '@ambreia/kernel/runtime/IID';
+import {ComponentDependency} from '@ambreia/kernel/runtime/ComponentDependency';
 
 interface IThing { readonly name: string }
 

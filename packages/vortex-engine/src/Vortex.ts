@@ -1,11 +1,11 @@
 import {EventEmitter} from 'eventemitter3';
 import {Application, TextureSource} from 'pixi.js';
-import {Core} from '@core/Core';
+import {Core} from '@ambreia/kernel/Core';
 import {VortexMain} from './VortexMain';
 import {IID_CoreCommunicationManager} from '@iid/IIDCoreCommunicationManager';
 import {Logger} from '@ambreia/common/utils/Logger';
 import {FRAME_CHANNEL_PIXI, FrameTimings} from '@ambreia/common/utils/FrameTimings';
-import type {CoreComponentContext} from '@core/runtime/CoreComponentContext';
+import type {CoreComponentContext} from '@ambreia/kernel/runtime/CoreComponentContext';
 import type {AssetUrlSource} from '@ambreia/ui/IResourceManager';
 import type {IElementDescriptionData} from '@ambreia/ui/kit/IElementDescriptor';
 import type {ISkinData} from '@ambreia/ui/graphics/renderer/BitmapSkinParser';

@@ -6,7 +6,7 @@ import type {IWindow} from '@ambreia/ui/IWindow';
 import type {IFrameWindow} from '@ambreia/ui/components/IFrameWindow';
 import type {ITextWindow} from '@ambreia/ui/components/ITextWindow';
 import type {IScrollbarWindow} from '@ambreia/ui/components/IScrollbarWindow';
-import type {ILinkEventTracker} from '@core/runtime/events/ILinkEventTracker';
+import type {ILinkEventTracker} from '@ambreia/kernel/runtime/events/ILinkEventTracker';
 import type {AssetLoaderStruct} from '@ambreia/common/assets/AssetLoaderStruct';
 import {AssetLoaderEvent} from '@ambreia/common/assets/loaders/AssetLoaderEvent';
 import {WindowEvent} from '@ambreia/ui/events/WindowEvent';
