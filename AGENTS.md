@@ -35,11 +35,17 @@ node install.mjs             # unpack assets (vortex-client-assets.zip); --pack 
 
 | Package | What it is |
 |---|---|
-| `packages/vortex-engine` | Engine: `core/` (runtime/DI, assets, network transport, window engine), `room/` (generic room engine), `habbo/` (game core: `avatar` incl. the editor, `communication`, `configuration`, `localization`, `room`, `session`, `ui` (room desktop, name bubble), `window`), `iid/` (DI symbols) |
+| `packages/ambreia-common` | `@ambreia/common`: Logger, utilities, asset loading, reactive — imports no other Ambreia package |
+| `packages/ambreia-net` | `@ambreia/net`: WebSocket transport, encryption, wire format, registry, packet tap — imports `@ambreia/common` only |
+| `packages/vortex-engine` | Engine: `core/` (runtime/DI, window engine, the DI wrappers `AssetLibrary` and `CoreCommunicationManager`), `room/` (generic room engine), `habbo/` (game core: `avatar` incl. the editor, `communication`, `configuration`, `localization`, `room`, `session`, `ui` (room desktop, name bubble), `window`), `iid/` (DI symbols) |
 | `packages/vortex-client` | App shell: boot (`src/App.ts`), display classes, assets, `src/vortex-layouts/` (new window XML) |
 | `packages/vortex-glaze` | Live window-layout editor built on the client's own widgets |
 | `packages/vortex-imager` | Server-side avatar/furni/room renderer reusing the engine |
 
+The project is named **Ambreia** (the MMORPG); new packages take the `@ambreia/` scope, the older
+`vortex-*` names are renamed in a later pass. `@ambreia/common/*` and `@ambreia/net/*` are workspace
+packages imported by deep path (`@ambreia/common/utils/Logger`; a folder barrel is `…/utils/index`);
+`packages/vortex-engine/tools/move-modules.mjs` moves files into a package and rewrites their imports.
 Aliases: `@core/` `@habbo/` `@room/` `@iid/` → engine `src/`; in the client also `@ui/` and `@/` → client
 `src/`. Target: engines become packages `@vortex/common`, `net`, `avatar`, `iso`, `ui`, then `kernel`,
 `protocol`, `game` (spec §3, milestones J1–J6).
@@ -252,9 +258,10 @@ _Applies to: `packages/vortex-client/tools/**`, `packages/vortex-client/src/asse
 
 ## Rule: Wire protocol / communication rules
 
-_Applies to: `**/communication/**`_
+_Applies to: `**/communication/**`, `packages/ambreia-net/**`_
 
-You are editing wire-protocol code (`core/communication/`, `habbo/communication/`).
+You are editing wire-protocol code (`packages/ambreia-net/` — transport, encryption, wire format,
+registry — or `habbo/communication/` — the messages).
 
 The server is **`../vortex-rpg-emulator`** (C#, Orleans). Its wire contract is
 `Vortex.Revisions/Revision20260701/`: `Headers.cs` (ids), `Parsers/` (what it reads from us),
@@ -282,12 +289,17 @@ _Applies to: `**/room/**`_
 
 ## Rule: `pnpm dev` pre-bundles the engine
 
-_Applies to: `packages/vortex-client/vite.config.ts`, `packages/vortex-client/tools/vite-plugin-*.mjs`_
+_Applies to: `packages/vortex-client/vite.config.ts`, `packages/vortex-client/tools/vite-plugin-*.mjs`, `packages/*/package.json`_
 
 The client statically reaches ~3,970 of the engine's files at boot; served one request per module
 that was 15 s cold and ~6 s per reload (the port has no `import.meta.hot`, so every change is a full
 reload). `tools/vite-plugin-engine-bundle.mjs` hands the engine to esbuild in watch mode instead
 (~185 requests, ~1.3 s cold, ~0.45 s reload). It is serve-only; `pnpm build` is untouched.
+
+- **One esbuild graph covers the engine and the workspace packages** (`@ambreia/common`,
+  `@ambreia/net`; `outbase` is `packages/`), so their singletons (`Logger`, `FrameTimings`) exist once.
+  A new package must be added to `ALIAS_TARGETS`, `SOURCE_ROOTS` and the two specifier regexes, or a
+  client import of it is served by Vite as a second copy.
 
 - **`@core`/`@habbo`/`@room`/`@iid` are deliberately absent from `resolve.alias` in dev.** `vite:alias`
   runs before user `enforce: 'pre'` plugins, so declaring them would rewrite the specifier to engine

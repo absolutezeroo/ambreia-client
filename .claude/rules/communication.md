@@ -1,11 +1,13 @@
 ---
 paths:
   - "**/communication/**"
+  - "packages/ambreia-net/**"
 ---
 
 # Wire protocol / communication rules
 
-You are editing wire-protocol code (`core/communication/`, `habbo/communication/`).
+You are editing wire-protocol code (`packages/ambreia-net/` — transport, encryption, wire format,
+registry — or `habbo/communication/` — the messages).
 
 The server is **`../vortex-rpg-emulator`** (C#, Orleans). Its wire contract is
 `Vortex.Revisions/Revision20260701/`: `Headers.cs` (ids), `Parsers/` (what it reads from us),

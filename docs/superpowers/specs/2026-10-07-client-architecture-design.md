@@ -303,7 +303,7 @@ commit). Les alias `@core`, `@habbo`, `@room`, `@iid` disparaissent au fil des e
 | # | Jalon | Contenu | Preuve |
 |---|---|---|---|
 | J0 | Préparation | Terminer et merger le M0 client ; réécrire `00-mandate`, `30-as3-traceability`, `CLAUDE.md` (§10) ; générateur d'en-têtes ; contrôle des frontières | Le hook refuse un import interdit ; `Headers.ts` généré et vérifié |
-| J1 | `common` + `net` | Extraire `core/utils`, `assets`, `reactive`, puis `core/communication` ; adapter `C/tools/vite-plugin-engine-bundle.mjs` à plusieurs paquets ; point d'écoute de `net` | `pnpm build`, `pnpm dev` OK, rechargement dev pas plus lent qu'avant |
+| J1 | `common` + `net` | Extraire `core/utils`, `assets`, `reactive`, puis `core/communication` ; adapter `C/tools/vite-plugin-engine-bundle.mjs` à plusieurs paquets ; point d'écoute de `net` — **fait le 2026-10-07** sous les noms `@ambreia/common` et `@ambreia/net` (bilan `plans/2026-10-07-j1-common-net.bilan.md`) | `pnpm build`, `pnpm dev` OK, rechargement dev pas plus lent qu'avant |
 | J2 | `avatar` | Éditeur sorti vers `game` ; constructeur simple, options typées ; fabriques canvas et XML injectées ; `Core.instance` retiré ; imports `@vortex/common` ciblés (pas tous les chargeurs) | Un script Node génère un PNG d'avatar en n'important que `@vortex/avatar` (+ `common`) ; l'imager n'a plus de shim pour les avatars |
 | J3 | `ui` | `core/window` + partie générique de `habbo/window` ; registre de widgets ; widgets de jeu enregistrés depuis `game` | Bac à sable `ui` qui affiche un layout ; Glaze ne dépend plus que de `ui` |
 | J4 | `iso` | `room/` + rendu de `habbo/room` ; les 3 imports de `Vortex.ts` supprimés ; registres de logiques et de visualisations | Bac à sable `iso` qui charge une room ; l'imager rend une room sans faux `Vortex.ts` |
@@ -352,7 +352,7 @@ entrée en room, avatar visible, ouverture d'une fenêtre), plus :
 | # | Décision | Où elle se tranche |
 |---|---|---|
 | 1 | Nom de portée des paquets (`@vortex/*` proposé) | Plan J0 |
-| 2 | Bundle de dev à plusieurs paquets : un esbuild commun ou un par paquet | Plan J1 |
+| 2 | Bundle de dev à plusieurs paquets : un esbuild commun ou un par paquet | **Tranché (plan J1)** : un seul esbuild pour le moteur et tous les paquets |
 | 3 | Frontière exacte « générique / jeu » dans `habbo/window` (widget par widget) | Plan J3 |
 | 4 | Frontière exacte « rendu / logique » dans `habbo/room` | Plan J4 |
 | 5 | Retrait du chiffrement RC4 | Plus tard, client et serveur ensemble |

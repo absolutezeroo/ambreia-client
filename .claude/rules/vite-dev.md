@@ -2,6 +2,7 @@
 paths:
   - "packages/vortex-client/vite.config.ts"
   - "packages/vortex-client/tools/vite-plugin-*.mjs"
+  - "packages/*/package.json"
 ---
 
 # `pnpm dev` pre-bundles the engine
@@ -10,6 +11,11 @@ The client statically reaches ~3,970 of the engine's files at boot; served one r
 that was 15 s cold and ~6 s per reload (the port has no `import.meta.hot`, so every change is a full
 reload). `tools/vite-plugin-engine-bundle.mjs` hands the engine to esbuild in watch mode instead
 (~185 requests, ~1.3 s cold, ~0.45 s reload). It is serve-only; `pnpm build` is untouched.
+
+- **One esbuild graph covers the engine and the workspace packages** (`@ambreia/common`,
+  `@ambreia/net`; `outbase` is `packages/`), so their singletons (`Logger`, `FrameTimings`) exist once.
+  A new package must be added to `ALIAS_TARGETS`, `SOURCE_ROOTS` and the two specifier regexes, or a
+  client import of it is served by Vite as a second copy.
 
 - **`@core`/`@habbo`/`@room`/`@iid` are deliberately absent from `resolve.alias` in dev.** `vite:alias`
   runs before user `enforce: 'pre'` plugins, so declaring them would rewrite the specifier to engine
