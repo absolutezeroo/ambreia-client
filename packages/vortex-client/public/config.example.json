@@ -1,0 +1,9 @@
+{
+  "app": {
+    "server": { "host": "wss://jeu.exemple.fr/ws", "ports": [40001] }
+  },
+  "legacy": {
+    "url.prefix": "https://jeu.exemple.fr"
+  },
+  "room-ui": { "enabled": true }
+}

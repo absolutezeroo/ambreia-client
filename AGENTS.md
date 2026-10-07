@@ -39,6 +39,7 @@ node install.mjs             # unpack assets (vortex-client-assets.zip); --pack 
 | `packages/ambreia-net` | `@ambreia/net`: WebSocket transport, encryption, wire format, registry, packet tap — imports `@ambreia/common` only |
 | `packages/ambreia-avatar` | `@ambreia/avatar`: avatar renderer (not the editor), built from typed options; runs in Node (`tools/render-avatar.mjs`) — imports `@ambreia/common` only |
 | `packages/ambreia-ui` | `@ambreia/ui`: window system (`src/`), generic kit (`src/kit/`: plain `WindowManager`, `WidgetRegistry`, dialogs, generic widgets), XML parsers (`src/assets/`); `pnpm --filter @ambreia/ui sandbox` shows it alone — imports `@ambreia/common` only |
+| `packages/ambreia-kernel` | `@ambreia/kernel`: DI (`runtime/`), typed config (`config/`: Zod, `app` + `legacy` + one section per feature, `config.json`), features (`feature/`: `defineFeature`, `bootFeatures`) — imports `@ambreia/common` only |
 | `packages/ambreia-iso` | `@ambreia/iso`: room engine — core (`src/`), `scene/`, `furniture/`, `avatar/`, `effects/`, each with its `register*` module; `IsoStage` loads a room out of session (zone format); `pnpm --filter @ambreia/iso sandbox` — imports `@ambreia/common` and `@ambreia/avatar` only |
 | `packages/vortex-engine` | Engine: `core/` (runtime/DI, the DI wrappers `AssetLibrary` and `CoreCommunicationManager`), `habbo/` (game core: `avatar` incl. the editor, `communication`, `configuration`, `localization`, `room` (RoomEngine, the message handler: the game glue over `iso`), `session`, `ui` (room desktop, name bubble), `window` (the game windows and widgets: `HabboWindowManager extends WindowManager`)), `iid/` (DI symbols) |
 | `packages/vortex-client` | App shell: boot (`src/App.ts`), display classes, assets, `src/vortex-layouts/` (new window XML) |
@@ -81,8 +82,9 @@ Aliases: `@core/` `@habbo/` `@iid/` → engine `src/` (`@room` went with J4); in
 - Log with `Logger.getLogger('habbo.room.RoomEngine')`: `trace` per frame/packet/item, `debug` for a
   subsystem's own commentary, `info` for milestones, `warn` for data or paths the client does not
   handle (they render nothing, so `debug` would hide them), `error` when the user will notice.
-- Managers are DI `Component`s registered under an IID, with one `I<Manager>` interface
-  (`docs/PATTERNS.md` → Manager template).
+- A manager is a feature (`defineFeature` in `vortex-engine/src/features/`, one line in `ENGINE_FEATURES`):
+  a DI `Component` or a plain instance under an IID, with one `I<Manager>` interface (`docs/PATTERNS.md`).
+  Config: a feature reads its own section; old keys go through `legacy` / `getProperty` until migrated.
 - Render loops allocate nothing per frame and use `Set`/`Map` for lookups (`docs/STYLEGUIDE.md` →
   Performance).
 - Comments are in English and say why. Inherited code keeps its `// AS3:` trace when moved
@@ -113,7 +115,7 @@ Aliases: `@core/` `@habbo/` `@iid/` → engine `src/` (`@room` went with J4); in
 | Port history (frozen, not updated any more) | `docs/IMPLEMENTATION_STATUS.md` |
 
 The website (`vortex-web`) lives in its own repository; comments naming it describe that site. It
-hands the client a session with `?sso=<ticket>`, read in `packages/vortex-client/index.html`.
+hands the client a session with `?sso=<ticket>`, read by the kernel's config (`browserSources`, App.ts).
 
 ## Keeping this file useful
 
