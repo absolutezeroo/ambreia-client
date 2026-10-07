@@ -3,6 +3,7 @@ import type {LayerState} from '@ambreia/map-editor-core/layers/LayerState';
 import type {ZoneDocument} from '@ambreia/map-editor-core/zone/Zone.generated';
 import type {FurnitureSprites} from './FurnitureSprites';
 import type {IViewOptions} from './IViewOptions';
+import type {IWorldOverlay} from './IWorldOverlay';
 
 /** Everything the view draws, rebuilt by the app after each change. */
 export interface IViewModel
@@ -21,4 +22,6 @@ export interface IViewModel
     readonly dragOffset: {readonly dx: number; readonly dy: number} | null;
     /** The furniture the place tool would put under the pointer. */
     readonly ghost: IFurniturePaletteEntry | null;
+    /** The world layers' editing state (selected element, shape being drawn). */
+    readonly world: IWorldOverlay;
 }

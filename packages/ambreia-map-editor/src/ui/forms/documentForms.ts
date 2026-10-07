@@ -1,0 +1,41 @@
+import {updateWalls} from '@ambreia/map-editor-core/commands/updateWalls';
+import {updateAmbience} from '@ambreia/map-editor-core/commands/updateAmbience';
+import type {EditorApp} from '../../app/EditorApp';
+import type {IFieldSpec} from './IFieldSpec';
+
+type Form = {readonly title: string; readonly hint: string; readonly fields: IFieldSpec[]};
+
+/** "Murs": shown or not, their height and thickness (S§9). */
+export function wallsForm(app: EditorApp): Form
+{
+    const walls = () => app.doc.walls ?? {};
+
+    return {
+        title: 'Murs',
+        hint: 'Les murs du fond de la salle, comme dans Habbo. La porte reste toujours ouverte.',
+        fields: [
+            {kind: 'check', label: 'Murs visibles', get: () => walls().visible !== false, set: v => app.execute(updateWalls({visible: !!v}))},
+            {kind: 'number', label: 'Hauteur', get: () => walls().height ?? 0, set: v => app.execute(updateWalls({height: Number(v)})), min: 0, max: 16},
+            {kind: 'number', label: 'Épaisseur', get: () => walls().thickness ?? 0, set: v => app.execute(updateWalls({thickness: Number(v)})), min: 0, max: 3}
+        ]
+    };
+}
+
+/** "Ambiance": tint, brightness, day and night (S§35); the client draws them when it can. */
+export function ambienceForm(app: EditorApp): Form
+{
+    const ambience = () => app.doc.ambience ?? {};
+
+    return {
+        title: 'Ambiance',
+        hint: 'La lumière de la zone. Le client l\'appliquera quand son rendu le permettra (J4) ; le serveur l\'enregistre déjà.',
+        fields: [
+            {kind: 'text', label: 'Teinte (#rrggbb)', get: () => ambience().tint ?? '', set: v => app.execute(updateAmbience({tint: String(v).trim() || undefined}))},
+            {kind: 'number', label: 'Luminosité (%)', get: () => ambience().brightness ?? 100, set: v => app.execute(updateAmbience({brightness: Number(v)})), min: 0, max: 100},
+            {kind: 'check', label: 'Cycle jour / nuit', get: () => !!ambience().dayNight, set: v => app.execute(updateAmbience({dayNight: !!v}))},
+            {kind: 'section', label: 'Musique et météo'},
+            {kind: 'text', label: 'Musique', get: () => app.doc.settings.music ?? '', readOnly: true},
+            {kind: 'text', label: 'Météo', get: () => app.doc.settings.weather ?? '', readOnly: true}
+        ]
+    };
+}

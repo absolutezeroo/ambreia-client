@@ -6,6 +6,10 @@ import {WindowManager} from '@ambreia/ui/kit/WindowManager';
 import {EditorTexts} from './EditorTexts';
 
 const DESCRIPTION = 'habbo_element_description_xml';
+const GAME_WIDGET_TYPES = [
+    'avatar_image', 'badge_image', 'furniture_image', 'illumina_chat_bubble', 'pet_image',
+    'product_icon', 'product_image', 'room_previewer', 'updating_timestamp'
+] as const;
 // The one atlas whose embedded name is not its file name (see the client's App.ts).
 const ATLAS_FILES: Record<string, string> = {skin_ubuntu_bg_9: 'ubuntu_bg_9'};
 // The families the skins draw their text in (GlazeBoot's list); the window system measures with them.
@@ -63,6 +67,10 @@ export async function bootWindowSystem(): Promise<{manager: WindowManager; texts
     // mapeditor last: its keys win over a homonym elsewhere.
     const texts = new EditorTexts(...Object.entries(FRENCH_TEXTS).sort(([a], [b]) => Number(a.includes('mapeditor')) - Number(b.includes('mapeditor'))).map(([, text]) => text));
     const manager = new WindowManager({interpolate: text => text});
+
+    // The engine's game widgets (avatar, badge, furni…), placeholders here as in Glaze: the
+    // owner's NPC layouts name avatar_image, which draws nothing until the editor renders avatars.
+    for(const type of GAME_WIDGET_TYPES) manager.widgets.register(type, () => null);
 
     manager.setLocalization(texts);
     manager.initialize();

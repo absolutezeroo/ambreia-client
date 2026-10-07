@@ -53,6 +53,8 @@ async function boot(): Promise<void>
             const {manager, texts} = await windows;
             const app = new EditorApp(api, zone, doc, palette);
 
+            app.zones = await api.listZones();
+
             root.hidden = true;
             stage.hidden = false;
 

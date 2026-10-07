@@ -22,10 +22,15 @@ export class ViewInfoUi implements IPanelUi
 
         setText(this._window, 'view_info_0', app.doc.settings.id);
         setText(this._window, 'view_info_1', h
-            ? `(${h.x}, ${h.y}) h ${tile?.height ?? 0}${tile?.hole ? ' · trou' : ''}`
+            ? `(${h.x}, ${h.y}) h ${tile?.height ?? 0}${tile?.hole ? ' - trou' : ''}`
             : `${floor.width} × ${floor.length}`);
         setText(this._window, 'view_info_2', this._texts.get(CATEGORY_LABEL_KEYS[app.category]));
         this.onViewChange();
+    }
+
+    onPointer(): void
+    {
+        this.render();
     }
 
     onViewChange(): void

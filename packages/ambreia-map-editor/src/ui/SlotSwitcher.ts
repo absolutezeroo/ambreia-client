@@ -11,8 +11,10 @@ type SlotName = 'left' | 'inspector' | 'bottom';
 const SLOT_WINDOWS: Record<SlotName, string> = {left: 'left_slot', inspector: 'inspector_slot', bottom: 'bottom_slot'};
 
 /**
- * Fills the main window's three slots with the layouts the current category asks for. A layout
- * is built once and kept: switching back to a category finds its panel as it was left.
+ * Fills the main window's three slots with the layouts the current category asks for. A slot is
+ * named by its layout, or `layout#key` when one layout serves several categories with different
+ * content (left_npcs for the NPCs, the entries, the passages…): each key gets its own window.
+ * A window is built once and kept: switching back finds its panel as it was left.
  */
 export class SlotSwitcher implements IPanelUi
 {
@@ -76,7 +78,7 @@ export class SlotSwitcher implements IPanelUi
 
         if(!entry)
         {
-            const window = this._manager.buildWidgetLayout(layout);
+            const window = this._manager.buildWidgetLayout(layout.split('#')[0]);
 
             if(!window)
             {

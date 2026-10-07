@@ -4,6 +4,7 @@ import type {IFurnitureSprite} from './IFurnitureSprite';
 import type {IPick} from './IPick';
 import type {IViewModel} from './IViewModel';
 import {HALF_H, inPolygon, project, rhombus, STEP, tracePolygon} from './isoMath';
+import {WorldOverlayPainter} from './WorldOverlayPainter';
 
 type PointerKind = 'down' | 'move' | 'up';
 
@@ -22,6 +23,7 @@ export class IsoView
     onViewChange: () => void = () => undefined;
 
     private readonly _ctx: CanvasRenderingContext2D;
+    private readonly _world: WorldOverlayPainter;
     private _model: IViewModel | null = null;
     private _zoom = 1;
     private _ox = 0;
@@ -41,6 +43,7 @@ export class IsoView
     constructor()
     {
         this._ctx = this.canvas.getContext('2d')!;
+        this._world = new WorldOverlayPainter(this._ctx);
     }
 
     /** The size of the window that shows the view. */
@@ -217,6 +220,7 @@ export class IsoView
             }
         }
 
+        this._world.draw(model, this._zoom);
         this.drawHover(model);
     }
 

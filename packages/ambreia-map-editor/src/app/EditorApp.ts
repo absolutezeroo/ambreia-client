@@ -26,6 +26,7 @@ import type {IViewOptions} from '../view/IViewOptions';
 import {IsoView} from '../view/IsoView';
 import type {Category} from './Category';
 import {TOOL_KEYS} from './TOOL_KEYS';
+import {WorldEditing} from './WorldEditing';
 import type {IClipboardEntry} from './IClipboardEntry';
 import type {IJournalEntry} from './IJournalEntry';
 import type {ToolName} from './ToolName';
@@ -48,6 +49,8 @@ export class EditorApp
     readonly view = new IsoView();
     readonly options: IViewOptions = {grid: true, heights: false, walls: true, sprites: true};
     readonly journal: IJournalEntry[] = [];
+    /** The world layers' selection and tools (entries, areas, NPCs, spawns, triggers…). */
+    readonly world: WorldEditing = new WorldEditing(this);
 
     selection = EditorSelection.EMPTY;
     category: Category = 'floor';
@@ -56,6 +59,8 @@ export class EditorApp
     paintHeight = 0;
     choice: IFurniturePaletteEntry | null = null;
     serverFindings: IZoneFinding[] = [];
+    /** Every zone of the world: the destinations a passage or a teleport can aim at. */
+    zones: IZoneSummary[] = [];
     savedVersion: number | null;
     publishedVersion: number | null;
     status = '';
@@ -63,7 +68,7 @@ export class EditorApp
     busy = false;
 
     private readonly _furniture: Map<number, IFurniturePaletteEntry>;
-    private readonly _panels: {render(): void}[] = [];
+    private readonly _panels: {render(): void; onPointer?(): void}[] = [];
     private readonly _viewListeners: (() => void)[] = [];
     private _clipboard: IClipboardEntry | null = null;
     private _stroke = new Map<number, Cell>();
@@ -95,7 +100,7 @@ export class EditorApp
     }
 
     /** A panel to render after each change. */
-    attach(panel: {render(): void}): void
+    attach(panel: {render(): void; onPointer?(): void}): void
     {
         this._panels.push(panel);
     }
@@ -169,6 +174,8 @@ export class EditorApp
     setCategory(category: Category): void
     {
         this.category = category;
+        this.world.tool = 'select';
+        this.world.polygon = [];
         if(category === 'decor' && !['select', 'move', 'place'].includes(this.tool)) this.tool = 'select';
         if(category !== 'decor' && ['move', 'place'].includes(this.tool)) this.tool = 'select';
         this.refresh();
@@ -434,13 +441,23 @@ export class EditorApp
         else if(e.ctrlKey && key === 'c') this.copy();
         else if(e.ctrlKey && key === 'v') this.paste();
         else if(e.ctrlKey && key === 'd') this.duplicate();
-        else if(key === 'delete' || key === 'backspace') this.deleteSelection();
+        else if(this.world.layer && this.world.key(key)) return;
+        else if(key === 'delete' || key === 'backspace')
+        {
+            if(this.world.layer) this.world.remove();
+            else this.deleteSelection();
+        }
         else if(key === 'escape')
         {
             this.selection = EditorSelection.EMPTY;
             this.setTool('select');
         }
         else if(e.ctrlKey || e.altKey) return;
+        else if(this.world.layer && ['s', 'r', 'p'].includes(key))
+        {
+            // The world layers' tools: S select and drag, R rectangle, P polygon.
+            this.world.setTool(key === 's' ? 'select' : key === 'r' ? 'rect' : 'polygon');
+        }
         else if(this.category === 'decor' && key === 'r') this.rotateSelection();
         else if(this.category === 'decor' && key === 'm') this.setTool('move');
         else if(this.category === 'decor' && key === 's') this.setTool('select');
@@ -465,6 +482,16 @@ export class EditorApp
     private pointer(kind: 'down' | 'move' | 'up', pick: IPick, e: MouseEvent): void
     {
         this.hover = pick.cell;
+
+        // The world layers have their own tools: the floor and mobi tools stay out of their way.
+        if(this.world.layer)
+        {
+            this.world.pointer(kind, pick, e);
+            this.drawView();
+            for(const panel of this._panels) panel.onPointer?.();
+
+            return;
+        }
 
         switch(this.tool)
         {
@@ -503,6 +530,7 @@ export class EditorApp
         }
 
         this.drawView();
+        for(const panel of this._panels) panel.onPointer?.();
     }
 
     private selectTool(kind: 'down' | 'move' | 'up', pick: IPick, e: MouseEvent): void
@@ -643,7 +671,14 @@ export class EditorApp
             strokeCells: new Set(this._stroke.keys()),
             hover: this.hover,
             dragOffset: this.dragOffset(),
-            ghost: this.tool === 'place' ? this.choice : null
+            ghost: this.tool === 'place' && !this.world.layer ? this.choice : null,
+            world: {
+                layer: this.world.layer,
+                element: this.world.element,
+                polygon: this.world.polygon,
+                preview: this.world.preview,
+                dragOffset: this.world.dragOffset
+            }
         });
     }
 }
