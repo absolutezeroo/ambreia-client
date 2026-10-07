@@ -14,8 +14,11 @@
     "imager": "pnpm --filter vortex-imager start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "node --test \"packages/*/tools/**/*.test.mjs\"",
+    "test": "node --test \"packages/*/tools/**/*.test.mjs\" \".claude/scripts/**/*.test.mjs\"",
+    "typecheck": "pnpm --filter vortex-client exec tsc --noEmit && pnpm --filter vortex-glaze exec tsc --noEmit",
+    "check": "pnpm typecheck && pnpm test",
     "gen:headers": "node packages/vortex-engine/tools/gen-headers.mjs",
+    "sync:agents": "node .claude/scripts/sync-agent-docs.mjs --write",
     "prepare": "husky"
   },
   "author": "Clayton",
