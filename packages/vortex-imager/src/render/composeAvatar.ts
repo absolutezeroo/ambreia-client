@@ -132,7 +132,7 @@ export function composeAvatarWithSprites(
             animationFrame = layerData.animationFrame;
             dx += layerData.dx;
             dy += layerData.dy;
-            dd += layerData.dd;
+            dd += layerData.directionOffset;
         }
 
         if(dd < 0) dd += 8;

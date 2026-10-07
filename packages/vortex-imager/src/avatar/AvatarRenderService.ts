@@ -208,7 +208,7 @@ export class AvatarRenderService
             }
 
             return composite === null
-                ? await textureToPng(texture, request.zoom)
+                ? await textureToPng(texture as unknown as ShimTexture, request.zoom)
                 : await canvasToPng(composite, request.zoom);
         }
         finally
