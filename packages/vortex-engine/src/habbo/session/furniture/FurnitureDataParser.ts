@@ -1,12 +1,11 @@
 import {EventEmitter} from 'eventemitter3';
 import {Logger} from '@ambreia/common/utils/Logger';
-import {AssetLibrary} from '@core/assets/AssetLibrary';
+import {AssetLibrary} from '@ambreia/common/assets/AssetLibrary';
 import {AssetLoaderEventType} from '@ambreia/common/assets/loaders/AssetLoaderEvent';
 import {Core} from '@core/Core';
 import {FurnitureData} from './FurnitureData';
 
 import type {AssetLoaderEvent} from '@ambreia/common/assets/loaders/AssetLoaderEvent';
-import type {IContext} from '@core/runtime/IContext';
 import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';
 import type {IFurnitureData} from './IFurnitureData';
 
@@ -90,7 +89,7 @@ export class FurnitureDataParser
         this._critical = critical;
         // AS3: `_SafeStr_6050 = new AssetLibrary("FurniDataParserAssetLib")`. The port's
         // AssetLibrary is a Component and needs the context AS3's does not.
-        this._assetLib = new AssetLibrary(Core.instance as IContext, 'FurniDataParserAssetLib');
+        this._assetLib = new AssetLibrary('FurniDataParserAssetLib');
     }
 
     /**

@@ -1,12 +1,11 @@
 import {EventEmitter} from 'eventemitter3';
 import {Logger} from '@ambreia/common/utils/Logger';
-import {AssetLibrary} from '@core/assets/AssetLibrary';
+import {AssetLibrary} from '@ambreia/common/assets/AssetLibrary';
 import {AssetLoaderEventType} from '@ambreia/common/assets/loaders/AssetLoaderEvent';
 import {Core} from '@core/Core';
 import {ProductData} from './ProductData';
 
 import type {AssetLoaderEvent} from '@ambreia/common/assets/loaders/AssetLoaderEvent';
-import type {IContext} from '@core/runtime/IContext';
 import type {IProductData} from './IProductData';
 
 const log = Logger.getLogger('habbo.session.product.ProductDataParser');
@@ -67,7 +66,7 @@ export class ProductDataParser
     constructor(url: string, products: Map<string, IProductData>)
     {
         this._products = products;
-        this._assetLib = new AssetLibrary(Core.instance as IContext, 'ProductDataParserAssetLib');
+        this._assetLib = new AssetLibrary('ProductDataParserAssetLib');
         this._url = url;
         this._downloadRetriesLeft = ProductDataParser.MAX_DOWNLOAD_RETRIES;
 

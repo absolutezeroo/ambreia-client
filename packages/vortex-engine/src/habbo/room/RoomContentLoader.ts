@@ -17,7 +17,7 @@ import type {IRoomObjectVisualizationFactory} from '@room/object/IRoomObjectVisu
 import type {IGraphicAssetCollection} from '@ambreia/common/graphics/IGraphicAssetCollection';
 import type {IAsset} from '@ambreia/common/assets/IAsset';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
-import {AssetLibraryCollection} from '@core/assets/AssetLibraryCollection';
+import {AssetLibraryCollection} from '@ambreia/common/assets/AssetLibraryCollection';
 import {Core} from '@core/Core';
 import type {IHabboConfigurationManager} from '@habbo/configuration/IHabboConfigurationManager';
 import type {ISessionDataManager} from '@habbo/session/ISessionDataManager';
@@ -1751,7 +1751,7 @@ export class RoomContentLoader implements IRoomContentLoader, IFurniDataListener
         //
         // AS3's constructor takes the name alone; this one also needs the context because
         // AssetLibraryCollection extends Component here where AS3 extends EventDispatcherWrapper.
-        const collection: IAssetLibrary = new AssetLibraryCollection(context, libraryName);
+        const collection: IAssetLibrary = new AssetLibraryCollection(libraryName);
 
         this._assetLibraries.set(libraryName, collection);
 

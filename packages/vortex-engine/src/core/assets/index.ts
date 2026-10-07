@@ -5,8 +5,8 @@
 export * from '@ambreia/common/assets/loaders/index';
 
 // Exports
-export {AssetLibraryEvents, AssetLibrary,} from './AssetLibrary';
-export {AssetLibraryCollection} from './AssetLibraryCollection';
+export {AssetLibraryEvents, AssetLibrary,} from '@ambreia/common/assets/AssetLibrary';
+export {AssetLibraryCollection} from '@ambreia/common/assets/AssetLibraryCollection';
 export {AssetLoaderStruct} from '@ambreia/common/assets/AssetLoaderStruct';
 export {AssetTypeDeclaration} from '@ambreia/common/assets/AssetTypeDeclaration';
 export {BitmapDataAsset} from '@ambreia/common/assets/BitmapDataAsset';

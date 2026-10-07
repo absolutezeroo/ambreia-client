@@ -1,10 +1,9 @@
 import {EventEmitter} from 'eventemitter3';
-import {Component, type IContext} from '@core/runtime';
-import type {IAsset} from '@ambreia/common/assets/IAsset';
-import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
+import type {IAsset} from './IAsset';
+import type {IAssetLibrary} from './IAssetLibrary';
 import {AssetLibrary, AssetLibraryEvents} from './AssetLibrary';
-import type {AssetTypeDeclaration} from '@ambreia/common/assets/AssetTypeDeclaration';
-import type {AssetLoaderStruct} from '@ambreia/common/assets/AssetLoaderStruct';
+import type {AssetTypeDeclaration} from './AssetTypeDeclaration';
+import type {AssetLoaderStruct} from './AssetLoaderStruct';
 
 /**
  * AssetLibraryCollection
@@ -14,8 +13,11 @@ import type {AssetLoaderStruct} from '@ambreia/common/assets/AssetLoaderStruct';
  * A collection that aggregates multiple asset libraries and provides
  * a unified interface to query assets across all of them.
  */
-export class AssetLibraryCollection extends Component implements IAssetLibrary
+// DEVIATION: a Component in AS3, a plain class here — see AssetLibrary.
+export class AssetLibraryCollection implements IAssetLibrary
 {
+    private _disposed: boolean = false;
+
     protected readonly _libraries: IAssetLibrary[] = [];
     protected readonly _pendingLibraries: IAssetLibrary[] = [];
     protected readonly _collectionEvents: EventEmitter = new EventEmitter();
@@ -23,9 +25,8 @@ export class AssetLibraryCollection extends Component implements IAssetLibrary
     private readonly _name: string;
     private _libraryCounter: number = 0;
 
-    constructor(context: IContext, name: string = 'AssetLibraryCollection')
+    constructor(name: string = 'AssetLibraryCollection')
     {
-        super(context);
         this._name = name;
     }
 
@@ -119,7 +120,7 @@ export class AssetLibraryCollection extends Component implements IAssetLibrary
     {
         if(!this._binLibrary)
         {
-            this._binLibrary = new AssetLibrary(this.context, 'bin');
+            this._binLibrary = new AssetLibrary('bin');
             this._libraries.unshift(this._binLibrary);
         }
 
@@ -129,7 +130,12 @@ export class AssetLibraryCollection extends Component implements IAssetLibrary
     /**
 	 * Dispose of the collection
 	 */
-    override dispose(): void
+    get disposed(): boolean
+    {
+        return this._disposed;
+    }
+
+    dispose(): void
     {
         if(!this.disposed)
         {
@@ -150,7 +156,7 @@ export class AssetLibraryCollection extends Component implements IAssetLibrary
             this._binLibrary = null;
             this._collectionEvents.removeAllListeners();
 
-            super.dispose();
+            this._disposed = true;
         }
     }
 
@@ -159,7 +165,7 @@ export class AssetLibraryCollection extends Component implements IAssetLibrary
 	 */
     async loadFromUrl(url: string, isReady: boolean = false): Promise<void>
     {
-        const library = new AssetLibrary(this.context, `lib-${this._libraryCounter++}`);
+        const library = new AssetLibrary(`lib-${this._libraryCounter++}`);
         this._pendingLibraries.push(library);
 
         try
@@ -596,7 +602,7 @@ export class AssetLibraryCollection extends Component implements IAssetLibrary
     /**
 	 * String representation
 	 */
-    override toString(): string
+    toString(): string
     {
         return `[AssetLibraryCollection ${this._name} libraries=${this._libraries.length} assets=${this.numAssets}]`;
     }

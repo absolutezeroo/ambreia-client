@@ -398,12 +398,12 @@ export class AvatarRenderService
 
         context.registerInterface(IID_Core, context);
 
-        const assets = new AssetLibrary(context);
+        const assets = new AssetLibrary();
 
         this._context = context;
         this._assets = assets;
 
-        context.attachComponent(assets, [IID_AssetLibrary]);
+        context.attachInstance(IID_AssetLibrary, assets);
 
         await this.registerEmbeddedAvatarAssets(assets);
 

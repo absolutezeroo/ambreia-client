@@ -1,27 +1,26 @@
 import {EventEmitter} from 'eventemitter3';
-import {Component, type IContext} from '@core/runtime';
-import {Logger} from '@ambreia/common/utils/Logger';
-import type {IAsset} from '@ambreia/common/assets/IAsset';
-import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
-import type {IAssetLoader} from '@ambreia/common/assets/loaders/IAssetLoader';
-import {type AssetClass, type AssetLoaderClass, AssetTypeDeclaration} from '@ambreia/common/assets/AssetTypeDeclaration';
-import {AssetLoaderStruct} from '@ambreia/common/assets/AssetLoaderStruct';
-import {AssetLoaderEvent, AssetLoaderEventType} from '@ambreia/common/assets/loaders/AssetLoaderEvent';
+import {Logger} from '../utils/Logger';
+import type {IAsset} from './IAsset';
+import type {IAssetLibrary} from './IAssetLibrary';
+import type {IAssetLoader} from './loaders/IAssetLoader';
+import {type AssetClass, type AssetLoaderClass, AssetTypeDeclaration} from './AssetTypeDeclaration';
+import {AssetLoaderStruct} from './AssetLoaderStruct';
+import {AssetLoaderEvent, AssetLoaderEventType} from './loaders/AssetLoaderEvent';
 
 // Import default asset types
-import {UnknownAsset} from '@ambreia/common/assets/UnknownAsset';
-import {TextAsset} from '@ambreia/common/assets/TextAsset';
-import {XmlAsset} from '@ambreia/common/assets/XmlAsset';
-import {BitmapDataAsset} from '@ambreia/common/assets/BitmapDataAsset';
-import {SoundAsset} from '@ambreia/common/assets/SoundAsset';
-import {NitroAsset} from '@ambreia/common/assets/NitroAsset';
+import {UnknownAsset} from './UnknownAsset';
+import {TextAsset} from './TextAsset';
+import {XmlAsset} from './XmlAsset';
+import {BitmapDataAsset} from './BitmapDataAsset';
+import {SoundAsset} from './SoundAsset';
+import {NitroAsset} from './NitroAsset';
 
 // Import default loaders
-import {BinaryFileLoader} from '@ambreia/common/assets/loaders/BinaryFileLoader';
-import {TextFileLoader} from '@ambreia/common/assets/loaders/TextFileLoader';
-import {BitmapFileLoader} from '@ambreia/common/assets/loaders/BitmapFileLoader';
-import {SoundFileLoader} from '@ambreia/common/assets/loaders/SoundFileLoader';
-import {NitroBundleLoader} from '@ambreia/common/assets/loaders/NitroBundleLoader';
+import {BinaryFileLoader} from './loaders/BinaryFileLoader';
+import {TextFileLoader} from './loaders/TextFileLoader';
+import {BitmapFileLoader} from './loaders/BitmapFileLoader';
+import {SoundFileLoader} from './loaders/SoundFileLoader';
+import {NitroBundleLoader} from './loaders/NitroBundleLoader';
 
 /**
  * Asset library events
@@ -52,8 +51,12 @@ export const AssetLibraryEvents = {
  * - Loading assets from files
  * - Automatic type detection by file extension
  */
-export class AssetLibrary extends Component implements IAssetLibrary 
+// DEVIATION: AS3's AssetLibrary is a Component; here it is a plain class (spec §3 rule 1: no DI in an
+//   engine package). The engine registers it with `context.attachInstance(IID_AssetLibrary, …)`.
+export class AssetLibrary implements IAssetLibrary 
 {
+    private _disposed: boolean = false;
+
     /**
      * Shared type registry (global, across all libraries)
      */
@@ -79,10 +82,8 @@ export class AssetLibrary extends Component implements IAssetLibrary
     private readonly _assetByContent: Map<unknown, IAsset> = new Map();
     private readonly _assetNameIndex: Map<string, number> = new Map();
 
-    constructor(context: IContext, name: string = 'AssetLibrary') 
+    constructor(name: string = 'AssetLibrary') 
     {
-        super(context);
-
         this._name = name;
 
         // Initialize shared types on first library creation
@@ -239,7 +240,12 @@ export class AssetLibrary extends Component implements IAssetLibrary
     /**
      * Dispose of this library
      */
-    override dispose(): void 
+    get disposed(): boolean
+    {
+        return this._disposed;
+    }
+
+    dispose(): void 
     {
         if(!this.disposed) 
         {
@@ -257,7 +263,7 @@ export class AssetLibrary extends Component implements IAssetLibrary
 
             this._libraryEvents.removeAllListeners();
 
-            super.dispose();
+            this._disposed = true;
         }
     }
 
@@ -719,7 +725,7 @@ export class AssetLibrary extends Component implements IAssetLibrary
     /**
      * String representation
      */
-    override toString(): string 
+    toString(): string 
     {
         return `[AssetLibrary ${this._name} assets=${this._assetMap.size}]`;
     }

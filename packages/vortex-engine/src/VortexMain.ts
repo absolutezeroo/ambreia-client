@@ -14,7 +14,7 @@ import {AvatarRenderManager} from '@habbo/avatar/AvatarRenderManager';
 import {HabboWindowManager} from '@habbo/window/HabboWindowManager';
 import {RoomUI} from '@habbo/ui/RoomUI';
 import {Core} from '@core/Core';
-import {AssetLibrary} from '@core/assets/AssetLibrary';
+import {AssetLibrary} from '@ambreia/common/assets/AssetLibrary';
 import {AssetTypeDeclaration} from '@ambreia/common/assets/AssetTypeDeclaration';
 import {XmlAsset} from '@ambreia/common/assets/XmlAsset';
 import {TextAsset} from '@ambreia/common/assets/TextAsset';
@@ -502,8 +502,8 @@ export class VortexMain implements IVortexMain
         ctx.registerInterface(IID_Core, ctx);
 
         // Asset Library — manages all game assets
-        this._assets = new AssetLibrary(ctx);
-        ctx.attachComponent(this._assets, [IID_AssetLibrary]);
+        this._assets = new AssetLibrary();
+        ctx.attachInstance(IID_AssetLibrary, this._assets);
         this.registerEmbeddedAvatarAssets(config);
         this.registerChatStyleTextAssets(config);
         // Before any component exists, not after: HabboGroupsManager (12g below) builds its badge
