@@ -1,4 +1,5 @@
 import {EventEmitter} from 'eventemitter3';
+import {autoDetectRenderer} from 'pixi.js';
 import type {Renderer} from 'pixi.js';
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
@@ -61,7 +62,7 @@ export interface IIsoStageOptions
     modules?: readonly IsoModule[];
     /** Draws avatars and mannequins; none = they are not drawn. */
     avatarRenderer?: IAvatarRenderManager | null;
-    /** A PixiJS renderer for views drawn to a canvas; none = IsoStage makes one on first render. */
+    /** A PixiJS renderer for views drawn to a canvas (IIsoView.render()); see createOffscreenRenderer(). */
     renderer?: Renderer | null;
 }
 
@@ -74,6 +75,8 @@ interface IStageRoom
     door: IRoomDoor | null;
     wallGeometry: LegacyWallGeometry;
     ids: Map<string, number>;
+    /** The other way: internal id → the editor's id as given (string or number). */
+    items: Map<number, string | number>;
     nextId: number;
 }
 
@@ -98,6 +101,12 @@ export class IsoStage
         this._options = options;
         this._manager = manager;
         this._loader = loader;
+    }
+
+    /** A renderer of its own for a host without PixiJS, to pass as `renderer` (browser only). */
+    static createOffscreenRenderer(width: number = 800, height: number = 600): Promise<Renderer>
+    {
+        return autoDetectRenderer({width, height, backgroundAlpha: 0, antialias: false}) as Promise<Renderer>;
     }
 
     /** Builds the room pipeline and waits for its placeholder content (room, cursor, fallbacks). */
@@ -176,6 +185,7 @@ export class IsoStage
             door: findDoor(data.floor, heights),
             wallGeometry: buildWallGeometry(data.floor, heights, wallHeight, WALL_GEOMETRY_SCALE),
             ids: new Map(),
+            items: new Map(),
             nextId: 1
         };
 
@@ -197,7 +207,22 @@ export class IsoStage
 
         if(!room) return null;
 
-        return IsoView.create(room.instance, room.door, width, height, scale, this._options.renderer ?? null);
+        const floor = room.data.floor;
+
+        return IsoView.create({
+            instance: room.instance,
+            get door(): IRoomDoor | null { return room.door; },
+            width: floor.width,
+            length: floor.length,
+            heightAt: (x: number, y: number): number => Math.max(0, room.heights[y * floor.width + x]),
+            itemIdOf: (id: number): string | number | null => room.items.get(id) ?? null
+        }, width, height, scale, () => this._options.renderer ?? null);
+    }
+
+    /** The loaded room, for a host that reads it (counts, objects). */
+    getRoom(roomId: string): IRoomInstance | null
+    {
+        return this._rooms.get(roomId)?.instance ?? null;
     }
 
     /** Adds one furni (a stroke of the editor): no reload. */
@@ -217,6 +242,7 @@ export class IsoStage
         const id = room.ids.get(key) ?? room.nextId++;
 
         room.ids.set(key, id);
+        room.items.set(id, item.id);
 
         const object = room.instance.createRoomObject(id, type, category) as IRoomObjectController | null;
 
@@ -259,6 +285,7 @@ export class IsoStage
         room.instance.disposeObject(internal, RoomObjectCategoryEnum.OBJECT_CATEGORY_FURNITURE);
         room.instance.disposeObject(internal, RoomObjectCategoryEnum.OBJECT_CATEGORY_WALL);
         room.ids.delete(String(id));
+        room.items.delete(internal);
     }
 
     /** Changes one tile: the floor and wall planes are rebuilt, the furniture stays. */
