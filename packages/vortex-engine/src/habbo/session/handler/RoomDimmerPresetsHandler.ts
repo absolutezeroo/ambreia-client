@@ -6,12 +6,12 @@ import {BaseHandler} from './BaseHandler';
 // Message events
 import {
     RoomDimmerPresetsMessageEvent
-} from '../../communication/messages/incoming/room/furniture/RoomDimmerPresetsMessageEvent';
+} from '@ambreia/protocol/incoming/room/furniture/RoomDimmerPresetsMessageEvent';
 
 // Parsers
 import type {
     RoomDimmerPresetsMessageEventParser
-} from '../../communication/messages/parser/room/furniture/RoomDimmerPresetsMessageEventParser';
+} from '@ambreia/protocol/parser/room/furniture/RoomDimmerPresetsMessageEventParser';
 
 // Events
 import {RoomSessionDimmerPresetsEvent} from '../events/RoomSessionDimmerPresetsEvent';

@@ -6,11 +6,11 @@ import {
     YouAreControllerMessageEvent,
     YouAreNotControllerMessageEvent,
     YouAreOwnerMessageEvent,
-} from '../../communication/messages/incoming/room/permissions';
+} from '@ambreia/protocol/incoming/room/permissions/index';
 import type {
     YouAreControllerMessageParser,
     YouAreNotControllerMessageParser,
-} from '../../communication/messages/parser/room/permissions';
+} from '@ambreia/protocol/parser/room/permissions/index';
 
 /**
  * Room permissions handler

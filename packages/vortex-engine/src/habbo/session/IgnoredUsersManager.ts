@@ -7,8 +7,8 @@ import {
     GetIgnoredUsersMessageComposer,
     IgnoreUserMessageComposer,
     UnignoreUserMessageComposer,
-} from '../communication/messages/outgoing/users';
-import {IgnoreResultMessageEvent, IgnoredUsersMessageEvent} from '../communication/messages/incoming/users';
+} from '@ambreia/protocol/outgoing/users/index';
+import {IgnoreResultMessageEvent, IgnoredUsersMessageEvent} from '@ambreia/protocol/incoming/users/index';
 
 /**
  * Ignored users manager

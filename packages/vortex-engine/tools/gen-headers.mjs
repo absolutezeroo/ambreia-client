@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Writes src/habbo/communication/Headers.generated.ts from the emulator's Headers.cs, or with
+// Writes @ambreia/protocol's src/Headers.generated.ts from the emulator's Headers.cs, or with
 // --check verifies the committed copy still matches it (run by .husky/pre-commit).
 // docs/superpowers/specs/2026-10-07-client-architecture-design.md §6.
 import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
@@ -16,7 +16,7 @@ const candidates = process.env.VORTEX_EMULATOR_DIR
     : emulatorCandidates(REPO, existsSync(dotGit) && !statSync(dotGit).isDirectory() ? readFileSync(dotGit, 'utf8') : null);
 const EMULATOR = candidates.find(dir => existsSync(join(dir, HEADERS_CS))) ?? candidates[0];
 const SOURCE = join(EMULATOR, HEADERS_CS);
-const TARGET = join(ENGINE, 'src', 'habbo', 'communication', 'Headers.generated.ts');
+const TARGET = join(REPO, 'packages', 'ambreia-protocol', 'src', 'Headers.generated.ts');
 const check = process.argv.includes('--check');
 
 if(!existsSync(SOURCE))

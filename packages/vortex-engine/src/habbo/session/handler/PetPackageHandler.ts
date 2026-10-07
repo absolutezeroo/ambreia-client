@@ -6,18 +6,18 @@ import {BaseHandler} from './BaseHandler';
 // Message events
 import {
     OpenPetPackageRequestedMessageEvent
-} from '../../communication/messages/incoming/room/furniture/OpenPetPackageRequestedMessageEvent';
+} from '@ambreia/protocol/incoming/room/furniture/OpenPetPackageRequestedMessageEvent';
 import {
     OpenPetPackageResultMessageEvent
-} from '../../communication/messages/incoming/room/furniture/OpenPetPackageResultMessageEvent';
+} from '@ambreia/protocol/incoming/room/furniture/OpenPetPackageResultMessageEvent';
 
 // Parsers
 import type {
     OpenPetPackageRequestedMessageEventParser
-} from '../../communication/messages/parser/room/furniture/OpenPetPackageRequestedMessageEventParser';
+} from '@ambreia/protocol/parser/room/furniture/OpenPetPackageRequestedMessageEventParser';
 import type {
     OpenPetPackageResultMessageEventParser
-} from '../../communication/messages/parser/room/furniture/OpenPetPackageResultMessageEventParser';
+} from '@ambreia/protocol/parser/room/furniture/OpenPetPackageResultMessageEventParser';
 
 // Events
 import {RoomSessionPetPackageEvent} from '../events/RoomSessionPetPackageEvent';

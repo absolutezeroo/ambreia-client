@@ -18,36 +18,36 @@ import {Logger} from '@ambreia/common/utils/Logger';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 import {
     FloorHeightMapMessageEvent
-} from '@habbo/communication/messages/incoming/room/engine/FloorHeightMapMessageEvent';
+} from '@ambreia/protocol/incoming/room/engine/FloorHeightMapMessageEvent';
 import type {
     FloorHeightMapMessageParser
-} from '@habbo/communication/messages/parser/room/engine/FloorHeightMapMessageParser';
-import {RoomEntryTileMessageEvent} from '@habbo/communication/messages/incoming/room/layout/RoomEntryTileMessageEvent';
+} from '@ambreia/protocol/parser/room/engine/FloorHeightMapMessageParser';
+import {RoomEntryTileMessageEvent} from '@ambreia/protocol/incoming/room/layout/RoomEntryTileMessageEvent';
 import type {
     RoomEntryTileMessageParser
-} from '@habbo/communication/messages/parser/room/layout/RoomEntryTileMessageParser';
+} from '@ambreia/protocol/parser/room/layout/RoomEntryTileMessageParser';
 import {
     RoomOccupiedTilesMessageEvent
-} from '@habbo/communication/messages/incoming/room/layout/RoomOccupiedTilesMessageEvent';
+} from '@ambreia/protocol/incoming/room/layout/RoomOccupiedTilesMessageEvent';
 import {
     RoomVisualizationSettingsEvent
-} from '@habbo/communication/messages/incoming/room/engine/RoomVisualizationSettingsEvent';
+} from '@ambreia/protocol/incoming/room/engine/RoomVisualizationSettingsEvent';
 import type {
     RoomVisualizationSettingsEventParser
-} from '@habbo/communication/messages/parser/room/engine/RoomVisualizationSettingsEventParser';
-import {PerkAllowancesMessageEvent} from '@habbo/communication/messages/incoming/perk/PerkAllowancesMessageEvent';
+} from '@ambreia/protocol/parser/room/engine/RoomVisualizationSettingsEventParser';
+import {PerkAllowancesMessageEvent} from '@ambreia/protocol/incoming/perk/PerkAllowancesMessageEvent';
 import type {
     PerkAllowancesMessageEventParser
-} from '@habbo/communication/messages/parser/perk/PerkAllowancesMessageEventParser';
+} from '@ambreia/protocol/parser/perk/PerkAllowancesMessageEventParser';
 import {
     GetOccupiedTilesMessageComposer
-} from '@habbo/communication/messages/outgoing/room/layout/GetOccupiedTilesMessageComposer';
+} from '@ambreia/protocol/outgoing/room/layout/GetOccupiedTilesMessageComposer';
 import {
     GetRoomEntryTileMessageComposer
-} from '@habbo/communication/messages/outgoing/room/layout/GetRoomEntryTileMessageComposer';
+} from '@ambreia/protocol/outgoing/room/layout/GetRoomEntryTileMessageComposer';
 import {
     UpdateFloorPropertiesMessageComposer
-} from '@habbo/communication/messages/outgoing/room/layout/UpdateFloorPropertiesMessageComposer';
+} from '@ambreia/protocol/outgoing/room/layout/UpdateFloorPropertiesMessageComposer';
 import {FloorPlanCache} from './FloorPlanCache';
 import {FloorPlanPreviewer} from './FloorPlanPreviewer';
 import {HeightMapEditor} from './HeightMapEditor';

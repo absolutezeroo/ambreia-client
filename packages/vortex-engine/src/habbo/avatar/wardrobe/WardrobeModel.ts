@@ -1,5 +1,5 @@
 import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
-import type {WardrobeOutfit} from '@habbo/communication/messages/parser/wardrobe/WardrobeOutfit';
+import type {WardrobeOutfit} from '@ambreia/protocol/parser/wardrobe/WardrobeOutfit';
 import type {HabboAvatarEditor} from '../HabboAvatarEditor';
 import type {ISideContentModel} from '../common/ISideContent';
 import {ErrorReportStorage} from '@ambreia/common/utils/ErrorReportStorage';

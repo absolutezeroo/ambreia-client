@@ -5,7 +5,7 @@ import type {IMessageComposer} from '@ambreia/net/messages/IMessageComposer';
 import type {IHabboCommunicationManager} from '../communication/IHabboCommunicationManager';
 import type {IHabboLocalizationManager} from '../localization/IHabboLocalizationManager';
 import type {IHabboWindowManager} from '../window/IHabboWindowManager';
-import type {IAvatarEffect} from '../communication/messages/parser/inventory/AvatarEffectsMessageParser';
+import type {IAvatarEffect} from '@ambreia/protocol/parser/inventory/AvatarEffectsMessageParser';
 import type {IUserDataManager} from './IUserDataManager';
 import type {IPerkManager} from './IPerkManager';
 import type {IIgnoredUsersManager} from './IIgnoredUsersManager';

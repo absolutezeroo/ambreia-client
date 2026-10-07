@@ -3,7 +3,7 @@ import type {IFrameWindow} from '@ambreia/ui/components/IFrameWindow';
 import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import {
     UpdateFloorPropertiesMessageComposer
-} from '@habbo/communication/messages/outgoing/room/layout/UpdateFloorPropertiesMessageComposer';
+} from '@ambreia/protocol/outgoing/room/layout/UpdateFloorPropertiesMessageComposer';
 import {BCFloorPlanEditor} from './BCFloorPlanEditor';
 
 /**

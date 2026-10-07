@@ -4,18 +4,18 @@ import type {HabboAvatarEditor} from './HabboAvatarEditor';
 import type {IAvatarEditorMessageHandler} from './IAvatarEditorMessageHandler';
 import type {IOutfit} from './IOutfit';
 import {AvatarEditorIdEnum} from './enum/AvatarEditorIdEnum';
-import {AvatarEffectActivatedMessageEvent} from '@habbo/communication/messages/incoming/inventory/AvatarEffectActivatedMessageEvent';
-import {AvatarEffectAddedMessageEvent} from '@habbo/communication/messages/incoming/inventory/AvatarEffectAddedMessageEvent';
-import {AvatarEffectExpiredMessageEvent} from '@habbo/communication/messages/incoming/inventory/AvatarEffectExpiredMessageEvent';
-import {AvatarEffectMessageEvent} from '@habbo/communication/messages/incoming/room/action/AvatarEffectMessageEvent';
-import {AvatarEffectSelectedMessageEvent} from '@habbo/communication/messages/incoming/wardrobe/AvatarEffectSelectedMessageEvent';
-import type {CheckUserNameResultMessageParser} from '@habbo/communication/messages/parser/help/CheckUserNameResultMessageParser';
-import {CheckUserNameResultMessageEvent} from '@habbo/communication/messages/incoming/help/CheckUserNameResultMessageEvent';
-import {UserRightsMessageEvent} from '@habbo/communication/messages/incoming/handshake/UserRightsMessageEvent';
-import {WardrobeMessageEvent} from '@habbo/communication/messages/incoming/wardrobe/WardrobeMessageEvent';
-import {CheckUserNameMessageComposer} from '@habbo/communication/messages/outgoing/help/CheckUserNameMessageComposer';
-import {GetWardrobeMessageComposer} from '@habbo/communication/messages/outgoing/wardrobe/GetWardrobeMessageComposer';
-import {SaveWardrobeOutfitMessageComposer} from '@habbo/communication/messages/outgoing/wardrobe/SaveWardrobeOutfitMessageComposer';
+import {AvatarEffectActivatedMessageEvent} from '@ambreia/protocol/incoming/inventory/AvatarEffectActivatedMessageEvent';
+import {AvatarEffectAddedMessageEvent} from '@ambreia/protocol/incoming/inventory/AvatarEffectAddedMessageEvent';
+import {AvatarEffectExpiredMessageEvent} from '@ambreia/protocol/incoming/inventory/AvatarEffectExpiredMessageEvent';
+import {AvatarEffectMessageEvent} from '@ambreia/protocol/incoming/room/action/AvatarEffectMessageEvent';
+import {AvatarEffectSelectedMessageEvent} from '@ambreia/protocol/incoming/wardrobe/AvatarEffectSelectedMessageEvent';
+import type {CheckUserNameResultMessageParser} from '@ambreia/protocol/parser/help/CheckUserNameResultMessageParser';
+import {CheckUserNameResultMessageEvent} from '@ambreia/protocol/incoming/help/CheckUserNameResultMessageEvent';
+import {UserRightsMessageEvent} from '@ambreia/protocol/incoming/handshake/UserRightsMessageEvent';
+import {WardrobeMessageEvent} from '@ambreia/protocol/incoming/wardrobe/WardrobeMessageEvent';
+import {CheckUserNameMessageComposer} from '@ambreia/protocol/outgoing/help/CheckUserNameMessageComposer';
+import {GetWardrobeMessageComposer} from '@ambreia/protocol/outgoing/wardrobe/GetWardrobeMessageComposer';
+import {SaveWardrobeOutfitMessageComposer} from '@ambreia/protocol/outgoing/wardrobe/SaveWardrobeOutfitMessageComposer';
 
 /**
  * The editor's network side: eight incoming messages and three requests.

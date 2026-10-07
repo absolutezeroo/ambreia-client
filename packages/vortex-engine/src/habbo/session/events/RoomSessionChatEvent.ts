@@ -1,5 +1,5 @@
 import type {IRoomSession} from '../IRoomSession';
-import type {IChatLink} from '../../communication/messages/parser/room/chat/ChatMessageEventParser';
+import type {IChatLink} from '@ambreia/protocol/parser/room/chat/ChatMessageEventParser';
 import {RoomSessionEvent} from './RoomSessionEvent';
 
 /**

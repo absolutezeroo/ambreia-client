@@ -5,8 +5,8 @@ import type {IHabboCommunicationManager} from '../communication/IHabboCommunicat
 import {HabboGroupBadgesMessageEvent, RoomReadyMessageEvent} from "@habbo/communication";
 import {
     GetHabboGroupBadgesMessageComposer
-} from "@habbo/communication/messages/outgoing/users/GetHabboGroupBadgesMessageComposer";
-import type {HabboGroupBadgesMessageParser} from "@habbo/communication/messages/parser/users/HabboGroupBadgesMessageParser";
+} from "@ambreia/protocol/outgoing/users/GetHabboGroupBadgesMessageComposer";
+import type {HabboGroupBadgesMessageParser} from "@ambreia/protocol/parser/users/HabboGroupBadgesMessageParser";
 
 /**
  * Habbo group info manager

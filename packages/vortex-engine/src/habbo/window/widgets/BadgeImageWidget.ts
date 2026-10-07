@@ -12,11 +12,11 @@ import {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
 import {BadgeImageType} from '@ambreia/ui/kit/enum/BadgeImageType';
 import {
     GroupDetailsChangedMessageEvent
-} from '@habbo/communication/messages/incoming/users/GroupDetailsChangedMessageEvent';
-import {HabboGroupBadgesMessageEvent} from '@habbo/communication/messages/incoming/users/HabboGroupBadgesMessageEvent';
+} from '@ambreia/protocol/incoming/users/GroupDetailsChangedMessageEvent';
+import {HabboGroupBadgesMessageEvent} from '@ambreia/protocol/incoming/users/HabboGroupBadgesMessageEvent';
 import {
     GetHabboGroupDetailsMessageComposer
-} from '@habbo/communication/messages/outgoing/users/GetHabboGroupDetailsMessageComposer';
+} from '@ambreia/protocol/outgoing/users/GetHabboGroupDetailsMessageComposer';
 
 /**
  * Badge image rendering widget.

@@ -3,7 +3,7 @@ import {Component, ComponentDependency, type IContext} from '@core/runtime';
 import {ArcFour} from '@habbo/communication/encryption/ArcFour';
 import {DiffieHellman} from '@habbo/communication/encryption/DiffieHellman';
 import {Logger} from '@ambreia/common/utils/Logger';
-import {HabboMessages} from './HabboMessages';
+import {HabboMessages} from '@ambreia/protocol/HabboMessages';
 import type { HabboCommunicationEventType} from './enum/HabboCommunicationEvent';
 import {HabboCommunicationEvent} from './enum/HabboCommunicationEvent';
 import {HabboCommunicationManagerEvent} from './enum/HabboCommunicationManagerEvent';

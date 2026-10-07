@@ -4,7 +4,7 @@
  * @see sources/win63_version/habbo/ui/widget/events/RoomWidgetChatUpdateEvent.as
  * (primary win63_version copy has decompiler corruption; cross-checked here)
  */
-import type {IChatLink} from '@habbo/communication/messages/parser/room/chat/ChatMessageEventParser';
+import type {IChatLink} from '@ambreia/protocol/parser/room/chat/ChatMessageEventParser';
 import {RoomWidgetUpdateEvent} from './RoomWidgetUpdateEvent';
 
 export class RoomWidgetChatUpdateEvent extends RoomWidgetUpdateEvent

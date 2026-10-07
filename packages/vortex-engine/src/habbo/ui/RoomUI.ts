@@ -34,10 +34,10 @@ import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocaliza
 import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
 import type {IHabboCommunicationManager} from '@habbo/communication/IHabboCommunicationManager';
 import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
-import {CantConnectMessageEvent} from '@habbo/communication/messages/incoming/room/session/CantConnectMessageEvent';
-import type {CantConnectMessageParser} from '@habbo/communication/messages/parser/room/session/CantConnectMessageParser';
-import {NotificationDialogMessageEvent} from '@habbo/communication/messages/incoming/notifications/NotificationDialogMessageEvent';
-import type {NotificationDialogMessageEventParser} from '@habbo/communication/messages/parser/notifications/NotificationDialogMessageEventParser';
+import {CantConnectMessageEvent} from '@ambreia/protocol/incoming/room/session/CantConnectMessageEvent';
+import type {CantConnectMessageParser} from '@ambreia/protocol/parser/room/session/CantConnectMessageParser';
+import {NotificationDialogMessageEvent} from '@ambreia/protocol/incoming/notifications/NotificationDialogMessageEvent';
+import type {NotificationDialogMessageEventParser} from '@ambreia/protocol/parser/notifications/NotificationDialogMessageEventParser';
 import type {IRoomSession} from '@habbo/session/IRoomSession';
 
 // Events

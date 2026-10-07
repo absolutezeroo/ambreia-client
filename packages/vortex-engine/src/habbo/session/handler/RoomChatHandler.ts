@@ -4,41 +4,41 @@ import type {IRoomHandlerListener} from '../IRoomHandlerListener';
 import {BaseHandler} from './BaseHandler';
 
 // Message events
-import {ChatMessageEvent} from '../../communication/messages/incoming/room/chat/ChatMessageEvent';
-import {ShoutMessageEvent} from '../../communication/messages/incoming/room/chat/ShoutMessageEvent';
-import {WhisperMessageEvent} from '../../communication/messages/incoming/room/chat/WhisperMessageEvent';
-import {PetRespectNotificationEvent} from '../../communication/messages/incoming/notifications/PetRespectNotificationEvent';
+import {ChatMessageEvent} from '@ambreia/protocol/incoming/room/chat/ChatMessageEvent';
+import {ShoutMessageEvent} from '@ambreia/protocol/incoming/room/chat/ShoutMessageEvent';
+import {WhisperMessageEvent} from '@ambreia/protocol/incoming/room/chat/WhisperMessageEvent';
+import {PetRespectNotificationEvent} from '@ambreia/protocol/incoming/notifications/PetRespectNotificationEvent';
 
 // Parsers
 import type {
     PetRespectNotificationEventParser
-} from '../../communication/messages/parser/notifications/PetRespectNotificationEventParser';
-import type {ChatMessageEventParser, IChatLink} from '../../communication/messages/parser/room/chat/ChatMessageEventParser';
+} from '@ambreia/protocol/parser/notifications/PetRespectNotificationEventParser';
+import type {ChatMessageEventParser, IChatLink} from '@ambreia/protocol/parser/room/chat/ChatMessageEventParser';
 
-import {RemainingMutePeriodMessageEvent} from '@habbo/communication/messages/incoming/room/session/RemainingMutePeriodMessageEvent';
-import type {RemainingMutePeriodMessageParser} from '@habbo/communication/messages/parser/room/session/RemainingMutePeriodMessageParser';
-import {FloodControlMessageEvent} from '../../communication/messages/incoming/room/chat/FloodControlMessageEvent';
+import {RemainingMutePeriodMessageEvent} from '@ambreia/protocol/incoming/room/session/RemainingMutePeriodMessageEvent';
+import type {RemainingMutePeriodMessageParser} from '@ambreia/protocol/parser/room/session/RemainingMutePeriodMessageParser';
+import {FloodControlMessageEvent} from '@ambreia/protocol/incoming/room/chat/FloodControlMessageEvent';
 import type {
     FloodControlMessageParser
-} from '../../communication/messages/parser/room/chat/FloodControlMessageParser';
+} from '@ambreia/protocol/parser/room/chat/FloodControlMessageParser';
 import {
     RespectNotificationMessageEvent
-} from '../../communication/messages/incoming/notifications/RespectNotificationMessageEvent';
+} from '@ambreia/protocol/incoming/notifications/RespectNotificationMessageEvent';
 import type {
     RespectNotificationMessageEventParser
-} from '../../communication/messages/parser/notifications/RespectNotificationMessageEventParser';
+} from '@ambreia/protocol/parser/notifications/RespectNotificationMessageEventParser';
 import {
     HandItemReceivedMessageEvent
-} from '../../communication/messages/incoming/users/HandItemReceivedMessageEvent';
+} from '@ambreia/protocol/incoming/users/HandItemReceivedMessageEvent';
 import type {
     HandItemReceivedMessageParser
-} from '../../communication/messages/parser/users/HandItemReceivedMessageParser';
+} from '@ambreia/protocol/parser/users/HandItemReceivedMessageParser';
 import {
     SpecialSystemChatMessageEvent
-} from '../../communication/messages/incoming/room/chat/SpecialSystemChatMessageEvent';
+} from '@ambreia/protocol/incoming/room/chat/SpecialSystemChatMessageEvent';
 import type {
     SpecialSystemChatMessageParser
-} from '../../communication/messages/parser/room/chat/SpecialSystemChatMessageParser';
+} from '@ambreia/protocol/parser/room/chat/SpecialSystemChatMessageParser';
 
 // Events
 import {RoomSessionChatEvent} from '../events/RoomSessionChatEvent';

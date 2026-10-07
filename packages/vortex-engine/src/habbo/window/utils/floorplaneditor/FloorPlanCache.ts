@@ -1,10 +1,10 @@
 import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
 import type {
     FloorHeightMapMessageParser
-} from '@habbo/communication/messages/parser/room/engine/FloorHeightMapMessageParser';
+} from '@ambreia/protocol/parser/room/engine/FloorHeightMapMessageParser';
 import type {
     RoomOccupiedTilesMessageParser
-} from '@habbo/communication/messages/parser/room/layout/RoomOccupiedTilesMessageParser';
+} from '@ambreia/protocol/parser/room/layout/RoomOccupiedTilesMessageParser';
 import type {BCFloorPlanEditor} from './BCFloorPlanEditor';
 
 /** A tile address in plan space. AS3 uses `flash.geom.Point`, which this port has no equivalent of. */

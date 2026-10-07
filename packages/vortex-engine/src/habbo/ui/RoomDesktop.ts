@@ -53,8 +53,8 @@ import {RoomWidgetRoomObjectUpdateEvent} from './widget/events/RoomWidgetRoomObj
 import type {RoomEngineObjectPlacedEvent} from '@ambreia/iso/scene/events/RoomEngineObjectPlacedEvent';
 import {RoomWidgetRoomObjectPlaceEvent} from './widget/events/RoomWidgetRoomObjectPlaceEvent';
 import {RoomDesktopMouseZoomEnableEvent} from './widget/events/RoomDesktopMouseZoomEnableEvent';
-import {PerkAllowancesMessageEvent} from '@habbo/communication/messages/incoming/perk/PerkAllowancesMessageEvent';
-import type {PerkAllowancesMessageEventParser} from '@habbo/communication/messages/parser/perk/PerkAllowancesMessageEventParser';
+import {PerkAllowancesMessageEvent} from '@ambreia/protocol/incoming/perk/PerkAllowancesMessageEvent';
+import type {PerkAllowancesMessageEventParser} from '@ambreia/protocol/parser/perk/PerkAllowancesMessageEventParser';
 import {PerkType} from '@habbo/communication/enum/PerkType';
 import {AvatarInfoWidgetHandler} from './handler/AvatarInfoWidgetHandler';
 import type {AvatarInfoWidget} from './widget/avatarinfo/AvatarInfoWidget';
@@ -68,16 +68,16 @@ import type {IRoomWidget} from './widget/IRoomWidget';
 import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
 import {
     BotSkillListUpdateEvent
-} from '@habbo/communication/messages/incoming/room/bot/BotSkillListUpdateEvent';
+} from '@ambreia/protocol/incoming/room/bot/BotSkillListUpdateEvent';
 import {
     BotForceOpenContextMenuEvent
-} from '@habbo/communication/messages/incoming/room/bot/BotForceOpenContextMenuEvent';
+} from '@ambreia/protocol/incoming/room/bot/BotForceOpenContextMenuEvent';
 import type {
     BotSkillListUpdateParser
-} from '@habbo/communication/messages/parser/room/bot/BotSkillListUpdateParser';
+} from '@ambreia/protocol/parser/room/bot/BotSkillListUpdateParser';
 import type {
     BotForceOpenContextMenuParser
-} from '@habbo/communication/messages/parser/room/bot/BotForceOpenContextMenuParser';
+} from '@ambreia/protocol/parser/room/bot/BotForceOpenContextMenuParser';
 import {
     RoomWidgetRentableBotSkillListUpdateEvent
 } from './widget/events/RoomWidgetRentableBotSkillListUpdateEvent';

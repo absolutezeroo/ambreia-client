@@ -30,7 +30,7 @@ import {TorsoModel} from './torso/TorsoModel';
 import {WardrobeModel} from './wardrobe/WardrobeModel';
 import {
     UpdateFigureDataMessageComposer
-} from '@habbo/communication/messages/outgoing/avatar/UpdateFigureDataMessageComposer';
+} from '@ambreia/protocol/outgoing/avatar/UpdateFigureDataMessageComposer';
 
 /**
  * One editor instance: two figures (one per gender), the eight category pages, the wardrobe, and

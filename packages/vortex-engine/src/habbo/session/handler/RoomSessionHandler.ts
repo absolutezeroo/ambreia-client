@@ -9,46 +9,46 @@ import {ErrorReportStorage} from '@ambreia/common/utils/ErrorReportStorage';
 // Message events
 import {
     OpenConnectionMessageEvent
-} from '../../communication/messages/incoming/room/session/OpenConnectionMessageEvent';
+} from '@ambreia/protocol/incoming/room/session/OpenConnectionMessageEvent';
 import {
     FlatAccessibleMessageEvent
-} from '../../communication/messages/incoming/room/session/FlatAccessibleMessageEvent';
-import {RoomReadyMessageEvent} from '../../communication/messages/incoming/room/session/RoomReadyMessageEvent';
+} from '@ambreia/protocol/incoming/room/session/FlatAccessibleMessageEvent';
+import {RoomReadyMessageEvent} from '@ambreia/protocol/incoming/room/session/RoomReadyMessageEvent';
 import {
     CloseConnectionMessageEvent
-} from '../../communication/messages/incoming/room/session/CloseConnectionMessageEvent';
+} from '@ambreia/protocol/incoming/room/session/CloseConnectionMessageEvent';
 import {
     RoomQueueStatusMessageEvent
-} from '../../communication/messages/incoming/room/session/RoomQueueStatusMessageEvent';
+} from '@ambreia/protocol/incoming/room/session/RoomQueueStatusMessageEvent';
 import {
     YouAreSpectatorMessageEvent
-} from '../../communication/messages/incoming/room/session/YouAreSpectatorMessageEvent';
+} from '@ambreia/protocol/incoming/room/session/YouAreSpectatorMessageEvent';
 import {
     FlatAccessDeniedMessageEvent
-} from '../../communication/messages/incoming/navigator/FlatAccessDeniedMessageEvent';
-import {RoomForwardMessageEvent} from '../../communication/messages/incoming/room/session/RoomForwardMessageEvent';
-import {CantConnectMessageEvent} from '../../communication/messages/incoming/room/session/CantConnectMessageEvent';
-import {QuitMessageComposer} from '../../communication/messages/outgoing/room/session/QuitMessageComposer';
+} from '@ambreia/protocol/incoming/navigator/FlatAccessDeniedMessageEvent';
+import {RoomForwardMessageEvent} from '@ambreia/protocol/incoming/room/session/RoomForwardMessageEvent';
+import {CantConnectMessageEvent} from '@ambreia/protocol/incoming/room/session/CantConnectMessageEvent';
+import {QuitMessageComposer} from '@ambreia/protocol/outgoing/room/session/QuitMessageComposer';
 
 // Parsers
 import type {
     OpenConnectionMessageParser
-} from '../../communication/messages/parser/room/session/OpenConnectionMessageParser';
+} from '@ambreia/protocol/parser/room/session/OpenConnectionMessageParser';
 import type {
     FlatAccessibleMessageParser
-} from '../../communication/messages/parser/room/session/FlatAccessibleMessageParser';
-import type {RoomReadyMessageParser} from '../../communication/messages/parser/room/session/RoomReadyMessageParser';
+} from '@ambreia/protocol/parser/room/session/FlatAccessibleMessageParser';
+import type {RoomReadyMessageParser} from '@ambreia/protocol/parser/room/session/RoomReadyMessageParser';
 import type {
     FlatAccessDeniedMessageParser
-} from '../../communication/messages/parser/navigator/FlatAccessDeniedMessageParser';
+} from '@ambreia/protocol/parser/navigator/FlatAccessDeniedMessageParser';
 import type {
     RoomQueueStatusMessageParser
-} from '../../communication/messages/parser/room/session/RoomQueueStatusMessageParser';
+} from '@ambreia/protocol/parser/room/session/RoomQueueStatusMessageParser';
 import type {
     YouAreSpectatorMessageParser
-} from '../../communication/messages/parser/room/session/YouAreSpectatorMessageParser';
-import type {RoomForwardMessageParser} from '../../communication/messages/parser/room/session/RoomForwardMessageParser';
-import type {CantConnectMessageParser} from '../../communication/messages/parser/room/session/CantConnectMessageParser';
+} from '@ambreia/protocol/parser/room/session/YouAreSpectatorMessageParser';
+import type {RoomForwardMessageParser} from '@ambreia/protocol/parser/room/session/RoomForwardMessageParser';
+import type {CantConnectMessageParser} from '@ambreia/protocol/parser/room/session/CantConnectMessageParser';
 
 import {Logger} from '@ambreia/common/utils/Logger';
 

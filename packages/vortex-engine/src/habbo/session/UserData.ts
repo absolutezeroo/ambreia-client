@@ -1,5 +1,5 @@
 import type {IUserData} from './IUserData';
-import type {BotSkillData} from '@habbo/communication/messages/parser/room/bot/BotSkillData';
+import type {BotSkillData} from '@ambreia/protocol/parser/room/bot/BotSkillData';
 
 /**
  * User data type constants

@@ -13,7 +13,7 @@ import {RoomSession} from './RoomSession';
 import {RoomSessionEvent} from './events/RoomSessionEvent';
 import {
     RoomNetworkOpenConnectionMessageComposer
-} from '../communication/messages/outgoing/room/session/RoomNetworkOpenConnectionMessageComposer';
+} from '@ambreia/protocol/outgoing/room/session/RoomNetworkOpenConnectionMessageComposer';
 import type {BaseHandler} from './handler/BaseHandler';
 import {RoomSessionHandler, RoomSessionHandlerState} from './handler/RoomSessionHandler';
 import {RoomPermissionsHandler} from './handler/RoomPermissionsHandler';

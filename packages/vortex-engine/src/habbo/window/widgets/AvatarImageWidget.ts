@@ -13,7 +13,7 @@ import {AvatarRenderEvent} from '@ambreia/avatar/enum/AvatarRenderEvent';
 import {Logger} from '@ambreia/common/utils/Logger';
 import {
     GetExtendedProfileMessageComposer
-} from '@habbo/communication/messages/outgoing/users/GetExtendedProfileMessageComposer';
+} from '@ambreia/protocol/outgoing/users/GetExtendedProfileMessageComposer';
 import type {IIterator} from '@ambreia/ui/utils/IIterator';
 import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
 

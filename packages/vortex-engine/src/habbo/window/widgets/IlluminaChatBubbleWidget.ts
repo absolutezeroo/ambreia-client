@@ -10,7 +10,7 @@ import type {IAvatarImageWidget} from '@ambreia/ui/kit/widgets/IAvatarImageWidge
 import type {UpdatingTimeStampWidget} from './UpdatingTimeStampWidget';
 import {ChatBubbleMessage} from '@ambreia/ui/kit/widgets/ChatBubbleMessage';
 import {Logger} from '@ambreia/common/utils/Logger';
-import {GetExtendedProfileMessageComposer} from '@habbo/communication/messages/outgoing/users/GetExtendedProfileMessageComposer';
+import {GetExtendedProfileMessageComposer} from '@ambreia/protocol/outgoing/users/GetExtendedProfileMessageComposer';
 import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import type {IIterator} from '@ambreia/ui/utils/IIterator';
 import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';

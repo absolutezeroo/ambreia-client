@@ -6,12 +6,12 @@ import {BaseHandler} from './BaseHandler';
 // Message events
 import {
     PresentOpenedMessageEvent
-} from '../../communication/messages/incoming/room/furniture/PresentOpenedMessageEvent';
+} from '@ambreia/protocol/incoming/room/furniture/PresentOpenedMessageEvent';
 
 // Parsers
 import type {
     PresentOpenedMessageEventParser
-} from '../../communication/messages/parser/room/furniture/PresentOpenedMessageEventParser';
+} from '@ambreia/protocol/parser/room/furniture/PresentOpenedMessageEventParser';
 
 // Events
 import {RoomSessionPresentEvent} from '../events/RoomSessionPresentEvent';

@@ -6,12 +6,12 @@ import {BaseHandler} from './BaseHandler';
 // Message events
 import {
     GetGuestRoomResultMessageEvent
-} from '../../communication/messages/incoming/navigator/GetGuestRoomResultMessageEvent';
+} from '@ambreia/protocol/incoming/navigator/GetGuestRoomResultMessageEvent';
 
 // Parsers
 import type {
     GetGuestRoomResultMessageParser
-} from '../../communication/messages/parser/navigator/GetGuestRoomResultMessageParser';
+} from '@ambreia/protocol/parser/navigator/GetGuestRoomResultMessageParser';
 
 // Events
 import {RoomSessionEvent} from '../events/RoomSessionEvent';

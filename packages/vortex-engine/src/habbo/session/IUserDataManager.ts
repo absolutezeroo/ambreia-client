@@ -1,7 +1,7 @@
 import type {IDisposable} from '@core/runtime';
 import type {IConnection} from '@ambreia/net/connection/IConnection';
 import type {IUserData} from './IUserData';
-import type {ISelectedBadge} from '@habbo/communication/messages/parser/users/HabboUserBadgesMessageParser';
+import type {ISelectedBadge} from '@ambreia/protocol/parser/users/HabboUserBadgesMessageParser';
 
 /**
  * Interface for user data manager

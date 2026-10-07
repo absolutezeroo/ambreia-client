@@ -15,179 +15,179 @@ import {RoomObjectUserTypes, getUserTypeName} from '@ambreia/iso/scene/object/Ro
 import {FurniStackingHeightMap} from '@ambreia/iso/scene/utils/FurniStackingHeightMap';
 
 // Message Events - Room Session
-import {RoomReadyMessageEvent} from '../communication/messages/incoming/room/session/RoomReadyMessageEvent';
-import type {RoomReadyMessageParser} from '../communication/messages/parser/room/session/RoomReadyMessageParser';
+import {RoomReadyMessageEvent} from '@ambreia/protocol/incoming/room/session/RoomReadyMessageEvent';
+import type {RoomReadyMessageParser} from '@ambreia/protocol/parser/room/session/RoomReadyMessageParser';
 
 // Message Events - Room Engine
 import {
     FurnitureAliasesMessageEvent
-} from '../communication/messages/incoming/room/engine/FurnitureAliasesMessageEvent';
-import {HeightMapMessageEvent} from '../communication/messages/incoming/room/engine/HeightMapMessageEvent';
-import {FloorHeightMapMessageEvent} from '../communication/messages/incoming/room/engine/FloorHeightMapMessageEvent';
-import {HeightMapUpdateMessageEvent} from '../communication/messages/incoming/room/engine/HeightMapUpdateMessageEvent';
-import {ObjectsMessageEvent} from '../communication/messages/incoming/room/engine/ObjectsMessageEvent';
-import {ObjectAddMessageEvent} from '../communication/messages/incoming/room/engine/ObjectAddMessageEvent';
-import {ObjectUpdateMessageEvent} from '../communication/messages/incoming/room/engine/ObjectUpdateMessageEvent';
-import {ObjectRemoveMessageEvent} from '../communication/messages/incoming/room/engine/ObjectRemoveMessageEvent';
+} from '@ambreia/protocol/incoming/room/engine/FurnitureAliasesMessageEvent';
+import {HeightMapMessageEvent} from '@ambreia/protocol/incoming/room/engine/HeightMapMessageEvent';
+import {FloorHeightMapMessageEvent} from '@ambreia/protocol/incoming/room/engine/FloorHeightMapMessageEvent';
+import {HeightMapUpdateMessageEvent} from '@ambreia/protocol/incoming/room/engine/HeightMapUpdateMessageEvent';
+import {ObjectsMessageEvent} from '@ambreia/protocol/incoming/room/engine/ObjectsMessageEvent';
+import {ObjectAddMessageEvent} from '@ambreia/protocol/incoming/room/engine/ObjectAddMessageEvent';
+import {ObjectUpdateMessageEvent} from '@ambreia/protocol/incoming/room/engine/ObjectUpdateMessageEvent';
+import {ObjectRemoveMessageEvent} from '@ambreia/protocol/incoming/room/engine/ObjectRemoveMessageEvent';
 import {
     ObjectDataUpdateMessageEvent
-} from '../communication/messages/incoming/room/engine/ObjectDataUpdateMessageEvent';
+} from '@ambreia/protocol/incoming/room/engine/ObjectDataUpdateMessageEvent';
 import {
     ObjectsDataUpdateMessageEvent
-} from '../communication/messages/incoming/room/engine/ObjectsDataUpdateMessageEvent';
-import {DiceValueMessageEvent} from '../communication/messages/incoming/room/engine/DiceValueMessageEvent';
-import {OneWayDoorStatusMessageEvent} from '../communication/messages/incoming/room/engine/OneWayDoorStatusMessageEvent';
-import type {OneWayDoorStatusMessageParser} from '../communication/messages/parser/room/engine/OneWayDoorStatusMessageParser';
-import {ItemStateUpdateMessageEvent} from '../communication/messages/incoming/room/engine/ItemStateUpdateMessageEvent';
-import type {ItemStateUpdateMessageParser} from '../communication/messages/parser/room/engine/ItemStateUpdateMessageParser';
-import {ItemsStateUpdateMessageEvent} from '../communication/messages/incoming/room/engine/ItemsStateUpdateMessageEvent';
-import type {ItemsStateUpdateMessageParser} from '../communication/messages/parser/room/engine/ItemsStateUpdateMessageParser';
-import {ItemDataUpdateMessageEvent} from '../communication/messages/incoming/room/engine/ItemDataUpdateMessageEvent';
-import type {ItemDataUpdateMessageParser} from '../communication/messages/parser/room/engine/ItemDataUpdateMessageParser';
-import {AreaHideMessageEvent} from '../communication/messages/incoming/room/engine/AreaHideMessageEvent';
-import type {AreaHideMessageParser} from '../communication/messages/parser/room/engine/AreaHideMessageParser';
-import {ObjectRemoveConfirmMessageEvent} from '../communication/messages/incoming/room/engine/ObjectRemoveConfirmMessageEvent';
-import type {ObjectRemoveConfirmMessageParser} from '../communication/messages/parser/room/engine/ObjectRemoveConfirmMessageParser';
-import {PickupObjectMessageComposer} from '../communication/messages/outgoing/room/engine/PickupObjectMessageComposer';
-import {SpecialRoomEffectMessageEvent} from '../communication/messages/incoming/room/engine/SpecialRoomEffectMessageEvent';
-import type {SpecialRoomEffectMessageParser} from '../communication/messages/parser/room/engine/SpecialRoomEffectMessageParser';
+} from '@ambreia/protocol/incoming/room/engine/ObjectsDataUpdateMessageEvent';
+import {DiceValueMessageEvent} from '@ambreia/protocol/incoming/room/engine/DiceValueMessageEvent';
+import {OneWayDoorStatusMessageEvent} from '@ambreia/protocol/incoming/room/engine/OneWayDoorStatusMessageEvent';
+import type {OneWayDoorStatusMessageParser} from '@ambreia/protocol/parser/room/engine/OneWayDoorStatusMessageParser';
+import {ItemStateUpdateMessageEvent} from '@ambreia/protocol/incoming/room/engine/ItemStateUpdateMessageEvent';
+import type {ItemStateUpdateMessageParser} from '@ambreia/protocol/parser/room/engine/ItemStateUpdateMessageParser';
+import {ItemsStateUpdateMessageEvent} from '@ambreia/protocol/incoming/room/engine/ItemsStateUpdateMessageEvent';
+import type {ItemsStateUpdateMessageParser} from '@ambreia/protocol/parser/room/engine/ItemsStateUpdateMessageParser';
+import {ItemDataUpdateMessageEvent} from '@ambreia/protocol/incoming/room/engine/ItemDataUpdateMessageEvent';
+import type {ItemDataUpdateMessageParser} from '@ambreia/protocol/parser/room/engine/ItemDataUpdateMessageParser';
+import {AreaHideMessageEvent} from '@ambreia/protocol/incoming/room/engine/AreaHideMessageEvent';
+import type {AreaHideMessageParser} from '@ambreia/protocol/parser/room/engine/AreaHideMessageParser';
+import {ObjectRemoveConfirmMessageEvent} from '@ambreia/protocol/incoming/room/engine/ObjectRemoveConfirmMessageEvent';
+import type {ObjectRemoveConfirmMessageParser} from '@ambreia/protocol/parser/room/engine/ObjectRemoveConfirmMessageParser';
+import {PickupObjectMessageComposer} from '@ambreia/protocol/outgoing/room/engine/PickupObjectMessageComposer';
+import {SpecialRoomEffectMessageEvent} from '@ambreia/protocol/incoming/room/engine/SpecialRoomEffectMessageEvent';
+import type {SpecialRoomEffectMessageParser} from '@ambreia/protocol/parser/room/engine/SpecialRoomEffectMessageParser';
 import {RoomRotatingEffect} from '@ambreia/iso/utils/RoomRotatingEffect';
 import {RoomShakingEffect} from '@ambreia/iso/utils/RoomShakingEffect';
 import {RoomEngineZoomEvent} from '@ambreia/iso/scene/events/RoomEngineZoomEvent';
-import {PetExperienceEvent} from '../communication/messages/incoming/room/pet/PetExperienceEvent';
-import type {PetExperienceEventParser} from '../communication/messages/parser/room/pet/PetExperienceEventParser';
-import {PetFigureUpdateEvent} from '../communication/messages/incoming/room/pet/PetFigureUpdateEvent';
-import type {PetFigureUpdateEventParser} from '../communication/messages/parser/room/pet/PetFigureUpdateEventParser';
-import {YouArePlayingGameMessageEvent} from '../communication/messages/incoming/room/session/YouArePlayingGameMessageEvent';
-import type {YouArePlayingGameMessageParser} from '../communication/messages/parser/room/session/YouArePlayingGameMessageParser';
-import {YouAreNotSpectatorMessageEvent} from '../communication/messages/incoming/room/session/YouAreNotSpectatorMessageEvent';
-import type {YouAreNotSpectatorMessageParser} from '../communication/messages/parser/room/session/YouAreNotSpectatorMessageParser';
-import {GamePlayerValueMessageEvent} from '../communication/messages/incoming/room/session/GamePlayerValueMessageEvent';
-import type {GamePlayerValueMessageParser} from '../communication/messages/parser/room/session/GamePlayerValueMessageParser';
-import {HanditemConfigurationMessageEvent} from '../communication/messages/incoming/room/session/HanditemConfigurationMessageEvent';
-import type {HanditemConfigurationMessageParser} from '../communication/messages/parser/room/session/HanditemConfigurationMessageParser';
+import {PetExperienceEvent} from '@ambreia/protocol/incoming/room/pet/PetExperienceEvent';
+import type {PetExperienceEventParser} from '@ambreia/protocol/parser/room/pet/PetExperienceEventParser';
+import {PetFigureUpdateEvent} from '@ambreia/protocol/incoming/room/pet/PetFigureUpdateEvent';
+import type {PetFigureUpdateEventParser} from '@ambreia/protocol/parser/room/pet/PetFigureUpdateEventParser';
+import {YouArePlayingGameMessageEvent} from '@ambreia/protocol/incoming/room/session/YouArePlayingGameMessageEvent';
+import type {YouArePlayingGameMessageParser} from '@ambreia/protocol/parser/room/session/YouArePlayingGameMessageParser';
+import {YouAreNotSpectatorMessageEvent} from '@ambreia/protocol/incoming/room/session/YouAreNotSpectatorMessageEvent';
+import type {YouAreNotSpectatorMessageParser} from '@ambreia/protocol/parser/room/session/YouAreNotSpectatorMessageParser';
+import {GamePlayerValueMessageEvent} from '@ambreia/protocol/incoming/room/session/GamePlayerValueMessageEvent';
+import type {GamePlayerValueMessageParser} from '@ambreia/protocol/parser/room/session/GamePlayerValueMessageParser';
+import {HanditemConfigurationMessageEvent} from '@ambreia/protocol/incoming/room/session/HanditemConfigurationMessageEvent';
+import type {HanditemConfigurationMessageParser} from '@ambreia/protocol/parser/room/session/HanditemConfigurationMessageParser';
 import {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import type {IDisposable} from '@ambreia/common/IDisposable';
-import {GuideSessionStartedMessageEvent} from '../communication/messages/incoming/help/GuideSessionStartedMessageEvent';
-import {GuideSessionEndedMessageEvent} from '../communication/messages/incoming/help/GuideSessionEndedMessageEvent';
-import {GuideSessionErrorMessageEvent} from '../communication/messages/incoming/help/GuideSessionErrorMessageEvent';
-import type {GuideSessionStartedMessageParser} from '../communication/messages/parser/help/GuideSessionStartedMessageParser';
-import {ItemRemoveMultipleMessageEvent} from '../communication/messages/incoming/room/engine/ItemRemoveMultipleMessageEvent';
-import type {ItemRemoveMultipleMessageParser} from '../communication/messages/parser/room/engine/ItemRemoveMultipleMessageParser';
-import {ObjectRemoveMultipleMessageEvent} from '../communication/messages/incoming/room/engine/ObjectRemoveMultipleMessageEvent';
-import type {ObjectRemoveMultipleMessageParser} from '../communication/messages/parser/room/engine/ObjectRemoveMultipleMessageParser';
-import type {DiceValueMessageParser} from '../communication/messages/parser/room/engine/DiceValueMessageParser';
+import {GuideSessionStartedMessageEvent} from '@ambreia/protocol/incoming/help/GuideSessionStartedMessageEvent';
+import {GuideSessionEndedMessageEvent} from '@ambreia/protocol/incoming/help/GuideSessionEndedMessageEvent';
+import {GuideSessionErrorMessageEvent} from '@ambreia/protocol/incoming/help/GuideSessionErrorMessageEvent';
+import type {GuideSessionStartedMessageParser} from '@ambreia/protocol/parser/help/GuideSessionStartedMessageParser';
+import {ItemRemoveMultipleMessageEvent} from '@ambreia/protocol/incoming/room/engine/ItemRemoveMultipleMessageEvent';
+import type {ItemRemoveMultipleMessageParser} from '@ambreia/protocol/parser/room/engine/ItemRemoveMultipleMessageParser';
+import {ObjectRemoveMultipleMessageEvent} from '@ambreia/protocol/incoming/room/engine/ObjectRemoveMultipleMessageEvent';
+import type {ObjectRemoveMultipleMessageParser} from '@ambreia/protocol/parser/room/engine/ObjectRemoveMultipleMessageParser';
+import type {DiceValueMessageParser} from '@ambreia/protocol/parser/room/engine/DiceValueMessageParser';
 import {LegacyStuffData} from '@ambreia/iso/scene/object/data/LegacyStuffData';
-import {ItemsMessageEvent} from '../communication/messages/incoming/room/engine/ItemsMessageEvent';
-import {ItemAddMessageEvent} from '../communication/messages/incoming/room/engine/ItemAddMessageEvent';
-import {ItemUpdateMessageEvent} from '../communication/messages/incoming/room/engine/ItemUpdateMessageEvent';
-import {ItemRemoveMessageEvent} from '../communication/messages/incoming/room/engine/ItemRemoveMessageEvent';
-import {UsersMessageEvent} from '../communication/messages/incoming/room/engine/UsersMessageEvent';
-import {UserUpdateMessageEvent} from '../communication/messages/incoming/room/engine/UserUpdateMessageEvent';
-import {UserRemoveMessageEvent} from '../communication/messages/incoming/room/engine/UserRemoveMessageEvent';
-import {BlockUserUpdateMessageEvent} from '../communication/messages/incoming/users/BlockUserUpdateMessageEvent';
-import type {BlockUserUpdateMessageParser} from '../communication/messages/parser/users/BlockUserUpdateMessageParser';
-import {UserObjectMessageEvent} from '../communication/messages/incoming/handshake/UserObjectMessageEvent';
+import {ItemsMessageEvent} from '@ambreia/protocol/incoming/room/engine/ItemsMessageEvent';
+import {ItemAddMessageEvent} from '@ambreia/protocol/incoming/room/engine/ItemAddMessageEvent';
+import {ItemUpdateMessageEvent} from '@ambreia/protocol/incoming/room/engine/ItemUpdateMessageEvent';
+import {ItemRemoveMessageEvent} from '@ambreia/protocol/incoming/room/engine/ItemRemoveMessageEvent';
+import {UsersMessageEvent} from '@ambreia/protocol/incoming/room/engine/UsersMessageEvent';
+import {UserUpdateMessageEvent} from '@ambreia/protocol/incoming/room/engine/UserUpdateMessageEvent';
+import {UserRemoveMessageEvent} from '@ambreia/protocol/incoming/room/engine/UserRemoveMessageEvent';
+import {BlockUserUpdateMessageEvent} from '@ambreia/protocol/incoming/users/BlockUserUpdateMessageEvent';
+import type {BlockUserUpdateMessageParser} from '@ambreia/protocol/parser/users/BlockUserUpdateMessageParser';
+import {UserObjectMessageEvent} from '@ambreia/protocol/incoming/handshake/UserObjectMessageEvent';
 import {
     SlideObjectBundleMessageEvent
-} from '../communication/messages/incoming/room/engine/SlideObjectBundleMessageEvent';
-import {RoomPropertyMessageEvent} from '../communication/messages/incoming/room/engine/RoomPropertyMessageEvent';
+} from '@ambreia/protocol/incoming/room/engine/SlideObjectBundleMessageEvent';
+import {RoomPropertyMessageEvent} from '@ambreia/protocol/incoming/room/engine/RoomPropertyMessageEvent';
 import {
     RoomVisualizationSettingsEvent
-} from '../communication/messages/incoming/room/engine/RoomVisualizationSettingsEvent';
+} from '@ambreia/protocol/incoming/room/engine/RoomVisualizationSettingsEvent';
 
 // Message Events - Room Chat
-import {UserTypingMessageEvent} from '../communication/messages/incoming/room/chat/UserTypingMessageEvent';
-import {ChatMessageEvent} from '../communication/messages/incoming/room/chat/ChatMessageEvent';
-import {ShoutMessageEvent} from '../communication/messages/incoming/room/chat/ShoutMessageEvent';
-import {WhisperMessageEvent} from '../communication/messages/incoming/room/chat/WhisperMessageEvent';
+import {UserTypingMessageEvent} from '@ambreia/protocol/incoming/room/chat/UserTypingMessageEvent';
+import {ChatMessageEvent} from '@ambreia/protocol/incoming/room/chat/ChatMessageEvent';
+import {ShoutMessageEvent} from '@ambreia/protocol/incoming/room/chat/ShoutMessageEvent';
+import {WhisperMessageEvent} from '@ambreia/protocol/incoming/room/chat/WhisperMessageEvent';
 import type {
     ChatMessageEventParser
-} from '../communication/messages/parser/room/chat/ChatMessageEventParser';
-import {IgnoreResultMessageEvent} from '../communication/messages/incoming/users/IgnoreResultMessageEvent';
+} from '@ambreia/protocol/parser/room/chat/ChatMessageEventParser';
+import {IgnoreResultMessageEvent} from '@ambreia/protocol/incoming/users/IgnoreResultMessageEvent';
 import {IgnoreResult} from '../session/IIgnoredUsersManager';
 
 // Message Events - Room Action
-import {ExpressionMessageEvent} from '../communication/messages/incoming/room/action/ExpressionMessageEvent';
-import {DanceMessageEvent} from '../communication/messages/incoming/room/action/DanceMessageEvent';
-import {AvatarEffectMessageEvent} from '../communication/messages/incoming/room/action/AvatarEffectMessageEvent';
-import {SleepMessageEvent} from '../communication/messages/incoming/room/action/SleepMessageEvent';
-import {CarryObjectMessageEvent} from '../communication/messages/incoming/room/action/CarryObjectMessageEvent';
-import {UseObjectMessageEvent} from '../communication/messages/incoming/room/action/UseObjectMessageEvent';
-import {UserChangeMessageEvent} from '../communication/messages/incoming/room/action/UserChangeMessageEvent';
+import {ExpressionMessageEvent} from '@ambreia/protocol/incoming/room/action/ExpressionMessageEvent';
+import {DanceMessageEvent} from '@ambreia/protocol/incoming/room/action/DanceMessageEvent';
+import {AvatarEffectMessageEvent} from '@ambreia/protocol/incoming/room/action/AvatarEffectMessageEvent';
+import {SleepMessageEvent} from '@ambreia/protocol/incoming/room/action/SleepMessageEvent';
+import {CarryObjectMessageEvent} from '@ambreia/protocol/incoming/room/action/CarryObjectMessageEvent';
+import {UseObjectMessageEvent} from '@ambreia/protocol/incoming/room/action/UseObjectMessageEvent';
+import {UserChangeMessageEvent} from '@ambreia/protocol/incoming/room/action/UserChangeMessageEvent';
 
 // Parsers
-import type {HeightMapMessageParser} from '../communication/messages/parser/room/engine/HeightMapMessageParser';
+import type {HeightMapMessageParser} from '@ambreia/protocol/parser/room/engine/HeightMapMessageParser';
 import type {
     FloorHeightMapMessageParser
-} from '../communication/messages/parser/room/engine/FloorHeightMapMessageParser';
+} from '@ambreia/protocol/parser/room/engine/FloorHeightMapMessageParser';
 import type {
     HeightMapUpdateMessageParser
-} from '../communication/messages/parser/room/engine/HeightMapUpdateMessageParser';
-import type {ObjectsMessageParser} from '../communication/messages/parser/room/engine/ObjectsMessageParser';
-import type {ObjectAddMessageParser} from '../communication/messages/parser/room/engine/ObjectAddMessageParser';
-import type {ObjectUpdateMessageParser} from '../communication/messages/parser/room/engine/ObjectUpdateMessageParser';
-import type {ObjectRemoveMessageParser} from '../communication/messages/parser/room/engine/ObjectRemoveMessageParser';
+} from '@ambreia/protocol/parser/room/engine/HeightMapUpdateMessageParser';
+import type {ObjectsMessageParser} from '@ambreia/protocol/parser/room/engine/ObjectsMessageParser';
+import type {ObjectAddMessageParser} from '@ambreia/protocol/parser/room/engine/ObjectAddMessageParser';
+import type {ObjectUpdateMessageParser} from '@ambreia/protocol/parser/room/engine/ObjectUpdateMessageParser';
+import type {ObjectRemoveMessageParser} from '@ambreia/protocol/parser/room/engine/ObjectRemoveMessageParser';
 import type {
     ObjectDataUpdateMessageParser
-} from '../communication/messages/parser/room/engine/ObjectDataUpdateMessageParser';
+} from '@ambreia/protocol/parser/room/engine/ObjectDataUpdateMessageParser';
 import type {
     ObjectsDataUpdateMessageParser
-} from '../communication/messages/parser/room/engine/ObjectsDataUpdateMessageParser';
-import type {ItemsMessageParser} from '../communication/messages/parser/room/engine/ItemsMessageParser';
-import type {ItemAddMessageParser} from '../communication/messages/parser/room/engine/ItemAddMessageParser';
-import type {ItemUpdateMessageParser} from '../communication/messages/parser/room/engine/ItemUpdateMessageParser';
-import type {ItemRemoveMessageParser} from '../communication/messages/parser/room/engine/ItemRemoveMessageParser';
-import type {UsersMessageParser} from '../communication/messages/parser/room/engine/UsersMessageParser';
-import type {UserUpdateMessageParser} from '../communication/messages/parser/room/engine/UserUpdateMessageParser';
-import type {UserRemoveMessageParser} from '../communication/messages/parser/room/engine/UserRemoveMessageParser';
-import type {UserObjectMessageParser} from '../communication/messages/parser/handshake/UserObjectMessageParser';
+} from '@ambreia/protocol/parser/room/engine/ObjectsDataUpdateMessageParser';
+import type {ItemsMessageParser} from '@ambreia/protocol/parser/room/engine/ItemsMessageParser';
+import type {ItemAddMessageParser} from '@ambreia/protocol/parser/room/engine/ItemAddMessageParser';
+import type {ItemUpdateMessageParser} from '@ambreia/protocol/parser/room/engine/ItemUpdateMessageParser';
+import type {ItemRemoveMessageParser} from '@ambreia/protocol/parser/room/engine/ItemRemoveMessageParser';
+import type {UsersMessageParser} from '@ambreia/protocol/parser/room/engine/UsersMessageParser';
+import type {UserUpdateMessageParser} from '@ambreia/protocol/parser/room/engine/UserUpdateMessageParser';
+import type {UserRemoveMessageParser} from '@ambreia/protocol/parser/room/engine/UserRemoveMessageParser';
+import type {UserObjectMessageParser} from '@ambreia/protocol/parser/handshake/UserObjectMessageParser';
 import type {
     SlideObjectBundleMessageParser
-} from '../communication/messages/parser/room/engine/SlideObjectBundleMessageParser';
+} from '@ambreia/protocol/parser/room/engine/SlideObjectBundleMessageParser';
 import type {
     FurnitureAliasesMessageParser
-} from '../communication/messages/parser/room/engine/FurnitureAliasesMessageParser';
+} from '@ambreia/protocol/parser/room/engine/FurnitureAliasesMessageParser';
 import type {
     RoomPropertyMessageEventParser
-} from '../communication/messages/parser/room/engine/RoomPropertyMessageEventParser';
+} from '@ambreia/protocol/parser/room/engine/RoomPropertyMessageEventParser';
 import type {
     RoomVisualizationSettingsEventParser
-} from '../communication/messages/parser/room/engine/RoomVisualizationSettingsEventParser';
-import type {FurnitureFloorData} from '../communication/messages/incoming/room/engine/FurnitureFloorData';
-import type {FurnitureWallData} from '../communication/messages/incoming/room/engine/FurnitureWallData';
-import type {RoomUserData} from '../communication/messages/incoming/room/engine/RoomUserData';
+} from '@ambreia/protocol/parser/room/engine/RoomVisualizationSettingsEventParser';
+import type {FurnitureFloorData} from '@ambreia/protocol/incoming/room/engine/FurnitureFloorData';
+import type {FurnitureWallData} from '@ambreia/protocol/incoming/room/engine/FurnitureWallData';
+import type {RoomUserData} from '@ambreia/protocol/incoming/room/engine/RoomUserData';
 
 // Parsers - Room Chat
 import type {
     UserTypingMessageEventParser
-} from '../communication/messages/parser/room/chat/UserTypingMessageEventParser';
+} from '@ambreia/protocol/parser/room/chat/UserTypingMessageEventParser';
 
 // Parsers - Room Action
 import type {
     ExpressionMessageEventParser
-} from '../communication/messages/parser/room/action/ExpressionMessageEventParser';
-import type {DanceMessageEventParser} from '../communication/messages/parser/room/action/DanceMessageEventParser';
+} from '@ambreia/protocol/parser/room/action/ExpressionMessageEventParser';
+import type {DanceMessageEventParser} from '@ambreia/protocol/parser/room/action/DanceMessageEventParser';
 import type {
     AvatarEffectMessageEventParser
-} from '../communication/messages/parser/room/action/AvatarEffectMessageEventParser';
-import type {SleepMessageEventParser} from '../communication/messages/parser/room/action/SleepMessageEventParser';
+} from '@ambreia/protocol/parser/room/action/AvatarEffectMessageEventParser';
+import type {SleepMessageEventParser} from '@ambreia/protocol/parser/room/action/SleepMessageEventParser';
 import type {
     CarryObjectMessageEventParser
-} from '../communication/messages/parser/room/action/CarryObjectMessageEventParser';
+} from '@ambreia/protocol/parser/room/action/CarryObjectMessageEventParser';
 import type {
     UseObjectMessageEventParser
-} from '../communication/messages/parser/room/action/UseObjectMessageEventParser';
+} from '@ambreia/protocol/parser/room/action/UseObjectMessageEventParser';
 import type {
     UserChangeMessageEventParser
-} from '../communication/messages/parser/room/action/UserChangeMessageEventParser';
+} from '@ambreia/protocol/parser/room/action/UserChangeMessageEventParser';
 
 // Room Object Variables
 import {RoomObjectVariableEnum} from '@ambreia/iso/scene/object/RoomObjectVariableEnum';
 
 // Room Entry Tile
-import {RoomEntryTileMessageEvent} from '../communication/messages/incoming/room/layout/RoomEntryTileMessageEvent';
-import type {RoomEntryTileMessageParser} from '../communication/messages/parser/room/layout/RoomEntryTileMessageParser';
+import {RoomEntryTileMessageEvent} from '@ambreia/protocol/incoming/room/layout/RoomEntryTileMessageEvent';
+import type {RoomEntryTileMessageParser} from '@ambreia/protocol/parser/room/layout/RoomEntryTileMessageParser';
 
 // Room Object
 import {RoomPlaneParser} from '@ambreia/iso/scene/object/RoomPlaneParser';

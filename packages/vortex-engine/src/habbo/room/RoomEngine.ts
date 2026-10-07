@@ -45,7 +45,7 @@ import {RoomObjectOperationEnum} from '@ambreia/iso/scene/object/RoomObjectOpera
 import {RoomObjectAvatarSelectedMessage} from '@ambreia/iso/scene/messages/RoomObjectAvatarSelectedMessage';
 import {RoomObjectSelectedMessage} from '@ambreia/iso/scene/messages/RoomObjectSelectedMessage';
 import {RoomObjectVisibilityUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectVisibilityUpdateMessage';
-import {LookToMessageComposer} from '@habbo/communication/messages/outgoing/room/avatar/LookToMessageComposer';
+import {LookToMessageComposer} from '@ambreia/protocol/outgoing/room/avatar/LookToMessageComposer';
 import {getUserTypeName, RoomObjectUserTypes} from '@ambreia/iso/scene/object/RoomObjectUserTypes';
 import {RoomObjectVariableEnum} from '@ambreia/iso/scene/object/RoomObjectVariableEnum';
 import {StuffDataFactory} from '@ambreia/iso/scene/object/data/StuffDataFactory';
@@ -126,47 +126,47 @@ import {RoomContentLoader} from '@ambreia/iso/scene/RoomContentLoader';
 import type {PetColorResult} from '@ambreia/iso/scene/PetColorResult';
 import {RoomContentLoadedEvent} from '@ambreia/iso/events/RoomContentLoadedEvent';
 import {RoomObjectTileCursorUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectTileCursorUpdateMessage';
-import {MoveAvatarMessageComposer} from '@habbo/communication/messages/outgoing/room/engine/MoveAvatarMessageComposer';
-import {ClickFurniMessageComposer} from '@habbo/communication/messages/outgoing/room/engine/ClickFurniMessageComposer';
-import {ClickCharacterComposer} from '@habbo/communication/messages/outgoing/room/ClickCharacterComposer';
+import {MoveAvatarMessageComposer} from '@ambreia/protocol/outgoing/room/engine/MoveAvatarMessageComposer';
+import {ClickFurniMessageComposer} from '@ambreia/protocol/outgoing/room/engine/ClickFurniMessageComposer';
+import {ClickCharacterComposer} from '@ambreia/protocol/outgoing/room/ClickCharacterComposer';
 import {
     UseFurnitureMessageComposer
-} from '@habbo/communication/messages/outgoing/room/furniture/UseFurnitureMessageComposer';
+} from '@ambreia/protocol/outgoing/room/furniture/UseFurnitureMessageComposer';
 import {
     PlaceObjectMessageComposer
-} from '@habbo/communication/messages/outgoing/room/engine/PlaceObjectMessageComposer';
+} from '@ambreia/protocol/outgoing/room/engine/PlaceObjectMessageComposer';
 import {
     SetObjectDataMessageComposer
-} from '@habbo/communication/messages/outgoing/room/furniture/SetObjectDataMessageComposer';
+} from '@ambreia/protocol/outgoing/room/furniture/SetObjectDataMessageComposer';
 import {
     SetRandomStateMessageComposer
-} from '@habbo/communication/messages/outgoing/room/furniture/SetRandomStateMessageComposer';
+} from '@ambreia/protocol/outgoing/room/furniture/SetRandomStateMessageComposer';
 import {
     UseWallItemMessageComposer
-} from '@habbo/communication/messages/outgoing/room/furniture/UseWallItemMessageComposer';
-import {PlacePetComposer} from '@habbo/communication/messages/outgoing/room/pet/PlacePetComposer';
-import {PlaceBotMessageComposer} from '@habbo/communication/messages/outgoing/room/bot/PlaceBotMessageComposer';
+} from '@ambreia/protocol/outgoing/room/furniture/UseWallItemMessageComposer';
+import {PlacePetComposer} from '@ambreia/protocol/outgoing/room/pet/PlacePetComposer';
+import {PlaceBotMessageComposer} from '@ambreia/protocol/outgoing/room/bot/PlaceBotMessageComposer';
 import {
     PlacePostItMessageComposer
-} from '@habbo/communication/messages/outgoing/room/engine/PlacePostItMessageComposer';
+} from '@ambreia/protocol/outgoing/room/engine/PlacePostItMessageComposer';
 import {
     RemoveBotFromFlatMessageComposer
-} from '@habbo/communication/messages/outgoing/room/bot/RemoveBotFromFlatMessageComposer';
-import {MoveBotMessageComposer} from '@habbo/communication/messages/outgoing/room/bot/MoveBotMessageComposer';
-import {MovePetMessageComposer} from '@habbo/communication/messages/outgoing/room/pet/MovePetMessageComposer';
+} from '@ambreia/protocol/outgoing/room/bot/RemoveBotFromFlatMessageComposer';
+import {MoveBotMessageComposer} from '@ambreia/protocol/outgoing/room/bot/MoveBotMessageComposer';
+import {MovePetMessageComposer} from '@ambreia/protocol/outgoing/room/pet/MovePetMessageComposer';
 import {
     GetGuildFurniContextMenuInfoMessageComposer
-} from '@habbo/communication/messages/outgoing/room/furniture/GetGuildFurniContextMenuInfoMessageComposer';
+} from '@ambreia/protocol/outgoing/room/furniture/GetGuildFurniContextMenuInfoMessageComposer';
 import {
     GetResolutionAchievementsMessageComposer
-} from '@habbo/communication/messages/outgoing/quest/GetResolutionAchievementsMessageComposer';
-import {MoveObjectMessageComposer} from '@habbo/communication/messages/outgoing/room/engine/MoveObjectMessageComposer';
+} from '@ambreia/protocol/outgoing/quest/GetResolutionAchievementsMessageComposer';
+import {MoveObjectMessageComposer} from '@ambreia/protocol/outgoing/room/engine/MoveObjectMessageComposer';
 import {
     MoveWallItemMessageComposer
-} from '@habbo/communication/messages/outgoing/room/engine/MoveWallItemMessageComposer';
+} from '@ambreia/protocol/outgoing/room/engine/MoveWallItemMessageComposer';
 import {
     PickupObjectMessageComposer
-} from '@habbo/communication/messages/outgoing/room/engine/PickupObjectMessageComposer';
+} from '@ambreia/protocol/outgoing/room/engine/PickupObjectMessageComposer';
 import {RoomEngineObjectPlacedEvent} from '@ambreia/iso/scene/events/RoomEngineObjectPlacedEvent';
 import {RoomObjectRoomMaskUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectRoomMaskUpdateMessage';
 import {RoomObjectModelDataUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectModelDataUpdateMessage';
@@ -205,8 +205,8 @@ import {
     SetItemDataMessageComposer,
     SpinWheelOfFortuneMessageComposer,
     ThrowDiceMessageComposer
-} from '@habbo/communication/messages/outgoing/room/furniture';
-import {RoomUserData} from '@habbo/communication/messages/incoming/room/engine/RoomUserData';
+} from '@ambreia/protocol/outgoing/room/furniture/index';
+import {RoomUserData} from '@ambreia/protocol/incoming/room/engine/RoomUserData';
 import {RoomObjectMouseEvent} from '@ambreia/iso/events/RoomObjectMouseEvent';
 import {OrderedMap} from '@ambreia/common/utils/OrderedMap';
 import {GraphicAssetCollection} from '@ambreia/common/graphics/GraphicAssetCollection';

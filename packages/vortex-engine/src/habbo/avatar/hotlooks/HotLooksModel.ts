@@ -5,9 +5,9 @@ import type {ICategoryModelOwner} from '../common/ICategoryModelOwner';
 import {Logger} from '@ambreia/common/utils/Logger';
 import {CategoryBaseModel} from '../common/CategoryBaseModel';
 import {FigureData} from '../figuredata/FigureData';
-import type {HotLooksMessageParser} from '@habbo/communication/messages/parser/hotlooks/HotLooksMessageParser';
-import {HotLooksMessageEvent} from '@habbo/communication/messages/incoming/hotlooks/HotLooksMessageEvent';
-import {GetHotLooksMessageComposer} from '@habbo/communication/messages/outgoing/hotlooks/GetHotLooksMessageComposer';
+import type {HotLooksMessageParser} from '@ambreia/protocol/parser/hotlooks/HotLooksMessageParser';
+import {HotLooksMessageEvent} from '@ambreia/protocol/incoming/hotlooks/HotLooksMessageEvent';
+import {GetHotLooksMessageComposer} from '@ambreia/protocol/outgoing/hotlooks/GetHotLooksMessageComposer';
 import {HotLooksView} from './HotLooksView';
 import {Outfit} from '../wardrobe/Outfit';
 

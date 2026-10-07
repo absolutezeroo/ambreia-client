@@ -3,7 +3,7 @@ import type {IConnection} from '@ambreia/net/connection/IConnection';
 import type {IMessageComposer} from '@ambreia/net/messages/IMessageComposer';
 import type {IRoomSession, RoomSessionStateType} from './IRoomSession';
 import {RoomSessionState} from './IRoomSession';
-import type {RoomModerationSettings} from '../communication/messages/incoming/navigator';
+import type {RoomModerationSettings} from '@ambreia/protocol/incoming/navigator/index';
 import {
     AmbassadorAlertMessageComposer,
     AssignRightsMessageComposer,
@@ -39,14 +39,14 @@ import {
     UpdateClothingChangeFurnitureComposer,
     UseProductForPetComposer,
     WhisperMessageComposer,
-} from '../communication/messages/outgoing/room';
-import {VisitUserMessageComposer,} from '../communication/messages/outgoing/friendlist';
-import {EventLogMessageComposer,} from '../communication/messages/outgoing';
-import {NewUserExperienceScriptProceedComposer,} from '../communication/messages/outgoing/handshake';
+} from '@ambreia/protocol/outgoing/room/index';
+import {VisitUserMessageComposer,} from '@ambreia/protocol/outgoing/friendlist/index';
+import {EventLogMessageComposer,} from '@ambreia/protocol/outgoing/index';
+import {NewUserExperienceScriptProceedComposer,} from '@ambreia/protocol/outgoing/handshake/index';
 import {
     PeerUsersClassificationMessageComposer,
     RoomUsersClassificationMessageComposer,
-} from '../communication/messages/outgoing/moderation';
+} from '@ambreia/protocol/outgoing/moderation/index';
 import type {IUserDataManager} from "@habbo/session/IUserDataManager";
 import {UserDataManager} from "@habbo/session/UserDataManager";
 

@@ -28,140 +28,140 @@ import type {IRoomSessionManager} from './IRoomSessionManager';
 import type {IHabboConfigurationManager} from '../configuration/IHabboConfigurationManager';
 
 // Events - Handshake
-import {UserObjectMessageEvent} from '../communication/messages/incoming/handshake/UserObjectMessageEvent';
-import {UserRightsMessageEvent} from '../communication/messages/incoming/handshake/UserRightsMessageEvent';
-import {NoobnessLevelMessageEvent} from '../communication/messages/incoming/handshake/NoobnessLevelMessageEvent';
+import {UserObjectMessageEvent} from '@ambreia/protocol/incoming/handshake/UserObjectMessageEvent';
+import {UserRightsMessageEvent} from '@ambreia/protocol/incoming/handshake/UserRightsMessageEvent';
+import {NoobnessLevelMessageEvent} from '@ambreia/protocol/incoming/handshake/NoobnessLevelMessageEvent';
 import {
     IsFirstLoginOfDayMessageEvent
-} from '../communication/messages/incoming/handshake/IsFirstLoginOfDayMessageEvent';
+} from '@ambreia/protocol/incoming/handshake/IsFirstLoginOfDayMessageEvent';
 
 // Events - Availability
 import {
     AvailabilityStatusMessageEvent
-} from '../communication/messages/incoming/availability/AvailabilityStatusMessageEvent';
+} from '@ambreia/protocol/incoming/availability/AvailabilityStatusMessageEvent';
 
 // Events - Avatar
-import {FigureUpdateMessageEvent} from '../communication/messages/incoming/avatar/FigureUpdateMessageEvent';
+import {FigureUpdateMessageEvent} from '@ambreia/protocol/incoming/avatar/FigureUpdateMessageEvent';
 
 // Events - Navigator
 import {
     NavigatorSettingsMessageEvent
-} from '../communication/messages/incoming/navigator/NavigatorSettingsMessageEvent';
-import {FavouritesMessageEvent} from '../communication/messages/incoming/navigator/FavouritesMessageEvent';
+} from '@ambreia/protocol/incoming/navigator/NavigatorSettingsMessageEvent';
+import {FavouritesMessageEvent} from '@ambreia/protocol/incoming/navigator/FavouritesMessageEvent';
 
 // Events - Notifications
-import {ActivityPointsMessageEvent} from '../communication/messages/incoming/notifications/ActivityPointsMessageEvent';
-import {InfoFeedEnableMessageEvent} from '../communication/messages/incoming/notifications/InfoFeedEnableMessageEvent';
+import {ActivityPointsMessageEvent} from '@ambreia/protocol/incoming/notifications/ActivityPointsMessageEvent';
+import {InfoFeedEnableMessageEvent} from '@ambreia/protocol/incoming/notifications/InfoFeedEnableMessageEvent';
 import {
     AccountSafetyLockStatusChangeMessageEvent
-} from '../communication/messages/incoming/notifications/AccountSafetyLockStatusChangeMessageEvent';
-import {PetRespectFailedEvent} from '../communication/messages/incoming/notifications/PetRespectFailedEvent';
+} from '@ambreia/protocol/incoming/notifications/AccountSafetyLockStatusChangeMessageEvent';
+import {PetRespectFailedEvent} from '@ambreia/protocol/incoming/notifications/PetRespectFailedEvent';
 
 // Events - Inventory
 import {
     AchievementsScoreMessageEvent
-} from '../communication/messages/incoming/inventory/AchievementsScoreMessageEvent';
-import {FigureSetIdsMessageEvent} from '../communication/messages/incoming/inventory/FigureSetIdsMessageEvent';
-import {AvatarEffectsMessageEvent} from '../communication/messages/incoming/inventory/AvatarEffectsMessageEvent';
+} from '@ambreia/protocol/incoming/inventory/AchievementsScoreMessageEvent';
+import {FigureSetIdsMessageEvent} from '@ambreia/protocol/incoming/inventory/FigureSetIdsMessageEvent';
+import {AvatarEffectsMessageEvent} from '@ambreia/protocol/incoming/inventory/AvatarEffectsMessageEvent';
 
 // Events - Users
-import {InClientLinkMessageEvent} from '../communication/messages/incoming/users/InClientLinkMessageEvent';
-import {EmailStatusResultEvent} from '../communication/messages/incoming/users/EmailStatusResultEvent';
+import {InClientLinkMessageEvent} from '@ambreia/protocol/incoming/users/InClientLinkMessageEvent';
+import {EmailStatusResultEvent} from '@ambreia/protocol/incoming/users/EmailStatusResultEvent';
 
 // Events - Help (name change)
 import {
     ChangeUserNameResultMessageEvent
-} from '../communication/messages/incoming/help/ChangeUserNameResultMessageEvent';
-import {UserNameChangedMessageEvent} from '../communication/messages/incoming/help/UserNameChangedMessageEvent';
+} from '@ambreia/protocol/incoming/help/ChangeUserNameResultMessageEvent';
+import {UserNameChangedMessageEvent} from '@ambreia/protocol/incoming/help/UserNameChangedMessageEvent';
 
 // Events - Room
-import {RoomReadyMessageEvent} from '../communication/messages/incoming/room/session/RoomReadyMessageEvent';
-import {UserChangeMessageEvent} from '../communication/messages/incoming/room/action/UserChangeMessageEvent';
+import {RoomReadyMessageEvent} from '@ambreia/protocol/incoming/room/session/RoomReadyMessageEvent';
+import {UserChangeMessageEvent} from '@ambreia/protocol/incoming/room/action/UserChangeMessageEvent';
 
 // Events - Preferences & chat styles
-import {AccountPreferencesEvent} from '../communication/messages/incoming/preferences/AccountPreferencesEvent';
-import {UserNftChatStylesMessageEvent} from '../communication/messages/incoming/users/UserNftChatStylesMessageEvent';
+import {AccountPreferencesEvent} from '@ambreia/protocol/incoming/preferences/AccountPreferencesEvent';
+import {UserNftChatStylesMessageEvent} from '@ambreia/protocol/incoming/users/UserNftChatStylesMessageEvent';
 import {
     UserPurchasableChatStyleChangedMessageEvent
-} from '../communication/messages/incoming/users/UserPurchasableChatStyleChangedMessageEvent';
+} from '@ambreia/protocol/incoming/users/UserPurchasableChatStyleChangedMessageEvent';
 import {
     UserPurchasableChatStylesMessageEvent
-} from '../communication/messages/incoming/users/UserPurchasableChatStylesMessageEvent';
+} from '@ambreia/protocol/incoming/users/UserPurchasableChatStylesMessageEvent';
 
 // Parsers
-import type {UserObjectMessageParser} from '../communication/messages/parser/handshake/UserObjectMessageParser';
-import type {UserRightsMessageParser} from '../communication/messages/parser/handshake/UserRightsMessageParser';
-import type {NoobnessLevelMessageParser} from '../communication/messages/parser/handshake/NoobnessLevelMessageParser';
+import type {UserObjectMessageParser} from '@ambreia/protocol/parser/handshake/UserObjectMessageParser';
+import type {UserRightsMessageParser} from '@ambreia/protocol/parser/handshake/UserRightsMessageParser';
+import type {NoobnessLevelMessageParser} from '@ambreia/protocol/parser/handshake/NoobnessLevelMessageParser';
 import type {
     IsFirstLoginOfDayMessageParser
-} from '../communication/messages/parser/handshake/IsFirstLoginOfDayMessageParser';
+} from '@ambreia/protocol/parser/handshake/IsFirstLoginOfDayMessageParser';
 import type {
     AvailabilityStatusMessageParser
-} from '../communication/messages/parser/availability/AvailabilityStatusMessageParser';
-import type {FigureUpdateMessageParser} from '../communication/messages/parser/avatar/FigureUpdateMessageParser';
+} from '@ambreia/protocol/parser/availability/AvailabilityStatusMessageParser';
+import type {FigureUpdateMessageParser} from '@ambreia/protocol/parser/avatar/FigureUpdateMessageParser';
 import type {
     NavigatorSettingsMessageParser
-} from '../communication/messages/parser/navigator/NavigatorSettingsMessageParser';
-import type {FavouritesMessageParser} from '../communication/messages/parser/navigator/FavouritesMessageParser';
+} from '@ambreia/protocol/parser/navigator/NavigatorSettingsMessageParser';
+import type {FavouritesMessageParser} from '@ambreia/protocol/parser/navigator/FavouritesMessageParser';
 import type {
     ActivityPointsMessageParser
-} from '../communication/messages/parser/notifications/ActivityPointsMessageParser';
+} from '@ambreia/protocol/parser/notifications/ActivityPointsMessageParser';
 import type {
     InfoFeedEnableMessageParser
-} from '../communication/messages/parser/notifications/InfoFeedEnableMessageParser';
+} from '@ambreia/protocol/parser/notifications/InfoFeedEnableMessageParser';
 import type {
     AccountSafetyLockStatusChangeMessageEventParser
-} from '../communication/messages/parser/notifications/AccountSafetyLockStatusChangeMessageEventParser';
+} from '@ambreia/protocol/parser/notifications/AccountSafetyLockStatusChangeMessageEventParser';
 import type {
     AchievementsScoreMessageParser
-} from '../communication/messages/parser/inventory/AchievementsScoreMessageParser';
-import type {FigureSetIdsMessageParser} from '../communication/messages/parser/inventory/FigureSetIdsMessageParser';
+} from '@ambreia/protocol/parser/inventory/AchievementsScoreMessageParser';
+import type {FigureSetIdsMessageParser} from '@ambreia/protocol/parser/inventory/FigureSetIdsMessageParser';
 import type {
     AvatarEffectsMessageParser,
     IAvatarEffect
-} from '../communication/messages/parser/inventory/AvatarEffectsMessageParser';
-import type {InClientLinkMessageParser} from '../communication/messages/parser/users/InClientLinkMessageParser';
-import type {EmailStatusResultParser} from '../communication/messages/parser/users/EmailStatusResultParser';
+} from '@ambreia/protocol/parser/inventory/AvatarEffectsMessageParser';
+import type {InClientLinkMessageParser} from '@ambreia/protocol/parser/users/InClientLinkMessageParser';
+import type {EmailStatusResultParser} from '@ambreia/protocol/parser/users/EmailStatusResultParser';
 import type {
     ChangeUserNameResultMessageParser
-} from '../communication/messages/parser/help/ChangeUserNameResultMessageParser';
-import type {UserNameChangedMessageParser} from '../communication/messages/parser/help/UserNameChangedMessageParser';
-import type {RoomReadyMessageParser} from '../communication/messages/parser/room/session/RoomReadyMessageParser';
-import type {AccountPreferencesParser} from '../communication/messages/parser/preferences/AccountPreferencesParser';
-import type {UserNftChatStylesMessageParser} from '../communication/messages/parser/users/UserNftChatStylesMessageParser';
+} from '@ambreia/protocol/parser/help/ChangeUserNameResultMessageParser';
+import type {UserNameChangedMessageParser} from '@ambreia/protocol/parser/help/UserNameChangedMessageParser';
+import type {RoomReadyMessageParser} from '@ambreia/protocol/parser/room/session/RoomReadyMessageParser';
+import type {AccountPreferencesParser} from '@ambreia/protocol/parser/preferences/AccountPreferencesParser';
+import type {UserNftChatStylesMessageParser} from '@ambreia/protocol/parser/users/UserNftChatStylesMessageParser';
 import type {
     UserPurchasableChatStyleChangedMessageParser
-} from '../communication/messages/parser/users/UserPurchasableChatStyleChangedMessageParser';
+} from '@ambreia/protocol/parser/users/UserPurchasableChatStyleChangedMessageParser';
 import type {
     UserPurchasableChatStylesMessageParser
-} from '../communication/messages/parser/users/UserPurchasableChatStylesMessageParser';
+} from '@ambreia/protocol/parser/users/UserPurchasableChatStylesMessageParser';
 
 // Composers
-import {RespectUserMessageComposer} from '../communication/messages/outgoing/room/RespectUserMessageComposer';
-import {RespectPetMessageComposer} from '../communication/messages/outgoing/room/RespectPetMessageComposer';
-import {ChatMessageComposer} from '../communication/messages/outgoing/room/chat/ChatMessageComposer';
-import {SetUIFlagsMessageComposer} from '../communication/messages/outgoing/preferences/SetUIFlagsMessageComposer';
+import {RespectUserMessageComposer} from '@ambreia/protocol/outgoing/room/RespectUserMessageComposer';
+import {RespectPetMessageComposer} from '@ambreia/protocol/outgoing/room/RespectPetMessageComposer';
+import {ChatMessageComposer} from '@ambreia/protocol/outgoing/room/chat/ChatMessageComposer';
+import {SetUIFlagsMessageComposer} from '@ambreia/protocol/outgoing/preferences/SetUIFlagsMessageComposer';
 import {
     CreditVaultStatusMessageComposer
-} from '../communication/messages/outgoing/inventory/CreditVaultStatusMessageComposer';
+} from '@ambreia/protocol/outgoing/inventory/CreditVaultStatusMessageComposer';
 import {
     WithdrawCreditVaultMessageComposer
-} from '../communication/messages/outgoing/inventory/WithdrawCreditVaultMessageComposer';
+} from '@ambreia/protocol/outgoing/inventory/WithdrawCreditVaultMessageComposer';
 import {
     IncomeRewardStatusMessageComposer
-} from '../communication/messages/outgoing/inventory/IncomeRewardStatusMessageComposer';
+} from '@ambreia/protocol/outgoing/inventory/IncomeRewardStatusMessageComposer';
 import {
     IncomeRewardClaimMessageComposer
-} from '../communication/messages/outgoing/inventory/IncomeRewardClaimMessageComposer';
+} from '@ambreia/protocol/outgoing/inventory/IncomeRewardClaimMessageComposer';
 import {
     GetUserNftChatStylesMessageComposer
-} from '../communication/messages/outgoing/users/GetUserNftChatStylesMessageComposer';
+} from '@ambreia/protocol/outgoing/users/GetUserNftChatStylesMessageComposer';
 import {
     GetDailyTasksComposer
-} from '../communication/messages/outgoing/users/GetDailyTasksComposer';
+} from '@ambreia/protocol/outgoing/users/GetDailyTasksComposer';
 import {
     ReplenishRespectMessageComposer
-} from '../communication/messages/outgoing/users/ReplenishRespectMessageComposer';
+} from '@ambreia/protocol/outgoing/users/ReplenishRespectMessageComposer';
 
 // Session events
 import {UserNameUpdateEvent} from './events/UserNameUpdateEvent';

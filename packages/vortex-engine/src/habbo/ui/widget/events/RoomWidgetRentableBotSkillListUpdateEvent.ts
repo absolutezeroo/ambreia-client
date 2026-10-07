@@ -7,7 +7,7 @@
  * its in-client-link and NUX buttons — the plain id list on the info event cannot express them.
  */
 import {RoomWidgetUpdateEvent} from './RoomWidgetUpdateEvent';
-import type {BotSkillData} from '@habbo/communication/messages/parser/room/bot/BotSkillData';
+import type {BotSkillData} from '@ambreia/protocol/parser/room/bot/BotSkillData';
 
 export class RoomWidgetRentableBotSkillListUpdateEvent extends RoomWidgetUpdateEvent
 {

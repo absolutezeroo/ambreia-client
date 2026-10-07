@@ -3,11 +3,11 @@ export * from './demo';
 export * from './encryption';
 export * from './enum';
 export * from './login';
-export * from './messages';
+export * from '@ambreia/protocol/index';
 
 // Exports
 export { HabboCommunicationManager } from './HabboCommunicationManager';
-export { HabboMessages } from './HabboMessages';
+export { HabboMessages } from '@ambreia/protocol/HabboMessages';
 export { ApiRequest } from './ApiRequest';
 export { WebApiRequest } from './WebApiRequest';
 export { HabboWebApiSession } from './HabboWebApiSession';

@@ -5,36 +5,36 @@ import {BaseHandler} from './BaseHandler';
 import {RoomShakingEffect} from '@ambreia/iso/utils/RoomShakingEffect';
 
 // Message events
-import {UsersMessageEvent} from '../../communication/messages/incoming/room/engine/UsersMessageEvent';
-import {UserRemoveMessageEvent} from '../../communication/messages/incoming/room/engine/UserRemoveMessageEvent';
-import {DoorbellMessageEvent} from '../../communication/messages/incoming/navigator/DoorbellMessageEvent';
-import {BlockUserUpdateMessageEvent} from '../../communication/messages/incoming/users/BlockUserUpdateMessageEvent';
-import {FavoriteMembershipUpdateMessageEvent} from '../../communication/messages/incoming/room/engine/FavoriteMembershipUpdateMessageEvent';
-import type {FavoriteMembershipUpdateMessageEventParser} from '../../communication/messages/parser/room/engine/FavoriteMembershipUpdateMessageEventParser';
+import {UsersMessageEvent} from '@ambreia/protocol/incoming/room/engine/UsersMessageEvent';
+import {UserRemoveMessageEvent} from '@ambreia/protocol/incoming/room/engine/UserRemoveMessageEvent';
+import {DoorbellMessageEvent} from '@ambreia/protocol/incoming/navigator/DoorbellMessageEvent';
+import {BlockUserUpdateMessageEvent} from '@ambreia/protocol/incoming/users/BlockUserUpdateMessageEvent';
+import {FavoriteMembershipUpdateMessageEvent} from '@ambreia/protocol/incoming/room/engine/FavoriteMembershipUpdateMessageEvent';
+import type {FavoriteMembershipUpdateMessageEventParser} from '@ambreia/protocol/parser/room/engine/FavoriteMembershipUpdateMessageEventParser';
 import {RoomSessionFavouriteGroupUpdateEvent} from '../events/RoomSessionFavouriteGroupUpdateEvent';
-import {HabboUserBadgesMessageEvent} from '../../communication/messages/incoming/users/HabboUserBadgesMessageEvent';
-import {UserChangeMessageEvent} from '@habbo/communication/messages/incoming/room/action/UserChangeMessageEvent';
-import {DanceMessageEvent} from '@habbo/communication/messages/incoming/room/action/DanceMessageEvent';
+import {HabboUserBadgesMessageEvent} from '@ambreia/protocol/incoming/users/HabboUserBadgesMessageEvent';
+import {UserChangeMessageEvent} from '@ambreia/protocol/incoming/room/action/UserChangeMessageEvent';
+import {DanceMessageEvent} from '@ambreia/protocol/incoming/room/action/DanceMessageEvent';
 import type {
     DanceMessageEventParser
-} from '@habbo/communication/messages/parser/room/action/DanceMessageEventParser';
+} from '@ambreia/protocol/parser/room/action/DanceMessageEventParser';
 import {
     NewFriendRequestMessageEvent
-} from '@habbo/communication/messages/incoming/friendlist/NewFriendRequestMessageEvent';
+} from '@ambreia/protocol/incoming/friendlist/NewFriendRequestMessageEvent';
 import type {
     NewFriendRequestMessageParser
-} from '@habbo/communication/messages/parser/friendlist/NewFriendRequestMessageParser';
+} from '@ambreia/protocol/parser/friendlist/NewFriendRequestMessageParser';
 import {RoomSessionDanceEvent} from '../events/RoomSessionDanceEvent';
 import {RoomSessionFriendRequestEvent} from '../events/RoomSessionFriendRequestEvent';
 
 // Parsers
-import type {UsersMessageParser} from '../../communication/messages/parser/room/engine/UsersMessageParser';
-import type {UserRemoveMessageParser} from '../../communication/messages/parser/room/engine/UserRemoveMessageParser';
-import type {DoorbellMessageParser} from '../../communication/messages/parser/navigator/DoorbellMessageParser';
-import type {HabboUserBadgesMessageParser} from '../../communication/messages/parser/users/HabboUserBadgesMessageParser';
+import type {UsersMessageParser} from '@ambreia/protocol/parser/room/engine/UsersMessageParser';
+import type {UserRemoveMessageParser} from '@ambreia/protocol/parser/room/engine/UserRemoveMessageParser';
+import type {DoorbellMessageParser} from '@ambreia/protocol/parser/navigator/DoorbellMessageParser';
+import type {HabboUserBadgesMessageParser} from '@ambreia/protocol/parser/users/HabboUserBadgesMessageParser';
 import type {
     UserChangeMessageEventParser
-} from '@habbo/communication/messages/parser/room/action/UserChangeMessageEventParser';
+} from '@ambreia/protocol/parser/room/action/UserChangeMessageEventParser';
 
 // Events
 import {RoomSessionUserDataUpdateEvent} from '../events/RoomSessionUserDataUpdateEvent';
@@ -44,37 +44,37 @@ import {RoomSessionUserFigureUpdateEvent} from '../events/RoomSessionUserFigureU
 import type {IUserData} from '@habbo/session';
 import { UserData} from '@habbo/session';
 import type {RoomUserData} from '@habbo/communication';
-import {PetInfoMessageEvent} from '@habbo/communication/messages/incoming/room/pet/PetInfoMessageEvent';
-import type {PetInfoMessageEventParser} from '@habbo/communication/messages/parser/room/pet/PetInfoMessageEventParser';
+import {PetInfoMessageEvent} from '@ambreia/protocol/incoming/room/pet/PetInfoMessageEvent';
+import type {PetInfoMessageEventParser} from '@ambreia/protocol/parser/room/pet/PetInfoMessageEventParser';
 import {PetInfo} from '../PetInfo';
 import {RoomSessionPetInfoUpdateEvent} from '../events/RoomSessionPetInfoUpdateEvent';
 
 // Pet message events + parsers — AS3 registers all of these in the RoomUsersHandler constructor
 // (sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/handler/RoomUsersHandler.as:85-95).
-import {PetCommandsMessageEvent} from '@habbo/communication/messages/incoming/room/pet/PetCommandsMessageEvent';
-import {PetPlacingErrorEvent} from '@habbo/communication/messages/incoming/room/pet/PetPlacingErrorEvent';
-import {PetFigureUpdateEvent} from '@habbo/communication/messages/incoming/room/pet/PetFigureUpdateEvent';
-import {PetStatusUpdateEvent} from '@habbo/communication/messages/incoming/room/pet/PetStatusUpdateEvent';
-import {PetLevelUpdateEvent} from '@habbo/communication/messages/incoming/room/pet/PetLevelUpdateEvent';
-import type {PetCommandsMessageEventParser} from '@habbo/communication/messages/parser/room/pet/PetCommandsMessageEventParser';
-import type {PetPlacingErrorEventParser} from '@habbo/communication/messages/parser/room/pet/PetPlacingErrorEventParser';
-import type {PetFigureUpdateEventParser} from '@habbo/communication/messages/parser/room/pet/PetFigureUpdateEventParser';
-import type {PetStatusUpdateEventParser} from '@habbo/communication/messages/parser/room/pet/PetStatusUpdateEventParser';
-import type {PetLevelUpdateEventParser} from '@habbo/communication/messages/parser/room/pet/PetLevelUpdateEventParser';
+import {PetCommandsMessageEvent} from '@ambreia/protocol/incoming/room/pet/PetCommandsMessageEvent';
+import {PetPlacingErrorEvent} from '@ambreia/protocol/incoming/room/pet/PetPlacingErrorEvent';
+import {PetFigureUpdateEvent} from '@ambreia/protocol/incoming/room/pet/PetFigureUpdateEvent';
+import {PetStatusUpdateEvent} from '@ambreia/protocol/incoming/room/pet/PetStatusUpdateEvent';
+import {PetLevelUpdateEvent} from '@ambreia/protocol/incoming/room/pet/PetLevelUpdateEvent';
+import type {PetCommandsMessageEventParser} from '@ambreia/protocol/parser/room/pet/PetCommandsMessageEventParser';
+import type {PetPlacingErrorEventParser} from '@ambreia/protocol/parser/room/pet/PetPlacingErrorEventParser';
+import type {PetFigureUpdateEventParser} from '@ambreia/protocol/parser/room/pet/PetFigureUpdateEventParser';
+import type {PetStatusUpdateEventParser} from '@ambreia/protocol/parser/room/pet/PetStatusUpdateEventParser';
+import type {PetLevelUpdateEventParser} from '@ambreia/protocol/parser/room/pet/PetLevelUpdateEventParser';
 
 import {RoomSessionPetCommandsUpdateEvent} from '../events/RoomSessionPetCommandsUpdateEvent';
 import {RoomSessionPetFigureUpdateEvent} from '../events/RoomSessionPetFigureUpdateEvent';
 import {RoomSessionPetStatusUpdateEvent} from '../events/RoomSessionPetStatusUpdateEvent';
 import {RoomSessionPetLevelUpdateEvent} from '../events/RoomSessionPetLevelUpdateEvent';
 import {RoomSessionErrorMessageEvent} from '../events/RoomSessionErrorMessageEvent';
-import {BotErrorEvent} from '@habbo/communication/messages/incoming/room/bot/BotErrorEvent';
-import type {BotErrorParser} from '@habbo/communication/messages/parser/room/bot/BotErrorParser';
+import {BotErrorEvent} from '@ambreia/protocol/incoming/room/bot/BotErrorEvent';
+import type {BotErrorParser} from '@ambreia/protocol/parser/room/bot/BotErrorParser';
 import {
     UserNameChangedMessageEvent
-} from '@habbo/communication/messages/incoming/help/UserNameChangedMessageEvent';
+} from '@ambreia/protocol/incoming/help/UserNameChangedMessageEvent';
 import type {
     UserNameChangedMessageParser
-} from '@habbo/communication/messages/parser/help/UserNameChangedMessageParser';
+} from '@ambreia/protocol/parser/help/UserNameChangedMessageParser';
 
 /**
  * Room users handler

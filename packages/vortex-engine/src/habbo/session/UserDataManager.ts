@@ -2,9 +2,9 @@ import type {IUserDataManager} from './IUserDataManager';
 import type {IUserData} from './IUserData';
 import {UserDataType} from './UserData';
 import type {IConnection} from '@ambreia/net/connection/IConnection';
-import {GetSelectedBadgesMessageComposer} from '../communication/messages/outgoing/users/GetSelectedBadgesMessageComposer';
-import {GetPetInfoMessageComposer} from '../communication/messages/outgoing/room/pet/GetPetInfoMessageComposer';
-import type {ISelectedBadge} from '@habbo/communication/messages/parser/users/HabboUserBadgesMessageParser';
+import {GetSelectedBadgesMessageComposer} from '@ambreia/protocol/outgoing/users/GetSelectedBadgesMessageComposer';
+import {GetPetInfoMessageComposer} from '@ambreia/protocol/outgoing/room/pet/GetPetInfoMessageComposer';
+import type {ISelectedBadge} from '@ambreia/protocol/parser/users/HabboUserBadgesMessageParser';
 
 /**
  * Room user data manager

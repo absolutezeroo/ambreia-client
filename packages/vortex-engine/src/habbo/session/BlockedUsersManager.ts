@@ -5,11 +5,11 @@ import {
     BlockListInitComposer,
     BlockUserMessageComposer,
     UnblockUserMessageComposer,
-} from '../communication/messages/outgoing/users';
+} from '@ambreia/protocol/outgoing/users/index';
 import {
     BlockListMessageEvent,
     BlockUserUpdateMessageEvent,
-} from '../communication/messages/incoming/users';
+} from '@ambreia/protocol/incoming/users/index';
 
 /**
  * Blocked users manager.

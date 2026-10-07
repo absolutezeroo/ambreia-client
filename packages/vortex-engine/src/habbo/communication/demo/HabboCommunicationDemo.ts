@@ -14,14 +14,14 @@ import {
     SSOTicketMessageComposer,
     UniqueIDMessageComposer,
     VersionCheckMessageComposer,
-} from '../messages/outgoing/handshake';
+} from '@ambreia/protocol/outgoing/handshake/index';
 import {CommunicationUtils} from '@habbo/utils/CommunicationUtils';
 import {IID_HabboCommunicationManager} from "@iid/IIDHabboCommunicationManager";
 import {IID_HabboWindowManager} from '@iid/IIDHabboWindowManager';
 import {IID_HabboLocalizationManager} from '@iid/IIDHabboLocalizationManager';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';
-import {DisconnectReasonMessageEvent} from '../messages/incoming/handshake/DisconnectReasonMessageEvent';
+import {DisconnectReasonMessageEvent} from '@ambreia/protocol/incoming/handshake/DisconnectReasonMessageEvent';
 import type {IHabboCommunicationDemo} from "@habbo/communication/demo/IHabboCommunicationDemo";
 
 const log = Logger.getLogger('habbo.communication.demo.HabboCommunicationDemo');

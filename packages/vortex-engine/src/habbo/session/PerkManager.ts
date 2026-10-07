@@ -1,7 +1,7 @@
 import type {IPerkManager, IPerkAllowance} from './IPerkManager';
 import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
 import type {SessionDataManager} from './SessionDataManager';
-import {PerkAllowancesMessageEvent} from '@habbo/communication/messages/incoming/perk';
+import {PerkAllowancesMessageEvent} from '@ambreia/protocol/incoming/perk/index';
 import {PerksUpdatedEvent} from './events/PerksUpdatedEvent';
 
 /**

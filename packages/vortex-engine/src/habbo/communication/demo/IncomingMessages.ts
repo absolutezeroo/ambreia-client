@@ -19,7 +19,7 @@ import {
     InitDiffieHandshakeMessageEvent,
     PingMessageEvent,
     UniqueMachineIdMessageEvent,
-} from '../messages/incoming/handshake';
+} from '@ambreia/protocol/incoming/handshake/index';
 
 // Parsers
 import type {
@@ -28,17 +28,17 @@ import type {
     GenericErrorMessageParser,
     IdentityAccountsEventParser,
     InitDiffieHandshakeMessageParser,
-} from '../messages/parser/handshake';
+} from '@ambreia/protocol/parser/handshake/index';
 
-import {LoginFailedHotelClosedMessageEvent, MaintenanceStatusMessageEvent,} from '../messages/incoming/availability';
+import {LoginFailedHotelClosedMessageEvent, MaintenanceStatusMessageEvent,} from '@ambreia/protocol/incoming/availability/index';
 
 import type {
     LoginFailedHotelClosedMessageEventParser,
     MaintenanceStatusMessageEventParser,
-} from '../messages/parser/availability';
+} from '@ambreia/protocol/parser/availability/index';
 
-import {ErrorReportEvent} from '../messages/incoming/error';
-import type {ErrorReportEventParser} from '../messages/parser/error';
+import {ErrorReportEvent} from '@ambreia/protocol/incoming/error/index';
+import type {ErrorReportEventParser} from '@ambreia/protocol/parser/error/index';
 
 // Composers
 import {
@@ -47,10 +47,10 @@ import {
     InfoRetrieveMessageComposer,
     InitDiffieHandshakeMessageComposer,
     PongMessageComposer,
-} from '../messages/outgoing/handshake';
+} from '@ambreia/protocol/outgoing/handshake/index';
 
-import {EventLogMessageComposer} from '../messages/outgoing/tracking';
-import {GetFurnitureAliasesMessageComposer} from '../messages/outgoing/room/engine';
+import {EventLogMessageComposer} from '@ambreia/protocol/outgoing/tracking/index';
+import {GetFurnitureAliasesMessageComposer} from '@ambreia/protocol/outgoing/room/engine/index';
 
 const log = Logger.getLogger('habbo.communication.demo.IncomingMessages');
 

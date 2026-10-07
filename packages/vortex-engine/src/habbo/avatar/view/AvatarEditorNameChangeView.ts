@@ -7,7 +7,7 @@ import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import type {AvatarEditorView} from '../AvatarEditorView';
 import type {IHabboAvatarEditorHost} from '../IHabboAvatarEditorHost';
 import {AvatarEditorNameSuggestionListRenderer} from './AvatarEditorNameSuggestionListRenderer';
-import {CheckUserNameResultMessageEvent} from '@habbo/communication/messages/incoming/help/CheckUserNameResultMessageEvent';
+import {CheckUserNameResultMessageEvent} from '@ambreia/protocol/incoming/help/CheckUserNameResultMessageEvent';
 import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
 
 /**

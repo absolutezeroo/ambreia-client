@@ -1,4 +1,4 @@
-import type {BotSkillData} from '@habbo/communication/messages/parser/room/bot/BotSkillData';
+import type {BotSkillData} from '@ambreia/protocol/parser/room/bot/BotSkillData';
 /**
  * Interface for room user data
  * Based on AS3 com.sulake.habbo.session.class_3490 (IUserData)

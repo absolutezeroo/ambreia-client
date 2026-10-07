@@ -4,10 +4,10 @@ import type {IRoomHandlerListener} from '../IRoomHandlerListener';
 import {BaseHandler} from './BaseHandler';
 
 // Message events
-import {GenericErrorMessageEvent} from '../../communication/messages/incoming/handshake/GenericErrorMessageEvent';
+import {GenericErrorMessageEvent} from '@ambreia/protocol/incoming/handshake/GenericErrorMessageEvent';
 
 // Parsers
-import type {GenericErrorMessageParser} from '../../communication/messages/parser/handshake/GenericErrorMessageParser';
+import type {GenericErrorMessageParser} from '@ambreia/protocol/parser/handshake/GenericErrorMessageParser';
 
 // Events
 import {RoomSessionErrorMessageEvent} from '../events/RoomSessionErrorMessageEvent';
