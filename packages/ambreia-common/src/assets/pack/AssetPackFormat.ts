@@ -143,5 +143,6 @@ export function parsePackIndexRegion(region: Uint8Array): {index: IPackIndex; di
 
 export function inflateManifest(bytes: Uint8Array, dictionary: Uint8Array): Uint8Array
 {
-    return inflateRaw(bytes, {dictionary});
+    // pako's inflate takes `dictionary` (its deflate's twin); @types/pako only declares it for deflate.
+    return inflateRaw(bytes, {dictionary} as Parameters<typeof inflateRaw>[1]);
 }
