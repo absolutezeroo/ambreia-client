@@ -1147,9 +1147,10 @@ export class AvatarImageCache
             //   cut from inside the box (`texture.orig`, what the asset offsets are measured against).
             //   The frame is drawn at that offset and at its own size — what a PixiJS sprite does —
             //   instead of being stretched over the whole box, which blurred every trimmed part.
-            const trimmed = texture as {trim?: {x: number; y: number} | null; orig?: {width: number} | null};
-            const trim = trimmed.trim ?? null;
-            const boxWidth = trimmed.orig?.width ?? imageData.rect.width;
+            // The box is the part's own rect: under PixiJS that is texture.width, the untrimmed size; the
+            // imager's pixi shim reports the frame there and a zero trim, which then keeps parts in place.
+            const trim = (texture as {trim?: {x: number; y: number} | null}).trim ?? null;
+            const boxWidth = imageData.rect.width;
             const partWidth = trim ? frame.width : imageData.rect.width;
             const partHeight = trim ? frame.height : imageData.rect.height;
             const partX = trim ? drawX + (needsFlip ? boxWidth - trim.x - frame.width : trim.x) : drawX;
