@@ -442,6 +442,7 @@ export class VortexMain implements IVortexMain
         // Nullify Habbo manager refs (inverse init order)
         this._avatarEditor = null;
         this._roomUI = null;
+        this._windowManager?.dispose();
         this._windowManager = null;
         this._avatarRenderManager?.dispose();
         this._avatarRenderManager = null;
@@ -643,9 +644,19 @@ export class VortexMain implements IVortexMain
         // `pre-noyau-client` keeps them.
 
         // 12l. Window Manager
-        this._windowManager = new HabboWindowManager(ctx);
+        // A plain class since J3 (spec §3 rule 1): its six services come in as dependencies of the
+        // attach, and it builds its contexts once they have resolved, as initComponent() did.
+        const windowManager = new HabboWindowManager(ctx, {
+            interpolate: (text: string): string => ctx.configuration?.interpolate(text) ?? text
+        });
+        this._windowManager = windowManager;
         this.applyWindowAssets(config?.windowAssets ?? null);
-        ctx.attachComponent(this._windowManager, [IID_HabboWindowManager]);
+        ctx.attachInstance(IID_HabboWindowManager, windowManager, {
+            dependencies: windowManager.createDependencies(),
+            ready: () => windowManager.initialize(),
+            update: (deltaTime: number) => windowManager.update(deltaTime),
+            updatePriority: 0
+        });
 
         // 12m. Room UI
         this._roomUI = new RoomUI(ctx, 0, this._assets);

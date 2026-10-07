@@ -103,6 +103,12 @@ importers:
         specifier: ^5.0.1
         version: 5.0.4
     devDependencies:
+      '@napi-rs/canvas':
+        specifier: ^0.1.71
+        version: 0.1.100
+      linkedom:
+        specifier: ^0.18.9
+        version: 0.18.13
       typescript:
         specifier: ^5.7.2
         version: 5.9.3

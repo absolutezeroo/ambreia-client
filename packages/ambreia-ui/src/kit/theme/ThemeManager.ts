@@ -1,13 +1,12 @@
-import type {IThemeManager} from '@ambreia/ui/theme/IThemeManager';
-import type {IPropertyMap} from '@ambreia/ui/theme/IPropertyMap';
-import type {SkinContainer} from '@ambreia/ui/graphics/SkinContainer';
-import {PropertyMap} from '@ambreia/ui/theme/PropertyMap';
-import {Theme} from '@ambreia/ui/kit/theme/Theme';
-import {HabboWidgetFactory} from '../HabboWidgetFactory';
+import type {IThemeManager} from '../../theme/IThemeManager';
+import type {IPropertyMap} from '../../theme/IPropertyMap';
+import type {SkinContainer} from '../../graphics/SkinContainer';
+import {PropertyMap} from '../../theme/PropertyMap';
+import {Theme} from './Theme';
 
 // Moved to core/window/theme so `IThemeManager` — a core interface — can name its own return type
 // without core importing from habbo. Re-exported here for the callers already importing it.
-import type {IThemeAndIntent} from '@ambreia/ui/theme/IThemeAndIntent';
+import type {IThemeAndIntent} from '../../theme/IThemeAndIntent';
 
 export type {IThemeAndIntent};
 
@@ -47,7 +46,9 @@ export class ThemeManager implements IThemeManager
     private _skinContainer: SkinContainer;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/theme/ThemeManager.as::ThemeManager()
-    constructor(skinContainer: SkinContainer)
+    // DEVIATION: AS3 reads WidgetClasses.WIDGET_TYPES itself; the widget types are the host's, so
+    //   they are passed in (the engine passes HabboWidgetFactory.WIDGET_TYPES).
+    constructor(skinContainer: SkinContainer, widgetTypes: readonly string[] = [])
     {
         this._skinContainer = skinContainer;
 
@@ -133,8 +134,8 @@ export class ThemeManager implements IThemeManager
         properties.addBoolean('vertical', false);
         // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/theme/ThemeManager.as::ThemeManager() — addEnumeration("widget_type","",WidgetClasses.WIDGET_TYPES)
         // The list was spelled out here and had already drifted from the registry it copies; it now
-        // comes off `HabboWidgetFactory` (the port of `WidgetClasses`), which derives it as AS3 does.
-        properties.addEnumeration('widget_type', '', [...HabboWidgetFactory.WIDGET_TYPES]);
+        // comes from the window manager's widget factory, which derives it as AS3 does.
+        properties.addEnumeration('widget_type', '', [...widgetTypes]);
         properties.addBoolean('word_wrap', false);
         properties.addNumber('zoom_x', 1);
         properties.addNumber('zoom_y', 1);

@@ -18,7 +18,7 @@ import {MouseEventQueue} from './utils/MouseEventQueue';
 import {TabletEventQueue} from './utils/tablet/TabletEventQueue';
 import {TabletEventProcessor} from './utils/tablet/TabletEventProcessor';
 
-type WindowContextResizeHost = {
+export type WindowContextResizeHost = {
     width: number;
     height: number;
     addEventListener(type: string, listener: (event?: Event) => void): void;

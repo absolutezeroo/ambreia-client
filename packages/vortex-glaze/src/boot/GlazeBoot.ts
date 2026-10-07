@@ -217,20 +217,32 @@ export class GlazeBoot
 
         ctx.attachComponent(localization, [IID_HabboLocalizationManager]);
 
-        const windowManager = new HabboWindowManager(ctx);
+        const windowManager = new HabboWindowManager(ctx, {
+            interpolate: (text: string): string => ctx.configuration?.interpolate(text) ?? text
+        });
+        let ready = false;
 
-        ctx.attachComponent(windowManager, [IID_HabboWindowManager]);
+        ctx.attachInstance(IID_HabboWindowManager, windowManager, {
+            dependencies: windowManager.createDependencies(),
+            ready: () =>
+            {
+                windowManager.initialize();
+                ready = true;
+            },
+            update: (deltaTime: number) => windowManager.update(deltaTime),
+            updatePriority: 0
+        });
 
         ctx.initialize();
 
-        // The manager resolves its dependency and runs initComponent() on a
-        // microtask; wait until it unlocks before touching the context/renderer.
-        for(let i = 0; i < 200 && (windowManager as unknown as { locked: boolean }).locked; i++)
+        // The localisation resolves on a microtask; the manager builds its contexts then. Wait for
+        // that before touching the context/renderer.
+        for(let i = 0; i < 200 && !ready; i++)
         {
             await new Promise<void>((resolve) => setTimeout(resolve, 0));
         }
 
-        if((windowManager as unknown as { locked: boolean }).locked)
+        if(!ready)
         {
             throw new Error('[GlazeBoot] Window manager never finished initialization (dependency unresolved).');
         }

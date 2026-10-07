@@ -389,29 +389,13 @@ implements IWindowUpdateReceiver
     // TS-only: registers with the window manager's update loop (AS3 used ENTER_FRAME)
     private registerForUpdates(): void
     {
-        const updateAwareManager = this._windowManager as unknown as {
-            registerUpdateReceiver?: (receiver: IWindowUpdateReceiver, priority: number) => void
-            context?: {
-                registerUpdateReceiver?: (receiver: IWindowUpdateReceiver, priority: number) => void
-            }
-        };
-
-        updateAwareManager.registerUpdateReceiver?.(this, 10);
-        updateAwareManager.context?.registerUpdateReceiver?.(this, 10);
+        this._windowManager.registerUpdateReceiver(this, 10);
     }
 
     // TS-only: unregisters from the window manager's update loop
     private unregisterFromUpdates(): void
     {
-        const updateAwareManager = this._windowManager as unknown as {
-            removeUpdateReceiver?: (receiver: IWindowUpdateReceiver) => void
-            context?: {
-                removeUpdateReceiver?: (receiver: IWindowUpdateReceiver) => void
-            }
-        };
-
-        updateAwareManager.removeUpdateReceiver?.(this);
-        updateAwareManager.context?.removeUpdateReceiver?.(this);
+        this._windowManager.removeUpdateReceiver(this);
     }
 }
 

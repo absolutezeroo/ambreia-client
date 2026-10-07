@@ -2,7 +2,6 @@ import type {IRunningNumberWidget} from './IRunningNumberWidget';
 import type {IWidgetWindow} from '../../components/IWidgetWindow';
 import type {IWindowManager} from '../IWindowManager';
 import type {IWindowContainer} from '../../IWindowContainer';
-import type {IWindowUpdateReceiver} from '../../IWindowUpdateReceiver';
 import type {ITextWindow} from '../../components/ITextWindow';
 import {PropertyStruct} from '../../utils/PropertyStruct';
 import type {IIterator} from '../../utils/IIterator';
@@ -61,13 +60,7 @@ export class RunningNumberWidget implements IRunningNumberWidget
         }
 
         // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/RunningNumberWidget.as::RunningNumberWidget() — _windowManager.registerUpdateReceiver(this, var_1449)
-        const updateAwareManager = this._windowManager as unknown as
-		{
-		    registerUpdateReceiver?: (r: IWindowUpdateReceiver, p: number) => void;
-		    context?: { registerUpdateReceiver?: (r: IWindowUpdateReceiver, p: number) => void };
-		};
-        updateAwareManager.registerUpdateReceiver?.(this, this._updateFrequency);
-        updateAwareManager.context?.registerUpdateReceiver?.(this, this._updateFrequency);
+        this._windowManager?.registerUpdateReceiver(this, this._updateFrequency);
 
         this._widgetWindow.setParamFlag(147456);
         this._widgetWindow.rootWindow = this._root;
@@ -270,13 +263,7 @@ export class RunningNumberWidget implements IRunningNumberWidget
         }
 
         // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/RunningNumberWidget.as::dispose() — _windowManager.removeUpdateReceiver(this)
-        const updateAwareManager = this._windowManager as unknown as
-		{
-		    removeUpdateReceiver?: (r: IWindowUpdateReceiver) => void;
-		    context?: { removeUpdateReceiver?: (r: IWindowUpdateReceiver) => void };
-		};
-        updateAwareManager.removeUpdateReceiver?.(this);
-        updateAwareManager.context?.removeUpdateReceiver?.(this);
+        this._windowManager?.removeUpdateReceiver(this);
 
         this._windowManager = null;
         this._disposed = true;
