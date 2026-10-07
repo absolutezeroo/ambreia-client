@@ -415,9 +415,15 @@ export class AvatarRenderService
 
         log.debug(`Avatar libraries: ${configuration.getProperty('flash.dynamic.avatar.download.url')}`);
 
-        const renderManager = new AvatarRenderManager(context);
+        const renderManager = new AvatarRenderManager({
+            assets,
+            downloadUrl: configuration.getProperty('flash.dynamic.avatar.download.url'),
+            downloadNameTemplate: configuration.getProperty('flash.dynamic.avatar.download.name.template'),
+            figureMapUrl: configuration.getProperty('flash.dynamic.avatar.download.configuration'),
+            figurePartListUrl: configuration.getProperty('external.figurepartlist.txt')
+        });
 
-        context.attachComponent(renderManager, [IID_AvatarRenderManager]);
+        context.attachInstance(IID_AvatarRenderManager, renderManager);
 
         await withTimeout(new Promise<void>((resolve) =>
         {

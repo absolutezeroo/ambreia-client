@@ -1,9 +1,7 @@
 import type {IAsset} from '@ambreia/common/assets/IAsset';
-import {Component, ComponentDependency, type IContext} from '@core/runtime';
-import {IID_HabboConfigurationManager} from '@iid/IIDHabboConfigurationManager';
-import {IID_AssetLibrary} from '@iid/IIDAssetLibrary';
-import type {IHabboConfigurationManager} from '../configuration/IHabboConfigurationManager';
-import type {IAssetLibrary} from '@core/assets';
+import {EventEmitter} from 'eventemitter3';
+import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
+import type {IAvatarRenderOptions} from './IAvatarRenderOptions';
 import type {IAvatarRenderManager} from './IAvatarRenderManager';
 import type {IAvatarImage} from './IAvatarImage';
 import type {IAvatarFigureContainer} from './IAvatarFigureContainer';
@@ -36,8 +34,15 @@ const log = Logger.getLogger('habbo.avatar.AvatarRenderManager');
  * @see sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/AvatarRenderManager.as
  * @see sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/AvatarRenderManager.as
  */
-export class AvatarRenderManager extends Component implements IAvatarRenderManager 
+// DEVIATION: AS3's AvatarRenderManager is a Component fed by the DI context and the configuration.
+//   Here it is built from typed options (spec §3 rule 1); the engine reads the four configuration
+//   keys, builds it once the configuration is complete, and registers it with attachInstance().
+export class AvatarRenderManager implements IAvatarRenderManager 
 {
+    private readonly _options: IAvatarRenderOptions;
+    private readonly _events: EventEmitter = new EventEmitter();
+    private _disposed: boolean = false;
+
     private static readonly EMBEDDED_AVATAR_ACTIONS_XML = `<actions><action  id="Default" precedence="1000" state="std" main="1" isdefault="1" geometrytype="vertical" activepartset="figure" assetpartdefinition="std"/>	<!-- baked in actions for snowwar -->
 				<action  id="SnowWarRun" state="swrun" precedence="104" main="1" geometrytype="vertical" activepartset="snowwarrun" assetpartdefinition="swrun" prevents="fx.2,fx.3,fx.6,fx.14,fx.15,fx.17,fx.18,fx.19,fx.20,fx.21,fx.22,fx.33,fx.34,fx.35,fx.36,fx.38,fx.39,fx.45,fx.46,fx.48,fx.54,fx.55,fx.56,fx.57,fx.58,fx.69,fx.71,fx.72,fx.89,fx.90,fx.91,fx.92,fx.94,fx.97,fx.100,fx.104,fx.107,fx.108,fx.115,fx.116,fx.117,fx.118,fx.119,fx.120,fx.121,fx.122,fx.123,fx.124,fx.125,fx.127,fx.129,fx.130,fx.131,fx.132,fx.134,fx.135,fx.136,fx.137,fx.138,fx.139,fx.140,fx.141,fx.142,fx.143,fx.144,fx.145,fx.146,fx.147,fx.148,fx.149,fx.150,fx.151,fx.152,fx.153,fx.154,fx.155,fx.156,fx.157,fx.158,fx.159,fx.160,fx.161,fx.162,fx.164,fx.165,fx.166,fx167,fx168,fx169,fx170,fx171,fx172,fx173,fx174,fx175,fx176,dance"/>
 				<action  id="SnowWarDieFront" state="swdiefront" precedence="105" main="1" geometrytype="swhorizontal" activepartset="snowwardiefront" assetpartdefinition="swdie" startfromframezero="true" prevents="fx.2,fx.3,fx.6,fx.14,fx.15,fx.17,fx.18,fx.19,fx.20,fx.21,fx.22,fx.33,fx.34,fx.35,fx.36,fx.38,fx.39,fx.45,fx.46,fx.48,fx.54,fx.55,fx.56,fx.57,fx.58,fx.69,fx.71,fx.72,fx.89,fx.90,fx.91,fx.92,fx.94,fx.97,fx.100,fx.104,fx.105,fx.107,fx.108,fx.115,fx.116,fx.117,fx.118,fx.119,fx.120,fx.121,fx.122,fx.123,fx.124,fx.125,fx.127,fx.129,fx.130,fx.131,fx.132,fx.134,fx.135,fx.136,fx.137,fx.138,fx.139,fx.140,fx.141,fx.142,fx.143,fx.144,fx.145,fx.146,fx.147,fx.148,fx.149,fx.150,fx.151,fx.152,fx.153,fx.154,fx.155,fx.156,fx.157,fx.158,fx.159,fx.160,fx.161,fx.162,fx.164,fx.165,fx.166,fx167,fx168,fx169,fx170,fx171,fx172,fx173,fx174,fx175,fx176,dance"/>
@@ -64,7 +69,6 @@ export class AvatarRenderManager extends Component implements IAvatarRenderManag
     // AS3: .../src/com/sulake/habbo/avatar/_SafeCls_582.as::_blockedFigure
     private _blockedFigure: AvatarFigureContainer | null = null;
     private _pendingFigureDownloads: [IAvatarFigureContainer, IAvatarImageListener | null][] = [];
-    private _configuration: IHabboConfigurationManager | null = null;
     private _assetLibrary: IAssetLibrary | null = null;
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/AvatarRenderManager.as::_figureMapReady
     private _figureMapReady: boolean = false;
@@ -80,12 +84,42 @@ export class AvatarRenderManager extends Component implements IAvatarRenderManag
     private _structureDownload: AvatarStructureDownload | null = null;
     private _configurationCompleteHandled: boolean = false;
 
-    constructor(context: IContext) 
+    constructor(options: IAvatarRenderOptions) 
     {
-        super(context);
-
+        this._options = options;
+        this._assetLibrary = options.assets;
         this._structure = new AvatarStructure(this);
         this._aliasCollection = new AssetAliasCollection();
+
+        // What initComponent() and the configuration's `complete` did, in that order: the
+        // embedded XMLs first, then the downloads the configuration's URLs point at.
+        this.onConfigurationReady();
+        this.onConfigurationComplete();
+    }
+
+    // TS-only: the Component used to provide these two; the manager owns them now.
+    public get events(): EventEmitter
+    {
+        return this._events;
+    }
+
+    // TS-only: see `events`.
+    public get disposed(): boolean
+    {
+        return this._disposed;
+    }
+
+    // TS-only: the four configuration keys AS3 read through getProperty(), answered from the options.
+    private option(key: string): string
+    {
+        switch(key)
+        {
+            case 'external.figurepartlist.txt': return this._options.figurePartListUrl ?? '';
+            case 'flash.dynamic.avatar.download.url': return this._options.downloadUrl;
+            case 'flash.dynamic.avatar.download.name.template': return this._options.downloadNameTemplate;
+            case 'flash.dynamic.avatar.download.configuration': return this._options.figureMapUrl;
+            default: return '';
+        }
     }
 
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/AvatarRenderManager.as::_isReady
@@ -103,31 +137,6 @@ export class AvatarRenderManager extends Component implements IAvatarRenderManag
         if(!this._effectAssetDownloadManager) return new Map();
 
         return this._effectAssetDownloadManager.effectMap;
-    }
-
-    protected override get dependencies(): Array<ComponentDependency<any>> 
-    {
-        return [
-            new ComponentDependency(
-                IID_HabboConfigurationManager,
-                (config: IHabboConfigurationManager | null) => 
-                {
-                    this._configuration = config;
-                    this.tryOnConfigurationComplete();
-                },
-                true,
-                [{type: 'complete', callback: () => this.tryOnConfigurationComplete()}]
-            ),
-            new ComponentDependency(
-                IID_AssetLibrary,
-                (assets: IAssetLibrary | null) => 
-                {
-                    this._assetLibrary = assets;
-                    this.tryOnConfigurationComplete();
-                },
-                true
-            ),
-        ];
     }
 
     // AS3: .../src/com/sulake/habbo/avatar/_SafeCls_582.as::_activeImages
@@ -497,8 +506,7 @@ export class AvatarRenderManager extends Component implements IAvatarRenderManag
         this._placeholderFigure = null;
         this._structure.dispose();
         this._aliasCollection.dispose();
-
-        super.dispose();
+        this._events.removeAllListeners();
     }
 
     // AS3: sources/win63_version/habbo/avatar/class_49.as::onConfigurationComplete()
@@ -514,34 +522,6 @@ export class AvatarRenderManager extends Component implements IAvatarRenderManag
         void this.loadActions();
         this.loadFigureData();
         this.initDownloadManagers();
-    }
-
-    // AS3: sources/win63_version/habbo/avatar/class_49.as::initComponent()
-    protected override initComponent(): void 
-    {
-        this.onConfigurationReady();
-    }
-
-    /**
-     * Component's dependency injection resolves IID_HabboConfigurationManager and
-     * IID_AssetLibrary independently and in no guaranteed order, and only attaches
-     * the 'complete' listener once the *configuration* dependency resolves — so
-     * relying on that listener alone breaks two ways: (1) if configuration already
-     * finished loading (and already emitted 'complete') before this component's
-     * dependency on it resolved, the listener is attached after the fact and never
-     * fires again since 'complete' is one-shot, and (2) even accounting for that,
-     * onConfigurationComplete() also needs _assetLibrary, which is a *separate*
-     * dependency that can resolve before or after configuration with no ordering
-     * guarantee — initDownloadManagers() would otherwise silently bail out
-     * ("AssetLibrary not available for download managers") if it ran first. So:
-     * check both conditions from every point either one could become satisfied,
-     * and let onConfigurationComplete()'s own guard make repeat calls a no-op.
-     */
-    private tryOnConfigurationComplete(): void 
-    {
-        if(!this._assetLibrary || !this._configuration?.isInitialized()) return;
-
-        this.onConfigurationComplete();
     }
 
     /**
@@ -651,7 +631,7 @@ export class AvatarRenderManager extends Component implements IAvatarRenderManag
     // AS3: sources/win63_version/habbo/avatar/class_49.as::onConfigurationComplete()
     private loadFigureData(): void 
     {
-        const url = this._configuration?.getProperty('external.figurepartlist.txt') ?? '';
+        const url = this.option('external.figurepartlist.txt');
 
         if(url === '') 
         {
@@ -670,12 +650,7 @@ export class AvatarRenderManager extends Component implements IAvatarRenderManag
 
     private getAvatarActionsUrl(): string 
     {
-        if(!this._configuration) 
-        {
-            return '';
-        }
-
-        const dynamicAvatarUrl = this._configuration.getProperty('flash.dynamic.avatar.download.url');
+        const dynamicAvatarUrl = this.option('flash.dynamic.avatar.download.url');
 
         if(this.isResolvedDownloadUrlTemplate(dynamicAvatarUrl)) 
         {
@@ -687,12 +662,7 @@ export class AvatarRenderManager extends Component implements IAvatarRenderManag
 
     private getEffectMapUrl(): string 
     {
-        if(!this._configuration) 
-        {
-            return '';
-        }
-
-        const dynamicAvatarUrl = this._configuration.getProperty('flash.dynamic.avatar.download.url');
+        const dynamicAvatarUrl = this.option('flash.dynamic.avatar.download.url');
 
         return this.isResolvedDownloadUrlTemplate(dynamicAvatarUrl) ? dynamicAvatarUrl + 'effectmap.xml' : '';
     }
@@ -744,7 +714,8 @@ export class AvatarRenderManager extends Component implements IAvatarRenderManag
                 this._assetLibrary,
                 this._aliasCollection,
                 () => this._isReady,
-                () => this.onMandatoryLibrariesReady()
+                () => this.onMandatoryLibrariesReady(),
+                this._options.onLibraryLoaded ?? null
             );
 
             this.loadFigureMap();
@@ -765,19 +736,14 @@ export class AvatarRenderManager extends Component implements IAvatarRenderManag
 
     private getAvatarDownloadUrlTemplate(downloadUrlKey: string, nameTemplateKey: string): string 
     {
-        if(!this._configuration) 
-        {
-            return '';
-        }
-
-        const downloadUrl = this._configuration.getProperty(downloadUrlKey);
+        const downloadUrl = this.option(downloadUrlKey);
 
         if(!this.isResolvedDownloadUrlTemplate(downloadUrl)) 
         {
             return '';
         }
 
-        return downloadUrl + this._configuration.getProperty(nameTemplateKey);
+        return downloadUrl + this.option(nameTemplateKey);
     }
 
     private isResolvedDownloadUrlTemplate(url: string): boolean 
@@ -789,7 +755,7 @@ export class AvatarRenderManager extends Component implements IAvatarRenderManag
     {
         try 
         {
-            const url = this._configuration?.getProperty('flash.dynamic.avatar.download.configuration') ?? '';
+            const url = this.option('flash.dynamic.avatar.download.configuration');
 
             if(url === '' || !this._avatarAssetDownloadManager) 
             {

@@ -5,7 +5,6 @@ import type {IAvatarImageListener} from './IAvatarImageListener';
 import type {AvatarStructure} from './AvatarStructure';
 import type {AssetAliasCollection} from './alias/AssetAliasCollection';
 import {AvatarAssetDownloadLibrary} from './AvatarAssetDownloadLibrary';
-import {Core} from '@core/Core';
 import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('habbo.avatar.AvatarAssetDownloadManager');
@@ -66,16 +65,22 @@ export class AvatarAssetDownloadManager extends EventEmitter
     private _renderReadyProvider: (() => boolean) | null;
     private _mandatoryLibrariesReadyCallback: (() => void) | null;
 
+    // TS-only: the loading-bar hook the host passes in place of Core.instance.
+    private readonly _libraryLoadedCallback: ((libraryName: string) => void) | null;
+
     constructor(
         downloadUrl: string,
         structure: AvatarStructure,
         assetLibrary: IAssetLibrary,
         aliasCollection: AssetAliasCollection | null = null,
         renderReadyProvider: (() => boolean) | null = null,
-        mandatoryLibrariesReadyCallback: (() => void) | null = null
+        mandatoryLibrariesReadyCallback: (() => void) | null = null,
+        libraryLoadedCallback: ((libraryName: string) => void) | null = null
     ) 
     {
         super();
+
+        this._libraryLoadedCallback = libraryLoadedCallback;
 
         this._structure = structure;
         this._downloadUrl = downloadUrl;
@@ -475,7 +480,8 @@ export class AvatarAssetDownloadManager extends EventEmitter
             // fetch them — this manager does — so the completion is reported back to it, which
             // is what decrements `getNumberOfFilesPending()` and emits the progress event
             // VortexMain.onProgressEvent() listens for.
-            Core.instance?.updateLoadingProcess(library.libraryName, 'complete');
+            // TS-only: was `Core.instance?.updateLoadingProcess(...)`; the host passes the callback.
+            this._libraryLoadedCallback?.(library.libraryName);
 
             if(this._mandatoryLibs.length === 0 && this._mandatoryLibrariesReadyCallback !== null)
             {

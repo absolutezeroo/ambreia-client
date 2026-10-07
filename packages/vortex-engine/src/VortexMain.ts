@@ -443,6 +443,7 @@ export class VortexMain implements IVortexMain
         this._avatarEditor = null;
         this._roomUI = null;
         this._windowManager = null;
+        this._avatarRenderManager?.dispose();
         this._avatarRenderManager = null;
         this._roomEngine = null;
         this._sessionDataManager = null;
@@ -615,8 +616,27 @@ export class VortexMain implements IVortexMain
         ctx.attachComponent(this._roomEngine, [IID_RoomEngine]);
 
         // 12a. Avatar Render Manager
-        this._avatarRenderManager = new AvatarRenderManager(ctx);
-        ctx.attachComponent(this._avatarRenderManager, [IID_AvatarRenderManager]);
+        // 12a. Avatar Render Manager. A plain class since J2 (spec §3 rule 1): built from the four
+        // configuration keys once the configuration is complete — what its DI dependency on the
+        // configuration used to wait for — and registered as an instance.
+        const configuration = this._configurationManager;
+        const startAvatarRendering = (): void =>
+        {
+            if(this._avatarRenderManager !== null || configuration === null) return;
+
+            this._avatarRenderManager = new AvatarRenderManager({
+                assets: this._assets!,
+                downloadUrl: configuration.getProperty('flash.dynamic.avatar.download.url'),
+                downloadNameTemplate: configuration.getProperty('flash.dynamic.avatar.download.name.template'),
+                figureMapUrl: configuration.getProperty('flash.dynamic.avatar.download.configuration'),
+                figurePartListUrl: configuration.getProperty('external.figurepartlist.txt'),
+                onLibraryLoaded: name => Core.instance?.updateLoadingProcess(name, 'complete')
+            });
+            ctx.attachInstance(IID_AvatarRenderManager, this._avatarRenderManager);
+        };
+
+        if(configuration?.isInitialized()) startAvatarRendering();
+        else configuration?.events.once('complete', startAvatarRendering);
 
         // 12b-12k (phone number, NUX, campaigns, ads, tracking, groups, notifications, sound,
         // catalog, toolbar, quests, chat) left with the core cut (2026-10-07); the git tag
