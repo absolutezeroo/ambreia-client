@@ -65,8 +65,17 @@ Pour y arriver, l'environnement a dû être contourné, **sans rien committer** 
   en-têtes.
 - **Environnement de dev** (propriétaire) : aligner la clé RSA client/émulateur pour le dev local,
   corriger `DevPluginPaths`, recréer ou migrer la base de dev puis appliquer `dev_zone.sql`.
-- **Code mort connu** : abonnements pet dans `RoomUsersHandler`, `RoomMessageHandler`,
-  `PetPackageHandler`, dont les messages ne sont plus enregistrés ; 212 orphelins génériques, à trier
-  pendant J1.
+- **Code mort connu** (relevé par la revue finale) : environ 95 abonnements du code gardé visent des
+  événements hors contrat (`SessionDataManager`, les handlers de session, `AvatarEditorMessageHandler`,
+  `BlockedUsersManager`/`IgnoredUsersManager`, `demo/IncomingMessages`, `BadgeImageWidget`, `RoomDesktop`
+  à chaque entrée en room), et environ 93 composers hors contrat restent envoyés (clic sur avatar ou
+  meuble, listes de blocage et d'ignorés au démarrage, double-clic sur meuble, éditeur). Chaque classe
+  ne prévient plus qu'une fois (`log.once`) ; le nettoyage se fait feature par feature. 211 orphelins
+  génériques, à trier pendant J1.
+- **Meubles** : le Ctrl+clic (ramassage) ne retire plus le meuble localement quand la demande ne part
+  pas. Le déplacement par Alt+glisser, réservé à qui a des droits sur la room, laisse encore le meuble à
+  sa nouvelle place côté client alors que `MoveObject` est hors contrat.
 - **Affichages perdus, assumés** : panneaux publicitaires vides, animation de ramassage vers
-  l'inventaire retirée, vêtements à vendre masqués dans l'éditeur (pas d'inventaire).
+  l'inventaire retirée, vêtements à vendre masqués dans l'éditeur (pas d'inventaire). Après un
+  `CantConnect`, l'alerte s'affiche mais il n'y a plus de vue de l'hôtel où revenir : écran vide jusqu'au
+  rechargement. Le compte à rebours de maintenance a disparu avec les notifications.

@@ -55,7 +55,8 @@ export class MessageRegistry
 
         if(id === undefined)
         {
-            log.warn(`Unknown message event class: ${className}`);
+            // Once per class: kept code may subscribe to a message outside the contract on every room entry.
+            log.once(`unknown-event:${className}`).warn(`Unknown message event class: ${className}`);
             return;
         }
 

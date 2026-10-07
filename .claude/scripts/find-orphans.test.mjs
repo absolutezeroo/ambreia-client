@@ -56,3 +56,13 @@ test('multi-line import lists and a barrel reached by a namespace import keep ev
 
     assert.deepEqual(findOrphans({ root, entries: ['src/main.ts'], scan: ['src'], aliases: {} }), ['src/lib/c.ts']);
 });
+
+test('a generated file is never reported: tools and hooks read it, not imports', () =>
+{
+    const root = project({
+        'src/main.ts': 'export const x = 1;\n',
+        'src/Headers.generated.ts': 'export const Incoming = {};\n'
+    });
+
+    assert.deepEqual(findOrphans({ root, entries: ['src/main.ts'], scan: ['src'], aliases: {} }), []);
+});

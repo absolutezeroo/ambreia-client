@@ -212,7 +212,8 @@ export class SocketConnection extends EventEmitter<IConnectionEvents> implements
         const messageId = this._messageRegistry.getMessageIdForComposer(composer);
         if(messageId < 0)
         {
-            log.warn(`Unknown composer: ${composer.constructor.name}`);
+            // Once per class: a composer outside the contract is sent from a click path, every click.
+            log.once(`unknown-composer:${composer.constructor.name}`).warn(`Unknown composer: ${composer.constructor.name}`);
             return false;
         }
 

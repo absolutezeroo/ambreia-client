@@ -14,7 +14,7 @@
     "imager": "pnpm --filter vortex-imager start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "node --test \"packages/*/tools/**/*.test.mjs\" \".claude/scripts/**/*.test.mjs\"",
+    "test": "node --test \"packages/*/tools/**/*.test.mjs\" \".claude/scripts/**/*.test.mjs\" && tsx --tsconfig packages/vortex-engine/tsconfig.json --test \"packages/*/test/**/*.test.ts\"",
     "typecheck": "pnpm --filter vortex-client exec tsc --noEmit && pnpm --filter vortex-glaze exec tsc --noEmit && pnpm --filter vortex-imager exec tsc --noEmit",
     "check": "pnpm typecheck && pnpm test",
     "gen:headers": "node packages/vortex-engine/tools/gen-headers.mjs",
@@ -38,6 +38,7 @@
     "globals": "^17.7.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.8",
+    "tsx": "4.23.0",
     "typescript-eslint": "^8.62.1",
     "yaml": "^2.9.0"
   },

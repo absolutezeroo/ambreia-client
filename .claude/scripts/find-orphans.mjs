@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Lists source files that no entry point reaches. Named imports are followed through `export *`
 // barrels to the file that declares the name, so a barrel does not keep its whole folder alive.
-// Usage, from the repo root: node .claude/scripts/find-orphans.mjs [--delete]
+// Usage, from the repo root: node .claude/scripts/find-orphans.mjs
+// It only lists: a deletion goes through a reviewed path list and `git rm --pathspec-from-file`.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -126,7 +127,8 @@ export function findOrphans({ root, entries, scan, aliases })
             {
                 if(e.name !== 'node_modules' && e.name !== 'assets') walk(rel);
             }
-            else if(rel.endsWith('.ts') && !rel.endsWith('.d.ts')) all.push(rel);
+            // A generated file is read by tools and hooks, never imported, so it always looks orphaned.
+            else if(rel.endsWith('.ts') && !rel.endsWith('.d.ts') && !rel.endsWith('.generated.ts')) all.push(rel);
         }
     };
 
@@ -144,14 +146,9 @@ if(process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.met
         root,
         entries: [`${E}/index.ts`, `${C}/index.ts`, 'packages/vortex-glaze/src/main.ts', 'packages/vortex-imager/src/index.ts'],
         scan: [E, C],
-        aliases: { '@core': `${E}/core`, '@habbo': `${E}/habbo`, '@room': `${E}/room`, '@iid': `${E}/iid`, '@ui': C, '@': C }
+        aliases: { '@core': `${E}/core`, '@habbo': `${E}/habbo`, '@room': `${E}/room`, '@iid': `${E}/iid`, '@ui': C, '@': C, '@client': C }
     });
 
     for(const f of orphans) console.log(f);
     console.error(`${orphans.length} orphan file(s)`);
-
-    if(process.argv.includes('--delete'))
-    {
-        for(const f of orphans) fs.rmSync(path.join(root, f));
-    }
 }

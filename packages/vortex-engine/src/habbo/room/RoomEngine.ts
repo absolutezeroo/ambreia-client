@@ -3140,10 +3140,10 @@ export class RoomEngine extends Component implements IRoomEngine,
             }
             case RoomObjectOperationEnum.OBJECT_PICKUP:
             case RoomObjectOperationEnum.OBJECT_EJECT: {
-                if(this._connection) 
-                {
-                    this._connection.send(new PickupObjectMessageComposer(objectId, category));
-                }
+                // DEVIATION: AS3 disposes whatever send() did. Since the core cut (2026-10-07) pickup is
+                //   outside the server contract, send() refuses it, and disposing anyway removed on screen
+                //   a furni the server still has; the object now stays unless the request left.
+                if(this._connection && !this._connection.send(new PickupObjectMessageComposer(objectId, category))) return false;
 
                 return this.disposeRoomObject(this._activeRoomId, objectId, category);
             }

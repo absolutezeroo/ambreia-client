@@ -14,7 +14,7 @@ pnpm install                 # dependencies (pnpm 11, Node >= 22)
 pnpm dev                     # client dev server on :5173 (also starts the imager on :8081)
 pnpm check                   # typecheck client+engine+glaze+imager, then all tool tests (~45 s): the gate
 pnpm typecheck               # just the typecheck
-pnpm test                    # node:test over packages/*/tools and .claude/scripts
+pnpm test                    # node:test over packages/*/tools and .claude/scripts, then packages/*/test/*.test.ts via tsx
 node --test <file.test.mjs>  # one test file
 node node_modules/eslint/bin/eslint.js <file>   # lint one file
 pnpm build                   # production build of the client (tsc + vite)
