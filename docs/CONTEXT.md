@@ -1,6 +1,6 @@
 # Vortex Project Context
 
-> Fork RPG : les features retirées volontairement sont listées dans la spec du fork (`vortex-rpg-emulator/docs/superpowers/specs/2026-10-05-habbo-rpg-design.md`, section 7) ; voir aussi `.claude/rules/20-architecture.md` règle 8.
+> Fork RPG : les features retirées volontairement sont listées dans la spec du fork (`vortex-rpg-emulator/docs/superpowers/specs/2026-10-05-habbo-rpg-design.md`, section 7) ; voir aussi `CLAUDE.md` → Never.
 
 This document provides the architecture and project context. Read it before implementation work, then use `docs/IMPLEMENTATION_STATUS.md` for the current project state.
 
@@ -34,7 +34,7 @@ vortex/
 │   ├── win63_version/                 Secondary AS3 source, 4,783 .as — also obfuscated, different scheme
 │   ├── PRODUCTION-201601012205-226667486/  Tertiary, 4,029 .as — the only unobfuscated tree (2016 build)
 │   ├── WIN63-202601121721-391685409/  Earlier 2026 dump (8,323 .as + raw binaryData/images/shapes);
-│   │                                  used by the compare-as3-revisions skill to diff packet headers
+│   │                                  kept for history (message ids now come from the emulator)
 │   ├── HABBO-ARCTURUS-DAYBREAK/       Unrelated Java reference dump — NOT this project's server
 │   ├── NITRO/                         Unrelated TS client, reference only
 │   └── gamedata/                      external_texts / variables / effect_map
@@ -46,7 +46,7 @@ vortex/
 │   ├── PATTERNS.md, STYLEGUIDE.md
 │   ├── architectures/                 Per-module AS3 deep-dives, created on demand
 │   └── audits/
-├── .claude/rules/                     Auto-loaded enforcement rules — read 00-mandate.md first
+├── .claude/rules/                     Path-scoped rules for Claude Code — start with CLAUDE.md
 ├── AGENTS.md                          Generated from .claude/rules/ for non-Claude tools
 └── package.json
 ```
@@ -154,7 +154,7 @@ Most ported Flash window/controller code currently lives in `packages/vortex-eng
 | `sources/WIN63-202607011411-782849652/`      | 3,345 `.as`  | `src/com/sulake/{core,habbo,room,iid}/`   | **Primary**; read first. Plus 1,839 `.as` under `src/unknowns/`.        |
 | `sources/win63_version/`                     | 4,783 `.as`  | `core/`, `habbo/`, `room/`, `iid/`        | Secondary. Also obfuscated — see the warning below.                     |
 | `sources/PRODUCTION-201601012205-226667486/` | 4,029 `.as`  | `src/com/sulake/...` plus embedded assets | Tertiary; the **only** unobfuscated tree, but a 2016 build.             |
-| `sources/WIN63-202601121721-391685409/`      | 8,323 `.as`  | raw dump (`binaryData/`, `images/`, …)    | Earlier 2026 revision; input to the `compare-as3-revisions` skill.      |
+| `sources/WIN63-202601121721-391685409/`      | 8,323 `.as`  | raw dump (`binaryData/`, `images/`, …)    | Earlier 2026 revision; history only.      |
 
 > **Three corrections to earlier revisions of this file.** They were repeated for months and each one
 > cost real work; CLAUDE.md is the authority and says the same:

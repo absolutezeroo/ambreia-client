@@ -1321,7 +1321,7 @@ export class ProductViewCatalogWidget extends CatalogWidget implements IGetImage
      *
      * DEVIATION: Flash composites this into a `BitmapData`. There is none in the engine — the shim
      *   under `onBoardingHcUi/display/` belongs to the client, which the engine may not import
-     *   (`.claude/rules/20-architecture.md` #3) — so it composites into an `OffscreenCanvas` and
+     *   (`CLAUDE.md` → Never, layer walls) — so it composites into an `OffscreenCanvas` and
      *   hands the result over as an `ImageBitmap`.
      */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/catalog/viewer/widgets/ProductViewCatalogWidget.as::onPreviewProduct() ("e" branch, no-canvas path)

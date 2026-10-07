@@ -7,7 +7,7 @@ import type {IDisposable} from '@core/runtime/IDisposable';
  * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/quest/AnimationObject.as
  *
  * AS3 names it `AnimationObject`, without the `I` this port's naming convention requires
- * (`.claude/rules/10-conventions.md`); the trace comments below carry the real member names.
+ * (ESLint naming-convention); the trace comments below carry the real member names.
  *
  * Every method takes the animation's elapsed time in milliseconds, so an object is free to start
  * late (`Twinkle` does) without the animation tracking per-object clocks.

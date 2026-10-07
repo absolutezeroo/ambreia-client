@@ -108,7 +108,7 @@ export class AvatarInfoWidgetHandler implements IRoomWidgetHandler
         this._container?.sessionDataManager?.events.off(UserNameUpdateEvent.NAME_UPDATE, this.onUserNameUpdate);
 
         // AS3 dispatches these on `roomSessionManager.events`; this port routes session events
-        // through `sessionEvents` (see .claude/rules/20-architecture.md #4).
+        // through `sessionEvents` (see CLAUDE.md → Never).
         const previousSessionEvents = this._container?.roomSessionManager?.sessionEvents;
 
         if(previousSessionEvents)

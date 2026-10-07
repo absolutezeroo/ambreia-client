@@ -17,7 +17,7 @@ export class StringBuffer
 
     // AS3: .../src/com/sulake/habbo/friendbar/groupforums/StringBuffer.as::buffer
     // AS3 spells it `buffer`, without the underscore every other private field in the module has;
-    // renamed here to the port's own private-field convention (.claude/rules/10-conventions.md).
+    // renamed here to the port's own private-field convention (enforced by ESLint naming-convention).
     private _buffer: number[] = [];
 
     // AS3: .../src/com/sulake/habbo/friendbar/groupforums/StringBuffer.as::addEscaped()

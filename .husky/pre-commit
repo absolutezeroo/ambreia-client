@@ -1,15 +1,9 @@
 npx lint-staged
 
 # Message ids come from the emulator (docs/superpowers/specs/2026-10-07-client-architecture-design.md §6).
-# Unlike the optional checks below, this one is shared tooling and blocks the commit.
 node packages/vortex-engine/tools/gen-headers.mjs --check || exit 1
 
-# scripts/ is local-only tooling and is not part of the shared repository, so every
-# check below is optional: it runs for whoever has the script and is skipped silently
-# for everyone else. Without these guards a fresh clone fails its first commit with
-# "Cannot find module".
-[ -f scripts/sync-agent-docs.mjs ] && node scripts/sync-agent-docs.mjs
-[ -f scripts/check-as3-trace.mjs ] && node scripts/check-as3-trace.mjs
-[ -f scripts/check-status-doc.mjs ] && node scripts/check-status-doc.mjs
+# AGENTS.md and .github/copilot-instructions.md are generated from CLAUDE.md + .claude/rules/.
+node .claude/scripts/sync-agent-docs.mjs || exit 1
 
 exit 0

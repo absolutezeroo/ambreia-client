@@ -328,7 +328,7 @@ export class RoomManager extends Component implements IRoomManager, IRoomInstanc
             // returns an empty ImageResult, which is exactly what AS3's own `PetImageWidget.refresh()`
             // expects — it asks for a pet image before the engine can serve one and falls back to
             // `placeholder_pet_png`. Five of these fired on every boot for a path the client handles
-            // by design, which is what `warn` is not for (.claude/rules/10-conventions.md).
+            // by design, which is what `warn` is not for (CLAUDE.md → Conventions).
             log.debug(`Cannot create room — manager not initialized (state: ${this._state})`);
 
             return null;

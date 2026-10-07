@@ -626,7 +626,7 @@ export class SocketConnection extends EventEmitter<IConnectionEvents> implements
 
         if(!events || events.length === 0)
         {
-            // `warn`, not `debug`. `.claude/rules/10-conventions.md` reserves `warn` for exactly
+            // `warn`, not `debug`. `CLAUDE.md` → Conventions reserves `warn` for exactly
             // this shape — a code path the client does not handle, which renders nothing and
             // throws nothing, so `debug` buries it — and "ported but never wired" is this port's
             // single most common defect: the parser and the handler both exist, nobody registered

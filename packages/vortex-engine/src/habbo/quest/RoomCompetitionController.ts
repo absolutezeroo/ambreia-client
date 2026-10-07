@@ -613,7 +613,7 @@ export class RoomCompetitionController implements IDisposable, IGetImageListener
         toolbarEvent.iconId = HabboToolbarIconEnum.RECEPTION;
 
         // AS3 says `toolbar.events.dispatchEvent(e)`; the port's toolbar publishes the same bus as
-        // `toolbarEvents`, because `events` is reserved on a DI Component (rule 20-architecture #4).
+        // `toolbarEvents`, because `events` is reserved on a DI Component (CLAUDE.md → Never).
         this._engine?.toolbar?.toolbarEvents.emit(HabboToolbarEvent.TOOLBAR_CLICK, toolbarEvent);
     };
 

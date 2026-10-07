@@ -65,7 +65,7 @@ An earlier estimate counted 190 manual `addListItem`/`removeListItem*` calls and
 `getChildByName` calls across 47 files under `habbo/` as the pain surface. Most of that code
 is **ported from AS3**, and its imperative shape *is* the AS3 shape: a `refresh()` that clears
 and rebuilds a list is the faithful port of an AS3 `refresh()` that does the same.
-`.claude/rules/20-architecture.md` #2 ("Never simplify AS3 architecture") and the project's
+the former rule "Never simplify AS3 architecture" (removed 2026-10-07) and the project's
 own history (every "plausible improvement" over the AS3 mechanism has eventually been
 reverted) put that code out of bounds.
 

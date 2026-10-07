@@ -178,7 +178,7 @@ export class HabboNuxDialogs extends Component implements ILinkEventTracker
             ),
             // AS3 passes the RSE_STARTED/RSE_ENDED listeners in the dependency's event-listener
             // list, which the port attaches to `events`; RoomSessionManager emits RSE_* on
-            // `sessionEvents` instead (rule 20-architecture #4), so subscribe there in the resolve
+            // `sessionEvents` instead (CLAUDE.md → Never), so subscribe there in the resolve
             // callback.
             new ComponentDependency(
                 IID_RoomSessionManager,

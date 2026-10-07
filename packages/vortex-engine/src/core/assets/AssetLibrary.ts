@@ -153,7 +153,7 @@ export class AssetLibrary extends Component implements IAssetLibrary
 
     // DEVIATION: AS3 gates its own static `debug()` on a per-class flag. This port logs through
     //   `Logger.getLogger('core.assets.AssetLibrary')`, whose level is set centrally (see
-    //   `.claude/rules/10-conventions.md` → Logging), so a second per-class switch would only be
+    //   `CLAUDE.md` → Conventions), so a second per-class switch would only be
     //   able to contradict it.
     // AS3: .../src/com/sulake/core/assets/AssetLibrary.as::setDebugLogsEnabled()
 

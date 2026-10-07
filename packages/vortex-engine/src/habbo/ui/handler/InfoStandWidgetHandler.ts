@@ -128,7 +128,7 @@ export class InfoStandWidgetHandler implements IRoomWidgetHandler, IGetImageList
     }
 
     // AS3 dispatches these on `roomSessionManager.events`; this port routes session events
-    // through `sessionEvents` instead (see .claude/rules/20-architecture.md #4 — `events` is
+    // through `sessionEvents` instead (see CLAUDE.md → Never — `events` is
     // reserved by the DI Component base). RoomUsersHandler emits PET_INFO on exactly that
     // emitter, so it is the correct subscription point.
     // DEVIATION: AS3 registers nine roomSessionManager listeners here; the four breeding ones

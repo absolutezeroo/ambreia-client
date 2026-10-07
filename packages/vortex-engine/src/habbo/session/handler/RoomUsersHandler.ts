@@ -464,7 +464,7 @@ export class RoomUsersHandler extends BaseHandler
         petInfo.accessRights = parser.accessRights;
 
         // AS3 dispatches on `listener.events`; this port routes session events through
-        // `sessionEvents` (see .claude/rules/20-architecture.md #4 - `events` is reserved by the DI
+        // `sessionEvents` (see CLAUDE.md → Never - `events` is reserved by the DI
         // Component base), so the emit below is the local equivalent of AS3's dispatchEvent.
         if(this.listener.sessionEvents)
         {

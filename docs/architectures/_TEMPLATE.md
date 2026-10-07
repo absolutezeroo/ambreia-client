@@ -16,4 +16,4 @@ Sequence of how the main classes in this module cooperate (event flow, manager �
 
 ## Divergences & TODOs
 
-Any deliberate TypeScript-side divergence from the AS3 (should be rare — see `.claude/rules/20-architecture.md` critical rule #2), and any outstanding `TODO(AS3)` markers left in this module's code.
+Any deliberate TypeScript-side divergence from the AS3 (each marked `// DEVIATION:` at its declaration — see `.claude/rules/30-as3-traceability.md`), and any outstanding `TODO(AS3)` markers left in this module's code.

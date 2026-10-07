@@ -228,7 +228,7 @@ about 100. Clone to `C:\vortex` rather than somewhere under `Documents`, or lift
 
 ## Contributing
 
-The port has rules, and they are not optional — read `.claude/rules/00-mandate.md` first. The short
+The port has rules, and they are not optional — read `CLAUDE.md` first. The short
 version: the AS3 source is the truth, it is read before anything is written, and every ported member
 carries a comment naming the file and member it came from. `CLAUDE.md` explains why, and documents
 the traps in the decompiled sources that have cost real time.
