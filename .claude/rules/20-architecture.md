@@ -12,16 +12,15 @@ Data flow: `Engine emits event → Client display class listens and updates`
 
 ## Critical rules
 
-1. **AS3 is the source of truth** — Never invent code. Read `sources/WIN63-202607011411-782849652/` first, cross-referencing `sources/win63_version/` when identifiers there are obfuscated
-2. **Never simplify AS3 architecture** — If AS3 has handlers/interfaces/delegation, implement them exactly
+1. **AS3 explains inherited behaviour** — before changing inherited code, read its AS3 origin (the `AS3:` trace). Fidelity is no longer required (spec `2026-10-07-client-architecture-design.md` §10); understanding still is
+2. **Restructure on purpose, not by accident** — the package split (spec §3) is the plan. Outside it, do not flatten handlers/interfaces/delegation without writing the reason at the declaration
 3. **Engine must NEVER import from client** — `vortex-engine` has zero UI knowledge
 4. **Never override `get events()`** in Component subclasses — breaks the DI event system; use a different property name (e.g. `sessionEvents`)
 5. **Use `createObjectInternal()`** not `createRoomObject()` from container (infinite recursion)
 6. **Update `docs/IMPLEMENTATION_STATUS.md`** after every significant implementation
 7. **Performance**: `Set`/`Map` for lookups, no allocations in render loops, cache textures, viewport culling (see `docs/STYLEGUIDE.md` Performance section and `docs/PATTERNS.md` section 0)
-8. **Full port**: ALL AS3 files are ported — both logic AND display. Flash XML layouts/skins ship as XML, verbatim. No ENGINE/VIEW distinction
-   **Exception du fork RPG :** ce dépôt est le client du RPG Habbo
-   (spec : `vortex-rpg-emulator/docs/superpowers/specs/2026-10-05-habbo-rpg-design.md`).
-   Les features listées en section 7 de la spec (« Retiré ») sont supprimées volontairement et ne
-   doivent pas être re-portées, sauf le derby de pêche, gardé (décision 1 du plan M0 client). Tout le reste suit toujours la règle du port complet.
+8. **No re-port of removed features** — the features listed in section 7 of the RPG spec
+   (`vortex-rpg-emulator/docs/superpowers/specs/2026-10-05-habbo-rpg-design.md`) stay removed, except the
+   fishing derby (M0 client plan, decision 1). Everything else inherited is kept and restructured, not re-ported.
 9. **Managers**: DI Component with IID registration, one `I<Manager>` interface per manager (see `docs/PATTERNS.md` → Manager template)
+10. **Layer walls** — the engines (`common`, `net`, `avatar`, `iso`, `ui`) never import `kernel`, `protocol` or `game`; `iso` may import `avatar`, never the reverse; features are folders of `game` and talk through declared interfaces or events (spec §3). Walls are enforced by `package.json` dependencies between packages and by `no-restricted-imports` in `eslint.config.mjs` (add new ones with `wall()`).

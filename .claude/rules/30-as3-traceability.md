@@ -1,5 +1,20 @@
 # AS3 traceability
 
+**Since 2026-10-07 the trace is provenance, not a fidelity contract**
+(`docs/superpowers/specs/2026-10-07-client-architecture-design.md` §10). It records where inherited
+code came from. Three consequences:
+
+- **Keep the `AS3:` line when you move, rename or restructure a member.** Losing it loses the only
+  pointer to the code that explains the behaviour.
+- **A member that now behaves differently from its origin keeps its `AS3:` line.** A
+  `// DEVIATION:` note is recommended when the difference would surprise someone reading the AS3,
+  and no longer required.
+- **New code needs no marker.** RPG features and new packages carry neither `AS3:` nor `TS-only:`;
+  `TS-only:` is only for a member added to a class that was ported from the AS3.
+
+The rest of this file describes how the traces were written during the port; it still applies to
+reading and keeping them.
+
 Every TypeScript class, method, accessor, property, interface member, handler, parser, composer, or event ported from AS3 MUST include an `AS3:` source trace comment immediately above the declaration.
 
 Required format:
@@ -85,12 +100,13 @@ deliberately replaced — and that claim must be one a reader can check. "There 
 not such a claim; callers arrive. "`_SafeCls_1711` has no entry in the registry, which maps 581
 composers" is.
 
-Incomplete members still require a compatible TypeScript signature and a `TODO(AS3)` comment with source path, class/member name, and exact remaining behavior. Never silently omit an AS3 member because it is currently unused; incomplete behavior must be visible as a TODO/stub, not missing from the interface.
+An inherited member left half-done keeps a compatible TypeScript signature and a `TODO(AS3)` comment with source path, class/member name, and exact remaining behavior. A member deliberately removed during the refactor simply goes, with the reason in the commit message.
 
 ## A faithful line is not a faithful port
 
-AS3 is the source of truth. That is not in question, and none of what follows is licence to
-deviate — every time this port *departed* from the AS3 it got worse (`AvatarInfoWidget.positionView()`
+This section was written during the port, when the AS3 was the contract. Its lesson outlives that
+contract and applies to every change of inherited code: during the port, every *accidental*
+departure from the AS3 made things worse (`AvatarInfoWidget.positionView()`
 reimplemented what `RWGOI_MESSAGE_GET_OBJECT_LOCATION` already answered and stranded the bubble at
 (0,0); `OwnAvatarMenuView` walked its grid with `numChildren` instead of the grid's own iterator and
 made every panel unclickable). The point is narrower and harder: **transcribing the instruction is

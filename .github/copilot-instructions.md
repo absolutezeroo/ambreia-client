@@ -7,19 +7,24 @@ Full TypeScript/PixiJS v8 port of the Habbo Hotel Flash client. Monorepo: `vorte
 <!-- BEGIN:GENERATED-RULES -->
 ## Mandatory: read before coding
 
-Before writing any implementation code, you MUST complete these steps IN ORDER:
+This repository is the client of the Habbo RPG fork. Since 2026-10-07 it follows
+`docs/superpowers/specs/2026-10-07-client-architecture-design.md`: the engine is being split into
+packages (`@vortex/common`, `net`, `avatar`, `iso`, `ui`, `kernel`, `protocol`, `game`), and the
+code no longer has to stay faithful to the AS3. The AS3 remains the best explanation of *why*
+inherited code behaves the way it does.
 
-1. **Read the AS3 source file** — Find and read the corresponding AS3 file IN ITS ENTIRETY
-   - Primary: `sources/WIN63-202607011411-782849652/src/com/sulake/<module>/<Class>.as`
-   - Secondary: `sources/win63_version/<module>/<Class>.as`
-   - Tertiary: `sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/<module>/<Class>.as`
-   - **Never invent a name for an obfuscated identifier.** `win63_version` will not recover it — that tree is obfuscated too, with a different scheme. Only PRODUCTION is unobfuscated, and only for classes that existed in 2016. See CLAUDE.md → "AS3 sources" for how to identify a class, and what to do when a name exists in no tree (say so at the declaration; never pass a derived name off as recovered).
-2. **Read the AS3 interface** — `I<Class>.as` + `handler/` directory if present
-3. **Check `docs/PATTERNS.md`** if implementing a Composer, Parser, Event, Manager, or UI Window
-4. **Check `docs/IMPLEMENTATION_STATUS.md`** for the current module status
-5. **Read `docs/CLIENT-SERVER-ARCHITECTURE.md`** if touching anything in `habbo/communication/` (composers, parsers, message events/IDs) or any feature that sends/receives network messages — it documents how this client is expected to talk to a real Arcturus-Community-style server: the wire protocol, handshake/encryption sequence, message ID conventions, full per-system request/response flows (room, chat, catalog, inventory, trading, etc.), and a list of **known real-server bugs and protocol mismatches**. Some AS3 behavior that looks wrong may actually be a deliberate workaround for a documented server-side bug — check this doc before "fixing" wire-format code in `habbo/communication/`.
+Before writing implementation code:
 
-If you haven't read the AS3 source, your implementation is invalid. No exceptions.
+1. **Read the spec and the plan** of the milestone you are working on (`docs/superpowers/specs/`,
+   `docs/superpowers/plans/`).
+2. **Read the code you change, and its AS3 origin when it has one.** The `AS3:` trace above a
+   declaration points to it (primary tree `sources/WIN63-202607011411-782849652/`). Read it to
+   understand inherited behaviour before changing it, not to copy it line by line.
+3. **Respect the layer walls** (spec §3). `eslint.config.mjs` enforces the ones that exist; a
+   `no-restricted-imports` error means the design is wrong, not the rule.
+4. **Check `docs/PATTERNS.md`** before adding a Composer, Parser, Event, Manager or window.
+5. **Read `docs/CLIENT-SERVER-ARCHITECTURE.md`** before touching anything that sends or receives
+   network messages. Message ids come from the emulator (`pnpm gen:headers`), never from the AS3.
 
 ## Before you delete or replace existing TypeScript
 
@@ -102,21 +107,35 @@ Data flow: `Engine emits event → Client display class listens and updates`
 
 ## Critical rules
 
-1. **AS3 is the source of truth** — Never invent code. Read `sources/WIN63-202607011411-782849652/` first, cross-referencing `sources/win63_version/` when identifiers there are obfuscated
-2. **Never simplify AS3 architecture** — If AS3 has handlers/interfaces/delegation, implement them exactly
+1. **AS3 explains inherited behaviour** — before changing inherited code, read its AS3 origin (the `AS3:` trace). Fidelity is no longer required (spec `2026-10-07-client-architecture-design.md` §10); understanding still is
+2. **Restructure on purpose, not by accident** — the package split (spec §3) is the plan. Outside it, do not flatten handlers/interfaces/delegation without writing the reason at the declaration
 3. **Engine must NEVER import from client** — `vortex-engine` has zero UI knowledge
 4. **Never override `get events()`** in Component subclasses — breaks the DI event system; use a different property name (e.g. `sessionEvents`)
 5. **Use `createObjectInternal()`** not `createRoomObject()` from container (infinite recursion)
 6. **Update `docs/IMPLEMENTATION_STATUS.md`** after every significant implementation
 7. **Performance**: `Set`/`Map` for lookups, no allocations in render loops, cache textures, viewport culling (see `docs/STYLEGUIDE.md` Performance section and `docs/PATTERNS.md` section 0)
-8. **Full port**: ALL AS3 files are ported — both logic AND display. Flash XML layouts/skins ship as XML, verbatim. No ENGINE/VIEW distinction
-   **Exception du fork RPG :** ce dépôt est le client du RPG Habbo
-   (spec : `vortex-rpg-emulator/docs/superpowers/specs/2026-10-05-habbo-rpg-design.md`).
-   Les features listées en section 7 de la spec (« Retiré ») sont supprimées volontairement et ne
-   doivent pas être re-portées, sauf le derby de pêche, gardé (décision 1 du plan M0 client). Tout le reste suit toujours la règle du port complet.
+8. **No re-port of removed features** — the features listed in section 7 of the RPG spec
+   (`vortex-rpg-emulator/docs/superpowers/specs/2026-10-05-habbo-rpg-design.md`) stay removed, except the
+   fishing derby (M0 client plan, decision 1). Everything else inherited is kept and restructured, not re-ported.
 9. **Managers**: DI Component with IID registration, one `I<Manager>` interface per manager (see `docs/PATTERNS.md` → Manager template)
+10. **Layer walls** — the engines (`common`, `net`, `avatar`, `iso`, `ui`) never import `kernel`, `protocol` or `game`; `iso` may import `avatar`, never the reverse; features are folders of `game` and talk through declared interfaces or events (spec §3). Walls are enforced by `package.json` dependencies between packages and by `no-restricted-imports` in `eslint.config.mjs` (add new ones with `wall()`).
 
 ## AS3 traceability
+
+**Since 2026-10-07 the trace is provenance, not a fidelity contract**
+(`docs/superpowers/specs/2026-10-07-client-architecture-design.md` §10). It records where inherited
+code came from. Three consequences:
+
+- **Keep the `AS3:` line when you move, rename or restructure a member.** Losing it loses the only
+  pointer to the code that explains the behaviour.
+- **A member that now behaves differently from its origin keeps its `AS3:` line.** A
+  `// DEVIATION:` note is recommended when the difference would surprise someone reading the AS3,
+  and no longer required.
+- **New code needs no marker.** RPG features and new packages carry neither `AS3:` nor `TS-only:`;
+  `TS-only:` is only for a member added to a class that was ported from the AS3.
+
+The rest of this file describes how the traces were written during the port; it still applies to
+reading and keeping them.
 
 Every TypeScript class, method, accessor, property, interface member, handler, parser, composer, or event ported from AS3 MUST include an `AS3:` source trace comment immediately above the declaration.
 
@@ -203,12 +222,13 @@ deliberately replaced — and that claim must be one a reader can check. "There 
 not such a claim; callers arrive. "`_SafeCls_1711` has no entry in the registry, which maps 581
 composers" is.
 
-Incomplete members still require a compatible TypeScript signature and a `TODO(AS3)` comment with source path, class/member name, and exact remaining behavior. Never silently omit an AS3 member because it is currently unused; incomplete behavior must be visible as a TODO/stub, not missing from the interface.
+An inherited member left half-done keeps a compatible TypeScript signature and a `TODO(AS3)` comment with source path, class/member name, and exact remaining behavior. A member deliberately removed during the refactor simply goes, with the reason in the commit message.
 
 ## A faithful line is not a faithful port
 
-AS3 is the source of truth. That is not in question, and none of what follows is licence to
-deviate — every time this port *departed* from the AS3 it got worse (`AvatarInfoWidget.positionView()`
+This section was written during the port, when the AS3 was the contract. Its lesson outlives that
+contract and applies to every change of inherited code: during the port, every *accidental*
+departure from the AS3 made things worse (`AvatarInfoWidget.positionView()`
 reimplemented what `RWGOI_MESSAGE_GET_OBJECT_LOCATION` already answered and stranded the bubble at
 (0,0); `OwnAvatarMenuView` walked its grid with `numChildren` instead of the grid's own iterator and
 made every panel unclickable). The point is narrower and harder: **transcribing the instruction is
@@ -253,11 +273,12 @@ You are editing wire-protocol code (`core/communication/`, `habbo/communication/
 
 1. Read `docs/CLIENT-SERVER-ARCHITECTURE.md` in full for the system you are touching (handshake/encryption, or the specific composer/parser's request-response flow) before changing anything here.
 2. Check that document's "known real-server bugs and protocol mismatches" list first. AS3 code that looks wrong (odd byte order, a seemingly redundant field, a workaround-looking branch) may be a deliberate compensation for a real Arcturus-Community server bug — verify before "fixing" it.
-3. `Parser.parse()` read order and `Composer.getMessageArray()` field order MUST match the AS3 exactly; reordering silently breaks the wire format.
+3. `Parser.parse()` read order and `Composer.getMessageArray()` field order MUST match the emulator's serializer/parser for that message (`vortex-rpg-emulator/Vortex.Revisions/Revision20260701/{Serializers,Parsers}/`); reordering silently breaks the wire format.
 4. See `docs/PATTERNS.md` → MessageComposer / MessageParser / MessageEvent templates before adding a new message type. Quick shape reminder:
    - **Composer**: `extends MessageComposer<TupleType>` with `_data` and `getMessageArray()`
    - **Parser**: `implements IMessageParser` with `flush()` + `parse(wrapper)`
    - **Event**: `extends MessageEvent implements IMessageEvent` with `callback` parameter in constructor
+5. **Message ids come from `Headers.generated.ts`**, written by `pnpm gen:headers` from the emulator's `Headers.cs` and checked by the pre-commit hook. New registrations use `Incoming.X` / `Outgoing.X`; never type an id by hand, never take one from the AS3 registry.
 
 ## Window/UI rules (`core/window/`, `habbo/window/`, `**/widgets/**`)
 

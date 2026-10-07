@@ -1,18 +1,23 @@
-# Mandatory: read before coding
+# Before you code
 
-Before writing any implementation code, you MUST complete these steps IN ORDER:
+This repository is the client of the Habbo RPG fork. Since 2026-10-07 it follows
+`docs/superpowers/specs/2026-10-07-client-architecture-design.md`: the engine is being split into
+packages (`@vortex/common`, `net`, `avatar`, `iso`, `ui`, `kernel`, `protocol`, `game`), and the
+code no longer has to stay faithful to the AS3. The AS3 remains the best explanation of *why*
+inherited code behaves the way it does.
 
-1. **Read the AS3 source file** — Find and read the corresponding AS3 file IN ITS ENTIRETY
-   - Primary: `sources/WIN63-202607011411-782849652/src/com/sulake/<module>/<Class>.as`
-   - Secondary: `sources/win63_version/<module>/<Class>.as`
-   - Tertiary: `sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/<module>/<Class>.as`
-   - **Never invent a name for an obfuscated identifier.** `win63_version` will not recover it — that tree is obfuscated too, with a different scheme. Only PRODUCTION is unobfuscated, and only for classes that existed in 2016. See CLAUDE.md → "AS3 sources" for how to identify a class, and what to do when a name exists in no tree (say so at the declaration; never pass a derived name off as recovered).
-2. **Read the AS3 interface** — `I<Class>.as` + `handler/` directory if present
-3. **Check `docs/PATTERNS.md`** if implementing a Composer, Parser, Event, Manager, or UI Window
-4. **Check `docs/IMPLEMENTATION_STATUS.md`** for the current module status
-5. **Read `docs/CLIENT-SERVER-ARCHITECTURE.md`** if touching anything in `habbo/communication/` (composers, parsers, message events/IDs) or any feature that sends/receives network messages — it documents how this client is expected to talk to a real Arcturus-Community-style server: the wire protocol, handshake/encryption sequence, message ID conventions, full per-system request/response flows (room, chat, catalog, inventory, trading, etc.), and a list of **known real-server bugs and protocol mismatches**. Some AS3 behavior that looks wrong may actually be a deliberate workaround for a documented server-side bug — check this doc before "fixing" wire-format code in `habbo/communication/`.
+Before writing implementation code:
 
-If you haven't read the AS3 source, your implementation is invalid. No exceptions.
+1. **Read the spec and the plan** of the milestone you are working on (`docs/superpowers/specs/`,
+   `docs/superpowers/plans/`).
+2. **Read the code you change, and its AS3 origin when it has one.** The `AS3:` trace above a
+   declaration points to it (primary tree `sources/WIN63-202607011411-782849652/`). Read it to
+   understand inherited behaviour before changing it, not to copy it line by line.
+3. **Respect the layer walls** (spec §3). `eslint.config.mjs` enforces the ones that exist; a
+   `no-restricted-imports` error means the design is wrong, not the rule.
+4. **Check `docs/PATTERNS.md`** before adding a Composer, Parser, Event, Manager or window.
+5. **Read `docs/CLIENT-SERVER-ARCHITECTURE.md`** before touching anything that sends or receives
+   network messages. Message ids come from the emulator (`pnpm gen:headers`), never from the AS3.
 
 ## Before you delete or replace existing TypeScript
 

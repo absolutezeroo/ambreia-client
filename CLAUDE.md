@@ -1,6 +1,9 @@
 # Vortex
 
 Fork RPG de vortex-modern-client ; voir la spec et `.claude/rules/20-architecture.md` règle 8.
+Depuis le 2026-10-07, l'architecture cible est `docs/superpowers/specs/2026-10-07-client-architecture-design.md`
+(moteurs en paquets, features branchables, config typée) ; la synchro avec `vortex-modern-client` est
+arrêtée et la fidélité à l'AS3 n'est plus exigée (`.claude/rules/00-mandate.md`).
 
 Full TypeScript/PixiJS v8 port of the Habbo Hotel Flash client. pnpm monorepo: `vortex-engine` (engine) + `vortex-client` (display, UI). The entire Flash client is ported — both logic and display — and the original Flash window layouts/skins ship as XML, verbatim from the dump (see Assets below).
 
@@ -11,6 +14,8 @@ pnpm install      # Install dependencies
 pnpm dev          # Dev server (Vite)
 pnpm build        # Production build (TSC + Vite)
 pnpm lint         # ESLint over both packages
+pnpm test         # node:test over packages/*/tools/**/*.test.mjs (header generator, layer walls)
+pnpm gen:headers  # Regenerate Headers.generated.ts from ../vortex-rpg-emulator's Headers.cs
 ```
 
 ### `pnpm dev` pre-bundles the engine
@@ -254,9 +259,11 @@ its numbers must never be treated as authority. `docs/CLIENT-SERVER-ARCHITECTURE
 (its opening note discards an earlier Arcturus-based draft), but the table row above used to imply
 the opposite, which is how an entire round of "fixes" once landed in the wrong repository.
 
-Header source-of-truth order stays: WIN63's own registry
-(`.../habbo/communication/_SafeCls_2046.as`) first, then the emulator as corroboration — never the
-emulator alone.
+Header source of truth is **the emulator** (since 2026-10-07): `pnpm gen:headers` writes
+`packages/vortex-engine/src/habbo/communication/Headers.generated.ts` from
+`../vortex-rpg-emulator/Vortex.Revisions/Revision20260701/Headers.cs`, and the pre-commit hook refuses
+a stale copy. The WIN63 registry (`.../habbo/communication/_SafeCls_2046.as`) is history: read it to
+understand an inherited message, never to pick a number.
 
 ### The website lives in its own repository
 
