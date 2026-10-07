@@ -1,19 +1,19 @@
-import type {IIlluminaChatBubbleWidget} from './IIlluminaChatBubbleWidget';
-import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
+import type {IIlluminaChatBubbleWidget} from '@ambreia/ui/kit/widgets/IIlluminaChatBubbleWidget';
+import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
 import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import {PropertyStruct} from '@core/window/utils/PropertyStruct';
-import type {IItemListWindow} from '@core/window/components/IItemListWindow';
-import type {ITextWindow} from '@core/window/components/ITextWindow';
-import type {IAvatarImageWidget} from './IAvatarImageWidget';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
+import type {IItemListWindow} from '@ambreia/ui/components/IItemListWindow';
+import type {ITextWindow} from '@ambreia/ui/components/ITextWindow';
+import type {IAvatarImageWidget} from '@ambreia/ui/kit/widgets/IAvatarImageWidget';
 import type {UpdatingTimeStampWidget} from './UpdatingTimeStampWidget';
-import {ChatBubbleMessage} from './ChatBubbleMessage';
+import {ChatBubbleMessage} from '@ambreia/ui/kit/widgets/ChatBubbleMessage';
 import {Logger} from '@ambreia/common/utils/Logger';
 import {GetExtendedProfileMessageComposer} from '@habbo/communication/messages/outgoing/users/GetExtendedProfileMessageComposer';
-import type {WindowEvent} from '@core/window/events/WindowEvent';
-import type {IIterator} from '@core/window/utils/IIterator';
-import {EmptyIterator} from '@core/window/iterators/EmptyIterator';
+import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
+import type {IIterator} from '@ambreia/ui/utils/IIterator';
+import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
 
 const log = Logger.getLogger('habbo.window.widgets.IlluminaChatBubbleWidget');
 

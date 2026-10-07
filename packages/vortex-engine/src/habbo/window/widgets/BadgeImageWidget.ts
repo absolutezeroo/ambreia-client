@@ -1,15 +1,15 @@
-import type {IBadgeImageWidget} from './IBadgeImageWidget';
-import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
+import type {IBadgeImageWidget} from '@ambreia/ui/kit/widgets/IBadgeImageWidget';
+import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
 import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IRegionWindow} from '@core/window/components/IRegionWindow';
-import type {IStaticBitmapWrapperWindow} from '@core/window/components/IStaticBitmapWrapperWindow';
-import type {IIterator} from '@core/window/utils/IIterator';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {IRegionWindow} from '@ambreia/ui/components/IRegionWindow';
+import type {IStaticBitmapWrapperWindow} from '@ambreia/ui/components/IStaticBitmapWrapperWindow';
+import type {IIterator} from '@ambreia/ui/utils/IIterator';
 import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
-import {EmptyIterator} from '@core/window/iterators/EmptyIterator';
-import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
-import {PropertyStruct} from '@core/window/utils/PropertyStruct';
-import {BadgeImageType} from '../enum/BadgeImageType';
+import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
+import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
+import {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
+import {BadgeImageType} from '@ambreia/ui/kit/enum/BadgeImageType';
 import {
     GroupDetailsChangedMessageEvent
 } from '@habbo/communication/messages/incoming/users/GroupDetailsChangedMessageEvent';

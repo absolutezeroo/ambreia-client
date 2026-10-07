@@ -1,5 +1,5 @@
 import type {EventEmitter} from 'eventemitter3';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 import type {IAvatarEditorSaveListener} from './IAvatarEditorSaveListener';
 
 /**

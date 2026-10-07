@@ -1,13 +1,13 @@
-import type {IProgressIndicatorWidget} from './IProgressIndicatorWidget';
-import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
+import type {IProgressIndicatorWidget} from '@ambreia/ui/kit/widgets/IProgressIndicatorWidget';
+import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
 import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {IItemListWindow} from '@core/window/components/IItemListWindow';
-import type {IStaticBitmapWrapperWindow} from '@core/window/components/IStaticBitmapWrapperWindow';
-import {PropertyStruct} from '@core/window/utils/PropertyStruct';
-import {ProgressIndicatorMode} from '../enum/ProgressIndicatorMode';
-import {ProgressIndicatorStyle} from '../enum/ProgressIndicatorStyle';
-import type {IIterator} from '@core/window/utils/IIterator';
-import {EmptyIterator} from '@core/window/iterators/EmptyIterator';
+import type {IItemListWindow} from '@ambreia/ui/components/IItemListWindow';
+import type {IStaticBitmapWrapperWindow} from '@ambreia/ui/components/IStaticBitmapWrapperWindow';
+import {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
+import {ProgressIndicatorMode} from '@ambreia/ui/kit/enum/ProgressIndicatorMode';
+import {ProgressIndicatorStyle} from '@ambreia/ui/kit/enum/ProgressIndicatorStyle';
+import type {IIterator} from '@ambreia/ui/utils/IIterator';
+import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
 
 /**
  * Progress bar widget.

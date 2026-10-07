@@ -1,8 +1,8 @@
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IRegionWindow} from '@core/window/components/IRegionWindow';
-import type {ITextWindow} from '@core/window/components/ITextWindow';
-import type {ITextFieldWindow} from '@core/window/components/ITextFieldWindow';
+import type {IWindow} from '../../../IWindow';
+import type {IWindowContainer} from '../../../IWindowContainer';
+import type {IRegionWindow} from '../../../components/IRegionWindow';
+import type {ITextWindow} from '../../../components/ITextWindow';
+import type {ITextFieldWindow} from '../../../components/ITextFieldWindow';
 
 /**
  * CellTemplate — holds the detached child windows of a table cell's region template (highlight border,

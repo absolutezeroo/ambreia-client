@@ -1,13 +1,13 @@
 import type {IDisposable} from '@ambreia/common/IDisposable';
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import {WindowEvent} from '@core/window/events/WindowEvent';
-import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
-import {HabboAlertDialogFlag} from '../enum/HabboAlertDialogFlag';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import {WindowEvent} from '@ambreia/ui/events/WindowEvent';
+import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
+import {HabboAlertDialogFlag} from '@ambreia/ui/kit/enum/HabboAlertDialogFlag';
 import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {ICaption} from './AlertDialogCaption';
-import {AlertDialogCaption} from './AlertDialogCaption';
-import type {IModalDialog} from './IModalDialog';
+import type {ICaption} from '@ambreia/ui/kit/utils/AlertDialogCaption';
+import {AlertDialogCaption} from '@ambreia/ui/kit/utils/AlertDialogCaption';
+import type {IModalDialog} from '@ambreia/ui/kit/utils/IModalDialog';
 
 /**
  * Callback type for alert dialog events.

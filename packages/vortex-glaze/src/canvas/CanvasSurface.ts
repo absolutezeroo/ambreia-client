@@ -1,9 +1,9 @@
 import type {IHabboWindowManager} from '@habbo/window';
-import type {IWindow} from '@core/window/IWindow';
-import type {WindowController} from '@core/window/WindowController';
-import type {WindowMouseOperator} from '@core/window/services/WindowMouseOperator';
-import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
-import {NativeWheelDelta} from '@core/window/utils/NativeWheelDelta';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {WindowController} from '@ambreia/ui/WindowController';
+import type {WindowMouseOperator} from '@ambreia/ui/services/WindowMouseOperator';
+import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
+import {NativeWheelDelta} from '@ambreia/ui/utils/NativeWheelDelta';
 import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('glaze.canvas.CanvasSurface');

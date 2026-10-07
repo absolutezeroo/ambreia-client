@@ -1,11 +1,11 @@
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IBitmapWrapperWindow} from '@core/window/components/IBitmapWrapperWindow';
-import type {IStaticBitmapWrapperWindow} from '@core/window/components/IStaticBitmapWrapperWindow';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {IBitmapWrapperWindow} from '@ambreia/ui/components/IBitmapWrapperWindow';
+import type {IStaticBitmapWrapperWindow} from '@ambreia/ui/components/IStaticBitmapWrapperWindow';
 import type {IPartColor} from '@ambreia/avatar/structure/figure/IPartColor';
 import type {IAvatarEditorGridColorItem} from './IAvatarEditorGridItem';
 import type {ICategoryModel} from './ICategoryModel';
-import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
+import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
 
 /**
  * One colour swatch: a tinted 13×21 chip, a border that shows selection and hover, and a club

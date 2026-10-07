@@ -1,13 +1,13 @@
-import type {IThemeManager} from '@core/window/theme/IThemeManager';
-import type {IPropertyMap} from '@core/window/theme/IPropertyMap';
-import type {SkinContainer} from '@core/window/graphics/SkinContainer';
-import {PropertyMap} from '@core/window/theme/PropertyMap';
-import {Theme} from './Theme';
+import type {IThemeManager} from '@ambreia/ui/theme/IThemeManager';
+import type {IPropertyMap} from '@ambreia/ui/theme/IPropertyMap';
+import type {SkinContainer} from '@ambreia/ui/graphics/SkinContainer';
+import {PropertyMap} from '@ambreia/ui/theme/PropertyMap';
+import {Theme} from '@ambreia/ui/kit/theme/Theme';
 import {HabboWidgetFactory} from '../HabboWidgetFactory';
 
 // Moved to core/window/theme so `IThemeManager` — a core interface — can name its own return type
 // without core importing from habbo. Re-exported here for the callers already importing it.
-import type {IThemeAndIntent} from '@core/window/theme/IThemeAndIntent';
+import type {IThemeAndIntent} from '@ambreia/ui/theme/IThemeAndIntent';
 
 export type {IThemeAndIntent};
 

@@ -1,10 +1,10 @@
 import type {Texture} from 'pixi.js';
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IBitmapWrapperWindow} from '@core/window/components/IBitmapWrapperWindow';
-import type {IInteractiveWindow} from '@core/window/components/IInteractiveWindow';
-import type {IStaticBitmapWrapperWindow} from '@core/window/components/IStaticBitmapWrapperWindow';
-import type {WindowEvent} from '@core/window/events/WindowEvent';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {IBitmapWrapperWindow} from '@ambreia/ui/components/IBitmapWrapperWindow';
+import type {IInteractiveWindow} from '@ambreia/ui/components/IInteractiveWindow';
+import type {IStaticBitmapWrapperWindow} from '@ambreia/ui/components/IStaticBitmapWrapperWindow';
+import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 import {AvatarTextureUtils} from '../AvatarTextureUtils';
 

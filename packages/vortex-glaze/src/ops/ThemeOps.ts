@@ -1,6 +1,6 @@
-import type {IWindow} from '@core/window/IWindow';
-import type {WindowController} from '@core/window/WindowController';
-import {Theme} from '@habbo/window/theme/Theme';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {WindowController} from '@ambreia/ui/WindowController';
+import {Theme} from '@ambreia/ui/kit/theme/Theme';
 import type {EditorState} from '../state/EditorState';
 
 interface IThemeManagerLike

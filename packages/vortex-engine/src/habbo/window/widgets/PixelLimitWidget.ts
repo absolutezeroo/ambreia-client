@@ -1,13 +1,13 @@
-import type {IPixelLimitWidget} from './IPixelLimitWidget';
-import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
+import type {IPixelLimitWidget} from '@ambreia/ui/kit/widgets/IPixelLimitWidget';
+import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
 import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IWindow} from '@core/window/IWindow';
-import type {IStaticBitmapWrapperWindow} from '@core/window/components/IStaticBitmapWrapperWindow';
-import type {IIterator} from '@core/window/utils/IIterator';
-import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
-import {EmptyIterator} from '@core/window/iterators/EmptyIterator';
-import {PropertyStruct} from '@core/window/utils/PropertyStruct';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IStaticBitmapWrapperWindow} from '@ambreia/ui/components/IStaticBitmapWrapperWindow';
+import type {IIterator} from '@ambreia/ui/utils/IIterator';
+import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
+import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
+import {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
 
 /**
  * Pixel limit display widget.

@@ -1,5 +1,5 @@
 // Exports
-export {Theme} from './Theme';
+export {Theme} from '@ambreia/ui/kit/theme/Theme';
 export {ThemeManager} from './ThemeManager';
 
 // Types

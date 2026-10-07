@@ -1,6 +1,6 @@
-import type {IWindow} from '@core/window/IWindow';
-import {WindowEvent} from '@core/window/events/WindowEvent';
-import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import {WindowEvent} from '@ambreia/ui/events/WindowEvent';
+import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
 import type {IHabboWindowManager} from '../IHabboWindowManager';
 import type {AlertDialogCallback, IAlertDialog} from './AlertDialog';
 import {AlertDialog} from './AlertDialog';

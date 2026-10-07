@@ -1,4 +1,4 @@
-import type {IWindow} from '@core/window/IWindow';
+import type {IWindow} from '../IWindow';
 
 /**
  * Data container for a hint target.

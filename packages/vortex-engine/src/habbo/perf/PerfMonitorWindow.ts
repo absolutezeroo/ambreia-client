@@ -1,10 +1,10 @@
 import {Logger} from '@ambreia/common/utils/Logger';
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IBitmapWrapperWindow} from '@core/window/components/IBitmapWrapperWindow';
-import type {ISelectableWindow} from '@core/window/components/ISelectableWindow';
-import type {ITabContextWindow} from '@core/window/components/ITabContextWindow';
-import {WindowEvent} from '@core/window/events/WindowEvent';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {IBitmapWrapperWindow} from '@ambreia/ui/components/IBitmapWrapperWindow';
+import type {ISelectableWindow} from '@ambreia/ui/components/ISelectableWindow';
+import type {ITabContextWindow} from '@ambreia/ui/components/ITabContextWindow';
+import {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 import type {IRoomEngine} from '@habbo/room/IRoomEngine';
 import {RoomObjectCategoryEnum} from '@habbo/room/object/RoomObjectCategoryEnum';
@@ -19,7 +19,7 @@ import {
     FrameTimings
 } from '@ambreia/common/utils/FrameTimings';
 import {PERF_MONITOR_LAYOUT_NAME, PERF_MONITOR_TABS} from './PerfMonitorLayout';
-import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
+import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
 
 const log = Logger.getLogger('habbo.perf.PerfMonitorWindow');
 

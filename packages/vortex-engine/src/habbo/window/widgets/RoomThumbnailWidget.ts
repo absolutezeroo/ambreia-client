@@ -1,10 +1,10 @@
-import type {IRoomThumbnailWidget} from './IRoomThumbnailWidget';
-import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
+import type {IRoomThumbnailWidget} from '@ambreia/ui/kit/widgets/IRoomThumbnailWidget';
+import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
 import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IWindow} from '@core/window/IWindow';
-import type {PropertyStruct} from '@core/window/utils/PropertyStruct';
-import type {IIterator} from '@core/window/utils/IIterator';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
+import type {IIterator} from '@ambreia/ui/utils/IIterator';
 
 /**
  * Room thumbnail widget.

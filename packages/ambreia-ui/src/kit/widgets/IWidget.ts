@@ -1,6 +1,6 @@
 import type {IDisposable} from '@ambreia/common/IDisposable';
-import type {IIterable} from '@core/window/utils/IIterable';
-import type {PropertyStruct} from '@core/window/utils/PropertyStruct';
+import type {IIterable} from '../../utils/IIterable';
+import type {PropertyStruct} from '../../utils/PropertyStruct';
 
 /**
  * Base interface for all Habbo window widgets.

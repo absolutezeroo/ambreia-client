@@ -1,4 +1,4 @@
-import type {PropertyMap} from '@core/window/theme/PropertyMap';
+import type {PropertyMap} from '../../theme/PropertyMap';
 
 /**
  * Represents a named window theme with a base style range and property defaults.

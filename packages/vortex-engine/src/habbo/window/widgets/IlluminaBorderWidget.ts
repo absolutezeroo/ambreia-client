@@ -1,12 +1,12 @@
-import type {IIlluminaBorderWidget} from './IIlluminaBorderWidget';
-import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
+import type {IIlluminaBorderWidget} from '@ambreia/ui/kit/widgets/IIlluminaBorderWidget';
+import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
 import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import {PropertyStruct} from '@core/window/utils/PropertyStruct';
-import {WindowEvent} from '@core/window/events/WindowEvent';
-import type {WindowEventListener} from '@core/window/events/WindowEventDispatcher';
-import type {IIterator} from '@core/window/utils/IIterator';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
+import {WindowEvent} from '@ambreia/ui/events/WindowEvent';
+import type {WindowEventListener} from '@ambreia/ui/events/WindowEventDispatcher';
+import type {IIterator} from '@ambreia/ui/utils/IIterator';
 
 /**
  * Illumina theme border widget.

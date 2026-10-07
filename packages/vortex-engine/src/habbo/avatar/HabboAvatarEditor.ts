@@ -1,5 +1,5 @@
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 import type {IAvatarImage} from '@ambreia/avatar/IAvatarImage';
 import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
 import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';

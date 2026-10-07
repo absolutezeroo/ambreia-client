@@ -1,5 +1,5 @@
 import type {IDisposable} from '@ambreia/common/IDisposable';
-import type {IWindow} from '@core/window/IWindow';
+import type {IWindow} from '../../IWindow';
 
 /**
  * Interface for modal dialogs.

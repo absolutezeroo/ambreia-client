@@ -1,5 +1,5 @@
-import type {IWidgetFactory} from '@core/window/IWidgetFactory';
-import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
+import type {IWidgetFactory} from '@ambreia/ui/IWidgetFactory';
+import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
 import type {IHabboWindowManager} from './IHabboWindowManager';
 import {Logger} from '@ambreia/common/utils/Logger';
 import {AvatarImageWidget} from './widgets/AvatarImageWidget';

@@ -1,6 +1,6 @@
 import {Component, ComponentDependency, type IContext} from '@core/runtime';
 import {Logger} from '@ambreia/common/utils/Logger';
-import type {IWindow} from '@core/window/IWindow';
+import type {IWindow} from '@ambreia/ui/IWindow';
 import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
 import type {IMessageComposer} from '@ambreia/net/messages/IMessageComposer';
 import type {IHabboCommunicationManager} from '../communication/IHabboCommunicationManager';
@@ -179,7 +179,7 @@ import {BlockedUsersManager} from './BlockedUsersManager';
 import {HabboGroupInfoManager} from './HabboGroupInfoManager';
 import {PerkType} from '../communication/enum/PerkType';
 import {HabboWebTools} from '@habbo/utils/HabboWebTools';
-import {WindowEvent} from '@core/window/events/WindowEvent';
+import {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import type {IDisposable} from '@ambreia/common/IDisposable';
 
 const log = Logger.getLogger('habbo.session.SessionDataManager');

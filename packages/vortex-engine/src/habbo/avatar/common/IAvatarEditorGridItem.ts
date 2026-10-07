@@ -1,4 +1,4 @@
-import type {IWindowContainer} from '@core/window/IWindowContainer';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 import type {IPartColor} from '@ambreia/avatar/structure/figure/IPartColor';
 import type {IFigurePartSet} from '@ambreia/avatar/structure/figure/IFigurePartSet';
 

@@ -1,9 +1,9 @@
 import type {IDisposable} from '@ambreia/common/IDisposable';
-import type {IWindow} from '@core/window/IWindow';
-import type {IItemListWindow} from '@core/window/components/IItemListWindow';
-import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IItemListWindow} from '@ambreia/ui/components/IItemListWindow';
+import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
 
-import type {ITableObject} from './ITableObject';
+import type {ITableObject} from '@ambreia/ui/kit/utils/tableview/ITableObject';
 import {TableCellView} from './TableCellView';
 import type {TableRowModel} from './TableRowModel';
 import type {TableView} from './TableView';

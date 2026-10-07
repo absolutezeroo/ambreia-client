@@ -1,11 +1,11 @@
-import type {IWindow} from '@core/window/IWindow';
-import type {WindowController} from '@core/window/WindowController';
-import type {WindowEvent} from '@core/window/events/WindowEvent';
-import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
-import {WindowTreeInspector} from '@core/window/debugger';
-import type {IWindowDebugNode} from '@core/window/debugger';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {WindowController} from '@ambreia/ui/WindowController';
+import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
+import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
+import {WindowTreeInspector} from '@ambreia/ui/debugger/index';
+import type {IWindowDebugNode} from '@ambreia/ui/debugger/index';
 import {signal, computed, effect, onCleanup, type Scope, type SignalReader} from '@ambreia/common/reactive/index';
-import {createWindowScope, bind, on, each, type IReconcilableList} from '@core/window/reactive';
+import {createWindowScope, bind, on, each, type IReconcilableList} from '@ambreia/ui/reactive/index';
 import {type EditorState} from '../../state/EditorState';
 import {signalsOf, type EditorSignals} from '../../state/EditorSignals';
 import {canHaveChildren, dropNode, type DropPosition} from '../../ops/StructuralOps';

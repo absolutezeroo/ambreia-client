@@ -1,10 +1,10 @@
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IFrameWindow} from '@core/window/components/IFrameWindow';
-import type {ITabButtonWindow} from '@core/window/components/ITabButtonWindow';
-import type {ITabContextWindow} from '@core/window/components/ITabContextWindow';
-import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
-import type {WindowEvent} from '@core/window/events/WindowEvent';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {IFrameWindow} from '@ambreia/ui/components/IFrameWindow';
+import type {ITabButtonWindow} from '@ambreia/ui/components/ITabButtonWindow';
+import type {ITabContextWindow} from '@ambreia/ui/components/ITabContextWindow';
+import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
+import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import type {HabboAvatarEditor} from './HabboAvatarEditor';
 import type {IAvatarEditorGridView} from './common/ICategoryView';
 import type {IAvatarEditorView} from './view/IAvatarEditorView';

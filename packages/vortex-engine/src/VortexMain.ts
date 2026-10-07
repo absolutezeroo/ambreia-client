@@ -3,7 +3,7 @@ import {HabboConfigurationManager} from '@habbo/configuration/HabboConfiguration
 import {HabboCommunicationManager} from '@habbo/communication/HabboCommunicationManager';
 import {HabboCommunicationDemo} from '@habbo/communication/demo/HabboCommunicationDemo';
 import {HabboLocalizationManager} from '@habbo/localization/HabboLocalizationManager';
-import {WindowParser} from '@core/window/utils/WindowParser';
+import {WindowParser} from '@ambreia/ui/utils/WindowParser';
 import {RoomEngine, RoomMessageHandler} from '@habbo/room';
 import {HabboRoomRendererFactory} from '@habbo/room/renderer/HabboRoomRendererFactory';
 import {RoomManager} from '@room/RoomManager';

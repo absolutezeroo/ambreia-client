@@ -1,6 +1,6 @@
-import type {IWindow} from '@core/window/IWindow';
+import type {IWindow} from '@ambreia/ui/IWindow';
 import type {IHabboWindowManager} from './IHabboWindowManager';
-import {HintTarget} from './HintTarget';
+import {HintTarget} from '@ambreia/ui/kit/HintTarget';
 import type {IUpdateReceiver} from '@core/runtime/IContext';
 
 /**

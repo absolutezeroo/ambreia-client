@@ -62,7 +62,7 @@ import type {IRoomDesktop} from './IRoomDesktop';
 import {RoomDesktop} from './RoomDesktop';
 import {RoomWidgetFactory} from './RoomWidgetFactory';
 import {HideRoomWidgetEvent} from './widget/events/HideRoomWidgetEvent';
-import type {IDisplayObjectWrapper} from '@core/window/components/IDisplayObjectWrapper';
+import type {IDisplayObjectWrapper} from '@ambreia/ui/components/IDisplayObjectWrapper';
 
 const log = Logger.getLogger('habbo.ui.RoomUI');
 

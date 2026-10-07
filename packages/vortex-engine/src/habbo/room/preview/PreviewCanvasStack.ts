@@ -1,6 +1,6 @@
 import type {Container} from 'pixi.js';
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 
 /**
  * One live room-preview canvas and the window it visually belongs to.

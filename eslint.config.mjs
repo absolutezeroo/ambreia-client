@@ -227,6 +227,18 @@ export default tseslint.config(
         }
     },
     {
+        files: ['packages/ambreia-ui/src/**/*.ts'],
+        rules:
+        {
+            'no-restricted-imports': wall(
+                {
+                    regex: '^@(core|habbo|room|iid|ui)(/|$)|^@ambreia/(?!common/)|(^|/)vortex-(engine|client)(/|$)|(^|/)ambreia-[a-z]+/src(/|$)',
+                    message: `@ambreia/ui depends on @ambreia/common only (${WALLS_SPEC}).`
+                }
+            )
+        }
+    },
+    {
         files: ['**/*.mjs'],
         languageOptions: { globals: { ...globals.node } }
     },

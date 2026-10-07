@@ -1,10 +1,10 @@
-import type {IWindow} from '@core/window/IWindow';
-import type {WindowController} from '@core/window/WindowController';
-import type {WindowEvent} from '@core/window/events/WindowEvent';
-import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {WindowController} from '@ambreia/ui/WindowController';
+import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
+import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
 import {Logger} from '@ambreia/common/utils/Logger';
 import {effect, type Scope} from '@ambreia/common/reactive/index';
-import {createWindowScope, bind} from '@core/window/reactive';
+import {createWindowScope, bind} from '@ambreia/ui/reactive/index';
 import {ZOOM_STEPS, type EditorState} from '../../state/EditorState';
 import {signalsOf, type EditorSignals} from '../../state/EditorSignals';
 import {downloadLayout, importLayoutXml, saveLayout} from '../../ops/LayoutSerializer';

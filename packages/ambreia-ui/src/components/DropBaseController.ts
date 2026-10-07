@@ -9,7 +9,7 @@ import type {WindowController} from '../WindowController';
 import {WindowEvent} from '../events/WindowEvent';
 import type {PropertyStruct} from '../utils/PropertyStruct';
 import {InteractiveController} from './InteractiveController';
-import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
+import {WindowMouseEvent} from '../events/WindowMouseEvent';
 
 /**
  * Base controller for dropdown windows.

@@ -1,16 +1,16 @@
-import type {IIlluminaInputWidget} from './IIlluminaInputWidget';
-import type {IIlluminaInputHandler} from './IIlluminaInputHandler';
-import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
+import type {IIlluminaInputWidget} from '@ambreia/ui/kit/widgets/IIlluminaInputWidget';
+import type {IIlluminaInputHandler} from '@ambreia/ui/kit/widgets/IIlluminaInputHandler';
+import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
 import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {ITextFieldWindow} from '@core/window/components/ITextFieldWindow';
-import {PropertyStruct} from '@core/window/utils/PropertyStruct';
-import {WindowEvent} from '@core/window/events/WindowEvent';
-import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
-import {WindowKeyboardEvent} from '@core/window/events/WindowKeyboardEvent';
-import type {IIterator} from '@core/window/utils/IIterator';
-import {EmptyIterator} from '@core/window/iterators/EmptyIterator';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {ITextFieldWindow} from '@ambreia/ui/components/ITextFieldWindow';
+import {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
+import {WindowEvent} from '@ambreia/ui/events/WindowEvent';
+import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
+import {WindowKeyboardEvent} from '@ambreia/ui/events/WindowKeyboardEvent';
+import type {IIterator} from '@ambreia/ui/utils/IIterator';
+import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
 
 /**
  * Illumina input field widget.

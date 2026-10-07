@@ -1,9 +1,9 @@
 import {Logger} from '@ambreia/common/utils/Logger';
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IBitmapWrapperWindow} from '@core/window/components/IBitmapWrapperWindow';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {IBitmapWrapperWindow} from '@ambreia/ui/components/IBitmapWrapperWindow';
 import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {IModalDialog} from './IModalDialog';
+import type {IModalDialog} from '@ambreia/ui/kit/utils/IModalDialog';
 
 const log = Logger.getLogger('habbo.window.utils.ModalDialog');
 

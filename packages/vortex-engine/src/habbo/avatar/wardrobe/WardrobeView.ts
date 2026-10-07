@@ -1,6 +1,6 @@
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IItemListWindow} from '@core/window/components/IItemListWindow';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {IItemListWindow} from '@ambreia/ui/components/IItemListWindow';
 import type {ISideContentView} from '../common/ISideContent';
 import type {WardrobeModel} from './WardrobeModel';
 import {Logger} from '@ambreia/common/utils/Logger';

@@ -1,6 +1,6 @@
 import {Logger} from '@ambreia/common/utils/Logger';
-import type {AssetUrlSource, IResourceManager} from '@core/window/IResourceManager';
-import type {IAssetReceiver} from '@core/window/IAssetReceiver';
+import type {AssetUrlSource, IResourceManager} from '@ambreia/ui/IResourceManager';
+import type {IAssetReceiver} from '@ambreia/ui/IAssetReceiver';
 import type {IHabboWindowManager} from './IHabboWindowManager';
 
 const log = Logger.getLogger('habbo.window.ResourceManager');

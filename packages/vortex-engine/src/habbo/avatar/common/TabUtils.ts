@@ -1,4 +1,4 @@
-import type {IStaticBitmapWrapperWindow} from '@core/window/components/IStaticBitmapWrapperWindow';
+import type {IStaticBitmapWrapperWindow} from '@ambreia/ui/components/IStaticBitmapWrapperWindow';
 
 /**
  * Switches a tab icon between its lit and unlit artwork.

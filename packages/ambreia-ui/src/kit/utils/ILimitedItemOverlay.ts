@@ -1,5 +1,5 @@
 import type {IDisposable} from '@ambreia/common/IDisposable';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
+import type {IWindowContainer} from '../../IWindowContainer';
 
 /**
  * Interface for limited item overlays.

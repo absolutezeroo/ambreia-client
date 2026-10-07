@@ -1,15 +1,15 @@
-import type {ILimitedItemGridOverlayWidget} from './ILimitedItemGridOverlayWidget';
-import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
+import type {ILimitedItemGridOverlayWidget} from '@ambreia/ui/kit/widgets/ILimitedItemGridOverlayWidget';
+import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
 import type {IHabboWindowManager} from '../IHabboWindowManager';
 import {NumberPlaqueBitmap} from '@habbo/window/utils/NumberPlaqueBitmap';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IWindow} from '@core/window/IWindow';
-import type {PropertyStruct} from '@core/window/utils/PropertyStruct';
-import type {IIterator} from '@core/window/utils/IIterator';
-import {EmptyIterator} from '@core/window/iterators/EmptyIterator';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
+import type {IIterator} from '@ambreia/ui/utils/IIterator';
+import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
 import type {IUpdateReceiver} from '@core/runtime/IContext';
-import type {IAssetReceiver} from '@core/window/IAssetReceiver';
-import type {IBitmapWrapperWindow} from '@core/window/components/IBitmapWrapperWindow';
+import type {IAssetReceiver} from '@ambreia/ui/IAssetReceiver';
+import type {IBitmapWrapperWindow} from '@ambreia/ui/components/IBitmapWrapperWindow';
 
 /**
  * Limited item grid overlay widget.

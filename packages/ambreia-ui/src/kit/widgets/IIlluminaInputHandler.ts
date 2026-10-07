@@ -1,4 +1,4 @@
-import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
+import type {IWidgetWindow} from '../../components/IWidgetWindow';
 
 /**
  * Interface for handling Illumina input widget submissions.

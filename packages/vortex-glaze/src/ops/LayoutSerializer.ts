@@ -1,4 +1,4 @@
-import {WindowParser} from '@core/window/utils/WindowParser';
+import {WindowParser} from '@ambreia/ui/utils/WindowParser';
 import type {EditorState} from '../state/EditorState';
 
 /**

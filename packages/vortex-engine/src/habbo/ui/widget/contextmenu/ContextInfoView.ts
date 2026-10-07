@@ -8,14 +8,14 @@
  * smoothing). Adaptations vs AS3: the auto-hide Flash Timer → setTimeout; the
  * BitmapData copyPixels in setImageAsset → an ImageBitmap set on the window.
  */
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {WindowEvent} from '@core/window/events/WindowEvent';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import type {BitmapDataAsset} from '@ambreia/common/assets/BitmapDataAsset';
 import {FixedSizeStack} from '@habbo/utils/FixedSizeStack';
 import {RoomWidgetUserActionMessage} from '../messages/RoomWidgetUserActionMessage';
 import type {IContextMenuParentWidget} from './IContextMenuParentWidget';
-import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
+import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
 
 export interface IScreenRectangle
 {

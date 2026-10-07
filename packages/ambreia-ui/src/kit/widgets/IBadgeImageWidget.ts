@@ -1,5 +1,5 @@
 import type {IWidget} from './IWidget';
-import type {IBitmapDataContainer} from '@core/window/utils/IBitmapDataContainer';
+import type {IBitmapDataContainer} from '../../utils/IBitmapDataContainer';
 
 /**
  * Interface for the badge image widget.

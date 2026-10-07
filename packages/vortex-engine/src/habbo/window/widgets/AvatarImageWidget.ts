@@ -1,21 +1,21 @@
 import type {Texture} from 'pixi.js';
-import type {IAvatarImageWidget} from './IAvatarImageWidget';
+import type {IAvatarImageWidget} from '@ambreia/ui/kit/widgets/IAvatarImageWidget';
 import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
-import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
+import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
 import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IWindow} from '@core/window/IWindow';
-import type {IBitmapWrapperWindow} from '@core/window/components/IBitmapWrapperWindow';
-import type {IAssetReceiver} from '@core/window/IAssetReceiver';
-import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
-import {PropertyStruct} from '@core/window/utils/PropertyStruct';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IBitmapWrapperWindow} from '@ambreia/ui/components/IBitmapWrapperWindow';
+import type {IAssetReceiver} from '@ambreia/ui/IAssetReceiver';
+import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
+import {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
 import {AvatarRenderEvent} from '@ambreia/avatar/enum/AvatarRenderEvent';
 import {Logger} from '@ambreia/common/utils/Logger';
 import {
     GetExtendedProfileMessageComposer
 } from '@habbo/communication/messages/outgoing/users/GetExtendedProfileMessageComposer';
-import type {IIterator} from '@core/window/utils/IIterator';
-import {EmptyIterator} from '@core/window/iterators/EmptyIterator';
+import type {IIterator} from '@ambreia/ui/utils/IIterator';
+import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
 
 const log = Logger.getLogger('habbo.window.widgets.AvatarImageWidget');
 

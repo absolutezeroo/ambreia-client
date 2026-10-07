@@ -1,0 +1,17 @@
+{
+  "name": "@ambreia/ui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Ambreia window system: XML layouts, skins, themes, dialogs, widgets",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "dependencies": {
+    "@ambreia/common": "workspace:*",
+    "eventemitter3": "^5.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}

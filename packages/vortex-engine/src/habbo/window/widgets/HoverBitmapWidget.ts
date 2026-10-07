@@ -1,13 +1,13 @@
-import type {IWidget} from './IWidget';
-import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
+import type {IWidget} from '@ambreia/ui/kit/widgets/IWidget';
+import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
 import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {IWindow} from '@core/window/IWindow';
-import type {IStaticBitmapWrapperWindow} from '@core/window/components/IStaticBitmapWrapperWindow';
-import {PropertyStruct} from '@core/window/utils/PropertyStruct';
-import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
-import type {WindowEventListener} from '@core/window/events/WindowEventDispatcher';
-import type {IIterator} from '@core/window/utils/IIterator';
-import {EmptyIterator} from '@core/window/iterators/EmptyIterator';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IStaticBitmapWrapperWindow} from '@ambreia/ui/components/IStaticBitmapWrapperWindow';
+import {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
+import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
+import type {WindowEventListener} from '@ambreia/ui/events/WindowEventDispatcher';
+import type {IIterator} from '@ambreia/ui/utils/IIterator';
+import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
 
 /**
  * Hover bitmap effect widget.

@@ -1,7 +1,7 @@
 import {Logger} from '@ambreia/common/utils/Logger';
-import type {IWindow} from '@core/window/IWindow';
-import type {WindowEvent} from '@core/window/events/WindowEvent';
-import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
+import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
 import {LineInterpolation} from '@room/utils/LineInterpolation';
 import type {BCFloorPlanEditor} from './BCFloorPlanEditor';
 import type {FloorPlanCache, IPlanPoint} from './FloorPlanCache';

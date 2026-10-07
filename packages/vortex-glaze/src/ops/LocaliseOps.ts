@@ -1,4 +1,4 @@
-import {WindowParser} from '@core/window/utils/WindowParser';
+import {WindowParser} from '@ambreia/ui/utils/WindowParser';
 import {GameDataResources} from '@core/localization';
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {EditorState} from '../state/EditorState';

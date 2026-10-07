@@ -11,11 +11,11 @@
  * from JSON and provides access to named containers for widget placement.
  */
 import {Logger} from '@ambreia/common/utils/Logger';
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IDisplayObjectWrapper} from '@core/window/components/IDisplayObjectWrapper';
-import {WindowEvent} from '@core/window/events/WindowEvent';
-import {WindowParam} from '@core/window/enum/WindowParam';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {IDisplayObjectWrapper} from '@ambreia/ui/components/IDisplayObjectWrapper';
+import {WindowEvent} from '@ambreia/ui/events/WindowEvent';
+import {WindowParam} from '@ambreia/ui/enum/WindowParam';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 import type {IHabboConfigurationManager} from '@habbo/configuration/IHabboConfigurationManager';
 

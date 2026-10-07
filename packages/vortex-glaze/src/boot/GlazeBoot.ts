@@ -3,7 +3,7 @@ import type {CoreComponentContext} from '@core/runtime/CoreComponentContext';
 import {Logger, LogLevel} from '@ambreia/common/utils/Logger';
 import {HabboWindowManager} from '@habbo/window';
 import type {IHabboWindowManager, IElementDescriptionData} from '@habbo/window';
-import type {ISkinData} from '@core/window';
+import type {ISkinData} from '@ambreia/ui/index';
 import {IID_HabboLocalizationManager} from '@iid/IIDHabboLocalizationManager';
 import {IID_HabboWindowManager} from '@iid/IIDHabboWindowManager';
 import {IID_Core} from '@iid/IIDCore';

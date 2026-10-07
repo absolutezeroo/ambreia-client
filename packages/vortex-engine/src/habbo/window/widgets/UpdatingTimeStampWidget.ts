@@ -1,10 +1,10 @@
-import type {IWidget} from './IWidget';
-import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
+import type {IWidget} from '@ambreia/ui/kit/widgets/IWidget';
+import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
 import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {IWindow} from '@core/window/IWindow';
-import type {PropertyStruct} from '@core/window/utils/PropertyStruct';
-import type {IIterator} from '@core/window/utils/IIterator';
-import {EmptyIterator} from '@core/window/iterators/EmptyIterator';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
+import type {IIterator} from '@ambreia/ui/utils/IIterator';
+import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
 import {FriendlyTime} from '@habbo/utils/FriendlyTime';
 
 /**

@@ -1,5 +1,5 @@
-import type {IWindow} from '@core/window/IWindow';
-import type {WindowController} from '@core/window/WindowController';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {WindowController} from '@ambreia/ui/WindowController';
 import {Logger} from '@ambreia/common/utils/Logger';
 import {cloneSelected, deleteSelected} from '../ops/StructuralOps';
 import {copySelected, cutSelected, pasteClipboard} from '../ops/ClipboardOps';

@@ -1,20 +1,20 @@
 import type {IDisposable} from '@ambreia/common/IDisposable';
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IItemListWindow} from '@core/window/components/IItemListWindow';
-import type {IScrollableListWindow} from '@core/window/components/IScrollableListWindow';
-import type {IScrollableWindow} from '@core/window/components/IScrollableWindow';
-import type {IRegionWindow} from '@core/window/components/IRegionWindow';
-import type {ITextWindow} from '@core/window/components/ITextWindow';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {IItemListWindow} from '@ambreia/ui/components/IItemListWindow';
+import type {IScrollableListWindow} from '@ambreia/ui/components/IScrollableListWindow';
+import type {IScrollableWindow} from '@ambreia/ui/components/IScrollableWindow';
+import type {IRegionWindow} from '@ambreia/ui/components/IRegionWindow';
+import type {ITextWindow} from '@ambreia/ui/components/ITextWindow';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 import {DeBouncer} from '@habbo/utils/DeBouncer';
 
-import {CellTemplate} from './CellTemplate';
-import type {ITableObject} from './ITableObject';
-import type {TableColumn} from './TableColumn';
+import {CellTemplate} from '@ambreia/ui/kit/utils/tableview/CellTemplate';
+import type {ITableObject} from '@ambreia/ui/kit/utils/tableview/ITableObject';
+import type {TableColumn} from '@ambreia/ui/kit/utils/tableview/TableColumn';
 import {TableRowModel} from './TableRowModel';
 import {TableRowView} from './TableRowView';
-import {WindowEvent} from '@core/window/events/WindowEvent';
+import {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 
 type Rectangle = {x: number; y: number; width: number; height: number};
 type RowCallback = (object: ITableObject | null) => void;

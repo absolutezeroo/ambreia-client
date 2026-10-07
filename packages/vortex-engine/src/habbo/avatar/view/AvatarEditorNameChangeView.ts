@@ -1,14 +1,14 @@
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IFrameWindow} from '@core/window/components/IFrameWindow';
-import type {ITextFieldWindow} from '@core/window/components/ITextFieldWindow';
-import type {ITextWindow} from '@core/window/components/ITextWindow';
-import type {WindowEvent} from '@core/window/events/WindowEvent';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {IFrameWindow} from '@ambreia/ui/components/IFrameWindow';
+import type {ITextFieldWindow} from '@ambreia/ui/components/ITextFieldWindow';
+import type {ITextWindow} from '@ambreia/ui/components/ITextWindow';
+import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import type {AvatarEditorView} from '../AvatarEditorView';
 import type {IHabboAvatarEditorHost} from '../IHabboAvatarEditorHost';
 import {AvatarEditorNameSuggestionListRenderer} from './AvatarEditorNameSuggestionListRenderer';
 import {CheckUserNameResultMessageEvent} from '@habbo/communication/messages/incoming/help/CheckUserNameResultMessageEvent';
-import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
+import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
 
 /**
  * The rename dialog, opened beside the editor by its `avatar_name_change` button.

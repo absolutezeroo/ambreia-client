@@ -13,6 +13,7 @@
   "dependencies": {
     "@ambreia/common": "workspace:*",
     "@ambreia/net": "workspace:*",
+    "@ambreia/ui": "workspace:*",
     "eventemitter3": "^5.0.1",
     "pixi.js": "^8.6.6",
     "vortex-client": "workspace:*",

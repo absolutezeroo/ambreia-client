@@ -8,7 +8,7 @@
  */
 import type {EventEmitter} from 'eventemitter3';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
-import type {IWindow} from '@core/window/IWindow';
+import type {IWindow} from '@ambreia/ui/IWindow';
 import type {IHabboLocalizationManager} from '@habbo/localization/IHabboLocalizationManager';
 import type {IHabboWindowManager} from '@habbo/window/IHabboWindowManager';
 import type {IRoomDesktop} from '@habbo/ui/IRoomDesktop';

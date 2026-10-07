@@ -1,20 +1,20 @@
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {IDisposable} from '@ambreia/common/IDisposable';
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IRegionWindow} from '@core/window/components/IRegionWindow';
-import type {IStaticBitmapWrapperWindow} from '@core/window/components/IStaticBitmapWrapperWindow';
-import type {ITextFieldWindow} from '@core/window/components/ITextFieldWindow';
-import type {ITextWindow} from '@core/window/components/ITextWindow';
-import {WindowKeyboardEvent} from '@core/window/events/WindowKeyboardEvent';
-import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {IRegionWindow} from '@ambreia/ui/components/IRegionWindow';
+import type {IStaticBitmapWrapperWindow} from '@ambreia/ui/components/IStaticBitmapWrapperWindow';
+import type {ITextFieldWindow} from '@ambreia/ui/components/ITextFieldWindow';
+import type {ITextWindow} from '@ambreia/ui/components/ITextWindow';
+import {WindowKeyboardEvent} from '@ambreia/ui/events/WindowKeyboardEvent';
+import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
 
-import type {CellTemplate} from './CellTemplate';
-import {TableCell} from './TableCell';
-import type {TableColumn} from './TableColumn';
+import type {CellTemplate} from '@ambreia/ui/kit/utils/tableview/CellTemplate';
+import {TableCell} from '@ambreia/ui/kit/utils/tableview/TableCell';
+import type {TableColumn} from '@ambreia/ui/kit/utils/tableview/TableColumn';
 import type {TableRowView} from './TableRowView';
 import type {TableView} from './TableView';
-import {WindowEvent} from '@core/window/events/WindowEvent';
+import {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 
 const log = Logger.getLogger('habbo.window.utils.tableview.TableCellView');
 

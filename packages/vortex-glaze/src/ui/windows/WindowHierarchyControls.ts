@@ -1,9 +1,9 @@
-import type {IWindow} from '@core/window/IWindow';
-import type {WindowController} from '@core/window/WindowController';
-import type {WindowEvent} from '@core/window/events/WindowEvent';
-import {WindowMouseEvent} from '@core/window/events/WindowMouseEvent';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {WindowController} from '@ambreia/ui/WindowController';
+import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
+import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
 import {effect, signal, type Scope, type SignalReader} from '@ambreia/common/reactive/index';
-import {createWindowScope} from '@core/window/reactive';
+import {createWindowScope} from '@ambreia/ui/reactive/index';
 import {type EditorState} from '../../state/EditorState';
 import {addChildOfType, cloneSelected, convertSelected, deleteSelected, reorderSelected, wrapSelected} from '../../ops/StructuralOps';
 import {specFor, type IWidgetSpec} from '../../ops/WidgetCatalog';

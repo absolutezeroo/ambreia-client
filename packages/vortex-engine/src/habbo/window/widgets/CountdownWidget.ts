@@ -1,14 +1,14 @@
-import type {ICountdownWidget} from './ICountdownWidget';
-import type {IWidgetWindow} from '@core/window/components/IWidgetWindow';
+import type {ICountdownWidget} from '@ambreia/ui/kit/widgets/ICountdownWidget';
+import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
 import type {IHabboWindowManager} from '../IHabboWindowManager';
-import type {IWindow} from '@core/window/IWindow';
-import type {IWindowContainer} from '@core/window/IWindowContainer';
-import type {IItemListWindow} from '@core/window/components/IItemListWindow';
-import type {ITextWindow} from '@core/window/components/ITextWindow';
+import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {IItemListWindow} from '@ambreia/ui/components/IItemListWindow';
+import type {ITextWindow} from '@ambreia/ui/components/ITextWindow';
 import type {IUpdateReceiver} from '@core/runtime/IContext';
-import {PropertyStruct} from '@core/window/utils/PropertyStruct';
-import type {IIterator} from '@core/window/utils/IIterator';
-import {EmptyIterator} from '@core/window/iterators/EmptyIterator';
+import {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
+import type {IIterator} from '@ambreia/ui/utils/IIterator';
+import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
 
 /**
  * Countdown timer widget.
