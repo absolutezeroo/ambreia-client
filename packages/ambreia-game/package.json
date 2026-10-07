@@ -1,0 +1,25 @@
+{
+  "name": "@ambreia/game",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Ambreia game: the features (managers, room glue, session, windows) over the engines and the protocol",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "dependencies": {
+    "@ambreia/avatar": "workspace:*",
+    "@ambreia/common": "workspace:*",
+    "@ambreia/iso": "workspace:*",
+    "@ambreia/kernel": "workspace:*",
+    "@ambreia/net": "workspace:*",
+    "@ambreia/protocol": "workspace:*",
+    "@ambreia/ui": "workspace:*",
+    "eventemitter3": "^5.0.1",
+    "pixi.js": "^8.6.6",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}

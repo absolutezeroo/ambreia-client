@@ -36,12 +36,14 @@ node install.mjs             # unpack assets (vortex-client-assets.zip); --pack 
 | Package | What it is |
 |---|---|
 | `packages/ambreia-common` | `@ambreia/common`: Logger, utilities, asset loading, reactive — imports no other Ambreia package |
-| `packages/ambreia-net` | `@ambreia/net`: WebSocket transport, encryption, wire format, registry, packet tap — imports `@ambreia/common` only |
+| `packages/ambreia-net` | `@ambreia/net`: WebSocket transport, encryption, wire format, registry, packet tap, the new message style (`style/MessageMap`) — imports `@ambreia/common` only |
 | `packages/ambreia-avatar` | `@ambreia/avatar`: avatar renderer (not the editor), built from typed options; runs in Node (`tools/render-avatar.mjs`) — imports `@ambreia/common` only |
 | `packages/ambreia-ui` | `@ambreia/ui`: window system (`src/`), generic kit (`src/kit/`: plain `WindowManager`, `WidgetRegistry`, dialogs, generic widgets), XML parsers (`src/assets/`); `pnpm --filter @ambreia/ui sandbox` shows it alone — imports `@ambreia/common` only |
 | `packages/ambreia-kernel` | `@ambreia/kernel`: DI (`runtime/`), typed config (`config/`: Zod, `app` + `legacy` + one section per feature, `config.json`), features (`feature/`: `defineFeature`, `bootFeatures`) — imports `@ambreia/common` only |
 | `packages/ambreia-iso` | `@ambreia/iso`: room engine — core (`src/`), `scene/`, `furniture/`, `avatar/`, `effects/`, each with its `register*` module; `IsoStage` loads a room out of session (zone format); `pnpm --filter @ambreia/iso sandbox` — imports `@ambreia/common` and `@ambreia/avatar` only |
-| `packages/vortex-engine` | Engine: `core/` (runtime/DI, the DI wrappers `AssetLibrary` and `CoreCommunicationManager`), `habbo/` (game core: `avatar` incl. the editor, `communication`, `configuration`, `localization`, `room` (RoomEngine, the message handler: the game glue over `iso`), `session`, `ui` (room desktop, name bubble), `window` (the game windows and widgets: `HabboWindowManager extends WindowManager`)), `iid/` (DI symbols) |
+| `packages/ambreia-protocol` | `@ambreia/protocol`: `Headers.generated.ts` (from the emulator), `HabboMessages.ts`, the inherited messages, parsers and composers — imports `@ambreia/common`, `net`, `iso` only |
+| `packages/ambreia-game` | `@ambreia/game`: the game over the engines — `features/` (`GAME_FEATURES`, `IGameFeature`: images, room widgets; one folder per feature, e.g. `loading-bar/`), `core/` (DI wrappers), `avatar` incl. the editor, `communication`, `configuration`, `localization`, `room` (RoomEngine, the message handler: the glue over `iso`), `session`, `ui` (room desktop, `RoomWidgetRegistry`), `window` (`HabboWindowManager extends WindowManager`), `iid/` — never imports the host packages |
+| `packages/vortex-engine` | The host shell: `Vortex`, `VortexMain` (boots `GAME_FEATURES` through the kernel), their interfaces |
 | `packages/vortex-client` | App shell: boot (`src/App.ts`), display classes, assets, `src/vortex-layouts/` (new window XML) |
 | `packages/vortex-glaze` | Live window-layout editor — imports `@ambreia/ui` and `@ambreia/common` only (ESLint wall) |
 | `packages/vortex-imager` | Server-side avatar/furni/room renderer reusing the engine |
@@ -54,16 +56,17 @@ Browser globals (canvas, image decode, XML) go through `platform()` of `@ambreia
 a Node tool calls `setPlatform()` first (see `packages/ambreia-avatar/tools/node-platform.mjs`). Engine
 packages are plain classes; the DI registers them with `context.attachInstance(iid, instance, {dependencies, ready, update})`.
 `@ambreia/ui` (the package) is not `@ui/` (the client's alias for its own `src/`).
-Aliases: `@core/` `@habbo/` `@iid/` → engine `src/` (`@room` went with J4); in the client also `@ui/` and `@/` → client
-`src/`. Target: engines become packages `@vortex/common`, `net`, `avatar`, `iso`, `ui`, then `kernel`,
+Aliases: in the client `@ui/` and `@/` → client `src/` (the engine's `@core/` `@habbo/` `@iid/` went with J6:
+import `@ambreia/game/…`). Target: engines become packages `@vortex/common`, `net`, `avatar`, `iso`, `ui`, then `kernel`,
 `protocol`, `game` (spec §3, milestones J1–J6).
 
 ## Never
 
 - **Edit `sources/**`, `*.generated.ts`, built `src/assets/window-*` or `.vortex-dev/`.** A hook refuses
   and names what to run instead.
-- **Cross a layer wall**: the engine never imports the client; `core/` never imports `habbo/` or
-  `room/`; `room/` never imports `habbo/`. ESLint enforces it (`wall()` in `eslint.config.mjs`); an
+- **Cross a layer wall**: engines (`common`, `net`, `avatar`, `iso`, `ui`) never import `kernel`,
+  `protocol` or `game`; nothing under `packages/ambreia-*` imports a `vortex-*` package; the game's
+  `core/` never reaches out of `core/`. ESLint enforces it (`wall()` in `eslint.config.mjs`); an
   error there means the design is wrong, not the rule.
 - **Type a message id**: use `Incoming.X` / `Outgoing.X` from `Headers.generated.ts`.
 - **Run a bare `git commit`**: the owner keeps staged work in progress. Commit by path:
@@ -82,7 +85,7 @@ Aliases: `@core/` `@habbo/` `@iid/` → engine `src/` (`@room` went with J4); in
 - Log with `Logger.getLogger('habbo.room.RoomEngine')`: `trace` per frame/packet/item, `debug` for a
   subsystem's own commentary, `info` for milestones, `warn` for data or paths the client does not
   handle (they render nothing, so `debug` would hide them), `error` when the user will notice.
-- A manager is a feature (`defineFeature` in `vortex-engine/src/features/`, one line in `ENGINE_FEATURES`):
+- A manager is a feature (`@ambreia/game/features/`, one line in `GAME_FEATURES`; a new feature gets its own folder):
   a DI `Component` or a plain instance under an IID, with one `I<Manager>` interface (`docs/PATTERNS.md`).
   Config: a feature reads its own section; old keys go through `legacy` / `getProperty` until migrated.
 - Render loops allocate nothing per frame and use `Set`/`Map` for lookups (`docs/STYLEGUIDE.md` →
@@ -267,10 +270,12 @@ _Applies to: `packages/vortex-client/tools/**`, `packages/vortex-client/src/asse
 
 ## Rule: Wire protocol / communication rules
 
-_Applies to: `**/communication/**`, `packages/ambreia-net/**`_
+_Applies to: `**/communication/**`, `packages/ambreia-net/**`, `packages/ambreia-protocol/**`_
 
 You are editing wire-protocol code (`packages/ambreia-net/` — transport, encryption, wire format,
-registry — or `habbo/communication/` — the messages).
+registry, the new style's `style/MessageMap` — `packages/ambreia-protocol/` — `Headers.generated.ts`,
+`HabboMessages.ts` and the inherited messages, parsers and composers — or the game's
+`communication/`, the managers that use them).
 
 The server is **`../vortex-rpg-emulator`** (C#, Orleans). Its wire contract is
 `Vortex.Revisions/Revision20260701/`: `Headers.cs` (ids), `Parsers/` (what it reads from us),
@@ -285,12 +290,17 @@ authority on every message; `sources/HABBO-ARCTURUS-DAYBREAK/` is not this proje
    - **Parser**: `implements IMessageParser` with `flush()` + `parse(wrapper)`
    - **Event**: `extends MessageEvent implements IMessageEvent` with `callback` parameter in constructor
 5. **Message ids come from `Headers.generated.ts`**, written by `pnpm gen:headers` from the emulator's `Headers.cs` and checked by the pre-commit hook. New registrations use `Incoming.X` / `Outgoing.X`; never type an id by hand, never take one from the AS3 registry.
+6. **A new message uses the new style** (spec §6, `@ambreia/net/style/MessageMap`): a plain class, an
+   `IIncomingParser` or `IOutgoingSerializer`, an `IMessageHandler`, and a `MessageMap` per domain
+   installed on the connection (`map.install(connection)`, `map.send(connection, message)`). A header
+   an inherited event already serves is refused at install: take it out of `HabboMessages` and add
+   it to `@ambreia/protocol/NewStyleHeaders` (the registration tests accept either style, never both).
 
 ## Rule: Room engine rules
 
 _Applies to: `**/room/**`, `packages/ambreia-iso/**`_
 
-`@ambreia/iso` is the room engine: its core (`src/`: manager, instances, objects, renderer, events, utils), `scene/` (planes, content loader, factories), `furniture/`, `avatar/`, `effects/` — a type is drawn only if its module registered it (`registerScene/Furniture/Avatars/Effects`, `DEFAULT_ROOM_MODULES`). The engine's `habbo/room/` keeps the game glue (`RoomEngine`, `RoomMessageHandler`). Out of session, rooms load through `IsoStage`.
+`@ambreia/iso` is the room engine: its core (`src/`: manager, instances, objects, renderer, events, utils), `scene/` (planes, content loader, factories), `furniture/`, `avatar/`, `effects/` — a type is drawn only if its module registered it (`registerScene/Furniture/Avatars/Effects`, `DEFAULT_ROOM_MODULES`). `@ambreia/game`'s `room/` keeps the game glue (`RoomEngine`, `RoomMessageHandler`). Out of session, rooms load through `IsoStage`.
 
 1. Use `createObjectInternal()`, never `createRoomObject()`, when creating room objects from a container (the latter recurses infinitely).
 2. `renderer/` is a render-loop hot path: no allocations per frame, cache textures by content key, cull objects outside the viewport. See `docs/STYLEGUIDE.md` → Performance.
@@ -312,10 +322,10 @@ reload). `tools/vite-plugin-engine-bundle.mjs` hands the engine to esbuild in wa
   specifier is routed to the bundle, so a new package needs no edit; one served by Vite instead would
   be a second copy.
 
-- **`@core`/`@habbo`/`@iid` are deliberately absent from `resolve.alias` in dev.** `vite:alias`
-  runs before user `enforce: 'pre'` plugins, so declaring them would rewrite the specifier to engine
-  source before the plugin sees it, and the ~3,970 requests come back. They are restored for
-  `command === 'build'`.
+- **No `@ambreia/*` or engine alias in `resolve.alias`.** `vite:alias` runs before user
+  `enforce: 'pre'` plugins, so an alias would rewrite the specifier to source before the plugin sees
+  it, and the ~3,970 requests come back. A build takes the packages from the workspace links. The
+  old `@core`/`@habbo`/`@iid` aliases went with J6 (`@ambreia/game`).
 - **Only `pixi.js` and `eventemitter3` are external to the bundle** (the client imports them too and
   there must be one instance). `pako` is engine-only and not resolvable from the client package:
   externalising it gives "Failed to resolve import" and a blank page.
@@ -326,7 +336,7 @@ reload). `tools/vite-plugin-engine-bundle.mjs` hands the engine to esbuild in wa
 
 _Applies to: `**/window/**`, `**/widgets/**`, `packages/ambreia-ui/**`_
 
-You are editing the ported Flash UI/window system: `@ambreia/ui` (`packages/ambreia-ui/src`, its generic kit in `src/kit/`), the game windows in the engine's `habbo/window/` and `habbo/*/widgets/`, and the client's `window/`.
+You are editing the ported Flash UI/window system: `@ambreia/ui` (`packages/ambreia-ui/src`, its generic kit in `src/kit/`), the game windows in `@ambreia/game`'s `window/` and `*/widgets/`, and the client's `window/`.
 
 1. See `docs/PATTERNS.md` → "UI Window (ported from Flash)" and "Component Lifecycle" for the expected class shape. Quick shape reminder: UI Windows are ported from the AS3 `IWindow`/`IFrameWindow` hierarchy using PixiJS + the XML layouts described in rule 3.
 2. Never override `get events()` in a Component subclass — it breaks the DI event system. Use a differently named property (e.g. `sessionEvents`).

@@ -1,8 +1,8 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {WindowManager} from '@ambreia/ui/kit/WindowManager';
-import {HabboWindowManager} from '@habbo/window/HabboWindowManager';
-import type {IContext} from '@core/runtime/IContext';
+import {HabboWindowManager} from '@ambreia/game/window/HabboWindowManager';
+import type {IContext} from '@ambreia/kernel/runtime/IContext';
 import {GLAZE_GAME_WIDGET_TYPES} from '../src/boot/GameWidgetPlaceholder';
 
 // Glaze cannot import the engine, so it spells the game widget types out; this keeps the copy

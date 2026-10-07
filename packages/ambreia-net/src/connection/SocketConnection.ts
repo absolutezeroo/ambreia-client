@@ -37,7 +37,9 @@ export class SocketConnection extends EventEmitter<IConnectionEvents> implements
     private _socket: WebSocket | null = null;
     private _receivedBuffer: ByteArray = new ByteArray();
     private _pendingMessages: ByteArray[] = [];
-    private _pendingComposers: IMessageComposer<unknown[]>[] = [];
+    // Sends held until the connection is configured: a composer's or a map's, replayed in order.
+    private _pendingComposers: Array<() => boolean> = [];
+    private readonly _incomingHandlers = new Map<number, {name: string; handle: (wrapper: IMessageDataWrapper) => void}>();
     private _pendingReceivedMessages: IMessageDataWrapper[] = [];
     // TS-only: no AS3 counterpart; dedupes the dropped-packet warnings in handleReceivedMessage().
     private readonly _unhandledMessageIds: Set<number> = new Set();
@@ -208,7 +210,7 @@ export class SocketConnection extends EventEmitter<IConnectionEvents> implements
 
         if(!this._clientToServerEncryption || (this._authenticated && !this._configurationReady))
         {
-            this._pendingComposers.push(composer);
+            this._pendingComposers.push(() => this.send(composer));
             return false;
         }
 
@@ -220,9 +222,45 @@ export class SocketConnection extends EventEmitter<IConnectionEvents> implements
             return false;
         }
 
-        PacketLogger.outgoing(messageId, composer.constructor.name);
+        return this.encodeAndSend(messageId, composer.constructor.name, composer.getMessageArray());
+    }
 
-        let values: unknown[] = composer.getMessageArray();
+    // TS-only: see IConnection.sendValues().
+    sendValues(header: number, name: string, values: unknown[]): boolean
+    {
+        if(this._disposed) return false;
+
+        if(!this._clientToServerEncryption || (this._authenticated && !this._configurationReady))
+        {
+            this._pendingComposers.push(() => this.sendValues(header, name, values));
+            return false;
+        }
+
+        return this.encodeAndSend(header, name, values);
+    }
+
+    // TS-only: see IConnection.handleIncoming().
+    handleIncoming(header: number, name: string, handler: (wrapper: IMessageDataWrapper) => void): () => void
+    {
+        const taken = this._incomingHandlers.get(header)?.name
+            ?? (this._messageRegistry.hasIncomingMessage(header) ? `the inherited event ${this._messageRegistry.getIncomingMessageName(header)}` : null);
+
+        if(taken !== null) throw new Error(`Incoming header ${header} (${name}) is already served by ${taken}`);
+
+        const entry = {name, handle: handler};
+
+        this._incomingHandlers.set(header, entry);
+
+        return () =>
+        {
+            if(this._incomingHandlers.get(header) === entry) this._incomingHandlers.delete(header);
+        };
+    }
+
+    /** The tail every send shares once the id is known: log, tap, encode, encipher, write. */
+    private encodeAndSend(messageId: number, name: string, values: unknown[]): boolean
+    {
+        PacketLogger.outgoing(messageId, name);
 
         if(this._tap?.outgoing)
         {
@@ -236,7 +274,7 @@ export class SocketConnection extends EventEmitter<IConnectionEvents> implements
 
         const encoded = this._wireFormatter.encode(messageId, values);
 
-        this._clientToServerEncryption.encipher(encoded);
+        this._clientToServerEncryption!.encipher(encoded);
 
         return this.sendRaw(encoded, messageId);
     }
@@ -417,6 +455,7 @@ export class SocketConnection extends EventEmitter<IConnectionEvents> implements
         this._pendingMessages = [];
         this._pendingComposers = [];
         this._pendingReceivedMessages = [];
+        this._incomingHandlers.clear();
         this._messageRegistry.clear();
         this._wireFormatter.dispose();
         this._clientToServerEncryption = null;
@@ -616,9 +655,9 @@ export class SocketConnection extends EventEmitter<IConnectionEvents> implements
         const composers = this._pendingComposers;
         this._pendingComposers = [];
 
-        for(const composer of composers)
+        for(const send of composers)
         {
-            this.send(composer);
+            send();
         }
     }
 
@@ -669,6 +708,25 @@ export class SocketConnection extends EventEmitter<IConnectionEvents> implements
         }
 
         const messageId = wrapper.getMessageId();
+        const handler = this._incomingHandlers.get(messageId);
+
+        if(handler)
+        {
+            PacketLogger.incoming(messageId, handler.name, 1);
+
+            try
+            {
+                handler.handle(wrapper);
+            }
+            catch (error)
+            {
+                log.error(`Handler error for ${messageId} (${handler.name}): ${(error as Error).message}`, error);
+                this._callback?.messageParseError?.(wrapper);
+            }
+
+            return;
+        }
+
         const events = this._messageRegistry.getMessageEventsForId(messageId);
 
         PacketLogger.incoming(messageId, this._messageRegistry.getIncomingMessageName(messageId), events?.length ?? 0);

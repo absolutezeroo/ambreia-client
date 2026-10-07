@@ -215,3 +215,48 @@ test('engines never import the kernel (spec §3 rule 1)', async () =>
         assert.equal((await wallHits(spec, `packages/${engine}/src/Probe.ts`)).length, 1, engine);
     }
 });
+
+const probe = (name, from) => `import {${name}} from '${from}';\nexport {${name}};\n`;
+
+test('protocol: common, net and iso are allowed, the kernel and the game are refused', async () =>
+{
+    const at = 'packages/ambreia-protocol/src/Probe.ts';
+
+    assert.equal((await wallHits(probe('MessageEvent', '@ambreia/net/messages/MessageEvent'), at)).length, 0);
+    assert.equal((await wallHits(probe('Vector3d', '@ambreia/iso/utils/Vector3d'), at)).length, 0);
+    assert.equal((await wallHits(probe('Logger', '@ambreia/common/utils/Logger'), at)).length, 0);
+    assert.equal((await wallHits(probe('Component', '@ambreia/kernel/runtime/Component'), at)).length, 1);
+    assert.equal((await wallHits(probe('RoomEngine', '@ambreia/game/room/RoomEngine'), at)).length, 1);
+});
+
+test('engines and the kernel never import protocol or game (spec §3 rule 1)', async () =>
+{
+    for(const pkg of ['ambreia-common', 'ambreia-net', 'ambreia-avatar', 'ambreia-iso', 'ambreia-ui', 'ambreia-kernel'])
+    {
+        const at = `packages/${pkg}/src/Probe.ts`;
+
+        assert.equal((await wallHits(probe('Incoming', '@ambreia/protocol/Headers.generated'), at)).length, 1, pkg);
+        assert.equal((await wallHits(probe('RoomEngine', '@ambreia/game/room/RoomEngine'), at)).length, 1, pkg);
+    }
+});
+
+test('game: every @ambreia package is allowed, the client and the engine shell are refused', async () =>
+{
+    const at = 'packages/ambreia-game/src/room/Probe.ts';
+
+    for(const from of ['@ambreia/kernel/runtime/Component', '@ambreia/protocol/Headers.generated', '@ambreia/iso/utils/Vector3d', '@ambreia/ui/kit/WindowManager'])
+    {
+        assert.equal((await wallHits(probe('X', from), at)).length, 0, from);
+    }
+
+    assert.equal((await wallHits(probe('App', '@/App'), at)).length, 1);
+    assert.equal((await wallHits(probe('Vortex', 'vortex-engine'), at)).length, 1);
+});
+
+test('game: core/ never reaches out of core/, at any depth', async () =>
+{
+    assert.equal((await wallHits(probe('RoomEngine', '../room/RoomEngine'), 'packages/ambreia-game/src/core/Probe.ts')).length, 1);
+    assert.equal((await wallHits(probe('RoomEngine', '../../room/RoomEngine'), 'packages/ambreia-game/src/core/communication/Probe.ts')).length, 1);
+    assert.equal((await wallHits(probe('Loc', '../localization/Localization'), 'packages/ambreia-game/src/core/communication/Probe.ts')).length, 0);
+    assert.equal((await wallHits(probe('RoomEngine', '../../../room/RoomEngine'), 'packages/ambreia-game/src/core/runtime/events/Probe.ts')).length, 1);
+});

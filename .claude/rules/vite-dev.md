@@ -18,10 +18,10 @@ reload). `tools/vite-plugin-engine-bundle.mjs` hands the engine to esbuild in wa
   specifier is routed to the bundle, so a new package needs no edit; one served by Vite instead would
   be a second copy.
 
-- **`@core`/`@habbo`/`@iid` are deliberately absent from `resolve.alias` in dev.** `vite:alias`
-  runs before user `enforce: 'pre'` plugins, so declaring them would rewrite the specifier to engine
-  source before the plugin sees it, and the ~3,970 requests come back. They are restored for
-  `command === 'build'`.
+- **No `@ambreia/*` or engine alias in `resolve.alias`.** `vite:alias` runs before user
+  `enforce: 'pre'` plugins, so an alias would rewrite the specifier to source before the plugin sees
+  it, and the ~3,970 requests come back. A build takes the packages from the workspace links. The
+  old `@core`/`@habbo`/`@iid` aliases went with J6 (`@ambreia/game`).
 - **Only `pixi.js` and `eventemitter3` are external to the bundle** (the client imports them too and
   there must be one instance). `pako` is engine-only and not resolvable from the client package:
   externalising it gives "Failed to resolve import" and a blank page.

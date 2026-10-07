@@ -20,6 +20,7 @@ test('every packages/ambreia-* with a src folder joins the engine graph, nothing
 test('a new package needs no regex edit to be routed to the bundle', () =>
 {
     assert.ok(ENGINE_ALIAS_RE.test('@ambreia/avatar/AvatarImage'));
-    assert.ok(ENGINE_ALIAS_RE.test('@core/runtime/Component'));
+    // The engine aliases went with J6: the game is @ambreia/game.
+    assert.ok(!ENGINE_ALIAS_RE.test('@core/runtime/Component'));
     assert.ok(!ENGINE_ALIAS_RE.test('@ambreiax/thing'));
 });

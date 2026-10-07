@@ -1,16 +1,16 @@
-import type {IDisposable} from "@core";
-import type {IHabboCommunicationDemo, IHabboCommunicationManager} from "@habbo/communication";
-import type {IHabboLocalizationManager} from "@habbo/localization";
-import type {IHabboConfigurationManager} from "@habbo/configuration";
+import type {IDisposable} from "@ambreia/game/core/index";
+import type {IHabboCommunicationDemo, IHabboCommunicationManager} from "@ambreia/game/communication/index";
+import type {IHabboLocalizationManager} from "@ambreia/game/localization/index";
+import type {IHabboConfigurationManager} from "@ambreia/game/configuration/index";
 import type {IRoomManager} from "@ambreia/iso/IRoomManager";
-import type {IRoomSessionManager, ISessionDataManager} from "@habbo/session";
-import type {IRoomEngine} from "@habbo/room";
+import type {IRoomSessionManager, ISessionDataManager} from "@ambreia/game/session/index";
+import type {IRoomEngine} from "@ambreia/game/room/index";
 import type {IVortexConfig} from "./Vortex";
-import type {IRoomMessageHandler} from "@habbo/room/IRoomMessageHandler";
-import type {IHabboWindowManager} from "@habbo/window/IHabboWindowManager";
+import type {IRoomMessageHandler} from "@ambreia/game/room/IRoomMessageHandler";
+import type {IHabboWindowManager} from "@ambreia/game/window/IHabboWindowManager";
 import type {IAssetLibrary} from "@ambreia/common/assets/IAssetLibrary";
 import type {Application} from 'pixi.js';
-import type {HabboAvatarEditorManager} from "@habbo/avatar/HabboAvatarEditorManager";
+import type {HabboAvatarEditorManager} from "@ambreia/game/avatar/HabboAvatarEditorManager";
 
 export interface IVortexMain extends IDisposable
 {

@@ -1,3 +1,4 @@
+import type {IMessageDataWrapper} from '../messages/IMessageDataWrapper';
 import type {IDisposable} from '@ambreia/common/IDisposable';
 import type {IEncryption} from '../encryption/IEncryption';
 import type {IMessageComposer} from '../messages/IMessageComposer';
@@ -144,4 +145,15 @@ export interface IConnection extends IDisposable
 
     // TS-only: hands a message to the handlers as if the server had sent it, without touching the cipher.
     injectIncoming(messageId: number, values: unknown[]): void;
+
+    /**
+     * TS-only, the new network style (spec §6, `style/MessageMap`): `handler` receives every
+     * incoming message of `header`, before the inherited events, and the call returns the
+     * unsubscription. Throws when an inherited event class or another handler already serves the
+     * header: two readers of one message is a bug, not a feature.
+     */
+    handleIncoming(header: number, name: string, handler: (wrapper: IMessageDataWrapper) => void): () => void;
+
+    /** TS-only, the new network style: sends `values` under `header`, like send() does a composer's. */
+    sendValues(header: number, name: string, values: unknown[]): boolean;
 }

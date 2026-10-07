@@ -11,7 +11,7 @@
  * and it is the client's class doing it.
  *
  * @see packages/vortex-engine/src/habbo/room/renderer/RoomRenderingCanvas.ts
- * @see packages/vortex-engine/src/habbo/room/RoomEngine.ts
+ * @see packages/ambreia-game/src/room/RoomEngine.ts
  */
 import {Logger} from '@ambreia/common/utils/Logger';
 import {Vector3d} from '@ambreia/iso/utils/Vector3d';
@@ -730,7 +730,7 @@ interface IDoor
  * `RoomEntryTileMessageParser` plays in the client — rather than replacing the detection, because
  * the *direction* is not in the database and is what the whole thing turns on.
  *
- * @see packages/vortex-engine/src/habbo/room/RoomMessageHandler.ts::onFloorHeightMap()
+ * @see packages/ambreia-game/src/room/RoomMessageHandler.ts::onFloorHeightMap()
  */
 function detectDoor(tiles: ITileMap, room: IRoomRow): IDoor | null
 {
@@ -808,7 +808,7 @@ function applyDoorDisplacement(geometry: RoomGeometry, door: IDoor | null): void
  * the widest one with holes, which is what the emulator's own `CompileModelFromString()` does
  * with a short row.
  *
- * @see packages/vortex-engine/src/habbo/communication/messages/parser/room/engine/FloorHeightMapMessageParser.ts
+ * @see packages/ambreia-protocol/src/parser/room/engine/FloorHeightMapMessageParser.ts
  */
 function parseModel(model: string): ITileMap
 {

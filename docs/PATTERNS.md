@@ -44,7 +44,7 @@ Composers serialize data for sending to the server.
 ### Template
 
 ```typescript
-import { MessageComposer } from '@core/communication/messages/MessageComposer';
+import { MessageComposer } from '@ambreia/net/messages/MessageComposer';
 
 /**
  * Sends a request to open a flat connection.
@@ -91,8 +91,8 @@ Parsers deserialize data received from the server.
 ### Template
 
 ```typescript
-import type { IMessageDataWrapper } from '@core/communication/messages/IMessageDataWrapper';
-import type { IMessageParser } from '@core/communication/messages/IMessageParser';
+import type { IMessageDataWrapper } from '@ambreia/net/messages/IMessageDataWrapper';
+import type { IMessageParser } from '@ambreia/net/messages/IMessageParser';
 
 /**
  * Parses room info data from the server.
@@ -163,8 +163,8 @@ Events bind a Parser to a callback for incoming message handling.
 ### Template
 
 ```typescript
-import { MessageEvent } from '@core/communication/messages/MessageEvent';
-import type { IMessageEvent, MessageEventCallback } from '@core/communication/messages/IMessageEvent';
+import { MessageEvent } from '@ambreia/net/messages/MessageEvent';
+import type { IMessageEvent, MessageEventCallback } from '@ambreia/net/messages/IMessageEvent';
 import { RoomInfoParser } from './RoomInfoParser';
 
 /**
@@ -197,10 +197,10 @@ Managers are the main business logic classes, registered in the DI system.
 ### Template
 
 ```typescript
-import { Component } from '@core/runtime/Component';
-import { ComponentDependency } from '@core/runtime/ComponentDependency';
-import { IID_HabboCommunicationManager } from '@iid/IIDHabboCommunicationManager';
-import type { IHabboCommunicationManager } from '@habbo/communication/IHabboCommunicationManager';
+import { Component } from '@ambreia/kernel/runtime/Component';
+import { ComponentDependency } from '@ambreia/kernel/runtime/ComponentDependency';
+import { IID_HabboCommunicationManager } from '@ambreia/game/iid/IIDHabboCommunicationManager';
+import type { IHabboCommunicationManager } from '@ambreia/game/communication/IHabboCommunicationManager';
 
 /**
  * Manages room instances and their lifecycle.
@@ -287,7 +287,7 @@ export class RoomManager extends Component implements IRoomManager
 - **NEVER override `get events()`** — use a different name for custom events
 - `dispose()` is ALWAYS the last method, calls `super.dispose()`
 - `dispose()` checks `_disposed` to avoid double calls (inherited from `Component`)
-- IIDs are registered in `packages/vortex-engine/src/iid/index.ts`
+- IIDs are registered in `packages/ambreia-game/src/iid/`
 
 ---
 
@@ -298,7 +298,7 @@ Handlers listen to server messages and delegate to a listener.
 ### Template
 
 ```typescript
-import type { IConnection } from '@core/communication/connections/IConnection';
+import type { IConnection } from '@ambreia/net/connection/IConnection';
 
 /**
  * Handles room-related messages from the server.
@@ -367,7 +367,7 @@ Data classes represent protocol structures.
 ### Template
 
 ```typescript
-import type { IMessageDataWrapper } from '@core/communication/messages/IMessageDataWrapper';
+import type { IMessageDataWrapper } from '@ambreia/net/messages/IMessageDataWrapper';
 
 /**
  * Represents a room entry from navigation results.
@@ -539,11 +539,11 @@ Every manager and service extends `Component`. The lifecycle follows a strict se
 ### Template
 
 ```typescript
-import { Component } from '@core/runtime/Component';
-import { ComponentDependency } from '@core/runtime/ComponentDependency';
-import { IID_HabboConfigurationManager } from '@iid/IIDHabboConfigurationManager';
-import type { IContext } from '@core/runtime/IContext';
-import type { IHabboConfigurationManager } from '@habbo/configuration/IHabboConfigurationManager';
+import { Component } from '@ambreia/kernel/runtime/Component';
+import { ComponentDependency } from '@ambreia/kernel/runtime/ComponentDependency';
+import { IID_HabboConfigurationManager } from '@ambreia/game/iid/IIDHabboConfigurationManager';
+import type { IContext } from '@ambreia/kernel/runtime/IContext';
+import type { IHabboConfigurationManager } from '@ambreia/game/configuration/IHabboConfigurationManager';
 
 export class MyManager extends Component implements IMyManager
 {
@@ -604,12 +604,12 @@ Every injectable service has a unique Interface Identifier (`IID<T>`) for type-s
 
 ### IID declaration
 
-One file per IID in `packages/vortex-engine/src/iid/`:
+One file per IID in `packages/ambreia-game/src/iid/`:
 
 ```typescript
 // IIDRoomEngine.ts
-import { createIID } from '@core/runtime/IID';
-import type { IRoomEngine } from '@habbo/room/IRoomEngine';
+import { createIID } from '@ambreia/kernel/runtime/IID';
+import type { IRoomEngine } from '@ambreia/game/room/IRoomEngine';
 
 export const IID_RoomEngine = createIID<IRoomEngine>('IRoomEngine');
 ```
@@ -894,7 +894,7 @@ The project uses `eventemitter3` (not Node.js EventEmitter). Three event pattern
 ### A. ComponentEvents (lifecycle)
 
 ```typescript
-import { ComponentEvents } from '@core/runtime/Component';
+import { ComponentEvents } from '@ambreia/kernel/runtime/Component';
 
 // Defined as const object
 export const ComponentEvents = {
@@ -1000,7 +1000,7 @@ Named loggers with colored output. One logger per module.
 ### Template
 
 ```typescript
-import { Logger } from '@core/utils/Logger';
+import { Logger } from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('RoomEngine');
 
@@ -1032,13 +1032,13 @@ The codebase enforces separation of type-only imports from value imports.
 
 ```typescript
 // Value imports (used at runtime)
-import { Component } from '@core/runtime/Component';
+import { Component } from '@ambreia/kernel/runtime/Component';
 import { EventEmitter } from 'eventemitter3';
 
 // Type-only imports (erased at compile time)
-import type { IContext } from '@core/runtime/IContext';
+import type { IContext } from '@ambreia/kernel/runtime/IContext';
 import type { IRoomObject } from '@room/object/IRoomObject';
-import type { IMessageDataWrapper } from '@core/communication/messages/IMessageDataWrapper';
+import type { IMessageDataWrapper } from '@ambreia/net/messages/IMessageDataWrapper';
 ```
 
 ### Rules

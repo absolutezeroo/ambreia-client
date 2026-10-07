@@ -19,9 +19,11 @@
   },
   "dependencies": {
     "@ambreia/common": "workspace:*",
+    "@ambreia/game": "workspace:*",
     "@ambreia/iso": "workspace:*",
     "@ambreia/kernel": "workspace:*",
     "@ambreia/net": "workspace:*",
+    "@ambreia/protocol": "workspace:*",
     "@ambreia/ui": "workspace:*",
     "eventemitter3": "^5.0.1",
     "pixi.js": "^8.6.6",

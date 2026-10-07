@@ -9,7 +9,7 @@ import {TYPE_CODE_TO_NAME, WindowType} from '@ambreia/ui/enum/WindowType';
 import type {ILogRecord} from '@ambreia/common/utils/Logger';
 import {Logger, LogLevel} from '@ambreia/common/utils/Logger';
 import type {IElementDescriptor} from '@ambreia/ui/kit/IElementDescriptor';
-import type {ILinkEventTracker} from '@core/runtime/events';
+import type {ILinkEventTracker} from '@ambreia/game/core/runtime/events/index';
 
 const log = Logger.getLogger('client.debugger.WindowDebuggerOverlay');
 

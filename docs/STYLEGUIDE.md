@@ -121,11 +121,11 @@ AS3: function dispose():void → TS: dispose(): void           (identical)
 ```typescript
 // Use import type for type-only imports
 import type { IRoomSession } from './IRoomSession';
-import type { IMessageDataWrapper } from '@core/communication/messages/IMessageDataWrapper';
+import type { IMessageDataWrapper } from '@ambreia/net/messages/IMessageDataWrapper';
 
 // Regular import for values (classes, functions, constants)
 import { RoomSession } from './RoomSession';
-import { Component } from '@core/di/Component';
+import { Component } from '@ambreia/kernel/runtime/Component';
 ```
 
 ### Path aliases
@@ -134,7 +134,7 @@ Always prefer aliases over deep relative paths:
 
 ```typescript
 // CORRECT — alias
-import { Component } from '@core/di/Component';
+import { Component } from '@ambreia/kernel/runtime/Component';
 import type { IRoomEngine } from '@room/IRoomEngine';
 
 // WRONG — deep relative path
@@ -156,8 +156,8 @@ export default RoomSessionManager;
 
 1. External types (`import type` from third-party packages)
 2. External imports (third-party packages)
-3. Internal types (`import type` from `@core/`, `@habbo/`, etc.)
-4. Internal imports (from `@core/`, `@habbo/`, etc.)
+3. Internal types (`import type` from `@ambreia/…`, or relative inside a package)
+4. Internal imports (from `@ambreia/…`, or relative inside a package)
 5. Relative imports
 
 ---
@@ -406,7 +406,7 @@ source_as_win63/habbo/session/
     ├── RoomDataHandler.as
     └── RoomChatHandler.as
 
-→ packages/vortex-engine/src/habbo/session/
+→ packages/ambreia-game/src/session/
   ├── RoomSessionManager.ts
   ├── IRoomSessionManager.ts
   ├── RoomSession.ts
@@ -469,7 +469,7 @@ private _data: Record<string, unknown>;  // If type is truly unknown
 one module-level logger:
 
 ```typescript
-import {Logger} from '@core/utils/Logger';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('habbo.room.RoomEngine');
 ```

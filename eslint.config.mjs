@@ -265,6 +265,51 @@ export default tseslint.config(
         }
     },
     {
+        // The protocol: the server's messages, their parsers and composers. It carries the iso types
+        // its messages hold (stuff data, vectors) and nothing of the kernel or the game (spec §3).
+        files: ['packages/ambreia-protocol/src/**/*.ts'],
+        rules:
+        {
+            'no-restricted-imports': wall(
+                {
+                    regex: '^@(core|habbo|room|iid|ui)(/|$)|^@ambreia/(?!(common|net|iso)/)|(^|/)vortex-(engine|client)(/|$)|(^|/)ambreia-[a-z]+/src(/|$)',
+                    message: `@ambreia/protocol depends on @ambreia/common, net and iso only (${WALLS_SPEC}).`
+                }
+            )
+        }
+    },
+    {
+        // The game stands on every Ambreia package, and on nothing of the host that boots it.
+        files: ['packages/ambreia-game/src/**/*.ts'],
+        rules:
+        {
+            'no-restricted-imports': wall(
+                {
+                    regex: '(^|/)vortex-(engine|client|glaze|imager)(/|$)|(^|/)ambreia-[a-z]+/src(/|$)',
+                    message: `@ambreia/game never imports the host packages (${WALLS_SPEC}).`
+                }
+            )
+        }
+    },
+    // game/src/core is the game's bottom layer: it never reaches out of core/. Its folders share
+    // names with the game's (communication, localization), so the wall counts the climb per depth.
+    ...[1, 2, 3].map(depth => ({
+        files: [`packages/ambreia-game/src/core/${'*/'.repeat(depth - 1)}*.ts`],
+        rules:
+        {
+            'no-restricted-imports': wall(
+                {
+                    regex: '(^|/)vortex-(engine|client|glaze|imager)(/|$)|(^|/)ambreia-[a-z]+/src(/|$)',
+                    message: `@ambreia/game never imports the host packages (${WALLS_SPEC}).`
+                },
+                {
+                    regex: `^(\\.\\./){${depth}}`,
+                    message: `game core/ never imports the rest of the game (${WALLS_SPEC}).`
+                }
+            )
+        }
+    })),
+    {
         // Glaze is the window system's own editor: it stands on @ambreia/ui and @ambreia/common, so
         // what it can do is what any other host of the window system can (spec §11, J3).
         files: ['packages/vortex-glaze/src/**/*.ts'],
