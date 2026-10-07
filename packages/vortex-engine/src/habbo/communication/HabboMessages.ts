@@ -186,6 +186,11 @@ import {
 
 // Outgoing Composers - Room Chat
 
+// Outgoing Composers - Room Furniture
+import {UseFurnitureMessageComposer} from './messages/outgoing/room/furniture/UseFurnitureMessageComposer';
+import {UseWallItemMessageComposer} from './messages/outgoing/room/furniture/UseWallItemMessageComposer';
+import {Outgoing} from './Headers.generated';
+
 // Outgoing Composers - Room Avatar
 import {
     LookToMessageComposer,
@@ -931,7 +936,10 @@ export class HabboMessages implements IMessageConfiguration
         // AS3: AreaHideFurniWidget.as::updateData() — the area-hide rectangle and its three flags.
         // AS3: _SafeCls_1821.as::changeRoomObjectState() — the three siblings of UseFurniture
         // above. Floor items split on the isRandom flag (3353 / 1942); wall items take 3590.
-        // 3590 disagrees with the emulator, which listens on 1540 — see the composer's own note.
+        // Both came back with the emulator's zone furni interactions (its 975b08e8f): a door,
+        // lever, sign, teleport or seat answers them; their state comes back as stuff data.
+        this._composers.set(Outgoing.UseFurnitureMessageEvent, UseFurnitureMessageComposer);
+        this._composers.set(Outgoing.UseWallItemMessageEvent, UseWallItemMessageComposer);
         // AS3: _SafeCls_1821.as::modifyRoomObjectData() "OBJECT_SAVE_STUFF_DATA"
 
         // The floor plan editor's three. The two GETs have a real handler waiting on the emulator;

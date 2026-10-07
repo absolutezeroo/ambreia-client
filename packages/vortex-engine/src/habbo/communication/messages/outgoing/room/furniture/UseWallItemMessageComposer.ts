@@ -7,16 +7,8 @@ import {MessageComposer} from '@ambreia/net/messages/MessageComposer';
  *
  * Header 3590, from WIN63's registry (`_SafeCls_2046.as::_composers[3590]`).
  *
- * **The emulator disagrees, and the registry wins.** vortex-emulator declares
- * `UseWallItemMessageEvent = 1540` with the comment *"UNRESOLVED: no distinct AS3 backing
- * found — room engine modifyWallItemData() sends the only composer for this action"*. That
- * conclusion is wrong: `modifyWallItemData()` (3498, SetItemData) writes a wall item's colour
- * and text, which is a different action from *using* one. `changeRoomObjectState()` has a
- * distinct `param3 == 20` branch sending `_SafeCls_3754`, and the registry gives it 3590.
- * Header source-of-truth order is the WIN63 registry first, the emulator as corroboration only.
- *
- * Practical consequence: the server currently listens on 1540 and will not act on this. The
- * client is nonetheless correct, and the fix belongs in vortex-emulator's Headers.cs.
+ * The emulator once declared 1540 for this message; since its commit 975b08e8f (2026-10-07) it
+ * listens on 3590 as well, with the same `(objectId, param)` payload.
  *
  * The name comes from vortex-emulator; no unobfuscated tree carries this composer.
  */
