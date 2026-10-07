@@ -81,7 +81,10 @@ export interface IContext extends IDisposable
 	 * @param interfaces Array of interface IDs this component provides
 	 */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/core/runtime/_SafeCls_54.as::attachComponent()
-    attachComponent(component: Component, interfaces: IID[]): void;
+    attachComponent(component: Component, interfaces: IID[], instance?: unknown): void;
+
+    // TS-only: registers a plain object (an engine package's class) under `iid`.
+    attachInstance<T>(iid: IID<T>, instance: T): void;
 
     /**
 	 * Detach a component from this context

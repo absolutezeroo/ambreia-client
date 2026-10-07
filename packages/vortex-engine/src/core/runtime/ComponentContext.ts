@@ -149,7 +149,8 @@ export class ComponentContext extends Component implements IContext
 	 * Attach a component to this context
 	 */
     // AS3: .../src/com/sulake/core/runtime/_SafeCls_56.as::attachComponent()
-    attachComponent(component: Component, interfaces: IID[]): void
+    // `instance` is TS-only: see attachInstance().
+    attachComponent(component: Component, interfaces: IID[], instance?: unknown): void
     {
         if(this.disposed) return;
 
@@ -175,7 +176,7 @@ export class ComponentContext extends Component implements IContext
         // Register interfaces
         for(const iid of interfaces)
         {
-            component.registerInterface(iid, component);
+            component.registerInterface(iid, instance ?? component);
         }
 
         // Listen for unlock event
@@ -596,6 +597,14 @@ export class ComponentContext extends Component implements IContext
     /**
 	 * Announce that an interface is now available
 	 */
+    // TS-only: the DI wrapper of an engine package (spec §3 rule 1). The package's object is a plain
+    //   class; a bare carrier Component holds it under `iid`, and every request receives the object
+    //   (announceInterfaceAvailability() reads it back through the carrier's queueInterface()).
+    attachInstance<T>(iid: IID<T>, instance: T): void
+    {
+        this.attachComponent(new Component(this), [iid], instance);
+    }
+
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/core/runtime/ComponentContext.as::announceInterfaceAvailability()
     private announceInterfaceAvailability<T>(iid: IID<T>, provider: Component | T): void
     {
