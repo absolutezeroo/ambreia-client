@@ -64,6 +64,8 @@ export interface IIsoStageOptions
     avatarRenderer?: IAvatarRenderManager | null;
     /** A PixiJS renderer for views drawn to a canvas (IIsoView.render()); see createOffscreenRenderer(). */
     renderer?: Renderer | null;
+    /** How long create() waits for the room content before it gives up; default two minutes. */
+    bootTimeoutMs?: number;
 }
 
 /** One loaded room: its instance, its geometry, and the editor's ids mapped to iso's. */
@@ -150,7 +152,7 @@ export class IsoStage
         manager.start();
         manager.limitContentProcessing = false;
 
-        await withTimeout(stage.pumpUntil(new Promise<void>((resolve) =>
+        await stage.pumpUntil(new Promise<void>((resolve) =>
         {
             manager.initialize(null, {
                 roomManagerInitialized: (): void => resolve(),
@@ -161,7 +163,7 @@ export class IsoStage
                 objectInitialized: (): void => {},
                 objectsInitialized: (): void => {}
             });
-        })), BOOT_TIMEOUT_MS, 'the room content did not load');
+        }), options.bootTimeoutMs ?? BOOT_TIMEOUT_MS, 'the room content did not load');
 
         stage._roomData = buildRoomVisualizationData(loader.getAssetByName('room') as NitroAsset | null);
 
@@ -269,7 +271,10 @@ export class IsoStage
         const category = 'side' in item ? RoomObjectCategoryEnum.OBJECT_CATEGORY_WALL : RoomObjectCategoryEnum.OBJECT_CATEGORY_FURNITURE;
         const object = id === undefined ? null : room!.instance.getObject(id, category) as IRoomObjectController | null;
 
-        if(!room || object === null || object.getType() !== this.typeOf(item))
+        // A colour is a definition of the same class (`chair*1`, `chair*3`), and the colour is set
+        // once (immutable, as the client sets it): another definition is a new object.
+        if(!room || object === null || object.getType() !== this.typeOf(item)
+            || object.getModel().getNumber(RoomObjectVariableEnum.FURNITURE_TYPE_ID) !== item.definition)
         {
             this.removeItem(roomId, item.id);
             await this.addItem(roomId, item);
@@ -427,14 +432,18 @@ export class IsoStage
         this._manager.update(this._time);
     }
 
-    private async pumpUntil(settled: Promise<void>): Promise<void>
+    /** Updates the manager until `settled` resolves, or rejects after `ms` and stops updating. */
+    private async pumpUntil(settled: Promise<void>, ms: number, what: string): Promise<void>
     {
+        const deadline = performance.now() + ms;
         let done = false;
 
-        void settled.then(() => { done = true; });
+        void settled.then(() => { done = true; }, () => { done = true; });
 
         while(!done)
         {
+            if(performance.now() >= deadline) throw new Error(`${what} within ${ms} ms`);
+
             this.pump();
             await new Promise<void>(resolve => setTimeout(resolve, PUMP_INTERVAL_MS));
         }

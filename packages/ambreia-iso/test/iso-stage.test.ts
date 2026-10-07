@@ -8,6 +8,8 @@ import {FurnitureDataParser} from '../src/furniture/data/FurnitureDataParser';
 import type {IFurnitureData} from '../src/furniture/data/IFurnitureData';
 import {RoomObjectCategoryEnum} from '../src/scene/object/RoomObjectCategoryEnum';
 import type {IIsoRoomData} from '../src/IIsoRoomData';
+import {RoomObjectVariableEnum} from '../src/scene/object/RoomObjectVariableEnum';
+import {RoomManager} from '../src/RoomManager';
 
 // A room loaded out of session against the asset server, as the map editor will (plan D5).
 const ASSETS = process.env.AMBREIA_ASSETS?.replace(/\/+$/, '') ?? null;
@@ -115,4 +117,85 @@ test('the view projects tiles, follows the camera, and points back at items and 
 
     view.dispose();
     stage.dispose();
+});
+
+async function emptyStage(base: string, name: string): Promise<IsoStage>
+{
+    const properties: Record<string, string> = {
+        'flash.dynamic.download.url': `${base}/dcr/hof_furni/`,
+        'flash.dynamic.download.name.template': '%typeid%.nitro',
+        'pet.dynamic.download.url': `${base}/gordon/vortex-assets-PRODUCTION-202601121522-867048149/`,
+        'pet.dynamic.download.name.template': '%type%.nitro'
+    };
+    const stage = await IsoStage.create({assets: new AssetLibrary(name), property: key => properties[key] ?? '', furniData: await furniData(base)});
+
+    await stage.loadRoom('r', {floor: {width: 3, length: 3, tiles: Array.from({length: 9}, () => ({height: 0, walkable: true, hole: false}))}, decor: [], wallDecor: []});
+
+    return stage;
+}
+
+test('changing a furni to another colour of its class redraws it in that colour', {skip: SKIP, timeout: 120_000}, async () =>
+{
+    setPlatform(nodePlatform());
+
+    const stage = await emptyStage(ASSETS!, 'iso-colour');
+    const chair = {id: 'armchair', definition: 5666001, class: 'mode_gold_armchair*1', x: 1, y: 1, z: 0, rotation: 2, state: '0'};
+
+    await stage.addItem('r', chair);
+    await stage.updateItem('r', {...chair, definition: 5666003, class: 'mode_gold_armchair*3'});
+
+    const object = stage.getRoom('r')!.getObjects(RoomObjectCategoryEnum.OBJECT_CATEGORY_FURNITURE)[0];
+
+    assert.equal(object.getModel().getNumber(RoomObjectVariableEnum.FURNITURE_COLOR), 3);
+    stage.dispose();
+});
+
+test('two furni of a type not loaded yet, added together, both get its content', {skip: SKIP, timeout: 120_000}, async () =>
+{
+    setPlatform(nodePlatform());
+
+    const stage = await emptyStage(ASSETS!, 'iso-concurrent');
+    const cactus = (id: string, x: number): {id: string; definition: number; class: string; x: number; y: number; z: number; rotation: number; state: string} =>
+        ({id, definition: 164, class: 'plant_big_cactus', x, y: 1, z: 0, rotation: 0, state: '0'});
+
+    await Promise.all([stage.addItem('r', cactus('a', 0)), stage.addItem('r', cactus('b', 2))]);
+    stage.update(16);
+
+    const objects = stage.getRoom('r')!.getObjects(RoomObjectCategoryEnum.OBJECT_CATEGORY_FURNITURE);
+
+    assert.deepEqual(objects.map(o => o.isInitialized()), [true, true]);
+    stage.dispose();
+});
+
+test('a boot that times out stops pumping the room manager', {timeout: 30_000}, async () =>
+{
+    setPlatform(nodePlatform());
+
+    // Content that never arrives: every download hangs (no socket left behind when the test ends).
+    const originalFetch = globalThis.fetch;
+    const original = RoomManager.prototype.update;
+    let updates = 0;
+
+    globalThis.fetch = (() => new Promise<Response>(() => {})) as typeof fetch;
+    RoomManager.prototype.update = function(this: RoomManager, time: number): void { updates++; original.call(this, time); };
+
+    try
+    {
+        await assert.rejects(IsoStage.create({
+            assets: new AssetLibrary('iso-timeout'),
+            property: key => (key === 'pet.dynamic.download.url' ? 'http://content.invalid/' : ''),
+            furniData: [],
+            bootTimeoutMs: 300
+        }), /did not load/);
+
+        const before = updates;
+
+        await new Promise(resolve => setTimeout(resolve, 200));
+        assert.equal(updates, before);
+    }
+    finally
+    {
+        RoomManager.prototype.update = original;
+        globalThis.fetch = originalFetch;
+    }
 });
