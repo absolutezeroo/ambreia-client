@@ -1,6 +1,7 @@
 import type {ZoneDecorObject, ZoneFloor, ZoneTile} from '@ambreia/map-editor-core/zone/Zone.generated';
 import {rotatedFootprint, tileAt} from '@ambreia/map-editor-core/zone/zoneGeometry';
 import type {IFurnitureSprite} from './IFurnitureSprite';
+import type {IsoBackdrop} from './IsoBackdrop';
 import type {IPick} from './IPick';
 import type {IViewModel} from './IViewModel';
 import {HALF_H, inPolygon, project, rhombus, STEP, tracePolygon} from './isoMath';
@@ -12,9 +13,10 @@ type PointerKind = 'down' | 'move' | 'up';
 const WALL_HEIGHT = 3.6 * STEP;
 
 /**
- * The editor's isometric view: tiles with their heights, the walls, player spawns, the door, and
- * each furni as the room draws it (vortex-imager), or as a box of its footprint while the image
- * loads. @ambreia/iso replaces the floor and walls with the room's own when J4 lands.
+ * The editor's isometric view: the room as the game draws it (@ambreia/iso, see IsoBackdrop) with
+ * the editor's marks over it -- selection, door, spawns, world layers. Without iso (no asset
+ * server, a zone it refuses) the view draws the room itself: tiles with their heights, the walls,
+ * and each furni as vortex-imager draws it, or as a box of its footprint while the image loads.
  */
 export class IsoView
 {
@@ -32,6 +34,11 @@ export class IsoView
     private _fitted = false;
     private _width = 1;
     private _height = 1;
+    /** This frame's room comes from the backdrop: draw only the editor's marks over it. */
+    private _real = false;
+
+    /** The room as the game draws it; null until it loads, and when it cannot. */
+    backdrop: IsoBackdrop | null = null;
 
     /**
      * The view draws into its own canvas, which is not in the page: the window system shows it in
@@ -152,7 +159,11 @@ export class IsoView
 
         let objectId: string | null = null;
 
-        if(model.layers.isVisible('decor'))
+        if(model.layers.isVisible('decor') && this.realRoom(model))
+        {
+            objectId = this.backdrop!.pick(x, y);
+        }
+        else if(model.layers.isVisible('decor'))
         {
             for(const o of this.sortedDecor(model).reverse())
             {
@@ -178,12 +189,25 @@ export class IsoView
 
         if(!model) return;
 
+        this._real = false;
+
+        if(this.realRoom(model))
+        {
+            const room = this.backdrop!.render(this._width, this._height, this._zoom, this._ox, this._oy);
+
+            if(room)
+            {
+                ctx.drawImage(room, 0, 0);
+                this._real = true;
+            }
+        }
+
         ctx.setTransform(this._zoom, 0, 0, this._zoom, this._ox, this._oy);
         ctx.imageSmoothingEnabled = false;
 
         const floor = model.doc.floor;
 
-        if(model.options.walls) this.drawWalls(floor);
+        if(model.options.walls && !this._real) this.drawWalls(floor);
 
         if(model.layers.isVisible('floor'))
         {
@@ -222,6 +246,12 @@ export class IsoView
 
         this._world.draw(model, this._zoom);
         this.drawHover(model);
+    }
+
+    /** The backdrop draws the room when it is loaded and the furni view is on (Affichage). */
+    private realRoom(model: IViewModel): boolean
+    {
+        return !!this.backdrop?.ready && model.options.sprites;
     }
 
     private drawHover(model: IViewModel): void
@@ -300,7 +330,18 @@ export class IsoView
         const h = t.height ?? 0;
         const top = rhombus(x, y, 1, 1, h);
 
-        if(t.hole)
+        if(this._real)
+        {
+            if(model.options.grid && !t.hole)
+            {
+                tracePolygon(ctx, top);
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
+                ctx.lineWidth = 1 / this._zoom;
+                ctx.stroke();
+            }
+            if(model.options.heights && !t.hole) this.heightLabel(top, h);
+        }
+        else if(t.hole)
         {
             tracePolygon(ctx, rhombus(x, y, 1, 1, 0));
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.07)';
@@ -337,18 +378,22 @@ export class IsoView
                 ctx.stroke();
             }
 
-            if(model.options.heights)
-            {
-                ctx.font = '10px "Segoe UI", sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillStyle = 'rgba(60, 40, 10, 0.75)';
-                ctx.fillText(String(h), top[0], top[1] + HALF_H);
-            }
+            if(model.options.heights) this.heightLabel(top, h);
         }
 
         if(model.selectedCells.has(i)) this.overlay(x, y, h, 'rgba(120, 180, 255, 0.45)', '#7fb4ff');
         if(model.strokeCells.has(i)) this.overlay(x, y, h, 'rgba(90, 220, 140, 0.45)', null);
+    }
+
+    private heightLabel(top: number[], h: number): void
+    {
+        const ctx = this._ctx;
+
+        ctx.font = '10px "Segoe UI", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = this._real ? 'rgba(255, 255, 255, 0.85)' : 'rgba(60, 40, 10, 0.75)';
+        ctx.fillText(String(h), top[0], top[1] + HALF_H);
     }
 
     private face(edge: number[], depth: number, color: string): void
@@ -462,6 +507,20 @@ export class IsoView
             ctx.strokeStyle = '#4fb0ff';
             ctx.lineWidth = 2 / this._zoom;
             ctx.stroke();
+        }
+
+        if(this._real)
+        {
+            // The room draws the furni where it stands; a dragged one shows where it would land.
+            if(offset && sprite)
+            {
+                ctx.globalAlpha = 0.75;
+                this.drawSprite(sprite, o.x, o.y, o.z ?? 0, dx, dy);
+                ctx.globalAlpha = 1;
+            }
+            if(o.locked) this.label('🔒', base, '#ffffff');
+
+            return;
         }
 
         if(sprite)

@@ -23,6 +23,7 @@ import {describe} from '../panels/html';
 import {FurnitureSprites} from '../view/FurnitureSprites';
 import type {IPick} from '../view/IPick';
 import type {IViewOptions} from '../view/IViewOptions';
+import {IsoBackdrop} from '../view/IsoBackdrop';
 import {IsoView} from '../view/IsoView';
 import type {Category} from './Category';
 import {TOOL_KEYS} from './TOOL_KEYS';
@@ -47,6 +48,8 @@ export class EditorApp
     readonly layers = new LayerState();
     readonly sprites = new FurnitureSprites();
     readonly view = new IsoView();
+    /** The document the room engine last received. */
+    private _syncedDoc: ZoneDocument | null = null;
     readonly options: IViewOptions = {grid: true, heights: false, walls: true, sprites: true};
     readonly journal: IJournalEntry[] = [];
     /** The world layers' selection and tools (entries, areas, NPCs, spawns, triggers…). */
@@ -90,6 +93,16 @@ export class EditorApp
         this.publishedVersion = zone.publishedVersion;
 
         this.view.onPointer = (kind, pick, e) => this.pointer(kind, pick, e);
+
+        void IsoBackdrop.shared().then(backdrop =>
+        {
+            if(!backdrop) return;
+
+            backdrop.onChange = () => this.view.draw();
+            this.view.backdrop = backdrop;
+            this._syncedDoc = null;
+            this.drawView();
+        });
         this.view.onViewChange = () => this._viewListeners.forEach(l => l());
         this.sprites.onLoad = () => this.drawView();
 
@@ -664,6 +677,13 @@ export class EditorApp
 
     private drawView(): void
     {
+        // The room engine follows the document, not the pointer: only a new document is sent.
+        if(this.view.backdrop && this._syncedDoc !== this.doc)
+        {
+            this._syncedDoc = this.doc;
+            this.view.backdrop.setDocument(this.doc);
+        }
+
         const floor = this.doc.floor;
         const cells = new Set(this.selection.cells.map(c => tileIndex(floor, c.x ?? 0, c.y ?? 0)));
 

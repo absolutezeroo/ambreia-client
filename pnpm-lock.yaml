@@ -151,6 +151,9 @@ importers:
       '@ambreia/common':
         specifier: workspace:*
         version: link:../ambreia-common
+      '@ambreia/iso':
+        specifier: workspace:*
+        version: link:../ambreia-iso
       '@ambreia/map-editor-core':
         specifier: workspace:*
         version: link:../ambreia-map-editor-core

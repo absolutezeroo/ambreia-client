@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@ambreia/common": "workspace:*",
+    "@ambreia/iso": "workspace:*",
     "@ambreia/ui": "workspace:*",
     "@ambreia/map-editor-core": "workspace:*",
     "@tauri-apps/plugin-opener": "^2.2.0"

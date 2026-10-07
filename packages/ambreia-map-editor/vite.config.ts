@@ -17,7 +17,11 @@ export default defineConfig({
         fs: {allow: [resolve(__dirname, '../..')]},
         proxy: {
             '/api': {target: process.env.AMBREIA_API ?? 'http://127.0.0.1:8080', changeOrigin: true},
-            '/habbo-imaging': {target: process.env.AMBREIA_IMAGER ?? 'http://127.0.0.1:8081', changeOrigin: true}
+            '/habbo-imaging': {target: process.env.AMBREIA_IMAGER ?? 'http://127.0.0.1:8081', changeOrigin: true},
+            // The room engine's content (@ambreia/iso): furnidata and the furni themselves.
+            '/gamedata': {target: process.env.AMBREIA_ASSETS ?? 'http://vortex-assets.local', changeOrigin: true},
+            '/dcr': {target: process.env.AMBREIA_ASSETS ?? 'http://vortex-assets.local', changeOrigin: true},
+            '/gordon': {target: process.env.AMBREIA_ASSETS ?? 'http://vortex-assets.local', changeOrigin: true}
         }
     }
 });
