@@ -126,3 +126,14 @@ test('net: common is allowed, the engine is refused', async () =>
     assert.equal(common.length, 0);
     assert.equal(core.length, 1);
 });
+
+test('a package never reaches another package by a relative path into its sources', async () =>
+{
+    const net = await wallHits("import {Logger} from '../../../ambreia-common/src/utils/Logger';\nexport {Logger};\n",
+        'packages/ambreia-net/src/connection/Probe.ts');
+    const common = await wallHits("import {ByteArray} from '../../ambreia-net/src/util/ByteArray';\nexport {ByteArray};\n",
+        'packages/ambreia-common/src/utils/Probe.ts');
+
+    assert.equal(net.length, 1);
+    assert.equal(common.length, 1);
+});

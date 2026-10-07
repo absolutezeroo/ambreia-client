@@ -130,3 +130,30 @@ test('the tap sees outgoing values, can edit them or drop the message', () =>
     assert.deepEqual(seen, [[200, 1], [200, 2]]);
     assert.deepEqual(sent.map(sentValue), [10]);
 });
+
+// Real composers hand out their own `_data` array, not a copy.
+class DataComposer extends MessageComposer<[number]>
+{
+    private readonly _data: [number] = [5];
+
+    getMessageArray(): [number]
+    {
+        return this._data;
+    }
+}
+
+test('a tap that edits the outgoing values in place does not change the composer', () =>
+{
+    const {connection: c} = connection();
+    const composer = new DataComposer();
+
+    c.registerMessageClasses({events: new Map(), composers: new Map([[201, DataComposer]])});
+    c.setPacketTap({outgoing: (_id, values) =>
+    {
+        values[0] = 50;
+        return values;
+    }});
+    c.send(composer);
+
+    assert.deepEqual(composer.getMessageArray(), [5]);
+});

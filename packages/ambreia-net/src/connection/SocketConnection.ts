@@ -226,7 +226,8 @@ export class SocketConnection extends EventEmitter<IConnectionEvents> implements
 
         if(this._tap?.outgoing)
         {
-            const edited = this._tap.outgoing(messageId, values);
+            // A copy: composers hand out their own `_data`, and a tap editing in place would change it.
+            const edited = this._tap.outgoing(messageId, [...values]);
 
             if(edited === null) return false;
 

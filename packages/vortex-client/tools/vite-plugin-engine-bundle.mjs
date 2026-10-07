@@ -20,7 +20,7 @@
 //
 // Serve-only: `pnpm build` is completely unaffected.
 import {createRequire} from 'node:module';
-import {statSync, readFileSync, rmSync} from 'node:fs';
+import {readdirSync, statSync, readFileSync, rmSync} from 'node:fs';
 import {readdir} from 'node:fs/promises';
 import {join, relative} from 'node:path';
 
@@ -29,9 +29,10 @@ const esbuild = require('esbuild');
 
 const OUT_DIR_NAME = '.vortex-dev';
 
-// Engine and workspace-package specifiers a client file may import. Kept in sync with ALIAS_TARGETS.
-const ENGINE_ALIAS_RE = /^(?:@(?:core|habbo|room|iid)|@ambreia\/(?:common|net))(\/|$)/;
-const ENGINE_SPEC_RE = /from\s*['"]((?:@(?:core|habbo|room|iid)|@ambreia\/(?:common|net))(?:\/[^'"]*)?|vortex-engine)['"]|import\s*\(\s*['"]((?:@(?:core|habbo|room|iid)|@ambreia\/(?:common|net))(?:\/[^'"]*)?|vortex-engine)['"]\s*\)/g;
+// Engine and workspace-package specifiers a client file may import. Any `@ambreia/<name>` matches,
+// so a new package needs no edit here; workspaceAliases() finds where it lives.
+export const ENGINE_ALIAS_RE = /^(?:@(?:core|habbo|room|iid)|@ambreia\/[a-z-]+)(\/|$)/;
+const ENGINE_SPEC_RE = /from\s*['"]((?:@(?:core|habbo|room|iid)|@ambreia\/[a-z-]+)(?:\/[^'"]*)?|vortex-engine)['"]|import\s*\(\s*['"]((?:@(?:core|habbo|room|iid)|@ambreia\/[a-z-]+)(?:\/[^'"]*)?|vortex-engine)['"]\s*\)/g;
 
 // Only externalise what the client imports too, so there is exactly one instance of it at
 // runtime. `pako` is engine-only and pnpm does not expose it to resolution from the client
@@ -40,6 +41,33 @@ const ENGINE_SPEC_RE = /from\s*['"]((?:@(?:core|habbo|room|iid)|@ambreia\/(?:com
 const SHARED_EXTERNALS = ['pixi.js', 'eventemitter3'];
 
 const norm = (p) => p.replace(/\\/g, '/');
+
+/**
+ * `@ambreia/<name>` → `<packages>/ambreia-<name>/src`, for every such folder on disk. Read rather
+ * than listed so a package added at J2–J6 joins the one esbuild graph by itself: a package missing
+ * here is served by Vite as source next to its bundled copy, and its singletons exist twice.
+ */
+export function workspaceAliases(packagesDir)
+{
+	const root = norm(packagesDir);
+	const aliases = {};
+
+	for (const name of readdirSync(root))
+	{
+		if (!name.startsWith('ambreia-')) continue;
+
+		try
+		{
+			if (statSync(root + '/' + name + '/src').isDirectory()) aliases['@ambreia/' + name.slice('ambreia-'.length)] = root + '/' + name + '/src';
+		}
+		catch
+		{
+			// a package folder without src/ is not a source package
+		}
+	}
+
+	return aliases;
+}
 
 export function engineBundle(options)
 {
@@ -58,10 +86,9 @@ export function engineBundle(options)
 			'@habbo': ENGINE_SRC + '/habbo',
 			'@room': ENGINE_SRC + '/room',
 			'@iid': ENGINE_SRC + '/iid',
-			'@ambreia/common': PACKAGES + '/ambreia-common/src',
-			'@ambreia/net': PACKAGES + '/ambreia-net/src'
+			...workspaceAliases(PACKAGES)
 		};
-	const SOURCE_ROOTS = [ENGINE_SRC, PACKAGES + '/ambreia-common/src', PACKAGES + '/ambreia-net/src'];
+	const SOURCE_ROOTS = [ENGINE_SRC, ...Object.values(workspaceAliases(PACKAGES))];
 
 	function firstExistingFile(base)
 	{

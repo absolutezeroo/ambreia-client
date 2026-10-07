@@ -196,7 +196,7 @@ export default tseslint.config(
         {
             'no-restricted-imports': wall(
                 {
-                    regex: '^@(core|habbo|room|iid|ui)(/|$)|^@ambreia/|(^|/)(vortex-(engine|client)|ambreia-net)(/|$)',
+                    regex: '^@(core|habbo|room|iid|ui)(/|$)|^@ambreia/|(^|/)vortex-(engine|client)(/|$)|(^|/)ambreia-[a-z]+/src(/|$)',
                     message: `@ambreia/common is the bottom package: it imports no other Ambreia package (${WALLS_SPEC}).`
                 }
             )
@@ -208,7 +208,7 @@ export default tseslint.config(
         {
             'no-restricted-imports': wall(
                 {
-                    regex: '^@(core|habbo|room|iid|ui)(/|$)|^@ambreia/(?!common/)|(^|/)vortex-(engine|client)(/|$)',
+                    regex: '^@(core|habbo|room|iid|ui)(/|$)|^@ambreia/(?!common/)|(^|/)vortex-(engine|client)(/|$)|(^|/)ambreia-[a-z]+/src(/|$)',
                     message: `@ambreia/net depends on @ambreia/common only (${WALLS_SPEC}).`
                 }
             )

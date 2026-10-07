@@ -14,8 +14,9 @@ reload). `tools/vite-plugin-engine-bundle.mjs` hands the engine to esbuild in wa
 
 - **One esbuild graph covers the engine and the workspace packages** (`@ambreia/common`,
   `@ambreia/net`; `outbase` is `packages/`), so their singletons (`Logger`, `FrameTimings`) exist once.
-  A new package must be added to `ALIAS_TARGETS`, `SOURCE_ROOTS` and the two specifier regexes, or a
-  client import of it is served by Vite as a second copy.
+  Every `packages/ambreia-*/src` is found on disk (`workspaceAliases()`) and any `@ambreia/<name>`
+  specifier is routed to the bundle, so a new package needs no edit; one served by Vite instead would
+  be a second copy.
 
 - **`@core`/`@habbo`/`@room`/`@iid` are deliberately absent from `resolve.alias` in dev.** `vite:alias`
   runs before user `enforce: 'pre'` plugins, so declaring them would rewrite the specifier to engine

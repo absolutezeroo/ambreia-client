@@ -68,6 +68,8 @@ export function planMoves({ root, scan, aliases, moves })
         const m = moves[groupOf(target)];
         return m.specifier + stripTs(newPath(target)).slice(stripTs(m.to).length);
     };
+    // `@scope/name/sub` → `@scope/name`.
+    const packageOf = g => moves[g].specifier.split('/').slice(0, 2).join('/');
     const relativeTo = (file, target) =>
     {
         const rel = posix(path.relative(path.dirname(newPath(file)), stripTs(newPath(target))));
@@ -99,9 +101,13 @@ export function planMoves({ root, scan, aliases, moves })
                 continue;
             }
 
-            // Moved files reach each other relatively: one run moves into one package, and a
-            // package importing itself by name needs a rootDir tsc cannot infer.
-            if(gFile >= 0) next = gFile === gTarget && spec.startsWith('.') ? null : relativeTo(file, target);
+            // Inside one package, moved files reach each other relatively (a package importing
+            // itself by name needs a rootDir tsc cannot infer); across packages, by package name,
+            // so the import goes through `exports` and the declared dependency.
+            if(gFile >= 0 && packageOf(gFile) === packageOf(gTarget))
+            {
+                next = gFile === gTarget && spec.startsWith('.') ? null : relativeTo(file, target);
+            }
             else next = specifierFor(target);
 
             if(next !== null && next !== spec)

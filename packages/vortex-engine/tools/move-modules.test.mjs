@@ -119,10 +119,28 @@ test('a moved file reaches a file of another move in the same run by a relative 
         scan: ['eng/src'],
         aliases: ALIASES,
         moves: [
-            { from: 'eng/src/core/utils', to: 'common/src/utils', specifier: '@c/utils' },
-            { from: 'eng/src/core/assets', to: 'common/src/assets', specifier: '@c/assets' }
+            { from: 'eng/src/core/utils', to: 'common/src/utils', specifier: '@c/common/utils' },
+            { from: 'eng/src/core/assets', to: 'common/src/assets', specifier: '@c/common/assets' }
         ]
     });
 
     assert.deepEqual(p.rewrites.get('eng/src/core/assets/A.ts') ?? [], []);
+});
+
+test('moves into two different packages in one run reach each other by package name', () =>
+{
+    const p = planMoves({
+        root: project({
+            'eng/src/room/R.ts': "import {A} from '../avatar/A';\n",
+            'eng/src/avatar/A.ts': 'export class A {}\n'
+        }),
+        scan: ['eng/src'],
+        aliases: ALIASES,
+        moves: [
+            { from: 'eng/src/room', to: 'iso/src', specifier: '@x/iso' },
+            { from: 'eng/src/avatar', to: 'avatar/src', specifier: '@x/avatar' }
+        ]
+    });
+
+    assert.deepEqual(next(p, 'eng/src/room/R.ts'), ['../avatar/A -> @x/avatar/A']);
 });
