@@ -236,16 +236,17 @@ else
     await writeSealed({kind: 'dictionary', id: dictionaryId}, dictionary);
 }
 
-const sharedImages = new Map<string, Promise<{bytes: Buffer; format: 'webp' | 'png'}>>();
+// Format and digest only: a piece points at a shared image, it never carries its bytes.
+const sharedImages = new Map<string, Promise<{format: 'webp' | 'png'; digest: string}>>();
 
 /** A shared image already in images/ (from an earlier build), its format read off its bytes. */
-async function storedImage(key: string): Promise<{bytes: Buffer; format: 'webp' | 'png'} | null>
+async function storedImage(key: string): Promise<{format: 'webp' | 'png'; digest: string} | null>
 {
     for(const format of ['webp', 'png'] as const)
     {
         const bytes = await readOpened({kind: 'image', sha1: key, format});
 
-        if(bytes) return {bytes, format: bytes.subarray(0, 4).toString('latin1') === 'RIFF' ? 'webp' : 'png'};
+        if(bytes) return {format: bytes.subarray(0, 4).toString('latin1') === 'RIFF' ? 'webp' : 'png', digest: sha1(bytes)};
         if(layout.encrypted) break; // one name whatever the format
     }
 
@@ -253,7 +254,7 @@ async function storedImage(key: string): Promise<{bytes: Buffer; format: 'webp' 
 }
 
 /** One conversion per shared image, whichever worker meets it first; reused from images/ if there. */
-const sharedImage = (key: string, png: Buffer, where: string): Promise<{bytes: Buffer; format: 'webp' | 'png'}> =>
+const sharedImage = (key: string, png: Buffer, where: string): Promise<{format: 'webp' | 'png'; digest: string}> =>
 {
     let pending = sharedImages.get(key);
 
@@ -265,7 +266,7 @@ const sharedImage = (key: string, png: Buffer, where: string): Promise<{bytes: B
             report.sharedImages++;
             if(result.format === 'png') report.pngKept.push(where);
 
-            return result;
+            return {format: result.format, digest: sha1(result.bytes)};
         }));
         sharedImages.set(key, pending);
     }
@@ -273,9 +274,13 @@ const sharedImage = (key: string, png: Buffer, where: string): Promise<{bytes: B
     return pending;
 };
 
+// Written now, not at the end: a run that is stopped resumes from what it wrote, with this dictionary.
+writeAtomic(descriptorPath, Buffer.from(JSON.stringify({v: 1, kind: KIND, dictionary: dictionaryId, encrypted: layout.encrypted, keyId: layout.keyId} satisfies IAmbreiaDescriptor)));
+
 // 3. The pieces, a few bundles' images converted at a time (each conversion holds two decoded images).
 const seen = new Set<string>();
 const written: Array<{name: string; manifest: string; images: Map<string, string>}> = [];
+const kept: Array<{name: string; file: string}> = [];
 let failures = 0;
 
 for(let start = 0; start < bundles.length; start += WORKERS * 4)
@@ -301,9 +306,11 @@ for(let start = 0; start < bundles.length; start += WORKERS * 4)
 
             seen.add(name);
 
-            if(!FORCE && previous && fs.existsSync(target) && fs.statSync(target).mtimeMs >= fs.statSync(file).mtimeMs)
+            // Not tied to the descriptor: a stopped run left none, and its pieces are checked at the end anyway.
+            if(!FORCE && fs.existsSync(target) && fs.statSync(target).mtimeMs >= fs.statSync(file).mtimeMs)
             {
                 report.upToDate++;
+                kept.push({name, file});
                 continue;
             }
 
@@ -323,11 +330,20 @@ for(let start = 0; start < bundles.length; start += WORKERS * 4)
             {
                 const key = sha1(image.data);
                 const shared = (uses.get(key) ?? 0) > 1 || sharedImages.has(key) || (await storedImage(key)) !== null;
-                const {format, bytes} = shared ? await sharedImage(key, image.data, `${name}/${image.name}`) : await optimise(image.data);
+                if(shared)
+                {
+                    const {format, digest} = await sharedImage(key, image.data, `${name}/${image.name}`);
 
-                if(!shared && format === 'png') report.pngKept.push(`${name}/${image.name}`);
+                    images.push({entryName: image.name, format, shared: key});
+                    expected.set(image.name, digest);
+                    continue;
+                }
 
-                images.push(shared ? {entryName: image.name, format, shared: key} : {entryName: image.name, format, bytes});
+                const {format, bytes} = await optimise(image.data);
+
+                if(format === 'png') report.pngKept.push(`${name}/${image.name}`);
+
+                images.push({entryName: image.name, format, bytes});
                 expected.set(image.name, sha1(bytes));
             }
 
@@ -350,7 +366,6 @@ for(let start = 0; start < bundles.length; start += WORKERS * 4)
     if(Math.floor(start / 5000) !== Math.floor((start + WORKERS * 4) / 5000)) console.log(`${Math.min(start + WORKERS * 4, bundles.length)}/${bundles.length}`);
 }
 
-writeAtomic(descriptorPath, Buffer.from(JSON.stringify({v: 1, kind: KIND, dictionary: dictionaryId, encrypted: layout.encrypted, keyId: layout.keyId} satisfies IAmbreiaDescriptor)));
 
 // 4. Read every piece written back through the client's reader.
 const reader = new AmbreiaDirectory(path.resolve(OUTPUT), async url =>
@@ -380,6 +395,25 @@ for(const piece of written)
             failures++;
             console.error(`read-back: image ${piece.name}/${entry} differs`);
         }
+    }
+}
+
+// Kept pieces: they must still open with this key and dictionary and give their source's manifest.
+for(const piece of kept)
+{
+    const source = readBundle(piece.file);
+    const json = typeof source === 'string' ? null : source.find(entry => entry.name.endsWith('.json'));
+
+    try
+    {
+        const files = await reader.read(piece.name);
+
+        if(!files || !json || new TextDecoder().decode(files[0].data) !== canonical(json.data)) throw new Error('manifest differs');
+    }
+    catch (error)
+    {
+        failures++;
+        console.error(`read-back: kept piece ${piece.name}: ${(error as Error).message}`);
     }
 }
 
