@@ -1,3 +1,5 @@
+import {Incoming, Outgoing} from './Headers.generated';
+
 /**
  * The server headers served by the new network style (`@ambreia/net/style/MessageMap`, spec §6)
  * instead of an inherited event or composer in HabboMessages. A message moving to the new style
@@ -5,8 +7,21 @@
  * the registration tests accept either style.
  */
 export const NewStyleHeaders = {
-    incoming: new Set<number>([]),
-    outgoing: new Set<number>([])
+    incoming: new Set<number>([
+        // F3a: the characters screen and the character's state (features/character).
+        Incoming.RpgCharacterListMessageComposer,
+        Incoming.RpgClassListMessageComposer,
+        Incoming.RpgCharacterResultMessageComposer,
+        Incoming.RpgCharacterStateMessageComposer,
+        Incoming.RpgCharacterProgressMessageComposer,
+        Incoming.RpgCharacterStatsMessageComposer
+    ]),
+    outgoing: new Set<number>([
+        Outgoing.RpgCharacterListRequestMessageEvent,
+        Outgoing.RpgCharacterCreateMessageEvent,
+        Outgoing.RpgCharacterChooseClassMessageEvent,
+        Outgoing.RpgEnterWorldMessageEvent
+    ])
 };
 
 /** The names of `headers` served by neither style. */

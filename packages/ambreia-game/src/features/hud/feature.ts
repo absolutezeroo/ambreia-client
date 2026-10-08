@@ -2,6 +2,7 @@ import {RoomSessionEvent} from '../../session/events/RoomSessionEvent';
 import type {IGameFeature} from '../GameFeature';
 import {HudView} from './HudView';
 import {PlayerHudState} from './PlayerHudState';
+import {bindCharacterToHud} from './CharacterHudBridge';
 
 // The demo's icons: read by name (static_bitmap asset_uri set at run time), so declared to be
 // decoded at load (IGameFeature.images). The server's skills will come with their own list.
@@ -45,6 +46,9 @@ export const HudFeature: IGameFeature = {
             view.show();
         };
         const hide = (): void => view?.hide();
+
+        // The played character fills the HUD (F3a): level, XP, and the bars' maxima.
+        if(host.made.character) bindCharacterToHud(host.made.character, state);
 
         host.made.roomSession?.sessionEvents.on(RoomSessionEvent.RSE_STARTED, show);
         host.made.roomSession?.sessionEvents.on(RoomSessionEvent.RSE_ENDED, hide);

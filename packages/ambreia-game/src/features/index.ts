@@ -21,6 +21,8 @@ import {AvatarInfoFeature} from './avatar-info/feature';
 import {LoadingBarFeature} from './loading-bar/feature';
 import {AssetPacksFeature} from './asset-packs/feature';
 import {HudFeature} from './hud/feature';
+import {CharacterFeature} from './character/feature';
+import type {RpgCharacterSession} from './character/RpgCharacterSession';
 import {IID_HabboConfigurationManager} from '../iid/IIDHabboConfigurationManager';
 import {IID_HabboCommunicationManager} from '../iid/IIDHabboCommunicationManager';
 import {IID_HabboLocalizationManager} from '../iid/IIDHabboLocalizationManager';
@@ -47,6 +49,8 @@ export interface IEngineManagers
     avatarRenderer: AvatarRenderManager | null;
     windowManager: HabboWindowManager | null;
     roomUI: RoomUI | null;
+    /** The account's characters and the played one (features/character, F3a). */
+    character: RpgCharacterSession | null;
 }
 
 /** The engine's own objects the features are made with: none of them is configuration. */
@@ -73,7 +77,7 @@ export function emptyManagers(): IEngineManagers
 {
     return {
         configuration: null, communication: null, demo: null, localization: null, roomManager: null, roomSession: null,
-        sessionData: null, roomEngine: null, avatarRenderer: null, windowManager: null, roomUI: null
+        sessionData: null, roomEngine: null, avatarRenderer: null, windowManager: null, roomUI: null, character: null
     };
 }
 
@@ -290,5 +294,6 @@ export const GAME_FEATURES: readonly IGameFeature[] = [
     SessionData, RoomEngines, AvatarRenderer, Windows, RoomUserInterface,
     AvatarInfoFeature,
     LoadingBarFeature,
+    CharacterFeature,
     HudFeature
 ];
