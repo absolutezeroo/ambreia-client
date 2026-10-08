@@ -112,3 +112,21 @@ Le propriétaire a choisi un fichier par pièce après la mesure du pack.
   - une image déjà présente dans `images/` est référencée.
 - **Repli.** `ambreia.json` absent : le dossier est ignoré et tout passe par les `.nitro`. Pièce absente (404) : son `.nitro`.
 - **Le gros pack et ses requêtes Range sont retirés du code.** Le codec des manifestes, la conversion vérifiée, le montage et la feature restent.
+
+## Protection (2026-10-08) : chiffrement et noms opaques (choix 1 et 3 du propriétaire)
+
+- **Clé maîtresse.** 32 octets aléatoires, dans un fichier de clé hors du dossier servi (`--key-file`).
+- **Dérivation par HKDF-SHA256** (WebCrypto, identique dans Node et dans le navigateur) :
+  - une clé AES-256-GCM par fichier ;
+  - une clé HMAC pour les noms ;
+  - un identifiant de clé.
+- **Fichier chiffré :** `iv (12 octets) ‖ texte chiffré ‖ tag`. Les données associées sont le chemin logique (`piece/<nom>`, `image/<sha1>`, `dictionary/<id>`) : un fichier servi sous le nom d'un autre ne se déchiffre pas.
+- **Noms opaques :** `hex(HMAC(nom logique))[0..32]`. Fichiers obtenus :
+  - `<h>.ambreia` (pièces) ;
+  - `images/<h>.bin` ;
+  - `dictionary/<h>.bin`.
+
+  Sans la clé, on ne sait pas quoi demander.
+- **`ambreia.json` reste en clair** : `{ v, kind, dictionary, encrypted, keyId }`. Il ne contient aucun secret.
+- **Repli.** Un dossier chiffré sans clé, ou avec la mauvaise (`keyId`), est ignoré : retour aux `.nitro`, avec un avertissement unique.
+- **Livraison de la clé, provisoire :** `config.json` → `asset-packs.key`. Ce fichier est public : le chiffrement n'y arrête que l'ouverture directe d'une URL et l'énumération. La vraie protection demande une clé envoyée par le serveur après connexion (point 2, non retenu pour l'instant).
