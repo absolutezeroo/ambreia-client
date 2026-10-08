@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "build:window-data": "node ./tools/build-window-assets.mjs",
     "build:bundle": "node ./tools/bundle-assets.mjs",
-    "build:pack": "tsx ./tools/build-asset-pack.ts",
+    "build:ambreia": "tsx ./tools/build-ambreia.ts",
     "import:avatar-configurations": "node ./tools/import-avatar-configurations.mjs --write",
     "import:crypted-images": "node ./tools/import-crypted-images.mjs --write",
     "import:crypted-sounds": "node ./tools/import-crypted-sounds.mjs --write",

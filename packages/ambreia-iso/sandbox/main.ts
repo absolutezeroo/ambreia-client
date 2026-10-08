@@ -1,6 +1,6 @@
 import {Application} from 'pixi.js';
 import {AssetLibrary} from '@ambreia/common/assets/AssetLibrary';
-import {AssetPack} from '@ambreia/common/assets/pack/AssetPack';
+import {AmbreiaDirectory} from '@ambreia/common/assets/pack/AmbreiaDirectory';
 import {AssetPacks} from '@ambreia/common/assets/pack/AssetPacks';
 import {IsoStage} from '../src/IsoStage';
 import type {IIsoView} from '../src/IsoView';
@@ -21,9 +21,9 @@ const MODULES: Record<string, IsoModule> = {scene: registerScene, furniture: reg
 const modules = (params.get('modules') ?? 'scene,furniture,avatars,effects').split(',').map(name => MODULES[name]).filter(Boolean);
 const canvasHost = params.get('host') === 'canvas';
 
-// ?pack=1: the furniture comes from /packs/furniture.ambreia (one Range per piece) instead of
-// /dcr/hof_furni/*.nitro — the same room either way (plan 2026-10-08-asset-packs).
-if(params.get('pack') === '1') AssetPacks.mount('/dcr/hof_furni/', new AssetPack('/packs/furniture.ambreia'));
+// ?pack=1: the furniture comes from /ambreia/furniture/*.ambreia instead of /dcr/hof_furni/*.nitro —
+// the same room either way (plan 2026-10-08-asset-packs).
+if(params.get('pack') === '1') AssetPacks.mount('/dcr/hof_furni/', new AmbreiaDirectory('/ambreia/furniture/'));
 
 // The hotel's properties the room content needs, on this origin (vite proxies them).
 const PROPERTIES: Record<string, string> = {

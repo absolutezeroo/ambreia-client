@@ -1,5 +1,5 @@
 // The asset-packs feature (plan 2026-10-08-asset-packs): once the configuration is loaded, each
-// configured pack stands in for the .nitro directory the client downloads that family from.
+// configured .ambreia directory stands in for the .nitro directory the client downloads that family from.
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {AssetPacks} from '@ambreia/common/assets/pack/AssetPacks';
@@ -34,15 +34,15 @@ test('the configured packs are mounted on the download directories once the conf
 {
     const {host: made, complete} = host(false);
 
-    create({furniture: '${url.prefix}/packs/furniture.ambreia', clothing: '${url.prefix}/packs/clothing.ambreia'}, made);
+    create({furniture: '${url.prefix}/ambreia/furniture/', clothing: '${url.prefix}/ambreia/clothing/'}, made);
     assert.equal(AssetPacks.resolve('http://assets/dcr/hof_furni/throne.nitro'), null);
 
     complete();
 
     try
     {
-        assert.equal(AssetPacks.resolve('http://assets/dcr/hof_furni/throne.nitro')?.pack.url, 'http://assets/packs/furniture.ambreia');
-        assert.equal(AssetPacks.resolve('http://assets/gordon/PRODUCTION/hh_human_body.nitro')?.pack.url, 'http://assets/packs/clothing.ambreia');
+        assert.equal(AssetPacks.resolve('http://assets/dcr/hof_furni/throne.nitro')?.pack.url, 'http://assets/ambreia/furniture/');
+        assert.equal(AssetPacks.resolve('http://assets/gordon/PRODUCTION/hh_human_body.nitro')?.pack.url, 'http://assets/ambreia/clothing/');
     }
     finally
     {

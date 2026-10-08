@@ -1,11 +1,12 @@
-// .ambreia packs (plan 2026-10-08-asset-packs): many .nitro bundles in one file, read a piece at a
-// time with HTTP Range, the manifests through an exactly reversible codec.
+// .ambreia pieces (plan 2026-10-08-asset-packs, revision): one optimised file per .nitro, images
+// shared by several pieces stored once, the manifests through an exactly reversible codec and a
+// deflate dictionary read once per directory.
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {encodeManifest, decodeManifest} from '../src/assets/pack/ManifestCodec';
-import {AssetPackWriter, PACK_PREFIX_LENGTH} from '../src/assets/pack/AssetPackFormat';
-import {AssetPack, PackRangeUnsupportedError} from '../src/assets/pack/AssetPack';
-import type {RangeFetch} from '../src/assets/pack/AssetPack';
+import {compressManifest, decodePiece, encodePiece} from '../src/assets/pack/AmbreiaPiece';
+import {AmbreiaDirectory} from '../src/assets/pack/AmbreiaDirectory';
+import type {FetchBytes} from '../src/assets/pack/AmbreiaDirectory';
 import {AssetPacks} from '../src/assets/pack/AssetPacks';
 import {NitroBundleLoader} from '../src/assets/loaders/NitroBundleLoader';
 import {AssetLoaderEventType} from '../src/assets/loaders/AssetLoaderEvent';
@@ -25,6 +26,11 @@ const manifest = (name: string): Record<string, unknown> => ({
     visualizations: [{size: 64, layerCount: 1}]
 });
 
+const DICTIONARY = new TextEncoder().encode('"spritesheet":{"frames":{"');
+const DICTIONARY_ID = '0123456789abcdef';
+const SHARED = new Uint8Array([7, 7, 7, 7]);
+const SHARED_SHA1 = 'aa'.repeat(20);
+
 test('the manifest codec gives back the same JSON text, unusual frames and keys included', () =>
 {
     const m = manifest('shirt_U_test');
@@ -34,106 +40,110 @@ test('the manifest codec gives back the same JSON text, unusual frames and keys 
     assert.ok(JSON.stringify(encoded).length < JSON.stringify(m).length);
 });
 
-/** A pack in memory and a fetch that serves Range from it, counting requests. */
-function memoryPack(items: Array<{name: string; image: Uint8Array; shareWith?: string}>): {bytes: Uint8Array; requests: Array<[number, number]>; fetch: RangeFetch}
+test('a piece file round-trips: dictionary id, manifest, its own image, a shared one under another name', () =>
 {
-    const chunks: Uint8Array[] = [];
-    const writer = new AssetPackWriter('clothing', new TextEncoder().encode('"spritesheet":{"frames":'), chunk => chunks.push(chunk));
-    const keys = new Map<string, string>();
+    const own = new Uint8Array([82, 73, 70, 70, 1, 2]);
+    const bytes = encodePiece({
+        dictionaryId: DICTIONARY_ID,
+        manifest: compressManifest(manifest('hat'), DICTIONARY),
+        images: [{entryName: 'hat.png', format: 'webp', bytes: own}, {entryName: 'hat_extra.png', format: 'png', shared: SHARED_SHA1}]
+    }, 'hat');
+    const piece = decodePiece(bytes, 'hat');
 
-    for(const item of items)
+    assert.equal(piece.dictionaryId, DICTIONARY_ID);
+    assert.deepEqual(piece.images.map(image => [image.entryName, image.format, image.shared ?? null]), [['hat.png', 'webp', null], ['hat_extra.png', 'png', SHARED_SHA1]]);
+    assert.deepEqual([...piece.images[0].bytes!], [...own]);
+});
+
+/** A served .ambreia directory in memory; records what was requested. */
+function directory(pieces: string[], options: {descriptor?: boolean; dictionaryId?: string} = {}): {fetch: FetchBytes; requested: string[]}
+{
+    const files = new Map<string, Uint8Array>();
+    const dir = 'http://assets/ambreia/furniture/';
+
+    if(options.descriptor !== false) files.set(`${dir}ambreia.json`, new TextEncoder().encode(JSON.stringify({v: 1, kind: 'furniture', dictionary: DICTIONARY_ID})));
+    files.set(`${dir}dictionary/${DICTIONARY_ID}.bin`, DICTIONARY);
+    files.set(`${dir}images/${SHARED_SHA1}.webp`, SHARED);
+
+    for(const name of pieces)
     {
-        const key = item.shareWith ?? item.name;
-
-        keys.set(item.name, key);
-        writer.addItem(item.name, manifest(item.name), [{entryName: `${item.name}.png`, key, ext: 'webp', bytes: () => item.image}]);
+        files.set(`${dir}${name}.ambreia`, encodePiece({
+            dictionaryId: options.dictionaryId ?? DICTIONARY_ID,
+            manifest: compressManifest(manifest(name), DICTIONARY),
+            images: [name.startsWith('shared') ? {entryName: `${name}.png`, format: 'webp', shared: SHARED_SHA1} : {entryName: `${name}.png`, format: 'webp', bytes: new Uint8Array([name.length])}]
+        }, name));
     }
 
-    const head = writer.finish();
-    const bytes = new Uint8Array(head.length + chunks.reduce((n, c) => n + c.length, 0));
-    let at = 0;
+    const requested: string[] = [];
 
-    for(const part of [head, ...chunks]) { bytes.set(part, at); at += part.length; }
-
-    const requests: Array<[number, number]> = [];
-
-    return {bytes, requests, fetch: async (_url, start, end) => { requests.push([start, end]); return bytes.slice(start, end + 1); }};
+    return {requested, fetch: async url => { requested.push(url); return files.get(url) ?? null; }};
 }
 
 test('a piece comes back as the files of its .nitro: the same manifest and its image bytes', async () =>
 {
-    const image = new Uint8Array([82, 73, 70, 70, 1, 2, 3, 4, 5]);
-    const {fetch} = memoryPack([{name: 'hat_U_party7', image}, {name: 'shirt_M_tee', image: new Uint8Array([9, 9])}]);
-    const files = await new AssetPack('mem://clothing.ambreia', fetch).read('hat_U_party7');
+    const {fetch} = directory(['throne']);
+    const files = await new AmbreiaDirectory('http://assets/ambreia/furniture/', fetch).read('throne');
 
     assert.ok(files);
-    assert.deepEqual(files.map(f => f.name), ['hat_U_party7.json', 'hat_U_party7.webp']);
-    assert.deepEqual(JSON.parse(new TextDecoder().decode(files[0].data)), manifest('hat_U_party7'));
-    assert.deepEqual([...files[1].data], [...image]);
+    assert.deepEqual(files.map(f => f.name), ['throne.json', 'throne.webp']);
+    assert.deepEqual(JSON.parse(new TextDecoder().decode(files[0].data)), manifest('throne'));
+    assert.deepEqual([...files[1].data], ['throne'.length]);
 });
 
-test('a piece whose image follows its manifest is one request after the index', async () =>
+test('the descriptor and the dictionary are read once for the whole directory; a piece is one request', async () =>
 {
-    const {fetch, requests} = memoryPack([{name: 'a', image: new Uint8Array([1])}, {name: 'b', image: new Uint8Array([2])}]);
-    const pack = new AssetPack('mem://p', fetch);
+    const {fetch, requested} = directory(['a', 'bb', 'ccc']);
+    const dir = new AmbreiaDirectory('http://assets/ambreia/furniture/', fetch);
 
-    await pack.read('a');
-    const before = requests.length;
+    await Promise.all(['a', 'bb', 'ccc'].map(name => dir.read(name)));
 
-    await pack.read('b');
-
-    assert.equal(requests.length - before, 1);
+    assert.equal(requested.filter(url => url.endsWith('ambreia.json')).length, 1);
+    assert.equal(requested.filter(url => url.includes('/dictionary/')).length, 1);
+    assert.equal(requested.filter(url => url.endsWith('.ambreia')).length, 3);
 });
 
-test('the index is sharded: reading one piece of many fetches a small part of it, not all of it', async () =>
+test('an image several pieces use is fetched from images/ by its hash', async () =>
 {
-    const items = Array.from({length: 3000}, (_, i) => ({name: `furni_${i}`, image: new Uint8Array([i % 256])}));
-    const {fetch, requests, bytes} = memoryPack(items);
-    const pack = new AssetPack('mem://p', fetch);
+    const {fetch, requested} = directory(['shared_red', 'shared_blue']);
+    const dir = new AmbreiaDirectory('http://assets/ambreia/furniture/', fetch);
+    const red = await dir.read('shared_red');
 
-    assert.equal((await pack.read('furni_1234'))![0].name, 'furni_1234.json');
+    await dir.read('shared_blue');
 
-    // Everything read before the piece itself is index: it must not grow with the pack.
-    const index = requests.slice(0, -1).reduce((total, [start, end]) => total + end - start + 1, 0);
-
-    assert.ok(requests.length <= 3, `requests ${requests.length}`);
-    // The fixed first read (head, shard table, dictionary) plus one shard: the furniture pack's
-    // whole index was 1.65 MB before it was sharded.
-    assert.ok(index < PACK_PREFIX_LENGTH + 8 * 1024, `index bytes read ${index} (pack ${bytes.length})`);
+    assert.deepEqual([...red![1].data], [...SHARED]);
+    assert.equal(requested.filter(url => url.includes('/images/')).length, 1);
 });
 
-test('an image shared by two pieces is stored once and read for both', async () =>
+test('a piece the directory lacks answers null', async () =>
 {
-    const image = new Uint8Array([7, 7, 7, 7]);
-    const {fetch, bytes} = memoryPack([{name: 'red', image}, {name: 'blue', image, shareWith: 'red'}]);
-    const blue = await new AssetPack('mem://p', fetch).read('blue');
+    const {fetch} = directory(['a']);
 
-    assert.deepEqual([...blue![1].data], [...image]);
-    assert.equal([...bytes].join(',').split('7,7,7,7').length - 1, 1);
+    assert.equal(await new AmbreiaDirectory('http://assets/ambreia/furniture/', fetch).read('missing'), null);
 });
 
-test('a piece the pack does not hold answers null', async () =>
+test('a directory without its descriptor is unusable: every piece loads from its .nitro', async () =>
 {
-    const {fetch} = memoryPack([{name: 'a', image: new Uint8Array([1])}]);
+    const {fetch} = directory(['a'], {descriptor: false});
+    const dir = new AmbreiaDirectory('http://assets/ambreia/furniture/', fetch);
 
-    assert.equal(await new AssetPack('mem://p', fetch).read('missing'), null);
+    await assert.rejects(dir.read('a'));
+    assert.equal(dir.broken, true);
 });
 
-test('a server that ignores Range makes the pack unusable instead of downloading it whole', async () =>
+test('a piece built with another dictionary is refused rather than decoded wrong', async () =>
 {
-    const pack = new AssetPack('mem://p', async () => { throw new PackRangeUnsupportedError('mem://p', 200); });
+    const {fetch} = directory(['a'], {dictionaryId: 'ffffffffffffffff'});
 
-    await assert.rejects(pack.read('a'), PackRangeUnsupportedError);
-    assert.equal(pack.broken, true);
+    await assert.rejects(new AmbreiaDirectory('http://assets/ambreia/furniture/', fetch).read('a'), /dictionary/);
 });
 
-test('a mounted pack answers for the .nitro URLs of its directory only', () =>
+test('a mounted directory answers for the .nitro URLs of the directory it replaces only', () =>
 {
-    const pack = new AssetPack('http://assets/packs/furniture.ambreia', async () => new Uint8Array());
+    const dir = new AmbreiaDirectory('http://assets/ambreia/furniture/', async () => null);
 
-    AssetPacks.mount('http://assets/dcr/hof_furni', pack);
+    AssetPacks.mount('http://assets/dcr/hof_furni', dir);
 
-    assert.deepEqual(AssetPacks.resolve('http://assets/dcr/hof_furni/throne.nitro?v=3'), {pack, name: 'throne'});
+    assert.deepEqual(AssetPacks.resolve('http://assets/dcr/hof_furni/throne.nitro?v=3'), {pack: dir, name: 'throne'});
     assert.equal(AssetPacks.resolve('http://assets/dcr/hof_furni/icons/throne_icon.png'), null);
     assert.equal(AssetPacks.resolve('http://assets/dcr/hof_furni/sub/throne.nitro'), null);
     assert.equal(AssetPacks.resolve('http://assets/gordon/hh_human_body.nitro'), null);
@@ -171,20 +181,18 @@ async function loadThroughLoader(url: string): Promise<{loader: NitroBundleLoade
     }
 }
 
-test('NitroBundleLoader reads a mounted piece from its pack, never from the .nitro URL', async () =>
+test('NitroBundleLoader reads a mounted piece from its .ambreia file, never from the .nitro URL', async () =>
 {
-    const {fetch} = memoryPack([{name: 'hat_U_party7', image: new Uint8Array([1, 2, 3])}]);
-
-    AssetPacks.mount('http://assets/gordon/', new AssetPack('mem://clothing.ambreia', fetch));
+    AssetPacks.mount('http://assets/dcr/hof_furni/', new AmbreiaDirectory('http://assets/ambreia/furniture/', directory(['throne']).fetch));
 
     try
     {
-        const {loader, fetched, decoded, ok} = await loadThroughLoader('http://assets/gordon/hat_U_party7.nitro');
+        const {loader, fetched, decoded, ok} = await loadThroughLoader('http://assets/dcr/hof_furni/throne.nitro');
 
         assert.equal(ok, true);
         assert.deepEqual(fetched, []);
         assert.deepEqual(decoded, ['image/webp']);
-        assert.equal(loader.jsonData?.name, 'hat_U_party7');
+        assert.equal(loader.jsonData?.name, 'throne');
         assert.equal(loader.textures.size, 2);
     }
     finally
@@ -193,18 +201,16 @@ test('NitroBundleLoader reads a mounted piece from its pack, never from the .nit
     }
 });
 
-test('a piece missing from the mounted pack loads from its .nitro URL as before', async () =>
+test('a piece missing from the mounted directory loads from its .nitro URL as before', async () =>
 {
-    const {fetch} = memoryPack([{name: 'hat_U_party7', image: new Uint8Array([1])}]);
-
-    AssetPacks.mount('http://assets/gordon/', new AssetPack('mem://clothing.ambreia', fetch));
+    AssetPacks.mount('http://assets/dcr/hof_furni/', new AmbreiaDirectory('http://assets/ambreia/furniture/', directory(['throne']).fetch));
 
     try
     {
-        const {fetched} = await loadThroughLoader('http://assets/gordon/shirt_M_absent.nitro');
+        const {fetched} = await loadThroughLoader('http://assets/dcr/hof_furni/chair.nitro');
 
         // The loader's own retries (`?retry=n`) included: every request is for the .nitro file.
-        assert.ok(fetched.length > 0 && fetched.every(url => url.startsWith('http://assets/gordon/shirt_M_absent.nitro')), fetched.join(' '));
+        assert.ok(fetched.length > 0 && fetched.every(url => url.startsWith('http://assets/dcr/hof_furni/chair.nitro')), fetched.join(' '));
     }
     finally
     {

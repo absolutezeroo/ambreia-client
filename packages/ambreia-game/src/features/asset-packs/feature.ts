@@ -1,6 +1,6 @@
 import {z} from 'zod';
 import {Logger} from '@ambreia/common/utils/Logger';
-import {AssetPack} from '@ambreia/common/assets/pack/AssetPack';
+import {AmbreiaDirectory} from '@ambreia/common/assets/pack/AmbreiaDirectory';
 import {AssetPacks} from '@ambreia/common/assets/pack/AssetPacks';
 import type {IGameFeature} from '../GameFeature';
 
@@ -13,11 +13,11 @@ const DIRECTORIES = {
 } as const;
 
 /**
- * .ambreia packs (plan 2026-10-08-asset-packs): one file per family standing in for its thousands
- * of .nitro files, read a piece at a time. A pack URL may use the configuration's `${…}` variables
- * (`${url.prefix}/packs/furniture.ambreia`). Mounted once the configuration is loaded, before the
- * avatar renderer starts downloading; a piece the pack lacks, or a pack that cannot be read, still
- * loads from its .nitro.
+ * .ambreia directories (plan 2026-10-08-asset-packs): per family, one optimised `.ambreia` file per
+ * piece standing in for its `.nitro`. A directory URL may use the configuration's `${…}` variables
+ * (`${url.prefix}/ambreia/furniture/`). Mounted once the configuration is loaded, before the avatar
+ * renderer starts downloading; a piece the directory lacks, or a directory that cannot be read,
+ * still loads from its .nitro.
  */
 export const AssetPacksFeature: IGameFeature = {
     id: 'asset-packs',
@@ -48,7 +48,7 @@ export const AssetPacksFeature: IGameFeature = {
                     continue;
                 }
 
-                AssetPacks.mount(directory, new AssetPack(configuration.interpolate(packUrl)));
+                AssetPacks.mount(directory, new AmbreiaDirectory(configuration.interpolate(packUrl)));
                 log.info(`${family}: ${configuration.interpolate(packUrl)} stands in for ${directory}*.nitro`);
             }
         };

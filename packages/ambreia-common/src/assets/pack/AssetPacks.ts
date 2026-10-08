@@ -1,16 +1,16 @@
-import type {AssetPack} from './AssetPack';
+import type {AmbreiaDirectory} from './AmbreiaDirectory';
 
 /**
- * Where packs stand in for .nitro files: a pack mounted on a directory answers for every
- * `<directory>/<name>.nitro` it holds (NitroBundleLoader asks before fetching). Global like the
+ * Where .ambreia directories stand in for .nitro files: one mounted on a directory answers for
+ * every `<directory>/<name>.nitro` it holds (NitroBundleLoader asks before fetching). Global like the
  * asset loaders that consult it, which AssetLibrary creates itself.
  */
 export class AssetPacks
 {
-    private static readonly MOUNTS: Array<{directory: string; pack: AssetPack}> = [];
+    private static readonly MOUNTS: Array<{directory: string; pack: AmbreiaDirectory}> = [];
 
     /** `directory` is the URL the .nitro files are fetched under (`…/dcr/hof_furni/`). */
-    static mount(directory: string, pack: AssetPack): void
+    static mount(directory: string, pack: AmbreiaDirectory): void
     {
         const normalized = directory.endsWith('/') ? directory : `${directory}/`;
 
@@ -23,7 +23,7 @@ export class AssetPacks
     }
 
     /** The pack and piece name standing in for `url`, or null (not a mounted .nitro, or the pack is broken). */
-    static resolve(url: string): {pack: AssetPack; name: string} | null
+    static resolve(url: string): {pack: AmbreiaDirectory; name: string} | null
     {
         const path = url.split(/[?#]/)[0];
 

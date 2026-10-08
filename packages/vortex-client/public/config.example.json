@@ -14,7 +14,7 @@
     "enabled": true
   },
   "asset-packs": {
-    "clothing": "${url.prefix}/packs/clothing.ambreia",
-    "furniture": "${url.prefix}/packs/furniture.ambreia"
+    "clothing": "${url.prefix}/ambreia/clothing/",
+    "furniture": "${url.prefix}/ambreia/furniture/"
   }
 }
