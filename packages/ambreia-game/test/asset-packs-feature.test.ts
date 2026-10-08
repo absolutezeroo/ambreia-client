@@ -63,3 +63,10 @@ test('a misspelt pack key is a configuration error, not a silently unused pack',
 
     assert.throws(() => loadConfig(sources, featureSections([AssetPacksFeature])), ConfigError);
 });
+
+test('a key that is not 32 bytes of base64url is a configuration error', () =>
+{
+    const sources = [{name: 'defaults', values: {app: {server: {host: 'ws://test'}}}}, {name: 'config.json', values: {'asset-packs': {key: 'too-short'}}}];
+
+    assert.throws(() => loadConfig(sources, featureSections([AssetPacksFeature])), ConfigError);
+});

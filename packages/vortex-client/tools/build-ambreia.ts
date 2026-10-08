@@ -3,7 +3,11 @@
  * Builds an .ambreia directory from a folder of .nitro bundles: one optimised `<name>.ambreia` per
  * bundle (plan docs/superpowers/plans/2026-10-08-asset-packs.md, revision).
  *
- *   pnpm --filter vortex-client build:ambreia <input folder> <output folder> [--kind=furniture] [--max] [--force] [--workers=2]
+ *   pnpm --filter vortex-client build:ambreia <input folder> <output folder> [--key-file=<file>] [--kind=furniture] [--max] [--force] [--workers=2]
+ *
+ * --key-file encrypts the directory (AES-256-GCM per file, names nobody can guess; AmbreiaLayout). The
+ * file holds the 32-byte master key in base64url and is created when missing — keep it out of
+ * anything served: whoever has it reads every piece.
  *
  * Lossless, and checked rather than assumed:
  * - every PNG becomes lossless WebP only if the WebP decodes to the same alpha everywhere and the
@@ -13,8 +17,8 @@
  * - every piece written is read back through the client's own reader and compared.
  * Any difference: exit code 1.
  *
- * Incremental: a piece newer than its .nitro is kept, the directory's dictionary is reused, an image
- * already in `images/` is referenced. `--force` rebuilds everything with a new dictionary. An image
+ * Incremental: a piece newer than its .nitro is kept, the directory's dictionary (and key) are
+ * reused, an image already in `images/` is referenced. `--force` rebuilds everything with a new dictionary. An image
  * used by two pieces or more goes to `images/<sha1>` once; any other lives inside its piece (one
  * request). Unreadable bundles (an HTML error page saved as .nitro, a truncated file) are skipped
  * and listed in `<output>/report.json`.
@@ -30,6 +34,8 @@ import {decodeManifest, encodeManifest} from '@ambreia/common/assets/pack/Manife
 import type {IEncodedManifest} from '@ambreia/common/assets/pack/ManifestCodec';
 import {AmbreiaDirectory} from '@ambreia/common/assets/pack/AmbreiaDirectory';
 import type {IAmbreiaDescriptor} from '@ambreia/common/assets/pack/AmbreiaDirectory';
+import {decodeMasterKey, encodeMasterKey, encryptedLayout, generateMasterKey, plainLayout} from '@ambreia/common/assets/pack/AmbreiaLayout';
+import type {IAmbreiaLayout, LogicalPath} from '@ambreia/common/assets/pack/AmbreiaLayout';
 
 const args = process.argv.slice(2).filter(arg => !arg.startsWith('--'));
 const flag = (name: string, fallback: string): string => process.argv.find(arg => arg.startsWith(`--${name}=`))?.slice(name.length + 3) ?? fallback;
@@ -37,7 +43,7 @@ const [INPUT, OUTPUT] = args;
 
 if(!INPUT || !OUTPUT)
 {
-    console.error('usage: build-ambreia <input folder> <output folder> [--kind=furniture] [--max] [--force] [--workers=2]');
+    console.error('usage: build-ambreia <input folder> <output folder> [--key-file=<file>] [--kind=furniture] [--max] [--force] [--workers=2]');
     process.exit(2);
 }
 
@@ -46,6 +52,7 @@ const KIND = flag('kind', path.basename(path.resolve(OUTPUT)));
 const QUALITY = process.argv.includes('--max') ? 100 : 80;
 const FORCE = process.argv.includes('--force');
 const WORKERS = Number(flag('workers', '2'));
+const KEY_FILE = flag('key-file', '');
 const DICTIONARY_SIZE = 32 * 1024;
 
 sharp.cache(false);
@@ -157,8 +164,44 @@ const report = {
 fs.mkdirSync(path.join(OUTPUT, 'images'), {recursive: true});
 fs.mkdirSync(path.join(OUTPUT, 'dictionary'), {recursive: true});
 
+/** The master key in KEY_FILE, created when the file does not exist — never inside the output. */
+function masterKey(): Uint8Array
+{
+    if(!path.relative(path.resolve(OUTPUT), path.resolve(KEY_FILE)).startsWith('..'))
+    {
+        console.error(`--key-file must not be inside ${OUTPUT}: the key would be served with the files it protects`);
+        process.exit(2);
+    }
+
+    if(fs.existsSync(KEY_FILE)) return decodeMasterKey(fs.readFileSync(KEY_FILE, 'utf8'));
+
+    const key = generateMasterKey();
+
+    fs.mkdirSync(path.dirname(path.resolve(KEY_FILE)), {recursive: true});
+    fs.writeFileSync(KEY_FILE, `${encodeMasterKey(key)}\n`, {mode: 0o600});
+    console.log(`new master key written to ${KEY_FILE}`);
+
+    return key;
+}
+
+const layout: IAmbreiaLayout = KEY_FILE ? await encryptedLayout(masterKey()) : plainLayout();
+const fileOf = async (logical: LogicalPath): Promise<string> => path.join(OUTPUT, ...(await layout.path(logical)).split('/'));
+const writeSealed = async (logical: LogicalPath, bytes: Uint8Array): Promise<void> => writeAtomic(await fileOf(logical), await layout.seal(logical, bytes));
+const readOpened = async (logical: LogicalPath): Promise<Buffer | null> =>
+{
+    const file = await fileOf(logical);
+
+    return fs.existsSync(file) ? Buffer.from(await layout.open(logical, new Uint8Array(fs.readFileSync(file)))) : null;
+};
+
 const descriptorPath = path.join(OUTPUT, 'ambreia.json');
 const previous = !FORCE && fs.existsSync(descriptorPath) ? JSON.parse(fs.readFileSync(descriptorPath, 'utf8')) as IAmbreiaDescriptor : null;
+
+if(previous && (Boolean(previous.encrypted) !== layout.encrypted || (previous.keyId ?? null) !== layout.keyId))
+{
+    console.error(`${OUTPUT} was built ${previous.encrypted ? `with key ${previous.keyId}` : 'without a key'}, this run ${layout.encrypted ? `uses key ${layout.keyId}` : 'has none'}: rebuild with --force`);
+    process.exit(2);
+}
 
 // 1. Count the uses of every image (shared ones go to images/), and sample manifests for the dictionary.
 const uses = new Map<string, number>();
@@ -176,7 +219,6 @@ for(const [i, file] of bundles.entries())
     if(!previous && i % sampleEvery === 0) sample.push(JSON.stringify(encodeManifest(JSON.parse(files.find(entry => entry.name.endsWith('.json'))!.data.toString('utf8')))));
 }
 
-for(const existing of fs.readdirSync(path.join(OUTPUT, 'images'))) uses.set(existing.replace(/\.(webp|png)$/, ''), 2);
 
 // 2. The manifests' dictionary: kept from the previous build, or the tail of a spread sample.
 let dictionaryId: string;
@@ -185,35 +227,46 @@ let dictionary: Uint8Array;
 if(previous)
 {
     dictionaryId = previous.dictionary;
-    dictionary = new Uint8Array(fs.readFileSync(path.join(OUTPUT, 'dictionary', `${dictionaryId}.bin`)));
+    dictionary = new Uint8Array((await readOpened({kind: 'dictionary', id: dictionaryId}))!);
 }
 else
 {
     dictionary = new Uint8Array(Buffer.from(sample.join('')).subarray(-DICTIONARY_SIZE));
     dictionaryId = sha1(dictionary).slice(0, 16);
-    writeAtomic(path.join(OUTPUT, 'dictionary', `${dictionaryId}.bin`), dictionary);
+    await writeSealed({kind: 'dictionary', id: dictionaryId}, dictionary);
 }
 
-// One conversion per shared image, whichever worker meets it first; reused from images/ if there.
 const sharedImages = new Map<string, Promise<{bytes: Buffer; format: 'webp' | 'png'}>>();
+
+/** A shared image already in images/ (from an earlier build), its format read off its bytes. */
+async function storedImage(key: string): Promise<{bytes: Buffer; format: 'webp' | 'png'} | null>
+{
+    for(const format of ['webp', 'png'] as const)
+    {
+        const bytes = await readOpened({kind: 'image', sha1: key, format});
+
+        if(bytes) return {bytes, format: bytes.subarray(0, 4).toString('latin1') === 'RIFF' ? 'webp' : 'png'};
+        if(layout.encrypted) break; // one name whatever the format
+    }
+
+    return null;
+}
+
+/** One conversion per shared image, whichever worker meets it first; reused from images/ if there. */
 const sharedImage = (key: string, png: Buffer, where: string): Promise<{bytes: Buffer; format: 'webp' | 'png'}> =>
 {
     let pending = sharedImages.get(key);
 
     if(!pending)
     {
-        const existing = (['webp', 'png'] as const).find(format => fs.existsSync(path.join(OUTPUT, 'images', `${key}.${format}`)));
+        pending = storedImage(key).then(stored => stored ?? optimise(png).then(async (result) =>
+        {
+            await writeSealed({kind: 'image', sha1: key, format: result.format}, result.bytes);
+            report.sharedImages++;
+            if(result.format === 'png') report.pngKept.push(where);
 
-        pending = existing
-            ? Promise.resolve({bytes: fs.readFileSync(path.join(OUTPUT, 'images', `${key}.${existing}`)), format: existing})
-            : optimise(png).then((result) =>
-            {
-                writeAtomic(path.join(OUTPUT, 'images', `${key}.${result.format}`), result.bytes);
-                report.sharedImages++;
-                if(result.format === 'png') report.pngKept.push(where);
-
-                return result;
-            });
+            return result;
+        }));
         sharedImages.set(key, pending);
     }
 
@@ -235,7 +288,7 @@ for(let start = 0; start < bundles.length; start += WORKERS * 4)
         {
             const file = batch[i];
             const name = path.basename(file, '.nitro');
-            const target = path.join(OUTPUT, `${name}.ambreia`);
+            const target = await fileOf({kind: 'piece', name});
             const relative = path.relative(INPUT, file);
 
             report.inputBytes += fs.statSync(file).size;
@@ -269,7 +322,7 @@ for(let start = 0; start < bundles.length; start += WORKERS * 4)
             for(const image of files.filter(entry => entry.name.endsWith('.png')))
             {
                 const key = sha1(image.data);
-                const shared = (uses.get(key) ?? 0) > 1;
+                const shared = (uses.get(key) ?? 0) > 1 || sharedImages.has(key) || (await storedImage(key)) !== null;
                 const {format, bytes} = shared ? await sharedImage(key, image.data, `${name}/${image.name}`) : await optimise(image.data);
 
                 if(!shared && format === 'png') report.pngKept.push(`${name}/${image.name}`);
@@ -288,7 +341,7 @@ for(let start = 0; start < bundles.length; start += WORKERS * 4)
                 continue;
             }
 
-            writeAtomic(target, encodePiece({dictionaryId, manifest: compressed, images}, name));
+            await writeSealed({kind: 'piece', name}, encodePiece({dictionaryId, manifest: compressed, images}, name));
             written.push({name, manifest: sha1(Buffer.from(back)), images: expected});
             report.written++;
         }
@@ -297,7 +350,7 @@ for(let start = 0; start < bundles.length; start += WORKERS * 4)
     if(Math.floor(start / 5000) !== Math.floor((start + WORKERS * 4) / 5000)) console.log(`${Math.min(start + WORKERS * 4, bundles.length)}/${bundles.length}`);
 }
 
-writeAtomic(descriptorPath, Buffer.from(JSON.stringify({v: 1, kind: KIND, dictionary: dictionaryId} satisfies IAmbreiaDescriptor)));
+writeAtomic(descriptorPath, Buffer.from(JSON.stringify({v: 1, kind: KIND, dictionary: dictionaryId, encrypted: layout.encrypted, keyId: layout.keyId} satisfies IAmbreiaDescriptor)));
 
 // 4. Read every piece written back through the client's reader.
 const reader = new AmbreiaDirectory(path.resolve(OUTPUT), async url =>
@@ -305,7 +358,7 @@ const reader = new AmbreiaDirectory(path.resolve(OUTPUT), async url =>
     const file = decodeURIComponent(url);
 
     return fs.existsSync(file) ? new Uint8Array(fs.readFileSync(file)) : null;
-});
+}, layout);
 
 for(const piece of written)
 {

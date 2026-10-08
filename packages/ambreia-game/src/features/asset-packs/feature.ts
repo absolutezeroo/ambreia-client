@@ -1,6 +1,7 @@
 import {z} from 'zod';
 import {Logger} from '@ambreia/common/utils/Logger';
-import {AmbreiaDirectory} from '@ambreia/common/assets/pack/AmbreiaDirectory';
+import {AmbreiaDirectory, httpBytes} from '@ambreia/common/assets/pack/AmbreiaDirectory';
+import {decodeMasterKey, encryptedLayout} from '@ambreia/common/assets/pack/AmbreiaLayout';
 import {AssetPacks} from '@ambreia/common/assets/pack/AssetPacks';
 import type {IGameFeature} from '../GameFeature';
 
@@ -23,11 +24,18 @@ export const AssetPacksFeature: IGameFeature = {
     id: 'asset-packs',
     config: z.object({
         clothing: z.string().min(1).optional(),
-        furniture: z.string().min(1).optional()
+        furniture: z.string().min(1).optional(),
+        /**
+         * The master key of encrypted directories (base64url, 32 bytes). Provisional: config.json is
+         * public, so this only keeps out a direct look at an URL and the guessing of names; the key
+         * belongs in a server message after login (plan 2026-10-08-asset-packs, protection).
+         */
+        key: z.string().regex(/^[A-Za-z0-9_-]{43}$/, 'a 32-byte key in base64url (43 characters)').optional()
     }),
     create: ({config, host}) =>
     {
-        const settings = config as {clothing?: string; furniture?: string};
+        const settings = config as {clothing?: string; furniture?: string; key?: string};
+        const layout = settings.key ? encryptedLayout(decodeMasterKey(settings.key)) : null;
         const configuration = host.made.configuration;
 
         if(!configuration || (!settings.clothing && !settings.furniture)) return null;
@@ -48,7 +56,7 @@ export const AssetPacksFeature: IGameFeature = {
                     continue;
                 }
 
-                AssetPacks.mount(directory, new AmbreiaDirectory(configuration.interpolate(packUrl)));
+                AssetPacks.mount(directory, new AmbreiaDirectory(configuration.interpolate(packUrl), httpBytes, layout));
                 log.info(`${family}: ${configuration.interpolate(packUrl)} stands in for ${directory}*.nitro`);
             }
         };
