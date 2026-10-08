@@ -105,12 +105,6 @@ export interface IUserDataManager extends IDisposable
     updateAchievementScore(roomIndex: number, score: number): void;
 
     /**
-	 * Update badges rank
-	 */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/_SafeCls_2765.as::updateBadgesRank()
-    updateBadgesRank(roomIndex: number, badgesRank: number): void;
-
-    /**
 	 * Update name by room index
 	 */
     // AS3: .../src/com/sulake/habbo/session/UserDataManager.as::updateNameByIndex()

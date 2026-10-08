@@ -228,17 +228,6 @@ export class UserDataManager implements IUserDataManager
         }
     }
 
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/UserDataManager.as::updateBadgesRank()
-    updateBadgesRank(roomIndex: number, badgesRank: number): void
-    {
-        const userData = this.getUserDataByIndex(roomIndex);
-
-        if(userData)
-        {
-            userData.badgesRank = badgesRank;
-        }
-    }
-
     // AS3: .../src/com/sulake/habbo/session/UserDataManager.as::markAsBlocked()
     markAsBlocked(roomIndex: number, blocked: boolean = true): void
     {

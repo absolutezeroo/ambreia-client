@@ -24,9 +24,7 @@ export class RoomSessionUserFigureUpdateEvent extends RoomSessionEvent
         figure: string,
         sex: string,
         customInfo: string,
-        achievementScore: number,
-        // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/events/RoomSessionUserFigureUpdateEvent.as::badgesRank
-        badgesRank: number
+        achievementScore: number
     )
     {
         super(RoomSessionUserFigureUpdateEvent.USER_FIGURE, session);
@@ -35,7 +33,6 @@ export class RoomSessionUserFigureUpdateEvent extends RoomSessionEvent
         this._sex = sex;
         this._customInfo = customInfo;
         this._achievementScore = achievementScore;
-        this._badgesRank = badgesRank;
     }
 
     private _roomIndex: number;
@@ -82,14 +79,5 @@ export class RoomSessionUserFigureUpdateEvent extends RoomSessionEvent
     get achievementScore(): number
     {
         return this._achievementScore;
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/events/RoomSessionUserFigureUpdateEvent.as::badgesRank
-    private _badgesRank: number;
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/events/RoomSessionUserFigureUpdateEvent.as::get badgesRank()
-    get badgesRank(): number
-    {
-        return this._badgesRank;
     }
 }

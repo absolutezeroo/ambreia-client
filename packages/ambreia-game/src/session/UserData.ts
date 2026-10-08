@@ -137,23 +137,6 @@ export class UserData implements IUserData
         this._achievementScore = value;
     }
 
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/UserData.as::badgesRank
-    private _badgesRank: number = -1;
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/UserData.as::get badgesRank()
-    get badgesRank(): number
-    {
-        if(this._isBlocked) return -1;
-
-        return this._badgesRank;
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/UserData.as::set badgesRank()
-    set badgesRank(value: number)
-    {
-        this._badgesRank = value;
-    }
-
     private _groupID: string = '';
 
     // AS3: .../src/com/sulake/habbo/session/UserData.as::get groupID()

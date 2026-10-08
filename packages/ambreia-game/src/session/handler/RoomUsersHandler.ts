@@ -708,7 +708,6 @@ export class RoomUsersHandler extends BaseHandler
         session.userDataManager.updateFigure(parser.id, parser.figure, parser.sex, false, false);
         session.userDataManager.updateCustom(parser.id, parser.customInfo);
         session.userDataManager.updateAchievementScore(parser.id, parser.achievementScore);
-        session.userDataManager.updateBadgesRank(parser.id, parser.badgesRank);
 
         if(this.listener.sessionEvents)
         {
@@ -720,8 +719,7 @@ export class RoomUsersHandler extends BaseHandler
                     parser.figure,
                     parser.sex,
                     parser.customInfo,
-                    parser.achievementScore,
-                    parser.badgesRank
+                    parser.achievementScore
                 )
             );
         }
