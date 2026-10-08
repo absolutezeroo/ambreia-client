@@ -78,3 +78,6 @@ __pycache__/
 
 # build:ambreia state and reports (digests of the .nitro, unreadable bundles)
 .ambreia-build/
+
+# A deployment's own client configuration (server, keys); config.example.json is the template
+packages/vortex-client/public/config.json

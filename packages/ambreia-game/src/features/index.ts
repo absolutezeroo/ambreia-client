@@ -20,6 +20,7 @@ import type {IGameFeature} from './GameFeature';
 import {AvatarInfoFeature} from './avatar-info/feature';
 import {LoadingBarFeature} from './loading-bar/feature';
 import {AssetPacksFeature} from './asset-packs/feature';
+import {HudFeature} from './hud/feature';
 import {IID_HabboConfigurationManager} from '../iid/IIDHabboConfigurationManager';
 import {IID_HabboCommunicationManager} from '../iid/IIDHabboCommunicationManager';
 import {IID_HabboLocalizationManager} from '../iid/IIDHabboLocalizationManager';
@@ -142,6 +143,7 @@ const CommunicationDemo = feature({
         const demo = new HabboCommunicationDemo(context);
 
         if(app.sso) demo.ssoTicket = app.sso;
+        if(app.server.rsaModulus) demo.rsaModulus = app.server.rsaModulus;
         host.made.demo = demo;
 
         return demo;
@@ -287,5 +289,6 @@ export const GAME_FEATURES: readonly IGameFeature[] = [
     Configuration, AssetPacksFeature, Communication, CommunicationDemo, Localization, Rooms, RoomRenderers, RoomSessions,
     SessionData, RoomEngines, AvatarRenderer, Windows, RoomUserInterface,
     AvatarInfoFeature,
-    LoadingBarFeature
+    LoadingBarFeature,
+    HudFeature
 ];
