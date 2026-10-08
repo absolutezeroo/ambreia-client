@@ -1725,7 +1725,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
         this._streamPublishingAllowed = parser.streamPublishingAllowed;
         this._lastAccessDate = parser.lastAccessDate;
         this._nameChangeAllowed = parser.nameChangeAllowed;
-        this._accountSafetyLocked = parser.accountSafetyLocked;
 
         // log.info(`User loaded: ${this._userName} (ID: ${this._userId})`);
     }

@@ -114,14 +114,6 @@ export class UserObjectMessageParser implements IMessageParser
         return this._nameChangeAllowed;
     }
 
-    private _accountSafetyLocked: boolean = false;
-
-    // AS3: sources/win63_version/habbo/communication/messages/parser/handshake/UserObjectEventParser.as::get accountSafetyLocked()
-    get accountSafetyLocked(): boolean
-    {
-        return this._accountSafetyLocked;
-    }
-
     private _accountTradeLocked: boolean = false;
 
     // AS3: sources/win63_version/habbo/communication/messages/parser/handshake/UserObjectEventParser.as::get accountTradeLocked()
@@ -170,7 +162,6 @@ export class UserObjectMessageParser implements IMessageParser
         this._streamPublishingAllowed = false;
         this._lastAccessDate = '';
         this._nameChangeAllowed = false;
-        this._accountSafetyLocked = false;
         this._accountTradeLocked = false;
         this._nameColor = '';
         this._respectReplenishesLeft = 0;
@@ -179,6 +170,8 @@ export class UserObjectMessageParser implements IMessageParser
     }
 
     // AS3: sources/win63_version/habbo/communication/messages/parser/handshake/UserObjectEventParser.as::parse()
+    // DEVIATION: AS3 reads an account-safety-locked flag after nameChangeAllowed; the RPG server has
+    // no safety lock and no longer writes it.
     parse(wrapper: IMessageDataWrapper): boolean
     {
         this._id = wrapper.readInt();
@@ -194,7 +187,6 @@ export class UserObjectMessageParser implements IMessageParser
         this._streamPublishingAllowed = wrapper.readBoolean();
         this._lastAccessDate = wrapper.readString();
         this._nameChangeAllowed = wrapper.readBoolean();
-        this._accountSafetyLocked = wrapper.readBoolean();
 
         if(wrapper.bytesAvailable > 0)
         {
