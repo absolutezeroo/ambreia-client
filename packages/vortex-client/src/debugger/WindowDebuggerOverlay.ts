@@ -16,11 +16,9 @@ const log = Logger.getLogger('client.debugger.WindowDebuggerOverlay');
 /**
  * Dev-only visual debugger overlay (vortex-client/src/debugger).
  *
- * Entirely opt-in: installWindowDebugger() only adds one small floating
- * toggle button (plus a Ctrl+Shift+D hotkey as a bonus shortcut — some
- * browsers reserve that combo, e.g. Firefox's "Bookmark All Tabs", and
- * can swallow it before page JS ever sees it, so the button is the
- * reliable path). Lets you browse every registered widget layout and
+ * Entirely opt-in: installWindowDebugger() only adds the Ctrl+Shift+D hotkey
+ * (Firefox reserves that combo for "Bookmark All Tabs"; Chrome and Edge pass
+ * it on). Lets you browse every registered widget layout and
  * skin/style combination, spawn a layout as a real live window (same
  * buildWidgetLayout() path production uses, so it's fully interactive),
  * and inspect its component tree with on-canvas highlight boxes.
@@ -141,11 +139,8 @@ export function installWindowDebugger(canvas: HTMLCanvasElement): () => void
             panel = new WindowDebuggerPanel(canvas, () => 
             {
                 panel = null;
-                toggleButton.classList.remove('hwd-toggle-active');
             });
         }
-
-        toggleButton.classList.toggle('hwd-toggle-active', panel !== null);
     };
 
     const onKeyDown = (event: KeyboardEvent): void => 
@@ -166,14 +161,13 @@ export function installWindowDebugger(canvas: HTMLCanvasElement): () => void
 
     if(isLogCaptureEnabled()) Logger.onRecord(onLogRecord);
 
-    const toggleButton = createToggleButton(toggle);
-
+    // Ctrl+Shift+D only: the floating 🐞 button sat over the game, on the strip of a website the
+    // client no longer runs in.
     return () =>
     {
         window.removeEventListener('keydown', onKeyDown);
         removeErrorCapture();
         Logger.onRecord(null);
-        toggleButton.remove();
         panel?.dispose();
         panel = null;
     };
@@ -248,21 +242,6 @@ function createLogCaptureButton(): HTMLButtonElement
     });
 
     paint();
-
-    return button;
-}
-
-function createToggleButton(onToggle: () => void): HTMLButtonElement 
-{
-    injectStyles();
-
-    const button = document.createElement('button');
-
-    button.className = 'hwd-toggle-btn';
-    button.textContent = '🐞';
-    button.title = 'Window Debugger (Ctrl+Shift+D)';
-    button.addEventListener('click', onToggle);
-    document.body.appendChild(button);
 
     return button;
 }
@@ -1769,32 +1748,6 @@ function injectStyles(): void
     const style = document.createElement('style');
 
     style.textContent = `
-.hwd-toggle-btn {
-    /* Last in the row the site starts at top left: [back to web] [fullscreen] [report] [debugger].
-       The first two are the site's own (vortex-web Client.svelte), the third is the bug reporter
-       at left 124px; this one follows it. Same gold pill so the four read as one strip rather than
-       as three different products, restated in plain CSS because this bundle has no Tailwind. */
-    position: fixed;
-    top: 12px;
-    left: 186px;
-    padding: 6px 12px;
-    border-radius: 0 5px 5px 0;
-    background: #ffb900;
-    border: 2px solid #ffea00;
-    color: #000;
-    box-shadow: -1px 4px 0 rgb(0 0 0 / 30%);
-    font-size: 16px;
-    line-height: 1;
-    cursor: pointer;
-    z-index: 999997;
-}
-.hwd-toggle-btn:hover { background: #ffd400; border-color: #fffd70; }
-.hwd-toggle-btn:active {
-    transform: translateY(2px); background: #f89400; border-color: #ffce37;
-    box-shadow: -1px 2px 0 rgb(0 0 0 / 30%);
-}
-/* Open: the pressed shade held, so the strip shows which control is active without a second hue. */
-.hwd-toggle-btn.hwd-toggle-active { background: #f89400; border-color: #ffce37; }
 .hwd-root {
     position: fixed;
     top: 12px;

@@ -124,37 +124,6 @@ function buildDialog(): HTMLDialogElement
  * the hotel, which is also what makes a player trust it enough to use it.
  */
 const STYLE = `
-/* Fourth in the row the site starts at top left: [back to web] [fullscreen] [report] [debugger].
-   Those first two live in the SITE document (vortex-web's Client.svelte, "client__buttons",
-   top 12px / left 12px); these two are inside the client's own iframe and cannot join that flex
-   row, so they are placed after it by hand. The bottom edge is not an option: toolbar bottom
-   left, chat input bottom centre, and a furni context menu opens wherever the furni is, which is
-   what this button was sitting on top of.
-
-   The look is that row's, restated in plain CSS because there is no Tailwind in this bundle:
-   gold pill #ffb900 on a #ffea00 border, square left edge and 5px right, icon only with the
-   label opening on hover over 150ms - the same trick "client__close__expand" uses so a control
-   can be an icon without being a mystery. */
-#vortex-bug-report-button {
-    position: fixed; top: 12px; left: 124px; z-index: 2147483000;
-    display: flex; align-items: center; cursor: pointer;
-    padding: 6px 12px; border: 2px solid #ffea00; border-radius: 0 5px 5px 0;
-    background: #ffb900; color: #000;
-    font: 700 12px/1.2 Ubuntu, Arial, Helvetica, sans-serif; text-transform: uppercase;
-    box-shadow: -1px 4px 0 rgb(0 0 0 / 30%);
-}
-#vortex-bug-report-button:hover { border-color: #fffd70; background: #ffd400; }
-#vortex-bug-report-button:active {
-    transform: translateY(2px); border-color: #ffce37; background: #f89400;
-    box-shadow: -1px 2px 0 rgb(0 0 0 / 30%);
-}
-#vortex-bug-report-button .vbr-label {
-    display: block; width: 0; overflow: hidden; white-space: nowrap;
-    transition: width 150ms ease-out;
-}
-#vortex-bug-report-button:hover .vbr-label { width: 58px; }
-#vortex-bug-report-button .vbr-label > span { display: block; padding-left: 6px; }
-
 #vortex-bug-report {
     padding: 0; max-width: 440px; width: calc(100% - 32px);
     background: #0E151C; color: #FFF; border: 1px solid #BACAD3;
@@ -271,8 +240,8 @@ function failureText(status: number): string
 }
 
 /**
- * Adds the button and the dialog to the page. Safe to call more than once; the second call is a
- * no-op rather than a second button.
+ * Adds the dialog (F8) to the page. Safe to call more than once; the second call is a
+ * no-op rather than a second listener.
  */
 export function installBugReporter(): void
 {
@@ -289,15 +258,15 @@ export function installBugReporter(): void
     const dialog = buildDialog();
     document.body.appendChild(dialog);
 
-    const button = document.createElement('button');
-    button.id = 'vortex-bug-report-button';
-    button.type = 'button';
-    // Icon plus a label that is zero-width until hover, mirroring the site's "Web" button.
-    button.innerHTML = '<span aria-hidden="true">🐛</span>'
-        + '<span class="vbr-label"><span>Report</span></span>';
-    button.title = 'Report a problem';
-    button.addEventListener('click', () => dialog.showModal());
-    document.body.appendChild(button);
+    // F8, not a button: the floating one sat over the game, on the strip of a website the client no
+    // longer runs in. Not Ctrl+Shift+B either, which Chrome and Edge keep for the bookmarks bar.
+    window.addEventListener('keydown', (event) =>
+    {
+        if(event.code !== 'F8' || dialog.open) return;
+
+        event.preventDefault();
+        dialog.showModal();
+    });
 
     const form = dialog.querySelector('form')!;
     const textarea = dialog.querySelector('textarea')!;

@@ -400,10 +400,14 @@ export class HabboCommunicationDemo extends Component implements IHabboCommunica
             events.on(HabboCommunicationManagerEvent.DISCONNECTED, onDisconnected);
             events.on(HabboCommunicationManagerEvent.CONNECTION_ERROR, onConnectionError);
 
-            timeoutId = setTimeout(() =>
+            // Infinite: an account ticket authenticates when a character enters the world (F3a).
+            if(Number.isFinite(timeoutMs))
             {
-                rejectAuthentication(new Error('[HabboCommunicationDemo] Authentication timed out'));
-            }, timeoutMs);
+                timeoutId = setTimeout(() =>
+                {
+                    rejectAuthentication(new Error('[HabboCommunicationDemo] Authentication timed out'));
+                }, timeoutMs);
+            }
         });
     }
 

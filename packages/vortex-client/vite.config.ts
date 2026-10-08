@@ -57,8 +57,9 @@ export default defineConfig(({command}) => ({
         port: 5173,
         strictPort: true,
         proxy: {
+            // `VORTEX_WEBAPI=http://localhost:8080 pnpm dev` for a local emulator's web API (login).
             '/webapi': {
-                target: 'http://ovarkladwpokgvd718w5.72.60.91.223.sslip.io',
+                target: process.env.VORTEX_WEBAPI ?? 'http://ovarkladwpokgvd718w5.72.60.91.223.sslip.io',
                 changeOrigin: true,
                 secure: false,
                 rewrite: (path) => path.replace(/^\/webapi/, ''),
@@ -67,6 +68,7 @@ export default defineConfig(({command}) => ({
             '/gamedata': {target: 'http://vortex-assets.local', changeOrigin: true},
             '/gordon': {target: 'http://vortex-assets.local', changeOrigin: true},
             '/dcr': {target: 'http://vortex-assets.local', changeOrigin: true},
+            '/ambreia': {target: 'http://vortex-assets.local', changeOrigin: true},
             '/habbo-imaging': {target: 'http://localhost:8081', changeOrigin: true},
         },
     },

@@ -37,6 +37,9 @@ export interface IHabboLocalizationManager extends ICoreLocalizationManager
 	 */
     requestLocalizationInit(): void;
 
+    /** TS-only: loads the texts before authentication (the login screens need them); once. */
+    loadTexts(): Promise<void>;
+
     /**
 	 * Get active environment ID
 	 */

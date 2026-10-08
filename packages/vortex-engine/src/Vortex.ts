@@ -467,7 +467,10 @@ export class Vortex implements IVortex
         log.debug('Connecting to server...');
 
         demo.startConnectionWithSSO(ssoTicket);
-        await demo.waitForAuthentication();
+        // No time limit: with an account ticket the server authenticates the session only once
+        // the player has picked (or created) a character and entered the world (F3a §4). A
+        // refused ticket still ends the wait, through the disconnect.
+        await demo.waitForAuthentication(Number.POSITIVE_INFINITY);
 
         this.wireRoomMessageHandler();
     }

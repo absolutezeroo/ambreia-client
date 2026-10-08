@@ -27,6 +27,9 @@ export class HabboLocalizationManager extends CoreLocalizationManager implements
     ];
 
     private _isLocalizationInitialized: boolean = false;
+    // TS-only: the texts are in. The login and characters screens load them before the session is
+    // authenticated (F3a), so authentication must not fetch the 50k entries a second time.
+    private _textsLoaded: boolean = false;
     private _badgePointLimits: Map<string, number> = new Map();
     private _configurationManager: IHabboConfigurationManager | null = null;
     private _communicationManager: IHabboCommunicationManager | null = null;
@@ -330,6 +333,7 @@ export class HabboLocalizationManager extends CoreLocalizationManager implements
         this.events.once(LocalizationEvent.LOCALIZATION_LOADED, () =>
         {
             this._isLocalizationInitialized = false;
+            this._textsLoaded = true;
             log.info('Localizations ready');
 
             // AS3: `localizationsReady()` dispatches a plain `complete` outward, which is what
@@ -368,7 +372,24 @@ export class HabboLocalizationManager extends CoreLocalizationManager implements
     // AS3: .../src/com/sulake/habbo/localization/HabboLocalizationManager.as::onAuthenticated()
     private onAuthenticated(): void
     {
-        this.requestLocalizationInit();
+        // DEVIATION: AS3 always loads here; the screens before authentication may have already.
+        if(!this._textsLoaded) this.requestLocalizationInit();
+    }
+
+    /**
+     * TS-only: the texts, loaded now rather than at authentication — the client's own login and
+     * characters screens come before it (F3a). Resolves at once when they are already in, or when
+     * external texts are skipped altogether.
+     */
+    loadTexts(): Promise<void>
+    {
+        if(this._textsLoaded || this._skipExternals) return Promise.resolve();
+
+        return new Promise(resolve =>
+        {
+            this.events.once('complete', () => resolve());
+            this.requestLocalizationInit();
+        });
     }
 
     // AS3: .../src/com/sulake/habbo/localization/HabboLocalizationManager.as::configureLocalizationLocations()

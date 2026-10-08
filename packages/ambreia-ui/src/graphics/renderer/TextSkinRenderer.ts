@@ -224,8 +224,12 @@ export class TextSkinRenderer extends SkinRenderer
         const h = rect.height;
 
         const type = window.type;
-        const typedWindow = window as unknown as { text?: string };
-        const text = typedWindow.text ?? window.caption;
+        const typedWindow = window as unknown as { text?: string; displayAsPassword?: boolean };
+        const raw = typedWindow.text ?? window.caption;
+        // Flash's TextField masked a password itself; here the canvas paints the glyphs (the DOM
+        // input only carries the caret), so the mask is drawn here — `*`, as Flash did: the
+        // client's fonts have no `•`.
+        const text = typedWindow.displayAsPassword && raw ? '*'.repeat([...raw].length) : raw;
 
         const tw = window as unknown as ITextWindowShape;
 
