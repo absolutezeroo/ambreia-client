@@ -6,7 +6,7 @@
     "prebuild": "node ./tools/bundle-assets.mjs",
     "predev": "node ./tools/bundle-assets.mjs",
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && node ./tools/check-release-bundle.mjs",
     "preview": "vite preview",
     "build:window-data": "node ./tools/build-window-assets.mjs",
     "build:bundle": "node ./tools/bundle-assets.mjs",

@@ -3,6 +3,7 @@ import {resolve} from 'path';
 import {engineBundle} from './tools/vite-plugin-engine-bundle.mjs';
 import {perfLog} from './tools/vite-plugin-perf-log.mjs';
 import {imagerServer} from '../vortex-imager/tools/vite-plugin-imager.mjs';
+import {release} from './tools/vite-plugin-release.mjs';
 
 // In dev, the @ambreia/* packages are resolved by the engineBundle plugin; in a build, Vite takes
 // them from the workspace links like any dependency. The engine aliases (@core/@habbo/@iid) went
@@ -30,6 +31,9 @@ export default defineConfig(({command}) => ({
         // serve-only; brings up packages/vortex-imager unless something already holds :8081, so
         // the `/habbo-imaging` proxy below has a service to reach without a second terminal
         imagerServer(),
+        // build-only; inlines the ids of the newest release revision and strips the message names
+        // (AMBREIA_RELEASE=<json> to pick another). Spec 2026-10-08-random-header-revisions §4.4.
+        release({repoRoot: resolve(__dirname, '../..')}),
     ],
     // The text engine is reached through a subpath export from inside the
     // engine bundle, which Vite's dep scanner does not crawl — without this it
@@ -74,7 +78,8 @@ export default defineConfig(({command}) => ({
     },
     build: {
         target: 'ES2022',
-        sourcemap: true,
+        // Off: a source map is the original source, message names included (spec 2026-10-08 §4.4).
+        sourcemap: false,
     },
     esbuild: {
         tsconfigRaw: {

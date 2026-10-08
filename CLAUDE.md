@@ -15,7 +15,7 @@ pnpm typecheck               # just the typecheck
 pnpm test                    # node:test over packages/*/tools and .claude/scripts, then packages/*/test/*.test.ts via tsx
 node --test <file.test.mjs>  # one test file
 node node_modules/eslint/bin/eslint.js <file>   # lint one file
-pnpm build                   # production build of the client (tsc + vite)
+pnpm build                   # production build: needs a release revision (AMBREIA_RELEASE=<json>, else the newest in ../vortex-rpg-emulator/Vortex.Revisions/Releases)
 pnpm gen:headers             # regenerate message ids from the emulator's Headers.cs
 pnpm sync:agents             # regenerate AGENTS.md / copilot-instructions.md from this file + rules
 node install.mjs             # unpack assets (vortex-client-assets.zip); --pack to rebuild the zip
