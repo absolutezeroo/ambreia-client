@@ -65,10 +65,31 @@ if(app) await app.init({width, height, background: '#20242c', antialias: false})
 const renderer = app ? app.renderer : await IsoStage.createOffscreenRenderer(width, height, 0x20242c);
 const stage = await IsoStage.create({assets: new AssetLibrary('iso-sandbox'), property: key => PROPERTIES[key] ?? '', furniData: await furniData(), modules, renderer});
 
-await stage.loadRoom('zone', zone as IIsoRoomData);
+// ?zone=stairs: stairs, a raised landing and a walkway, to look at how heights read (solid sides).
+// ?zone=big&furni=2000: a 64 × 64 floor (the format's limit) with the sample zone's furniture
+// scattered over it, for measuring a room far larger than the screen.
+const bigZone = (count: number): IIsoRoomData =>
+{
+    const size = 64;
+    const tile = {height: 0, walkable: true, hole: false};
+    const decor = Array.from({length: count}, (_, i) =>
+    {
+        const sample = zone.decor[i % zone.decor.length];
+        const at = (i * 7919) % (size * size);
+
+        return {...sample, id: `big_${i}`, x: at % size, y: Math.floor(at / size), z: 0};
+    });
+
+    return {...zone, floor: {width: size, length: size, tiles: Array.from({length: size * size}, () => tile), door: null}, decor, wallDecor: []} as IIsoRoomData;
+};
+
+const room = (params.get('zone') === 'stairs' ? (await import('./zone-stairs.json')).default
+    : params.get('zone') === 'big' ? bigZone(Number(params.get('furni') ?? 2000)) : zone) as IIsoRoomData;
+
+await stage.loadRoom('zone', room);
 
 const view: IIsoView = stage.createView('zone', width, height, 64)!;
-const centre = view.tileToView(zone.floor.width / 2, zone.floor.length / 2, 0);
+const centre = view.tileToView(room.floor.width / 2, room.floor.length / 2, 0);
 
 view.panX += width / 2 - centre.x;
 view.panY += height / 2 - centre.y;
@@ -109,4 +130,4 @@ host.addEventListener('mousemove', (event) =>
     pickLabel.textContent = `tile ${picked.tile ? `${picked.tile.x},${picked.tile.y}` : '—'} · item ${picked.itemId ?? '—'}`;
 });
 
-(window as unknown as {sandbox: unknown}).sandbox = {stage, view, modules: modules.length, host: canvasHost ? 'canvas' : 'pixi'};
+(window as unknown as {sandbox: unknown}).sandbox = {stage, view, app, modules: modules.length, host: canvasHost ? 'canvas' : 'pixi'};

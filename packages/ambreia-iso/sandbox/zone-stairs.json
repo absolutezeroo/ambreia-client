@@ -1,0 +1,1135 @@
+{
+ "floor": {
+  "width": 16,
+  "length": 14,
+  "tiles": [
+   {
+    "height": 0,
+    "walkable": false,
+    "hole": true
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": false,
+    "hole": true
+   },
+   {
+    "height": 3,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 2,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 1,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 7,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": false,
+    "hole": true
+   },
+   {
+    "height": 0,
+    "walkable": false,
+    "hole": true
+   },
+   {
+    "height": 0,
+    "walkable": false,
+    "hole": true
+   },
+   {
+    "height": 0,
+    "walkable": false,
+    "hole": true
+   },
+   {
+    "height": 3,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 2,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 1,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 7,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": false,
+    "hole": true
+   },
+   {
+    "height": 0,
+    "walkable": false,
+    "hole": true
+   },
+   {
+    "height": 0,
+    "walkable": false,
+    "hole": true
+   },
+   {
+    "height": 0,
+    "walkable": false,
+    "hole": true
+   },
+   {
+    "height": 3,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 2,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 1,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 7,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": false,
+    "hole": true
+   },
+   {
+    "height": 0,
+    "walkable": false,
+    "hole": true
+   },
+   {
+    "height": 0,
+    "walkable": false,
+    "hole": true
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 3,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 2,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 1,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 7,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": false,
+    "hole": true
+   },
+   {
+    "height": 0,
+    "walkable": false,
+    "hole": true
+   },
+   {
+    "height": 0,
+    "walkable": false,
+    "hole": true
+   },
+   {
+    "height": 0,
+    "walkable": false,
+    "hole": true
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 7,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 7,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 7,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": false,
+    "hole": true
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 7,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 7,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 7,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": false,
+    "hole": true
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 1,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 2,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 3,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 4,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 5,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 6,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 7,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 7,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 7,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 7,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": false,
+    "hole": true
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 7,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 7,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 7,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": false,
+    "hole": true
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": false,
+    "hole": true
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": false,
+    "hole": true
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": false,
+    "hole": true
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": false,
+    "hole": true
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   },
+   {
+    "height": 0,
+    "walkable": true,
+    "hole": false
+   }
+  ],
+  "door": {
+   "x": 0,
+   "y": 4
+  },
+  "doorDirection": 2
+ },
+ "decor": [],
+ "wallDecor": []
+}

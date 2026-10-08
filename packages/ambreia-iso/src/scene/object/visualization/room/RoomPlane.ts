@@ -206,6 +206,14 @@ export class RoomPlane implements IRoomPlane
     // TS-only: AS3 masks its BitmapData in place.
     private _maskedTextureCanvas: HTMLCanvasElement | null = null;
 
+    /** What the canvases were last drawn from; `render()` skips a redraw that would repeat it. */
+    // TS-only: see render().
+    private _drawnTexture: PlaneBitmapData | null = null;
+    // TS-only: see render().
+    private _drawnGeometryId: number = -1;
+    // TS-only: see render().
+    private _drawnColor: number = -1;
+
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/room/RoomPlane.as::set rasterizer()
     set rasterizer(value: IPlaneRasterizer | null)
     {
@@ -750,9 +758,7 @@ export class RoomPlane implements IRoomPlane
         }
 
         // Render the plane
-        this.render(geometry, time);
-
-        return true;
+        return this.render(geometry, time) || needsUpdate;
     }
 
     /**
@@ -1289,24 +1295,41 @@ export class RoomPlane implements IRoomPlane
 	 *
 	 * @see sources/win63_version/habbo/room/object/visualization/room/RoomPlane.as
 	 */
-    private render(geometry: IRoomGeometry, time: number): void
+    private render(geometry: IRoomGeometry, time: number): boolean
     {
-        if(!this.visible)
+        if(!this.visible || this._width < 1 || this._height < 1)
         {
             this._graphics.visible = false;
             if(this._textureSprite) this._textureSprite.visible = false;
-            return;
+            this._drawnGeometryId = -1;
+            return true;
         }
 
-        if(this._width < 1 || this._height < 1)
+        const masksChanged = this._maskChanged;
+        const textureBitmapData = this.getTexture(geometry, time);
+        const resized = this._bitmapData === null || this._bitmapData.width !== this._width || this._bitmapData.height !== this._height;
+
+        // DEVIATION: AS3 redraws the plane on every update tick (UPDATE_INTERVAL); this skips a redraw
+        //   that would repeat the last one. Here a redraw is a canvas pass, a full-plane
+        //   getImageData in snapEdges() and a GPU upload: measured on an empty 64 × 64 floor, 157 ms
+        //   every 250 ms — the room's whole frame budget for a picture that had not changed. A mask
+        //   left to the polygon fallback keeps redrawing, as its artwork may still arrive.
+        if(!resized
+            && !masksChanged
+            && textureBitmapData === this._drawnTexture
+            && geometry.updateId === this._drawnGeometryId
+            && this._color === this._drawnColor
+            && this._assetMaskedTypes.size === this._bitmapMasks.length)
         {
-            this._graphics.visible = false;
-            if(this._textureSprite) this._textureSprite.visible = false;
-            return;
+            return false;
         }
+
+        this._drawnTexture = textureBitmapData;
+        this._drawnGeometryId = geometry.updateId;
+        this._drawnColor = this._color;
 
         // Ensure _bitmapData canvas exists and matches dimensions (AS3: new BitmapData(_width, _height))
-        if(this._bitmapData === null || this._bitmapData.width !== this._width || this._bitmapData.height !== this._height)
+        if(this._bitmapData === null || resized)
         {
             this._bitmapData = document.createElement('canvas');
             this._bitmapData.width = this._width;
@@ -1329,8 +1352,6 @@ export class RoomPlane implements IRoomPlane
         ctx.clearRect(0, 0, this._width, this._height);
 
         // Try textured rendering first
-        const textureBitmapData = this.getTexture(geometry, time);
-
         if(textureBitmapData?.bitmap)
         {
             // One masked copy, two canvases — and both are on screen. `_outputCanvas` feeds
@@ -1456,6 +1477,8 @@ export class RoomPlane implements IRoomPlane
         {
             this._bitmapDataTexture.source.update();
         }
+
+        return true;
     }
 
     /**
