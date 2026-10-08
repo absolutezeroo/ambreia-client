@@ -138,9 +138,7 @@ export class RoomUsersHandler extends BaseHandler
     /**
 	 * Convert a RoomUserData (from parser) into a UserData (for session storage).
 	 *
-	 * The RPG fork removed pet breeding and monsterplants: the parser still reads the rarity and
-	 * the breed / harvest / revive / breeding-permission flags (the server sends them), but they
-	 * are no longer copied onto the session's user data.
+	 * The RPG server sends no guild, badge rank, pet rarity or breeding flags, so none are copied.
 	 */
     private static createUserDataFromRoomUser(roomUser: RoomUserData): UserData
     {
@@ -153,10 +151,6 @@ export class RoomUsersHandler extends BaseHandler
         userData.sex = roomUser.sex;
         userData.custom = roomUser.custom;
         userData.achievementScore = roomUser.achievementScore;
-        userData.badgesRank = roomUser.badgesRank;
-        userData.groupID = roomUser.groupID;
-        userData.groupName = roomUser.groupName;
-        userData.groupStatus = roomUser.groupStatus;
         userData.isModerator = roomUser.isModerator;
         userData.ownerId = roomUser.ownerId;
         userData.ownerName = roomUser.ownerName;

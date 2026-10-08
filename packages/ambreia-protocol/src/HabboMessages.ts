@@ -462,14 +462,8 @@ export class HabboMessages implements IMessageConfiguration
         this._events.set(2859, ItemRemoveMessageEvent);
         this._events.set(834, ItemStateUpdateMessageEvent);
         this._events.set(540, ItemDataUpdateMessageEvent);
-        // Header verified (_SafeCls_2131 -> parser _SafeCls_2309). The extra Integer is now
-        // identified: AS3 reads `badgesRank` after `isModerator` on the userType==1 branch, and
-        // this port does not.
-        //
-        // It is deliberately still not read. vortex-emulator's RoomAvatarSerializer ends its
-        // player block at IsModerator too, so client and server agree today; adding the read to
-        // match AS3 alone would consume four bytes that are not on the wire and desync every
-        // remaining user in the packet. Fixing it means changing both sides together.
+        // Header verified (_SafeCls_2131 -> parser _SafeCls_2309). The RPG player block is shorter
+        // than AS3's: it ends at isModerator (no guild, swimsuit or badge rank), on both sides.
         this._events.set(996, UsersMessageEvent);
         this._events.set(2613, UserUpdateMessageEvent);
         this._events.set(3693, UserRemoveMessageEvent);

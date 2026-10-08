@@ -88,6 +88,9 @@ export class UsersMessageParser implements IMessageParser
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2184/_SafeCls_2309.as::parse()
+    // DEVIATION: AS3 also reads a player's guild (id, status, name), swimsuit figure and badge rank,
+    // and a pet's rarity and four breeding flags. The RPG server sends none of them (no guilds,
+    // pools, leaderboard or breeding), so the player block ends at isModerator.
     parse(wrapper: IMessageDataWrapper): boolean
     {
         const count = wrapper.readInt();
@@ -120,24 +123,9 @@ export class UsersMessageParser implements IMessageParser
                     userData.webID = webId;
                     userData.userType = RoomUserData.USER_TYPE_USER;
                     userData.sex = this.resolveSex(wrapper.readString());
-                    userData.groupID = String(wrapper.readInt());
-                    userData.groupStatus = wrapper.readInt();
-                    userData.groupName = wrapper.readString();
-
-                    const swimFigure = wrapper.readString();
-                    userData.figure = swimFigure ? this.convertSwimFigure(swimFigure, figure, userData.sex) : figure;
-
+                    userData.figure = figure;
                     userData.achievementScore = wrapper.readInt();
                     userData.isModerator = wrapper.readBoolean();
-
-                    // The last field of a type-1 avatar, and the reason this parser used to die on
-                    // "End of buffer". It does not exist in the 2016 PRODUCTION build this file was
-                    // transcribed from, so it was never read — leaving four bytes per user in the
-                    // buffer, which the next iteration consumed as `webId` and pushed every
-                    // subsequent field one slot out until a readString() ran off the end. The
-                    // primary tree reads it (`_SafeCls_2309.as::parse()`) and the emulator writes it
-                    // (`RoomAvatarSerializer.SerializePlayerAvatar`, `.WriteInteger(BadgesRank)`).
-                    userData.badgesRank = wrapper.readInt();
                     break;
                 }
 
@@ -148,13 +136,8 @@ export class UsersMessageParser implements IMessageParser
                     userData.subType = wrapper.readInt().toString();
                     userData.ownerId = wrapper.readInt();
                     userData.ownerName = wrapper.readString();
-                    userData.rarityLevel = wrapper.readInt();
                     userData.hasSaddle = wrapper.readBoolean();
                     userData.isRiding = wrapper.readBoolean();
-                    userData.canBreed = wrapper.readBoolean();
-                    userData.canHarvest = wrapper.readBoolean();
-                    userData.canRevive = wrapper.readBoolean();
-                    userData.hasBreedingPermission = wrapper.readBoolean();
                     userData.petLevel = wrapper.readInt();
                     userData.petPosture = wrapper.readString();
                     break;
@@ -197,60 +180,5 @@ export class UsersMessageParser implements IMessageParser
     private resolveSex(value: string): string
     {
         return value[0]?.toLowerCase() === 'f' ? 'F' : 'M';
-    }
-
-    /**
-     * The swimsuit colours the server names by hex, indexed into a swimsuit part id.
-     *
-     * Order is load-bearing — the id is the index — so this is the array verbatim, in order.
-     */
-    // AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2184/_SafeCls_2309.as::convertSwimFigure()
-    private static readonly SWIM_COLOURS: readonly string[] = [
-        '238,238,238', '250,56,49', '253,146,160', '42,199,210', '53,51,44', '239,255,146',
-        '198,255,152', '255,146,90', '157,89,126', '182,243,255', '109,255,51', '51,120,201',
-        '255,182,49', '223,161,233', '249,251,50', '202,175,143', '197,198,197', '71,98,61',
-        '138,131,97', '255,140,51', '84,198,39', '30,108,153', '152,79,136', '119,200,255',
-        '255,192,142', '60,75,135', '124,44,71', '215,255,227', '143,63,28', '255,99,147',
-        '31,155,121', '253,255,51'
-    ];
-
-    /**
-     * Appends the swimsuit parts to a figure.
-     *
-     * This used to be the 2016 PRODUCTION version, which hardcodes the swimsuit colour to 10001 and
-     * always emits a swim type. The 2026 client derives both from the wire value — which is
-     * `<something>=<name>/<r,g,b>` — and, crucially, **leaves both at 1** when the string carries no
-     * `=`, producing `.ss-1-1`. Same root cause as the missing `badgesRank` above: the file was
-     * transcribed from a build ten years older than the one this port targets.
-     */
-    // AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2184/_SafeCls_2309.as::convertSwimFigure()
-    private convertSwimFigure(swimFigure: string, baseFigure: string, sex: string): string
-    {
-        let skinColour = 1;
-
-        for(const part of baseFigure.split('.'))
-        {
-            const fields = part.split('-');
-
-            if(fields.length > 2 && fields[0] === 'hd')
-            {
-                skinColour = parseInt(fields[2]);
-            }
-        }
-
-        let swimType = 1;
-        let swimColour = 1;
-        const parts = swimFigure.split('=');
-
-        if(parts.length > 1)
-        {
-            // AS3 also pulls out `_loc14_` (the half before the slash) here and never uses it.
-            const colourName = parts[1].split('/')[1];
-
-            swimType = sex === 'F' ? 10010 : 10011;
-            swimColour = 10000 + UsersMessageParser.SWIM_COLOURS.indexOf(colourName) + 1;
-        }
-
-        return `${baseFigure}.bds-10001-${skinColour}.ss-${swimType}-${swimColour}`;
     }
 }

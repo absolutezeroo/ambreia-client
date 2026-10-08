@@ -167,50 +167,6 @@ export class RoomUserData
         if(!this._readOnly) this._userType = value;
     }
 
-    private _groupID: string = '';
-
-    // AS3: .../src/unknowns/_SafePkg_2102/_SafeCls_2262.as::get groupID()
-    get groupID(): string
-    {
-        return this._groupID;
-    }
-
-    // AS3: .../src/unknowns/_SafePkg_2102/_SafeCls_2262.as::set groupID()
-    set groupID(value: string)
-    {
-        if(!this._readOnly) this._groupID = value;
-    }
-
-    // AS3: .../src/unknowns/_SafePkg_2102/_SafeCls_2262.as::_groupStatus
-    private _groupStatus: number = 0;
-
-    // AS3: .../src/unknowns/_SafePkg_2102/_SafeCls_2262.as::get groupStatus()
-    get groupStatus(): number
-    {
-        return this._groupStatus;
-    }
-
-    // AS3: .../src/unknowns/_SafePkg_2102/_SafeCls_2262.as::set groupStatus()
-    set groupStatus(value: number)
-    {
-        if(!this._readOnly) this._groupStatus = value;
-    }
-
-    // AS3: .../src/unknowns/_SafePkg_2102/_SafeCls_2262.as::_groupName
-    private _groupName: string = '';
-
-    // AS3: .../src/unknowns/_SafePkg_2102/_SafeCls_2262.as::get groupName()
-    get groupName(): string
-    {
-        return this._groupName;
-    }
-
-    // AS3: .../src/unknowns/_SafePkg_2102/_SafeCls_2262.as::set groupName()
-    set groupName(value: string)
-    {
-        if(!this._readOnly) this._groupName = value;
-    }
-
     // AS3: .../src/unknowns/_SafePkg_2102/_SafeCls_2262.as::_achievementScore
     private _achievementScore: number = 0;
 
@@ -224,26 +180,6 @@ export class RoomUserData
     set achievementScore(value: number)
     {
         if(!this._readOnly) this._achievementScore = value;
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2102/_SafeCls_2262.as::badgesRank
-    // The note that used to sit here — "the initial room-users list simply doesn't carry it" — was
-    // read off the 2016 PRODUCTION build. The 2026 client reads it as the last field of every
-    // type-1 avatar (`_SafePkg_2184/_SafeCls_2309.as::parse()`), and the emulator writes it. Taking
-    // that note at face value is what left four bytes per user unread and desynchronised the rest
-    // of the packet.
-    private _badgesRank: number = -1;
-
-    // AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2102/_SafeCls_2262.as::get badgesRank()
-    get badgesRank(): number
-    {
-        return this._badgesRank;
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2102/_SafeCls_2262.as::set badgesRank()
-    set badgesRank(value: number)
-    {
-        if(!this._readOnly) this._badgesRank = value;
     }
 
     private _isModerator: boolean = false;
@@ -303,20 +239,6 @@ export class RoomUserData
         if(!this._readOnly) this._ownerName = value;
     }
 
-    private _rarityLevel: number = 0;
-
-    // AS3: .../src/unknowns/_SafePkg_2102/_SafeCls_2262.as::get rarityLevel()
-    get rarityLevel(): number
-    {
-        return this._rarityLevel;
-    }
-
-    // AS3: .../src/unknowns/_SafePkg_2102/_SafeCls_2262.as::set rarityLevel()
-    set rarityLevel(value: number)
-    {
-        if(!this._readOnly) this._rarityLevel = value;
-    }
-
     private _hasSaddle: boolean = false;
 
     // AS3: .../src/unknowns/_SafePkg_2102/_SafeCls_2262.as::get hasSaddle()
@@ -343,62 +265,6 @@ export class RoomUserData
     set isRiding(value: boolean)
     {
         if(!this._readOnly) this._isRiding = value;
-    }
-
-    private _canBreed: boolean = false;
-
-    // AS3: .../src/unknowns/_SafePkg_2102/_SafeCls_2262.as::get canBreed()
-    get canBreed(): boolean
-    {
-        return this._canBreed;
-    }
-
-    // AS3: .../src/unknowns/_SafePkg_2102/_SafeCls_2262.as::set canBreed()
-    set canBreed(value: boolean)
-    {
-        if(!this._readOnly) this._canBreed = value;
-    }
-
-    private _canHarvest: boolean = false;
-
-    // AS3: .../src/unknowns/_SafePkg_2102/_SafeCls_2262.as::get canHarvest()
-    get canHarvest(): boolean
-    {
-        return this._canHarvest;
-    }
-
-    // AS3: .../src/unknowns/_SafePkg_2102/_SafeCls_2262.as::set canHarvest()
-    set canHarvest(value: boolean)
-    {
-        if(!this._readOnly) this._canHarvest = value;
-    }
-
-    private _canRevive: boolean = false;
-
-    // AS3: .../src/unknowns/_SafePkg_2102/_SafeCls_2262.as::get canRevive()
-    get canRevive(): boolean
-    {
-        return this._canRevive;
-    }
-
-    // AS3: .../src/unknowns/_SafePkg_2102/_SafeCls_2262.as::set canRevive()
-    set canRevive(value: boolean)
-    {
-        if(!this._readOnly) this._canRevive = value;
-    }
-
-    private _hasBreedingPermission: boolean = false;
-
-    // AS3: .../src/unknowns/_SafePkg_2102/_SafeCls_2262.as::get hasBreedingPermission()
-    get hasBreedingPermission(): boolean
-    {
-        return this._hasBreedingPermission;
-    }
-
-    // AS3: .../src/unknowns/_SafePkg_2102/_SafeCls_2262.as::set hasBreedingPermission()
-    set hasBreedingPermission(value: boolean)
-    {
-        if(!this._readOnly) this._hasBreedingPermission = value;
     }
 
     private _petLevel: number = 0;
