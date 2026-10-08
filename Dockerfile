@@ -37,7 +37,7 @@ COPY . .
 RUN node install.mjs --skip-install --skip-checks
 
 # `prebuild` (tools/bundle-assets.mjs) runs on its own and turns the unpacked tree into the
-# .bundle files index.html loads.
+# assets-*.ambreia files index.html loads.
 #
 # NODE_OPTIONS is not tuning, it is what makes this step finish. `tsc && vite build` over this
 # codebase exhausted V8's old space and aborted with exit 134 — the trace ends in

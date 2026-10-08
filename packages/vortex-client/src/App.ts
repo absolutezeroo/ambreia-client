@@ -24,6 +24,9 @@ import {Logger} from '@ambreia/common/utils/Logger';
 import type {IElementDescriptionData} from '@ambreia/game/window/index';
 import type {RoomUI} from '@ambreia/game/ui/RoomUI';
 import type {RoomDesktop} from '@ambreia/game/ui/RoomDesktop';
+import {LoginScreen} from '@ambreia/game/features/login/LoginScreen';
+import {AuthApi} from '@ambreia/game/features/login/AuthApi';
+import {version as CLIENT_VERSION} from '../package.json';
 import type {VortexLoadingScreen} from './VortexLoadingScreen';
 import {AssetBundle} from '@ambreia/common/assets/AssetBundle';
 import {browserLanguage, readTexts, type OwnTexts} from '@ambreia/common/localization/Texts';
@@ -566,11 +569,6 @@ export class VortexApp
         // rebuild. See docs/STYLEGUIDE.md → Logging.
         Logger.configureFromEnvironment(import.meta.env.DEV);
 
-        // Before the bundles, not after: a link posted while they download has to land somewhere,
-        // and the listener queues it. Installed later it would simply not be there — the site can
-        // post the moment the iframe exists, which is several seconds before the engine does.
-        this.installLinkChannel();
-
         let kernelConfig: IKernelConfig;
 
         try
@@ -613,12 +611,12 @@ export class VortexApp
         // `<!DO` as its header and died on "Unsupported bundle version: 1008821359", which is that
         // text read as a big-endian int. BASE_URL is `/client/` in dev and `/` in a build.
         const [imageBundle, xmlBundle] = await Promise.all([
-            AssetBundle.load(`${import.meta.env.BASE_URL}assets-images.bundle`, (ratio: number) =>
+            AssetBundle.load(`${import.meta.env.BASE_URL}assets-images.ambreia`, (ratio: number) =>
             {
                 bundleProgress.images = ratio;
                 updateBundleProgress();
             }),
-            AssetBundle.load(`${import.meta.env.BASE_URL}assets-xml.bundle`, (ratio: number) =>
+            AssetBundle.load(`${import.meta.env.BASE_URL}assets-xml.ambreia`, (ratio: number) =>
             {
                 bundleProgress.xml = ratio;
                 updateBundleProgress();
@@ -633,37 +631,11 @@ export class VortexApp
         this._imageBundle = imageBundle;
         this._xmlBundle = xmlBundle;
 
-        // The gate itself is AS3's: with no SSO ticket nothing of the game loads — in particular
-        // SessionDataManager (and its furnidata/productdata downloads) is only constructed once
-        // the core starts. So the engine boot lives *after* this gate, not before it.
-        //
-        // DEVIATION: AS3 answers a missing ticket by showing its own login screen, and this port
-        //   carried a file-for-file copy of `WIN63-202607011411-782849652/src/login/` to do the
-        //   same. That copy is deleted: `vortex-web` authenticates against the very
-        //   `Vortex.WebApi` routes the screen drove (`/api/public/authentication/login`,
-        //   `/api/ssotoken`) and hands the client a ticket on `?sso=`, so the in-client one was a
-        //   second auth surface for one session — reachable by anyone who opened /client directly,
-        //   and its `RegisterView` (invented; the dump's `src/login/` registers no account) let a
-        //   visitor skip the terms and birthdate the site's registration form asks for. Nothing
-        //   here calls it, so it is a redirect, not a screen.
+        // DEVIATION: AS3 gates the whole boot on an SSO ticket and shows its login flow without one;
+        //   the website used to own that login and hand a ticket on `?sso=`. There is no site any
+        //   more (F3a §1): the engine boots either way, and without a ticket the client shows its
+        //   own login screen (LoginScreen), which gets an account ticket from the web API.
         // AS3: sources/WIN63-202607011411-782849652/src/binaryData/HabboAir.as::createLoginFlowOrLoadingScreen()
-        const configuredTicket = kernelConfig.app.sso;
-
-        if(!configuredTicket)
-        {
-            // The site owns the origin root and serves this client under it (`/client`). When it
-            // does not — the client alone at the root — there is nobody to send the visitor to and
-            // a redirect would only reload this page, so say so rather than loop.
-            if(window.location.pathname === '/')
-            {
-                throw new Error('[VortexApp] No SSO ticket, and no site at the origin root to get one from');
-            }
-
-            window.location.replace('/');
-
-            return;
-        }
-
         let vortex: typeof Vortex.instance;
 
         try
@@ -682,16 +654,6 @@ export class VortexApp
             throw error;
         }
 
-        // AS3: the SSO ticket reaches the client through FlashVars either way — HabboAir
-        // writes the one the login flow produced back into the same Dictionary
-        // (`_SafeStr_4998["sso.token"] = _loginFlow.ssoToken`) before starting the core.
-        const ssoTicket = kernelConfig.app.sso;
-
-        if(ssoTicket)
-        {
-            vortex.habboCommunication.ssoTicket = ssoTicket;
-        }
-
         this.installConnectionActions(vortex);
 
         // 5. Create the canvas and set desktop sizes BEFORE creating windows.
@@ -705,13 +667,26 @@ export class VortexApp
         // the time that gate opens — hence before connect() rather than after.
         this.createCanvas();
 
-        // DEVIATION: AS3 loads the texts on authentication, from the gamedata; they come out of the
-        // client's own bundle (readTexts()).
+        // Before connect(), not after: the login and characters screens are windows the player
+        // uses before the session is authenticated, so input and the render loop run already.
+        await this.initClientUi(vortex);
+
+        // DEVIATION: AS3 loads the texts on authentication. The login and characters screens come
+        // before it now, and an account ticket only authenticates on entering the world (F3a).
         vortex.localization.loadTexts(readTexts(xmlBundle, OWN_TEXTS, kernelConfig.app.language ?? browserLanguage()));
 
+        // AS3: the SSO ticket reaches the client through FlashVars either way — HabboAir
+        // writes the one the login flow produced back into the same Dictionary
+        // (`_SafeStr_4998["sso.token"] = _loginFlow.ssoToken`) before starting the core.
+        const login = kernelConfig.app.sso ? null : new LoginScreen(vortex.windowManager, vortex.localization, new AuthApi(), CLIENT_VERSION);
+
+        vortex.habboCommunication.ssoTicket = kernelConfig.app.sso ?? await login!.signIn();
+
+        // With an account ticket this resolves once a character enters the world (F3a §4): the
+        // login screen stays behind the characters screen until then.
         await vortex.connect();
 
-        await this.initClientUi(vortex);
+        login?.dispose();
 
         // AS3: `HabboCommunicationManager.onConfigurationComplete()` -> `connection.isConfigured()`.
         // Until that call the connection holds every server message it received after authentication
@@ -733,8 +708,8 @@ export class VortexApp
      * skins, layouts). Idempotent: the login flow's avatar creator calls it too, so the two
      * entry points share one boot rather than racing a second one.
      *
-     * AS3: HabboAir.as::startCoreInitializationIfPossible() -> prepareCore(). Nothing in here
-     * may run before an SSO ticket exists — see the gate in init().
+     * AS3: HabboAir.as::startCoreInitializationIfPossible() -> prepareCore(). AS3 waits for an
+     * SSO ticket first; here it runs before the login screen, which is itself made of windows.
      */
     private bootstrapEngine(vortexConfig: IVortexConfig): Promise<typeof Vortex.instance>
     {
@@ -962,7 +937,6 @@ export class VortexApp
             setAuthenticated: () =>
             {
                 this._authenticated = true;
-                this.fireStartLink(vortex);
             },
             setError: () => undefined,
             setLoginStep: () => undefined,
@@ -1001,86 +975,9 @@ export class VortexApp
         window.parent.postMessage({type: SiteChannel.DISCONNECTED}, window.location.origin);
     };
 
-    /**
-     * The second channel for `/hotel?link=…`, and the reason it has to exist.
-     *
-     * The site MOUNTS THIS CLIENT ONCE and never reloads it — closing the hotel parks the iframe
-     * off-screen with its socket, its room and its session intact, which is what makes coming back
-     * instant (components/Client.svelte). The consequence is that the query string is written
-     * exactly once: `?link=habboUI/open/hccenter` from the purse reached the client the first time
-     * the hotel was opened in a session and never again, so every later click did nothing at all.
-     *
-     * A message is the only way in after that, and same-origin is what makes it cheap: the site
-     * proxies this client at `/client`, so the embedder and the embedded share an origin.
-     *
-     * WHAT IT WILL AND WILL NOT ACCEPT. `createLinkEvent` drives the client's own UI — open the
-     * catalog, walk into a room, file a report — so a listener that fired on anything would hand
-     * that to any page able to get a handle on this window, and this client is served publicly
-     * enough to be framed by one. Hence: the origin must be ours, the sender must be the parent
-     * frame, and the payload must be the exact shape below. Anything else is dropped in silence,
-     * because answering tells a prober it found something.
-     */
-    // TS-only: the website needs a way to re-deliver habbo.com's own `/hotel?link=…` handover to an
-    //   already-running client; AS3 has no counterpart because the Flash client took it in FlashVars
-    //   and was reloaded for each visit.
-    private installLinkChannel(): void
-    {
-        if(this._linkChannel) return;
-
-        this._linkChannel = (event: MessageEvent): void =>
-        {
-            if(event.origin !== window.location.origin) return;
-            if(event.source !== window.parent) return;
-
-            const data = event.data as {type?: unknown; link?: unknown} | null;
-
-            if(!data || data.type !== SiteChannel.LINK) return;
-            if(typeof data.link !== 'string' || data.link.length === 0) return;
-
-            // Before the handshake completes a link reaches a tracker that sends a composer nobody
-            // reads, so it waits where `fireStartLink` will find it instead of being dropped. That
-            // covers the whole boot, engine included: this listener is installed before the engine
-            // exists, which is why the instance is read here and not captured.
-            if(!this._authenticated || !Vortex.hasInstance)
-            {
-                this._startLink = data.link;
-
-                return;
-            }
-
-            Vortex.instance.context.createLinkEvent(data.link);
-        };
-
-        window.addEventListener('message', this._linkChannel);
-    }
-
-    /**
-     * Fires the start link (`?link=`, or one the site posted during the boot) once, the moment the session is authenticated.
-     *
-     * That moment is the point: `navigator/goto/42` reaches a tracker that sends a composer, and a
-     * composer sent before the handshake completes is a composer nobody reads. `setAuthenticated`
-     * is the only callback here that means "the socket is up and the player exists", which is why
-     * it is the one that stopped being a no-op.
-     *
-     * Cleared after firing. The connection actions are reinstalled on a reconnect, and a link that
-     * survived one would teleport a player out of wherever they had walked to since.
-     */
-    // TS-only: the website needs an entry point for habbo.com's own `/hotel?link=…` handover; AS3
-    //   has no counterpart because the Flash client took it in FlashVars.
-    private fireStartLink(vortex: typeof Vortex.instance): void
-    {
-        const link = this._startLink;
-
-        if(link === null || link.length === 0) return;
-
-        this._startLink = null;
-
-        vortex.context.createLinkEvent(link);
-    }
-
     private async initClientUi(vortex: typeof Vortex.instance): Promise<void>
     {
-        // Visual window debugger (Ctrl+Shift+D, or the 🐞 button). On in dev always; in a
+        // Visual window debugger (Ctrl+Shift+D). On in dev always; in a
         // production build only when `VITE_WINDOW_DEBUGGER=1` was set AT BUILD TIME.
         //
         // It cannot be a runtime switch. Vite substitutes `import.meta.env.*` as literals and the

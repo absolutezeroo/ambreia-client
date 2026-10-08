@@ -10,7 +10,6 @@ export const Incoming = {
     CarryObjectMessageComposer: 2850,
     CloseConnectionMessageComposer: 3404,
     CompleteDiffieHandshakeComposer: 3401,
-    DanceMessageComposer: 2217,
     DisconnectReasonComposer: 4000,
     FigureUpdateComposer: 132,
     FloorHeightMapMessageComposer: 2885,

@@ -29,24 +29,9 @@ import {
 } from './incoming/avatar/index';
 
 // Incoming Events - Notifications
-// Incoming Events - Notifications (extended)
 import {
     NotificationDialogMessageEvent,
 } from './incoming/notifications/index';
-
-// Incoming Events - Inventory
-
-// Incoming Events - Catalog
-
-// Incoming Events - Marketplace
-
-// Incoming Events - Landing View
-
-// Incoming Events - Competition
-
-// Incoming Events - Quest
-
-// Incoming Events - Achievements
 
 // Incoming Events - Room Session
 import {
@@ -95,51 +80,6 @@ import {
     UserUpdateMessageEvent,
 } from './incoming/room/engine/index';
 
-// Incoming Events - Room Chat
-
-// Incoming Events - Room Furniture
-
-// Incoming Events - Room Pet
-
-// Incoming Events - Room Rentable Bot
-
-// Outgoing Composers - Youtube display furni
-
-// Incoming Events - Youtube display furni
-
-// Outgoing Composers - Crafting
-
-// Incoming Events - Crafting
-
-// Onboarding (new user flow) — the starter-room pick and the figure save. Imported by path: the
-// nux/ barrels are generated and do not list these yet.
-// The NUX dialogs (habbo/nux/HabboNuxDialogs): the phone-verification offer and the gift picker.
-// The rentable-space furniture (habbo/ui/handler/RentableSpaceWidgetHandler).
-// SMS identity verification (habbo/phonenumber/HabboPhoneNumber). AS3 files these under
-// incoming|outgoing/gifts/; this port keeps the phone composers in outgoing/preferences/.
-
-// Incoming Events - Help (name change events)
-
-// Incoming Events - Error
-
-// Incoming Events - Users
-
-// Incoming Events - Preferences
-
-// Incoming Events - Discord
-
-// Incoming Events - Perk
-
-// Incoming Events - Chat styles
-
-// Incoming Events - Campaign
-
-// Incoming Events - Advertisement
-
-// Incoming Events - Tracking
-
-// Incoming Events - Friendlist
-
 // Incoming Events - Room Action
 import {
     AvatarEffectMessageEvent,
@@ -147,8 +87,6 @@ import {
     DanceMessageEvent,
     UserChangeMessageEvent,
 } from './incoming/room/action/index';
-
-// Incoming Events - New Navigator
 
 // Outgoing Composers - Handshake & Core
 import {
@@ -162,10 +100,6 @@ import {
     UniqueIDMessageComposer,
     VersionCheckMessageComposer,
 } from './outgoing/index';
-
-// Outgoing Composers - Navigator
-
-// Outgoing Composers - New Navigator
 
 // Outgoing Composers - Room Session
 import {
@@ -190,60 +124,6 @@ import {Outgoing} from './Headers.generated';
 import {
     LookToMessageComposer,
 } from './outgoing/room/avatar/index';
-
-// Outgoing Composers - Room Action
-
-// Incoming Events - Room Settings
-
-// Outgoing Composers - Room (settings)
-
-// Outgoing Composers - Room (root)
-
-// Outgoing Composers - Discord
-
-// Outgoing Composers - Preferences
-
-// Outgoing Composers - Sound
-
-// Incoming Events - Friendship furni (love lock and friends)
-
-// Outgoing Composers - Sound
-
-// Outgoing Composers - Room Furniture
-
-// Outgoing Composers - Room Rentable Bots
-
-// Outgoing Composers - Room Pet
-
-// Outgoing Composers - Landing View
-
-// Outgoing Composers - Catalog
-
-// Outgoing Composers - Marketplace
-
-// Outgoing Composers - Quest
-
-// Outgoing Composers - Achievements
-
-// Outgoing Composers - Talent
-
-// Outgoing Composers - Competition
-
-// Outgoing Composers - Notifications
-
-// Outgoing Composers - Tracking
-
-// Outgoing Composers - Friendlist
-
-// Outgoing Composers - Campaign
-
-// Outgoing Composers - Advertisement
-
-// Outgoing Composers - Handshake (NUX)
-
-// Outgoing Composers - Inventory
-
-// Vortex-specific (no AS3 backing) - furni editor and fishing
 
 const log = Logger.getLogger('habbo.communication.HabboMessages');
 

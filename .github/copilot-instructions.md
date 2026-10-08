@@ -277,6 +277,12 @@ _Applies to: `packages/vortex-client/tools/**`, `packages/vortex-client/src/asse
   download directories; `NitroBundleLoader` reads a mounted piece and falls back to the `.nitro`
   when it is missing. Image *data* is identical; browsers premultiply PNG and WebP alpha with
   different rounding, so semi-transparent pixels can render up to 2/255 apart (invisible).
+- **The client's own assets ship as two `.ambreia` bundles** (`public/assets-images.ambreia`,
+  `assets-xml.ambreia`, written by `tools/bundle-assets.mjs` on `predev`/`prebuild`): an `AMBB`
+  header over one entry table (`AssetBundle.ts`), the body deflated when that pays (the XML one).
+  PNGs become lossless WebP checked per pixel (`tools/lossless-webp.mjs`, shared with
+  `build-ambreia.ts`) under their `.png` key, cached by sha1 in `.ambreia-build/bundle-images/`
+  so a rebuild re-encodes only changed images. Not encrypted (owner's choice).
 - **Encrypted `.ambreia` directories** (`build:ambreia --key-file=<file>`): AES-256-GCM per file and
   HMAC file names from one 32-byte master key (`AmbreiaLayout`). The key file lives outside anything
   served (the tool refuses a key inside the output) and the client gets it from `asset-packs.key`.
