@@ -294,7 +294,6 @@ export class IncomingMessages
         connection.send(new InfoRetrieveMessageComposer());
         connection.send(new EventLogMessageComposer('Login', 'socket', 'client.auth_ok'));
         connection.send(new GetFurnitureAliasesMessageComposer());
-        this._communication.suggestedLoginActions = (event as AuthenticationOKMessageEvent).suggestedLoginActions;
 
         log.info('Authenticated');
 

@@ -52,7 +52,6 @@ export class HabboCommunicationManager extends Component implements IHabboCommun
     // AS3: .../src/com/sulake/habbo/communication/HabboCommunicationManager.as::_mode
     private _mode: number = 0;
     private _tcpNoDelay: boolean = true;
-    private _suggestedLoginActions: unknown[] = [];
     private _messageQueue: string = '';
 
     constructor(context: IContext)
@@ -108,18 +107,6 @@ export class HabboCommunicationManager extends Component implements IHabboCommun
         }
 
         return this._config.ports[this._portIndex];
-    }
-
-    // AS3: .../src/com/sulake/habbo/communication/HabboCommunicationManager.as::get suggestedLoginActions()
-    get suggestedLoginActions(): unknown[]
-    {
-        return this._suggestedLoginActions;
-    }
-
-    // AS3: .../src/com/sulake/habbo/communication/HabboCommunicationManager.as::set suggestedLoginActions()
-    set suggestedLoginActions(value: unknown[])
-    {
-        this._suggestedLoginActions = value;
     }
 
     // AS3: .../src/com/sulake/habbo/communication/HabboCommunicationManager.as::set tcpNoDelay()

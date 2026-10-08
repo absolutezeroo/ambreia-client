@@ -13,10 +13,4 @@ export class AuthenticationOKMessageEvent extends MessageEvent implements IMessa
     {
         super(callback, AuthenticationOKMessageParser);
     }
-
-    // AS3: sources/win63_version/habbo/communication/messages/incoming/handshake/AuthenticationOKMessageEvent.as::get suggestedLoginActions()
-    get suggestedLoginActions(): number[]
-    {
-        return this.getParser<AuthenticationOKMessageParser>().suggestedLoginActions;
-    }
 }

@@ -53,11 +53,6 @@ export interface IHabboCommunicationManager
     readonly port: number;
 
     /**
-	 * AS3: get/set suggestedLoginActions()
-	 */
-    suggestedLoginActions: unknown[];
-
-    /**
 	 * AS3: set tcpNoDelay()
 	 */
     set tcpNoDelay(value: boolean);
