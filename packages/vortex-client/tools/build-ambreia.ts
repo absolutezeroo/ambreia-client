@@ -17,11 +17,15 @@
  * - every piece written is read back through the client's own reader and compared.
  * Any difference: exit code 1.
  *
- * Incremental: a piece newer than its .nitro is kept, the directory's dictionary (and key) are
- * reused, an image already in `images/` is referenced. `--force` rebuilds everything with a new dictionary. An image
- * used by two pieces or more goes to `images/<sha1>` once; any other lives inside its piece (one
- * request). Unreadable bundles (an HTML error page saved as .nitro, a truncated file) are skipped
- * and listed in `<output>/report.json`.
+ * Incremental: a piece whose .nitro has the same digest as at its last build is kept (and checked
+ * again), the directory's dictionary and key are reused, an image already in `images/` is
+ * referenced. `--force` rebuilds every piece with a new dictionary; a change of key or of encryption
+ * needs an empty output, so nothing readable is left behind. An image used by two pieces or more goes
+ * to `images/<sha1>` once; any other lives inside its piece (one request).
+ *
+ * The build state (`<kind>.sources.json`: digest of each .nitro) and the report (`<kind>.report.json`,
+ * with the unreadable bundles) go to --state-dir (default `.ambreia-build/` in the working
+ * directory), never into the served output.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -53,6 +57,19 @@ const QUALITY = process.argv.includes('--max') ? 100 : 80;
 const FORCE = process.argv.includes('--force');
 const WORKERS = Number(flag('workers', '2'));
 const KEY_FILE = flag('key-file', '');
+const STATE_DIR = flag('state-dir', '.ambreia-build');
+
+if(process.argv.includes('--key-file') || process.argv.includes('--state-dir'))
+{
+    console.error('write --key-file=<file> and --state-dir=<dir>, with "="');
+    process.exit(2);
+}
+
+if(!(WORKERS >= 1))
+{
+    console.error('--workers must be 1 or more');
+    process.exit(2);
+}
 const DICTIONARY_SIZE = 32 * 1024;
 
 sharp.cache(false);
@@ -107,7 +124,11 @@ function readBundle(file: string): IBundleFile[] | string
             offset += 4 + dataLength;
         }
 
-        if(!files.some(file => file.name.endsWith('.json'))) return 'no manifest in the bundle';
+        const json = files.find(file => file.name.endsWith('.json'));
+
+        if(!json) return 'no manifest in the bundle';
+
+        JSON.parse(json.data.toString('utf8')); // an invalid manifest is a reason, not a crash later
 
         return files;
     }
@@ -119,7 +140,10 @@ function readBundle(file: string): IBundleFile[] | string
 
 async function pixels(image: Buffer): Promise<{data: Buffer; width: number; height: number}>
 {
-    const {data, info} = await sharp(image, {limitInputPixels: false}).ensureAlpha().raw().toBuffer({resolveWithObject: true});
+    // sRGB, 8 bits, RGBA whatever the source (greyscale, 16 bits): the comparison reads 4 bytes a pixel.
+    const {data, info} = await sharp(image, {limitInputPixels: false}).toColourspace('srgb').ensureAlpha().raw({depth: 'uchar'}).toBuffer({resolveWithObject: true});
+
+    if(info.channels !== 4) throw new Error(`${info.channels} channels after conversion`);
 
     return {data, width: info.width, height: info.height};
 }
@@ -167,7 +191,10 @@ fs.mkdirSync(path.join(OUTPUT, 'dictionary'), {recursive: true});
 /** The master key in KEY_FILE, created when the file does not exist — never inside the output. */
 function masterKey(): Uint8Array
 {
-    if(!path.relative(path.resolve(OUTPUT), path.resolve(KEY_FILE)).startsWith('..'))
+    const relative = path.relative(path.resolve(OUTPUT), path.resolve(KEY_FILE));
+
+    // Inside: empty, or a relative path that does not climb out (another drive gives an absolute one).
+    if(relative === '' || (!path.isAbsolute(relative) && relative !== '..' && !relative.startsWith(`..${path.sep}`)))
     {
         console.error(`--key-file must not be inside ${OUTPUT}: the key would be served with the files it protects`);
         process.exit(2);
@@ -195,13 +222,25 @@ const readOpened = async (logical: LogicalPath): Promise<Buffer | null> =>
 };
 
 const descriptorPath = path.join(OUTPUT, 'ambreia.json');
-const previous = !FORCE && fs.existsSync(descriptorPath) ? JSON.parse(fs.readFileSync(descriptorPath, 'utf8')) as IAmbreiaDescriptor : null;
+const existing = fs.existsSync(descriptorPath) ? JSON.parse(fs.readFileSync(descriptorPath, 'utf8')) as IAmbreiaDescriptor : null;
+const previous = FORCE ? null : existing;
 
-if(previous && (Boolean(previous.encrypted) !== layout.encrypted || (previous.keyId ?? null) !== layout.keyId))
+// Over a build with another key (or none), the old files would stay served next to the new ones:
+// readable, under guessable names. Not even with --force: an empty output, or the same key.
+if(existing && (Boolean(existing.encrypted) !== layout.encrypted || (existing.keyId ?? null) !== layout.keyId))
 {
-    console.error(`${OUTPUT} was built ${previous.encrypted ? `with key ${previous.keyId}` : 'without a key'}, this run ${layout.encrypted ? `uses key ${layout.keyId}` : 'has none'}: rebuild with --force`);
+    console.error(`${OUTPUT} was built ${existing.encrypted ? `with key ${existing.keyId}` : 'without a key'}, this run ${layout.encrypted ? `uses key ${layout.keyId}` : 'has none'}: `
+        + 'build into an empty folder (and delete the old one once the new one is served)');
     process.exit(2);
 }
+
+// The digest of each .nitro at its last build: what "up to date" means (a copy keeps old mtimes).
+fs.mkdirSync(STATE_DIR, {recursive: true});
+
+const statePath = path.join(STATE_DIR, `${KIND}.sources.json`);
+const state = !FORCE && fs.existsSync(statePath) ? JSON.parse(fs.readFileSync(statePath, 'utf8')) as {keyId: string | null; dictionary: string; sources: Record<string, string>} : null;
+const sources: Record<string, string> = {};
+const digests = new Map<string, string>();
 
 // 1. Count the uses of every image (shared ones go to images/), and sample manifests for the dictionary.
 const uses = new Map<string, number>();
@@ -210,6 +249,8 @@ const sampleEvery = Math.max(1, Math.floor(bundles.length / 400));
 
 for(const [i, file] of bundles.entries())
 {
+    digests.set(file, sha1(fs.readFileSync(file)));
+
     const files = readBundle(file);
 
     if(typeof files === 'string') continue;
@@ -227,7 +268,15 @@ let dictionary: Uint8Array;
 if(previous)
 {
     dictionaryId = previous.dictionary;
-    dictionary = new Uint8Array((await readOpened({kind: 'dictionary', id: dictionaryId}))!);
+    const stored = await readOpened({kind: 'dictionary', id: dictionaryId});
+
+    if(!stored)
+    {
+        console.error(`${OUTPUT}: the dictionary ${dictionaryId} named by ambreia.json is missing — rebuild with --force`);
+        process.exit(1);
+    }
+
+    dictionary = new Uint8Array(stored);
 }
 else
 {
@@ -306,9 +355,11 @@ for(let start = 0; start < bundles.length; start += WORKERS * 4)
 
             seen.add(name);
 
-            // Not tied to the descriptor: a stopped run left none, and its pieces are checked at the end anyway.
-            if(!FORCE && fs.existsSync(target) && fs.statSync(target).mtimeMs >= fs.statSync(file).mtimeMs)
+            const fresh = state !== null && state.keyId === layout.keyId && state.dictionary === dictionaryId && state.sources[name] === digests.get(file);
+
+            if(fresh && fs.existsSync(target))
             {
+                sources[name] = digests.get(file)!;
                 report.upToDate++;
                 kept.push({name, file});
                 continue;
@@ -358,6 +409,7 @@ for(let start = 0; start < bundles.length; start += WORKERS * 4)
             }
 
             await writeSealed({kind: 'piece', name}, encodePiece({dictionaryId, manifest: compressed, images}, name));
+            sources[name] = digests.get(file)!;
             written.push({name, manifest: sha1(Buffer.from(back)), images: expected});
             report.written++;
         }
@@ -377,7 +429,12 @@ const reader = new AmbreiaDirectory(path.resolve(OUTPUT), async url =>
 
 for(const piece of written)
 {
-    const files = await reader.read(piece.name);
+    const files = await reader.read(piece.name).catch((error: unknown) =>
+    {
+        console.error(`read-back: ${piece.name}: ${String((error as Error | null)?.message ?? error)}`);
+
+        return null;
+    });
 
     if(!files || sha1(files[0].data) !== piece.manifest)
     {
@@ -421,7 +478,10 @@ const sizeOf = (dir: string): number => fs.readdirSync(dir, {withFileTypes: true
 
 report.outputBytes = sizeOf(OUTPUT);
 report.seconds = Math.round((Date.now() - started) / 1000);
-fs.writeFileSync(path.join(OUTPUT, 'report.json'), JSON.stringify(report, null, 1));
+fs.writeFileSync(path.join(STATE_DIR, `${KIND}.report.json`), JSON.stringify(report, null, 1));
+
+// Only a run without differences records its sources: a failed piece is rebuilt next time.
+if(failures === 0) fs.writeFileSync(statePath, JSON.stringify({keyId: layout.keyId, dictionary: dictionaryId, sources}));
 
 console.log(`${KIND}: ${report.written} written, ${report.upToDate} up to date, ${report.sharedImages} shared images, ${megabytes(report.inputBytes)} of .nitro → ${megabytes(report.outputBytes)} `
     + `(${((1 - report.outputBytes / report.inputBytes) * 100).toFixed(1)} % smaller), ${report.pngKept.length} kept as PNG, ${report.unreadable.length} unreadable, ${report.seconds} s`);

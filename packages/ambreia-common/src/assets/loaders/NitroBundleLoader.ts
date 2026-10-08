@@ -104,8 +104,10 @@ export class NitroBundleLoader extends BinaryFileLoader
 
     private _jsonData: IAssetData | null = null;
 
-    // TS-only: the piece's files when an .ambreia pack stood in for the .nitro (plan 2026-10-08-asset-packs).
+    // TS-only: the piece's files when an .ambreia directory stood in for the .nitro (plan 2026-10-08-asset-packs).
     private _packFiles: Array<{name: string; data: Uint8Array}> | null = null;
+    // TS-only: set once the piece's files did not parse; this loader then sticks to the .nitro, retries included.
+    private _packFailed = false;
 
     /**
 	 * The parsed JSON data from the bundle
@@ -211,13 +213,13 @@ export class NitroBundleLoader extends BinaryFileLoader
     }
 
     /**
-     * TS-only: a .nitro under a directory an .ambreia pack is mounted on is read from the pack (one
-     * Range request) when the pack holds it, and fetched as before otherwise — or when the pack
-     * cannot be read, which is said once per pack.
+     * TS-only: a .nitro under a directory an .ambreia directory is mounted on is read from its piece
+     * file when the directory holds it, and fetched as before otherwise — or when the piece cannot be
+     * read or decoded, which is said once per directory and reason.
      */
     override load(url: string): void
     {
-        const mounted = AssetPacks.resolve(url);
+        const mounted = this._packFailed ? null : AssetPacks.resolve(url);
 
         if(!mounted)
         {
@@ -231,6 +233,7 @@ export class NitroBundleLoader extends BinaryFileLoader
         this._packFiles = null;
         this._errorCode = 0;
 
+        // Two-argument then(): a throw from a listener of the success path must not start a second load.
         mounted.pack.read(mounted.name).then((files) =>
         {
             if(this._disposed) return;
@@ -247,13 +250,24 @@ export class NitroBundleLoader extends BinaryFileLoader
             this._bytesLoaded = files.reduce((total, file) => total + file.data.length, 0);
             this.handleLoadEvent('open');
             this.handleLoadEvent('complete');
-        }).catch((error: unknown) =>
+        }, (error: unknown) =>
         {
             if(this._disposed) return;
 
-            log.once(`pack:${mounted.pack.url}`).warn(`${mounted.pack.url} cannot be read (${(error as Error).message}) — its pieces load from their .nitro files`);
-            super.load(url);
+            this.fallBackToNitro(url, mounted.pack.url, error);
         });
+    }
+
+    /** The piece could not be used: its .nitro instead, once, without spending a retry on the piece. */
+    private fallBackToNitro(url: string, directory: string, error: unknown): void
+    {
+        // pako throws strings; WebCrypto, DOMExceptions.
+        const reason = String((error as Error | null)?.message ?? error);
+
+        log.once(`pack:${directory}:${reason}`).warn(`${directory}: ${reason} — the pieces concerned load from their .nitro files`);
+        this._packFailed = true;
+        this._packFiles = null;
+        super.load(url);
     }
 
     /**
@@ -263,11 +277,25 @@ export class NitroBundleLoader extends BinaryFileLoader
     {
         if(type === 'complete' && (this._data || this._packFiles))
         {
+            const fromPack = this._packFiles !== null;
+
             this.parseBundle().then(() =>
             {
                 super.handleLoadEvent('complete', httpStatus);
-            }).catch((error) =>
+            }, (error: unknown) =>
             {
+                if(this._disposed) return;
+
+                // A piece that arrived but does not decode (an image the browser refuses, a server
+                // answering 200 with a page): its .nitro, not a retry of the same piece.
+                if(fromPack)
+                {
+                    this.releaseTextures();
+                    this.fallBackToNitro(this._url, 'an .ambreia piece', error);
+
+                    return;
+                }
+
                 log.error('Error parsing bundle:', error);
 
                 super.handleLoadEvent('ioError', httpStatus);
@@ -277,6 +305,17 @@ export class NitroBundleLoader extends BinaryFileLoader
         }
 
         super.handleLoadEvent(type, httpStatus);
+    }
+
+    // TS-only: drops what a failed parse of a piece left before the .nitro is parsed into this loader.
+    private releaseTextures(): void
+    {
+        this._spritesheet?.destroy(true);
+        if(!this._spritesheet) this._baseTexture?.destroy(true);
+        this._spritesheet = null;
+        this._baseTexture = null;
+        this._textures.clear();
+        this._jsonData = null;
     }
 
     /**

@@ -75,3 +75,6 @@ __pycache__/
 # regenerated per checkout from a dump — but a clone has no dump, so that rule left it unable to
 # draw anything at all. The archive is what makes `git clone && node install.mjs` sufficient on
 # its own. Re-pack and commit it whenever the dump changes: `node install.mjs --pack`.
+
+# build:ambreia state and reports (digests of the .nitro, unreadable bundles)
+.ambreia-build/

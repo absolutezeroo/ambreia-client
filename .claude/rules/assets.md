@@ -48,4 +48,7 @@ paths:
   served (the tool refuses a key inside the output) and the client gets it from `asset-packs.key`.
   That config is public, so this stops a direct look at an URL and name guessing, not a player:
   the key belongs in a server message after login. A directory needs the key it was built with
-  (`ambreia.json` → `keyId`); changing key or encryption is a `--force` rebuild.
+  (`ambreia.json` → `keyId`); a change of key or encryption is a build into an empty folder (the
+  tool refuses to mix them). Build state (`<kind>.sources.json`, the digest of each `.nitro` — "up
+  to date" means same digest, not newer mtime) and `<kind>.report.json` go to `--state-dir`
+  (`.ambreia-build/`, gitignored), never into the served output.

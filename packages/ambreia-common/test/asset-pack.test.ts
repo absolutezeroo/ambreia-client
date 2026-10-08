@@ -266,3 +266,35 @@ test('an encrypted piece served under the name of another does not decrypt', asy
 
     await assert.rejects(new AmbreiaDirectory(dir, fetch, encryptedLayout(key)).read('chair'));
 });
+
+test('a piece that downloads but does not decode falls back to its .nitro instead of retrying the piece', async () =>
+{
+    const {fetch, requested} = await directory(['throne']);
+    const fetched: string[] = [];
+    const original = globalThis.fetch;
+
+    AssetPacks.mount('http://assets/dcr/hof_furni/', new AmbreiaDirectory('http://assets/ambreia/furniture/', fetch));
+    globalThis.fetch = (async (input: string | URL | Request) => { fetched.push(String(input)); throw new TypeError('network down'); }) as typeof fetch;
+    setPlatform({...BROWSER_PLATFORM, decodeImage: async () => { throw new Error('undecodable image'); }});
+
+    try
+    {
+        const loader = new NitroBundleLoader('application/x-nitro-bundle');
+
+        await new Promise<void>(resolve =>
+        {
+            loader.events.once(AssetLoaderEventType.ERROR, () => resolve());
+            loader.events.once(AssetLoaderEventType.COMPLETE, () => resolve());
+            loader.load('http://assets/dcr/hof_furni/throne.nitro');
+        });
+
+        assert.equal(requested.filter(url => url.endsWith('throne.ambreia')).length, 1);
+        assert.ok(fetched.length > 0 && fetched[0] === 'http://assets/dcr/hof_furni/throne.nitro', fetched.join(' '));
+    }
+    finally
+    {
+        globalThis.fetch = original;
+        setPlatform(BROWSER_PLATFORM);
+        AssetPacks.unmountAll();
+    }
+});

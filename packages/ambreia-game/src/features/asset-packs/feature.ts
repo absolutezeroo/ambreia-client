@@ -36,6 +36,10 @@ export const AssetPacksFeature: IGameFeature = {
     {
         const settings = config as {clothing?: string; furniture?: string; key?: string};
         const layout = settings.key ? encryptedLayout(decodeMasterKey(settings.key)) : null;
+
+        // WebCrypto exists only on a secure origin (https, localhost): elsewhere every encrypted
+        // directory falls back to the .nitro files, and this says why.
+        layout?.catch((error: unknown) => log.warn(`asset-packs: the key cannot be used (${String((error as Error | null)?.message ?? error)}) — encrypted directories are skipped`));
         const configuration = host.made.configuration;
 
         if(!configuration || (!settings.clothing && !settings.furniture)) return null;
