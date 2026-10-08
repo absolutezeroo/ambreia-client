@@ -26,6 +26,8 @@ export interface IPlayerHud
     manaMax: number | null;
     xp: number | null;
     xpMax: number | null;
+    /** Shown on the XP bar instead of "xp / max" (e.g. MAX at the maximum level). */
+    xpLabel?: string | null;
     skills: IActionSlot[];
     items: IActionSlot[];
 }

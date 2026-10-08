@@ -140,7 +140,7 @@ export class HudView
         this.setText(player, 'level_txt', value.level === null ? '' : String(value.level));
         this.setBar(player, 'hp_bar', value.hp, value.hpMax);
         this.setBar(player, 'mana_bar', value.mana, value.manaMax);
-        this.setBar(player, 'xp_bar', value.xp, value.xpMax);
+        this.setBar(player, 'xp_bar', value.xp, value.xpMax, value.xpLabel ?? null);
 
         const head = ((player.findChildByName('head_image') as IWidgetWindow | null)?.widget ?? null) as IAvatarImageWidget | null;
 
@@ -231,7 +231,7 @@ export class HudView
     }
 
     /** `<name>` holds `bg`, `fill` and `value`: the fill's width follows value / max. */
-    private setBar(container: IWindowContainer, name: string, value: number | null, max: number | null): void
+    private setBar(container: IWindowContainer, name: string, value: number | null, max: number | null, label: string | null = null): void
     {
         const bar = container.findChildByName(name) as IWindowContainer | null;
         const background = bar?.findChildByName('bg');
@@ -243,7 +243,7 @@ export class HudView
 
         fill.visible = width > 0;
         if(width > 0) fill.width = width;
-        this.setText(bar, 'value', value === null || max === null ? '' : `${value} / ${max}`);
+        this.setText(bar, 'value', label ?? (value === null || max === null ? '' : `${value} / ${max}`));
     }
 
     dispose(): void
