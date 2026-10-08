@@ -61,8 +61,6 @@ export interface ISessionDataManager extends IDisposable
     readonly securityLevel: number;
     // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::get topSecurityLevel()
     readonly topSecurityLevel: number;
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::get isAmbassador()
-    readonly isAmbassador: boolean;
     readonly noobnessLevel: number;
 
     // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::get hasVip()

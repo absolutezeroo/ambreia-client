@@ -379,7 +379,8 @@ export class SessionDataManager extends Component implements ISessionDataManager
 
     // User status
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/session/SessionDataManager.as::_clubLevel
-    private _clubLevel: number = 0;
+    // DEVIATION: AS3 takes it from UserRights; the RPG server sends no membership, so it stays "no club".
+    private readonly _clubLevel: number = HabboClubLevelEnum.NO_CLUB;
 
     // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::get clubLevel()
     get clubLevel(): number
@@ -400,15 +401,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
     get topSecurityLevel(): number
     {
         return this._topSecurityLevel;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::_isAmbassador
-    private _isAmbassador: boolean = false;
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::get isAmbassador()
-    get isAmbassador(): boolean
-    {
-        return this._isAmbassador;
     }
 
     // Derived name: `_noobnessLevel` is declared in no AS3 tree — the trace points
@@ -1747,16 +1739,12 @@ export class SessionDataManager extends Component implements ISessionDataManager
 
         if(!parser) return;
 
-        // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/SessionDataManager.as::onUserRights()
-        // AS3 collapses the server's club level to {0, 2}; it never stores 1.
-        this._clubLevel = parser.clubLevel !== 0 ? HabboClubLevelEnum.VIP : HabboClubLevelEnum.NO_CLUB;
         this._securityLevel = parser.securityLevel;
-        this._isAmbassador = parser.isAmbassador;
 
         // Track the highest security level ever seen
         this._topSecurityLevel = Math.max(this._topSecurityLevel, parser.securityLevel);
 
-        log.debug(`Rights: Club=${this._clubLevel}, Security=${this._securityLevel}, Ambassador=${this._isAmbassador}`);
+        log.debug(`Rights: Security=${this._securityLevel}`);
     }
 
     private onNoobnessLevel(event: IMessageEvent): void

@@ -142,20 +142,16 @@ export class AvatarEditorMessageHandler implements IAvatarEditorMessageHandler
         this.editor?.wardrobe?.updateSlots(event.state, event.outfits);
     };
 
-    /**
-     * Maps the club level to **2 or 0** — not to the level itself. Any non-zero club makes the
-     * editor treat the user as a full subscriber.
-     */
     // AS3: .../avatar/AvatarEditorMessageHandler.as::onUserRights()
-    private onUserRights = (event: IMessageEvent): void =>
+    // DEVIATION: AS3 maps the club level to 2 or 0; the RPG server sends no membership, so the
+    // editor is always told "no club" (0) when the rights arrive.
+    private onUserRights = (): void =>
     {
         const editor = this.editor;
 
         if(editor === null) return;
 
-        const clubLevel = ((event as {parser?: unknown}).parser as {clubLevel?: number} | null)?.clubLevel ?? 0;
-
-        editor.clubMemberLevel = clubLevel !== 0 ? 2 : 0;
+        editor.clubMemberLevel = 0;
         editor.update();
     };
 
