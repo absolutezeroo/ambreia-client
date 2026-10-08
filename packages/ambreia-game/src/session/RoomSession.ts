@@ -228,10 +228,9 @@ export class RoomSession implements IRoomSession
     private _roomControllerLevel: number = 0;
 
     // AS3: .../src/com/sulake/habbo/session/RoomSession.as::get roomControllerLevel()
+    // DEVIATION: AS3 answers 0 while the room is in wired play-test mode; the RPG has no wired.
     get roomControllerLevel(): number
     {
-        if(this._playTestMode) return 0;
-
         return this._roomControllerLevel;
     }
 
@@ -385,21 +384,6 @@ export class RoomSession implements IRoomSession
     set isGameSession(value: boolean)
     {
         this._isGameSession = value;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::_playTestMode
-    private _playTestMode: boolean = false;
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::get playTestMode()
-    get playTestMode(): boolean
-    {
-        return this._playTestMode;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::set playTestMode()
-    set playTestMode(value: boolean)
-    {
-        this._playTestMode = value;
     }
 
     private _isNuxNotComplete: boolean = false;

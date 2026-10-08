@@ -91,10 +91,6 @@ export interface ISessionDataManager extends IDisposable
     readonly respectsRemaining: number;
     readonly respectsPetRemaining: number;
 
-    // Safety
-    readonly accountSafetyLocked: boolean;
-    readonly safetyLocked: boolean;
-
     // Stream & access
     readonly streamPublishingAllowed: boolean;
     readonly lastAccessDate: string;
@@ -184,10 +180,6 @@ export interface ISessionDataManager extends IDisposable
 
     // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::unblockUser()
     unblockUser(userId: number): void;
-
-    // Safety
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::isAccountSafetyLocked()
-    isAccountSafetyLocked(): boolean;
 
     // Badge images — every one of these delegates straight to BadgeImageManager in AS3.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/ISessionDataManager.as::getFurniIconImage()

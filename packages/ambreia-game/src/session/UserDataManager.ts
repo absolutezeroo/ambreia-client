@@ -251,8 +251,8 @@ export class UserDataManager implements IUserDataManager
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/UserDataManager.as::requestPetInfo()
-    // First link in the pet-infostand chain: the server answers with PetInfoMessageEvent (3192),
-    // which RoomUsersHandler turns into RoomSessionPetInfoUpdateEvent for InfoStandWidgetHandler.
+    // First link of AS3's pet-infostand chain. The RPG server sends no pet info back and nothing
+    // here listens for it any more.
     requestPetInfo(webId: number): void
     {
         const petData = this.getPetUserData(webId);

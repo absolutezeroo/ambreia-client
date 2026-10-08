@@ -25,14 +25,6 @@ export interface IUserData
     // AS3: .../src/com/sulake/habbo/session/_SafeCls_1826.as::get achievementScore()
     achievementScore: number;
 
-    // Group information
-    // AS3: .../src/com/sulake/habbo/session/_SafeCls_1826.as::get groupID()
-    groupID: string;
-    // AS3: .../src/com/sulake/habbo/session/_SafeCls_1826.as::get groupName()
-    groupName: string;
-    // AS3: .../src/com/sulake/habbo/session/_SafeCls_1826.as::get groupStatus()
-    groupStatus: number;
-
     // Owner information (for pets/bots)
     // AS3: .../src/com/sulake/habbo/session/_SafeCls_1826.as::get ownerId()
     ownerId: number;

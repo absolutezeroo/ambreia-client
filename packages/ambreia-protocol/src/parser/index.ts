@@ -11,6 +11,5 @@ export * from './help';
 export * from './inventory';
 export * from './moderation';
 export * from './perk';
-export * from './preferences';
 export * from './room';
 export * from './users';

@@ -69,8 +69,6 @@ export interface IRoomSession
     isUserDecorating: boolean;
     // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::get isGameSession()
     isGameSession: boolean;
-    // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::get playTestMode()
-    playTestMode: boolean;
     // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::get isNuxNotComplete()
     isNuxNotComplete: boolean;
 

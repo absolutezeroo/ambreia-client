@@ -52,9 +52,6 @@ import {FavouritesMessageEvent} from '@ambreia/protocol/incoming/navigator/Favou
 // Events - Notifications
 import {ActivityPointsMessageEvent} from '@ambreia/protocol/incoming/notifications/ActivityPointsMessageEvent';
 import {InfoFeedEnableMessageEvent} from '@ambreia/protocol/incoming/notifications/InfoFeedEnableMessageEvent';
-import {
-    AccountSafetyLockStatusChangeMessageEvent
-} from '@ambreia/protocol/incoming/notifications/AccountSafetyLockStatusChangeMessageEvent';
 import {PetRespectFailedEvent} from '@ambreia/protocol/incoming/notifications/PetRespectFailedEvent';
 
 // Events - Inventory
@@ -78,8 +75,7 @@ import {UserNameChangedMessageEvent} from '@ambreia/protocol/incoming/help/UserN
 import {RoomReadyMessageEvent} from '@ambreia/protocol/incoming/room/session/RoomReadyMessageEvent';
 import {UserChangeMessageEvent} from '@ambreia/protocol/incoming/room/action/UserChangeMessageEvent';
 
-// Events - Preferences & chat styles
-import {AccountPreferencesEvent} from '@ambreia/protocol/incoming/preferences/AccountPreferencesEvent';
+// Events - Chat styles
 import {UserNftChatStylesMessageEvent} from '@ambreia/protocol/incoming/users/UserNftChatStylesMessageEvent';
 import {
     UserPurchasableChatStyleChangedMessageEvent
@@ -110,9 +106,6 @@ import type {
     InfoFeedEnableMessageParser
 } from '@ambreia/protocol/parser/notifications/InfoFeedEnableMessageParser';
 import type {
-    AccountSafetyLockStatusChangeMessageEventParser
-} from '@ambreia/protocol/parser/notifications/AccountSafetyLockStatusChangeMessageEventParser';
-import type {
     AchievementsScoreMessageParser
 } from '@ambreia/protocol/parser/inventory/AchievementsScoreMessageParser';
 import type {FigureSetIdsMessageParser} from '@ambreia/protocol/parser/inventory/FigureSetIdsMessageParser';
@@ -127,7 +120,6 @@ import type {
 } from '@ambreia/protocol/parser/help/ChangeUserNameResultMessageParser';
 import type {UserNameChangedMessageParser} from '@ambreia/protocol/parser/help/UserNameChangedMessageParser';
 import type {RoomReadyMessageParser} from '@ambreia/protocol/parser/room/session/RoomReadyMessageParser';
-import type {AccountPreferencesParser} from '@ambreia/protocol/parser/preferences/AccountPreferencesParser';
 import type {UserNftChatStylesMessageParser} from '@ambreia/protocol/parser/users/UserNftChatStylesMessageParser';
 import type {
     UserPurchasableChatStyleChangedMessageParser
@@ -165,7 +157,6 @@ import {
 
 // Session events
 import {UserNameUpdateEvent} from './events/UserNameUpdateEvent';
-import {SessionDataPreferencesEvent} from './events/SessionDataPreferencesEvent';
 import {SessionDataToWidgetEvent} from './events/SessionDataToWidgetEvent';
 
 // Sub-managers
@@ -449,15 +440,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
         return this._petRespectLeft;
     }
 
-    // Safety & Verification
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::_accountSafetyLocked
-    private _accountSafetyLocked: boolean = false;
-
-    get accountSafetyLocked(): boolean
-    {
-        return this._accountSafetyLocked;
-    }
-
     private _nameChangeAllowed: boolean = false;
 
     // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::get nameChangeAllowed()
@@ -641,11 +623,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
     get respectsPetRemaining(): number
     {
         return this._petRespectLeft;
-    }
-
-    get safetyLocked(): boolean
-    {
-        return this._accountSafetyLocked;
     }
 
     // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::get perksReady()
@@ -874,12 +851,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
     unblockUser(userId: number): void
     {
         this._blockedUsersManager?.unblockUser(userId);
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::isAccountSafetyLocked()
-    isAccountSafetyLocked(): boolean
-    {
-        return this._accountSafetyLocked;
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/SessionDataManager.as::getFurniIconImage()
@@ -1672,8 +1643,7 @@ export class SessionDataManager extends Component implements ISessionDataManager
         // Users events
         this.addMessageEvent(new InClientLinkMessageEvent(this.onInClientLink.bind(this)));
 
-        // Safety & name change events
-        this.addMessageEvent(new AccountSafetyLockStatusChangeMessageEvent(this.onAccountSafetyLockStatusChanged.bind(this)));
+        // Name change events
         this.addMessageEvent(new ChangeUserNameResultMessageEvent(this.onChangeUserNameResult.bind(this)));
         this.addMessageEvent(new UserNameChangedMessageEvent(this.onUserNameChange.bind(this)));
         this.addMessageEvent(new EmailStatusResultEvent(this.onEmailStatus.bind(this)));
@@ -1685,8 +1655,7 @@ export class SessionDataManager extends Component implements ISessionDataManager
         // Notification events
         this.addMessageEvent(new PetRespectFailedEvent(this.onPetRespectFailed.bind(this)));
 
-        // Preferences & chat-style events
-        this.addMessageEvent(new AccountPreferencesEvent(this.onAccountPreferences.bind(this)));
+        // Chat-style events
         this.addMessageEvent(new UserNftChatStylesMessageEvent(this.onNftChatStyles.bind(this)));
         this.addMessageEvent(new UserPurchasableChatStylesMessageEvent(this.onPurchasableChatStyles.bind(this)));
         this.addMessageEvent(new UserPurchasableChatStyleChangedMessageEvent(this.onPurchasableChatStyleChanged.bind(this)));
@@ -1923,24 +1892,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
     }
 
     /**
-	 * Handle account safety lock status change
-	 * @see source_as_win63/habbo/session/SessionDataManager.as line 534
-	 */
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::onAccountSafetyLockStatusChanged()
-    private onAccountSafetyLockStatusChanged(event: IMessageEvent): void
-    {
-        if(!event) return;
-
-        const parser = event.parser as AccountSafetyLockStatusChangeMessageEventParser;
-
-        if(!parser) return;
-
-        this._accountSafetyLocked = (parser.status === 0);
-
-        log.debug(`Account safety lock: ${this._accountSafetyLocked}`);
-    }
-
-    /**
 	 * Handle user name change result
 	 * @see source_as_win63/habbo/session/SessionDataManager.as line 456
 	 */
@@ -2117,29 +2068,5 @@ export class SessionDataManager extends Component implements ISessionDataManager
         this._petRespectLeft++;
 
         log.debug('Pet respect failed, counter restored');
-    }
-
-    /**
-	 * Handle account preferences
-	 * @see source_as_win63/habbo/session/SessionDataManager.as line 493
-	 */
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::onAccountPreferences()
-    private onAccountPreferences(event: IMessageEvent): void
-    {
-        if(!event) return;
-
-        const parser = event.parser as AccountPreferencesParser;
-
-        if(!parser) return;
-
-        this._isRoomCameraFollowDisabled = parser.roomCameraFollowDisabled;
-        this._uiFlags = parser.uiFlags;
-
-        this.events.emit(
-            SessionDataPreferencesEvent.PREFERENCES_UPDATED,
-            new SessionDataPreferencesEvent(this._uiFlags)
-        );
-
-        log.debug(`Preferences: cameraFollow=${this._isRoomCameraFollowDisabled}, uiFlags=${this._uiFlags}`);
     }
 }

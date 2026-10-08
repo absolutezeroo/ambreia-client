@@ -137,56 +137,6 @@ export class UserData implements IUserData
         this._achievementScore = value;
     }
 
-    private _groupID: string = '';
-
-    // AS3: .../src/com/sulake/habbo/session/UserData.as::get groupID()
-    get groupID(): string
-    {
-        if(this._isBlocked) return '';
-
-        return this._groupID;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/UserData.as::set groupID()
-    set groupID(value: string)
-    {
-        this._groupID = value;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/UserData.as::_groupName
-    private _groupName: string = '';
-
-    // AS3: .../src/com/sulake/habbo/session/UserData.as::get groupName()
-    get groupName(): string
-    {
-        if(this._isBlocked) return '';
-
-        return this._groupName;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/UserData.as::set groupName()
-    set groupName(value: string)
-    {
-        this._groupName = value;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/UserData.as::_groupStatus
-    private _groupStatus: number = 0;
-
-    // AS3: .../src/com/sulake/habbo/session/UserData.as::get groupStatus()
-    get groupStatus(): number
-    {
-        if(this._isBlocked) return 0;
-
-        return this._groupStatus;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/UserData.as::set groupStatus()
-    set groupStatus(value: number)
-    {
-        this._groupStatus = value;
-    }
-
     private _ownerId: number = 0;
 
     // AS3: .../src/com/sulake/habbo/session/UserData.as::get ownerId()

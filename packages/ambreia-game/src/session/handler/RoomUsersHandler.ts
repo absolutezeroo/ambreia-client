@@ -9,9 +9,6 @@ import {UsersMessageEvent} from '@ambreia/protocol/incoming/room/engine/UsersMes
 import {UserRemoveMessageEvent} from '@ambreia/protocol/incoming/room/engine/UserRemoveMessageEvent';
 import {DoorbellMessageEvent} from '@ambreia/protocol/incoming/navigator/DoorbellMessageEvent';
 import {BlockUserUpdateMessageEvent} from '@ambreia/protocol/incoming/users/BlockUserUpdateMessageEvent';
-import {FavoriteMembershipUpdateMessageEvent} from '@ambreia/protocol/incoming/room/engine/FavoriteMembershipUpdateMessageEvent';
-import type {FavoriteMembershipUpdateMessageEventParser} from '@ambreia/protocol/parser/room/engine/FavoriteMembershipUpdateMessageEventParser';
-import {RoomSessionFavouriteGroupUpdateEvent} from '../events/RoomSessionFavouriteGroupUpdateEvent';
 import {HabboUserBadgesMessageEvent} from '@ambreia/protocol/incoming/users/HabboUserBadgesMessageEvent';
 import {UserChangeMessageEvent} from '@ambreia/protocol/incoming/room/action/UserChangeMessageEvent';
 import {DanceMessageEvent} from '@ambreia/protocol/incoming/room/action/DanceMessageEvent';
@@ -44,31 +41,6 @@ import {RoomSessionUserFigureUpdateEvent} from '../events/RoomSessionUserFigureU
 import type {IUserData} from '../index';
 import { UserData} from '../index';
 import type {RoomUserData} from '../../communication/index';
-import {PetInfoMessageEvent} from '@ambreia/protocol/incoming/room/pet/PetInfoMessageEvent';
-import type {PetInfoMessageEventParser} from '@ambreia/protocol/parser/room/pet/PetInfoMessageEventParser';
-import {PetInfo} from '../PetInfo';
-import {RoomSessionPetInfoUpdateEvent} from '../events/RoomSessionPetInfoUpdateEvent';
-
-// Pet message events + parsers — AS3 registers all of these in the RoomUsersHandler constructor
-// (sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/handler/RoomUsersHandler.as:85-95).
-import {PetCommandsMessageEvent} from '@ambreia/protocol/incoming/room/pet/PetCommandsMessageEvent';
-import {PetPlacingErrorEvent} from '@ambreia/protocol/incoming/room/pet/PetPlacingErrorEvent';
-import {PetFigureUpdateEvent} from '@ambreia/protocol/incoming/room/pet/PetFigureUpdateEvent';
-import {PetStatusUpdateEvent} from '@ambreia/protocol/incoming/room/pet/PetStatusUpdateEvent';
-import {PetLevelUpdateEvent} from '@ambreia/protocol/incoming/room/pet/PetLevelUpdateEvent';
-import type {PetCommandsMessageEventParser} from '@ambreia/protocol/parser/room/pet/PetCommandsMessageEventParser';
-import type {PetPlacingErrorEventParser} from '@ambreia/protocol/parser/room/pet/PetPlacingErrorEventParser';
-import type {PetFigureUpdateEventParser} from '@ambreia/protocol/parser/room/pet/PetFigureUpdateEventParser';
-import type {PetStatusUpdateEventParser} from '@ambreia/protocol/parser/room/pet/PetStatusUpdateEventParser';
-import type {PetLevelUpdateEventParser} from '@ambreia/protocol/parser/room/pet/PetLevelUpdateEventParser';
-
-import {RoomSessionPetCommandsUpdateEvent} from '../events/RoomSessionPetCommandsUpdateEvent';
-import {RoomSessionPetFigureUpdateEvent} from '../events/RoomSessionPetFigureUpdateEvent';
-import {RoomSessionPetStatusUpdateEvent} from '../events/RoomSessionPetStatusUpdateEvent';
-import {RoomSessionPetLevelUpdateEvent} from '../events/RoomSessionPetLevelUpdateEvent';
-import {RoomSessionErrorMessageEvent} from '../events/RoomSessionErrorMessageEvent';
-import {BotErrorEvent} from '@ambreia/protocol/incoming/room/bot/BotErrorEvent';
-import type {BotErrorParser} from '@ambreia/protocol/parser/room/bot/BotErrorParser';
 import {
     UserNameChangedMessageEvent
 } from '@ambreia/protocol/incoming/help/UserNameChangedMessageEvent';
@@ -81,8 +53,8 @@ import type {
  *
  * Based on AS3: com.sulake.habbo.session.handler.RoomUsersHandler
  *
- * Handles user-related messages and manages user data in the session. All 22 of AS3's
- * registrations are present, in its own order.
+ * Handles user-related messages and manages user data in the session, in AS3's registration
+ * order minus the messages the RPG server does not send (see the constructor).
  */
 export class RoomUsersHandler extends BaseHandler
 {
@@ -102,25 +74,10 @@ export class RoomUsersHandler extends BaseHandler
         this.addMessageEvent(connection, new UserRemoveMessageEvent(this.onUserRemove.bind(this)));
         this.addMessageEvent(connection, new HabboUserBadgesMessageEvent(this.onUserBadges.bind(this)));
         this.addMessageEvent(connection, new DoorbellMessageEvent(this.onDoorbell.bind(this)));
-        // The pet block, in AS3's own registration order. Only onPetInfo used to be here, so every
-        // other pet message reached the registry and then died with no subscriber: commands,
-        // placing errors, figure/status/level updates.
-        // DEVIATION: AS3 also subscribes the five breeding messages (PetBreedingResult, PetBreeding,
-        //   ConfirmBreedingRequest, ConfirmBreedingResult, NestBreedingSuccess); the RPG fork removed
-        //   pet breeding.
-        // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/handler/RoomUsersHandler.as::RoomUsersHandler()
-        this.addMessageEvent(connection, new PetInfoMessageEvent(this.onPetInfo.bind(this)));
-        this.addMessageEvent(connection, new PetCommandsMessageEvent(this.onEnabledPetCommands.bind(this)));
-        this.addMessageEvent(connection, new PetPlacingErrorEvent(this.onPetPlacingError.bind(this)));
-        this.addMessageEvent(connection, new PetFigureUpdateEvent(this.onPetFigureUpdate.bind(this)));
-        this.addMessageEvent(connection, new PetStatusUpdateEvent(this.onPetStatusUpdate.bind(this)));
-        this.addMessageEvent(connection, new PetLevelUpdateEvent(this.onPetLevelUpdate.bind(this)));
         this.addMessageEvent(connection, new BlockUserUpdateMessageEvent(this.onBlockUserUpdate.bind(this)));
-        this.addMessageEvent(connection, new FavoriteMembershipUpdateMessageEvent(this.onFavoriteMembershipUpdate.bind(this)));
-        // AS3: RoomUsersHandler.as:96 — `new _SafeCls_2510(onBotError)`, the refusal for every bot
-        // placement and rename.
-        this.addMessageEvent(connection, new BotErrorEvent(this.onBotError.bind(this)));
-
+        // DEVIATION: AS3 also subscribes the pet messages (info, commands, placing error, figure,
+        //   status, level, breeding), the favourite-group update and the bot error. The RPG server
+        //   sends none of them; pets and bots come back as RPG companions and monsters.
         this.addMessageEvent(connection, new UserChangeMessageEvent(this.onUserChange.bind(this)));
 
         // AS3: RoomUsersHandler.as:84 — the last registration this port was missing. Without it a
@@ -288,7 +245,6 @@ export class RoomUsersHandler extends BaseHandler
     }
 
     // AS3: .../src/com/sulake/habbo/session/handler/RoomUsersHandler.as::onBlockUserUpdate()
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/handler/RoomUsersHandler.as::onFavoriteMembershipUpdate()
     /**
 	 * The server's word on who is dancing and to what.
 	 *
@@ -357,39 +313,6 @@ export class RoomUsersHandler extends BaseHandler
         }
     }
 
-    private onFavoriteMembershipUpdate(event: IMessageEvent): void
-    {
-        const parser = event.parser as FavoriteMembershipUpdateMessageEventParser | null;
-
-        if(!parser) return;
-
-        const session = this.listener.getSession(this.roomId);
-
-        if(session === null) return;
-
-        const userData = session.userDataManager.getUserDataByIndex(parser.roomIndex);
-
-        if(userData === null) return;
-
-        // AS3 stores the group id back as a string on the user record before dispatching.
-        userData.groupID = '' + parser.habboGroupId;
-        userData.groupName = parser.habboGroupName;
-
-        if(this.listener.sessionEvents)
-        {
-            this.listener.sessionEvents.emit(
-                RoomSessionFavouriteGroupUpdateEvent.FAVOURITE_GROUP_UPDATE,
-                new RoomSessionFavouriteGroupUpdateEvent(
-                    session,
-                    parser.roomIndex,
-                    parser.habboGroupId,
-                    parser.status,
-                    parser.habboGroupName
-                )
-            );
-        }
-    }
-
     private onBlockUserUpdate(event: IMessageEvent): void
     {
         const blockEvent = event as BlockUserUpdateMessageEvent;
@@ -420,232 +343,6 @@ export class RoomUsersHandler extends BaseHandler
     /**
 	 * Handle doorbell ring
 	 */
-    // Note AS3 does not copy the parser's `name` onto PetInfo - PetInfo has no such member, in the
-    // original as here. The infostand reads the pet's name off its room object instead.
-    // DEVIATION: AS3 also copies the breed / harvest / revive / breeding-permission flags, the
-    //   rarity and the three monsterplant timers; the RPG fork removed pet breeding and
-    //   monsterplants, so the parser reads them off the wire and they stop there.
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/handler/RoomUsersHandler.as::onPetInfo()
-    private onPetInfo(event: IMessageEvent): void
-    {
-        const session = this.listener.getSession(this.roomId);
-
-        if(session === null) return;
-
-        const parser = event.parser as PetInfoMessageEventParser | null;
-
-        if(parser === null) return;
-
-        const petInfo = new PetInfo();
-
-        petInfo.petId = parser.petId;
-        petInfo.level = parser.level;
-        petInfo.levelMax = parser.maxLevel;
-        petInfo.experience = parser.experience;
-        petInfo.experienceMax = parser.experienceRequiredToLevel;
-        petInfo.energy = parser.energy;
-        petInfo.energyMax = parser.maxEnergy;
-        petInfo.nutrition = parser.nutrition;
-        petInfo.nutritionMax = parser.maxNutrition;
-        petInfo.ownerId = parser.ownerId;
-        petInfo.ownerName = parser.ownerName;
-        petInfo.respect = parser.respect;
-        petInfo.age = parser.age;
-        petInfo.breedId = parser.breedId;
-        petInfo.hasFreeSaddle = parser.hasFreeSaddle;
-        petInfo.isRiding = parser.isRiding;
-        petInfo.skillTresholds = parser.skillTresholds;
-        petInfo.accessRights = parser.accessRights;
-
-        // AS3 dispatches on `listener.events`; this port routes session events through
-        // `sessionEvents` (see CLAUDE.md → Never - `events` is reserved by the DI
-        // Component base), so the emit below is the local equivalent of AS3's dispatchEvent.
-        if(this.listener.sessionEvents)
-        {
-            this.listener.sessionEvents.emit(
-                RoomSessionPetInfoUpdateEvent.PET_INFO,
-                new RoomSessionPetInfoUpdateEvent(session, petInfo)
-            );
-        }
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/handler/RoomUsersHandler.as::onEnabledPetCommands()
-    private onEnabledPetCommands(event: IMessageEvent): void
-    {
-        const session = this.listener.getSession(this.roomId);
-
-        if(session === null) return;
-
-        const parser = event.parser as PetCommandsMessageEventParser | null;
-
-        if(parser === null) return;
-
-        if(this.listener.sessionEvents)
-        {
-            this.listener.sessionEvents.emit(
-                RoomSessionPetCommandsUpdateEvent.PET_COMMANDS,
-                new RoomSessionPetCommandsUpdateEvent(session, parser.petId, parser.allCommands, parser.enabledCommands)
-            );
-        }
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/handler/RoomUsersHandler.as::onPetPlacingError()
-    // The error codes and their event types are AS3's switch, verbatim; an unmapped code dispatches
-    // nothing, exactly as in the source.
-    private onPetPlacingError(event: IMessageEvent): void
-    {
-        const parser = event.parser as PetPlacingErrorEventParser | null;
-
-        if(parser === null) return;
-
-        const session = this.listener.getSession(this.roomId);
-
-        if(session === null) return;
-
-        let type: string | null = null;
-
-        switch(parser.errorCode)
-        {
-            case 0:
-                type = 'RSEME_PETS_FORBIDDEN_IN_HOTEL';
-                break;
-            case 1:
-                type = 'RSEME_PETS_FORBIDDEN_IN_FLAT';
-                break;
-            case 2:
-                type = 'RSEME_MAX_PETS';
-                break;
-            case 3:
-                type = 'RSEME_NO_FREE_TILES_FOR_PET';
-                break;
-            case 4:
-                type = 'RSEME_SELECTED_TILE_NOT_FREE_FOR_PET';
-                break;
-            case 5:
-                type = 'RSEME_MAX_NUMBER_OF_OWN_PETS';
-                break;
-        }
-
-        if(type !== null && this.listener.sessionEvents)
-        {
-            this.listener.sessionEvents.emit(type, new RoomSessionErrorMessageEvent(type, session));
-        }
-    }
-
-    /**
-     * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/handler/RoomUsersHandler.as::onBotError()
-     *
-     * The bot sibling of onPetPlacingError() above: one numeric code in, one localized room-session
-     * error out. RoomUI already lists all five of these types in its alert table.
-     */
-    // AS3: .../src/com/sulake/habbo/session/handler/RoomUsersHandler.as::onBotError()
-    private onBotError(event: IMessageEvent): void
-    {
-        const parser = event.parser as BotErrorParser | null;
-
-        if(parser === null) return;
-
-        const session = this.listener.getSession(this.roomId);
-
-        if(session === null) return;
-
-        let type: string | null = null;
-
-        switch(parser.errorCode)
-        {
-            case 0:
-                type = RoomSessionErrorMessageEvent.BOTS_FORBIDDEN_IN_HOTEL;
-                break;
-            case 1:
-                type = RoomSessionErrorMessageEvent.BOTS_FORBIDDEN_IN_FLAT;
-                break;
-            case 2:
-                type = RoomSessionErrorMessageEvent.BOT_LIMIT_REACHED;
-                break;
-            case 3:
-                type = RoomSessionErrorMessageEvent.SELECTED_TILE_NOT_FREE_FOR_BOT;
-                break;
-            case 4:
-                type = RoomSessionErrorMessageEvent.BOT_NAME_NOT_ACCEPTED;
-                break;
-        }
-
-        if(type !== null && this.listener.sessionEvents)
-        {
-            this.listener.sessionEvents.emit(type, new RoomSessionErrorMessageEvent(type, session));
-        }
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/handler/RoomUsersHandler.as::onPetFigureUpdate()
-    private onPetFigureUpdate(event: IMessageEvent): void
-    {
-        const parser = event.parser as PetFigureUpdateEventParser | null;
-
-        if(parser === null) return;
-
-        const session = this.listener.getSession(this.roomId);
-
-        if(session === null) return;
-
-        const figure = parser.figureData ? parser.figureData.figureString : '';
-
-        session.userDataManager.updateFigure(parser.roomIndex, figure, '', parser.hasSaddle, parser.isRiding);
-
-        if(this.listener.sessionEvents)
-        {
-            this.listener.sessionEvents.emit(
-                RoomSessionPetFigureUpdateEvent.PET_FIGURE_UPDATE,
-                new RoomSessionPetFigureUpdateEvent(session, parser.petId, figure)
-            );
-        }
-    }
-
-    // DEVIATION: AS3 first writes the breed / harvest / revive / breeding-permission flags onto the
-    //   pet's user data (updatePetBreedingStatus()) and carries them on the event; the RPG fork
-    //   removed pet breeding and monsterplants. The parser still reads them; the event still fires,
-    //   because the open own-pet menu closes on it.
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/handler/RoomUsersHandler.as::onPetStatusUpdate()
-    private onPetStatusUpdate(event: IMessageEvent): void
-    {
-        const parser = event.parser as PetStatusUpdateEventParser | null;
-
-        if(parser === null) return;
-
-        const session = this.listener.getSession(this.roomId);
-
-        if(session === null) return;
-
-        if(this.listener.sessionEvents)
-        {
-            this.listener.sessionEvents.emit(
-                RoomSessionPetStatusUpdateEvent.PET_STATUS_UPDATE,
-                new RoomSessionPetStatusUpdateEvent(session, parser.petId)
-            );
-        }
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/handler/RoomUsersHandler.as::onPetLevelUpdate()
-    private onPetLevelUpdate(event: IMessageEvent): void
-    {
-        const parser = event.parser as PetLevelUpdateEventParser | null;
-
-        if(parser === null) return;
-
-        const session = this.listener.getSession(this.roomId);
-
-        if(session === null) return;
-
-        session.userDataManager.updatePetLevel(parser.roomIndex, parser.level);
-
-        if(this.listener.sessionEvents)
-        {
-            this.listener.sessionEvents.emit(
-                RoomSessionPetLevelUpdateEvent.PET_LEVEL_UPDATE,
-                new RoomSessionPetLevelUpdateEvent(session, parser.petId, parser.level)
-            );
-        }
-    }
-
     // AS3: .../src/com/sulake/habbo/session/handler/RoomUsersHandler.as::onDoorbell()
     private onDoorbell(event: IMessageEvent): void
     {

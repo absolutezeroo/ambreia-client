@@ -3079,12 +3079,9 @@ export class RoomEngine extends Component implements IRoomEngine,
     {
         const object = this.getRoomObject(this._activeRoomId, objectId, category);
 
-        // Play-test mode owns the room's furniture: nothing may be rotated, picked up or moved
-        // while it is on. The free-furni-movement half is the same escape hatch
-        // `changeRoomObjectState()` uses — a room in that mode is exempt from the whole check.
+        // DEVIATION: AS3 refuses every operation here while the room is in wired play-test mode;
+        // the RPG has no wired, so no play-test mode.
         const session = this._roomSessionManager?.getSession(this._activeRoomId) ?? null;
-
-        if(session !== null && !this.activeRoomHasFreeFurniMovementsMode && session.playTestMode) return false;
 
         switch(action)
         {
@@ -8567,20 +8564,9 @@ export class RoomEngine extends Component implements IRoomEngine,
     {
         if(this._connection === null) return true;
 
+        // DEVIATION: AS3 refuses furni below usage policy 2 here while the room is in wired
+        // play-test mode; the RPG has no wired, so no play-test mode.
         const session = this._roomSessionManager?.getSession(roomId) ?? null;
-
-        // The `activeRoomHasFreeFurniMovementsMode` half of this guard was missing: AS3 skips the
-        // usage-policy check entirely in free-furni-movement rooms, so without it a play-test room
-        // in that mode refused to use its own furni.
-        if(session !== null && !this.activeRoomHasFreeFurniMovementsMode && session.playTestMode)
-        {
-            const object = this.getRoomObject(roomId, objectId, category);
-
-            if(object !== null && object.getModel().getNumber(RoomObjectVariableEnum.FURNITURE_USAGE_POLICY) < 2)
-            {
-                return false;
-            }
-        }
 
         const selectedObjectData = this._roomInstanceData.get(roomId)?.selectedObjectData ?? null;
 
