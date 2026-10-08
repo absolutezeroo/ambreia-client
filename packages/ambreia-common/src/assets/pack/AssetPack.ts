@@ -1,7 +1,7 @@
 import {decodeManifest} from './ManifestCodec';
 import type {IEncodedManifest} from './ManifestCodec';
-import {inflateManifest, parsePackIndexRegion, PACK_HEAD_LENGTH, readPackHead} from './AssetPackFormat';
-import type {IPackIndex} from './AssetPackFormat';
+import {inflateManifest, PACK_HEAD_LENGTH, PACK_PREFIX_LENGTH, parsePackShard, parsePackTop, readPackHead, shardOf} from './AssetPackFormat';
+import type {IPackShard, IPackTop} from './AssetPackFormat';
 
 /** Reads bytes [start, end] (inclusive) of `url`. */
 export type RangeFetch = (url: string, start: number, end: number) => Promise<Uint8Array>;
@@ -34,19 +34,22 @@ export const httpRange: RangeFetch = async (url, start, end) =>
 
 interface IOpenPack
 {
-    index: IPackIndex;
+    top: IPackTop;
     dictionary: Uint8Array;
+    shardsStart: number;
     dataStart: number;
 }
 
 /**
- * One .ambreia pack, read a piece at a time. The index is fetched with the first piece (two Range
- * requests: head, then index) and kept; a piece is then one request when its images follow its
- * manifest, which the build arranges for every image a piece is the first to use.
+ * One .ambreia pack, read a piece at a time. The first piece costs one request for the head and the
+ * top level (shard table, dictionary), one for its index shard and one for the piece; a shard is
+ * kept once read, and a piece whose images follow its manifest — every image it is the first to
+ * use — is a single request.
  */
 export class AssetPack
 {
     private _open: Promise<IOpenPack> | null = null;
+    private readonly _shards = new Map<number, Promise<IPackShard>>();
     private _broken = false;
 
     constructor(readonly url: string, private readonly _fetch: RangeFetch = httpRange) {}
@@ -60,19 +63,24 @@ export class AssetPack
     /** The files of the piece's .nitro (`<name>.json`, then its images), or null if the pack lacks it. */
     async read(name: string): Promise<Array<{name: string; data: Uint8Array}> | null>
     {
-        const {index, dictionary, dataStart} = await this.open();
-        const item = index.items[name];
+        const pack = await this.open();
+        const item = (await this.shard(pack, shardOf(name, pack.top.shards.length)))[name];
 
         if(!item) return null;
 
-        const [manifestOffset, manifestLength, entries] = item;
-        const spans: Array<[number, number]> = [[manifestOffset, manifestLength], ...entries.map(([, image]): [number, number] => [index.images[image][0], index.images[image][1]])];
-        const bytes = await this.readSpans(spans, dataStart);
-        const manifest = decodeManifest(JSON.parse(new TextDecoder().decode(inflateManifest(bytes[0], dictionary))) as IEncodedManifest);
+        const [manifestOffset, manifestLength, images] = item;
+        const spans: Array<[number, number]> = [[manifestOffset, manifestLength], ...images.map(([, offset, length]): [number, number] => [offset, length])];
+        const bytes = await this.readSpans(spans, pack.dataStart);
+        const manifest = decodeManifest(JSON.parse(new TextDecoder().decode(inflateManifest(bytes[0], pack.dictionary))) as IEncodedManifest);
 
         return [
             {name: `${name}.json`, data: new TextEncoder().encode(JSON.stringify(manifest))},
-            ...entries.map(([entryName, image], i) => ({name: index.images[image][2] === 'webp' ? entryName.replace(/\.png$/i, '.webp') : entryName, data: bytes[i + 1]}))
+            ...images.map(([entry, , , format], i) =>
+            {
+                const entryName = entry === 0 ? `${name}.png` : entry;
+
+                return {name: format === 0 ? entryName.replace(/\.png$/i, '.webp') : entryName, data: bytes[i + 1]};
+            })
         ];
     }
 
@@ -80,10 +88,16 @@ export class AssetPack
     {
         this._open ??= (async () =>
         {
-            const regionLength = readPackHead(await this._fetch(this.url, 0, PACK_HEAD_LENGTH - 1));
-            const region = await this._fetch(this.url, PACK_HEAD_LENGTH, PACK_HEAD_LENGTH + regionLength - 1);
+            let prefix = await this._fetch(this.url, 0, PACK_PREFIX_LENGTH - 1);
+            const topLength = readPackHead(prefix);
+            const shardsStart = PACK_HEAD_LENGTH + topLength;
 
-            return {...parsePackIndexRegion(region), dataStart: PACK_HEAD_LENGTH + regionLength};
+            if(prefix.length < shardsStart) prefix = await this._fetch(this.url, 0, shardsStart - 1);
+
+            const {top, dictionary} = parsePackTop(prefix.subarray(PACK_HEAD_LENGTH, shardsStart));
+            const last = top.shards[top.shards.length - 1];
+
+            return {top, dictionary, shardsStart, dataStart: shardsStart + (last ? last[0] + last[1] : 0)};
         })().catch((error: unknown) =>
         {
             this._broken = true;
@@ -92,6 +106,23 @@ export class AssetPack
         });
 
         return this._open;
+    }
+
+    private shard(pack: IOpenPack, index: number): Promise<IPackShard>
+    {
+        let shard = this._shards.get(index);
+
+        if(!shard)
+        {
+            const [offset, length] = pack.top.shards[index];
+
+            shard = this._fetch(this.url, pack.shardsStart + offset, pack.shardsStart + offset + length - 1).then(parsePackShard);
+            // A failed read is not cached: the next piece of that shard asks again.
+            shard.catch(() => this._shards.delete(index));
+            this._shards.set(index, shard);
+        }
+
+        return shard;
     }
 
     /** One request when the spans are back to back, one per span otherwise (a shared image). */

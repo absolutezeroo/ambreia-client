@@ -3,7 +3,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {encodeManifest, decodeManifest} from '../src/assets/pack/ManifestCodec';
-import {AssetPackWriter} from '../src/assets/pack/AssetPackFormat';
+import {AssetPackWriter, PACK_PREFIX_LENGTH} from '../src/assets/pack/AssetPackFormat';
 import {AssetPack, PackRangeUnsupportedError} from '../src/assets/pack/AssetPack';
 import type {RangeFetch} from '../src/assets/pack/AssetPack';
 import {AssetPacks} from '../src/assets/pack/AssetPacks';
@@ -83,6 +83,23 @@ test('a piece whose image follows its manifest is one request after the index', 
     await pack.read('b');
 
     assert.equal(requests.length - before, 1);
+});
+
+test('the index is sharded: reading one piece of many fetches a small part of it, not all of it', async () =>
+{
+    const items = Array.from({length: 3000}, (_, i) => ({name: `furni_${i}`, image: new Uint8Array([i % 256])}));
+    const {fetch, requests, bytes} = memoryPack(items);
+    const pack = new AssetPack('mem://p', fetch);
+
+    assert.equal((await pack.read('furni_1234'))![0].name, 'furni_1234.json');
+
+    // Everything read before the piece itself is index: it must not grow with the pack.
+    const index = requests.slice(0, -1).reduce((total, [start, end]) => total + end - start + 1, 0);
+
+    assert.ok(requests.length <= 3, `requests ${requests.length}`);
+    // The fixed first read (head, shard table, dictionary) plus one shard: the furniture pack's
+    // whole index was 1.65 MB before it was sharded.
+    assert.ok(index < PACK_PREFIX_LENGTH + 8 * 1024, `index bytes read ${index} (pack ${bytes.length})`);
 });
 
 test('an image shared by two pieces is stored once and read for both', async () =>
