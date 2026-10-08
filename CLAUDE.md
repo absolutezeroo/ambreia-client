@@ -19,6 +19,7 @@ pnpm build                   # production build of the client (tsc + vite)
 pnpm gen:headers             # regenerate message ids from the emulator's Headers.cs
 pnpm sync:agents             # regenerate AGENTS.md / copilot-instructions.md from this file + rules
 node install.mjs             # unpack assets (vortex-client-assets.zip); --pack to rebuild the zip
+pnpm --filter vortex-client build:ambreia <dir of .nitro> <out dir>   # lossless .ambreia pieces (rules/assets.md)
 ```
 
 ## Done means verified
@@ -33,7 +34,7 @@ node install.mjs             # unpack assets (vortex-client-assets.zip); --pack 
 
 | Package | What it is |
 |---|---|
-| `packages/ambreia-common` | `@ambreia/common`: Logger, utilities, asset loading, reactive — imports no other Ambreia package |
+| `packages/ambreia-common` | `@ambreia/common`: Logger, utilities, asset loading (incl. `.ambreia` pieces: `assets/pack/`), reactive — imports no other Ambreia package |
 | `packages/ambreia-net` | `@ambreia/net`: WebSocket transport, encryption, wire format, registry, packet tap, the new message style (`style/MessageMap`) — imports `@ambreia/common` only |
 | `packages/ambreia-avatar` | `@ambreia/avatar`: avatar renderer (not the editor), built from typed options; runs in Node (`tools/render-avatar.mjs`) — imports `@ambreia/common` only |
 | `packages/ambreia-ui` | `@ambreia/ui`: window system (`src/`), generic kit (`src/kit/`: plain `WindowManager`, `WidgetRegistry`, dialogs, generic widgets), XML parsers (`src/assets/`); `pnpm --filter @ambreia/ui sandbox` shows it alone — imports `@ambreia/common` only |

@@ -21,6 +21,7 @@ pnpm build                   # production build of the client (tsc + vite)
 pnpm gen:headers             # regenerate message ids from the emulator's Headers.cs
 pnpm sync:agents             # regenerate AGENTS.md / copilot-instructions.md from this file + rules
 node install.mjs             # unpack assets (vortex-client-assets.zip); --pack to rebuild the zip
+pnpm --filter vortex-client build:ambreia <dir of .nitro> <out dir>   # lossless .ambreia pieces (rules/assets.md)
 ```
 
 ## Done means verified
@@ -35,7 +36,7 @@ node install.mjs             # unpack assets (vortex-client-assets.zip); --pack 
 
 | Package | What it is |
 |---|---|
-| `packages/ambreia-common` | `@ambreia/common`: Logger, utilities, asset loading, reactive — imports no other Ambreia package |
+| `packages/ambreia-common` | `@ambreia/common`: Logger, utilities, asset loading (incl. `.ambreia` pieces: `assets/pack/`), reactive — imports no other Ambreia package |
 | `packages/ambreia-net` | `@ambreia/net`: WebSocket transport, encryption, wire format, registry, packet tap, the new message style (`style/MessageMap`) — imports `@ambreia/common` only |
 | `packages/ambreia-avatar` | `@ambreia/avatar`: avatar renderer (not the editor), built from typed options; runs in Node (`tools/render-avatar.mjs`) — imports `@ambreia/common` only |
 | `packages/ambreia-ui` | `@ambreia/ui`: window system (`src/`), generic kit (`src/kit/`: plain `WindowManager`, `WidgetRegistry`, dialogs, generic widgets), XML parsers (`src/assets/`); `pnpm --filter @ambreia/ui sandbox` shows it alone — imports `@ambreia/common` only |
@@ -267,6 +268,24 @@ _Applies to: `packages/vortex-client/tools/**`, `packages/vortex-client/src/asse
 - **Shipped assets can lag the primary dump**: check before assuming a code gap.
   `src/assets/configurations/HabboAvatarGeometry.xml` has 9 bodyparts and no `order-*` attributes
   where the WIN63 dump has 11 (`petl`/`petr`).
+- **`.ambreia` directories stand in for directories of `.nitro`** (plan `docs/superpowers/plans/2026-10-08-asset-packs.md`):
+  one `<name>.ambreia` per bundle, images used by several pieces once in `images/<sha1>`, the
+  manifests (`ManifestCodec`) deflated with `dictionary/<id>.bin`, `ambreia.json` at the root.
+  `build-ambreia.ts` is incremental and checks everything (lossless WebP per pixel, manifests, a
+  read-back); unreadable bundles are listed in `report.json`. The `asset-packs` feature mounts
+  `config.json` → `asset-packs.{clothing,furniture}` (directory URLs) on the avatar / furniture
+  download directories; `NitroBundleLoader` reads a mounted piece and falls back to the `.nitro`
+  when it is missing. Image *data* is identical; browsers premultiply PNG and WebP alpha with
+  different rounding, so semi-transparent pixels can render up to 2/255 apart (invisible).
+- **Encrypted `.ambreia` directories** (`build:ambreia --key-file=<file>`): AES-256-GCM per file and
+  HMAC file names from one 32-byte master key (`AmbreiaLayout`). The key file lives outside anything
+  served (the tool refuses a key inside the output) and the client gets it from `asset-packs.key`.
+  That config is public, so this stops a direct look at an URL and name guessing, not a player:
+  the key belongs in a server message after login. A directory needs the key it was built with
+  (`ambreia.json` → `keyId`); a change of key or encryption is a build into an empty folder (the
+  tool refuses to mix them). Build state (`<kind>.sources.json`, the digest of each `.nitro` — "up
+  to date" means same digest, not newer mtime) and `<kind>.report.json` go to `--state-dir`
+  (`.ambreia-build/`, gitignored), never into the served output.
 
 ## Rule: Wire protocol / communication rules
 

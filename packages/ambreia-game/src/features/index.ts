@@ -19,6 +19,7 @@ import {ObjectLocationRequestHandler} from '../ui/handler/ObjectLocationRequestH
 import type {IGameFeature} from './GameFeature';
 import {AvatarInfoFeature} from './avatar-info/feature';
 import {LoadingBarFeature} from './loading-bar/feature';
+import {AssetPacksFeature} from './asset-packs/feature';
 import {IID_HabboConfigurationManager} from '../iid/IIDHabboConfigurationManager';
 import {IID_HabboCommunicationManager} from '../iid/IIDHabboCommunicationManager';
 import {IID_HabboLocalizationManager} from '../iid/IIDHabboLocalizationManager';
@@ -283,7 +284,7 @@ const RoomUserInterface = feature({
  * window layouts are registered (VortexMain.initAvatarEditor()).
  */
 export const GAME_FEATURES: readonly IGameFeature[] = [
-    Configuration, Communication, CommunicationDemo, Localization, Rooms, RoomRenderers, RoomSessions,
+    Configuration, AssetPacksFeature, Communication, CommunicationDemo, Localization, Rooms, RoomRenderers, RoomSessions,
     SessionData, RoomEngines, AvatarRenderer, Windows, RoomUserInterface,
     AvatarInfoFeature,
     LoadingBarFeature

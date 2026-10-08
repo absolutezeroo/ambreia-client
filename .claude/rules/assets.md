@@ -34,3 +34,21 @@ paths:
 - **Shipped assets can lag the primary dump**: check before assuming a code gap.
   `src/assets/configurations/HabboAvatarGeometry.xml` has 9 bodyparts and no `order-*` attributes
   where the WIN63 dump has 11 (`petl`/`petr`).
+- **`.ambreia` directories stand in for directories of `.nitro`** (plan `docs/superpowers/plans/2026-10-08-asset-packs.md`):
+  one `<name>.ambreia` per bundle, images used by several pieces once in `images/<sha1>`, the
+  manifests (`ManifestCodec`) deflated with `dictionary/<id>.bin`, `ambreia.json` at the root.
+  `build-ambreia.ts` is incremental and checks everything (lossless WebP per pixel, manifests, a
+  read-back); unreadable bundles are listed in `report.json`. The `asset-packs` feature mounts
+  `config.json` → `asset-packs.{clothing,furniture}` (directory URLs) on the avatar / furniture
+  download directories; `NitroBundleLoader` reads a mounted piece and falls back to the `.nitro`
+  when it is missing. Image *data* is identical; browsers premultiply PNG and WebP alpha with
+  different rounding, so semi-transparent pixels can render up to 2/255 apart (invisible).
+- **Encrypted `.ambreia` directories** (`build:ambreia --key-file=<file>`): AES-256-GCM per file and
+  HMAC file names from one 32-byte master key (`AmbreiaLayout`). The key file lives outside anything
+  served (the tool refuses a key inside the output) and the client gets it from `asset-packs.key`.
+  That config is public, so this stops a direct look at an URL and name guessing, not a player:
+  the key belongs in a server message after login. A directory needs the key it was built with
+  (`ambreia.json` → `keyId`); a change of key or encryption is a build into an empty folder (the
+  tool refuses to mix them). Build state (`<kind>.sources.json`, the digest of each `.nitro` — "up
+  to date" means same digest, not newer mtime) and `<kind>.report.json` go to `--state-dir`
+  (`.ambreia-build/`, gitignored), never into the served output.

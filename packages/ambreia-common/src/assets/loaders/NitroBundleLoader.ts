@@ -4,6 +4,9 @@ import {BinaryFileLoader} from './BinaryFileLoader';
 import {platform} from '../../platform/Platform';
 import {textureFromCanvas} from '../../graphics/textureFromCanvas';
 import {Logger} from '../../utils/Logger';
+import {AssetPacks} from '../pack/AssetPacks';
+
+const log = Logger.getLogger('core.assets.loaders.NitroBundleLoader');
 
 /**
  * Nitro bundle asset data interface
@@ -101,6 +104,11 @@ export class NitroBundleLoader extends BinaryFileLoader
 
     private _jsonData: IAssetData | null = null;
 
+    // TS-only: the piece's files when an .ambreia directory stood in for the .nitro (plan 2026-10-08-asset-packs).
+    private _packFiles: Array<{name: string; data: Uint8Array}> | null = null;
+    // TS-only: set once the piece's files did not parse; this loader then sticks to the .nitro, retries included.
+    private _packFailed = false;
+
     /**
 	 * The parsed JSON data from the bundle
 	 */
@@ -173,6 +181,7 @@ export class NitroBundleLoader extends BinaryFileLoader
         if(!this._disposed)
         {
             this._jsonData = null;
+            this._packFiles = null;
 
             // Only destroy textures if ownership wasn't transferred
             if(!this._ownershipTransferred)
@@ -204,18 +213,90 @@ export class NitroBundleLoader extends BinaryFileLoader
     }
 
     /**
+     * TS-only: a .nitro under a directory an .ambreia directory is mounted on is read from its piece
+     * file when the directory holds it, and fetched as before otherwise — or when the piece cannot be
+     * read or decoded, which is said once per directory and reason.
+     */
+    override load(url: string): void
+    {
+        const mounted = this._packFailed ? null : AssetPacks.resolve(url);
+
+        if(!mounted)
+        {
+            super.load(url);
+
+            return;
+        }
+
+        this._url = url;
+        this._data = null;
+        this._packFiles = null;
+        this._errorCode = 0;
+
+        // Two-argument then(): a throw from a listener of the success path must not start a second load.
+        mounted.pack.read(mounted.name).then((files) =>
+        {
+            if(this._disposed) return;
+
+            if(!files)
+            {
+                super.load(url);
+
+                return;
+            }
+
+            this._packFiles = files;
+            this._status = 200;
+            this._bytesLoaded = files.reduce((total, file) => total + file.data.length, 0);
+            this.handleLoadEvent('open');
+            this.handleLoadEvent('complete');
+        }, (error: unknown) =>
+        {
+            if(this._disposed) return;
+
+            this.fallBackToNitro(url, mounted.pack.url, error);
+        });
+    }
+
+    /** The piece could not be used: its .nitro instead, once, without spending a retry on the piece. */
+    private fallBackToNitro(url: string, directory: string, error: unknown): void
+    {
+        // pako throws strings; WebCrypto, DOMExceptions.
+        const reason = String((error as Error | null)?.message ?? error);
+
+        log.once(`pack:${directory}:${reason}`).warn(`${directory}: ${reason} — the pieces concerned load from their .nitro files`);
+        this._packFailed = true;
+        this._packFiles = null;
+        super.load(url);
+    }
+
+    /**
 	 * Override to parse bundle after loading
 	 */
     protected override handleLoadEvent(type: string, httpStatus?: number): void
     {
-        if(type === 'complete' && this._data)
+        if(type === 'complete' && (this._data || this._packFiles))
         {
+            const fromPack = this._packFiles !== null;
+
             this.parseBundle().then(() =>
             {
                 super.handleLoadEvent('complete', httpStatus);
-            }).catch((error) =>
+            }, (error: unknown) =>
             {
-                Logger.getLogger('core.assets.loaders.NitroBundleLoader').error('Error parsing bundle:', error);
+                if(this._disposed) return;
+
+                // A piece that arrived but does not decode (an image the browser refuses, a server
+                // answering 200 with a page): its .nitro, not a retry of the same piece.
+                if(fromPack)
+                {
+                    this.releaseTextures();
+                    this.fallBackToNitro(this._url, 'an .ambreia piece', error);
+
+                    return;
+                }
+
+                log.error('Error parsing bundle:', error);
 
                 super.handleLoadEvent('ioError', httpStatus);
             });
@@ -226,17 +307,28 @@ export class NitroBundleLoader extends BinaryFileLoader
         super.handleLoadEvent(type, httpStatus);
     }
 
+    // TS-only: drops what a failed parse of a piece left before the .nitro is parsed into this loader.
+    private releaseTextures(): void
+    {
+        this._spritesheet?.destroy(true);
+        if(!this._spritesheet) this._baseTexture?.destroy(true);
+        this._spritesheet = null;
+        this._baseTexture = null;
+        this._textures.clear();
+        this._jsonData = null;
+    }
+
     /**
 	 * Parse the nitro bundle format
 	 */
     private async parseBundle(): Promise<void>
     {
-        if(!this._data)
+        const files = this._packFiles ?? (this._data ? this.extractFiles(this._data) : null);
+
+        if(!files)
         {
             throw new Error('No data to parse');
         }
-
-        const files = this.extractFiles(this._data);
 
         // Find and parse the JSON file
         const jsonFile = files.find(f => f.name.endsWith('.json'));
@@ -250,14 +342,14 @@ export class NitroBundleLoader extends BinaryFileLoader
         const jsonString = decoder.decode(jsonFile.data);
         this._jsonData = JSON.parse(jsonString);
 
-        // Find and load the PNG file(s)
-        const pngFile = files.find(f => f.name.endsWith('.png'));
+        // Find and load the image: PNG in a .nitro, WebP (lossless) or PNG in an .ambreia pack
+        const pngFile = files.find(f => f.name.endsWith('.png') || f.name.endsWith('.webp'));
 
         if(pngFile)
         {
             // Decoded by the platform (createImageBitmap in a browser), not Assets.load: PixiJS
             // cannot detect a parser for a blob URL.
-            const image = await platform().decodeImage(new Uint8Array(pngFile.data), 'image/png');
+            const image = await platform().decodeImage(new Uint8Array(pngFile.data), pngFile.name.endsWith('.webp') ? 'image/webp' : 'image/png');
 
             this._baseTexture = textureFromCanvas(image as unknown as {width: number; height: number});
 
