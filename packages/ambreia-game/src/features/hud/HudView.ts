@@ -14,6 +14,8 @@ const log = Logger.getLogger('habbo.features.hud.HudView');
 
 /** Gap between the HUD and the edges of the desktop. */
 const MARGIN = 12;
+/** The window context layer the HUD lives on (the default one, under dialogs). */
+const LAYER = 1;
 /** How often a running cooldown's seconds are redrawn; nothing ticks when none runs. */
 const COOLDOWN_TICK_MS = 250;
 
@@ -47,7 +49,9 @@ export class HudView
         const rect = (window: IWindow | null): unknown => window && {x: window.x, y: window.y, width: window.width, height: window.height, visible: window.visible};
         const desktop = (this._player?.parent ?? null) as IWindow | null;
 
-        return {player: rect(this._player), bar: rect(this._bar), desktop: rect(desktop), slots: this._slots.skills.length + this._slots.items.length};
+        const layers = [0, 1, 2, 3].map(layer => ({layer, rect: rect(this._windows.getDesktop(layer)), isParent: this._windows.getDesktop(layer) === desktop}));
+
+        return {player: rect(this._player), bar: rect(this._bar), desktop: rect(desktop), parentName: desktop?.name ?? null, layers, slots: this._slots.skills.length + this._slots.items.length};
     }
 
     show(): void
@@ -75,10 +79,12 @@ export class HudView
     {
         if(this._player && this._bar) return true;
 
-        this._player = this._windows.buildWidgetLayout('vortex_hud_player_xml') as IWindowContainer | null;
-        this._bar = this._windows.buildWidgetLayout('vortex_hud_action_bar_xml') as IWindowContainer | null;
+        const desktop = this._windows.getDesktop(LAYER) as IWindowContainer | null;
 
-        if(!this._player || !this._bar)
+        this._player = this._windows.buildWidgetLayout('vortex_hud_player_xml', LAYER) as IWindowContainer | null;
+        this._bar = this._windows.buildWidgetLayout('vortex_hud_action_bar_xml', LAYER) as IWindowContainer | null;
+
+        if(!this._player || !this._bar || !desktop)
         {
             log.warn('the HUD layouts (vortex_hud_player_xml, vortex_hud_action_bar_xml) did not build — no HUD');
             this._player?.destroy();
@@ -103,6 +109,9 @@ export class HudView
             }
         }
 
+        // buildFromXML() hands the windows back unattached, as AS3's did: the caller places them.
+        desktop.addChild(this._player);
+        desktop.addChild(this._bar);
         this._player.addEventListener(WindowEvent.WE_PARENT_RESIZED, this._onResize);
 
         return true;
@@ -111,7 +120,7 @@ export class HudView
     /** Frame top left, bar bottom centre of the desktop the windows were built on. */
     private place(): void
     {
-        const desktop = this._player?.parent as IWindow | null;
+        const desktop = this._windows.getDesktop(LAYER);
 
         if(!desktop || !this._player || !this._bar) return;
 
