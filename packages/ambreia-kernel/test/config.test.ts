@@ -118,3 +118,12 @@ test('a misspelt key is named, not dropped: the feature would stay on without a 
         return true;
     });
 });
+
+test('the server RSA modulus is optional, and must be hexadecimal when given', () =>
+{
+    const modulus = 'E228E8E9C40CFB0D2081B165376E921B844B5E581D88DBEA54CC038DA3CD9B00';
+
+    assert.equal(load({name: 'config.json', values: {app: {server: {host: 'ws://localhost:40001', rsaModulus: modulus}}}}).config.app.server.rsaModulus, modulus);
+    assert.equal(load().config.app.server.rsaModulus, undefined);
+    assert.throws(() => load({name: 'config.json', values: {app: {server: {host: 'ws://x', rsaModulus: 'not-hex'}}}}), ConfigError);
+});

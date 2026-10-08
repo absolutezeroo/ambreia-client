@@ -143,6 +143,7 @@ const CommunicationDemo = feature({
         const demo = new HabboCommunicationDemo(context);
 
         if(app.sso) demo.ssoTicket = app.sso;
+        if(app.server.rsaModulus) demo.rsaModulus = app.server.rsaModulus;
         host.made.demo = demo;
 
         return demo;

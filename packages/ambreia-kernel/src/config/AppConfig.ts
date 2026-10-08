@@ -9,7 +9,12 @@ export const AppSection = z.strictObject({
     server: z.strictObject({
         /** A full `ws(s)://` URL, or a host the ports are tried on. */
         host: z.string().min(1),
-        ports: z.array(z.number().int().positive()).default([40001])
+        ports: z.array(z.number().int().positive()).default([40001]),
+        /**
+         * The server's RSA public modulus (hex), when it is not the hotel's built-in one: a local
+         * emulator signs with its own development key (appsettings.Development.json → Crypto).
+         */
+        rsaModulus: z.string().regex(/^[0-9A-Fa-f]{64,}$/, 'an RSA modulus in hexadecimal').optional()
     }),
     /** The session ticket the website hands over (`?sso=`). */
     sso: z.string().optional(),

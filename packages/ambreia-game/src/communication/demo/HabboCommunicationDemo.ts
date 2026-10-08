@@ -165,6 +165,9 @@ export class HabboCommunicationDemo extends Component implements IHabboCommunica
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/communication/demo/HabboCommunicationDemo.as::_ssoTicket
     private _ssoTicket: string | null = null;
 
+    // TS-only: the server's RSA modulus from the configuration (app.server.rsaModulus); null = RSA's built-in one.
+    public rsaModulus: string | null = null;
+
     /**
 	 * @see source_as_win63/habbo/communication/demo/HabboCommunicationDemo.as ssoTicket
 	 */

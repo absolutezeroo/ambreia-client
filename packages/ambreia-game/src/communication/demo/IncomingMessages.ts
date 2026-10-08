@@ -86,7 +86,8 @@ export class IncomingMessages
     {
         this._demo = demo;
         this._communication = communication;
-        this._rsa = new RSA();
+        // The configured server key when there is one (a local emulator's development key).
+        this._rsa = new RSA(demo.rsaModulus ?? undefined);
 
         const connection = this._communication.connection as SocketConnection;
 
