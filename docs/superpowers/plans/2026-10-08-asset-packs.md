@@ -81,3 +81,34 @@ Les offsets sont relatifs à `dataStart`. Une pièce dont les images suivent son
   - Elle monte les packs sur `flash.dynamic.avatar.download.url` et `flash.dynamic.download.url`.
   - Vérification en direct : le démarrage charge les bibliothèques d'avatar par le pack (requêtes réseau, aucun `.nitro`), et le bac à sable iso affiche une room identique, mobis lus dans le pack.
 - [ ] **T5 — Documentation, revue finale, fusion.**
+
+## Révision (2026-10-08) : un fichier par pièce, pas un gros pack
+
+Le propriétaire a choisi un fichier par pièce après la mesure du pack.
+- **D'où vient le gain.** Les −72 % viennent de la conversion (WebP sans perte, manifestes compacts, doublons), pas du regroupement.
+- **Ce que le gros pack ne fait pas.** Il n'ôte aucune requête : une plage par pièce, comme un fichier par pièce.
+- **Ce que le gros pack coûte :**
+  - une mise à jour reconstruit et redéploie 491 Mo ;
+  - le navigateur et le CDN cachent mal des plages ;
+  - le premier accès lit un index (1,65 Mo avant le découpage) ;
+  - le serveur doit gérer les requêtes Range.
+
+**Format (dossier `.ambreia` d'une famille) :**
+
+```
+<dir>/ambreia.json             { v, kind, dictionary: "<id>" } — lu une fois ; absent → retour aux .nitro
+<dir>/dictionary/<id>.bin      dictionnaire deflate des manifestes (lu une fois)
+<dir>/<nom>.ambreia            une pièce : "AMBP", u16 version, u16 flags, 8 octets id du dictionnaire,
+                               u32 + manifeste (deflate-raw avec le dictionnaire), u16 nombre d'images, puis par image :
+                               u8 flags (1 = nom ≠ <nom>.png, 2 = PNG gardé, 4 = image partagée),
+                               [u16 + nom], puis u32 + octets (image propre) ou 20 octets sha1 (image partagée)
+<dir>/images/<sha1>.webp|png   une image utilisée par plusieurs pièces, stockée une fois
+```
+
+- **Image partagée** = utilisée par au moins deux pièces au moment du build. Sinon, elle est dans la pièce : une seule requête.
+- **Build incrémental :**
+  - une pièce plus récente que son `.nitro` est gardée ;
+  - le dictionnaire existant est réutilisé, et seul `--force` en crée un nouveau ;
+  - une image déjà présente dans `images/` est référencée.
+- **Repli.** `ambreia.json` absent : le dossier est ignoré et tout passe par les `.nitro`. Pièce absente (404) : son `.nitro`.
+- **Le gros pack et ses requêtes Range sont retirés du code.** Le codec des manifestes, la conversion vérifiée, le montage et la feature restent.
