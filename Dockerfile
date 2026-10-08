@@ -61,6 +61,13 @@ ENV NODE_OPTIONS=--max-old-space-size=4096
 ARG VITE_WINDOW_DEBUGGER=
 ENV VITE_WINDOW_DEBUGGER=$VITE_WINDOW_DEBUGGER
 
+# The release revision the client is built for (vortex-rpg-emulator Vortex.Revisions/Releases/*.json):
+# the deploy copies that file into the build context and passes its path relative to it, e.g.
+# --build-arg AMBREIA_RELEASE=release.json. Without it the build fails: a production client never
+# speaks the dev ids (spec docs/superpowers/specs/2026-10-08-random-header-revisions-design.md).
+ARG AMBREIA_RELEASE
+ENV AMBREIA_RELEASE=${AMBREIA_RELEASE:+/src/${AMBREIA_RELEASE}}
+
 RUN pnpm --filter vortex-client build
 
 # =================================================================================================
