@@ -1,7 +1,46 @@
 // Parses the emulator's Headers.cs and renders the client's Headers.generated.ts.
 // The emulator is the source of truth for message ids:
 // docs/superpowers/specs/2026-10-07-client-architecture-design.md §6.
+import { existsSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
+
+const RELEASE_RE = /^AMBREIA-\d{12}$/;
+const RELEASE_FILE_RE = /^AMBREIA-\d{12}\.json$/;
+
+function releaseSide(table, key)
+{
+    if(!table || typeof table !== 'object') throw new Error(`release: "${key}" is not an object`);
+
+    return new Map(Object.entries(table).map(([name, id]) =>
+    {
+        if(!Number.isInteger(id)) throw new Error(`release: ${key}.${name} is not an integer`);
+
+        return [name, id];
+    }));
+}
+
+/**
+ * A production revision (vortex-rpg-emulator scripts/revision-new.mjs), in the client's sense: the
+ * server's composers come in, its events go out.
+ */
+export function parseRelease(text)
+{
+    const json = JSON.parse(text);
+
+    if(!RELEASE_RE.test(json.revision ?? '')) throw new Error(`release: revision "${json.revision}" is not AMBREIA-yyyyMMddHHmm`);
+
+    return {revision: json.revision, incoming: releaseSide(json.composers, 'composers'), outgoing: releaseSide(json.events, 'events')};
+}
+
+/** The newest `AMBREIA-<12 digits>.json` of `dir` (the name sorts chronologically), or null. */
+export function latestReleaseFile(dir)
+{
+    if(!existsSync(dir)) return null;
+
+    const newest = readdirSync(dir).filter(name => RELEASE_FILE_RE.test(name)).sort().pop();
+
+    return newest ? join(dir, newest) : null;
+}
 
 const CLASS_RE = /^\s*(?:internal|public)\s+static\s+class\s+(\w+)/;
 const CONST_RE = /^\s*public\s+const\s+int\s+(\w+)\s*=\s*(-?\d+)\s*;/;

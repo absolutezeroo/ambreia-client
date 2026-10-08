@@ -1,7 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { mkdtempSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
-import { emulatorCandidates, parseHeadersCs, renderHeadersTs, sameContent } from './headers.mjs';
+import { emulatorCandidates, latestReleaseFile, parseHeadersCs, parseRelease, renderHeadersTs, sameContent } from './headers.mjs';
 
 const FIXTURE = `namespace Vortex.Revisions.Revision20260701;
 
@@ -104,4 +106,31 @@ test('announces the dev revision unless told another one', () =>
 {
     assert.match(renderHeadersTs(parseHeadersCs(FIXTURE)), /\nexport const REVISION = 'AMBREIA-DEV';\n/);
     assert.match(renderHeadersTs(parseHeadersCs(FIXTURE), 'AMBREIA-202610081530'), /\nexport const REVISION = 'AMBREIA-202610081530';\n/);
+});
+
+const RELEASE = JSON.stringify({revision: 'AMBREIA-202610081530', events: {PongMessageEvent: 17}, composers: {PingMessageComposer: 42}});
+
+test('a release table reads in the client\'s sense: composers come in, events go out', () =>
+{
+    const release = parseRelease(RELEASE);
+
+    assert.equal(release.revision, 'AMBREIA-202610081530');
+    assert.deepEqual([...release.incoming], [['PingMessageComposer', 42]]);
+    assert.deepEqual([...release.outgoing], [['PongMessageEvent', 17]]);
+});
+
+test('a malformed release table is refused', () =>
+{
+    assert.throws(() => parseRelease(JSON.stringify({revision: 'v1', events: {}, composers: {}})), /revision/);
+    assert.throws(() => parseRelease(JSON.stringify({revision: 'AMBREIA-202610081530', events: {A: 'x'}, composers: {}})), /A/);
+});
+
+test('the newest release is the last by name', () =>
+{
+    const dir = mkdtempSync(join(tmpdir(), 'releases-'));
+
+    for(const name of ['AMBREIA-202610081530.json', 'AMBREIA-202612010900.json', 'notes.txt']) writeFileSync(join(dir, name), '{}');
+
+    assert.equal(latestReleaseFile(dir), join(dir, 'AMBREIA-202612010900.json'));
+    assert.equal(latestReleaseFile(join(dir, 'missing')), null);
 });
