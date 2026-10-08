@@ -99,3 +99,9 @@ test('sameContent ignores CRLF vs LF', () =>
     assert.equal(sameContent('a\r\nb\r\n', 'a\nb\n'), true);
     assert.equal(sameContent('a\nb\n', 'a\nc\n'), false);
 });
+
+test('announces the dev revision unless told another one', () =>
+{
+    assert.match(renderHeadersTs(parseHeadersCs(FIXTURE)), /\nexport const REVISION = 'AMBREIA-DEV';\n/);
+    assert.match(renderHeadersTs(parseHeadersCs(FIXTURE), 'AMBREIA-202610081530'), /\nexport const REVISION = 'AMBREIA-202610081530';\n/);
+});

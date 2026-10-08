@@ -2,6 +2,9 @@
 // vortex-rpg-emulator/Vortex.Revisions/Revision20260701/Headers.cs. Do not edit: run `pnpm gen:headers`.
 // Spec: docs/superpowers/specs/2026-10-07-client-architecture-design.md §6.
 
+/** The protocol revision this client speaks, announced in ClientHello. */
+export const REVISION = 'AMBREIA-DEV';
+
 /** Server to client: the emulator's MessageComposer constants. */
 export const Incoming = {
     AuthenticationOKMessageComposer: 230,

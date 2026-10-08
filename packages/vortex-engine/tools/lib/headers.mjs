@@ -87,10 +87,11 @@ function renderBlock(exportName, doc, entries)
     return `/** ${doc} */\nexport const ${exportName} = {\n${lines.join('\n')}\n} as const;\n`;
 }
 
-export function renderHeadersTs(parsed)
+export function renderHeadersTs(parsed, revision = 'AMBREIA-DEV')
 {
     return [
         HEADER_COMMENT,
+        `/** The protocol revision this client speaks, announced in ClientHello. */\nexport const REVISION = '${revision}';\n`,
         renderBlock('Incoming', 'Server to client: the emulator\'s MessageComposer constants.', parsed.incoming),
         renderBlock('Outgoing', 'Client to server: the emulator\'s MessageEvent constants.', parsed.outgoing)
     ].join('\n');
