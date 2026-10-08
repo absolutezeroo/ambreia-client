@@ -1212,10 +1212,14 @@ export class RoomPlane implements IRoomPlane
         this._outputCanvas.height = this._height;
         const ctx = this._outputCanvas.getContext('2d')!;
 
+        // AS3 draws with smoothing off (RoomPlane.as::draw()).
+        ctx.imageSmoothingEnabled = false;
+
         // Apply affine transform and draw texture
         ctx.setTransform(a, b, c, d, tx, ty);
         ctx.drawImage(textureBitmap, 0, 0);
         ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.snapEdges(ctx);
 
         // Apply mask cutouts (door/window holes) on the textured canvas
         if(this._rectangleMasks.length > 0 || this._bitmapMasks.length > 0)
@@ -1260,7 +1264,9 @@ export class RoomPlane implements IRoomPlane
         }
 
         // Convert canvas to PixiJS texture and apply to sprite
-        const texture = Texture.from(this._outputCanvas);
+        // Nearest: a zoomed view magnifies the plane, and linear filtering would fade its edge into
+        // the transparent pixels beyond it, reopening the seam snapEdges() closed.
+        const texture = Texture.from({resource: this._outputCanvas, scaleMode: 'nearest'});
 
         if(this._textureSprite === null)
         {
@@ -1314,7 +1320,8 @@ export class RoomPlane implements IRoomPlane
 
             this._bitmapDataTexture = Texture.from({
                 resource: this._bitmapData,
-                alphaMode: 'premultiply-alpha-on-upload'
+                alphaMode: 'premultiply-alpha-on-upload',
+                scaleMode: 'nearest'
             });
         }
 
@@ -1452,6 +1459,31 @@ export class RoomPlane implements IRoomPlane
     }
 
     /**
+     * Gives a floor plane's skewed edges the hard, aliased edge Flash's draw() had. The canvas
+     * anti-aliases them instead, and where two coplanar floor planes meet their complementary
+     * half-covered pixels let a quarter of the background through: a dark line along every seam.
+     * A pixel at least half covered becomes opaque, the rest transparent, so neighbours tile.
+     * Floors only: their texture is opaque, a landscape's or a wall's may not be.
+     */
+    private snapEdges(ctx: CanvasRenderingContext2D): void
+    {
+        if(this._type !== RoomPlane.TYPE_FLOOR) return;
+
+        const image = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+        const data = image.data;
+
+        // getImageData is not premultiplied: raising alpha keeps the pixel's colour.
+        for(let i = 3; i < data.length; i += 4)
+        {
+            const alpha = data[i];
+
+            if(alpha !== 0 && alpha !== 255) data[i] = alpha >= 128 ? 255 : 0;
+        }
+
+        ctx.putImageData(image, 0, 0);
+    }
+
+    /**
 	 * Render texture bitmap to _bitmapData canvas using affine transform.
 	 * Same transform as renderTexture() but targets the _bitmapData canvas.
 	 */
@@ -1469,9 +1501,11 @@ export class RoomPlane implements IRoomPlane
         const tx = this._cornerC.x;
         const ty = this._cornerC.y;
 
+        ctx.imageSmoothingEnabled = false;
         ctx.setTransform(a, b, c, d, tx, ty);
         ctx.drawImage(textureBitmap, 0, 0);
         ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.snapEdges(ctx);
 
         // Apply mask cutouts
         if(this._rectangleMasks.length > 0 || this._bitmapMasks.length > 0)

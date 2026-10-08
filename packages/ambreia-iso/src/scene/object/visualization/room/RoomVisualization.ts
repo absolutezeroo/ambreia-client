@@ -545,11 +545,22 @@ export class RoomVisualization extends RoomObjectSpriteVisualization
             // AS3 gives the billboard the WALL plane type and tells the two apart only by which
             // rasterizer it hands over, so the branch below has to carry the distinction itself.
             let isBillboard = false;
+            let textureOffsetU = 0;
+            let textureOffsetV = 0;
 
             // Map type and color according to AS3 createPlanesAndSprites (lines 607-668)
             if(type === RoomPlaneData.PLANE_FLOOR)
             {
                 planeType = RoomPlane.TYPE_FLOOR;
+
+                // AS3 l.375-379: a floor plane whose corner is not on a tile edge (the floor runs
+                // under the wall's thickness) shifts its texture by the fraction, so the pattern
+                // stays on the tile grid instead of starting at the plane's own corner.
+                const u = location.x + leftSide.x + 0.5;
+                const v = location.y + rightSide.y + 0.5;
+
+                textureOffsetU = u - Math.trunc(u);
+                textureOffsetV = v - Math.trunc(v);
 
                 if(normal !== null && normal.z !== 0)
                 {
@@ -641,7 +652,9 @@ export class RoomVisualization extends RoomObjectSpriteVisualization
                 planeType,
                 true,
                 secondaryNormals.length > 0 ? secondaryNormals : null,
-                randomSeed
+                randomSeed,
+                textureOffsetU,
+                textureOffsetV
             );
 
             plane.color = color;
