@@ -38,7 +38,6 @@ export const Incoming = {
     RoomEntryTileMessageComposer: 2792,
     RoomForwardMessageComposer: 3339,
     RoomPropertyMessageComposer: 1956,
-    RoomRatingComposer: 2502,
     RoomReadyMessageComposer: 2349,
     RoomVisualizationSettingsComposer: 2986,
     RpgCharacterListMessageComposer: 9000,

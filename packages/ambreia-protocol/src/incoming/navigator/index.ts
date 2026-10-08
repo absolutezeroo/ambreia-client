@@ -2,7 +2,6 @@
 export * from './NavigatorSettingsMessageEvent';
 export * from './FavouritesMessageEvent';
 export * from './GetGuestRoomResultMessageEvent';
-export * from './RoomRatingMessageEvent';
 export * from './DoorbellMessageEvent';
 export * from './FlatAccessDeniedMessageEvent';
 

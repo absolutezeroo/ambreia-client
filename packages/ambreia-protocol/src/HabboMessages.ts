@@ -28,11 +28,6 @@ import {
     FigureUpdateMessageEvent,
 } from './incoming/avatar/index';
 
-// Incoming Events - Navigator
-import {
-    RoomRatingMessageEvent,
-} from './incoming/navigator/index';
-
 // Incoming Events - Notifications
 // Incoming Events - Notifications (extended)
 import {
@@ -344,19 +339,6 @@ export class HabboMessages implements IMessageConfiguration
 
         // === AVATAR ===
         this._events.set(132, FigureUpdateMessageEvent);
-
-        // === NAVIGATOR ===
-        // AS3: header corrected 3796 -> 3081 (_SafeCls_3187, onFavouriteChanged in
-        // com/sulake/habbo/navigator/_SafeCls_1951.as / _SafeCls_2208.as). Header 3796
-        // there is really onPetFigureUpdate (_SafeCls_2731), an unrelated, unported message.
-        // The room's flood sensitivity on its own. `vortex-emulator` sends it from the room
-        // settings dialog; nothing here listened, so the chat flow kept the default forever.
-        // AS3: header corrected 1265 -> 160 (_SafeCls_3509, whose parser _SafeCls_4150 builds the
-        // searchType/searchParam/rooms/ad data class _SafeCls_3104 — WIN63 registry _SafeCls_2046.as
-        // l.1262). 1265 is really the Wired furni-trigger push (_SafeCls_3224, registered below at
-        // l.1127), and because `_events` is a Map the later `set(1265, ...)` silently replaced this
-        // entry, so GuestRoomSearchResultMessageEvent had no id at all.
-        this._events.set(2502, RoomRatingMessageEvent);
 
         // === RAID PROTECTION ===
         // These three exist only in AIR-1.0.31 — no WIN63 build has the feature at all, so there
