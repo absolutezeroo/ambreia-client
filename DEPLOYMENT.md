@@ -341,6 +341,34 @@ address, so the same name across two resources would mean opposite things.
 This is the heaviest build in the deployment — `tsc && vite build` over the whole client. See
 [If the client build dies](#if-the-client-build-dies).
 
+**Build Variable** `AMBREIA_RELEASE` — the release revision this client is built for, as a path
+relative to the repository root (see [Releasing a protocol revision](#releasing-a-protocol-revision)).
+Without it the build stops: a production client never carries the dev message ids.
+
+### Releasing a protocol revision
+
+Every deploy that ships a client draws new message ids, like Habbo's `PRODUCTION-…` builds: a bot or
+packet logger written against one revision stops working at the next, and the client carries no
+message name to read the new table back from (spec
+`docs/superpowers/specs/2026-10-08-random-header-revisions-design.md`). Client and emulator must
+ship the **same** revision, together:
+
+1. **Draw** — in `vortex-rpg-emulator`: `node scripts/revision-new.mjs`. It writes
+   `Vortex.Revisions/Releases/AMBREIA-<UTC yyyyMMddHHmm>.json`. Commit it there: it is embedded in
+   the emulator's DLL, and the emulator speaks the newest one.
+2. **Hand it to the client** — copy the same file into this repository as
+   `release/AMBREIA-<…>.json`, commit, and set the client app's Build Variable
+   `AMBREIA_RELEASE=release/AMBREIA-<…>.json`. `pnpm build` fails if the client uses a message the
+   table lacks, or if a message name or a source map reaches `dist/`.
+3. **Deploy both.** The emulator speaks the release revision outside `DOTNET_ENVIRONMENT=Development`;
+   a container that runs in Development (as `docker-compose.yml` does) needs
+   `VORTEX__Vortex__Revisions__Release=true`, or it stays on `AMBREIA-DEV` and refuses every
+   production client. With no release committed, a release emulator refuses to start and says so.
+4. Players still on the previous client are told an update is available (DisconnectReason 122);
+   accepting it hands them back to the site, which loads the new client on the next open.
+
+The tables are as secret as the repositories that hold them: both must stay private.
+
 ## 7. The website app
 
 The website (`vortex-web`, the habbo-web port) no longer lives in this repository; deploy it from
