@@ -84,7 +84,6 @@ import {
 import {
     AvatarEffectMessageEvent,
     CarryObjectMessageEvent,
-    DanceMessageEvent,
     UserChangeMessageEvent,
 } from './incoming/room/action/index';
 
@@ -118,7 +117,7 @@ import {
 // Outgoing Composers - Room Furniture
 import {UseFurnitureMessageComposer} from './outgoing/room/furniture/UseFurnitureMessageComposer';
 import {UseWallItemMessageComposer} from './outgoing/room/furniture/UseWallItemMessageComposer';
-import {Outgoing} from './Headers.generated';
+import {Incoming, Outgoing} from './Headers.generated';
 
 // Outgoing Composers - Room Avatar
 import {
@@ -198,15 +197,15 @@ export class HabboMessages implements IMessageConfiguration
     private registerEvents(): void 
     {
         // === HANDSHAKE ===
-        this._events.set(3309, InitDiffieHandshakeMessageEvent);
-        this._events.set(3401, CompleteDiffieHandshakeMessageEvent);
-        this._events.set(230, AuthenticationOKMessageEvent);
-        this._events.set(4000, DisconnectReasonMessageEvent);
+        this._events.set(Incoming.InitDiffieHandshakeComposer, InitDiffieHandshakeMessageEvent);
+        this._events.set(Incoming.CompleteDiffieHandshakeComposer, CompleteDiffieHandshakeMessageEvent);
+        this._events.set(Incoming.AuthenticationOKMessageComposer, AuthenticationOKMessageEvent);
+        this._events.set(Incoming.DisconnectReasonComposer, DisconnectReasonMessageEvent);
 
         // === SESSION ===
-        this._events.set(1407, PingMessageEvent);
-        this._events.set(3599, UserRightsMessageEvent);
-        this._events.set(3985, UserObjectMessageEvent);
+        this._events.set(Incoming.PingMessageComposer, PingMessageEvent);
+        this._events.set(Incoming.UserRightsMessageComposer, UserRightsMessageEvent);
+        this._events.set(Incoming.UserObjectComposer, UserObjectMessageEvent);
         // AS3: header corrected 3913 -> 70 - was swapped with AccountSafetyLockStatusChangeMessageEvent.
         // _SafeCls_2046.as: _SafeStr_4546[70] = _SafeCls_2080, whose only member is `get noobnessLevel():int`.
 
@@ -215,10 +214,10 @@ export class HabboMessages implements IMessageConfiguration
         // sources/WIN63-202607011411-782849652 unknowns/_SafePkg_2018/_SafeCls_3162.as
         // (isInMaintenance, minutesUntilMaintenance, conditional duration) matches this
         // parser exactly and is registered at 1737, not 184.
-        this._events.set(1737, MaintenanceStatusMessageEvent);
+        this._events.set(Incoming.MaintenanceStatusMessageComposer, MaintenanceStatusMessageEvent);
 
         // === AVATAR ===
-        this._events.set(132, FigureUpdateMessageEvent);
+        this._events.set(Incoming.FigureUpdateComposer, FigureUpdateMessageEvent);
 
         // === RAID PROTECTION ===
         // These three exist only in AIR-1.0.31 — no WIN63 build has the feature at all, so there
@@ -303,9 +302,9 @@ export class HabboMessages implements IMessageConfiguration
         // reads `savedSearches:Vector`. 866 is the unread-forums count (parser exposes `unreadForumsCount:int`).
 
         // === ROOM SESSION ===
-        this._events.set(2349, RoomReadyMessageEvent);
-        this._events.set(611, OpenConnectionMessageEvent);
-        this._events.set(3404, CloseConnectionMessageEvent);
+        this._events.set(Incoming.RoomReadyMessageComposer, RoomReadyMessageEvent);
+        this._events.set(Incoming.OpenConnectionMessageComposer, OpenConnectionMessageEvent);
+        this._events.set(Incoming.CloseConnectionMessageComposer, CloseConnectionMessageEvent);
         // AS3: header corrected 1856 -> 412 (_SafeCls_3717, onYouAreNotSpectator,
         // com/sulake/habbo/room/_SafeCls_1984.as:286). Header 1856 there is really
         // onFurniListInvalidate (_SafeCls_2440), which has moved here from 3790 - see
@@ -315,48 +314,48 @@ export class HabboMessages implements IMessageConfiguration
         // chooserDisabled / freeFurniMovementsEnabled / invisibleFurni, each behind its own
         // bytes-available guard exactly as AS3 does. The emulator writes only the first boolean,
         // which the guards already tolerate.
-        this._events.set(2942, HanditemConfigurationMessageEvent);
-        this._events.set(3339, RoomForwardMessageEvent);
-        this._events.set(2430, CantConnectMessageEvent);
+        this._events.set(Incoming.HanditemConfigurationMessageComposer, HanditemConfigurationMessageEvent);
+        this._events.set(Incoming.RoomForwardMessageComposer, RoomForwardMessageEvent);
+        this._events.set(Incoming.CantConnectMessageComposer, CantConnectMessageEvent);
 
         // === ROOM PERMISSIONS ===
-        this._events.set(934, YouAreControllerMessageEvent);
-        this._events.set(456, YouAreNotControllerMessageEvent);
-        this._events.set(1986, YouAreOwnerMessageEvent);
+        this._events.set(Incoming.YouAreControllerMessageComposer, YouAreControllerMessageEvent);
+        this._events.set(Incoming.YouAreNotControllerMessageComposer, YouAreNotControllerMessageEvent);
+        this._events.set(Incoming.YouAreOwnerMessageComposer, YouAreOwnerMessageEvent);
 
         // === ROOM ENGINE ===
-        this._events.set(2885, FloorHeightMapMessageEvent);
-        this._events.set(154, FurnitureAliasesMessageEvent);
-        this._events.set(2260, HeightMapMessageEvent);
-        this._events.set(3279, HeightMapUpdateMessageEvent);
-        this._events.set(2792, RoomEntryTileMessageEvent);
-        this._events.set(2914, RoomEntryInfoMessageEvent);
-        this._events.set(2104, ObjectsMessageEvent);
-        this._events.set(368, ObjectAddMessageEvent);
-        this._events.set(114, ObjectUpdateMessageEvent);
-        this._events.set(1916, ObjectRemoveMessageEvent);
-        this._events.set(2329, ObjectDataUpdateMessageEvent);
-        this._events.set(3379, ItemsMessageEvent);
-        this._events.set(3733, ItemAddMessageEvent);
-        this._events.set(1198, ItemUpdateMessageEvent);
-        this._events.set(2859, ItemRemoveMessageEvent);
-        this._events.set(834, ItemStateUpdateMessageEvent);
-        this._events.set(540, ItemDataUpdateMessageEvent);
+        this._events.set(Incoming.FloorHeightMapMessageComposer, FloorHeightMapMessageEvent);
+        this._events.set(Incoming.FurnitureAliasesMessageComposer, FurnitureAliasesMessageEvent);
+        this._events.set(Incoming.HeightMapMessageComposer, HeightMapMessageEvent);
+        this._events.set(Incoming.HeightMapUpdateMessageComposer, HeightMapUpdateMessageEvent);
+        this._events.set(Incoming.RoomEntryTileMessageComposer, RoomEntryTileMessageEvent);
+        this._events.set(Incoming.RoomEntryInfoMessageComposer, RoomEntryInfoMessageEvent);
+        this._events.set(Incoming.ObjectsMessageComposer, ObjectsMessageEvent);
+        this._events.set(Incoming.ObjectAddMessageComposer, ObjectAddMessageEvent);
+        this._events.set(Incoming.ObjectUpdateMessageComposer, ObjectUpdateMessageEvent);
+        this._events.set(Incoming.ObjectRemoveMessageComposer, ObjectRemoveMessageEvent);
+        this._events.set(Incoming.ObjectDataUpdateMessageComposer, ObjectDataUpdateMessageEvent);
+        this._events.set(Incoming.ItemsMessageComposer, ItemsMessageEvent);
+        this._events.set(Incoming.ItemAddMessageComposer, ItemAddMessageEvent);
+        this._events.set(Incoming.ItemUpdateMessageComposer, ItemUpdateMessageEvent);
+        this._events.set(Incoming.ItemRemoveMessageComposer, ItemRemoveMessageEvent);
+        this._events.set(Incoming.ItemStateUpdateMessageComposer, ItemStateUpdateMessageEvent);
+        this._events.set(Incoming.ItemDataUpdateMessageComposer, ItemDataUpdateMessageEvent);
         // Header verified (_SafeCls_2131 -> parser _SafeCls_2309). The RPG player block is shorter
         // than AS3's: it ends at isModerator (no guild, swimsuit or badge rank), on both sides.
-        this._events.set(996, UsersMessageEvent);
-        this._events.set(2613, UserUpdateMessageEvent);
-        this._events.set(3693, UserRemoveMessageEvent);
+        this._events.set(Incoming.UsersMessageComposer, UsersMessageEvent);
+        this._events.set(Incoming.UserUpdateMessageComposer, UserUpdateMessageEvent);
+        this._events.set(Incoming.UserRemoveMessageComposer, UserRemoveMessageEvent);
         // AS3: sources/win63_version/habbo/communication/messages/incoming/room/engine/RoomPropertyMessageEvent.as
         // (name recovered; obfuscated in primary dump as _SafeStr_4546[1956] = _SafeCls_2935,
         // sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2102/_SafeCls_2935.as - exact
         // field match: floorType/wallType/landscapeType/animatedLandscapeType).
-        this._events.set(1956, RoomPropertyMessageEvent);
+        this._events.set(Incoming.RoomPropertyMessageComposer, RoomPropertyMessageEvent);
         // AS3: sources/win63_version/habbo/communication/messages/incoming/room/engine/RoomVisualizationSettingsEvent.as
         // (name recovered; obfuscated in primary dump as _SafeStr_4546[2986] = _SafeCls_2101,
         // sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_2102/_SafeCls_2101.as - exact
         // field match: wallsHidden/wallThicknessMultiplier/floorThicknessMultiplier).
-        this._events.set(2986, RoomVisualizationSettingsEvent);
+        this._events.set(Incoming.RoomVisualizationSettingsComposer, RoomVisualizationSettingsEvent);
 
         // === ROOM CHAT ===
         // AS3: _SafeCls_2046.as::_events[3614] = _SafeCls_3307 — the server refusing this player's
@@ -372,21 +371,20 @@ export class HabboMessages implements IMessageConfiguration
         // com/sulake/habbo/room/_SafeCls_1984.as:270, parser _SafeCls_3947 - userId,
         // expressionType - matches this TS parser exactly). Header 1783 there is really
         // onRoomSettingsSaved (_SafeCls_2385), which has moved here - see ROOM SETTINGS below.
-        this._events.set(2217, DanceMessageEvent);
         // AS3: header corrected 3629 -> 2624. The registry maps _SafeStr_4546[2624] = _SafeCls_2589,
         // the event RoomMessageHandler.onAvatarEffect subscribes to, whose parser _SafeCls_3361
         // reads (userId, effectId, delayMilliSeconds) — exactly this TS parser. 3629 is a different
         // message entirely (_SafeCls_3136 -> parser _SafeCls_4142, a single `type` int), consumed by
         // AvatarEditorMessageHandler.onAvatarEffectSelected. The wrong header is why in-room avatar
         // effects never arrived even though the whole render pipeline was ported.
-        this._events.set(2624, AvatarEffectMessageEvent);
-        this._events.set(2850, CarryObjectMessageEvent);
+        this._events.set(Incoming.AvatarEffectMessageComposer, AvatarEffectMessageEvent);
+        this._events.set(Incoming.CarryObjectMessageComposer, CarryObjectMessageEvent);
         // AS3: header corrected 2833 -> 1953 (_SafeCls_3578, onUseObject,
         // com/sulake/habbo/room/_SafeCls_1984.as:275, parser _SafeCls_3865 - userId,
         // itemType - matches this TS parser exactly). Header 2833 there is really
         // onStateMessage (_SafeCls_3686, com/sulake/habbo/phonenumber/HabboPhoneNumber.as:82),
         // an unrelated, unported message.
-        this._events.set(3798, UserChangeMessageEvent);
+        this._events.set(Incoming.UserChangeMessageComposer, UserChangeMessageEvent);
 
         // === ROOM FURNITURE ===
         // Vortex-custom (not in official AS3 dumps): vortex-client commit e8dc43d "chore(protocol):
@@ -613,7 +611,7 @@ export class HabboMessages implements IMessageConfiguration
 
         // === NOTIFICATIONS (extended) ===
         // AS3: sources/win63_version/habbo/communication/class_1881.as — name_1[2806] = ElementPointerMessageEvent
-        this._events.set(2243, NotificationDialogMessageEvent);
+        this._events.set(Incoming.NotificationDialogMessageComposer, NotificationDialogMessageEvent);
         // AS3: header corrected 1737 -> 184 - was swapped with MaintenanceStatusMessageEvent
         // (see AVAILABILITY section above). sources/WIN63-202607011411-782849652
         // unknowns/_SafePkg_2018/_SafeCls_2483.as (minutesUntilClosing only) matches this
@@ -713,22 +711,22 @@ export class HabboMessages implements IMessageConfiguration
     private registerComposers(): void
     {
         // === HANDSHAKE ===
-        this._composers.set(4000, ClientHelloMessageComposer);
-        this._composers.set(2022, InitDiffieHandshakeMessageComposer);
-        this._composers.set(2526, CompleteDiffieHandshakeMessageComposer);
-        this._composers.set(3584, VersionCheckMessageComposer);
+        this._composers.set(Outgoing.ClientHelloMessageEvent, ClientHelloMessageComposer);
+        this._composers.set(Outgoing.InitDiffieHandshakeMessageEvent, InitDiffieHandshakeMessageComposer);
+        this._composers.set(Outgoing.CompleteDiffieHandshakeMessageEvent, CompleteDiffieHandshakeMessageComposer);
+        this._composers.set(Outgoing.VersionCheckMessageEvent, VersionCheckMessageComposer);
         // Header from _SafeCls_2052 (via sendConnectionParameters()). The shape warning that used
         // to sit here was wrong: AS3's constructor takes only the ticket, but its body pushes
         // *two* values — the ticket then getTimer() — so the wire really does carry both. The TS
         // composer takes the timer as an optional second parameter defaulting to the same call,
         // which produces an identical payload.
-        this._composers.set(882, SSOTicketMessageComposer);
-        this._composers.set(2309, UniqueIDMessageComposer);
+        this._composers.set(Outgoing.SSOTicketMessageEvent, SSOTicketMessageComposer);
+        this._composers.set(Outgoing.UniqueIDMessageEvent, UniqueIDMessageComposer);
 
         // === SESSION ===
-        this._composers.set(362, PongMessageComposer);
-        this._composers.set(2864, DisconnectMessageComposer);
-        this._composers.set(756, InfoRetrieveMessageComposer);
+        this._composers.set(Outgoing.PongMessageEvent, PongMessageComposer);
+        this._composers.set(Outgoing.DisconnectMessageEvent, DisconnectMessageComposer);
+        this._composers.set(Outgoing.InfoRetrieveMessageEvent, InfoRetrieveMessageComposer);
 
         // === TRACKING ===
 
@@ -769,14 +767,14 @@ export class HabboMessages implements IMessageConfiguration
         // === NEW NAVIGATOR ===
 
         // === ROOM SESSION ===
-        this._composers.set(3234, OpenFlatConnectionMessageComposer);
+        this._composers.set(Outgoing.OpenFlatConnectionMessageEvent, OpenFlatConnectionMessageComposer);
         // AS3: sources/win63_version/habbo/communication/class_1881.as:628 — was incorrectly
         // registered as 2722 (that ID actually belongs to the unported groupforums
         // PostMessageMessageComposer, per class_1881.as:747).
-        this._composers.set(3061, QuitMessageComposer);
+        this._composers.set(Outgoing.QuitMessageEvent, QuitMessageComposer);
 
         // === ROOM AVATAR ===
-        this._composers.set(2508, LookToMessageComposer);
+        this._composers.set(Outgoing.LookToMessageEvent, LookToMessageComposer);
 
         // === ROOM ACTION ===
 
@@ -917,14 +915,14 @@ export class HabboMessages implements IMessageConfiguration
         // 3315 has no emulator counterpart — the two nudge-height arrows send into the void.
 
         // === ROOM ENGINE ===
-        this._composers.set(1901, GetFurnitureAliasesMessageComposer);
+        this._composers.set(Outgoing.GetFurnitureAliasesMessageEvent, GetFurnitureAliasesMessageComposer);
         // GetHeightMapMessageComposer removed 2026-08-27. The earlier TODO here was right that
         // 1935 is in no registry table and that nothing constructs it — but it stopped one step
         // short: the class is in **no AS3 tree at all**. It came from
         // `sources/NITRO/packages/nitro-shared/src/packets/outgoing/Room/Engine/GetHeightMapComposer.ts`,
         // which is not one of this project's three sources. In the 2026 protocol the server sends
         // the heightmap unprompted; there is nothing to request.
-        this._composers.set(2364, MoveAvatarMessageComposer);
+        this._composers.set(Outgoing.MoveAvatarMessageEvent, MoveAvatarMessageComposer);
         // Header from sources/WIN63-202607011411-782849652 (_SafeCls_2135 via HabboCatalog.as's
         // placement send). The constructor now carries AS3's full six arguments — id, category,
         // wallLocation, x, y, rotation — and the category picks between the floor and wall shapes.
