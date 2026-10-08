@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_map_editor_xml" width="1440" height="900" version="0.1">
   <window>
-    <frame x="0" y="0" width="1440" height="900" params="32769" style="3" name="map_editor_window" caption="${vortex.mapeditor.title}" color="0x418db0">
+    <frame x="0" y="0" width="1440" height="900" params="2177" style="3" name="map_editor_window" caption="${vortex.mapeditor.title}" color="0x418db0">
       <filters>
         <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
       </filters>
       <children>
-        <container x="0" y="4" width="1434" height="857" params="16" style="3" name="content">
+        <container x="0" y="4" width="1434" height="857" params="2192" style="3" name="content">
           <children>
-            <border x="0" y="0" width="1434" height="34" params="16" style="2" name="menu_bar" color="0xe6e6de">
+            <border x="0" y="0" width="1434" height="34" params="144" style="2" name="menu_bar" color="0xe6e6de">
               <children>
                 <dropmenu x="8" y="5" width="98" height="24" params="17" style="3" name="menu_file" caption="${vortex.mapeditor.menu.file}"/>
                 <dropmenu x="112" y="5" width="98" height="24" params="17" style="3" name="menu_edit" caption="${vortex.mapeditor.menu.edit}"/>
@@ -17,13 +17,13 @@
                 <button x="432" y="4" width="120" height="24" params="131089" style="6" color="0x0aa00" name="test_button" caption="${vortex.mapeditor.action.test_zone}" width_min="120" width_max="120"/>
                 <button x="558" y="4" width="110" height="24" params="131089" style="6" color="0x8c8c86" name="save_button" caption="${vortex.mapeditor.action.save}" width_min="110" width_max="110"/>
                 <button x="674" y="4" width="100" height="24" params="131089" style="6" color="0x2a8fd6" name="publish_button" caption="${vortex.mapeditor.action.publish}" width_min="100" width_max="100"/>
-                <dropmenu x="1048" y="5" width="230" height="24" params="17" style="3" name="zone_menu" caption="${vortex.mapeditor.zone_menu}"/>
-                <dropmenu x="1286" y="5" width="140" height="24" params="17" style="3" name="zoom_menu" caption="${vortex.mapeditor.zoom_menu}"/>
+                <dropmenu x="1048" y="5" width="230" height="24" params="81" style="3" name="zone_menu" caption="${vortex.mapeditor.zone_menu}"/>
+                <dropmenu x="1286" y="5" width="140" height="24" params="81" style="3" name="zoom_menu" caption="${vortex.mapeditor.zoom_menu}"/>
               </children>
             </border>
-            <border x="8" y="40" width="120" height="809" params="16" style="2" name="rail" color="0xd6e2ee">
+            <border x="8" y="40" width="120" height="809" params="2064" style="2" name="rail" color="0xd6e2ee">
               <children>
-                <itemlist_vertical x="6" y="6" width="108" height="797" params="16" style="3" name="rail_list">
+                <itemlist_vertical x="6" y="6" width="108" height="797" params="2064" style="3" name="rail_list">
                   <children>
                     <border x="0" y="0" width="108" height="40" params="17" style="2" name="rail_row" dynamic_style="lifted_hover" color="0xf2f2ec">
                       <children>
@@ -352,12 +352,12 @@
                 </itemlist_vertical>
               </children>
             </border>
-            <container x="136" y="40" width="300" height="584" params="16" style="3" name="left_slot">
+            <container x="136" y="40" width="300" height="584" params="2064" style="3" name="left_slot">
               <children/>
             </container>
-            <border x="444" y="40" width="634" height="584" params="16" style="2" name="viewport" color="0x1e2228">
+            <border x="444" y="40" width="634" height="584" params="2192" style="2" name="viewport" color="0x1e2228">
               <children>
-                <container x="1" y="1" width="632" height="582" params="16" style="3" name="viewport_slot" clipping="true">
+                <container x="1" y="1" width="632" height="582" params="2192" style="3" name="viewport_slot" clipping="true">
                   <children>
                     <border x="6" y="6" width="498" height="58" params="16" style="2" name="view_tool_bar" color="0xe6e6de">
                       <children>
@@ -518,7 +518,7 @@
                         </itemlist_horizontal>
                       </children>
                     </border>
-                    <container x="6" y="504" width="198" height="72" params="16" style="8" name="view_info_bg" color="0xff000000" blend="0.6" background="true"/>
+                    <container x="6" y="504" width="198" height="72" params="1040" style="8" name="view_info_bg" color="0xff000000" blend="0.6" background="true"/>
                     <text x="14" y="508" width="60" height="16" params="16" style="3" caption="${vortex.mapeditor.field.zone}">
                       <variables>
                         <var key="text_style" value="u_regular" type="String"/>
@@ -587,10 +587,10 @@
                 </container>
               </children>
             </border>
-            <container x="1086" y="40" width="340" height="809" params="16" style="3" name="inspector_slot">
+            <container x="1086" y="40" width="340" height="809" params="2128" style="3" name="inspector_slot">
               <children/>
             </container>
-            <container x="136" y="632" width="942" height="217" params="16" style="3" name="bottom_slot">
+            <container x="136" y="632" width="942" height="217" params="1168" style="3" name="bottom_slot">
               <children/>
             </container>
           </children>

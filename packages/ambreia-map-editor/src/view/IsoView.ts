@@ -193,6 +193,9 @@ export class IsoView
 
         if(this.realRoom(model))
         {
+            // The game's own cursor on a bare hover; a furni being placed keeps the editor's outline.
+            this.backdrop!.setCursor(model.ghost ? null : model.hover);
+
             const room = this.backdrop!.render(this._width, this._height, this._zoom, this._ox, this._oy);
 
             if(room)
@@ -265,7 +268,7 @@ export class IsoView
 
         if(!model.ghost)
         {
-            this.overlay(hover.x, hover.y, h, null, '#ffffff');
+            if(!this._real) this.overlay(hover.x, hover.y, h, null, '#ffffff');
 
             return;
         }

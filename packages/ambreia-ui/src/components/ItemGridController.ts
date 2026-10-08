@@ -568,6 +568,9 @@ export class ItemGridController extends ItemListController implements IItemGridW
     /**
 	 * Populates the grid with the given items.
 	 */
+    // AS3: .../src/com/sulake/core/window/components/ItemGridController.as::populate()
+    // DEVIATION: AS3 counts neither the items nor the columns it creates, so populating an empty
+    // grid stacks every item in one column; both counters advance here, filling rows as addGridItem() does.
     public override populate(items: IWindow[]): void
     {
         const savedAutoArrange = this.autoArrangeItems;
@@ -583,6 +586,7 @@ export class ItemGridController extends ItemListController implements IItemGridW
             {
                 this.addColumnForItem(item);
                 colCount++;
+                totalItems++;
             }
             else
             {
@@ -599,6 +603,8 @@ export class ItemGridController extends ItemListController implements IItemGridW
                         if((lastCol as unknown as IWindow).right + item.width <= this._width)
                         {
                             this.addColumnForItem(item);
+                            colCount++;
+                            totalItems++;
                             continue;
                         }
                     }

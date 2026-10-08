@@ -31,10 +31,13 @@ export class FurnitureSprites
         return typeof entry === 'object' ? entry : null;
     }
 
-    /** The catalogue's small picture of a furni. */
+    /**
+     * The catalogue's small picture of a furni: the hotel's own icon, a static file (`sofa_silo*2`
+     * is `sofa_silo_2_icon.png`), not a render the imager would have to load the furni for.
+     */
     static thumbnail(className: string): string
     {
-        return `${IMAGING}/furniture?class=${encodeURIComponent(className)}&size=s`;
+        return `/dcr/hof_furni/icons/${encodeURIComponent(className.replace('*', '_'))}_icon.png`;
     }
 
     /** The inspector's picture of a furni. */

@@ -3,11 +3,12 @@
   <window>
     <border x="0" y="0" width="52" height="52" params="17" style="2" name="furni_tile" dynamic_style="reward_track_item" color="0xe4e4dc">
       <children>
-        <static_bitmap x="10" y="10" width="32" height="32" params="16" style="3" name="furni_icon" tags="%23icon">
+        <static_bitmap x="2" y="2" width="48" height="48" params="16" style="3" name="furni_icon" tags="%23icon">
           <variables>
             <var key="asset_uri" value="rpg/dungeon-objects/icon_50" type="String"/>
             <var key="stretched_x" value="false" type="Boolean"/>
             <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="pivot_point" value="center" type="String"/>
           </variables>
         </static_bitmap>
       </children>

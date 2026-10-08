@@ -38,7 +38,8 @@ export class EditorShell
 
         this.window = window;
         (manager.getDesktop(1) as IWindowContainer).addChild(window);
-        this.centre(host);
+        // The page's size once; then the layout's scale params follow the desktop as it resizes.
+        window.rectangle = {x: 0, y: 0, width: host.canvas.width, height: host.canvas.height};
 
         this.mountView(host);
 
@@ -59,13 +60,6 @@ export class EditorShell
         });
     }
 
-    /** Re-centres the window when the page is resized. */
-    centre(host: WindowCanvasHost): void
-    {
-        this.window.x = Math.max(0, Math.round((host.canvas.width - this.window.width) / 2));
-        this.window.y = Math.max(0, Math.round((host.canvas.height - this.window.height) / 2));
-    }
-
     /** The isometric view as the first child of the owner's viewport: their toolbars draw over it. */
     private mountView(host: WindowCanvasHost): void
     {
@@ -82,6 +76,8 @@ export class EditorShell
         wrapper.setDisplayObject(this.app.view.canvas);
 
         this.app.view.setSize(slot.width, slot.height);
+        // The wrapper stretches with the viewport (its scale params); the view draws at its size.
+        wrapper.addEventListener('WE_RESIZED', () => this.app.view.setSize(wrapper.width, wrapper.height));
         host.setView(wrapper);
         host.onViewPointer = (kind, x, y, e) => this.app.view.pointer(kind, x, y, e);
         host.onViewWheel = (deltaY, x, y) => this.app.view.wheel(deltaY, x, y);

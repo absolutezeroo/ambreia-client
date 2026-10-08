@@ -20,6 +20,7 @@ import {RoomObjectCategoryEnum} from './scene/object/RoomObjectCategoryEnum';
 import {RoomObjectVariableEnum} from './scene/object/RoomObjectVariableEnum';
 import {RoomObjectRoomUpdateMessage} from './scene/messages/RoomObjectRoomUpdateMessage';
 import {RoomObjectDataUpdateMessage} from './scene/messages/RoomObjectDataUpdateMessage';
+import {RoomObjectTileCursorUpdateMessage} from './scene/messages/RoomObjectTileCursorUpdateMessage';
 import {LegacyStuffData} from './scene/object/data/LegacyStuffData';
 import type {RoomVisualizationData} from './scene/object/visualization/room/RoomVisualizationData';
 import {buildRoomVisualizationData} from './scene/RoomVisualizationDataBuilder';
@@ -42,6 +43,9 @@ const DEFAULT_LANDSCAPE_TYPE = '1';
 
 /** The room object of a room: one per room, in its own category. */
 const ROOM_OBJECT_ID = 0;
+
+/** The tile cursor: RoomEngine's OBJECT_ID_ROOM_HIGHLIGHTER, in the cursor category. */
+const CURSOR_OBJECT_ID = -2;
 
 /** The scale wall item positions are computed at (LegacyWallGeometry's, as the client's). */
 const WALL_GEOMETRY_SCALE = 64;
@@ -96,6 +100,7 @@ export class IsoStage
     private readonly _settledContent: Set<string> = new Set();
     private _roomData: RoomVisualizationData | null = null;
     private _time: number = 0;
+    private _cursorEvent: number = 0;
     private _disposed: boolean = false;
 
     private constructor(options: IIsoStageOptions, manager: RoomManager, loader: RoomContentLoader)
@@ -198,6 +203,7 @@ export class IsoStage
 
         this._rooms.set(roomId, room);
         this.buildRoomObject(room);
+        instance.createRoomObject(CURSOR_OBJECT_ID, 'tile_cursor', RoomObjectCategoryEnum.OBJECT_CATEGORY_CURSOR);
 
         for(const item of data.decor) await this.addItem(roomId, item);
         for(const item of data.wallDecor) await this.addItem(roomId, item);
@@ -315,6 +321,25 @@ export class IsoStage
         room.wallGeometry.setTileHeight(x, y, room.heights[y * floor.width + x]);
         room.instance.disposeObject(ROOM_OBJECT_ID, RoomObjectCategoryEnum.OBJECT_CATEGORY_ROOM);
         this.buildRoomObject(room);
+    }
+
+    /** The game's tile cursor on a tile at its floor height, as RoomEngine.handleMouseOverTile(); null hides it. */
+    setCursor(roomId: string, tile: {x: number; y: number} | null): void
+    {
+        const room = this._rooms.get(roomId);
+        const cursor = room?.instance.getObject(CURSOR_OBJECT_ID, RoomObjectCategoryEnum.OBJECT_CATEGORY_CURSOR);
+
+        if(!room || !cursor) return;
+
+        const {width, length} = room.data.floor;
+        const inside = tile !== null && tile.x >= 0 && tile.y >= 0 && tile.x < width && tile.y < length;
+        // A hole has no floor to show the cursor on, as in the game.
+        const height = inside ? room.heights[tile.y * width + tile.x] : -1;
+        const location = height >= 0 ? new Vector3d(tile!.x, tile!.y, height) : null;
+
+        // The logic drops a message whose source id it has just seen: each call is its own event.
+        (cursor as IRoomObjectController).getEventHandler()?.processUpdateMessage(
+            new RoomObjectTileCursorUpdateMessage(location, 0, location !== null, String(++this._cursorEvent)));
     }
 
     /** One frame: the logics, then every view's sprites. `deltaMs` since the previous call. */

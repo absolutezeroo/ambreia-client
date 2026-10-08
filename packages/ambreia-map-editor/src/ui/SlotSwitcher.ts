@@ -91,8 +91,8 @@ export class SlotSwitcher implements IPanelUi
             this._built.set(layout, entry);
         }
 
-        entry.window.x = 0;
-        entry.window.y = 0;
+        // The slot follows the page's size: the panel takes the slot's, and its stretching parts follow.
+        entry.window.rectangle = {x: 0, y: 0, width: container.width, height: container.height};
         container.addChild(entry.window);
         this._shown[slot] = layout;
     }

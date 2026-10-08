@@ -6,12 +6,13 @@ import {furnitureCategory} from '@ambreia/map-editor-core/palette/furnitureCateg
 import type {EditorApp} from '../../app/EditorApp';
 import type {Favorites} from '../../app/Favorites';
 import {FurnitureSprites} from '../../view/FurnitureSprites';
+import {loadFurniData} from '../../view/IsoBackdrop';
 import {child, ChoiceBinding, highlight, onClick, onWindowClick, SearchField, setImage, setText} from '../bind';
 import type {EditorTexts} from '../EditorTexts';
 import type {IPanelUi} from '../IPanelUi';
 import {CATALOG_CATEGORIES} from './CATALOG_CATEGORIES';
 
-const PAGE = 30;
+const PAGE = 60;
 
 type Filter = 'all' | 'favorites' | 'recent';
 type Entry = IFurniturePaletteEntry & {readonly category: CatalogCategory};
@@ -33,6 +34,8 @@ export class DecorPanelUi implements IPanelUi
     private _filter: Filter = 'all';
     private _page = 0;
     private readonly _search: SearchField;
+    /** furnidata's names by full class (`sofa_silo*2`), lower-cased for the search; empty until it loads. */
+    private _names = new Map<string, string>();
 
     constructor(
         private readonly _window: IWindow,
@@ -70,6 +73,13 @@ export class DecorPanelUi implements IPanelUi
         onClick(_window, 'next_button', () => this.refill(this._page + 1));
 
         this.refill(0);
+
+        // The search also matches the furni's name (furnidata's) once it arrives.
+        void loadFurniData().then(data =>
+        {
+            this._names = new Map(data.map(d => [d.fullName, d.localizedName.toLowerCase()]));
+            if(this._search.query) this.refill(this._page);
+        }).catch(() => undefined);
     }
 
     render(): void
@@ -95,7 +105,7 @@ export class DecorPanelUi implements IPanelUi
 
         if(this._filter === 'favorites') hits = hits.filter(f => this._favorites.isFavorite(f.definition));
         if(this._categoryValue !== 'all') hits = hits.filter(f => f.category === this._categoryValue);
-        if(q) hits = hits.filter(f => f.class.toLowerCase().includes(q) || String(f.definition) === q);
+        if(q) hits = hits.filter(f => f.class.toLowerCase().includes(q) || this._names.get(f.class)?.includes(q) || String(f.definition) === q);
 
         return hits;
     }

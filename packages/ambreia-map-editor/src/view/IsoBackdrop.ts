@@ -69,7 +69,7 @@ export class IsoBackdrop
             const stage = await IsoStage.create({
                 assets: new AssetLibrary('map-editor'),
                 property: key => PROPERTIES[key] ?? '',
-                furniData: await furniData(),
+                furniData: await loadFurniData(),
                 modules: [registerScene, registerFurniture],
                 renderer: await IsoStage.createOffscreenRenderer(MAX_WIDTH, MAX_HEIGHT, BACKGROUND)
             });
@@ -123,6 +123,12 @@ export class IsoBackdrop
         this._last = now;
 
         return view.render();
+    }
+
+    /** The game's tile cursor on the hovered tile; null hides it. */
+    setCursor(tile: {x: number; y: number} | null): void
+    {
+        if(this._view) this._stage.setCursor(ROOM, tile);
     }
 
     /** The editor id of the topmost furni under a view pixel, by sprite alpha. */
@@ -219,6 +225,14 @@ function wallItem(o: NonNullable<ZoneDocument['wallDecor']>[number]): IIsoWallIt
         offsetY: o.offsetY ?? 0,
         state: String(o.state ?? 0)
     };
+}
+
+let _furniData: Promise<IFurnitureData[]> | null = null;
+
+/** The hotel's furnidata (≈ 25 MB), fetched once for the room engine and the catalogue's names. */
+export function loadFurniData(): Promise<IFurnitureData[]>
+{
+    return (_furniData ??= furniData());
 }
 
 async function furniData(): Promise<IFurnitureData[]>
