@@ -540,17 +540,21 @@ export class HabboCommunicationDemo extends Component implements IHabboCommunica
     }
 
     /**
-     * The server moved to a newer revision. Reloading fetches the new bundle; the query is dropped
-     * because its ?sso= ticket is spent (see alert(): a plain reload re-boots against a dead ticket).
+     * The server moved to a newer revision. The player is told, and the client (App.ts) loads the new
+     * bundle the way its embedder needs: inside the site's frame only the site can, at the top level
+     * a reload does (see alert() for why the engine never navigates the page itself).
      */
     // TS-only: release revisions (spec docs/superpowers/specs/2026-10-08-random-header-revisions-design.md §4.5).
     private alertUpdateRequired(): void
     {
-        const reload = (): void => window.location.replace(window.location.pathname);
+        const update = (): void =>
+        {
+            this._communication?.events.emit(HabboCommunicationManagerEvent.UPDATE_REQUIRED);
+        };
 
         if(!this._windowManager)
         {
-            reload();
+            update();
 
             return;
         }
@@ -558,7 +562,7 @@ export class HabboCommunicationDemo extends Component implements IHabboCommunica
         this._windowManager.alert('${disconnect.updaterequired.title}', '${disconnect.updaterequired.description}', 0, (dialog) =>
         {
             dialog.dispose();
-            reload();
+            update();
         });
     }
 

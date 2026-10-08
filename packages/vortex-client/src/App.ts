@@ -950,7 +950,32 @@ export class VortexApp
             HabboCommunicationManagerEvent.DISCONNECT_ACKNOWLEDGED, this._onDisconnectAcknowledged);
         vortex.habboCommunication.events.on(
             HabboCommunicationManagerEvent.DISCONNECT_ACKNOWLEDGED, this._onDisconnectAcknowledged);
+        vortex.habboCommunication.events.off(
+            HabboCommunicationManagerEvent.UPDATE_REQUIRED, this._onUpdateRequired);
+        vortex.habboCommunication.events.on(
+            HabboCommunicationManagerEvent.UPDATE_REQUIRED, this._onUpdateRequired);
     }
+
+    /**
+     * The server speaks a newer revision (DisconnectReason 122): load the new bundle.
+     *
+     * Inside the site's frame that is the site's job — the same handover as a disconnect: it drops the
+     * frame and builds a fresh one, with a fresh ticket and the new bundle, the next time the hotel is
+     * opened. Navigating the frame ourselves would land the site's own page inside it. At the top level
+     * a reload without the query does it; the ?sso= ticket is spent anyway.
+     */
+    // TS-only: release revisions (spec docs/superpowers/specs/2026-10-08-random-header-revisions-design.md §4.5).
+    private readonly _onUpdateRequired = (): void =>
+    {
+        if(window.parent !== window)
+        {
+            this._onDisconnectAcknowledged();
+
+            return;
+        }
+
+        window.location.replace(window.location.pathname);
+    };
 
     /**
      * Hand the player back to the site, which is this client's login screen.

@@ -22,6 +22,7 @@ export interface IHabboCommunicationManagerEvents
 	 * constant for why this moment exists at all in a port with no `LoginFlow`.
 	 */
     [HabboCommunicationManagerEvent.DISCONNECT_ACKNOWLEDGED]: () => void;
+    [HabboCommunicationManagerEvent.UPDATE_REQUIRED]: () => void;
     [HabboCommunicationManagerEvent.ERROR]: (code: number, message: string) => void;
 }
 

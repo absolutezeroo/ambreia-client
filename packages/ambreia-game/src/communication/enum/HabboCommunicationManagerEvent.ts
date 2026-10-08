@@ -45,6 +45,14 @@ export const HabboCommunicationManagerEvent = {
     DISCONNECT_ACKNOWLEDGED: 'disconnectAcknowledged',
 
     /**
+	 * The server speaks a newer revision than this client (DisconnectReason 122) and the player
+	 * accepted the update. Like DISCONNECT_ACKNOWLEDGED, the engine only says so: the client decides
+	 * how to load the new bundle for its embedder.
+	 */
+    // TS-only: release revisions (spec docs/superpowers/specs/2026-10-08-random-header-revisions-design.md §4.5).
+    UPDATE_REQUIRED: 'updateRequired',
+
+    /**
 	 * A server-sent error message; carries the code and its text.
 	 */
     ERROR: 'error',
