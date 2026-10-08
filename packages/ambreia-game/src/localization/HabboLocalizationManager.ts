@@ -1,16 +1,7 @@
 import type {IContext} from '../core/runtime/index';
-import {Logger} from '@ambreia/common/utils/Logger';
-import {Core} from '@ambreia/kernel/Core';
 import {CoreLocalizationManager} from '../core/localization/index';
-import type {IHabboConfigurationManager} from '../configuration/IHabboConfigurationManager';
-import type {IHabboCommunicationManager} from '../communication/IHabboCommunicationManager';
 import type {IHabboLocalizationManager} from './IHabboLocalizationManager';
 import {BadgeBaseAndLevel} from './BadgeBaseAndLevel';
-import {HabboCommunicationEvent, type HabboCommunicationEventType} from '../communication/enum/index';
-import {HabboConfigurationFlags} from '../configuration/enum/HabboConfigurationFlags';
-import {LocalizationEvent} from '../core/localization/LocalizationEvent';
-
-const log = Logger.getLogger('habbo.localization.HabboLocalizationManager');
 
 /**
  * Habbo-specific localization manager
@@ -18,6 +9,8 @@ const log = Logger.getLogger('habbo.localization.HabboLocalizationManager');
  *
  * Based on AS3 com.sulake.habbo.localization.HabboLocalizationManager
  */
+// DEVIATION: AS3 loads the texts on authentication, from the gamedata hashes, with the embedded
+//   default_localizations under them. The client hands them over from its bundle (loadTexts()).
 export class HabboLocalizationManager extends CoreLocalizationManager implements IHabboLocalizationManager
 {
     private static readonly ROMAN_NUMERALS: string[] = [
@@ -26,119 +19,12 @@ export class HabboLocalizationManager extends CoreLocalizationManager implements
         'XXI', 'XXII', 'XXIII', 'XXIV', 'XXV', 'XXVI', 'XXVII', 'XXVIII', 'XXIX', 'XXX',
     ];
 
-    private _isLocalizationInitialized: boolean = false;
-    // TS-only: the texts are in. The login and characters screens load them before the session is
-    // authenticated (F3a), so authentication must not fetch the 50k entries a second time.
-    private _textsLoaded: boolean = false;
     private _badgePointLimits: Map<string, number> = new Map();
-    private _configurationManager: IHabboConfigurationManager | null = null;
-    private _communicationManager: IHabboCommunicationManager | null = null;
-    // AS3: .../src/com/sulake/habbo/localization/HabboLocalizationManager.as::_skipExternals
-    private _skipExternals: boolean = false;
-    private _boundOnLoginStep: ((step: HabboCommunicationEventType) => void) | null = null;
-
-    /**
-     * TS-only: the embedded `default_localizations*` texts, keyed by asset name.
-     *
-     * AS3 reads these off its own asset library (`assets.getAssetByName("default_localizations_en")`),
-     * which is populated from the embedded HabboLocalizationCom library. The port has no embedded
-     * SWF library, so the host hands the same texts in here — see `setEmbeddedLocalizationAssets()`.
-     */
-    private _embeddedLocalizations: Record<string, string> = {};
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/localization/HabboLocalizationManager.as constructor
     constructor(context: IContext, flags: number = 0)
     {
         super(context, flags);
-
-        this._skipExternals = (flags & HabboConfigurationFlags.SKIP_EXTERNAL_VARIABLES) > 0;
-    }
-
-    /**
-	 * Set the configuration manager reference
-	 */
-    setConfigurationManager(configManager: IHabboConfigurationManager): void
-    {
-        this._configurationManager = configManager;
-
-        this.configureLocalizationLocations();
-    }
-
-    /**
-	 * Set the communication manager reference
-	 */
-    setCommunicationManager(commManager: IHabboCommunicationManager): void
-    {
-        this._communicationManager = commManager;
-
-        if(this._skipExternals)
-        {
-            this.events.emit('complete');
-        }
-        else
-        {
-            // Listen for AUTHENTICATED event to trigger localization loading
-            this._boundOnLoginStep = (step: HabboCommunicationEventType) =>
-            {
-                if(step === HabboCommunicationEvent.AUTHENTICATED)
-                {
-                    this.onAuthenticated();
-                }
-            };
-            this._communicationManager.events.on('loginStep', this._boundOnLoginStep);
-        }
-    }
-
-    /**
-     * TS-only: supplies the embedded `default_localizations*` texts.
-     *
-     * These are what the login flow renders with — it runs before any external text file has been
-     * fetched, so without them every caption on the login screens shows its raw `${key}`.
-     */
-    setEmbeddedLocalizationAssets(assets: Record<string, string>): void
-    {
-        this._embeddedLocalizations = assets ?? {};
-    }
-
-    /**
-     * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/localization/HabboLocalizationManager.as::loadDefaultEmbedLocalizations()
-     *
-     * The global english-only file is ALWAYS parsed, then the language-specific one on top of it —
-     * so a key present in both takes the localised value. A missing language falls back to `en`
-     * once (`fallback` guards the recursion).
-     */
-    // AS3: .../src/com/sulake/habbo/localization/HabboLocalizationManager.as::loadDefaultEmbedLocalizations()
-    loadDefaultEmbedLocalizations(language: string, fallback: boolean = true): boolean
-    {
-        const languageAssetName = `default_localizations_${language}`;
-        const languageData = this._embeddedLocalizations[languageAssetName];
-
-        if(!languageData && language !== 'en' && fallback)
-        {
-            log.debug(`Could not load default localizations ${languageAssetName} : Trying with default_localizations_en...`);
-
-            return this.loadDefaultEmbedLocalizations('en', false);
-        }
-
-        const globalData = this._embeddedLocalizations['default_localizations'];
-
-        if(globalData)
-        {
-            this.parseLocalizationData(globalData);
-        }
-
-        if(languageData)
-        {
-            this.parseLocalizationData(languageData);
-
-            return true;
-        }
-
-        // Nothing rendered before the external texts land, and nothing throws — so this has to be
-        // visible rather than a debug line.
-        log.warn(`Could not load ${languageAssetName}`);
-
-        return false;
     }
 
     // AS3: .../src/com/sulake/habbo/localization/HabboLocalizationManager.as::getLocalizationWithParams()
@@ -167,39 +53,6 @@ export class HabboLocalizationManager extends CoreLocalizationManager implements
         }
 
         return this.getLocalization(key, defaultValue);
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/localization/HabboLocalizationManager.as::getExternalVariablesUrl()
-    getExternalVariablesUrl(): string
-    {
-        return this.getGameDataResources()?.externalVariablesUrl ?? '';
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/localization/HabboLocalizationManager.as::getExternalVariablesHash()
-    getExternalVariablesHash(): string
-    {
-        return this.getGameDataResources()?.externalVariablesHash ?? '';
-    }
-
-    /**
-	 * Any game-data resource by name, for the callers that need one the four named pairs above do
-	 * not cover.
-	 */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/localization/HabboLocalizationManager.as::getGameDataResourceUrl()
-    getGameDataResourceUrl(name: string): string
-    {
-        return this.getGameDataResources()?.getResourceUrl(name) ?? '';
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/localization/HabboLocalizationManager.as::getGameDataResourceHash()
-    getGameDataResourceHash(name: string): string
-    {
-        return this.getGameDataResources()?.getResourceHash(name) ?? '';
-    }
-
-    override getActiveEnvironmentId(): string
-    {
-        return super.getActiveEnvironmentId();
     }
 
     override getLocalization(key: string, defaultValue: string = ''): string
@@ -306,113 +159,6 @@ export class HabboLocalizationManager extends CoreLocalizationManager implements
     setBadgePointLimit(badgeId: string, limit: number): void
     {
         this._badgePointLimits.set(badgeId, limit);
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/localization/HabboLocalizationManager.as::requestLocalizationInit()
-    requestLocalizationInit(): void
-    {
-        if(this._isLocalizationInitialized)
-        {
-            return;
-        }
-
-        if(!this._configurationManager)
-        {
-            log.error('Configuration manager not set');
-            return;
-        }
-
-        this._isLocalizationInitialized = true;
-
-        // The two names the base manager actually emits. This listened for `'loaded'` and
-        // `'failed'`, which nothing anywhere raises — `CoreLocalizationManager` emits
-        // `LocalizationEvent.LOCALIZATION_LOADED` / `_FAILED`, whose values are AS3's own
-        // `LOCALIZATION_EVENT_*` strings. So neither arm had ever run: the ready flag stayed
-        // set, `complete` was never announced, and a failed gamedata load never crashed the
-        // client the way AS3 makes it.
-        this.events.once(LocalizationEvent.LOCALIZATION_LOADED, () =>
-        {
-            this._isLocalizationInitialized = false;
-            this._textsLoaded = true;
-            log.info('Localizations ready');
-
-            // AS3: `localizationsReady()` dispatches a plain `complete` outward, which is what
-            // the rest of the boot waits on.
-            this.events.emit('complete');
-        });
-
-        this.events.once(LocalizationEvent.LOCALIZATION_FAILED, () =>
-        {
-            this._isLocalizationInitialized = false;
-            Core.crash('Failed loading gamedata hashes', 8);
-        });
-
-        const hashesUrl = this._configurationManager.getProperty('gamedata.hashes.url');
-        const environmentId = this._configurationManager.getProperty('environment.id');
-
-        super.loadLocalizationFromURL(hashesUrl, environmentId);
-    }
-
-    protected override initComponent(): void
-    {
-        super.initComponent();
-
-        log.debug('HabboLocalizationManager initialized');
-    }
-
-    /**
-	 * Called when authentication is complete
-	 * Based on AS3:
-	 * ```
-	 * private function onAuthenticated(event: Event): void {
-	 *     requestLocalizationInit();
-	 * }
-	 * ```
-	 */
-    // AS3: .../src/com/sulake/habbo/localization/HabboLocalizationManager.as::onAuthenticated()
-    private onAuthenticated(): void
-    {
-        // DEVIATION: AS3 always loads here; the screens before authentication may have already.
-        if(!this._textsLoaded) this.requestLocalizationInit();
-    }
-
-    /**
-     * TS-only: the texts, loaded now rather than at authentication — the client's own login and
-     * characters screens come before it (F3a). Resolves at once when they are already in, or when
-     * external texts are skipped altogether.
-     */
-    loadTexts(): Promise<void>
-    {
-        if(this._textsLoaded || this._skipExternals) return Promise.resolve();
-
-        return new Promise(resolve =>
-        {
-            this.events.once('complete', () => resolve());
-            this.requestLocalizationInit();
-        });
-    }
-
-    // AS3: .../src/com/sulake/habbo/localization/HabboLocalizationManager.as::configureLocalizationLocations()
-    private configureLocalizationLocations(): void
-    {
-        if(!this._configurationManager)
-        {
-            return;
-        }
-
-        let index = 1;
-
-        while(this._configurationManager.propertyExists('localization.' + index))
-        {
-            const localizationName = this._configurationManager.getProperty('localization.' + index);
-            const localizationCode = this._configurationManager.getProperty('localization.' + index + '.code');
-            const localizationDisplayName = this._configurationManager.getProperty('localization.' + index + '.name');
-            const localizationUrl = this._configurationManager.getProperty('localization.' + index + '.url');
-
-            super.registerLocalizationDefinition(localizationName, localizationDisplayName, localizationUrl, localizationCode);
-
-            index++;
-        }
     }
 
     // AS3: .../src/com/sulake/habbo/localization/HabboLocalizationManager.as::getBadgePointLimit()

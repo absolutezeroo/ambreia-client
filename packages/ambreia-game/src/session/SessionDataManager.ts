@@ -661,9 +661,8 @@ export class SessionDataManager extends Component implements ISessionDataManager
                     // AS3's real HabboAir.as::prepareCore() registers every component library in
                     // one synchronous batch, well before HabboConfigurationManager's async download
                     // resolves, so every dependent's 'complete' listener (added below) is already
-                    // attached by the time it fires. This port's VortexMain.ts::prepareCore()
-                    // instead awaits initConfigurationDownload() before constructing later
-                    // components (including this one), so by the time this dependency resolves,
+                    // attached by the time it fires. Here the configuration is loaded the moment it
+                    // is made, before this component exists, so by the time this dependency resolves,
                     // 'complete' has already fired to nobody and never will again - furniture data
                     // (and anything else driven by onConfigurationComplete()) silently never loads.
                     // Catch up instead of only listening for a signal that already passed - deferred

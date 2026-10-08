@@ -1,8 +1,6 @@
 import type {EventEmitter} from 'eventemitter3';
 import type {ILocalizable} from './ILocalizable';
 import type {ILocalization} from './ILocalization';
-import type {ILocalizationDefinition} from './ILocalizationDefinition';
-import type {IGameDataResources} from '@ambreia/common/localization/IGameDataResources';
 
 /**
  * Events emitted by the localization manager
@@ -42,10 +40,10 @@ export interface ICoreLocalizationManager
     removeLocalizationListener(key: string, listener: ILocalizable): boolean;
 
     /**
-	 * Load localization data from a URL
+	 * Takes every text at once (the host reads them out of its bundle).
 	 */
-    // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/core/localization/ICoreLocalizationManager.as::loadLocalizationFromURL()
-    loadLocalizationFromURL(url: string, environmentId: string, acceptEmpty?: boolean): void;
+    // TS-only: replaces AS3's loadLocalizationFromURL().
+    loadTexts(texts: Readonly<Record<string, string>>): void;
 
     /**
 	 * Check if a localization key exists
@@ -95,45 +93,10 @@ export interface ICoreLocalizationManager
     getKeys(): string[];
 
     /**
-	 * Register a localization definition
-	 */
-    // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/core/localization/ICoreLocalizationManager.as::registerLocalizationDefinition()
-    registerLocalizationDefinition(id: string, name: string, url: string, code: string): void;
-
-    /**
-	 * Activate a localization definition
-	 */
-    // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/core/localization/ICoreLocalizationManager.as::activateLocalizationDefinition()
-    activateLocalizationDefinition(id: string): boolean;
-
-    /**
-	 * Get all localization definitions
-	 */
-    // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/core/localization/ICoreLocalizationManager.as::getLocalizationDefinitions()
-    getLocalizationDefinitions(): Map<string, ILocalizationDefinition>;
-
-    /**
-	 * Get a specific localization definition
-	 */
-    // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/core/localization/ICoreLocalizationManager.as::getLocalizationDefinition()
-    getLocalizationDefinition(id: string): ILocalizationDefinition | null;
-
-    /**
-	 * Get the currently active localization definition
-	 */
-    // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/core/localization/ICoreLocalizationManager.as::getActiveLocalizationDefinition()
-    getActiveLocalizationDefinition(): ILocalizationDefinition | null;
-
-    /**
 	 * Print all non-existing keys that were requested
 	 */
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/core/localization/ICoreLocalizationManager.as::printNonExistingKeys()
     printNonExistingKeys(): void;
-
-    /**
-	 * Get game data resources (hashes)
-	 */
-    getGameDataResources(): IGameDataResources | null;
 
     /**
 	 * Interpolate a string, replacing ${key} with localization values

@@ -1,4 +1,5 @@
 import {z} from 'zod';
+import {LANGUAGES} from '@ambreia/common/localization/Texts';
 
 /**
  * The `app` section (spec §5): what the client needs before any feature — where the server is,
@@ -20,8 +21,8 @@ export const AppSection = z.strictObject({
     sso: z.string().optional(),
     /** An internal link fired once the session is up (`?link=navigator/goto/42`). */
     startLink: z.string().optional(),
-    /** The legacy `external_variables` URL, when it is not the hotel's default one. */
-    configurationUrl: z.string().optional()
+    /** The texts' language; the browser's when it is one of LANGUAGES, otherwise English. */
+    language: z.enum(LANGUAGES).optional()
 });
 
 export type AppConfig = z.infer<typeof AppSection>;

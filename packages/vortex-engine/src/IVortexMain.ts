@@ -49,11 +49,6 @@ export interface IVortexMain extends IDisposable
     prepareCore(config?: IVortexConfig): Promise<void>;
 
     /**
-	 * Initialize localization
-	 */
-    initLocalization(): void;
-
-    /**
 	 * Construct the avatar editor. Must be called AFTER window layouts are registered.
 	 */
     initAvatarEditor(): void;

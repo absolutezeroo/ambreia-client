@@ -3,9 +3,10 @@ import type {AssetLibrary} from '@ambreia/common/assets/AssetLibrary';
 import {RoomManager} from '@ambreia/iso/RoomManager';
 import {HabboRoomRendererFactory} from '@ambreia/iso/scene/renderer/HabboRoomRendererFactory';
 import {AvatarRenderManager} from '@ambreia/avatar/AvatarRenderManager';
+import type {IAvatarData} from '@ambreia/avatar/AvatarData';
 import {Core} from '@ambreia/kernel/Core';
 import {HabboConfigurationManager} from '../configuration/HabboConfigurationManager';
-import {HabboProperty} from '../configuration/index';
+import {LEGACY_DEFAULTS} from '../configuration/legacyDefaults';
 import {HabboCommunicationManager} from '../communication/HabboCommunicationManager';
 import {HabboCommunicationDemo} from '../communication/demo/HabboCommunicationDemo';
 import {HabboLocalizationManager} from '../localization/HabboLocalizationManager';
@@ -57,9 +58,9 @@ export interface IEngineManagers
 export interface IEngineHost
 {
     readonly assets: AssetLibrary;
-    /** The AS3 embedded text assets (common_configuration_txt…), keyed by asset name. */
-    readonly embeddedConfigurations: Readonly<Record<string, string>>;
-    /** The `legacy` section (spec §5): old `key=value` properties, applied after the download. */
+    /** The avatar's shipped data, for the renderer. */
+    readonly avatarData: IAvatarData;
+    /** The `legacy` section (spec §5): old `key=value` properties, over legacy.defaults.json. */
     readonly legacy: Readonly<Record<string, string>>;
     /** Called with the window manager before it is attached: its skins and layouts go in first. */
     onWindowManager(windowManager: HabboWindowManager): void;
@@ -82,8 +83,8 @@ export function emptyManagers(): IEngineManagers
 }
 
 /**
- * The configuration: the embedded files, then external_variables, then the `legacy` section. It is
- * attached first and its download awaited, as prepareCore() did: every manager after it reads it.
+ * The configuration: legacy.defaults.json, then the kernel's `legacy` section (config.json, and the
+ * page's url.prefix). Loaded as it is made, so it is complete before any manager after it reads it.
  */
 const Configuration = feature({
     id: 'configuration',
@@ -93,25 +94,10 @@ const Configuration = feature({
     {
         const manager = new HabboConfigurationManager(context);
 
-        manager.setEmbeddedConfigurationAssets({...host.embeddedConfigurations});
+        manager.load({...LEGACY_DEFAULTS, ...host.legacy});
         host.made.configuration = manager;
 
         return manager;
-    },
-    afterAttach: async (_product, {app, host}) =>
-    {
-        const manager = host.made.configuration!;
-
-        // The Component base defers initComponent() to a microtask, and resetAll() in it parses the
-        // embedded configurations: the download has to start after it.
-        await Promise.resolve();
-
-        if(app.configurationUrl) manager.setProperty(HabboProperty.EXTERNAL_VARIABLES, app.configurationUrl);
-
-        await manager.initConfigurationDownload();
-
-        // After the download, so resetAll() does not clear them.
-        for(const [key, value] of Object.entries(host.legacy)) manager.setProperty(key, value);
     }
 });
 
@@ -164,13 +150,6 @@ const Localization = feature({
         host.made.localization = manager;
 
         return manager;
-    },
-    afterAttach: (_product, {host}) =>
-    {
-        const made = host.made;
-
-        made.localization!.setConfigurationManager(made.configuration!);
-        made.localization!.setCommunicationManager(made.communication!);
     }
 });
 
@@ -235,10 +214,9 @@ const AvatarRenderer = feature({
 
             made.avatarRenderer = new AvatarRenderManager({
                 assets: host.assets,
+                data: host.avatarData,
                 downloadUrl: configuration.getProperty('flash.dynamic.avatar.download.url'),
                 downloadNameTemplate: configuration.getProperty('flash.dynamic.avatar.download.name.template'),
-                figureMapUrl: configuration.getProperty('flash.dynamic.avatar.download.configuration'),
-                figurePartListUrl: configuration.getProperty('external.figurepartlist.txt'),
                 onLibraryLoaded: name => Core.instance?.updateLoadingProcess(name, 'complete')
             });
             context.attachInstance(IID_AvatarRenderManager, made.avatarRenderer);

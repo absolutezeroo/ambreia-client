@@ -40,9 +40,9 @@ const AUTHORED_SKINS = import.meta.glob('../../../vortex-client/src/vortex-skins
 }) as Record<string, string>;
 
 /** Every French text of the client's windows: the editor's layouts also borrow keys from other screens. */
-const FRENCH_TEXTS = import.meta.glob('../../../vortex-client/tools/locale-overrides/*.fr.txt', {
-    query: '?raw', import: 'default', eager: true
-}) as Record<string, string>;
+const FRENCH_TEXTS = import.meta.glob('../../../vortex-client/src/locales/fr/*.json', {
+    import: 'default', eager: true
+}) as Record<string, Readonly<Record<string, string>>>;
 
 const baseName = (path: string): string => path.split('/').pop()!.replace(/\.xml$/, '');
 
@@ -65,7 +65,7 @@ export async function bootWindowSystem(): Promise<{manager: WindowManager; texts
     }));
 
     // mapeditor last: its keys win over a homonym elsewhere.
-    const texts = new EditorTexts(...Object.entries(FRENCH_TEXTS).sort(([a], [b]) => Number(a.includes('mapeditor')) - Number(b.includes('mapeditor'))).map(([, text]) => text));
+    const texts = new EditorTexts(...Object.entries(FRENCH_TEXTS).sort(([a], [b]) => Number(a.endsWith('/mapeditor.json')) - Number(b.endsWith('/mapeditor.json'))).map(([, text]) => text));
     const manager = new WindowManager({interpolate: text => text});
 
     // The engine's game widgets (avatar, badge, furni…), placeholders here as in Glaze: the

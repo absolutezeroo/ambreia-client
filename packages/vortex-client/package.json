@@ -14,7 +14,6 @@
     "import:avatar-configurations": "node ./tools/import-avatar-configurations.mjs --write",
     "import:crypted-images": "node ./tools/import-crypted-images.mjs --write",
     "import:crypted-sounds": "node ./tools/import-crypted-sounds.mjs --write",
-    "import:chatstyles": "node ./tools/import-chatstyles.mjs --write",
     "import:localizations": "node ./tools/import-localizations.mjs --write",
     "tools": "node ./tools/dashboard/server.ts"
   },

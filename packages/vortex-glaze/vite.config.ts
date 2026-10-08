@@ -155,12 +155,8 @@ export default defineConfig({
         port: 5174,
         strictPort: true,
 
-        // The same asset-host roots vortex-client proxies, for the same reason: the shipped
-        // configuration holds RELATIVE urls (`localization.1.url=/gamedata/hashes.json`), so
-        // whichever origin served the page has to forward them. Without this the fetch resolved
-        // against glaze itself, Vite answered the SPA fallback with a 200, and `GameDataResources`
-        // reported "Failed to parse game data JSON" — an HTML page parsed as JSON, not a missing
-        // asset server. That is what made Localise silently do nothing.
+        // The same asset-host roots vortex-client proxies, for the same reason: asset URLs are
+        // relative to whichever origin served the page, so that origin has to forward them.
         proxy: {
             '/c_images': {target: 'http://vortex-assets.local', changeOrigin: true},
             '/gamedata': {target: 'http://vortex-assets.local', changeOrigin: true},

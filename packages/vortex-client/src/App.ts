@@ -1,5 +1,5 @@
 import type {IVortexConfig, IVortexWindowAssets} from 'vortex-engine';
-import {GAME_FEATURES, featureImages} from 'vortex-engine';
+import {GAME_FEATURES, featureImages, readAvatarData} from 'vortex-engine';
 import {loadConfig, ConfigError} from '@ambreia/kernel/config/loadConfig';
 import type {IKernelConfig} from '@ambreia/kernel/config/loadConfig';
 import {browserSources, parseConfigJson} from '@ambreia/kernel/config/browserSources';
@@ -9,8 +9,6 @@ import {Vortex} from 'vortex-engine';
 import {FRAME_CHANNEL_UI, FrameTimings} from '@ambreia/common/utils/FrameTimings';
 import {SiteChannel} from './SiteChannel';
 import {HabboCommunicationManagerEvent} from '@ambreia/game/communication/enum/HabboCommunicationManagerEvent';
-import {AssetTypeDeclaration} from '@ambreia/common/assets/AssetTypeDeclaration';
-import {UnknownAsset} from '@ambreia/common/assets/UnknownAsset';
 import {RoomEngineEvent} from '@ambreia/iso/scene/events/RoomEngineEvent';
 import type {AssetUrlSource} from '@ambreia/ui/IResourceManager';
 import type {ISkinData} from '@ambreia/ui/index';
@@ -28,6 +26,7 @@ import type {RoomUI} from '@ambreia/game/ui/RoomUI';
 import type {RoomDesktop} from '@ambreia/game/ui/RoomDesktop';
 import type {VortexLoadingScreen} from './VortexLoadingScreen';
 import {AssetBundle} from '@ambreia/common/assets/AssetBundle';
+import {browserLanguage, readTexts, type OwnTexts} from '@ambreia/common/localization/Texts';
 import {installWindowDebugger} from './debugger/WindowDebuggerOverlay';
 import {
     type IWindowLayoutXmlData,
@@ -50,49 +49,8 @@ const log = Logger.getLogger('client.App');
  */
 const ELEMENT_DESCRIPTION_ASSET = 'habbo_element_description_xml';
 
-const EMBEDDED_AVATAR_XML_ASSET_NAMES = [
-    'action_offset_lay',
-    'action_offset_swim',
-    'dance_sixseven_animation',
-    'HabboAvatarAnimation',
-    'HabboAvatarFigure',
-    'HabboAvatarGeometry',
-    'HabboAvatarPartSets',
-];
-
-/**
- * The `default_localizations*` embeds declared by `HabboLocalizationCom.as`, by asset name.
- *
- * `default_localizations` is the english-only global file; the rest are per-language and are
- * layered on top of it (see HabboLocalizationManager.loadDefaultEmbedLocalizations()).
- */
-const EMBEDDED_LOCALIZATION_ASSET_NAMES = [
-    'default_localizations',
-    'default_localizations_de',
-    'default_localizations_dk',
-    'default_localizations_en',
-    'default_localizations_es',
-    'default_localizations_fi',
-    'default_localizations_fr',
-    'default_localizations_it',
-    'default_localizations_nl',
-    'default_localizations_no',
-    'default_localizations_pt',
-    'default_localizations_se',
-    'default_localizations_tr',
-];
-
-function parseJson<T>(value: string): T | null 
-{
-    try 
-    {
-        return JSON.parse(value) as T;
-    }
-    catch (_error) 
-    {
-        return null;
-    }
-}
+/** Ambreia's own texts, per language (src/locales/<lang>/*.json); the Habbo ones are in the bundle. */
+const OWN_TEXTS = import.meta.glob('./locales/*/*.json', {import: 'default', eager: true}) as OwnTexts;
 
 function parseElementDescriptionFromBundle(raw: string, source: string): IElementDescriptionData | null
 {
@@ -187,173 +145,6 @@ async function loadWebFonts(bundle: AssetBundle): Promise<void>
             log.warn(`Failed to load webfont ${file}:`, error);
         }
     }));
-}
-
-/**
- * Gives `url.prefix` / `pocket.api` the origin the client is being served from, wherever the
- * shipped configuration leaves them empty.
- *
- * Empty is how that file spells "same origin", and it is the one thing it cannot spell:
- * `HabboConfigurationManager.parseKeyValueConfiguration()` keeps a line only while
- * `parts[1].length > 0`, so an empty value means the key does not EXIST — and `interpolate()`
- * returns `''` for the WHOLE value the moment one `${...}` key is missing. `external.variables.txt`
- * then comes back blank and the boot dies on "Missing external.variables.txt". Both behaviours are
- * AS3's, so the value has to be real.
- *
- * It has to be computed rather than written down: this client is served at its own root, under
- * vortex-web's `/client`, and through a tunnel, and each one needs a different prefix — including
- * a different SCHEME, which is what an absolute `http://…` in the file gets blocked for on an
- * https page. A non-empty value is left alone, so a deployment that really does serve its assets
- * from another origin keeps saying so; a checkout that regenerates `configurations/` from the dump
- * gets `http://vortex-assets.local` back and is the case to look at first if this returns.
- */
-function fillOriginPrefixes(configuration: string): string
-{
-    // `\r?` before the anchor: the shipped file has CRLF endings, and `$` under /m stops before the
-    // newline but not before the carriage return.
-    return configuration.replace(/^([ \t]*(?:url\.prefix|pocket\.api)(?:\.[a-z0-9]+)?=)[ \t]*\r?$/gim,
-        (_line, assignment: string) => `${assignment}${window.location.origin}`);
-}
-
-function readEmbeddedConfigurationAssets(bundle: AssetBundle): Record<string, string>
-{
-    const assets: Record<string, string> = {};
-    const commonConfiguration = bundle.getText('configurations/common_configuration_txt.txt');
-    const localizationConfiguration = bundle.getText('configurations/localization_configuration_txt.txt');
-
-    if(commonConfiguration !== null)
-    {
-        assets.common_configuration = fillOriginPrefixes(commonConfiguration);
-    }
-
-    if(localizationConfiguration !== null)
-    {
-        assets.localization_configuration = localizationConfiguration;
-    }
-
-    // AS3: HabboLocalizationCom's default_localizations* embeds, read by
-    // HabboLocalizationManager.loadDefaultEmbedLocalizations(). These are the only texts the login
-    // flow has — it runs before any external text file is fetched — so without them every login
-    // caption renders as its raw ${key}.
-    for(const assetName of EMBEDDED_LOCALIZATION_ASSET_NAMES)
-    {
-        const content = bundle.getText(`configurations/${assetName}_txt.txt`);
-
-        if(content !== null)
-        {
-            assets[assetName] = content;
-        }
-    }
-
-    const bundleKeys = bundle.listKeys();
-
-    for(const assetName of EMBEDDED_AVATAR_XML_ASSET_NAMES)
-    {
-        const content = readEmbeddedAvatarXmlAsset(bundle, bundleKeys, assetName);
-
-        if(content !== null)
-        {
-            assets[assetName] = content;
-        }
-    }
-
-    const chatStylesXml = bundle.getText('configurations/chatstyles_xml.xml');
-
-    if(chatStylesXml !== null)
-    {
-        assets.chatstyles_xml = chatStylesXml;
-    }
-
-    const chatStylesManifest = readChatStylesManifest(bundle);
-
-    if(chatStylesManifest)
-    {
-        for(const [styleId, flags] of Object.entries(chatStylesManifest))
-        {
-            if(!flags.hasRegpoints) continue;
-
-            const content = bundle.getText(`configurations/style_${styleId}_regpoints.txt`);
-
-            if(content !== null) assets[`style_${styleId}_regpoints`] = content;
-        }
-    }
-
-    return assets;
-}
-
-interface IChatStyleAssetFlags
-{
-    hasBase: boolean;
-    hasPointer: boolean;
-    hasEmblem: boolean;
-    hasEmblemMultiline: boolean;
-    hasIcon: boolean;
-    hasColor: boolean;
-    hasSelectorPreview: boolean;
-    hasRegpoints: boolean;
-}
-
-const CHAT_STYLE_IMAGE_SUFFIX_BY_FLAG: Record<string, string> = {
-    hasBase: 'chat_bubble_base',
-    hasPointer: 'chat_bubble_pointer',
-    hasEmblem: 'chat_bubble_emblem',
-    hasEmblemMultiline: 'chat_bubble_emblem_multiline',
-    hasIcon: 'icon',
-    hasColor: 'chat_bubble_color',
-    hasSelectorPreview: 'selector_preview',
-};
-
-function readChatStylesManifest(bundle: AssetBundle): Record<string, IChatStyleAssetFlags> | null
-{
-    const raw = bundle.getText('configurations/chatstyles-manifest.json');
-
-    if(raw === null) return null;
-
-    return parseJson<Record<string, IChatStyleAssetFlags>>(raw);
-}
-
-/**
- * Registers every extracted chat-style bitmap (packages/vortex-client/tools/
- * import-chatstyles.mjs's output) into AssetLibrary as a raw ImageBitmap - NOT through
- * the standard image/png -> BitmapDataAsset pipeline (readImageAssets() below, blob
- * URLs consumed by WindowManager), because ChatStyle.ts::getNewBackgroundSprite() draws
- * these directly via OffscreenCanvas.drawImage(), which needs a real ImageBitmap, not the
- * PixiJS Texture BitmapDataAsset.content would return.
- *
- * TS-only: no AS3 equivalent, this is infrastructure for the web port's asset bundling.
- */
-async function registerChatStyleImageAssets(vortex: Vortex, imageBundle: AssetBundle, xmlBundle: AssetBundle): Promise<void>
-{
-    const manifest = readChatStylesManifest(xmlBundle);
-
-    if(!manifest) return;
-
-    const declaration = vortex.assets.getAssetTypeDeclarationByMimeType('application/octet-stream')
-		?? new AssetTypeDeclaration('application/octet-stream', UnknownAsset);
-
-    const tasks: Promise<void>[] = [];
-
-    for(const [styleId, flags] of Object.entries(manifest))
-    {
-        for(const [flagKey, suffix] of Object.entries(CHAT_STYLE_IMAGE_SUFFIX_BY_FLAG))
-        {
-            if(!flags[flagKey as keyof IChatStyleAssetFlags]) continue;
-
-            const assetName = `style_${styleId}_${suffix}`;
-
-            tasks.push(imageBundle.getImageBitmap(`images/${assetName}.png`).then((bitmap) =>
-            {
-                if(!bitmap) return;
-
-                const asset = new UnknownAsset(declaration, assetName);
-
-                asset.setUnknownContent(bitmap);
-                vortex.assets.setAsset(assetName, asset, true);
-            }));
-        }
-    }
-
-    await Promise.all(tasks);
 }
 
 /**
@@ -563,38 +354,6 @@ function readLayoutImageNames(layouts: Map<string, string>): Set<string>
     log.debug(`Layouts name ${names.size} image assets`);
 
     return names;
-}
-
-function readEmbeddedAvatarXmlAsset(bundle: AssetBundle, bundleKeys: string[], assetName: string): string | null
-{
-    const candidates = [
-        `configurations/${assetName}.xml`,
-        `configurations/${assetName}_xml.xml`,
-        `configurations/${assetName}.json`,
-        `avatar/${assetName}.xml`,
-        `avatar/${assetName}_xml.xml`,
-        `${assetName}.xml`,
-        `${assetName}_xml.xml`,
-    ];
-
-    for(const candidate of candidates) 
-    {
-        const content = bundle.getText(candidate);
-
-        if(content !== null) 
-        {
-            return content;
-        }
-    }
-
-    const suffixMatch = bundleKeys.find((key) => 
-    {
-        return key.endsWith(`/${assetName}.xml`)
-            || key.endsWith(`/${assetName}_xml.xml`)
-            || key.endsWith(`/${assetName}.json`);
-    });
-
-    return suffixMatch ? bundle.getText(suffixMatch) : null;
 }
 
 function parseLayoutEntries(raw: string, source: string, baseName: string): IWindowLayoutXmlData[]
@@ -866,10 +625,9 @@ export class VortexApp
             }),
         ]);
 
-        const bundledConfigurations = readEmbeddedConfigurationAssets(xmlBundle);
         const vortexConfig: IVortexConfig = {
             kernel: kernelConfig,
-            embeddedConfigurations: bundledConfigurations,
+            avatarData: readAvatarData(file => xmlBundle.getText(`configurations/${file}`)),
         };
 
         this._imageBundle = imageBundle;
@@ -947,6 +705,10 @@ export class VortexApp
         // the time that gate opens — hence before connect() rather than after.
         this.createCanvas();
 
+        // DEVIATION: AS3 loads the texts on authentication, from the gamedata; they come out of the
+        // client's own bundle (readTexts()).
+        vortex.localization.loadTexts(readTexts(xmlBundle, OWN_TEXTS, kernelConfig.app.language ?? browserLanguage()));
+
         await vortex.connect();
 
         await this.initClientUi(vortex);
@@ -1008,12 +770,6 @@ export class VortexApp
         // Register bundled webfonts (Volter/Ubuntu) before anything renders text —
         // see loadWebFonts() for why this was previously silently missing.
         await loadWebFonts(xmlBundle);
-
-        // Chat-style bitmaps need real ImageBitmaps (not the standard image/png ->
-        // BitmapDataAsset/Texture pipeline) - see registerChatStyleImageAssets()'s own
-        // header comment for why. chatstyles_xml/regpoints text already went in above via
-        // embeddedConfigurations.
-        await registerChatStyleImageAssets(vortex, imageBundle, xmlBundle);
 
         return vortex;
     }

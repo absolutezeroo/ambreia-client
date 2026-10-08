@@ -100,6 +100,16 @@ test('browser sources: the dev host on localhost, the page origin elsewhere, ?ss
     assert.equal((deployed[0].values as {app: {server: {host: string}}}).app.server.host, 'wss://jeu.exemple.fr/ws');
 });
 
+test('url.prefix is the page origin unless config.json names one', () =>
+{
+    const page = {hostname: 'jeu.exemple.fr', protocol: 'https:', host: 'jeu.exemple.fr', search: ''};
+    const load = (configJson: unknown): string | undefined =>
+        loadConfig(browserSources(page, configJson), new Map()).config.legacy['url.prefix'];
+
+    assert.equal(load(null), 'https://jeu.exemple.fr');
+    assert.equal(load({legacy: {'url.prefix': 'https://assets.exemple.fr'}}), 'https://assets.exemple.fr');
+});
+
 test('config.json that is not JSON is named', () =>
 {
     assert.equal(parseConfigJson(null), null);

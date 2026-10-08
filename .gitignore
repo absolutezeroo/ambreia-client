@@ -42,6 +42,8 @@ tools/flash2html/output/
 packages/vortex-client/src/assets/window-layouts/
 packages/vortex-client/src/assets/window-skins/
 packages/vortex-client/src/assets/sounds/
+# The Habbo texts per language (habbo.<lang>.json); Ambreia's own are src/locales/, committed.
+packages/vortex-client/src/assets/localizations/
 NUL
 tmp/
 # Dev-only esbuild pre-bundle of vortex-engine, rebuilt on every `pnpm dev`

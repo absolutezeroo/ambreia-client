@@ -1,4 +1,3 @@
-import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import {ActionDefinition} from './ActionDefinition';
 import type {IActiveActionData} from './IActiveActionData';
 import {getXmlAttribute, getXmlChildElements, getXmlRoot} from '../structure/AvatarXmlUtils';
@@ -11,18 +10,19 @@ import {getXmlAttribute, getXmlChildElements, getXmlRoot} from '../structure/Ava
 export class AvatarActionManager
 {
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/actions/AvatarActionManager.as::_assets
-    private _assets: IAssetLibrary | null;
+    // DEVIATION: AS3 looked `action_offset_<state>` up in its asset library; the parsed files come in by state.
+    private _offsets: ReadonlyMap<string, unknown>;
     private _actions: Map<string, ActionDefinition>;
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/actions/AvatarActionManager.as::_defaultAction
     private _defaultAction: ActionDefinition | null = null;
     private _defaultLayAction: ActionDefinition | null = null;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/actions/AvatarActionManager.as::AvatarActionManager()
-    constructor(assetsOrData: IAssetLibrary | any, data: any = null)
+    constructor(data: any, offsets: ReadonlyMap<string, unknown> = new Map())
     {
-        this._assets = data !== null ? assetsOrData as IAssetLibrary : null;
+        this._offsets = offsets;
         this._actions = new Map();
-        this.updateActions(data !== null ? data : assetsOrData);
+        this.updateActions(data);
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/actions/AvatarActionManager.as::updateActions()
@@ -179,19 +179,9 @@ export class AvatarActionManager
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/actions/AvatarActionManager.as::parseActionOffsets()
     private parseActionOffsetsFromAssets(): void
     {
-        if(!this._assets) return;
-
         for(const action of this._actions.values())
         {
-            const state = action.state;
-            const assetName = 'action_offset_' + state;
-
-            if(!this._assets.hasAsset(assetName))
-            {
-                continue;
-            }
-
-            const root = getXmlRoot(this._assets.getAssetByName(assetName)?.content ?? null);
+            const root = getXmlRoot(this._offsets.get(action.state) ?? null);
 
             if(!root) continue;
 

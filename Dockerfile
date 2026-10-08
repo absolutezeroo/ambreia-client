@@ -24,9 +24,8 @@ RUN pnpm install --frozen-lockfile
 # --- source + build ------------------------------------------------------------------------------
 COPY . .
 
-# install.mjs unpacks vortex-client-assets.zip into the tree the build expects and writes the
-# deployment configuration (`common_configuration_txt.txt`), which is excluded from the archive on
-# purpose so that a clone gets defaults rather than the packer's own hotel.
+# install.mjs unpacks vortex-client-assets.zip into the tree the build expects. The configuration is
+# the code's defaults, under public/config.json when there is one.
 #
 #   --skip-install  pnpm install already ran above, in its own cached layer
 #   --skip-checks   the final step probes the asset host and the web API over the network; in a

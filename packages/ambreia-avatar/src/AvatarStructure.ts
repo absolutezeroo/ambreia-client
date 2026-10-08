@@ -95,15 +95,11 @@ export class AvatarStructure
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/AvatarStructure.as::initActions()
-    public initActions(assetsOrData: IAssetLibrary | any, data: any = null): void
+    public initActions(data: any, offsets: ReadonlyMap<string, unknown>): void
     {
-        const actionData = data !== null ? data : assetsOrData;
+        if(!data) return;
 
-        if(!actionData) return;
-
-        this._actionManager = data !== null
-            ? new AvatarActionManager(assetsOrData as IAssetLibrary, actionData)
-            : new AvatarActionManager(actionData);
+        this._actionManager = new AvatarActionManager(data, offsets);
         this._defaultAction = this._actionManager.getDefaultAction();
         this._defaultLayAction = this._actionManager.getDefaultLayAction();
     }

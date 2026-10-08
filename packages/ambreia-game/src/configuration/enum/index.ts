@@ -4,11 +4,9 @@
 // Exports
 export {HabboComponentFlags, isRoomViewerMode,} from './HabboComponentFlags';
 export {HabboConfigurationEvent} from './HabboConfigurationEvent';
-export {HabboConfigurationFlags} from './HabboConfigurationFlags';
 export {HabboProperty} from './HabboProperty';
 
 // Types
 export type {HabboComponentFlagsType} from './HabboComponentFlags';
 export type {HabboConfigurationEventType} from './HabboConfigurationEvent';
-export type {HabboConfigurationFlagsType} from './HabboConfigurationFlags';
 export type {HabboPropertyType, HabboPropertyKey,} from './HabboProperty';

@@ -17,11 +17,6 @@ export interface IHabboConfigurationManagerEvents
     'HCE_CONFIGURATION_LOADED': () => void;
 
     /**
-	 * Configuration load error
-	 */
-    'configurationError': (error: Error) => void;
-
-    /**
 	 * Component complete (ready to use)
 	 */
     'complete': () => void;
@@ -32,10 +27,7 @@ export interface IHabboConfigurationManagerEvents
  *
  * Based on AS3: com.sulake.habbo.configuration.IHabboConfigurationManager
  *
- * Extends ICoreConfiguration with Habbo-specific functionality:
- * - Environment management
- * - External variables download
- * - Configuration reset
+ * The `legacy` properties (HabboConfigurationManager.load()), read through ICoreConfiguration.
  */
 export interface IHabboConfigurationManager extends ICoreConfiguration
 {
@@ -58,24 +50,7 @@ export interface IHabboConfigurationManager extends ICoreConfiguration
     isInitialized(): boolean;
 
     /**
-	 * Update the environment ID and reload environment-specific properties
-	 * @param envId Environment identifier (e.g., "production", "staging")
+	 * Sets the properties and reports the configuration complete.
 	 */
-    updateEnvironmentId(envId: string): void;
-
-    /**
-	 * Reset all configuration to defaults
-	 * Clears all properties and reloads embedded configurations
-	 */
-    resetAll(): void;
-
-    /**
-	 * Provide embedded AS3 TextAsset configuration contents by asset name.
-	 */
-    setEmbeddedConfigurationAssets(assets: Record<string, string>): void;
-
-    /**
-	 * Initialize configuration download from external variables URL
-	 */
-    initConfigurationDownload(): Promise<void>;
+    load(values: Readonly<Record<string, string>>): void;
 }

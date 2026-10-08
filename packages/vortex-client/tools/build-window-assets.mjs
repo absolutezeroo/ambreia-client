@@ -424,7 +424,7 @@ function collectAssets(tree, label)
         const raw = toRawLinkageName(declaration.ref, obfuscatedNameMap);
 
         // Images, fonts, sounds and text blobs are declared alongside layouts and belong to
-        // other pipelines (import-crypted-images.mjs, import-chatstyles.mjs).
+        // other pipelines (import-crypted-images.mjs).
         if (raw && EMBED_LINKAGE_RE.exec(raw)?.[1].toLowerCase() !== 'xml')
         {
             otherMedia += 1;

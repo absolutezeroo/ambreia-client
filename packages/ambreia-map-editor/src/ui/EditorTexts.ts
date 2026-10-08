@@ -2,30 +2,18 @@ import type {ILocalizable} from '@ambreia/ui/ILocalizable';
 import type {IWindowLocalization} from '@ambreia/ui/IWindowLocalization';
 
 /**
- * The editor's texts: the owner's `mapeditor.<lang>.txt` override files (key=value, `#` comments,
- * `\n` for a newline, `%name%` placeholders), read the way build-gamedata-locale.mjs reads them.
- * Every `${key}` caption of the vortex_map_editor_* layouts resolves through it.
+ * The editor's texts: the client's `src/locales/<lang>/*.json` (`%name%` placeholders), later files
+ * winning. Every `${key}` caption of the vortex_map_editor_* layouts resolves through it.
  */
 export class EditorTexts implements IWindowLocalization
 {
     private readonly _texts = new Map<string, string>();
 
-    constructor(...sources: readonly string[])
+    constructor(...sources: readonly Readonly<Record<string, string>>[])
     {
         for(const source of sources)
         {
-            for(const line of source.split(/\r\n|\n|\r/))
-            {
-                if(line.startsWith('#')) continue;
-
-                const i = line.indexOf('=');
-
-                if(i <= 0) continue;
-
-                const value = line.slice(i + 1).trim().replace(/\\n/g, '\n');
-
-                if(value) this._texts.set(line.slice(0, i).trim(), value);
-            }
+            for(const [key, value] of Object.entries(source)) this._texts.set(key, value);
         }
     }
 

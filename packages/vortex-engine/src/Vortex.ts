@@ -114,6 +114,7 @@ export interface IVortexWindowAssets
  * Vortex configuration
  */
 import type {IKernelConfig} from '@ambreia/kernel/config/loadConfig';
+import type {IAvatarData} from '@ambreia/avatar/AvatarData';
 
 export interface IVortexConfig extends IVortexCoreConfig
 {
@@ -124,8 +125,8 @@ export interface IVortexConfig extends IVortexCoreConfig
      */
     kernel: IKernelConfig;
 
-    /** AS3 embedded text/XML asset contents keyed by asset name. */
-    embeddedConfigurations?: Record<string, string>;
+    /** The avatar's shipped data (readAvatarData()). */
+    avatarData: IAvatarData;
 
     /**
      * Window skins and layouts, handed to HabboWindowManager at construction.

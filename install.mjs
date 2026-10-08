@@ -29,10 +29,9 @@
 //   --pack [file]   write the generated assets to a zip and stop (default vortex-client-assets.zip)
 //   --assets <zip>  extract this archive instead of looking for the default one
 //   --dump <path>   use this dump instead of auto-detecting one under sources/
-//   --force-config  rewrite the configuration files even if they already exist
 //   --skip-install  do not run `pnpm install`
 //   --skip-checks   do not probe the asset host / emulator / web API at the end
-import {existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync} from 'node:fs';
+import {existsSync, readdirSync, statSync} from 'node:fs';
 import {spawnSync} from 'node:child_process';
 import {createConnection} from 'node:net';
 import {dirname, join, resolve} from 'node:path';
@@ -49,13 +48,9 @@ const CONFIGURATIONS = join(ASSETS, 'configurations');
 // What --pack puts in the archive, and what --assets is expected to contain: exactly the
 // directories the importers generate. `webfonts/` is deliberately absent - git carries those
 // nine files, so packaging them would ship a second copy that could drift from the tracked one.
-const PACKED_DIRS = ['configurations', 'images', 'sounds', 'window-layouts', 'window-skins'];
+const PACKED_DIRS = ['configurations', 'images', 'localizations', 'sounds', 'window-layouts', 'window-skins'];
 
-// ...except these two, which live in configurations/ but are not derived dump content: they are
-// the packer's own deployment configuration. Shipping them would point a stranger's client at
-// whatever hotel the archive was built on, and would stop step 5 from ever writing the local
-// defaults, since it leaves an existing file alone. See writeConfiguration().
-const DEPLOYMENT_CONFIGURATION = ['common_configuration_txt.txt', 'localization_configuration_txt.txt'];
+const CONFIG_JSON = join(repoRoot, 'packages', 'vortex-client', 'public', 'config.json');
 
 const DEFAULT_ARCHIVE = join(repoRoot, 'vortex-client-assets.zip');
 
@@ -92,7 +87,6 @@ function parseArgs()
         packTarget: value('--pack') ?? DEFAULT_ARCHIVE,
         archive: value('--assets'),
         dump: value('--dump'),
-        forceConfig: argv.includes('--force-config'),
         skipInstall: argv.includes('--skip-install'),
         skipChecks: argv.includes('--skip-checks')
     };
@@ -328,7 +322,6 @@ const IMPORTERS = [
     {script: 'import-crypted-images.mjs', flag: '--crypted-root', extra: ['--write'], what: 'images'},
     {script: 'import-crypted-sounds.mjs', flag: '--source', extra: ['--write'], what: 'sound effects'},
     {script: 'import-avatar-configurations.mjs', flag: '--source', extra: ['--write'], what: 'avatar configurations'},
-    {script: 'import-chatstyles.mjs', flag: '--crypted-root', extra: ['--write'], what: 'chat styles'},
     {script: 'import-localizations.mjs', flag: '--source', extra: ['--write'], what: 'localization texts'},
     // The odd one out: its input is not the dump but an `ffdec-cli -export image` of the AIR
     // client's SWF, because the AIR dump carries no images at all. It therefore takes no dump
@@ -404,139 +397,15 @@ function lastCountLine(output)
 // 5. Configuration
 // ---------------------------------------------------------------------------------------------
 
-// The one thing that cannot be imported. `HabboConfigurationCom.as` embeds these two files, but
-// the dump's copies are habbo.com's own: they name `game-us.habbo.com:30000` and
-// `https://www.habbo.com`, so a client built from them dials Sulake rather than your hotel.
-// They are deployment configuration, and this is the version that works against a local
-// vortex-emulator plus a local asset host.
-//
-// Two values are deliberately EMPTY, and that is not an oversight:
-//
-//   url.prefix / pocket.api  App.ts::fillOriginPrefixes() fills them with the origin the client
-//                            is actually served from, at boot. They have to be computed: the
-//                            client runs at its own root, under vortex-web's /client, and
-//                            through a tunnel, and each needs a different value - including a
-//                            different scheme, since an absolute http:// URL is blocked on an
-//                            https page. Writing one down here breaks two of the three.
-//
-// Note that `connection.info.host` / `.port` below are read by HabboCommunicationManager's
-// updateHostParameters() but are NOT what the socket dials - packages/vortex-client/index.html's
-// `VortexConfig.connection` is, and it is where the emulator's real address lives (127.0.0.1
-// when served locally, the page's own origin through /ws otherwise). Change the port there.
-const COMMON_CONFIGURATION = `#================================================#
-#  Written by install.mjs. Edit it freely - it   #
-#  is never overwritten once it exists.          #
-#================================================#
-
-
-#====== ENVIRONMENTS ======
-
-connection.info.name.en=Vortex
-connection.info.host.en=127.0.0.1
-connection.info.port.en=30000
-url.prefix.en=
-pocket.api.en=
-web.api.en=/webapi
-
-#======== CONFIGURATIONS ============
-use.sso=false
-
-comufy.enabled=false
-identityTracking.enabled=false
-processlog.enabled=true
-interstitial.enabled=false
-
-lagWarninglog.enabled=false
-monitor.garbage.collection=false
-performancetest.distribution.enabled=true
-
-# Everything the client fetches after this file is found through hashes.json: it maps a logical
-# name (external_variables, furnidata_json, figuredata, ...) to the file serving it, with a hash
-# for cache-busting. If the client boots to a blank room, this is the first URL to curl.
-gamedata.hashes.url=\${url.prefix}/gamedata/hashes.json
-
-hotelview.banner.url=\${url.prefix}/gamedata/supersecret
-external.variables.txt=\${url.prefix}/gamedata/external_variables/1
-external.texts.txt=\${url.prefix}/gamedata/external_texts/1
-
-client.fatal.error.url=\${url.prefix}/flash_client_error
-client.connection.failed.url=\${url.prefix}/client_connection_failed
-
-flash.dynamic.icon.download.name.template=%typeid%%param%_icon.png
-
-# Server-side avatar renderer, proxied at /habbo-imaging (see vite.config.ts, which starts
-# packages/vortex-imager for you on :8081).
-habbo.imaging.avatar.url=\${url.prefix}/habbo-imaging/avatarimage
-
-# flash.dynamic.avatar.download.* is intentionally absent: the real values arrive at runtime via
-# external_variables, itself pointed to by hashes.json. Static defaults here would mask whichever
-# step of that chain is actually failing.
-
-landing.view.background_left.uri=https://images.habbo.com/c_images/reception/jan21_background_left.png
-landing.view.background_right.uri=https://images.habbo.com/c_images/reception/background_right_easter2016.png
-
-# Dynamic widget grid (DynamicLayoutManager, 6 slots). Nothing pushes these via external_variables
-# in a local setup, so without defaults the hotel view is empty.
-landing.view.dynamic.slot.1.widget=avatarimage
-landing.view.dynamic.slot.2.widget=catalogpromo
-landing.view.dynamic.slot.3.widget=promoarticle
-landing.view.dynamic.slot.4.widget=dailyquest
-landing.view.dynamic.slot.5.widget=habbomoderationpromo
-landing.view.dynamic.slot.6.widget=
-
-landing.view.roomcategory=
-landing.view.catalog.promo.target=
-landing.view.catalog.promo.image.uri=https://images.habbo.com/c_images/reception/catalog_promo_default.png
-landing.view.roomhopper.image.uri=https://images.habbo.com/c_images/reception/room_hopper_default.png
-landing.view.bonus.rare.image.uri=https://images.habbo.com/c_images/reception/bonus_rare_default.png
-landing.view.community.catalog.target=
-
-game.center.default_game=snowwar
-game.center.enabled.forStaff=false
-game.center.enabled=false
-
-configuration.readonly=true
-
-live.environment.list=en
-`;
-
-// One hotel, one language. `localization.1.url` is the same hashes.json the common configuration
-// names; the dump's version lists eleven languages, each pointing at its own habbo.<tld>.
-const LOCALIZATION_CONFIGURATION = `#========= LOCALIZATIONS =========
-
-localization.1=en
-localization.1.code=en_US.iso-8859-1
-localization.1.name=English (COM)
-localization.1.url=/gamedata/hashes.json
-`;
-
+// Nothing to write: the client's configuration is the code's defaults (legacy.defaults.json, the
+// page's own origin as url.prefix) under packages/vortex-client/public/config.json, which only a
+// deployment needs. config.example.json shows what it overrides.
 function writeConfiguration()
 {
     step('5/6  Configuration');
 
-    mkdirSync(CONFIGURATIONS, {recursive: true});
-
-    for(const [name, content] of [
-        ['common_configuration_txt.txt', COMMON_CONFIGURATION],
-        ['localization_configuration_txt.txt', LOCALIZATION_CONFIGURATION]
-    ])
-    {
-        const target = join(CONFIGURATIONS, name);
-
-        if(existsSync(target) && !args.forceConfig)
-        {
-            ok(`${name} already exists, left alone`);
-            continue;
-        }
-
-        writeFileSync(target, content);
-        ok(`${name} ${args.forceConfig ? 'rewritten' : 'written'}`);
-    }
-
-    const common = join(CONFIGURATIONS, 'common_configuration_txt.txt');
-    const hashesUrl = /^gamedata\.hashes\.url=(.+)$/m.exec(readFileSync(common, 'utf8'));
-
-    if(hashesUrl) info(`gamedata comes from ${hashesUrl[1].trim()}`);
+    if(existsSync(CONFIG_JSON)) ok('public/config.json found');
+    else info('no public/config.json: the built-in defaults apply (see public/config.example.json)');
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -639,7 +508,7 @@ function pack()
     for(const name of PACKED_DIRS)
     {
         const dir = join(ASSETS, name);
-        const files = (existsSync(dir) ? listFiles(dir) : []).filter(file => !DEPLOYMENT_CONFIGURATION.includes(file));
+        const files = existsSync(dir) ? listFiles(dir) : [];
 
         if(files.length === 0)
         {

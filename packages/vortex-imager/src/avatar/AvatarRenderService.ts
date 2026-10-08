@@ -12,19 +12,20 @@
  * library, the real configuration manager (pointed at the hotel's own `external_variables`),
  * and the render manager. No socket, no window system, no ticker.
  */
-import {readFile} from 'node:fs/promises';
+import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {Core} from '@ambreia/kernel/Core';
 import type {CoreComponentContext} from '@ambreia/kernel/runtime/CoreComponentContext';
-import {AssetLibrary, AssetTypeDeclaration, XmlAsset} from '@ambreia/game/core/assets/index';
+import {AssetLibrary} from '@ambreia/game/core/assets/index';
 import {Logger} from '@ambreia/common/utils/Logger';
 import {IID_Core} from '@ambreia/kernel/iid/IIDCore';
 import {IID_AssetLibrary} from '@ambreia/kernel/iid/IIDAssetLibrary';
 import {IID_HabboConfigurationManager} from '@ambreia/game/iid/IIDHabboConfigurationManager';
 import {IID_AvatarRenderManager} from '@ambreia/game/iid/IIDAvatarRenderManager';
 import {HabboConfigurationManager} from '@ambreia/game/configuration/HabboConfigurationManager';
-import {HabboProperty} from '@ambreia/game/configuration/enum/HabboProperty';
+import {LEGACY_DEFAULTS} from '@ambreia/game/configuration/legacyDefaults';
 import {AvatarRenderManager} from '@ambreia/avatar/AvatarRenderManager';
+import {readAvatarData, type IAvatarData} from '@ambreia/avatar/AvatarData';
 import {AvatarRenderEvent} from '@ambreia/avatar/enum/AvatarRenderEvent';
 import {AvatarSetType} from '@ambreia/avatar/enum/AvatarSetType';
 import {AvatarAction} from '@ambreia/avatar/enum/AvatarAction';
@@ -56,18 +57,6 @@ import {canvasToPng, textureToPng} from '../render/encode';
 import {composeAvatarWithSprites} from '../render/composeAvatar';
 
 const log = Logger.getLogger('imager.avatar.AvatarRenderService');
-
-/**
- * The avatar XMLs the client embeds and the render manager reads straight out of the asset
- * library — geometry, part sets, animations and the figure defaults. Without them
- * `AvatarStructure` has no body to hang parts on and every render comes back empty.
- */
-const EMBEDDED_AVATAR_XML_ASSETS: string[] = [
-    'HabboAvatarAnimation',
-    'HabboAvatarFigure',
-    'HabboAvatarGeometry',
-    'HabboAvatarPartSets'
-];
 
 /** How long boot waits for the mandatory libraries and the figure map. */
 const READY_TIMEOUT_MS = 120_000;
@@ -266,7 +255,7 @@ export class AvatarRenderService
 
     /**
 	 * Reads a resolved hotel property. The badge renderer needs
-	 * `image.library.badgepart.url` from the same `external_variables` the avatars come from,
+	 * `image.library.badgepart.url` from the same properties the avatars come from,
 	 * so it goes through the configuration manager this service already owns rather than
 	 * getting its own copy of the hotel config.
 	 */
@@ -280,8 +269,7 @@ export class AvatarRenderService
 	 *
 	 * `RoomStack` takes these three rather than building its own: the DI container, the asset
 	 * library and the configuration manager are the same ones, and a second
-	 * `HabboConfigurationManager` would mean a second `external_variables` download and two
-	 * copies of the hotel config free to disagree with each other. Null until {@link boot}
+	 * `HabboConfigurationManager` would mean two copies of the properties free to disagree. Null until {@link boot}
 	 * resolves.
 	 */
     get context(): CoreComponentContext | null
@@ -405,11 +393,9 @@ export class AvatarRenderService
 
         context.attachInstance(IID_AssetLibrary, assets);
 
-        await this.registerEmbeddedAvatarAssets(assets);
-
         context.initialize();
 
-        const configuration = await this.createConfiguration(context);
+        const configuration = this.createConfiguration(context);
 
         this._configuration = configuration;
 
@@ -417,10 +403,9 @@ export class AvatarRenderService
 
         const renderManager = new AvatarRenderManager({
             assets,
+            data: this.readAvatarData(),
             downloadUrl: configuration.getProperty('flash.dynamic.avatar.download.url'),
-            downloadNameTemplate: configuration.getProperty('flash.dynamic.avatar.download.name.template'),
-            figureMapUrl: configuration.getProperty('flash.dynamic.avatar.download.configuration'),
-            figurePartListUrl: configuration.getProperty('external.figurepartlist.txt')
+            downloadNameTemplate: configuration.getProperty('flash.dynamic.avatar.download.name.template')
         });
 
         context.attachInstance(IID_AvatarRenderManager, renderManager);
@@ -443,74 +428,33 @@ export class AvatarRenderService
     }
 
     /**
-	 * Brings up the real configuration manager against the hotel's own `external_variables`,
-	 * so the imager resolves `flash.client.url` (and therefore the current asset build) the
-	 * same way and at the same time the client does.
+	 * The client's own starting properties (legacy.defaults.json), with `url.prefix` at the asset
+	 * host: the imager is told where to read, and every `${url.prefix}` resolves through it.
 	 */
-    private async createConfiguration(context: CoreComponentContext): Promise<HabboConfigurationManager>
+    private createConfiguration(context: CoreComponentContext): HabboConfigurationManager
     {
-        const common = await this.readAvatarConfigFile('common_configuration_txt.txt');
         const configuration = new HabboConfigurationManager(context);
 
-        configuration.setEmbeddedConfigurationAssets(common === null ? {} : {common_configuration: common});
         context.attachComponent(configuration, [IID_HabboConfigurationManager]);
-
-        // `Component` defers initComponent() to a microtask, and that is where the embedded
-        // configuration is parsed — reading properties before it lands gets empty strings.
-        await Promise.resolve();
-
-        configuration.updateEnvironmentId(this._config.environmentId);
-
-        // The asset host is the one thing the imager knows better than the hotel config does:
-        // it is told where to read, and every `${url.prefix}` in external_variables resolves
-        // through it.
-        configuration.setProperty('url.prefix', this._config.assetsBaseUrl);
-        configuration.setProperty(HabboProperty.EXTERNAL_VARIABLES, this._config.externalVariablesUrl);
-
-        await configuration.initConfigurationDownload();
-
-        configuration.setProperty('url.prefix', this._config.assetsBaseUrl);
+        configuration.load({...LEGACY_DEFAULTS, 'url.prefix': this._config.assetsBaseUrl});
 
         return configuration;
     }
 
-    /**
-	 * Registers the embedded avatar XMLs as `XmlAsset`s, the same shape and under the same
-	 * names `AvatarRenderManager.getEmbeddedAvatarAssetContent()` looks for.
-	 */
-    private async registerEmbeddedAvatarAssets(assets: AssetLibrary): Promise<void>
+    /** The client's Ambreia*.xml files, read from the same folder as the client bundles them. */
+    private readAvatarData(): IAvatarData
     {
-        const declaration = assets.getAssetTypeDeclarationByMimeType('text/xml')
-            ?? new AssetTypeDeclaration('text/xml', XmlAsset, null, 'xml');
-
-        for(const assetName of EMBEDDED_AVATAR_XML_ASSETS)
+        return readAvatarData(file =>
         {
-            const content = await this.readAvatarConfigFile(`${assetName}.xml`);
-
-            if(content === null)
+            try
             {
-                log.warn(`Missing embedded avatar asset: ${assetName}.xml`);
-
-                continue;
+                return readFileSync(join(this._config.avatarConfigDir, file), 'utf8');
             }
-
-            const asset = new XmlAsset(declaration, assetName);
-
-            asset.setUnknownContent(content);
-            assets.setAsset(assetName, asset, true);
-        }
-    }
-
-    private async readAvatarConfigFile(fileName: string): Promise<string | null>
-    {
-        try
-        {
-            return await readFile(join(this._config.avatarConfigDir, fileName), 'utf8');
-        }
-        catch
-        {
-            return null;
-        }
+            catch
+            {
+                return null;
+            }
+        });
     }
 }
 

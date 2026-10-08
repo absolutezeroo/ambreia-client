@@ -18,7 +18,6 @@ import {Core} from '@ambreia/kernel/Core';
 import {AssetLibrary} from '@ambreia/common/assets/AssetLibrary';
 import {AssetTypeDeclaration} from '@ambreia/common/assets/AssetTypeDeclaration';
 import {XmlAsset} from '@ambreia/common/assets/XmlAsset';
-import {TextAsset} from '@ambreia/common/assets/TextAsset';
 import {UnknownAsset} from '@ambreia/common/assets/UnknownAsset';
 import {CoreCommunicationManager} from '@ambreia/game/core/communication/CoreCommunicationManager';
 import type {CoreComponentContext} from '@ambreia/kernel/runtime/CoreComponentContext';
@@ -81,20 +80,6 @@ export class VortexMain implements IVortexMain
      */
     // AS3: .../src/binaryData/HabboAir.as::INIT_STEPS
     private static readonly INIT_STEPS: number = 3;
-
-    /**
-     * Embedded avatar XML assets registered from IVortexConfig.embeddedConfigurations.
-     * TS-only: no AS3 equivalent, this is infrastructure for the web port's asset bundling.
-     */
-    private static readonly EMBEDDED_AVATAR_XML_ASSET_NAMES: string[] = [
-        'action_offset_lay',
-        'action_offset_swim',
-        'dance_sixseven_animation',
-        'HabboAvatarAnimation',
-        'HabboAvatarFigure',
-        'HabboAvatarGeometry',
-        'HabboAvatarPartSets',
-    ];
 
     /**
      * PixiJS Application reference.
@@ -382,13 +367,8 @@ export class VortexMain implements IVortexMain
      * 1. prepareCore() — create Core, register all components
      * 2. addInitializationProgressListeners() — track config, localization, room engine, core running
      *
-     * The localization download is NOT started here. AS3 starts it exactly once, from
-     * HabboLocalizationManager.as::onAuthenticated() -> requestLocalizationInit(); the only
-     * caller of activateLocalizationDefinition() in the whole client is
-     * habbo/ui/handler/ChatInputWidgetHandler.as:394, the runtime language-switch command.
-     * Calling it at boot as well made both paths fetch and parse external_texts — 50,074
-     * entries twice, 175 ms apart, inside the window where the furnidata parse already has
-     * the main thread pinned.
+     * The texts are not loaded here: the client reads them out of its bundle and hands them to
+     * the localization manager (App.ts, HabboLocalizationManager.loadTexts()).
      *
      * @param application - The PixiJS Application (created by Vortex shell)
      * @param config - Optional Vortex configuration
@@ -528,8 +508,6 @@ export class VortexMain implements IVortexMain
         // Asset Library — manages all game assets
         this._assets = new AssetLibrary();
         ctx.attachInstance(IID_AssetLibrary, this._assets);
-        this.registerEmbeddedAvatarAssets(config);
-        this.registerChatStyleTextAssets(config);
         // Before any component exists, not after: HabboGroupsManager (12g below) builds its badge
         // editor in its own constructor and reads `badge_part_add` out of the library while doing
         // it. In AS3 those are `[Embed]`s in the component's own SWF library, so
@@ -551,7 +529,7 @@ export class VortexMain implements IVortexMain
         const made = emptyManagers();
         const host: IEngineHost = {
             assets: this._assets,
-            embeddedConfigurations: config.embeddedConfigurations ?? {},
+            avatarData: config.avatarData,
             legacy: config.kernel.legacy,
             onWindowManager: windowManager => this.applyWindowAssets(config.windowAssets ?? null, windowManager),
             renderer: () => Vortex.instance?.application?.renderer ?? null,
@@ -652,93 +630,6 @@ export class VortexMain implements IVortexMain
         ctx.attachComponent(this._avatarEditor, [IID_HabboAvatarEditor]);
 
         log.debug('Avatar editor initialized');
-    }
-
-    /**
-     * Activates the configured localization definition, downloading its texts.
-     *
-     * Not part of the boot: AS3 only reaches activateLocalizationDefinition() through the
-     * runtime language-switch command (ChatInputWidgetHandler.as:394), and lets
-     * onAuthenticated() -> requestLocalizationInit() do the initial load. Kept on IVortexMain
-     * so that switch has something to call once it is ported.
-     *
-     * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/handler/ChatInputWidgetHandler.as
-     */
-    initLocalization(): void
-    {
-        if(this._configurationManager!.propertyExists('localization.1')) 
-        {
-            const locName = this._configurationManager!.getProperty('localization.1');
-
-            this._localizationManager!.activateLocalizationDefinition(locName);
-        }
-    }
-
-    private registerEmbeddedAvatarAssets(config?: IVortexConfig): void 
-    {
-        if(!this._assets || !config?.embeddedConfigurations) 
-        {
-            return;
-        }
-
-        const declaration = this._assets.getAssetTypeDeclarationByMimeType('text/xml')
-            ?? new AssetTypeDeclaration('text/xml', XmlAsset, null, 'xml');
-
-        for(const assetName of VortexMain.EMBEDDED_AVATAR_XML_ASSET_NAMES) 
-        {
-            const content = config.embeddedConfigurations[assetName];
-
-            if(content === undefined) 
-            {
-                continue;
-            }
-
-            const asset = new XmlAsset(declaration, assetName);
-
-            asset.setUnknownContent(content);
-            this._assets.setAsset(assetName, asset, true);
-        }
-    }
-
-    /**
-     * Registers the freeflowchat "chatstyles_xml" catalog (as an XmlAsset, matching
-     * ChatStyleLibrary.ts::content cast to Document) and every "style_<id>_regpoints"
-     * config text (as a TextAsset, matching its content cast to string) found in
-     * config.embeddedConfigurations. Per-style bitmap assets are registered separately
-     * (image decoding is async) - see App.ts's chat-style image registration step.
-     *
-     * TS-only: no AS3 equivalent, this is infrastructure for the web port's asset
-     * bundling (same rationale as registerEmbeddedAvatarAssets() above).
-     */
-    private registerChatStyleTextAssets(config?: IVortexConfig): void 
-    {
-        if(!this._assets || !config?.embeddedConfigurations) 
-        {
-            return;
-        }
-
-        const xmlDeclaration = this._assets.getAssetTypeDeclarationByMimeType('text/xml')
-            ?? new AssetTypeDeclaration('text/xml', XmlAsset, null, 'xml');
-        const textDeclaration = this._assets.getAssetTypeDeclarationByMimeType('text/plain')
-            ?? new AssetTypeDeclaration('text/plain', TextAsset, null, 'txt');
-
-        for(const [assetName, content] of Object.entries(config.embeddedConfigurations)) 
-        {
-            if(assetName === 'chatstyles_xml') 
-            {
-                const asset = new XmlAsset(xmlDeclaration, assetName);
-
-                asset.setUnknownContent(content);
-                this._assets.setAsset(assetName, asset, true);
-            }
-            else if(/^style_.+_regpoints$/.test(assetName)) 
-            {
-                const asset = new TextAsset(textDeclaration, assetName);
-
-                asset.setUnknownContent(content);
-                this._assets.setAsset(assetName, asset, true);
-            }
-        }
     }
 
     /**

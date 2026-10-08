@@ -5,17 +5,17 @@
 //     --tsconfig packages/ambreia-avatar/tsconfig.json packages/ambreia-avatar/tools/render-avatar.mjs \
 //     <figure> <out.png> [--direction 2] [--zoom 2]
 //
-// The hotel's own external_variables say where the libraries are; the four embedded XMLs come from
+// The client's legacy.defaults.json says where the libraries are; the Ambreia*.xml data comes from
 // the client's configurations folder. Output matches the imager's `size=l` (zoom 2, nearest-neighbour).
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
+import { writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createCanvas } from '@napi-rs/canvas';
 import { setPlatform } from '@ambreia/common/platform/Platform';
 import { AssetLibrary } from '@ambreia/common/assets/AssetLibrary';
-import { AssetTypeDeclaration } from '@ambreia/common/assets/AssetTypeDeclaration';
-import { XmlAsset } from '@ambreia/common/assets/XmlAsset';
 import { AvatarRenderManager } from '@ambreia/avatar/AvatarRenderManager';
+import { readAvatarData } from '@ambreia/avatar/AvatarData';
 import { AvatarRenderEvent } from '@ambreia/avatar/enum/AvatarRenderEvent';
 import { AvatarScaleType } from '@ambreia/avatar/enum/AvatarScaleType';
 import { AvatarSetType } from '@ambreia/avatar/enum/AvatarSetType';
@@ -26,7 +26,6 @@ setPlatform(nodePlatform());
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const CONFIGURATIONS = resolve(HERE, '../../vortex-client/src/assets/configurations');
-const EMBEDDED = ['HabboAvatarAnimation', 'HabboAvatarFigure', 'HabboAvatarGeometry', 'HabboAvatarPartSets'];
 
 const args = process.argv.slice(2);
 const flag = (name, fallback) => { const i = args.indexOf(name); return i >= 0 ? Number(args[i + 1]) : fallback; };
@@ -43,34 +42,22 @@ if(!figure || !out)
 
 const withTimeout = (promise, ms, what) => Promise.race([promise, new Promise((_, reject) => setTimeout(() => reject(new Error(`${what} timed out`)), ms))]);
 
-/** external_variables is a JSON map with `${key}` references; url.prefix is the asset host. */
-async function hotelVariables()
+/** The client's starting properties, `${key}` references and all; url.prefix is the asset host. */
+function hotelVariables()
 {
-    const raw = await (await fetch(`${assetsBase}/gamedata/external_variables/1`)).json();
+    const raw = JSON.parse(readFileSync(resolve(HERE, '../../ambreia-game/src/configuration/legacy.defaults.json'), 'utf8'));
     const values = { ...raw, 'url.prefix': assetsBase };
     const resolveValue = (value, depth = 0) => depth > 8 ? value : value.replace(/\$\{([^}]+)\}/g, (_, key) => resolveValue(String(values[key] ?? ''), depth + 1));
 
     return key => resolveValue(String(values[key] ?? ''));
 }
 
-const variable = await hotelVariables();
-const assets = new AssetLibrary('avatar');
-const declaration = new AssetTypeDeclaration('text/xml', XmlAsset, null, 'xml');
-
-for(const name of EMBEDDED)
-{
-    const asset = new XmlAsset(declaration, name);
-
-    asset.setUnknownContent(await readFile(join(CONFIGURATIONS, `${name}.xml`), 'utf8'));
-    assets.setAsset(name, asset, true);
-}
-
+const variable = hotelVariables();
 const manager = new AvatarRenderManager({
-    assets,
+    assets: new AssetLibrary('avatar'),
+    data: readAvatarData(file => { try { return readFileSync(join(CONFIGURATIONS, file), 'utf8'); } catch { return null; } }),
     downloadUrl: variable('flash.dynamic.avatar.download.url'),
-    downloadNameTemplate: variable('flash.dynamic.avatar.download.name.template'),
-    figureMapUrl: variable('flash.dynamic.avatar.download.configuration'),
-    figurePartListUrl: variable('external.figurepartlist.txt')
+    downloadNameTemplate: variable('flash.dynamic.avatar.download.name.template')
 });
 
 if(!manager.isReady) await withTimeout(new Promise(done => manager.events.once(AvatarRenderEvent.AVATAR_RENDER_READY, done)), 120_000, 'render manager');

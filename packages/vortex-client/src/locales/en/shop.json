@@ -1,0 +1,16 @@
+{
+  "vortex.shop.buyback": "Buy back",
+  "vortex.shop.buyback_info": "Items you sell can be bought back for a limited time. After that they are gone for good.",
+  "vortex.shop.buyback_price": "Buyback price",
+  "vortex.shop.category.misc": "Misc",
+  "vortex.shop.empty.buyback": "You have not sold anything recently.",
+  "vortex.shop.inventory": "Your inventory",
+  "vortex.shop.max": "Max",
+  "vortex.shop.merchant_note": "The merchant buys this item back (minus %percent%% fee).",
+  "vortex.shop.original_price": "Original sale price",
+  "vortex.shop.recently_sold": "Recently sold items",
+  "vortex.shop.sold_on": "Sold on",
+  "vortex.shop.tab.buyback": "Buyback",
+  "vortex.shop.title": "Shop",
+  "vortex.shop.total_sale": "Total sale price"
+}

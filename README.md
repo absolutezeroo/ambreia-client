@@ -146,7 +146,6 @@ pnpm --filter vortex-client build:window-data              # 788 layouts + 133 s
 pnpm --filter vortex-client import:crypted-images          # PNGs, named as AS3 names them
 pnpm --filter vortex-client import:crypted-sounds          # 21 sound effects
 pnpm --filter vortex-client import:avatar-configurations   # 7 avatar XML configurations
-pnpm --filter vortex-client import:chatstyles              # the 89-style chat catalogue
 pnpm --filter vortex-client import:localizations           # 13 embedded localization texts
 ```
 

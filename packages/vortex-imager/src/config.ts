@@ -38,12 +38,6 @@ export interface IImagerConfig
 	 */
     assetsRoot: string | null;
 
-    /** URL of `external_variables` — the same one the client is pointed at. */
-    externalVariablesUrl: string;
-
-    /** Hotel environment suffix in `common_configuration_txt` (`en`, `s2`, …). */
-    environmentId: string;
-
     /** Directory holding the embedded avatar XMLs (geometry, part sets, animation, figure). */
     avatarConfigDir: string;
 
@@ -160,8 +154,6 @@ export function loadConfig(): IImagerConfig
         port: envNumber('IMAGER_PORT', 8081),
         assetsBaseUrl,
         assetsRoot: envOrNull('IMAGER_ASSETS_ROOT'),
-        externalVariablesUrl: env('IMAGER_EXTERNAL_VARIABLES_URL', `${assetsBaseUrl}/gamedata/external_variables/1`),
-        environmentId: env('IMAGER_ENVIRONMENT_ID', 'en'),
         // The client ships these as embedded assets; the imager reads the same files out of
         // the client package so both render against one copy.
         avatarConfigDir: env(

@@ -495,9 +495,9 @@ const ASSET_HOST = /\/?(?:https?:)?https?:\/\/vortex-assets\.local/g;
 
 // Replaces that host with `${url.prefix}`, which is what the rest of the configuration already
 // uses and what every consumer resolves for itself: the browser client fills it with the origin
-// it was served from (App.ts::fillOriginPrefixes, so /client, a bare root and a tunnel each get
-// the right one), and vortex-imager sets it to its own `assetsBaseUrl` before downloading
-// (AvatarRenderService::bootConfiguration). This is what `flash.client.url` and
+// it was served from (@ambreia/kernel's browserSources(), so /client, a bare root and a tunnel each
+// get the right one), and vortex-imager sets it to its own `assetsBaseUrl`
+// (AvatarRenderService::createConfiguration). This is what `flash.client.url` and
 // `dynamic.download.url` need to be reachable off this machine at all - with the absolute host
 // the client stops at "Failed to download required client libraries".
 //

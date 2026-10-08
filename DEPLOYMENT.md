@@ -49,11 +49,12 @@ ticket travels in the URL, so the client needs nothing of the site's session coo
 Not tidiness. The client resolves its services against the origin it was served from, and it does
 that on its own:
 
-- `install.mjs` writes `url.prefix` and `pocket.api` **empty on purpose**, and
-  `App.ts::fillOriginPrefixes()` fills them at boot with the origin actually serving the page.
+- `url.prefix` defaults to the origin actually serving the page (`browserSources()` in
+  `@ambreia/kernel`); a deployment that serves its assets elsewhere sets `legacy.url.prefix` in
+  `public/config.json`.
 - `packages/vortex-client/index.html` dials `wss://<that same origin>/ws` for anything that is not
   localhost.
-- The shipped configuration says `web.api.en=/webapi`, an origin-root path.
+- The shipped defaults (`legacy.defaults.json`) say `web.api` is `/webapi`, an origin-root path.
 
 So the API, the socket and the imager need **no source change to deploy**, no CORS policy and no
 cross-site cookie — on whichever host serves the client. That is why moving it to

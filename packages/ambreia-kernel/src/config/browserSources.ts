@@ -30,7 +30,9 @@ export function browserSources(location: IPageLocation, configJson: unknown): IC
         : `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws`;
     const query = new URLSearchParams(location.search);
     const url: Record<string, string> = {};
-    const sources: IConfigSource[] = [{name: 'defaults', values: {app: {server: {host}}}}];
+    // `${url.prefix}` in the legacy properties is the page's own origin unless config.json says
+    // otherwise: the client is served at its root, under the site's /client and through tunnels.
+    const sources: IConfigSource[] = [{name: 'defaults', values: {app: {server: {host}}, legacy: {'url.prefix': `${location.protocol}//${location.host}`}}}];
 
     if(configJson !== null && configJson !== undefined)
     {

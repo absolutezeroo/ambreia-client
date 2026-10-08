@@ -1,0 +1,16 @@
+{
+  "vortex.shop.buyback": "Racheter",
+  "vortex.shop.buyback_info": "Les objets que vous avez vendus restent disponibles au rachat pendant une durée limitée. Une fois le délai écoulé, ils sont définitivement supprimés.",
+  "vortex.shop.buyback_price": "Prix de rachat",
+  "vortex.shop.category.misc": "Divers",
+  "vortex.shop.empty.buyback": "Vous n'avez rien vendu récemment.",
+  "vortex.shop.inventory": "Votre inventaire",
+  "vortex.shop.max": "Max",
+  "vortex.shop.merchant_note": "Le marchand reprend cet objet (moins %percent% % de commission).",
+  "vortex.shop.original_price": "Prix de vente original",
+  "vortex.shop.recently_sold": "Objets récemment vendus",
+  "vortex.shop.sold_on": "Vendu le",
+  "vortex.shop.tab.buyback": "Rachat",
+  "vortex.shop.title": "Boutique",
+  "vortex.shop.total_sale": "Prix de vente total"
+}

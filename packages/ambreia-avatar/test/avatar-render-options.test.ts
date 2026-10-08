@@ -3,8 +3,9 @@ import assert from 'node:assert/strict';
 import {AssetLibrary} from '@ambreia/common/assets/AssetLibrary';
 import {setPlatform, BROWSER_PLATFORM} from '@ambreia/common/platform/Platform';
 import {AvatarRenderManager} from '../src/AvatarRenderManager';
+import {readAvatarData, AVATAR_DATA_FILES, AVATAR_ACTION_OFFSET_FILES} from '../src/AvatarData';
 
-// No DOM here: the embedded-XML step of the constructor parses into an empty document.
+// No DOM here: the constructor's parse of the shipped data gets an empty document.
 const EMPTY_DOCUMENT = {documentElement: null, getElementsByTagName: () => [], querySelectorAll: () => []} as unknown as Document;
 
 test('the render manager is built from options alone and owns its events', () =>
@@ -13,7 +14,7 @@ test('the render manager is built from options alone and owns its events', () =>
 
     try
     {
-        const manager = new AvatarRenderManager({assets: new AssetLibrary('avatar'), downloadUrl: '', downloadNameTemplate: '', figureMapUrl: ''});
+        const manager = new AvatarRenderManager({assets: new AssetLibrary('avatar'), data: readAvatarData(() => ''), downloadUrl: '', downloadNameTemplate: ''});
 
         assert.equal(manager.isReady, false);
         assert.equal(typeof manager.events.on, 'function');
@@ -24,4 +25,17 @@ test('the render manager is built from options alone and owns its events', () =>
     {
         setPlatform(BROWSER_PLATFORM);
     }
+});
+
+test('the avatar data names every missing file at once', () =>
+{
+    const files = [...Object.values(AVATAR_DATA_FILES), ...Object.values(AVATAR_ACTION_OFFSET_FILES)];
+
+    assert.throws(() => readAvatarData(file => file === 'AmbreiaAvatarGeometry.xml' ? '<geometry/>' : null),
+        error => files.filter(file => file !== 'AmbreiaAvatarGeometry.xml').every(file => (error as Error).message.includes(file)));
+
+    const data = readAvatarData(file => file);
+
+    assert.equal(data.geometry, 'AmbreiaAvatarGeometry.xml');
+    assert.equal(data.actionOffsets.swim, 'AmbreiaActionOffsetSwim.xml');
 });

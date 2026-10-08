@@ -11,6 +11,7 @@ export * from '@ambreia/game/core/communication/index';
 export * from './Vortex';
 export * from './VortexMain';
 export {GAME_FEATURES} from '@ambreia/game/features/index';
+export {readAvatarData} from '@ambreia/avatar/AvatarData';
 export {featureImages} from '@ambreia/game/features/GameFeature';
 export type {IEngineHost, IEngineManagers} from '@ambreia/game/features/index';
 

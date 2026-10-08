@@ -1,0 +1,14 @@
+{
+  "vortex.hud.alert.incoming": "%skill% in %count% second(s)!",
+  "vortex.hud.boss": "Boss",
+  "vortex.hud.casting": "Casting",
+  "vortex.hud.chat.placeholder": "Click here to write...",
+  "vortex.hud.dead": "Dead",
+  "vortex.hud.miss": "Miss",
+  "vortex.hud.nav.inventory": "Inventory",
+  "vortex.hud.nav.map": "Map",
+  "vortex.hud.nav.menu": "Menu",
+  "vortex.hud.nav.social": "Social",
+  "vortex.hud.players_here": "%count% players here",
+  "vortex.hud.target": "Selected target"
+}
