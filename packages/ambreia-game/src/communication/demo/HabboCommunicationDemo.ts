@@ -467,6 +467,13 @@ export class HabboCommunicationDemo extends Component implements IHabboCommunica
             this._communication.events.emit(HabboCommunicationManagerEvent.DISCONNECTED, reason, reasonText);
         }
 
+        if(reason === DisconnectReasonMessageEvent.INCOMPATIBLE_CLIENT_VERSION)
+        {
+            this.alertUpdateRequired();
+
+            return;
+        }
+
         // AS3 branches on the login flow being alive: with one it hands over to
         // `loginFlow.showDisconnected()`, without one it alerts. This port is always in the second
         // branch — its LoginFlow is disposed once boot is done — so only the alert is ported, and
@@ -529,6 +536,29 @@ export class HabboCommunicationDemo extends Component implements IHabboCommunica
             {
                 this._communication?.events.emit(HabboCommunicationManagerEvent.DISCONNECT_ACKNOWLEDGED);
             }
+        });
+    }
+
+    /**
+     * The server moved to a newer revision. Reloading fetches the new bundle; the query is dropped
+     * because its ?sso= ticket is spent (see alert(): a plain reload re-boots against a dead ticket).
+     */
+    // TS-only: release revisions (spec docs/superpowers/specs/2026-10-08-random-header-revisions-design.md §4.5).
+    private alertUpdateRequired(): void
+    {
+        const reload = (): void => window.location.replace(window.location.pathname);
+
+        if(!this._windowManager)
+        {
+            reload();
+
+            return;
+        }
+
+        this._windowManager.alert('${disconnect.updaterequired.title}', '${disconnect.updaterequired.description}', 0, (dialog) =>
+        {
+            dialog.dispose();
+            reload();
         });
     }
 

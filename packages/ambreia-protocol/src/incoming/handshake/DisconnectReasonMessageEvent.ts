@@ -10,6 +10,10 @@ import {DisconnectReasonMessageParser} from '../../parser/handshake/DisconnectRe
  */
 export class DisconnectReasonMessageEvent extends MessageEvent implements IMessageEvent
 {
+    /** The server does not speak this client's revision: a newer client has been deployed. */
+    // TS-only: the one reason code with a reader, HabboCommunicationDemo.disconnected() (spec 2026-10-08 §4.5).
+    static readonly INCOMPATIBLE_CLIENT_VERSION = 122;
+
     constructor(callback: MessageEventCallback)
     {
         super(callback, DisconnectReasonMessageParser);
@@ -56,7 +60,7 @@ export class DisconnectReasonMessageEvent extends MessageEvent implements IMessa
                 return '${disconnected.incorrect_password}';
             case 112:
                 return '${disconnected.idle}';
-            case 122:
+            case DisconnectReasonMessageEvent.INCOMPATIBLE_CLIENT_VERSION:
                 return '${disconnected.incompatible_client_version}';
             // AS3 spells out 39 more cases (4, 5, 16-17, 22-29, 100-126) before its own default,
             // and every one of them returns this same key. Collapsing them changes nothing.
