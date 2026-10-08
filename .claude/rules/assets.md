@@ -43,3 +43,9 @@ paths:
   download directories; `NitroBundleLoader` reads a mounted piece and falls back to the `.nitro`
   when it is missing. Image *data* is identical; browsers premultiply PNG and WebP alpha with
   different rounding, so semi-transparent pixels can render up to 2/255 apart (invisible).
+- **Encrypted `.ambreia` directories** (`build:ambreia --key-file=<file>`): AES-256-GCM per file and
+  HMAC file names from one 32-byte master key (`AmbreiaLayout`). The key file lives outside anything
+  served (the tool refuses a key inside the output) and the client gets it from `asset-packs.key`.
+  That config is public, so this stops a direct look at an URL and name guessing, not a player:
+  the key belongs in a server message after login. A directory needs the key it was built with
+  (`ambreia.json` → `keyId`); changing key or encryption is a `--force` rebuild.

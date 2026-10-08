@@ -1,6 +1,7 @@
 import {Application} from 'pixi.js';
 import {AssetLibrary} from '@ambreia/common/assets/AssetLibrary';
-import {AmbreiaDirectory} from '@ambreia/common/assets/pack/AmbreiaDirectory';
+import {AmbreiaDirectory, httpBytes} from '@ambreia/common/assets/pack/AmbreiaDirectory';
+import {decodeMasterKey, encryptedLayout} from '@ambreia/common/assets/pack/AmbreiaLayout';
 import {AssetPacks} from '@ambreia/common/assets/pack/AssetPacks';
 import {IsoStage} from '../src/IsoStage';
 import type {IIsoView} from '../src/IsoView';
@@ -22,8 +23,11 @@ const modules = (params.get('modules') ?? 'scene,furniture,avatars,effects').spl
 const canvasHost = params.get('host') === 'canvas';
 
 // ?pack=1: the furniture comes from /ambreia/furniture/*.ambreia instead of /dcr/hof_furni/*.nitro —
-// the same room either way (plan 2026-10-08-asset-packs).
-if(params.get('pack') === '1') AssetPacks.mount('/dcr/hof_furni/', new AmbreiaDirectory('/ambreia/furniture/'));
+// the same room either way (plan 2026-10-08-asset-packs). ?key= gives an encrypted directory its
+// master key (local testing only: a key in a URL is a key given away).
+const key = params.get('key');
+
+if(params.get('pack') === '1') AssetPacks.mount('/dcr/hof_furni/', new AmbreiaDirectory('/ambreia/furniture/', httpBytes, key ? encryptedLayout(decodeMasterKey(key)) : null));
 
 // The hotel's properties the room content needs, on this origin (vite proxies them).
 const PROPERTIES: Record<string, string> = {
