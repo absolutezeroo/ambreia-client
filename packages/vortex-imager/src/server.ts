@@ -28,6 +28,7 @@ import {BadgeRenderError} from './badge/BadgeRenderService';
 import type {RoomRenderService} from './room/RoomRenderService';
 import type {ImagerQuery} from './room/FurnitureRequest';
 import {
+    ContentUnavailableError,
     furnitureCacheKey,
     parseFurnitureRequest,
     parsePetRequest,
@@ -511,6 +512,13 @@ async function sendError(reply: FastifyReply, error: unknown, kind: string): Pro
     if(error instanceof BadgeRenderError || error instanceof RoomNotFoundError)
     {
         await reply.code(404).send({error: message});
+
+        return;
+    }
+
+    if(error instanceof ContentUnavailableError)
+    {
+        await reply.code(503).header('Retry-After', '4').send({error: message});
 
         return;
     }

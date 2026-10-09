@@ -240,43 +240,48 @@ export class RoomStack
 	 * `updateObjectContents()` swap the real content in when it lands. A single HTTP response
 	 * has nowhere to put a placeholder, so the request blocks here instead and the object is
 	 * created afterwards, already initialized.
+	 *
+	 * False when the bundle failed or did not arrive in time: the object would be the grey
+	 * placeholder box, and the type is asked for again on the next request rather than settled.
 	 */
-    async ensureContent(type: string): Promise<void>
+    async ensureContent(type: string): Promise<boolean>
     {
-        if(this._settledContent.has(type)) return;
+        if(this._settledContent.has(type)) return true;
 
         if(this._contentLoader.isLoaded(type) && this._contentLoader.getGraphicAssetCollection(type) !== null)
         {
             this._settledContent.add(type);
 
-            return;
+            return true;
         }
 
         const events = new EventEmitter();
 
-        const arrival = new Promise<void>((resolve) =>
+        const arrival = new Promise<boolean>((resolve) =>
         {
-            const settle = (): void => resolve();
-
-            events.once(RoomContentLoadedEvent.CONTENT_LOAD_SUCCESS, settle);
-            events.once(RoomContentLoadedEvent.CONTENT_LOAD_FAILURE, settle);
-            events.once(RoomContentLoadedEvent.CONTENT_LOAD_CANCEL, settle);
+            events.once(RoomContentLoadedEvent.CONTENT_LOAD_SUCCESS, () => resolve(true));
+            events.once(RoomContentLoadedEvent.CONTENT_LOAD_FAILURE, () => resolve(false));
+            events.once(RoomContentLoadedEvent.CONTENT_LOAD_CANCEL, () => resolve(false));
         });
 
         // Returns false both when the load could not start *and* when it was already in flight
         // or already registered, so the return value says nothing useful; the events do.
         this._contentLoader.loadObjectContent(type, events);
 
-        await withTimeout(arrival, CONTENT_TIMEOUT_MS).catch(() =>
-        {
-            log.warn(`Content for "${type}" did not load in time; rendering without it`);
-        });
+        const arrived = await withTimeout(arrival, CONTENT_TIMEOUT_MS).catch(() => false);
 
         // The bundle has arrived, but the collection it becomes is built by `update()`. Without
         // this the object created next gets a placeholder library and renders a grey box.
         this.pump();
 
-        this._settledContent.add(type);
+        // A load already in flight for another request fires no event on this emitter: what the
+        // loader holds now is the answer.
+        const loaded = arrived || this._contentLoader.isLoaded(type) && this._contentLoader.getGraphicAssetCollection(type) !== null;
+
+        if(loaded) this._settledContent.add(type);
+        else log.warn(`Content for "${type}" did not load; rendering without it`);
+
+        return loaded;
     }
 
     /**

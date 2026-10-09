@@ -29,7 +29,7 @@ import {LegacyStuffData} from '@ambreia/iso/scene/object/data/LegacyStuffData';
 import {PetFigureData} from '@ambreia/avatar/pets/PetFigureData';
 import type {RoomStack} from './RoomStack';
 import type {IFurnitureRequest, IPetRequest, IRoomRequest, ImagerQuery} from './FurnitureRequest';
-import {RoomNotFoundError, RoomRequestError} from './FurnitureRequest';
+import {ContentUnavailableError, RoomNotFoundError, RoomRequestError} from './FurnitureRequest';
 import type {IRoomItemRow, IRoomRow} from '../db/Database';
 import {collectSprites, composeSprites} from '../render/composeSprites';
 import type {ISpriteLayer} from '../render/composeSprites';
@@ -112,8 +112,13 @@ export class RoomRenderService
                 throw new RoomNotFoundError(`No furni named "${className}" in furnidata`);
             }
 
+            // A coloured variant (`rare_fan*2`) is the `rare_fan` bundle in colour 2: the type
+            // comes from the id, as on the `id=` path, or the loader waits for a bundle that
+            // does not exist and the request ends on the grey placeholder box.
+            const type = wall ? loader.getWallItemType(id, readSingle(query, 'extra')) : loader.getActiveObjectType(id);
+
             return {
-                type: className,
+                type: type ?? className,
                 category: wall ? RoomObjectCategoryEnum.OBJECT_CATEGORY_WALL : RoomObjectCategoryEnum.OBJECT_CATEGORY_FURNITURE,
                 colorIndex: wall ? loader.getWallItemColorIndex(id) : loader.getActiveObjectColorIndex(id)
             };
@@ -188,6 +193,13 @@ export class RoomRenderService
 
         try
         {
+            // A furni without its bundle would come out as the placeholder box, and be cached as
+            // that furni's image: fail instead, uncached, so the caller can ask again.
+            if(!await this._stack.ensureContent(request.type))
+            {
+                throw new ContentUnavailableError(`The content of "${request.type}" is not available yet`);
+            }
+
             const object = await this._stack.createObject(roomKey, 1, request.type, request.category);
 
             if(object === null)

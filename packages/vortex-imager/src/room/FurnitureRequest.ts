@@ -21,6 +21,10 @@ export class RoomRequestError extends Error
 export class RoomNotFoundError extends RoomRequestError
 {}
 
+/** Content that did not load (yet): answered 503 and never cached, so a later request renders it. */
+export class ContentUnavailableError extends Error
+{}
+
 export interface IFurnitureRequest
 {
     /**
