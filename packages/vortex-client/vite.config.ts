@@ -61,9 +61,11 @@ export default defineConfig(({command}) => ({
         port: 5173,
         strictPort: true,
         proxy: {
-            // `VORTEX_WEBAPI=http://localhost:8080 pnpm dev` for a local emulator's web API (login).
+            // The login's web API, on the same emulator as the socket of public/config.json: the
+            // account ticket it hands out is only known there. A local emulator by default; another
+            // one with `VORTEX_WEBAPI=<url> pnpm dev` (and its socket in config.json).
             '/webapi': {
-                target: process.env.VORTEX_WEBAPI ?? 'http://ovarkladwpokgvd718w5.72.60.91.223.sslip.io',
+                target: process.env.VORTEX_WEBAPI ?? 'http://localhost:8080',
                 changeOrigin: true,
                 secure: false,
                 rewrite: (path) => path.replace(/^\/webapi/, ''),
