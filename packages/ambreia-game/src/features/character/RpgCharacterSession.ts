@@ -2,6 +2,7 @@ import {EventEmitter} from 'eventemitter3';
 import type {IConnection} from '@ambreia/net/connection/IConnection';
 import type {MessageMap} from '@ambreia/net/style/MessageMap';
 import type {RpgCharacterListMessage} from '@ambreia/protocol/incoming/rpg/characters/RpgCharacterListMessage';
+import type {IRpgCharacterListEntry} from '@ambreia/protocol/incoming/rpg/characters/IRpgCharacterListEntry';
 import type {RpgClassListMessage} from '@ambreia/protocol/incoming/rpg/characters/RpgClassListMessage';
 import type {RpgCharacterStateMessage} from '@ambreia/protocol/incoming/rpg/characters/RpgCharacterStateMessage';
 import type {IRpgCharacterSession, IRpgCharacterSessionEvents} from './IRpgCharacterSession';
@@ -44,6 +45,13 @@ export class RpgCharacterSession implements IRpgCharacterSession
     get state(): RpgCharacterStateMessage | null
     {
         return this._state;
+    }
+
+    get played(): IRpgCharacterListEntry | null
+    {
+        const id = this._state?.playerId;
+
+        return this._characters?.characters.find(entry => entry.playerId === id) ?? null;
     }
 
     /** Serves the characters' headers on this connection (once: the client has one game socket). */

@@ -64,7 +64,10 @@ export const HudFeature: IGameFeature = {
             // The panels first: the frame and the bar are laid out around the top bar and the chat.
             panelsView ??= new HudPanelsView(windows, panels, host.made.localization, chat, () => view?.relayout());
             view ??= new HudView(windows, state);
-            state.update({name: host.made.sessionData?.userName ?? '', figure: host.made.sessionData?.figure ?? ''});
+            // The played character's name and figure (F3a); the session data's only without a character list.
+            const played = host.made.character?.played ?? null;
+
+            state.update({name: played?.name ?? host.made.sessionData?.userName ?? '', figure: played?.figure ?? host.made.sessionData?.figure ?? ''});
             panelsView.show();
             view.show();
         };

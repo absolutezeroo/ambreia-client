@@ -33,7 +33,7 @@ export const InventoryFeature: IGameFeature = {
         host.made.inventory = session;
 
         const bits = (): WindowBits => new WindowBits(host.made.localization);
-        const figure = (): string => host.made.sessionData?.figure ?? '';
+        const figure = (): string => host.made.character?.played?.figure ?? host.made.sessionData?.figure ?? '';
         const refresh = (): void =>
         {
             inventory?.renderStats();

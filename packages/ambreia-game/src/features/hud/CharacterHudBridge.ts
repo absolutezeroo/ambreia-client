@@ -22,7 +22,11 @@ function vitals(stats: IRpgStatBlock): {hp: number; hpMax: number; mana: number;
 export function bindCharacterToHud(session: IRpgCharacterSession, hud: PlayerHudState): () => void
 {
     const onState = (message: {level: number; xp: number; xpToNext: number; stats: IRpgStatBlock}): void =>
-        hud.update({level: message.level, ...xpValues(message.xp, message.xpToNext), ...vitals(message.stats)});
+    {
+        const played = session.played;
+
+        hud.update({level: message.level, ...xpValues(message.xp, message.xpToNext), ...vitals(message.stats), ...(played ? {name: played.name, figure: played.figure} : {})});
+    };
     const onProgress = (message: {level: number; xp: number; xpToNext: number}): void =>
         hud.update({level: message.level, ...xpValues(message.xp, message.xpToNext)});
     const onStats = (message: {stats: IRpgStatBlock}): void => hud.update(vitals(message.stats));
