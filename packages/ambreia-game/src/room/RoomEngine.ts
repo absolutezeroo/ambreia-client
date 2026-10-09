@@ -5549,6 +5549,13 @@ export class RoomEngine extends Component implements IRoomEngine,
         // rather than captured, because the geometry only arrives with the floor height map.
         canvas.floorHeightAt = (x: number, y: number): number | null =>
             this.getLegacyGeometry(roomId)?.getTileHeight(x, y) ?? null;
+        // A raised tile's floor is a solid piece sorted among the objects (@ambreia/iso sortTile).
+        canvas.raisedFloorAt = (x: number, y: number): boolean =>
+            this.getLegacyGeometry(roomId)?.isRaisedFloor(x, y) ?? false;
+        // The player sees through the raised floor hiding them or the tile under the pointer.
+        canvas.seeThrough = true;
+        // The see-through avatars' masks are stamped with the client's renderer.
+        canvas.pixiRenderer = this._renderer;
 
         this._renderingCanvases.set(key, canvas);
         this.applyRoomCanvasGeometry(roomId, canvas);
