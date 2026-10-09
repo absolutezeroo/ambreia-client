@@ -1,8 +1,7 @@
 import type {IItemGridWindow} from '@ambreia/ui/components/IItemGridWindow';
 import type {IWindow} from '@ambreia/ui/IWindow';
 import type {IFurniturePaletteEntry} from '@ambreia/map-editor-core/api/IFurniturePaletteEntry';
-import type {CatalogCategory} from '@ambreia/map-editor-core/palette/CatalogCategory';
-import {furnitureCategory} from '@ambreia/map-editor-core/palette/furnitureCategory';
+import {catalogPlaces, type CatalogSection, type ICatalogPlace} from '@ambreia/map-editor-core/palette/catalogPlaces';
 import type {EditorApp} from '../../app/EditorApp';
 import type {Favorites} from '../../app/Favorites';
 import {FurnitureSprites} from '../../view/FurnitureSprites';
@@ -15,22 +14,29 @@ import {CATALOG_CATEGORIES} from './CATALOG_CATEGORIES';
 const PAGE = 60;
 
 type Filter = 'all' | 'favorites' | 'recent';
-type Entry = IFurniturePaletteEntry & {readonly category: CatalogCategory};
+type Entry = IFurniturePaletteEntry & {readonly place: ICatalogPlace};
+
+const SECTIONS: readonly (readonly [CatalogSection | 'all', string])[] = [
+    ['all', 'Tout le catalogue'], ['seasons', 'Saisons'], ['rares', 'Rares'], ['collections', 'Collections'], ['types', 'Par type']
+];
 
 /**
- * "Catalogue de mobis" (vortex_map_editor_left_decor_xml): category menu, search, the three
- * filters, a page of furni_tile thumbnails from vortex-imager, the count and the pager.
+ * "Catalogue de mobis" (vortex_map_editor_left_decor_xml): section and group menus (Saisons →
+ * Noël 2012…, see catalogPlaces), search, the three filters, a page of furni_tile thumbnails from
+ * vortex-imager, the count and the pager.
  */
 export class DecorPanelUi implements IPanelUi
 {
     private readonly _floor: Entry[];
     private readonly _grid: IItemGridWindow | null;
-    private readonly _category: ChoiceBinding<CatalogCategory | 'all'>;
+    private readonly _section: ChoiceBinding<CatalogSection | 'all'>;
+    private readonly _group: ChoiceBinding<string>;
     private readonly _filters: IWindow[];
     private readonly _filterColors: number[];
     private _tiles: {window: IWindow; definition: number}[] = [];
     private _tileColor = 0;
-    private _categoryValue: CatalogCategory | 'all' = 'all';
+    private _sectionValue: CatalogSection | 'all' = 'all';
+    private _groupValue = 'all';
     private _filter: Filter = 'all';
     private _page = 0;
     private readonly _search: SearchField;
@@ -48,19 +54,29 @@ export class DecorPanelUi implements IPanelUi
         // Named classes first: thousands of numeric or empty class names would bury throne & co.
         const named = (e: IFurniturePaletteEntry) => /^[a-z]/i.test(e.class) ? 0 : 1;
 
-        this._floor = _app.palette
-            // A furni class is one word (colour variants: `sofa_silo*2`); pets and bots have spaces.
-            .filter(e => !e.wall && /^[\w*.-]+$/.test(e.class))
-            .map(e => ({...e, category: furnitureCategory(e.class)}))
+        // A furni class is one word (colour variants: `sofa_silo*2`); pets and bots have spaces.
+        const floor = _app.palette.filter(e => !e.wall && /^[\w*.-]+$/.test(e.class));
+        const places = catalogPlaces(floor.map(e => e.class));
+
+        this._floor = floor
+            .map(e => ({...e, place: places.get(e.class)}))
+            .filter((e): e is Entry => !!e.place)
             .sort((a, b) => named(a) - named(b) || a.class.localeCompare(b.class));
 
         this._grid = child<IItemGridWindow>(_window, 'furni_grid');
         this._search = new SearchField(_window, 'search_input', () => this.refill(0));
-        this._category = new ChoiceBinding<CatalogCategory | 'all'>(_window, 'category_menu', () => this._categoryValue, c =>
+        this._section = new ChoiceBinding<CatalogSection | 'all'>(_window, 'category_menu', () => this._sectionValue, s =>
         {
-            this._categoryValue = c;
+            this._sectionValue = s;
+            this._groupValue = 'all';
+            this._group.options(this.groups());
             this.refill(0);
-        }).options(CATALOG_CATEGORIES);
+        }).options(SECTIONS);
+        this._group = new ChoiceBinding<string>(_window, 'group_menu', () => this._groupValue, g =>
+        {
+            this._groupValue = g;
+            this.refill(0);
+        }).options(this.groups());
         this._filters = ['filter_0', 'filter_1', 'filter_2'].map(n => child(_window, n)).filter((w): w is IWindow => !!w);
         this._filterColors = this._filters.map(f => f.color);
 
@@ -86,7 +102,8 @@ export class DecorPanelUi implements IPanelUi
     {
         const chosen = this._app.choice?.definition;
 
-        this._category.render();
+        this._section.render();
+        this._group.render();
         highlight(this._filters, this._filterColors, ['all', 'favorites', 'recent'].indexOf(this._filter));
         for(const tile of this._tiles)
         {
@@ -104,10 +121,31 @@ export class DecorPanelUi implements IPanelUi
             : this._floor;
 
         if(this._filter === 'favorites') hits = hits.filter(f => this._favorites.isFavorite(f.definition));
-        if(this._categoryValue !== 'all') hits = hits.filter(f => f.category === this._categoryValue);
+        if(this._sectionValue !== 'all') hits = hits.filter(f => f.place.section === this._sectionValue);
+        if(this._groupValue !== 'all') hits = hits.filter(f => f.place.group === this._groupValue);
         if(q) hits = hits.filter(f => f.class.toLowerCase().includes(q) || this._names.get(f.class)?.includes(q) || String(f.definition) === q);
 
         return hits;
+    }
+
+    /** The group menu of the current section: seasons and rares by name then year, collections biggest first. */
+    private groups(): (readonly [string, string])[]
+    {
+        const all = ['all', 'Tous les groupes'] as const;
+
+        if(this._sectionValue === 'all') return [all];
+
+        const count = new Map<string, number>();
+
+        for(const f of this._floor) if(f.place.section === this._sectionValue) count.set(f.place.group, (count.get(f.place.group) ?? 0) + 1);
+
+        const groups = [...count.keys()];
+
+        if(this._sectionValue === 'types') return [all, ...CATALOG_CATEGORIES.filter(([c]) => count.has(c as string))] as (readonly [string, string])[];
+        if(this._sectionValue === 'collections') return [all, ...groups.sort((a, b) => count.get(b)! - count.get(a)!).map(g => [g, `${g} (${count.get(g)})`] as const)];
+
+        // `Noël:2012` → "Noël 2012"; a season with no year in its names comes first, as "Noël (autres)".
+        return [all, ...groups.sort((a, b) => a.localeCompare(b)).map(g => [g, g.includes(':') ? g.replace(':', ' ') : `${g} (autres)`] as const)];
     }
 
     private refill(page: number): void

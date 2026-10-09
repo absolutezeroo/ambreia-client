@@ -14,7 +14,8 @@
         </text>
         <container x="0" y="24" width="300" height="560" params="2064" style="3" name="decor_panel_body">
           <children>
-            <dropmenu x="8" y="8" width="284" height="24" params="17" style="3" name="category_menu" caption="${vortex.craft.recipes.all_categories}"/>
+            <dropmenu x="8" y="8" width="138" height="24" params="17" style="3" name="category_menu" caption="${vortex.craft.recipes.all_categories}"/>
+            <dropmenu x="154" y="8" width="138" height="24" params="17" style="3" name="group_menu" caption="${vortex.craft.recipes.all_categories}"/>
             <border x="8" y="38" width="284" height="24" params="16" style="2" color="0xe4e4dc">
               <children>
                 <static_bitmap x="4" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0x888880">
