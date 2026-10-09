@@ -8,21 +8,28 @@ import {RpgChatMessageParser} from '@ambreia/protocol/parser/rpg/chat/RpgChatMes
 import {RpgChatResultMessageParser} from '@ambreia/protocol/parser/rpg/chat/RpgChatResultMessageParser';
 import {RpgChatSendMessage} from '@ambreia/protocol/outgoing/rpg/chat/RpgChatSendMessage';
 import {RpgChatSendMessageSerializer} from '@ambreia/protocol/serializer/rpg/chat/RpgChatSendMessageSerializer';
-import type {IChatSend} from './chatSend';
+import type {RpgEmoteMessage} from '@ambreia/protocol/incoming/rpg/emote/RpgEmoteMessage';
+import {RpgEmoteMessageParser} from '@ambreia/protocol/parser/rpg/emote/RpgEmoteMessageParser';
+import {RpgEmoteSendMessage} from '@ambreia/protocol/outgoing/rpg/emote/RpgEmoteSendMessage';
+import {RpgEmoteSendMessageSerializer} from '@ambreia/protocol/serializer/rpg/emote/RpgEmoteSendMessageSerializer';
+import type {IChatSend} from '../hud/chatModel';
 
 export interface IRpgChatSessionEvents
 {
     message: [RpgChatMessage];
     result: [RpgChatResultMessage];
+    emote: [RpgEmoteMessage];
 }
 
-/** The chat's messages: the client's counterpart of the server's RpgChatMap.cs (F3c §10). */
+/** The chat's messages and the RP actions: the client's counterpart of RpgChatMap.cs and RpgEmoteMap.cs (F3c §10, §16). */
 export function rpgChatMap(announce: <E extends keyof IRpgChatSessionEvents>(event: E, ...args: IRpgChatSessionEvents[E]) => void): MessageMap
 {
     return new MessageMap()
         .incoming(Incoming.RpgChatMessageComposer, new RpgChatMessageParser(), {handle: message => announce('message', message)})
         .incoming(Incoming.RpgChatResultMessageComposer, new RpgChatResultMessageParser(), {handle: message => announce('result', message)})
-        .outgoing(RpgChatSendMessage, Outgoing.RpgChatSendMessageEvent, new RpgChatSendMessageSerializer());
+        .incoming(Incoming.RpgEmoteMessageComposer, new RpgEmoteMessageParser(), {handle: message => announce('emote', message)})
+        .outgoing(RpgChatSendMessage, Outgoing.RpgChatSendMessageEvent, new RpgChatSendMessageSerializer())
+        .outgoing(RpgEmoteSendMessage, Outgoing.RpgEmoteMessageEvent, new RpgEmoteSendMessageSerializer());
 }
 
 /** The RPG chat (F3c): announces the lines and refusals the server sends, sends what the player says. */
@@ -48,6 +55,12 @@ export class RpgChatSession
     send(line: IChatSend): boolean
     {
         return this._connection !== null && this._map.send(this._connection, new RpgChatSendMessage(line.channel, line.target, line.text));
+    }
+
+    /** Asks for an RP action on the player's avatar (`wave`…); the room plays it back to everyone. */
+    emote(key: string): boolean
+    {
+        return this._connection !== null && this._map.send(this._connection, new RpgEmoteSendMessage(key));
     }
 
     dispose(): void

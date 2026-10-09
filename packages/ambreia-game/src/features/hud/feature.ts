@@ -7,6 +7,8 @@ import {HudPanelsView} from './HudPanelsView';
 import {PlayerHudState} from './PlayerHudState';
 import {HudPanelsState, type IChatLine} from './HudPanelsState';
 import {bindCharacterToHud} from './CharacterHudBridge';
+import {ChatPanel} from './ChatPanel';
+import {CHAT_ICONS, loadChatSettings} from './chatModel';
 
 // The demo's icons: read by name (static_bitmap asset_uri set at run time), so declared to be
 // decoded at load (IGameFeature.images). The server's skills, quests and effects will come with
@@ -42,13 +44,15 @@ const clock = (date: Date): string => `${String(date.getHours()).padStart(2, '0'
  */
 export const HudFeature: IGameFeature = {
     id: 'hud',
-    images: [...DEMO_SKILLS, ...DEMO_ITEMS, ...DEMO_QUESTS, ...DEMO_BUFFS, ...DEMO_DEBUFFS, DEMO_BOSS],
+    images: [...CHAT_ICONS, ...DEMO_SKILLS, ...DEMO_ITEMS, ...DEMO_QUESTS, ...DEMO_BUFFS, ...DEMO_DEBUFFS, DEMO_BOSS],
     create: ({host}) =>
     {
         const state = new PlayerHudState();
         const panels = new HudPanelsState();
 
         host.made.hud = panels;
+        // The chat settings the player chose on this browser (the cog).
+        panels.update({chatSettings: loadChatSettings(ChatPanel.storage())});
         let view: HudView | null = null;
         let panelsView: HudPanelsView | null = null;
 

@@ -1,13 +1,12 @@
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {IGameFeature} from '../GameFeature';
 import {WindowBits} from '../character/WindowBits';
-import type {ChatChannel} from '../hud/HudPanelsState';
-import {chatClock, chatSend} from './chatSend';
+import {chatClock, chatSend, type ChatChannel} from '../hud/chatModel';
 import {RpgChatSession} from './RpgChatSession';
 
 const log = Logger.getLogger('habbo.features.chat');
 
-const CHANNELS = new Set<string>(['general', 'world', 'whisper', 'group', 'guild', 'system'] satisfies ChatChannel[]);
+const CHANNELS = new Set<string>(['world', 'general', 'group', 'guild', 'trade', 'recruitment', 'whisper', 'system'] satisfies ChatChannel[]);
 
 /**
  * The RPG chat (F3c §10.3): what the player types in the HUD's chat goes out as RpgChatSend, and
@@ -25,7 +24,7 @@ export const ChatFeature: IGameFeature = {
 
         hud?.events.on('say', typed =>
         {
-            const line = chatSend(typed, hud.value.chatTab, hud.value.whisperWith);
+            const line = chatSend(typed, hud.openTab, hud.value.sayChannel);
 
             if(line && !session.send(line)) log.warn('no game connection — the chat line was not sent');
         });
@@ -39,6 +38,10 @@ export const ChatFeature: IGameFeature = {
 
             hud?.addChatLine({time: chatClock(message.sentAt), channel, author: message.senderName, message: text, target: message.target});
         });
+
+        hud?.events.on('emote', key => session.emote(key));
+        // The room sends every RP action, the player's own too (F3c §16): played on the avatar.
+        session.events.on('emote', emote => host.made.roomEngine?.playRpgEmote(emote.objectId, emote.key));
 
         session.events.on('result', result =>
         {

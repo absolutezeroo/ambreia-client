@@ -1,4 +1,5 @@
 import {EventEmitter} from 'eventemitter3';
+import {ALL_TAB, DEFAULT_CHAT_SETTINGS, type ChatChannel, type IChatLine, type IChatSettings, type IChatTab} from './chatModel';
 
 /** A quest the tracker follows: its icon, name, current objective and progress (`2 / 5`). */
 export interface IQuestLine
@@ -48,22 +49,7 @@ export interface IHudUnit
     debuffs: string[];
 }
 
-export type ChatChannel = 'general' | 'world' | 'whisper' | 'group' | 'guild' | 'system';
-
-/** The chat window's tabs: General shows every line, the others their channel (F3c §10.3). */
-export type ChatTab = 'general' | 'group' | 'guild' | 'whisper';
-
-export interface IChatLine
-{
-    /** `14:22` */
-    time: string;
-    channel: ChatChannel;
-    /** Empty for a system line. */
-    author: string;
-    message: string;
-    /** For a whisper, the other player of the conversation (F3c §10.2). */
-    target?: string;
-}
+export type {ChatChannel, IChatLine} from './chatModel';
 
 /**
  * The HUD around the player frame and the action bar (RPG spec §16.3, mockup/glaze/hud_*.png):
@@ -89,37 +75,28 @@ export interface IHudPanels
     /** The warning under the boss (`Frappe sismique dans 3 seconde(s) !`). */
     alert: string | null;
     chat: IChatLine[];
-    chatTab: ChatTab;
-    /** The player the whisper tab talks to; null while no conversation is open. */
-    whisperWith: string | null;
+    /** The chat's tabs, « Général » first; `chatTab` is the open one's id. */
+    chatTabs: IChatTab[];
+    chatTab: string;
+    /** Where what is typed in « Général » goes (the bubble button). */
+    sayChannel: ChatChannel;
+    chatSettings: Readonly<IChatSettings>;
 }
 
 /** The chat keeps this many lines; older ones scroll away for good. */
 export const CHAT_HISTORY = 50;
 
-/**
- * The lines a tab shows: all of them in General; elsewhere its channel's (the whispers with
- * `whisperWith` in the whisper tab), and the system lines everywhere — a refusal shows in the tab
- * it was typed in (F3c §10.3).
- */
-export function chatLinesOf(lines: readonly IChatLine[], tab: ChatTab, whisperWith: string | null): IChatLine[]
-{
-    if(tab === 'general') return [...lines];
-
-    return lines.filter(line => line.channel === 'system'
-        || (tab === 'whisper' ? line.channel === 'whisper' && line.target === whisperWith : line.channel === tab));
-}
-
 export class HudPanelsState
 {
     /**
      * `nav`: a top bar button was clicked (`nav_inventory`…), the feature that owns the window opens
-     * it; `say`: the player typed a chat line (Enter), the chat feature sends it.
+     * it; `say`: the player typed a chat line (Enter), the chat feature sends it; `emote`: an RP
+     * action of the palette (`wave`…), the chat feature asks for it.
      */
-    readonly events = new EventEmitter<{changed: [Readonly<IHudPanels>]; nav: [string]; say: [string]}>();
+    readonly events = new EventEmitter<{changed: [Readonly<IHudPanels>]; nav: [string]; say: [string]; emote: [string]}>();
     private _value: IHudPanels = {
         gold: null, gems: null, tokens: null, questAlert: false, zoneName: '', zonePlayers: null,
-        quests: [], party: [], buffs: [], target: null, boss: null, alert: null, chat: [], chatTab: 'general', whisperWith: null
+        quests: [], party: [], buffs: [], target: null, boss: null, alert: null, chat: [], chatTabs: [ALL_TAB], chatTab: ALL_TAB.id, sayChannel: 'world', chatSettings: DEFAULT_CHAT_SETTINGS
     };
 
     get value(): Readonly<IHudPanels>
@@ -132,6 +109,12 @@ export class HudPanelsState
     {
         this._value = {...this._value, ...values};
         this.events.emit('changed', this._value);
+    }
+
+    /** The open tab (« Général » when its id is gone). */
+    get openTab(): IChatTab
+    {
+        return this._value.chatTabs.find(tab => tab.id === this._value.chatTab) ?? ALL_TAB;
     }
 
     addChatLine(line: IChatLine): void

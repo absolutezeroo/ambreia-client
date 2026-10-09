@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_hud_chat_emote_xml" width="36" height="36" version="0.1">
+  <window>
+    <border x="0" y="0" width="36" height="36" params="17" style="6" name="emote_cell" color="0xd8d0b8" dynamic_style="button">
+      <children>
+        <static_bitmap x="10" y="10" width="16" height="16" params="16" style="3" name="emote_icon" tags="%23icon" color="0xf0c040">
+            <variables>
+              <var key="asset_uri" value="" type="String"/>
+              <var key="stretched_x" value="false" type="Boolean"/>
+              <var key="stretched_y" value="false" type="Boolean"/>
+            </variables>
+          </static_bitmap>
+      </children>
+    </border>
+  </window>
+</layout>
