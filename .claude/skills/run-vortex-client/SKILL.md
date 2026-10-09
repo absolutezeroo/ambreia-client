@@ -38,7 +38,7 @@ node .claude/skills/run-vortex-client/driver.mjs quit                # close the
 | `goto [url]` | Navigate (default `http://localhost:5173/client/`) and wait for load |
 | `wait <ms>` / `waitfor <js expr>` | Sleep, or poll until the expression is truthy |
 | `ss <name>` | Screenshot to `.claude/skills/run-vortex-client/shots/<name>.png` (gitignored) |
-| `click x y` / `move x y` / `drag x1 y1 x2 y2 [steps]` | Mouse at CSS coordinates (1280×800 viewport) |
+| `click x y [shift|alt|ctrl]` / `move x y` / `drag x1 y1 x2 y2 [steps] [alt…]` | Mouse at CSS coordinates (1280×800 viewport), with modifier keys held |
 | `type <text>` / `key <Key>` | Insert text / press a key (`Enter`, `Escape`…) |
 | `eval <js>` | Evaluate in the page, print the JSON result |
 | `errors` | Console errors, page errors and unhandled rejections since the page loaded |

@@ -77,6 +77,10 @@ if(!window.__vortexErrorsHooked)
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+/** CDP modifier bits, for a trailing `alt`, `ctrl`, `meta` or `shift` on click, move and drag. */
+const MODIFIERS = {alt: 1, ctrl: 2, meta: 4, shift: 8};
+const modifiers = (tokens) => tokens.reduce((bits, token) => bits | (MODIFIERS[token] ?? 0), 0);
+
 async function fetchJson(path)
 {
     const res = await fetch(`http://127.0.0.1:${PORT}${path}`);
@@ -308,7 +312,7 @@ async function run(cdp, line)
         case 'click':
         {
             const [x, y] = rest.map(Number);
-            const base = {x, y, button: 'left', clickCount: 1, buttons: 0};
+            const base = {x, y, button: 'left', clickCount: 1, buttons: 0, modifiers: modifiers(rest)};
             await cdp.send('Input.dispatchMouseEvent', {...base, type: 'mouseMoved'});
 
             if(cmd === 'click')
@@ -325,8 +329,8 @@ async function run(cdp, line)
 
         case 'drag':
         {
-            const [x1, y1, x2, y2, steps = 8] = rest.map(Number);
-            const base = {button: 'left', clickCount: 1};
+            const [x1, y1, x2, y2, steps = 8] = rest.filter(token => !(token in MODIFIERS)).map(Number);
+            const base = {button: 'left', clickCount: 1, modifiers: modifiers(rest)};
 
             await cdp.send('Input.dispatchMouseEvent', {...base, type: 'mouseMoved', x: x1, y: y1, buttons: 0});
             await cdp.send('Input.dispatchMouseEvent', {...base, type: 'mousePressed', x: x1, y: y1, buttons: 1});
