@@ -251,6 +251,18 @@ export class RoomLogic extends ObjectLogicBase
             return;
         }
 
+        // DEVIATION: a floor plane standing up is the side of a raised floor (RoomPlaneParser
+        // addFloorSides), solid down to the floor in front. AS3 sides were a quarter of a level
+        // thick and nobody pointed at one; now they are walls, and the point found on one sits on
+        // the edge between two tiles, so the cursor jumped to the foot of the wall. A side picks no
+        // tile, like a wall: the cursor stays where it was.
+        if(planeType === RoomPlaneData.PLANE_FLOOR && planeParser.getPlaneNormal(planeIndex)?.z === 0)
+        {
+            this.object.getModelController()?.setNumber(RoomObjectVariableEnum.ROOM_SELECTED_PLANE, 0);
+
+            return;
+        }
+
         // Convert screen coordinates to plane-local coordinates
         const screenPoint = {x: event.screenX, y: event.screenY};
         const planePoint = geometry.getPlanePosition(screenPoint, planeLoc, planeLeftSide, planeRightSide);

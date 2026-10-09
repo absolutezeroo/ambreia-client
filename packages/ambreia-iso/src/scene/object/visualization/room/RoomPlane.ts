@@ -7,7 +7,7 @@
  * Supports both flat-color fallback (Graphics.poly) and textured rendering
  * via rasterizers (canvas-based affine transform).
  */
-import {Graphics, Sprite, Texture} from 'pixi.js';
+import {Graphics, Texture} from 'pixi.js';
 import {Vector3d} from '../../../../utils/Vector3d';
 import type {IVector3d} from '../../../../utils/IVector3d';
 import type {IRoomGeometry} from '../../../../utils/IRoomGeometry';
@@ -78,8 +78,6 @@ export class RoomPlane implements IRoomPlane
     private _height: number = 0;
     private _textureCache: Map<string, PlaneBitmapData> = new Map();
     private _cachedTextureBitmap: PlaneBitmapData | null = null;
-    private _textureSprite: Sprite | null = null;
-    private _outputCanvas: HTMLCanvasElement | null = null;
     private _bitmapMasks: IRoomPlaneBitmapMask[] = [];
     private _rectangleMasks: IRoomPlaneRectangleMask[] = [];
 
@@ -165,6 +163,22 @@ export class RoomPlane implements IRoomPlane
     }
 
     private _bitmapDataTexture: Texture | null = null;
+
+    /**
+     * Drawn floor pictures shared by every plane that would draw the same one: same rasterizer,
+     * material, size, corners, normal, texture offsets, colour and seed, no mask. A raised floor is
+     * one plane per tile (RoomPlaneParser.extractPlanes), so a platform is hundreds of identical
+     * tops: drawn once, not hundreds of times. No plane ever draws into a shared picture; the last
+     * one to let go of it destroys it.
+     */
+    // TS-only: see renderShared().
+    private static readonly SHARED: Map<string, {texture: Texture; refs: number}> = new Map();
+    // TS-only: see renderShared().
+    private static readonly RASTERIZER_IDS: WeakMap<object, number> = new WeakMap();
+    // TS-only: numbers the rasterizers for SHARED keys.
+    private static _lastRasterizerId: number = 0;
+    // TS-only: the SHARED picture this plane shows, if any.
+    private _sharedKey: string | null = null;
 
     /**
 	 * Get the rendered bitmap as a Texture.
@@ -650,11 +664,7 @@ export class RoomPlane implements IRoomPlane
         }
 
         this._graphics.destroy();
-        if(this._textureSprite !== null)
-        {
-            this._textureSprite.destroy();
-            this._textureSprite = null;
-        }
+        this.releaseShared();
         if(this._bitmapDataTexture !== null)
         {
             this._bitmapDataTexture.destroy(true);
@@ -662,7 +672,6 @@ export class RoomPlane implements IRoomPlane
         }
         this._bitmapData = null;
         this.resetTextureCache();
-        this._outputCanvas = null;
         this._bitmapMasks = [];
         this._rectangleMasks = [];
         this._rasterizer = null;
@@ -1093,24 +1102,11 @@ export class RoomPlane implements IRoomPlane
     }
 
     /**
-	 * Render textured plane using affine transform.
-	 * Based on AS3 RoomPlane.renderTexture() — applies Matrix transform for isometric projection.
-	 *
-	 * The texture from the rasterizer is a rectangular bitmap. We need to project it
-	 * onto the isometric quad defined by cornerA-D using an affine transform.
-	 *
-	 * Matrix mapping (AS3):
-	 *   cornerC = origin (tx, ty)
-	 *   cornerB = origin + horizontal axis
-	 *   cornerD = origin + vertical axis
-	 */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/room/RoomPlane.as::renderTexture()
-    /**
      * Cuts the door and window openings out of the plane's texture, using each mask's own artwork.
      *
      * Runs in **texture space, before the projection**, which is where AS3 does it and where it has
      * to be done: the mask asset is authored against the wall's flat texture, not against its
-     * projected parallelogram. The screen-space polygon pass in `renderTexture()` is the older
+     * projected parallelogram. The screen-space polygon pass in `renderTextureToBitmapData()` is the older
      * approximation and still runs — for every mask this one could *not* resolve.
      *
      * That split is deliberate and is what makes this safe to land: a mask type the manager does
@@ -1193,98 +1189,6 @@ export class RoomPlane implements IRoomPlane
         return this._maskedTextureCanvas;
     }
 
-    private renderTexture(textureBitmap: HTMLCanvasElement): void
-    {
-        const tw = textureBitmap.width;
-        const th = textureBitmap.height;
-
-        if(tw < 1 || th < 1) return;
-
-        // Affine matrix: maps texture rectangle to screen quad
-        // Based on AS3 RoomPlane.renderTexture() matrix construction
-        const a = (this._cornerB.x - this._cornerC.x) / tw;
-        const b = (this._cornerB.y - this._cornerC.y) / tw;
-        const c = (this._cornerD.x - this._cornerC.x) / th;
-        const d = (this._cornerD.y - this._cornerC.y) / th;
-        const tx = this._cornerC.x;
-        const ty = this._cornerC.y;
-
-        // Reuse or create output canvas
-        if(!this._outputCanvas)
-        {
-            this._outputCanvas = document.createElement('canvas');
-        }
-        this._outputCanvas.width = this._width;
-        this._outputCanvas.height = this._height;
-        const ctx = this._outputCanvas.getContext('2d')!;
-
-        // AS3 draws with smoothing off (RoomPlane.as::draw()).
-        ctx.imageSmoothingEnabled = false;
-
-        // Apply affine transform and draw texture
-        ctx.setTransform(a, b, c, d, tx, ty);
-        ctx.drawImage(textureBitmap, 0, 0);
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        this.snapEdges(ctx);
-
-        // Apply mask cutouts (door/window holes) on the textured canvas
-        if(this._rectangleMasks.length > 0 || this._bitmapMasks.length > 0)
-        {
-            ctx.globalCompositeOperation = 'destination-out';
-            const leftLen = this._leftSide.length;
-            const rightLen = this._rightSide.length;
-
-            // Rectangle masks (door openings)
-            for(const mask of this._rectangleMasks)
-            {
-                const maskPoints = this.getRectMaskScreenPoints(mask, leftLen, rightLen);
-
-                if(maskPoints !== null)
-                {
-                    this.drawMaskPoly(ctx, maskPoints);
-                }
-            }
-
-            // Bitmap masks (doors, windows via mask parser) — only the ones `applyBitmapMasks()`
-            // could not resolve to artwork. A mask cut from its own asset is already out of the
-            // texture; cutting it again here would take a second, differently-shaped bite.
-            for(const mask of this._bitmapMasks)
-            {
-                if(this._assetMaskedTypes.has(mask)) continue;
-
-                const maskPoints = this.getMaskHolePoints(mask, leftLen, rightLen);
-
-                if(maskPoints !== null)
-                {
-                    this.drawMaskPoly(ctx, maskPoints);
-                }
-            }
-
-            ctx.globalCompositeOperation = 'source-over';
-        }
-
-        // Dispose previous texture to prevent memory leak
-        if(this._textureSprite !== null)
-        {
-            this._textureSprite.texture.destroy(true);
-        }
-
-        // Convert canvas to PixiJS texture and apply to sprite
-        // Nearest: a zoomed view magnifies the plane, and linear filtering would fade its edge into
-        // the transparent pixels beyond it, reopening the seam snapEdges() closed.
-        const texture = Texture.from({resource: this._outputCanvas, scaleMode: 'nearest'});
-
-        if(this._textureSprite === null)
-        {
-            this._textureSprite = new Sprite(texture);
-            this._textureSprite.label = `RoomPlane_Tex_${this._uniqueId}`;
-        }
-        else
-        {
-            this._textureSprite.texture = texture;
-        }
-    }
-
     /**
 	 * Render the plane to internal _bitmapData canvas.
 	 * Uses textured rendering if rasterizer is available,
@@ -1300,9 +1204,21 @@ export class RoomPlane implements IRoomPlane
         if(!this.visible || this._width < 1 || this._height < 1)
         {
             this._graphics.visible = false;
-            if(this._textureSprite) this._textureSprite.visible = false;
             this._drawnGeometryId = -1;
             return true;
+        }
+
+        const shareKey = this.shareKey(geometry);
+
+        if(shareKey !== null)
+        {
+            const shown = this.renderShared(shareKey, geometry, time);
+
+            if(shown !== null) return shown;
+        }
+        else if(this._sharedKey !== null)
+        {
+            this.releaseShared();
         }
 
         const masksChanged = this._maskChanged;
@@ -1354,37 +1270,22 @@ export class RoomPlane implements IRoomPlane
         // Try textured rendering first
         if(textureBitmapData?.bitmap)
         {
-            // One masked copy, two canvases — and both are on screen. `_outputCanvas` feeds
-            // `_textureSprite`; `_bitmapData` feeds `bitmapDataTexture`, which is what
-            // `RoomVisualization` hands to its own published sprites. Passing the raw bitmap to the
-            // second left it cutting every opening with the geometric rectangle whatever artwork had
-            // resolved, and drawing no reveal at all.
+            // `_bitmapData` feeds `bitmapDataTexture`, which is what `RoomVisualization` hands to its
+            // published sprites: the masked copy, or every opening would be cut with the geometric
+            // rectangle whatever artwork had resolved, and draw no reveal at all.
+            // DEVIATION: the port also drew the plane a second time into its own canvas, sprite and
+            //   GPU texture (renderTexture()), parented to `displayObject` — which nothing adds to
+            //   the stage, so none of it was ever seen. Measured on 500 floor planes: 935 of the
+            //   1278 ms their first draw took. Removed.
             const masked = this.applyBitmapMasks(textureBitmapData.bitmap, geometry);
 
-            this.renderTexture(masked);
-
-            // Also render to _bitmapData canvas for the sprite system
             this.renderTextureToBitmapData(ctx, masked);
-
-            if(this._textureSprite)
-            {
-                this._textureSprite.x = -this._offset.x;
-                this._textureSprite.y = -this._offset.y;
-                this._textureSprite.visible = true;
-                this._textureSprite.zIndex = this._graphics.zIndex;
-
-                if(!this._textureSprite.parent && this._graphics.parent)
-                {
-                    this._graphics.parent.addChild(this._textureSprite);
-                }
-            }
 
             this._graphics.visible = false;
         }
         else
         {
             // Flat-color rendering to _bitmapData canvas
-            if(this._textureSprite) this._textureSprite.visible = false;
 
             const r = (this._color >> 16) & 0xFF;
             const g = (this._color >> 8) & 0xFF;
@@ -1506,10 +1407,96 @@ export class RoomPlane implements IRoomPlane
         ctx.putImageData(image, 0, 0);
     }
 
+    /** What this plane would draw, as a SHARED key; null when it may not share (not a floor, masked). */
+    // TS-only: see SHARED.
+    private shareKey(geometry: IRoomGeometry): string | null
+    {
+        if(this._type !== RoomPlane.TYPE_FLOOR || this._rasterizer === null || !this._hasTexture
+            || this._rectangleMasks.length > 0 || this._bitmapMasks.length > 0)
+        {
+            return null;
+        }
+
+        let rasterizerId = RoomPlane.RASTERIZER_IDS.get(this._rasterizer);
+
+        if(rasterizerId === undefined)
+        {
+            rasterizerId = ++RoomPlane._lastRasterizerId;
+            RoomPlane.RASTERIZER_IDS.set(this._rasterizer, rasterizerId);
+        }
+
+        const n = this._normal;
+        const c = [this._cornerA, this._cornerB, this._cornerC, this._cornerD].map(p => `${p.x},${p.y}`).join(';');
+
+        return `${rasterizerId}|${this._id}|${geometry.scale}|${this._width}x${this._height}|${c}|${n.x},${n.y},${n.z}`
+            + `|${this._textureOffsetU},${this._textureOffsetV},${this._textureMaxU},${this._textureMaxV}|${this._color}|${this._randomSeed}`;
+    }
+
     /**
-	 * Render texture bitmap to _bitmapData canvas using affine transform.
-	 * Same transform as renderTexture() but targets the _bitmapData canvas.
+     * Shows the SHARED picture for `key`, drawing it first if no plane has. Null when there is
+     * nothing to draw from yet (the rasterizer has no texture): the plane then draws as before.
+     */
+    // TS-only: see SHARED.
+    private renderShared(key: string, geometry: IRoomGeometry, time: number): boolean | null
+    {
+        if(key === this._sharedKey) return false;
+
+        let entry = RoomPlane.SHARED.get(key);
+
+        if(entry === undefined)
+        {
+            const textureBitmapData = this.getTexture(geometry, time);
+
+            if(!textureBitmapData?.bitmap) return null;
+
+            const canvas = document.createElement('canvas');
+
+            canvas.width = this._width;
+            canvas.height = this._height;
+            this.renderTextureToBitmapData(canvas.getContext('2d')!, this.applyBitmapMasks(textureBitmapData.bitmap, geometry));
+            entry = {texture: Texture.from({resource: canvas, alphaMode: 'premultiply-alpha-on-upload', scaleMode: 'nearest'}), refs: 0};
+            RoomPlane.SHARED.set(key, entry);
+        }
+
+        this.releaseShared();
+
+        if(this._bitmapDataTexture !== null) this._bitmapDataTexture.destroy(true);
+
+        this._bitmapData = null;
+        this._drawnTexture = null;
+        this._drawnGeometryId = -1;
+        entry.refs++;
+        this._sharedKey = key;
+        this._bitmapDataTexture = entry.texture;
+        this._graphics.visible = false;
+
+        return true;
+    }
+
+    /** Lets go of the SHARED picture this plane shows; the last plane to do so destroys it. */
+    // TS-only: see SHARED.
+    private releaseShared(): void
+    {
+        if(this._sharedKey === null) return;
+
+        const entry = RoomPlane.SHARED.get(this._sharedKey);
+
+        if(entry !== undefined && --entry.refs <= 0)
+        {
+            entry.texture.destroy(true);
+            RoomPlane.SHARED.delete(this._sharedKey);
+        }
+
+        this._sharedKey = null;
+        this._bitmapDataTexture = null;
+    }
+
+    /**
+	 * Projects the texture bitmap onto the plane's parallelogram in the _bitmapData canvas: the
+	 * affine matrix maps the texture rectangle to cornerC (origin), cornerB (horizontal axis) and
+	 * cornerD (vertical axis), as AS3 renderTexture() builds it.
 	 */
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/room/RoomPlane.as::renderTexture()
     private renderTextureToBitmapData(ctx: CanvasRenderingContext2D, textureBitmap: HTMLCanvasElement): void
     {
         const tw = textureBitmap.width;
@@ -1547,7 +1534,7 @@ export class RoomPlane implements IRoomPlane
                 }
             }
 
-            // Same split as `renderTexture()`: a mask already cut from its own artwork is out of the
+            // Same split as `applyBitmapMasks()`: a mask already cut from its own artwork is out of the
             // texture, and cutting it again here would take a second, differently-shaped bite.
             for(const mask of this._bitmapMasks)
             {

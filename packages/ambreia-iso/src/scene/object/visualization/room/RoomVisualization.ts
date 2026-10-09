@@ -13,6 +13,7 @@ import {RoomObjectSpriteVisualization} from '../../../../object/visualization/Ro
 import {RoomObjectSpriteType} from '../../../../object/enum/RoomObjectSpriteType';
 import {RoomPlane} from './RoomPlane';
 import {Vector3d} from '../../../../utils/Vector3d';
+import type {IVector3d} from '../../../../utils/IVector3d';
 import {RoomPlaneData} from '../../RoomPlaneData';
 import {RoomObjectVariableEnum} from '../../RoomObjectVariableEnum';
 import type {RoomPlaneParser} from '../../RoomPlaneParser';
@@ -53,6 +54,10 @@ export class RoomVisualization extends RoomObjectSpriteVisualization
     private static readonly UPDATE_INTERVAL: number = 250;
 
     private _planes: RoomPlane[] = [];
+    // TS-only: the raised floor pieces and the tile each sorts as (RoomPlaneData.sortTile).
+    private _planeSortTiles: Map<RoomPlane, IVector3d> = new Map();
+    // TS-only: the building of each raised floor piece (RoomPlaneData.sortGroup).
+    private _planeSortGroups: Map<RoomPlane, number> = new Map();
 
     /**
 	 * The plane parser this visualization was built from. AS3 keeps it as `_SafeStr_4639` and reaches
@@ -190,6 +195,8 @@ export class RoomVisualization extends RoomObjectSpriteVisualization
     {
         this.resetRoomPlanes();
         this._planes = [];
+        this._planeSortTiles.clear();
+        this._planeSortGroups.clear();
         this._planeIndexMap.clear();
         this._visiblePlanes = [];
         this._visiblePlaneSpriteNumbers = [];
@@ -462,6 +469,17 @@ export class RoomVisualization extends RoomObjectSpriteVisualization
                         if(plane.visible)
                         {
                             let depth = plane.relativeDepth + this.floorRelativeDepth + spriteIndex / 1000;
+                            const sortTile = this._planeSortTiles.get(plane);
+
+                            // DEVIATION: a raised floor piece sorts among the objects as its tile, just
+                            // behind what stands on it (RoomPlaneData.RAISED_FLOOR_DEPTH), instead of
+                            // behind everything: solid, it hides what stands behind it. Its own
+                            // relativeDepth, scaled down, orders the pieces of one tile.
+                            if(sortTile !== undefined && plane.type === RoomPlane.TYPE_FLOOR)
+                            {
+                                depth = geometry.getScreenPosition(sortTile)!.z - geometry.getScreenPosition(this.object!.getLocation())!.z
+                                    + RoomPlaneData.RAISED_FLOOR_DEPTH + plane.relativeDepth * 1e-4 + spriteIndex * 1e-7;
+                            }
 
                             if(plane.type !== RoomPlane.TYPE_FLOOR)
                             {
@@ -556,11 +574,17 @@ export class RoomVisualization extends RoomObjectSpriteVisualization
                 // AS3 l.375-379: a floor plane whose corner is not on a tile edge (the floor runs
                 // under the wall's thickness) shifts its texture by the fraction, so the pattern
                 // stays on the tile grid instead of starting at the plane's own corner.
-                const u = location.x + leftSide.x + 0.5;
-                const v = location.y + rightSide.y + 0.5;
+                // DEVIATION: a side of the floor (normal.z === 0) runs along x or y and up z; the AS3
+                // offsets it like a top, which only a FLOOR_THICKNESS edge could hide. Since the sides
+                // drop to the neighbour's floor (RoomPlaneParser.addFloorSides), the pattern follows
+                // the side's own axes, so side by side they make one wall.
+                const side = normal !== null && normal.z === 0;
+                const u = side ? (leftSide.x !== 0 ? location.x + leftSide.x : location.y + leftSide.y) + 0.5 : location.x + leftSide.x + 0.5;
+                // A side's texture starts at its top: shift it by the top's height so every side lines up.
+                const v = side ? 1 - (location.z + rightSide.z) : location.y + rightSide.y + 0.5;
 
                 textureOffsetU = u - Math.trunc(u);
-                textureOffsetV = v - Math.trunc(v);
+                textureOffsetV = v - Math.floor(v);
 
                 if(normal !== null && normal.z !== 0)
                 {
@@ -717,6 +741,14 @@ export class RoomVisualization extends RoomObjectSpriteVisualization
 
             this._planeIndexMap.set(i, this._planes.length);
             this._planes.push(plane);
+
+            const sortTile = planeParser.getPlaneSortTile(i);
+
+            if(sortTile !== null)
+            {
+                this._planeSortTiles.set(plane, sortTile);
+                this._planeSortGroups.set(plane, planeParser.getPlaneSortGroup(i));
+            }
         }
 
         this._initialized = true;
@@ -780,6 +812,12 @@ export class RoomVisualization extends RoomObjectSpriteVisualization
         }
 
         if(removedPlanes === 0) return;
+
+        for(const plane of this._planes.slice(this._planes.length - removedPlanes))
+        {
+            this._planeSortTiles.delete(plane);
+            this._planeSortGroups.delete(plane);
+        }
 
         this._planes = this._planes.slice(0, this._planes.length - removedPlanes);
         this.createSprites(this._planes.length);
@@ -1103,6 +1141,14 @@ export class RoomVisualization extends RoomObjectSpriteVisualization
         sprite.offsetY = -offset.y;
         sprite.relativeDepth = depth;
         sprite.color = plane.color;
+        // A raised piece can hide an avatar or a tile: the canvas sees through it (updateOcclusion()).
+        const sortTile = this._planeSortTiles.get(plane);
+
+        sprite.piece = sortTile === undefined ? null : {
+            tile: sortTile.x * 65536 + sortTile.y,
+            group: this._planeSortGroups.get(plane) ?? -1,
+            side: plane.normal.z === 0
+        };
 
         // AS3: sprite.asset = getPlaneBitmap(plane, name)
         const planeTexture = plane.cloneBitmapData();
@@ -1175,6 +1221,8 @@ export class RoomVisualization extends RoomObjectSpriteVisualization
         }
 
         this._planes = [];
+        this._planeSortTiles.clear();
+        this._planeSortGroups.clear();
         this._planeIndexMap.clear();
         this._initialized = false;
         this._updateCount++;

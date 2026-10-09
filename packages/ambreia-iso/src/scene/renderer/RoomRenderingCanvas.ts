@@ -11,7 +11,10 @@
  *
  * @see sources/win63_version/room/renderer/class_3523.as
  */
-import {Container, type Filter, Graphics, Rectangle, Text, type Renderer, Texture} from 'pixi.js';
+import {RoomPlaneData} from '../object/RoomPlaneData';
+import type {IRoomLight, IRoomLightingEmitter, RoomLighting} from './RoomLighting';
+import {FurnitureLights} from '../../furniture/FurnitureLights';
+import {Container, type Filter, Graphics, Rectangle, RenderTexture, Sprite, Text, type Renderer, Texture} from 'pixi.js';
 import {
     FRAME_CHANNEL_NET,
     FRAME_CHANNEL_PIXI,
@@ -91,6 +94,25 @@ interface IObjectSpriteCache {
 /**
  * Stored visualization entry — visualization + its room object.
  */
+/** One hidden avatar's x-ray, reused from frame to frame (RoomRenderingCanvas.updateXray()). */
+interface IXraySlot
+{
+    /** The finished picture, shown over the room. */
+    view: Sprite;
+    /** Everywhere minus what hides the avatar; and the avatar tinted, minus that cut. */
+    cut: RenderTexture;
+    picture: RenderTexture;
+    white: Sprite;
+    stamp: Container;
+    stamps: Sprite[];
+    body: Container;
+    copies: Sprite[];
+    eraser: Container;
+}
+
+// An object's sprites on a raised tile stay just in front of the floor piece under them.
+const RAISED_SPRITE_DEPTH = RoomPlaneData.RAISED_FLOOR_DEPTH - 0.05;
+
 export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface 
 {
     /**
@@ -246,6 +268,9 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
         this._display.sortableChildren = false;
         this._master.addChild(this._display);
 
+        this._xray.label = 'xray';
+        this._master.addChild(this._xray);
+
         // Create geometry with default direction (isometric view)
         this._geometry = new RoomGeometry(
             scale,
@@ -362,6 +387,76 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
      */
     // TS-only: no AS3 counterpart; feeds the DEVIATION in renderObject().
     public floorHeightAt: ((x: number, y: number) => number | null) | null = null;
+
+    /**
+     * True where the floor is raised above the room's lowest: drawn as a solid piece that sorts
+     * among the objects (RoomPlaneData.sortTile), RAISED_FLOOR_DEPTH behind its tile. Null draws
+     * every object as on flat ground.
+     */
+    // TS-only: see renderObject().
+    public raisedFloorAt: ((x: number, y: number) => boolean) | null = null;
+
+    /**
+     * Avatars something hides, drawn again over everything, tinted and see-through, cut to the shape
+     * of what is in front of them (updateXray()): a character behind a staircase or a furni stays in
+     * sight without the part still in view being veiled.
+     */
+    // TS-only: see updateXray().
+    private readonly _xray: Container = new Container();
+    // TS-only: updateXray()'s slots, one per hidden avatar, reused from frame to frame.
+    private readonly _xraySlots: IXraySlot[] = [];
+    // TS-only: per avatar object, its sorted sprite indices this frame; and one avatar's occluders.
+    private readonly _xrayAvatars: Map<string, number[]> = new Map();
+    private readonly _xrayOccluders: number[] = [];
+
+    // TS-only: see the lighting setter.
+    private _lighting: RoomLighting | null = null;
+    // TS-only: the furni lights found this frame (updateLighting()), reused, and by object id.
+    private readonly _furniLights: IRoomLight[] = [];
+    private readonly _furniLightOf: Map<string, IRoomLight> = new Map();
+    private readonly _furniLightBest: Map<string, number> = new Map();
+    // TS-only: the images that give light this frame (updateLighting()), reused.
+    private readonly _emitters: IRoomLightingEmitter[] = [];
+
+    /**
+     * The room's light (RoomLighting), multiplied over the scene below the see-through avatars;
+     * null draws the room as lit by day, the way Habbo did. Drawn with pixiRenderer.
+     */
+    // TS-only: no AS3 counterpart.
+    get lighting(): RoomLighting | null
+    {
+        return this._lighting;
+    }
+
+    set lighting(value: RoomLighting | null)
+    {
+        this._lighting?.view.removeFromParent();
+        this._lighting = value;
+
+        if(value !== null) this._master.addChildAt(value.view, this._master.getChildIndex(this._xray));
+    }
+
+    /** The renderer the x-ray masks are stamped with (updateXray()); null leaves hidden avatars hidden. */
+    // TS-only: see updateXray().
+    public pixiRenderer: (() => Renderer | null) | null = null;
+    // TS-only: the see-through copy's tint and alpha.
+    private static readonly XRAY_TINT: number = 0x7088ff;
+    private static readonly XRAY_ALPHA: number = 0.55;
+    /**
+     * Fade the raised floor that hides the player's avatar or the tile under the pointer
+     * (updateOcclusion()). The game turns it on; an editor showing the room as built leaves it off.
+     */
+    // TS-only: see updateOcclusion().
+    public seeThrough: boolean = false;
+    // TS-only: the buildings (RoomPlaneData.sortGroup) and furni (object ids) see-through this frame.
+    private readonly _fadedGroups: Set<number> = new Set();
+    private readonly _fadedFurni: Set<string> = new Set();
+    // TS-only: the sorted indices of the player's own avatar sprites this frame.
+    private readonly _ownIndices: number[] = [];
+    // TS-only: a see-through sprite's alpha (updateOcclusion()).
+    private static readonly FADE_ALPHA: number = 0.4;
+    // TS-only: hidesOwn() probes a HIDE_PROBES × HIDE_PROBES grid where two sprites overlap.
+    private static readonly HIDE_PROBES: number = 5;
 
     // The depth z AS3 passes to setDepthVector() while rotating. Literal in both call sites there.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/room/renderer/_SafeCls_3074.as::doMagic()
@@ -1040,6 +1135,8 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
 
         // Hide/pool unused sprites beyond spriteIndex
         this.cleanSprites(spriteIndex);
+        this.updateOcclusion(spriteIndex);
+        this.updateLighting(spriteIndex, time);
 
         FrameTimings.end(FRAME_CHANNEL_ROOM_SPRITES);
 
@@ -1184,6 +1281,11 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
             this._spriteMask = null;
         }
 
+        for(const slot of this._xraySlots)
+        {
+            slot.cut.destroy(true);
+            slot.picture.destroy(true);
+        }
         this._master.destroy({children: true});
 
         // Children (incl. the fps overlay) are destroyed by the cascade above.
@@ -1476,6 +1578,7 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
         const floorHeight = this.floorHeightAt?.(Math.round(location.x), Math.round(location.y)) ?? location.z;
         const onTile = !cache.accurateZ && floorHeight >= 0 && this.floorHeightAt !== null;
         const stacked = onTile && (location.z - floorHeight) > RoomRenderingCanvas.STACK_EPSILON;
+        const raised = !cache.accurateZ && (this.raisedFloorAt?.(Math.round(location.x), Math.round(location.y)) ?? false);
 
         const instanceId = visualization.getInstanceId();
         const updateId = visualization.getUpdateID();
@@ -1622,6 +1725,13 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
             }
 
             sortable.name = objectId;
+            sortable.tileX = Math.round(location.x);
+            sortable.tileY = Math.round(location.y);
+            sortable.worldX = location.x;
+            sortable.worldY = location.y;
+            sortable.direction = object.getDirection()?.x ?? 0;
+            sortable.objectType = object.getType();
+            sortable.fadable = sprite.spriteType !== RoomObjectSpriteType.ROOM_PLANE && RoomRenderingCanvas.isFurni(sortable.objectType);
             sortable.sprite = sprite;
 
             // An avatar's drawn sprite is one composed bitmap and has no library asset name of its
@@ -1663,9 +1773,17 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
             // own parts, and its body against the furniture it stands on. Room planes are exempt
             // whatever the object looks like: their +1000 is what holds the floor and the walls
             // behind every object in the room, and nothing may be allowed to clamp it.
-            const relativeDepth = stacked && sprite.spriteType !== RoomObjectSpriteType.ROOM_PLANE
+            let relativeDepth = stacked && sprite.spriteType !== RoomObjectSpriteType.ROOM_PLANE
                 ? Math.min(sprite.relativeDepth, 0)
                 : sprite.relativeDepth;
+
+            // TS-only: on a raised tile the floor is a piece sorted RAISED_FLOOR_DEPTH behind the
+            // tile, not +1000: a sprite set further back than that (an avatar's shadow is +1) would
+            // go under the floor it stands on.
+            if(raised && sprite.spriteType !== RoomObjectSpriteType.ROOM_PLANE)
+            {
+                relativeDepth = Math.min(relativeDepth, RAISED_SPRITE_DEPTH);
+            }
 
             sortable.z = baseZ + relativeDepth + 3.7e-11 * (startIndex + localCount);
 
@@ -1995,8 +2113,456 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
         this._objectSpriteCaches.delete(objectId);
     }
 
+    /**
+     * Sees through what hides the player, as an RPG does with a building the player walks behind:
+     *
+     * - a raised floor building (RoomPlaneData.sortGroup: the raised tiles joined edge to edge) or a
+     *   furni turns see-through, all of it, while it hides the player's own avatar, and only then.
+     *   It hides it when, drawn after it, it is opaque somewhere the avatar is (hidesOwn()).
+     * - the building whose side (a wall) is under the pointer turns see-through too, and that side
+     *   lets the mouse through, so a tile behind a wall can be clicked. A top stays clickable: it is
+     *   floor; so does a see-through furni.
+     * - any other avatar a raised piece still hides is drawn again over everything, tinted and
+     *   see-through, cut to the shape of the pieces in front of it (updateXray()).
+     */
+    // TS-only: no AS3 counterpart; Habbo had no floor anything could stand behind.
+    private updateOcclusion(count: number): void
+    {
+        const list = this._sortableSpriteList;
+        const groups = this._fadedGroups;
+        const furni = this._fadedFurni;
+        const own = this._ownIndices;
+
+        groups.clear();
+        furni.clear();
+        own.length = 0;
+
+        if(this.seeThrough)
+        {
+            for(let i = 0; i < count; i++)
+            {
+                const sprite = list[i]?.sprite;
+
+                if(sprite?.texture && sprite.spriteType === RoomObjectSpriteType.AVATAR_OWN) own.push(i);
+            }
+
+            const mouseX = this._mouseLocationX;
+            const mouseY = this._mouseLocationY;
+
+            for(let j = 0; j < count; j++)
+            {
+                const entry = list[j];
+                const piece = entry?.sprite?.piece ?? null;
+
+                if(!entry?.sprite?.texture || (piece === null && !entry.fadable)) continue;
+
+                if(piece !== null && groups.has(piece.group)) continue;
+                if(piece === null && furni.has(entry.name)) continue;
+
+                if(this.hidesOwn(j))
+                {
+                    if(piece !== null) groups.add(piece.group);
+                    else furni.add(entry.name);
+                }
+                else if(piece !== null && piece.side && this.spriteHit(j, mouseX, mouseY))
+                {
+                    groups.add(piece.group);
+                }
+            }
+        }
+
+        for(let j = 0; j < count; j++)
+        {
+            const extSprite = this.getSprite(j);
+            const entry = list[j];
+            const sprite = entry?.sprite;
+
+            if(extSprite === null || !sprite) continue;
+
+            const piece = sprite.piece;
+            const seeThrough = piece !== null ? groups.has(piece.group) : entry.fadable && furni.has(entry.name);
+
+            if(seeThrough)
+            {
+                if(extSprite.alpha !== RoomRenderingCanvas.FADE_ALPHA) extSprite.alpha = RoomRenderingCanvas.FADE_ALPHA;
+                extSprite.faded = true;
+                extSprite.fadedSide = piece !== null && piece.side;
+            }
+            else if(extSprite.faded)
+            {
+                extSprite.faded = false;
+                extSprite.fadedSide = false;
+                extSprite.alpha = sprite.alpha / 255;
+            }
+        }
+
+        this.updateXray(count);
+    }
+
+    /** True when the sprite drawn at `index` hides one of the player's own avatar sprites (hides()). */
+    // TS-only: see updateOcclusion().
+    private hidesOwn(index: number): boolean
+    {
+        for(const i of this._ownIndices)
+        {
+            if(i >= index) break;
+            if(this.hides(i, index)) return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * True when the sprite drawn at `front` hides the one drawn at `back`: drawn after it, and
+     * opaque at one of a few points where that one is opaque too.
+     */
+    // TS-only: see updateOcclusion().
+    private hides(back: number, front: number): boolean
+    {
+        const behind = this.getSprite(back);
+        const ahead = this.getSprite(front);
+
+        if(behind === null || ahead === null || back >= front) return false;
+
+        const [bl, bt, br, bb] = RoomRenderingCanvas.bounds(behind);
+        const [fl, ft, fr, fb] = RoomRenderingCanvas.bounds(ahead);
+        const left = Math.max(fl, bl);
+        const top = Math.max(ft, bt);
+        const right = Math.min(fr, br);
+        const bottom = Math.min(fb, bb);
+
+        if(left >= right || top >= bottom) return false;
+
+        for(let gy = 0; gy < RoomRenderingCanvas.HIDE_PROBES; gy++)
+        {
+            for(let gx = 0; gx < RoomRenderingCanvas.HIDE_PROBES; gx++)
+            {
+                const x = left + (right - left) * (gx + 0.5) / RoomRenderingCanvas.HIDE_PROBES;
+                const y = top + (bottom - top) * (gy + 0.5) / RoomRenderingCanvas.HIDE_PROBES;
+
+                if(this.spriteHit(back, x, y) && this.spriteHit(front, x, y)) return true;
+            }
+        }
+
+        return false;
+    }
+
+    /** A furni, by object type: not an avatar (user, pet, bot), the room or the tile cursor. */
+    // TS-only: see SortableSprite.fadable.
+    private static isFurni(type: string): boolean
+    {
+        return type !== RoomObjectUserTypes.USER && type !== RoomObjectUserTypes.PET && type !== RoomObjectUserTypes.BOT
+            && type !== RoomObjectUserTypes.RENTABLE_BOT && type !== 'room' && type !== 'tile_cursor';
+    }
+
+    /** The drawn rectangle of a sprite, left, top, right, bottom (a mirrored one extends leftward). */
+    // TS-only: see hidesOwn().
+    private static bounds(sprite: ExtendedSprite): [number, number, number, number]
+    {
+        const width = sprite.texture.width;
+        const height = sprite.texture.height;
+        const left = sprite.scale.x < 0 ? sprite.x - width : sprite.x;
+        const top = sprite.scale.y < 0 ? sprite.y - height : sprite.y;
+
+        return [left, top, left + width, top + height];
+    }
+
+    /** True when the sprite drawn at `index` is opaque at canvas point (x, y), mirrors folded back. */
+    // TS-only: the same fold as checkMouseHits().
+    private spriteHit(index: number, x: number, y: number): boolean
+    {
+        const sprite = this.getSprite(index);
+
+        if(sprite === null) return false;
+
+        let localX = x - sprite.x;
+        let localY = y - sprite.y;
+
+        if(sprite.scale.x < 0) localX = -localX - 1;
+        if(sprite.scale.y < 0) localY = -localY - 1;
+
+        return sprite.hitTest(localX, localY);
+    }
+
+    /** Draws the room's light map (lighting), the lantern at the feet of the player's own avatar. */
+    // TS-only: see the lighting setter.
+    private updateLighting(count: number, time: number): void
+    {
+        const renderer = this.pixiRenderer?.() ?? null;
+
+        if(this._lighting === null || renderer === null) return;
+
+        const list = this._sortableSpriteList;
+        let own: {x: number; y: number} | null = null;
+
+        for(let i = 0; i < count && own === null; i++)
+        {
+            if(list[i]?.sprite?.spriteType === RoomObjectSpriteType.AVATAR_OWN) own = {x: list[i].worldX, y: list[i].worldY};
+        }
+
+        // Furni light the room as their own files say (FurnitureLights): the image a furni shows
+        // tells how it lights, so its direction, state and animation are followed. One light per
+        // furni, its brightest image's.
+        let furni = 0;
+        let emitters = 0;
+        const glowing = this._furniLightOf;
+        const best = this._furniLightBest;
+
+        glowing.clear();
+        best.clear();
+
+        for(let i = 0; i < count && this._lighting.furniLights; i++)
+        {
+            const entry = list[i];
+            const sprite = entry?.sprite;
+            const frame = sprite?.visible && entry.fadable ? FurnitureLights.lightOf(sprite.assetName) : null;
+
+            if(frame === null) continue;
+
+            // The image that gives the light shows full bright.
+            const drawn = this.getSprite(i);
+
+            if(drawn !== null && drawn.texture !== Texture.EMPTY)
+            {
+                const emitter = this._emitters[emitters] ?? {texture: Texture.EMPTY, x: 0, y: 0, scaleX: 1, scaleY: 1};
+
+                emitter.texture = drawn.texture;
+                emitter.x = this._screenOffsetX + this._scale * drawn.x;
+                emitter.y = this._screenOffsetY + this._scale * drawn.y;
+                emitter.scaleX = this._scale * drawn.scale.x;
+                emitter.scaleY = this._scale * drawn.scale.y;
+                this._emitters[emitters++] = emitter;
+            }
+
+            let light = glowing.get(entry.name);
+
+            if(light === undefined)
+            {
+                light = this._furniLights[furni] ?? {x: 0, y: 0, z: 0, color: 0, radius: 0, intensity: 0, facing: {x: 0, y: 0}};
+                this._furniLights[furni++] = light;
+                glowing.set(entry.name, light);
+                best.set(entry.name, -1);
+            }
+
+            if(frame.level <= best.get(entry.name)!) continue;
+
+            // Its front, from its direction: 0° faces -y, 90° +x, 180° +y, 270° -x.
+            const angle = entry.direction * Math.PI / 180;
+
+            best.set(entry.name, frame.level);
+            light.x = entry.worldX + frame.x;
+            light.y = entry.worldY + frame.y;
+            light.z = Math.max(0, this._lighting.floor?.heightAt(entry.tileX, entry.tileY) ?? 0) + frame.z;
+            light.color = frame.color;
+            light.radius = frame.radius;
+            light.intensity = frame.intensity * frame.level;
+            light.height = 0;
+            light.spread = frame.spread ?? undefined;
+            light.facing = frame.spread === null ? undefined : light.facing ?? {x: 0, y: 0};
+
+            if(light.facing)
+            {
+                light.facing.x = Math.sin(angle);
+                light.facing.y = -Math.cos(angle);
+            }
+        }
+
+        this._lighting.render(renderer, this._geometry, this._width, this._height, this._screenOffsetX, this._screenOffsetY, this._scale, own, time,
+            this._furniLights, furni, this._emitters, emitters);
+    }
+
+    /**
+     * Draws again, over everything, tinted and see-through, every avatar something still hides — a
+     * raised floor piece or a furni that did not turn see-through — cut to the exact shape of what
+     * hides it, so only what that covers shows through and what is still in view is not veiled.
+     * Composed by hand in two textures the size of the avatar (erase blending), not with a Pixi
+     * mask: a sprite mask over this layer drew nothing at all.
+     */
+    // TS-only: see updateOcclusion().
+    private updateXray(count: number): void
+    {
+        const renderer = this.pixiRenderer?.() ?? null;
+        const list = this._sortableSpriteList;
+        const avatars = this._xrayAvatars;
+        const occluders = this._xrayOccluders;
+        let used = 0;
+
+        if(avatars.size > 256) avatars.clear();
+
+        for(const indices of avatars.values()) indices.length = 0;
+
+        for(let i = 0; i < count && renderer !== null; i++)
+        {
+            const entry = list[i];
+            const type = entry?.sprite?.spriteType;
+
+            if(!entry?.sprite?.texture || (type !== RoomObjectSpriteType.AVATAR && type !== RoomObjectSpriteType.AVATAR_OWN)) continue;
+
+            let indices = avatars.get(entry.name);
+
+            if(indices === undefined)
+            {
+                indices = [];
+                avatars.set(entry.name, indices);
+            }
+
+            indices.push(i);
+        }
+
+        for(const [name, indices] of avatars)
+        {
+            if(renderer === null || indices.length === 0) continue;
+
+            occluders.length = 0;
+
+            for(let j = indices[0] + 1; j < count; j++)
+            {
+                const entry = list[j];
+                const piece = entry?.sprite?.piece ?? null;
+
+                if(!entry?.sprite?.texture || entry.name === name) continue;
+
+                const hiding = piece !== null ? !this._fadedGroups.has(piece.group) : entry.fadable && !this._fadedFurni.has(entry.name);
+
+                if(!hiding) continue;
+
+                for(const i of indices)
+                {
+                    if(i >= j) break;
+
+                    if(this.hides(i, j))
+                    {
+                        occluders.push(j);
+                        break;
+                    }
+                }
+            }
+
+            if(occluders.length === 0) continue;
+
+            const slot = this.xraySlot(used++);
+            let left = Infinity;
+            let top = Infinity;
+            let right = -Infinity;
+            let bottom = -Infinity;
+
+            for(const i of indices)
+            {
+                const sprite = this.getSprite(i);
+
+                if(sprite === null) continue;
+
+                const [l, t, r, b] = RoomRenderingCanvas.bounds(sprite);
+
+                left = Math.min(left, l);
+                top = Math.min(top, t);
+                right = Math.max(right, r);
+                bottom = Math.max(bottom, b);
+            }
+
+            left = Math.floor(left);
+            top = Math.floor(top);
+
+            const width = Math.max(1, Math.ceil(right) - left);
+            const height = Math.max(1, Math.ceil(bottom) - top);
+
+            if(slot.view.width !== width || slot.view.height !== height)
+            {
+                slot.cut.resize(width, height);
+                slot.picture.resize(width, height);
+                slot.white.width = width;
+                slot.white.height = height;
+            }
+
+            // The cut: everywhere, minus what hides the avatar. Then the avatar, tinted, minus the cut:
+            // what is left is the part hidden. One picture, so its parts do not darken where they meet.
+            renderer.render({container: slot.white, target: slot.cut, clear: true});
+            RoomRenderingCanvas.copyInto(slot.stamps, slot.stamp, occluders, i => this.getSprite(i), -left, -top, null);
+            renderer.render({container: slot.stamp, target: slot.cut, clear: false});
+            RoomRenderingCanvas.copyInto(slot.copies, slot.body, indices, i => this.getSprite(i), -left, -top, RoomRenderingCanvas.XRAY_TINT);
+            renderer.render({container: slot.body, target: slot.picture, clear: true});
+            renderer.render({container: slot.eraser, target: slot.picture, clear: false});
+            slot.view.position.set(left, top);
+            slot.view.visible = true;
+        }
+
+        for(let i = used; i < this._xraySlots.length; i++) this._xraySlots[i].view.visible = false;
+    }
+
+    /** The `n`th x-ray slot, made on first use (see updateXray()). */
+    // TS-only: see updateXray().
+    private xraySlot(n: number): IXraySlot
+    {
+        let slot = this._xraySlots[n];
+
+        if(slot === undefined)
+        {
+            const cut = RenderTexture.create({width: 1, height: 1});
+            const picture = RenderTexture.create({width: 1, height: 1});
+            const white = new Sprite(Texture.WHITE);
+            const stamp = new Container();
+            const eraser = new Container();
+            const view = new Sprite(picture);
+
+            const cutSprite = new Sprite(cut);
+
+            // The cut is taken away from what is under it (so are the stamps, copyInto()). Set on the
+            // sprites themselves: a render() root's blend mode does not reach its children.
+            cutSprite.blendMode = 'erase';
+            eraser.addChild(cutSprite);
+            view.alpha = RoomRenderingCanvas.XRAY_ALPHA;
+            this._xray.addChild(view);
+            slot = {view, cut, picture, white, stamp, stamps: [], body: new Container(), copies: [], eraser};
+            this._xraySlots.push(slot);
+        }
+
+        return slot;
+    }
+
+    /**
+     * Shows in `parent` a copy of each sprite drawn at `indices`, shifted by (dx, dy), reusing and
+     * hiding the `pool`'s sprites; tinted for an x-ray copy, erasing for a stamp.
+     */
+    // TS-only: see updateXray().
+    private static copyInto(pool: Sprite[], parent: Container, indices: number[], spriteAt: (i: number) => ExtendedSprite | null, dx: number, dy: number, tint: number | null): void
+    {
+        let n = 0;
+
+        for(const i of indices)
+        {
+            const source = spriteAt(i);
+
+            if(source === null) continue;
+
+            let copy = pool[n];
+
+            if(copy === undefined)
+            {
+                copy = new Sprite();
+
+                if(tint !== null) copy.tint = tint;
+                else copy.blendMode = 'erase';
+
+                pool.push(copy);
+                parent.addChild(copy);
+            }
+
+            copy.texture = source.texture;
+            copy.position.set(source.x + dx, source.y + dy);
+            copy.scale.set(source.scale.x, source.scale.y);
+            copy.visible = true;
+            n++;
+        }
+
+        for(let i = n; i < pool.length; i++) pool[i].visible = false;
+    }
+
     private updateDisplayTransform(): void 
     {
+        // The see-through avatars and their masks are drawn in _display's space.
+        this._xray.position.set(this._screenOffsetX, this._screenOffsetY);
+        this._xray.scale.set(this._scale);
+
         if(this._display.x !== this._screenOffsetX) 
         {
             this._display.x = this._screenOffsetX;
@@ -2271,7 +2837,8 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
         {
             const extSprite = this.getSprite(i);
 
-            if(extSprite === null || !extSprite.visible) 
+            // A faded side (updateOcclusion()) lets the mouse through to what it was hiding.
+            if(extSprite === null || !extSprite.visible || extSprite.fadedSide) 
             {
                 continue;
             }
@@ -2428,7 +2995,7 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
         {
             const extSprite = this.getSprite(i);
 
-            if(extSprite === null || !extSprite.clickHandling) 
+            if(extSprite === null || !extSprite.clickHandling || extSprite.fadedSide) 
             {
                 continue;
             }

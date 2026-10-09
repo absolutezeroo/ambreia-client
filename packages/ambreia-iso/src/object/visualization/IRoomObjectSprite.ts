@@ -67,6 +67,20 @@ export interface IRoomObjectSprite
     alphaTolerance: number;
     // AS3: .../src/com/sulake/room/object/visualization/IRoomObjectSprite.as::get planeId()
     planeId: number;
+    /** A raised floor piece (RoomPlaneData.sortTile); null for every other sprite. */
+    // TS-only: see RoomRenderingCanvas.updateOcclusion().
+    piece: IRaisedFloorPiece | null;
 
     dispose(): void;
+}
+
+/** What the canvas needs of a raised floor piece to see through it (RoomRenderingCanvas.updateOcclusion()). */
+export interface IRaisedFloorPiece
+{
+    /** Its tile, `x * 65536 + y`. */
+    readonly tile: number;
+    /** Its building (RoomPlaneData.sortGroup): the pieces of one building fade together. */
+    readonly group: number;
+    /** True for a side (a wall of the block), false for its top. */
+    readonly side: boolean;
 }

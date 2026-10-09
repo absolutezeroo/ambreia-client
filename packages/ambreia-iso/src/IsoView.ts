@@ -8,6 +8,7 @@ import type {RoomSpriteMouseEvent} from './events/RoomSpriteMouseEvent';
 import {Vector3d} from './utils/Vector3d';
 import {HabboRoomRenderer} from './scene/renderer/HabboRoomRenderer';
 import type {RoomRenderingCanvas} from './scene/renderer/RoomRenderingCanvas';
+import type {RoomLighting} from './scene/renderer/RoomLighting';
 import {RoomObjectVariableEnum} from './scene/object/RoomObjectVariableEnum';
 import {RoomObjectCategoryEnum} from './scene/object/RoomObjectCategoryEnum';
 import {applyDoorDisplacement} from './scene/RoomFloorBuilder';
@@ -36,6 +37,8 @@ export interface IIsoView
     panY: number;
     scale: number;
     resize(width: number, height: number): void;
+    /** The room's light over this view (RoomLighting); null: lit by day. */
+    lighting: RoomLighting | null;
     dispose(): void;
 }
 
@@ -48,6 +51,8 @@ export interface IIsoViewRoom
     readonly length: number;
     /** Height of a tile, in tiles; a hole counts as 0 (the editor points at holes too). */
     heightAt(x: number, y: number): number;
+    /** True where the floor is raised above the room's lowest (RoomRenderingCanvas.raisedFloorAt). */
+    raisedAt(x: number, y: number): boolean;
     /** The editor's id of an internal object id, or null. */
     itemIdOf(id: number): string | number | null;
 }
@@ -100,6 +105,8 @@ export class IsoView implements IIsoView, IRoomRenderingCanvasMouseListener
         if(canvas === null) return null;
 
         applyDoorDisplacement(canvas.geometry, room.door);
+        canvas.raisedFloorAt = (x: number, y: number): boolean => room.raisedAt(x, y);
+        canvas.pixiRenderer = pixi;
 
         const view = new IsoView(room, renderer, canvas, canvasId, width, height, pixi);
 
@@ -206,6 +213,16 @@ export class IsoView implements IIsoView, IRoomRenderingCanvasMouseListener
         {
             this._picked = object;
         }
+    }
+
+    get lighting(): RoomLighting | null
+    {
+        return this._canvas.lighting;
+    }
+
+    set lighting(value: RoomLighting | null)
+    {
+        this._canvas.lighting = value;
     }
 
     resize(width: number, height: number): void

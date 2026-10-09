@@ -144,6 +144,13 @@ export class RoomPlaneParser
 
     // AS3: .../src/com/sulake/habbo/room/object/RoomPlaneParser.as::_floorHeight
     private _floorHeight: number = 0;
+    // Where a floor side over the void stops: the lowest floor of the room (addFloorSides).
+    private _lowestFloorZ: number = 0;
+    // The tile the floor planes being added belong to, when they sort among the objects (extractPlanes).
+    private _pieceTile: Vector3d | null = null;
+    // Its building (RoomPlaneData.sortGroup), and every tile's, row by row (-1: not raised).
+    private _pieceGroup: number = -1;
+    private _tileGroups: number[] = [];
 
     // Getters
     // AS3: .../src/com/sulake/habbo/room/object/RoomPlaneParser.as::get floorHeight()
@@ -184,7 +191,7 @@ export class RoomPlaneParser
     initializeHighlightArea(x: number, y: number, width: number, height: number): void
     {
         this.clearHighlightArea();
-        this.extractPlanes(this._expandedTileMatrix, x * 4, y * 4, width * 4, height * 4, true);
+        this.extractFloor(x * 4, y * 4, width * 4, height * 4, true);
     }
 
     /**
@@ -351,11 +358,45 @@ export class RoomPlaneParser
         return result;
     }
 
+    /**
+     * The corners of tile (x, y) that rise toward a staircase, as addTileTypes() packs them (8 nw,
+     * 4 ne, 2 sw, 1 se); 0 for a flat tile. A tile slopes toward an edge neighbour one level higher
+     * only where a staircase runs that way: it goes on rising past the neighbour, or the tile itself
+     * is a step above the one behind it. `at` gives a tile's height, NaN for the void. The floor and
+     * the avatars' altitude (LegacyWallGeometry.getFloorAltitude) both read it, so they agree.
+     */
+    // TS-only: the rule addTileTypes() and getFloorAltitude() share.
+    static rampCorners(at: (x: number, y: number) => number, x: number, y: number): number
+    {
+        const h = at(x, y);
+        const climbs = (dx: number, dy: number): boolean =>
+            at(x + dx, y + dy) === h + 1 && (at(x + 2 * dx, y + 2 * dy) === h + 2 || at(x - dx, y - dy) === h - 1);
+
+        const n = climbs(0, -1);
+        const s = climbs(0, 1);
+        const w = climbs(-1, 0);
+        const e = climbs(1, 0);
+        const corners = ((n || w) ? 8 : 0) | ((n || e) ? 4 : 0) | ((s || w) ? 2 : 0) | ((s || e) ? 1 : 0);
+
+        return corners === 15 ? 0 : corners;
+    }
+
     // AS3: .../src/com/sulake/habbo/room/object/RoomPlaneParser.as::addTileTypes()
+    // DEVIATION: the AS3 sloped a tile toward any of its 8 neighbours one level higher, so the floor
+    // beside a staircase, or diagonal to a step, sprouted little pyramids of quarter steps. The rule
+    // is now rampCorners().
     private static addTileTypes(tiles: number[][]): void
     {
         const height = tiles.length - 1;
         const width = tiles[0].length - 1;
+        // Height of a tile, NaN for the void (blocked, hole, off the map); `& 255` drops corner bits
+        // already written on the rows above.
+        const at = (x: number, y: number): number =>
+        {
+            const h = tiles[y]?.[x] ?? -1;
+
+            return h < 0 ? NaN : h & 255;
+        };
 
         for(let y = 1; y < height; y++)
         {
@@ -364,26 +405,7 @@ export class RoomPlaneParser
                 const tileHeight = tiles[y][x];
                 if(tileHeight >= 0)
                 {
-                    const nw = tiles[y - 1][x - 1] & 255;
-                    const n = tiles[y - 1][x] & 255;
-                    const ne = tiles[y - 1][x + 1] & 255;
-                    const w = tiles[y][x - 1] & 255;
-                    const e = tiles[y][x + 1] & 255;
-                    const sw = tiles[y + 1][x - 1] & 255;
-                    const s = tiles[y + 1][x] & 255;
-                    const se = tiles[y + 1][x + 1] & 255;
-
-                    const higher = tileHeight + 1;
-                    let corners = 0;
-
-                    corners |= (nw === higher || n === higher || w === higher) ? 8 : 0;
-                    corners |= (ne === higher || n === higher || e === higher) ? 4 : 0;
-                    corners |= (sw === higher || s === higher || w === higher) ? 2 : 0;
-                    corners |= (se === higher || s === higher || e === higher) ? 1 : 0;
-
-                    if(corners === 15) corners = 0;
-
-                    tiles[y][x] = tileHeight | (corners << 8);
+                    tiles[y][x] = tileHeight | (RoomPlaneParser.rampCorners(at, x, y) << 8);
                 }
             }
         }
@@ -544,6 +566,74 @@ export class RoomPlaneParser
         }
 
         return false;
+    }
+
+    /**
+     * Tile (x, y) as its floor is drawn: 16 heights in levels, row by row over its 4 × 4 quarters,
+     * stair ramps included (addTileTypes); null where there is no floor. An editor draws its grid
+     * and cursor on it so they follow the steps.
+     */
+    // TS-only: see RoomPlaneData.sortGroup.
+    getPlaneSortGroup(index: number): number
+    {
+        return this._planes[index]?.sortGroup ?? -1;
+    }
+
+    /** Numbers the buildings: the raised tiles joined edge to edge (RoomPlaneData.sortGroup). */
+    // TS-only: see RoomPlaneData.sortGroup.
+    private groupRaisedTiles(): number[]
+    {
+        const width = this._width;
+        const height = this._height;
+        const groups = new Array<number>(width * height).fill(-1);
+        const raised = (x: number, y: number): boolean => this._tileMatrix[y][x] > this._lowestFloorZ;
+        let next = 0;
+
+        for(let i = 0; i < groups.length; i++)
+        {
+            if(groups[i] !== -1 || !raised(i % width, Math.floor(i / width))) continue;
+
+            const stack = [i];
+
+            groups[i] = next;
+
+            while(stack.length > 0)
+            {
+                const j = stack.pop()!;
+                const x = j % width;
+                const y = Math.floor(j / width);
+
+                for(const [nx, ny] of [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]])
+                {
+                    const k = ny * width + nx;
+
+                    if(nx >= 0 && ny >= 0 && nx < width && ny < height && groups[k] === -1 && raised(nx, ny))
+                    {
+                        groups[k] = next;
+                        stack.push(k);
+                    }
+                }
+            }
+
+            next++;
+        }
+
+        return groups;
+    }
+
+    // TS-only: see RoomPlaneData.sortTile.
+    getPlaneSortTile(index: number): IVector3d | null
+    {
+        return this._planes[index]?.sortTile ?? null;
+    }
+
+    // TS-only: the AS3 never read the expanded matrix back.
+    getTileSurface(x: number, y: number): number[] | null
+    {
+        const rows = this._expandedTileMatrix.slice(y * 4, y * 4 + 4).map(row => row.slice(x * 4, x * 4 + 4));
+        const surface = rows.flat();
+
+        return surface.length === 16 && surface.every(h => h >= 0) ? surface.map(h => h / 4) : null;
     }
 
     // AS3: .../src/com/sulake/habbo/room/object/RoomPlaneParser.as::getTileHeight()
@@ -832,7 +922,9 @@ export class RoomPlaneParser
         RoomPlaneParser.unpadHeightMap(tilesCopy);
 
         this._expandedTileMatrix = RoomPlaneParser.expandFloorTiles(tilesCopy);
-        this.extractPlanes(this._expandedTileMatrix);
+        this._lowestFloorZ = Math.min(...this._tileMatrix.flat().filter(h => h >= 0), Infinity);
+        this._tileGroups = this.groupRaisedTiles();
+        this.extractFloor();
 
         // Add entrance floor tile
         if(entranceTile !== null)
@@ -841,8 +933,7 @@ export class RoomPlaneParser
             this.addFloor(
                 new Vector3d(entranceTile.x + 0.5, entranceTile.y + 0.5, entranceHeight),
                 new Vector3d(-1, 0, 0),
-                new Vector3d(0, -1, 0),
-                false, false, false, false
+                new Vector3d(0, -1, 0)
             );
         }
 
@@ -1419,70 +1510,68 @@ export class RoomPlaneParser
     }
 
     // AS3: .../src/com/sulake/habbo/room/object/RoomPlaneParser.as::addFloor()
-    private addFloor(
-        loc: IVector3d,
-        leftSide: IVector3d,
-        rightSide: IVector3d,
-        addRight: boolean,
-        addLeft: boolean,
-        addBottom: boolean,
-        addTop: boolean,
-        isHighlight: boolean = false
-    ): void
+    // DEVIATION: the AS3 also added a FLOOR_THICKNESS edge on each flagged side; the sides are now
+    // addFloorSides(), which drops each one to the neighbour's floor so raised floors read as blocks.
+    private addFloor(loc: IVector3d, leftSide: IVector3d, rightSide: IVector3d, isHighlight: boolean = false): void
     {
-        const plane = this.addPlane(RoomPlaneData.PLANE_FLOOR, loc, leftSide, rightSide, null, isHighlight);
+        this.addPlane(RoomPlaneData.PLANE_FLOOR, loc, leftSide, rightSide, null, isHighlight);
+    }
 
-        if(plane !== null)
+    /**
+     * The four vertical sides of the floor rectangle of expanded tiles `[x0, x1) × [y0, y1)` at
+     * `tileHeight`. Habbo drew a FLOOR_THICKNESS edge wherever the neighbour differed, so a floor
+     * two levels up floated over a black gap. Here a side goes down to its neighbour's floor, or under
+     * the room's lowest floor when the neighbour is void, cut in runs of equal neighbour height. A side
+     * one quarter above its neighbour (the stair quarters) keeps the thin edge; none faces a higher one.
+     */
+    private addFloorSides(tiles: number[][], x0: number, y0: number, x1: number, y1: number, tileHeight: number, isHighlight: boolean): void
+    {
+        const z = tileHeight / 4;
+        const thickness = RoomPlaneParser.FLOOR_THICKNESS * this._floorThicknessMultiplier;
+        const lowest = this._lowestFloorZ - thickness;
+        const neighbourBottom = (nx: number, ny: number): number =>
         {
-            const floorThickness = RoomPlaneParser.FLOOR_THICKNESS * this._floorThicknessMultiplier;
-            const thicknessVector = new Vector3d(0, 0, floorThickness);
-            const bottomLoc = Vector3d.dif(loc, thicknessVector)!;
+            const h = tiles[ny]?.[nx] ?? -1;
 
-            // AS3 param6: addBottom edge
-            if(addBottom)
-            {
-                this.addPlane(RoomPlaneData.PLANE_FLOOR, bottomLoc, leftSide, thicknessVector, null, isHighlight);
-            }
+            // No side against an equal or higher neighbour: its solid hides it, and drawn it lands
+            // over the neighbour (painter's sort) as a dark band along a staircase.
+            if(h >= tileHeight) return NaN;
 
-            // AS3 param7: addTop edge
-            if(addTop)
-            {
-                this.addPlane(
-                    RoomPlaneData.PLANE_FLOOR,
-                    Vector3d.sum(Vector3d.sum(bottomLoc, leftSide)!, rightSide)!,
-                    Vector3d.product(leftSide, -1)!,
-                    thicknessVector,
-                    null,
-                    isHighlight
-                );
-            }
+            return Math.min(z - thickness, h < 0 ? lowest : h / 4);
+        };
 
-            // AS3 param4: addRight edge
-            if(addRight)
-            {
-                this.addPlane(
-                    RoomPlaneData.PLANE_FLOOR,
-                    Vector3d.sum(bottomLoc, rightSide)!,
-                    Vector3d.product(rightSide, -1)!,
-                    thicknessVector,
-                    null,
-                    isHighlight
-                );
-            }
+        // Walks one side; `face(from, to, bottom)` emits the plane for cells [from, to).
+        const side = (from: number, to: number, cell: (i: number) => number, face: (a: number, b: number, bottom: number) => void): void =>
+        {
+            let runStart = from;
+            let runBottom = cell(from);
 
-            // AS3 param5: addLeft edge
-            if(addLeft)
+            for(let i = from + 1; i <= to; i++)
             {
-                this.addPlane(
-                    RoomPlaneData.PLANE_FLOOR,
-                    Vector3d.sum(bottomLoc, leftSide)!,
-                    rightSide,
-                    thicknessVector,
-                    null,
-                    isHighlight
-                );
+                const bottom = i < to ? cell(i) : NaN;
+
+                if(i === to || !Object.is(bottom, runBottom))
+                {
+                    if(!Number.isNaN(runBottom)) face(runStart, i, runBottom);
+                    runStart = i;
+                    runBottom = bottom;
+                }
             }
-        }
+        };
+        const add = (loc: Vector3d, leftSide: Vector3d, bottom: number): void =>
+        {
+            this.addPlane(RoomPlaneData.PLANE_FLOOR, loc, leftSide, new Vector3d(0, 0, z - bottom), null, isHighlight);
+        };
+        const w = (n: number): number => n / 4 - 0.5;
+
+        // +y side (AS3 addBottom)
+        side(x0, x1, i => neighbourBottom(i, y1), (a, b, bottom) => add(new Vector3d(w(b), w(y1), bottom), new Vector3d((a - b) / 4, 0, 0), bottom));
+        // -y side (AS3 addTop)
+        side(x0, x1, i => neighbourBottom(i, y0 - 1), (a, b, bottom) => add(new Vector3d(w(a), w(y0), bottom), new Vector3d((b - a) / 4, 0, 0), bottom));
+        // +x side (AS3 addRight)
+        side(y0, y1, i => neighbourBottom(x1, i), (a, b, bottom) => add(new Vector3d(w(x1), w(a), bottom), new Vector3d(0, (b - a) / 4, 0), bottom));
+        // -x side (AS3 addLeft)
+        side(y0, y1, i => neighbourBottom(x0 - 1, i), (a, b, bottom) => add(new Vector3d(w(x0), w(b), bottom), new Vector3d(0, (a - b) / 4, 0), bottom));
     }
 
     // AS3: .../src/com/sulake/habbo/room/object/RoomPlaneParser.as::addPlane()
@@ -1501,6 +1590,12 @@ export class RoomPlaneParser
         }
 
         const plane = new RoomPlaneData(type, loc, leftSide, rightSide, secondaryNormals);
+
+        if(type === RoomPlaneData.PLANE_FLOOR)
+        {
+            plane.sortTile = this._pieceTile;
+            plane.sortGroup = this._pieceGroup;
+        }
         this._planes.push(plane);
 
         if(isHighlight)
@@ -1511,6 +1606,21 @@ export class RoomPlaneParser
         return plane;
     }
 
+    /**
+     * The floor: the room's lowest floor runs under every tile, raised or not, then the raised
+     * tiles are drawn over it. A block hides that floor until the game fades the block out (to see
+     * the player or the tile under the pointer behind it), and then the ground shows, not a hole.
+     */
+    // TS-only: extractPlanes() over the expanded matrix twice; see the DEVIATION in extractPlanes().
+    private extractFloor(startX: number = 0, startY: number = 0, limitWidth: number = -1, limitHeight: number = -1, isHighlight: boolean = false): void
+    {
+        const lowest = this._lowestFloorZ * 4;
+        const ground = this._expandedTileMatrix.map(row => row.map(h => (h < 0 ? h : lowest)));
+
+        this.extractPlanes(ground, startX, startY, limitWidth, limitHeight, isHighlight);
+        this.extractPlanes(this._expandedTileMatrix, startX, startY, limitWidth, limitHeight, isHighlight, lowest);
+    }
+
     // AS3: .../src/com/sulake/habbo/room/object/RoomPlaneParser.as::extractPlanes()
     private extractPlanes(
         tiles: number[][],
@@ -1518,7 +1628,8 @@ export class RoomPlaneParser
         startY: number = 0,
         limitWidth: number = -1,
         limitHeight: number = -1,
-        isHighlight: boolean = false
+        isHighlight: boolean = false,
+        skipHeight: number = NaN
     ): void
     {
         const height = tiles.length;
@@ -1541,15 +1652,26 @@ export class RoomPlaneParser
                 const tileHeight = tiles[y][x];
 
                 // Skip blocked tiles or already processed
-                if(tileHeight < 0 || processed[y][x]) continue;
+                if(tileHeight < 0 || tileHeight === skipHeight || processed[y][x]) continue;
 
                 // Check edges
                 const hasLeftEdge = x === 0 || tiles[y][x - 1] !== tileHeight;
                 const hasTopEdge = y === 0 || tiles[y - 1][x] !== tileHeight;
 
+                // DEVIATION: the AS3 merges a floor into rectangles as large as their height allows. A
+                // floor above the room's lowest is cut at every tile instead: being solid now
+                // (addFloorSides), it hides what stands behind it, so each tile's piece sorts among the
+                // objects by its own tile (RoomPlaneData.sortTile). The lowest floor hides nothing and
+                // stays merged, behind everything as in the AS3.
+                // ponytail: a room raised all over is one piece per tile; merge along a row if that
+                // ever costs too many planes.
+                const raised = tileHeight > this._lowestFloorZ * 4;
+                const blockEndX = (Math.floor(x / 4) + 1) * 4;
+                const blockEndY = (Math.floor(y / 4) + 1) * 4;
+
                 // Find width of same-height rectangle
                 let rectWidth = x + 1;
-                while(rectWidth < endX)
+                while(rectWidth < endX && !(raised && rectWidth === blockEndX))
                 {
                     if(tiles[y][rectWidth] !== tileHeight ||
 						processed[y][rectWidth] ||
@@ -1560,16 +1682,17 @@ export class RoomPlaneParser
                     rectWidth++;
                 }
 
-                let hasRightEdge = rectWidth === width || tiles[y][rectWidth] !== tileHeight;
+                const hasRightEdge = rectWidth === width || tiles[y][rectWidth] !== tileHeight;
 
                 // Find height of same-height rectangle
                 let done = false;
                 let rectHeight = y + 1;
-                let hasBottomEdge = false;
 
                 while(rectHeight <= endY && !done)
                 {
-                    hasBottomEdge = rectHeight === height || tiles[rectHeight][x] !== tileHeight;
+                    if(raised && rectHeight === blockEndY) break;
+
+                    const hasBottomEdge = rectHeight === height || tiles[rectHeight][x] !== tileHeight;
 
                     done = rectHeight === endY ||
 						hasBottomEdge ||
@@ -1592,14 +1715,8 @@ export class RoomPlaneParser
                     rectHeight++;
                 }
 
-                if(!hasBottomEdge)
-                {
-                    hasBottomEdge = rectHeight === height;
-                }
-
-                // rectWidth may have shrunk during the height scan (line ~1380), so hasRightEdge
-                // must be recomputed against the final rectWidth (AS3: RoomPlaneParser.as:1673)
-                hasRightEdge = rectWidth === width || tiles[y][rectWidth] !== tileHeight;
+                // The edge flags only shape the rectangle now; addFloorSides() reads the neighbours
+                // itself, so the AS3's final recomputation of hasBottomEdge/hasRightEdge is gone.
 
                 // Mark tiles as processed
                 for(let py = y; py < rectHeight; py++)
@@ -1616,16 +1733,16 @@ export class RoomPlaneParser
                 const planeWidth = (rectWidth - x) / 4;
                 const planeHeight = (rectHeight - y) / 4;
 
+                this._pieceTile = raised ? new Vector3d(Math.floor(x / 4), Math.floor(y / 4), tileHeight / 4) : null;
+                this._pieceGroup = raised ? this._tileGroups[Math.floor(y / 4) * this._width + Math.floor(x / 4)] ?? -1 : -1;
                 this.addFloor(
                     new Vector3d(planeX + planeWidth, planeY + planeHeight, tileHeight / 4),
                     new Vector3d(-planeWidth, 0, 0),
                     new Vector3d(0, -planeHeight, 0),
-                    hasRightEdge,
-                    hasLeftEdge,
-                    hasBottomEdge,
-                    hasTopEdge,
                     isHighlight
                 );
+                this.addFloorSides(tiles, x, y, rectWidth, rectHeight, tileHeight, isHighlight);
+                this._pieceTile = null;
             }
         }
     }

@@ -7,7 +7,7 @@
  * Tracks property changes via updateId for efficient rendering.
  */
 import type {Texture} from 'pixi.js';
-import type {IRoomObjectSprite} from './IRoomObjectSprite';
+import type {IRaisedFloorPiece, IRoomObjectSprite} from './IRoomObjectSprite';
 import {RoomObjectSpriteType} from '../enum/RoomObjectSpriteType';
 
 let spriteInstanceCounter = 0;
@@ -522,6 +522,9 @@ export class RoomObjectSprite implements IRoomObjectSprite
     }
 
     private _planeId: number = 0;
+
+    // TS-only: see IRoomObjectSprite.piece.
+    piece: IRaisedFloorPiece | null = null;
 
     // Plane ID
     // AS3: .../src/com/sulake/room/object/visualization/RoomObjectSprite.as::get planeId()

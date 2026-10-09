@@ -9,6 +9,7 @@
  */
 import type {IVector3d} from '../../utils/IVector3d';
 import {Vector3d} from '../../utils/Vector3d';
+import {RoomPlaneParser} from '../object/RoomPlaneParser';
 
 export class LegacyWallGeometry
 {
@@ -20,6 +21,8 @@ export class LegacyWallGeometry
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/utils/_SafeCls_1855.as::DIRECTION_RIGHT
     private static readonly R = 'r';
     private _heightMap: number[][] = [];
+    // TS-only: the lowest floor, for isRaisedFloor(); null until asked after a change.
+    private _lowestFloor: number | null = null;
     // AS3: .../src/com/sulake/habbo/room/utils/_SafeCls_1855.as::_width
     private _width: number = 0;
     private _height: number = 0;
@@ -55,6 +58,8 @@ export class LegacyWallGeometry
     // AS3: .../src/com/sulake/habbo/room/utils/_SafeCls_1855.as::initialize()
     initialize(width: number, height: number, floorHeight: number): void
     {
+        this._lowestFloor = null;
+
         if(width <= this._width && height <= this._height)
         {
             this._width = width;
@@ -99,6 +104,7 @@ export class LegacyWallGeometry
         if(row)
         {
             row[x] = height;
+            this._lowestFloor = null;
             return true;
         }
 
@@ -189,20 +195,32 @@ export class LegacyWallGeometry
         // altitude keeps its fractional part — wall items and floor altitude drift
         // near height changes.
         const h = Math.trunc(this.getTileHeight(x, y));
-        const hPlus = h + 1;
+        // DEVIATION: the AS3 lifted the avatar half a level beside any of 8 neighbours one level
+        // higher, the floor's old stair corners; the floor only ramps where rampCorners() says now,
+        // and the avatar has to stand on that floor, not on a corner no longer drawn.
+        const at = (tx: number, ty: number): number => (this.isRoomTile(tx, ty) ? Math.trunc(this.getTileHeight(tx, ty)) : NaN);
 
-        // Check if any adjacent tile is exactly 1 higher
-        const hasHigherNeighbor =
-            Math.trunc(this.getTileHeight(x - 1, y - 1)) === hPlus
-			|| Math.trunc(this.getTileHeight(x, y - 1)) === hPlus
-			|| Math.trunc(this.getTileHeight(x + 1, y - 1)) === hPlus
-			|| Math.trunc(this.getTileHeight(x - 1, y)) === hPlus
-			|| Math.trunc(this.getTileHeight(x + 1, y)) === hPlus
-			|| Math.trunc(this.getTileHeight(x - 1, y + 1)) === hPlus
-			|| Math.trunc(this.getTileHeight(x, y + 1)) === hPlus
-			|| Math.trunc(this.getTileHeight(x + 1, y + 1)) === hPlus;
+        return h + (RoomPlaneParser.rampCorners(at, x, y) !== 0 ? 0.5 : 0);
+    }
 
-        return h + (hasHigherNeighbor ? 0.5 : 0);
+    /**
+     * True for a floor tile above the room's lowest floor: RoomPlaneParser draws it as a solid piece
+     * that sorts among the objects (RoomPlaneData.sortTile), so what stands on it is kept in front.
+     */
+    // TS-only: read by RoomRenderingCanvas.raisedFloorAt.
+    isRaisedFloor(x: number, y: number): boolean
+    {
+        if(!this.isRoomTile(x, y)) return false;
+
+        if(this._lowestFloor === null)
+        {
+            let lowest = Infinity;
+
+            for(const row of this._heightMap) for(const h of row) if(h >= 0 && h < lowest) lowest = h;
+            this._lowestFloor = lowest;
+        }
+
+        return this.getTileHeight(x, y) > this._lowestFloor;
     }
 
     /**

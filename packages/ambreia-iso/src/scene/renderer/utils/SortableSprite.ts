@@ -20,6 +20,22 @@ export class SortableSprite implements ISortableSprite
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/room/renderer/utils/SortableSprite.as::name
     public name: string = '';
 
+    /** The tile its object stands on, and whether it may fade (RoomRenderingCanvas.updateOcclusion()). */
+    // TS-only: see RoomRenderingCanvas.updateOcclusion().
+    public tileX: number = 0;
+    // TS-only: see tileX.
+    public tileY: number = 0;
+    // TS-only: see tileX. A furni, not an avatar, a room plane or the tile cursor.
+    public fadable: boolean = false;
+    // TS-only: its object's type (a furni's class name), for the lights it gives (updateLighting()).
+    public objectType: string = '';
+    // TS-only: where its object stands, in tiles, unrounded: a lantern follows a walking avatar smoothly.
+    public worldX: number = 0;
+    // TS-only: see worldX.
+    public worldY: number = 0;
+    // TS-only: which way its object faces, in degrees (a furni's rotation × 45): a screen lights its front.
+    public direction: number = 0;
+
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/room/renderer/utils/SortableSprite.as::_x
     private _x: number = 0;
 

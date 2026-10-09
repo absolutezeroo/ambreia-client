@@ -26,6 +26,7 @@ import type {RoomVisualizationData} from './scene/object/visualization/room/Room
 import {buildRoomVisualizationData} from './scene/RoomVisualizationDataBuilder';
 import type {LegacyWallGeometry} from './scene/utils/LegacyWallGeometry';
 import {applyDoorMask, buildPlaneParser, buildWallGeometry, findDoor, floorHeights} from './scene/RoomFloorBuilder';
+import type {RoomPlaneParser} from './scene/object/RoomPlaneParser';
 import type {IRoomDoor} from './scene/RoomFloorBuilder';
 import type {IFurnitureData} from './furniture/data/IFurnitureData';
 import type {NitroAsset} from '@ambreia/common/assets/NitroAsset';
@@ -84,6 +85,8 @@ interface IStageRoom
     /** The other way: internal id → the editor's id as given (string or number). */
     items: Map<number, string | number>;
     nextId: number;
+    /** The floor as last built, for tileSurface(). */
+    planes: RoomPlaneParser | null;
 }
 
 /**
@@ -198,7 +201,8 @@ export class IsoStage
             wallGeometry: buildWallGeometry(data.floor, heights, wallHeight, WALL_GEOMETRY_SCALE),
             ids: new Map(),
             items: new Map(),
-            nextId: 1
+            nextId: 1,
+            planes: null
         };
 
         this._rooms.set(roomId, room);
@@ -228,6 +232,7 @@ export class IsoStage
             width: floor.width,
             length: floor.length,
             heightAt: (x: number, y: number): number => Math.max(0, room.heights[y * floor.width + x]),
+            raisedAt: (x: number, y: number): boolean => room.wallGeometry.isRaisedFloor(x, y),
             itemIdOf: (id: number): string | number | null => room.items.get(id) ?? null
         }, width, height, scale, () => this._options.renderer ?? null);
     }
@@ -323,6 +328,12 @@ export class IsoStage
         this.buildRoomObject(room);
     }
 
+    /** Tile (x, y)'s floor as drawn: 16 quarter heights, row by row, stair ramps included; null for none. */
+    tileSurface(roomId: string, x: number, y: number): number[] | null
+    {
+        return this._rooms.get(roomId)?.planes?.getTileSurface(x, y) ?? null;
+    }
+
     /** The game's tile cursor on a tile at its floor height, as RoomEngine.handleMouseOverTile(); null hides it. */
     setCursor(roomId: string, tile: {x: number; y: number} | null): void
     {
@@ -376,6 +387,8 @@ export class IsoStage
 
         const {data} = room;
         const planes = buildPlaneParser(data.floor, room.heights, data.wallHeight ?? 0, room.door);
+
+        room.planes = planes;
         const model = object.getModelController();
         const handler = object.getEventHandler();
 

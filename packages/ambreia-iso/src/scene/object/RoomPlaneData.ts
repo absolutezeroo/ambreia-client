@@ -19,10 +19,33 @@ export class RoomPlaneData
     public static readonly PLANE_LANDSCAPE: number = 3;
     // AS3: .../src/com/sulake/habbo/room/object/RoomPlaneData.as::PLANE_BILLBOARD
     public static readonly PLANE_BILLBOARD: number = 4;
+
+    /**
+     * How far behind the objects on its own tile a raised floor piece sorts (sortTile): less than a
+     * tile step (0.7071), so the objects on the tile behind stay behind it. An object standing on a
+     * raised tile has its sprites held in front of that (RoomRenderingCanvas.raisedFloorAt), its
+     * shadow's +1 included.
+     */
+    // TS-only: see sortTile.
+    public static readonly RAISED_FLOOR_DEPTH: number = 0.6;
     // AS3: .../src/com/sulake/habbo/room/object/RoomPlaneData.as::_secondaryNormals
     private _secondaryNormals: Vector3d[] = [];
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/room/object/RoomPlaneData.as::_masks
     private _masks: RoomPlaneMaskData[] = [];
+
+    /**
+     * A piece of raised floor sorts among the objects as the tile it stands on: the tile's centre at
+     * its height. Null for the ground and the walls, which stay behind every object.
+     */
+    // TS-only: see RoomPlaneParser.extractPlanes().
+    public sortTile: Vector3d | null = null;
+
+    /**
+     * The building a raised floor piece belongs to: the raised tiles joined edge to edge share one
+     * number, so a block, its staircase and the walls touching it fade together. -1 elsewhere.
+     */
+    // TS-only: see RoomPlaneParser.extractPlanes().
+    public sortGroup: number = -1;
 
     constructor(type: number, loc: IVector3d, leftSide: IVector3d, rightSide: IVector3d, secondaryNormals: IVector3d[] | null)
     {

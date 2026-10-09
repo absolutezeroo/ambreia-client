@@ -1130,6 +1130,67 @@
   },
   "doorDirection": 2
  },
- "decor": [],
+ "decor": [
+  {
+   "id": "cactus_back",
+   "definition": 164,
+   "class": "plant_big_cactus",
+   "x": 11,
+   "y": 4,
+   "z": 0,
+   "rotation": 0,
+   "state": "0"
+  },
+  {
+   "id": "cactus_stair",
+   "definition": 164,
+   "class": "plant_big_cactus",
+   "x": 3,
+   "y": 6,
+   "z": 0,
+   "rotation": 0,
+   "state": "0"
+  },
+  {
+   "id": "chair_top",
+   "definition": 18,
+   "class": "chair_polyfon",
+   "x": 12,
+   "y": 6,
+   "z": 7,
+   "rotation": 2,
+   "state": "0"
+  },
+  {
+   "id": "throne_step",
+   "definition": 230,
+   "class": "throne",
+   "x": 6,
+   "y": 7,
+   "z": 3,
+   "rotation": 2,
+   "state": "0"
+  },
+  {
+   "id": "table_front",
+   "definition": 17,
+   "class": "table_polyfon_small",
+   "x": 12,
+   "y": 10,
+   "z": 0,
+   "rotation": 0,
+   "state": "0"
+  },
+  {
+   "id": "cactus_open",
+   "definition": 164,
+   "class": "plant_big_cactus",
+   "x": 3,
+   "y": 10,
+   "z": 0,
+   "rotation": 0,
+   "state": "0"
+  }
+ ],
  "wallDecor": []
 }

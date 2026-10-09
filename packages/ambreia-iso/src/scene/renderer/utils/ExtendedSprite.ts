@@ -98,6 +98,15 @@ export class ExtendedSprite extends Sprite
         this._clickHandling = value;
     }
 
+    /**
+     * A raised floor piece faded out because it hides the player or the tile under the pointer
+     * (RoomRenderingCanvas.updateOcclusion()). A faded side lets the mouse through.
+     */
+    // TS-only: no AS3 counterpart.
+    faded: boolean = false;
+    // TS-only: see faded.
+    fadedSide: boolean = false;
+
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/room/object/visualization/IRoomObjectSprite.as::skipMouseHandling
     private _skipMouseHandling: boolean = false;
 

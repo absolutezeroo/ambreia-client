@@ -23,6 +23,7 @@ import type {IFurnitureData} from '../furniture/data/IFurnitureData';
 import type {IFurniDataListener} from '../furniture/data/IFurniDataListener';
 import type {IRoomContentListener} from './IRoomContentListener';
 import type {NitroAsset} from '@ambreia/common/assets/NitroAsset';
+import {FurnitureLights} from '../furniture/FurnitureLights';
 import type {AssetLoaderEvent} from '@ambreia/common/assets/loaders/AssetLoaderEvent';
 import { AssetLoaderEventType} from '@ambreia/common/assets/loaders/AssetLoaderEvent';
 import {RoomContentLoadedEvent} from '../events/RoomContentLoadedEvent';
@@ -1965,6 +1966,9 @@ export class RoomContentLoader implements IRoomContentLoader, IFurniDataListener
 			assetLibrary.getAssetByName(this.getRoomObjectOriginalName(type))
         ) as NitroAsset | null;
         const assetDefinitions = data['assets'] ?? data['asset'] ?? null;
+
+        // TS-only: a furni built into a pack carries its lights (FurnitureLights).
+        if(data['lights'] !== undefined) FurnitureLights.register(data['lights']);
 
         if(asset !== null && asset.textures.size > 0 && assetDefinitions !== null && 'defineFromSpritesheet' in collection)
         {
