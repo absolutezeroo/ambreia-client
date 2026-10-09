@@ -2,8 +2,8 @@ import type {ZoneTile} from '../zone/Zone.generated';
 import {MAX_SIZE} from '../zone/zoneGeometry';
 import type {IEditorCommand} from './IEditorCommand';
 
-/** Grows or crops the floor from its far edges: the cells that remain keep their tiles. */
-export const resizeFloor = (width: number, length: number): IEditorCommand => ({
+/** Grows or crops the floor from its far edges: the cells that remain keep their tiles, new ones are fill. */
+export const resizeFloor = (width: number, length: number, fill: ZoneTile = {}): IEditorCommand => ({
     label: `Sol ${width}×${length}`,
     apply: doc =>
     {
@@ -19,7 +19,7 @@ export const resizeFloor = (width: number, length: number): IEditorCommand => ({
         {
             for(let x = 0; x < w; x++)
             {
-                tiles.push(x < floor.width && y < floor.length ? floor.tiles[y * floor.width + x] : {});
+                tiles.push(x < floor.width && y < floor.length ? floor.tiles[y * floor.width + x] : fill);
             }
         }
 

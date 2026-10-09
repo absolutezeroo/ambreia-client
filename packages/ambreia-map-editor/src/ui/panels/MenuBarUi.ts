@@ -50,6 +50,9 @@ export class MenuBarUi implements IPanelUi
             ['Hauteurs des cases', a => a.toggleOption('heights')],
             ['Murs', a => a.toggleOption('walls')],
             ['Vrais mobis', a => a.toggleOption('sprites')],
+            ['Niveau inférieur (Pg↓)', a => a.stepLevel(-1)],
+            ['Niveau supérieur (Pg↑)', a => a.stepLevel(1)],
+            ['Tous les niveaux (Début)', a => a.stepLevel(null)],
             ['Recentrer la vue', a => a.view.fit()]
         ]);
         this.menu('menu_test', [['Tester la zone dans l\'hôtel', a => void a.test()]]);

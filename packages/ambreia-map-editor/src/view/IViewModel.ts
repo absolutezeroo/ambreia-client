@@ -16,7 +16,8 @@ export interface IViewModel
     readonly selectedIds: ReadonlySet<string>;
     /** Tile indexes (y * width + x). */
     readonly selectedCells: ReadonlySet<number>;
-    readonly strokeCells: ReadonlySet<number>;
+    /** The cells of the floor stroke under way, past the floor's edges too (the tools that grow it). */
+    readonly stroke: readonly {readonly x: number; readonly y: number}[];
     readonly hover: {readonly x: number; readonly y: number} | null;
     /** Cells the selected objects are being dragged by. */
     readonly dragOffset: {readonly dx: number; readonly dy: number} | null;

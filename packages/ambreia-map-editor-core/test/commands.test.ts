@@ -55,6 +55,20 @@ test('a floor stroke clamps heights to 0..32 and leaves the input untouched', ()
     assert.equal(editTiles('Rien', [{x: 1, y: 1}], t => t).apply(doc), doc);
 });
 
+test('a tile added past the far edges grows the floor, the rest of the new band a hole', () =>
+{
+    const doc = blankZone('v', 'V', 4, 4);
+    const grown = editTiles('Ajouter', [{x: 5, y: 1}], t => ({...t, hole: false, height: 2})).apply(doc);
+
+    assert.deepEqual([grown.floor.width, grown.floor.length], [6, 4]);
+    assert.equal(tileAt(grown.floor, 5, 1)!.height, 2);
+    assert.equal(tileAt(grown.floor, 5, 1)!.hole, false);
+    assert.equal(tileAt(grown.floor, 4, 1)!.hole, true);
+    // Digging or raising the void adds no floor.
+    assert.equal(editTiles('Monter', [{x: 5, y: 1}], t => ({...t, height: 3})).apply(doc), doc);
+    assert.equal(editTiles('Ajouter', [{x: -1, y: 0}, {x: 64, y: 0}], t => ({...t, hole: false})).apply(doc), doc);
+});
+
 test('resizing keeps the tiles that remain', () =>
 {
     const doc = editTiles('Trou', [{x: 1, y: 2}], t => ({...t, hole: true})).apply(blankZone('v', 'V', 4, 4));

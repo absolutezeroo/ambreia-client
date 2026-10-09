@@ -1,10 +1,10 @@
 import type {ZoneDecorObject, ZoneFloor, ZoneTile} from '@ambreia/map-editor-core/zone/Zone.generated';
-import {rotatedFootprint, tileAt} from '@ambreia/map-editor-core/zone/zoneGeometry';
+import {MAX_SIZE, rotatedFootprint, tileAt} from '@ambreia/map-editor-core/zone/zoneGeometry';
 import type {IFurnitureSprite} from './IFurnitureSprite';
 import type {IsoBackdrop} from './IsoBackdrop';
 import type {IPick} from './IPick';
 import type {IViewModel} from './IViewModel';
-import {HALF_H, inPolygon, project, rhombus, STEP, tracePolygon} from './isoMath';
+import {HALF_H, HALF_W, inPolygon, project, rhombus, STEP, surfaceOutline, tracePolygon, traceSurface} from './isoMath';
 import {WorldOverlayPainter} from './WorldOverlayPainter';
 
 type PointerKind = 'down' | 'move' | 'up';
@@ -36,6 +36,11 @@ export class IsoView
     private _height = 1;
     /** This frame's room comes from the backdrop: draw only the editor's marks over it. */
     private _real = false;
+    /** The highest tile this frame (at least 1), the top of the grid's violet scale. */
+    private _topLevel = 1;
+    // nearestFirst()'s order, for a floor of _nearestWidth × _nearest.length / _nearestWidth.
+    private _nearest: number[] = [];
+    private _nearestWidth = 0;
 
     /** The room as the game draws it; null until it loads, and when it cannot. */
     backdrop: IsoBackdrop | null = null;
@@ -140,13 +145,35 @@ export class IsoView
         const floor = model.doc.floor;
         let cell: IPick['cell'] = null;
 
-        for(let i = floor.tiles.length - 1; i >= 0 && !cell; i--)
+        // Nearest first (larger x + y): a raised tile's top is its cell, but its sides are a wall,
+        // as iso draws them down to the floors in front: pointing at one picks nothing, neither the
+        // block nor what it hides (the level cut, Page Down, reaches that).
+        let wall = false;
+
+        for(const i of this.nearestFirst(floor))
         {
+            const t = floor.tiles[i];
+
+            if(t.hole || !this.shown(model, t)) continue;
+
             const x = i % floor.width;
             const y = Math.floor(i / floor.width);
+            const top = rhombus(x, y, 1, 1, t.height ?? 0);
 
-            if(!floor.tiles[i].hole && inPolygon(px, py, rhombus(x, y, 1, 1, floor.tiles[i].height ?? 0))) cell = {x, y};
+            if(inPolygon(px, py, top))
+            {
+                cell = {x, y};
+                break;
+            }
+
+            if(this.onSide(model, x, y, top, px, py))
+            {
+                wall = true;
+                break;
+            }
         }
+
+        if(wall) return {cell: null, objectId: this.realRoom(model) && model.layers.isVisible('decor') ? this.backdrop!.pick(x, y) : null};
 
         // A hole has no floor to click, but the floor tools still need its cell.
         for(let i = floor.tiles.length - 1; i >= 0 && !cell; i--)
@@ -155,6 +182,15 @@ export class IsoView
             const y = Math.floor(i / floor.width);
 
             if(inPolygon(px, py, rhombus(x, y, 1, 1, 0))) cell = {x, y};
+        }
+
+        // Past the far edges: the cell a floor tool would grow the floor to (project() inverted at 0).
+        if(!cell)
+        {
+            const x = Math.floor((px / HALF_W + py / HALF_H) / 2);
+            const y = Math.floor((py / HALF_H - px / HALF_W) / 2);
+
+            if(x >= 0 && y >= 0 && x < MAX_SIZE && y < MAX_SIZE) cell = {x, y};
         }
 
         let objectId: string | null = null;
@@ -193,8 +229,21 @@ export class IsoView
 
         if(this.realRoom(model))
         {
-            // The game's own cursor on a bare hover; a furni being placed keeps the editor's outline.
-            this.backdrop!.setCursor(model.ghost ? null : model.hover);
+            // The game's own cursor on a bare hover; a furni being placed is drawn by the room, with
+            // the editor's outline.
+            const hover = model.hover;
+            const ghost = model.ghost && hover && model.layers.isVisible('decor') ? model.ghost : null;
+
+            // The game's cursor is a flat sprite: on a stair tile drawHover() draws one that steps.
+            this.backdrop!.setCursor(ghost || (hover && this.stepped(hover.x, hover.y)) ? null : hover);
+            this.backdrop!.setGhost(ghost && hover && {
+                definition: ghost.definition,
+                class: ghost.class,
+                x: hover.x,
+                y: hover.y,
+                z: tileAt(model.doc.floor, hover.x, hover.y)?.height ?? 0,
+                rotation: 0
+            });
 
             const room = this.backdrop!.render(this._width, this._height, this._zoom, this._ox, this._oy);
 
@@ -214,7 +263,10 @@ export class IsoView
 
         if(model.layers.isVisible('floor'))
         {
+            this._topLevel = Math.max(1, ...floor.tiles.map(t => (t.hole ? 0 : t.height ?? 0)));
             floor.tiles.forEach((t, i) => this.drawTile(model, i % floor.width, Math.floor(i / floor.width), t, i));
+
+            for(const c of model.stroke) this.overlay(c.x, c.y, tileAt(floor, c.x, c.y)?.height ?? 0, 'rgba(90, 220, 140, 0.45)', '#5adc8c');
         }
 
         if(model.layers.isVisible('floor'))
@@ -251,6 +303,52 @@ export class IsoView
         this.drawHover(model);
     }
 
+    /** The floor's tile indices, nearest first (larger x + y); kept while the size is the same. */
+    private nearestFirst(floor: ZoneFloor): number[]
+    {
+        if(this._nearest.length !== floor.tiles.length || this._nearestWidth !== floor.width)
+        {
+            this._nearestWidth = floor.width;
+            this._nearest = floor.tiles.map((_, i) => i).sort((a, b) =>
+                (b % floor.width + Math.floor(b / floor.width)) - (a % floor.width + Math.floor(a / floor.width)));
+        }
+
+        return this._nearest;
+    }
+
+    /** True when (px, py) is on a side iso draws for tile (x, y), down to its front floors. */
+    private onSide(model: IViewModel, x: number, y: number, top: number[], px: number, py: number): boolean
+    {
+        const floor = model.doc.floor;
+        const h = tileAt(floor, x, y)?.height ?? 0;
+        const below = (bx: number, by: number): number =>
+        {
+            const n = tileAt(floor, bx, by);
+
+            return n && !n.hole && this.shown(model, n) ? Math.min(h, n.height ?? 0) : 0;
+        };
+        const side = (a: number, b: number, depth: number): number[] =>
+            [top[a], top[a + 1], top[b], top[b + 1], top[b], top[b + 1] + depth, top[a], top[a + 1] + depth];
+        const left = (h - below(x, y + 1)) * STEP;
+        const right = (h - below(x + 1, y)) * STEP;
+
+        return (left > 0 && inPolygon(px, py, side(6, 4, left))) || (right > 0 && inPolygon(px, py, side(4, 2, right)));
+    }
+
+    /** False for a tile off the level shown (IViewOptions.level). */
+    private shown(model: IViewModel, t: ZoneTile): boolean
+    {
+        return model.options.level === null || (t.height ?? 0) === model.options.level;
+    }
+
+    /** Tile (x, y)'s floor as the room draws it when it is not flat (a stair quarter ramp), else null. */
+    private stepped(x: number, y: number): number[] | null
+    {
+        const surface = this.backdrop?.tileSurface(x, y) ?? null;
+
+        return surface && surface.some(h => h !== surface[0]) ? surface : null;
+    }
+
     /** The backdrop draws the room when it is loaded and the furni view is on (Affichage). */
     private realRoom(model: IViewModel): boolean
     {
@@ -264,27 +362,52 @@ export class IsoView
 
         if(!hover) return;
 
-        const h = tileAt(floor, hover.x, hover.y)?.height ?? 0;
+        const tile = tileAt(floor, hover.x, hover.y);
+        const h = tile?.height ?? 0;
 
         if(!model.ghost)
         {
-            if(!this._real) this.overlay(hover.x, hover.y, h, null, '#ffffff');
+            // The game's cursor only stands on flat floor: a stair tile gets one in its colours that
+            // follows the quarters, the void and holes the editor's outline.
+            const surface = this._real ? this.stepped(hover.x, hover.y) : null;
+
+            if(surface)
+            {
+                traceSurface(this._ctx, hover.x, hover.y, surface);
+                this._ctx.fillStyle = 'rgb(209, 177, 46)';
+                this._ctx.fill('nonzero');
+                tracePolygon(this._ctx, surfaceOutline(hover.x, hover.y, surface));
+                this._ctx.strokeStyle = 'rgb(255, 216, 74)';
+                this._ctx.lineWidth = 2 / this._zoom;
+                this._ctx.stroke();
+            }
+            else if(!this._real || !tile || tile.hole) this.overlay(hover.x, hover.y, h, null, '#ffffff');
 
             return;
         }
 
-        const sprite = model.options.sprites ? model.sprites.get(model.ghost.class, 0, 0) : null;
-
-        this._ctx.globalAlpha = 0.6;
-        if(sprite) this.drawSprite(sprite, hover.x, hover.y, h, 0, 0);
-        else
+        // With the room drawn by iso the ghost is one of its furni (IsoBackdrop.setGhost).
+        if(!this._real)
         {
-            tracePolygon(this._ctx, rhombus(hover.x, hover.y, model.ghost.width, model.ghost.length, h));
-            this._ctx.fillStyle = 'rgba(120, 200, 255, 0.5)';
-            this._ctx.fill();
+            const sprite = model.options.sprites ? model.sprites.get(model.ghost.class, 0, 0) : null;
+
+            this._ctx.globalAlpha = 0.6;
+            if(sprite) this.drawSprite(sprite, hover.x, hover.y, h, 0, 0);
+            else
+            {
+                tracePolygon(this._ctx, rhombus(hover.x, hover.y, model.ghost.width, model.ghost.length, h));
+                this._ctx.fillStyle = 'rgba(120, 200, 255, 0.5)';
+                this._ctx.fill();
+            }
+            this._ctx.globalAlpha = 1;
         }
-        this._ctx.globalAlpha = 1;
-        this.overlay(hover.x, hover.y, h, null, '#7fd0ff');
+
+        const {width, length} = rotatedFootprint(model.ghost, 0);
+
+        tracePolygon(this._ctx, rhombus(hover.x, hover.y, width, length, h));
+        this._ctx.strokeStyle = '#7fd0ff';
+        this._ctx.lineWidth = 2 / this._zoom;
+        this._ctx.stroke();
     }
 
     /**
@@ -331,14 +454,29 @@ export class IsoView
     {
         const ctx = this._ctx;
         const h = t.height ?? 0;
+
+        if(!this.shown(model, t)) return;
         const top = rhombus(x, y, 1, 1, h);
 
         if(this._real)
         {
             if(model.options.grid && !t.hole)
             {
-                tracePolygon(ctx, top);
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
+                // Over the floor as drawn, so it follows the stair quarters. The higher the tile (against
+                // the map's highest), the more violet its top and lines: the ground stays as it is.
+                const surface = this.backdrop!.tileSurface(x, y);
+                const level = h / this._topLevel;
+
+                if(level > 0)
+                {
+                    if(surface) traceSurface(ctx, x, y, surface);
+                    else tracePolygon(ctx, top);
+                    ctx.fillStyle = `rgba(150, 70, 255, ${0.15 + 0.35 * level})`;
+                    ctx.fill('nonzero');
+                }
+
+                tracePolygon(ctx, surface ? surfaceOutline(x, y, surface) : top);
+                ctx.strokeStyle = `rgba(${255 - 85 * level}, ${255 - 165 * level}, 255, ${0.18 + 0.47 * level})`;
                 ctx.lineWidth = 1 / this._zoom;
                 ctx.stroke();
             }
@@ -385,7 +523,6 @@ export class IsoView
         }
 
         if(model.selectedCells.has(i)) this.overlay(x, y, h, 'rgba(120, 180, 255, 0.45)', '#7fb4ff');
-        if(model.strokeCells.has(i)) this.overlay(x, y, h, 'rgba(90, 220, 140, 0.45)', null);
     }
 
     private heightLabel(top: number[], h: number): void

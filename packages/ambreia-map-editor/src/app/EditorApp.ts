@@ -18,7 +18,7 @@ import type {IZoneFinding} from '@ambreia/map-editor-core/validation/IZoneFindin
 import {validateLocally} from '@ambreia/map-editor-core/validation/validateLocally';
 import {fillCells} from '@ambreia/map-editor-core/zone/fillCells';
 import type {ZoneCell, ZoneDocument, ZoneTile} from '@ambreia/map-editor-core/zone/Zone.generated';
-import {nextId, tileAt, tileIndex} from '@ambreia/map-editor-core/zone/zoneGeometry';
+import {inside, MAX_SIZE, nextId, tileAt, tileIndex} from '@ambreia/map-editor-core/zone/zoneGeometry';
 import {describe} from '../panels/html';
 import {FurnitureSprites} from '../view/FurnitureSprites';
 import type {IPick} from '../view/IPick';
@@ -50,7 +50,8 @@ export class EditorApp
     readonly view = new IsoView();
     /** The document the room engine last received. */
     private _syncedDoc: ZoneDocument | null = null;
-    readonly options: IViewOptions = {grid: true, heights: false, walls: true, sprites: true};
+    private _syncedLevel: number | null = null;
+    readonly options: IViewOptions = {grid: true, heights: false, walls: true, sprites: true, level: null};
     readonly journal: IJournalEntry[] = [];
     /** The world layers' selection and tools (entries, areas, NPCs, spawns, triggers…). */
     readonly world: WorldEditing = new WorldEditing(this);
@@ -74,6 +75,7 @@ export class EditorApp
     private readonly _panels: {render(): void; onPointer?(): void}[] = [];
     private readonly _viewListeners: (() => void)[] = [];
     private _clipboard: IClipboardEntry | null = null;
+    /** The cells of the stroke under way, keyed y * MAX_SIZE + x: they may lie past the floor's edges. */
     private _stroke = new Map<number, Cell>();
     private _dragFrom: Cell | null = null;
     private _dragTo: Cell | null = null;
@@ -219,9 +221,30 @@ export class EditorApp
         this.refresh();
     }
 
-    toggleOption(option: keyof IViewOptions): void
+    toggleOption(option: Exclude<keyof IViewOptions, 'level'>): void
     {
         this.options[option] = !this.options[option];
+        this.refresh();
+    }
+
+    /**
+     * Moves the level shown by `step` (−1 down, +1 up): only the tiles of that height are left, so a
+     * floor under a bridge, or a bridge alone, can be built. Going down from "all" starts at the
+     * top; going up past the top shows all again. `null` shows all.
+     */
+    stepLevel(step: -1 | 1 | null): void
+    {
+        const top = Math.max(0, ...this.doc.floor.tiles.map(t => (t.hole ? 0 : t.height ?? 0)));
+        const level = this.options.level;
+        let next: number | null = null;
+
+        if(step === -1) next = level === null ? top : Math.max(0, level - 1);
+        else if(step === 1 && level !== null && level < top) next = level + 1;
+
+        if(next === level) return;
+
+        this.options.level = next;
+        this.log(next === null ? 'Tous les niveaux.' : `Niveau ${next} : seules ses cases sont affichées.`);
         this.refresh();
     }
 
@@ -473,6 +496,9 @@ export class EditorApp
             this.setTool('select');
         }
         else if(e.ctrlKey || e.altKey) return;
+        else if(key === 'pagedown') this.stepLevel(-1);
+        else if(key === 'pageup') this.stepLevel(1);
+        else if(key === 'home') this.stepLevel(null);
         else if(this.world.layer && ['s', 'r', 'p'].includes(key))
         {
             // The world layers' tools: S select and drag, R rectangle, P polygon.
@@ -501,6 +527,12 @@ export class EditorApp
 
     private pointer(kind: 'down' | 'move' | 'up', pick: IPick, e: MouseEvent): void
     {
+        // A cell past the floor's edges is only for the tools that grow the floor (editTiles).
+        if(pick.cell && !inside(this.doc.floor, pick.cell.x, pick.cell.y) && (this.world.layer || !['tile-add', 'rect'].includes(this.tool)))
+        {
+            pick = {...pick, cell: null};
+        }
+
         this.hover = pick.cell;
 
         // The world layers have their own tools: the floor and mobi tools stay out of their way.
@@ -608,7 +640,7 @@ export class EditorApp
 
         if((kind === 'down' || (kind === 'move' && this._stroke.size)) && pick.cell)
         {
-            this._stroke.set(tileIndex(this.doc.floor, pick.cell.x, pick.cell.y), pick.cell);
+            this._stroke.set(pick.cell.y * MAX_SIZE + pick.cell.x, pick.cell);
         }
 
         if(kind !== 'up' || !this._stroke.size) return;
@@ -636,7 +668,7 @@ export class EditorApp
         if(this._rectFrom && pick.cell)
         {
             this._stroke = new Map(EditorSelection.rectangle(this._rectFrom, pick.cell).cells
-                .map(c => [tileIndex(this.doc.floor, c.x ?? 0, c.y ?? 0), {x: c.x ?? 0, y: c.y ?? 0}]));
+                .map(c => [(c.y ?? 0) * MAX_SIZE + (c.x ?? 0), {x: c.x ?? 0, y: c.y ?? 0}]));
         }
 
         if(kind !== 'up' || !this._rectFrom) return;
@@ -678,10 +710,11 @@ export class EditorApp
     private drawView(): void
     {
         // The room engine follows the document, not the pointer: only a new document is sent.
-        if(this.view.backdrop && this._syncedDoc !== this.doc)
+        if(this.view.backdrop && (this._syncedDoc !== this.doc || this._syncedLevel !== this.options.level))
         {
             this._syncedDoc = this.doc;
-            this.view.backdrop.setDocument(this.doc);
+            this._syncedLevel = this.options.level;
+            this.view.backdrop.setDocument(this.doc, this.options.level);
         }
 
         const floor = this.doc.floor;
@@ -695,7 +728,7 @@ export class EditorApp
             layers: this.layers,
             selectedIds: this.selection.ids,
             selectedCells: cells,
-            strokeCells: new Set(this._stroke.keys()),
+            stroke: [...this._stroke.values()],
             hover: this.hover,
             dragOffset: this.dragOffset(),
             ghost: this.tool === 'place' && !this.world.layer ? this.choice : null,
