@@ -104,5 +104,5 @@ Server:
 
 A slime drawn for the purpose (directions 2 and 0, mirrored for 4 and 6, the five animations), about
 40 px wide like Habbo's dog. It is an `.aseprite` (`*.png` is gitignored, so a PNG grid source would
-not be versioned), the pet type 37. It replaces the figure of `proof_brute`; the wolf stays a
-recoloured dog until it has art.
+not be versioned), the pet type 37. It replaces the figure of `proof_brute`. The wolf followed
+(`monsters/wolf/`, pet type 38, `monster.forest.wolf`).
