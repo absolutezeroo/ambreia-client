@@ -37,6 +37,8 @@ export interface IHudUnit
     name: string;
     /** Asset name of the portrait. */
     portrait: string | null;
+    /** A player's figure: the frame shows its head instead of the portrait. */
+    figure?: string | null;
     level: number | null;
     /** The line under the name (`Niv. 35 · Boss`). */
     info: string;

@@ -3,6 +3,7 @@ import {RoomEngineObjectEvent} from '@ambreia/iso/scene/events/RoomEngineObjectE
 import {RoomObjectCategoryEnum} from '@ambreia/iso/scene/object/RoomObjectCategoryEnum';
 import type {RpgTargetMessage} from '@ambreia/protocol/incoming/rpg/interaction/RpgTargetMessage';
 import {RoomSessionEvent} from '../../session/events/RoomSessionEvent';
+import type {IRoomSession} from '../../session/IRoomSession';
 import type {IGameFeature} from '../GameFeature';
 import {WindowBits} from '../character/WindowBits';
 import type {IHudPanels} from '../hud/HudPanelsState';
@@ -10,8 +11,11 @@ import {RpgInteractionSession} from './RpgInteractionSession';
 
 const log = Logger.getLogger('habbo.features.interaction');
 
-/** The HUD's target frame for an RpgTarget: name, `Niv. 6 · Guerrier`; no HP or effects on the wire yet. */
-export function targetUnit(target: RpgTargetMessage, bits: WindowBits): IHudPanels['target']
+/**
+ * The HUD's target frame for an RpgTarget: the head (`figure`, from the room's Users), name,
+ * `Niv. 6 · Guerrier`; no HP or effects on the wire yet.
+ */
+export function targetUnit(target: RpgTargetMessage, bits: WindowBits, figure: string | null): IHudPanels['target']
 {
     if(target.objectId === 0) return null;
 
@@ -19,7 +23,7 @@ export function targetUnit(target: RpgTargetMessage, bits: WindowBits): IHudPane
     const className = target.classId === '' ? '' : bits.contentName(`vortex.${target.classId}`, target.classId);
 
     return {
-        name: target.name, portrait: null, level: target.level, info: className === '' ? level : `${level} · ${className}`,
+        name: target.name, portrait: null, figure, level: target.level, info: className === '' ? level : `${level} · ${className}`,
         hp: null, hpMax: null, debuffs: [], cast: null
     };
 }
@@ -39,6 +43,8 @@ export const InteractionFeature: IGameFeature = {
 
         const engine = host.made.roomEngine;
         const hud = host.made.hud;
+        /** The room the player is in: its Users give the target's figure. */
+        let room: IRoomSession | null = null;
 
         session.events.on('interactives', message =>
         {
@@ -49,7 +55,9 @@ export const InteractionFeature: IGameFeature = {
         session.events.on('target', target =>
         {
             engine?.setRpgTarget(target.objectId);
-            hud?.update({target: targetUnit(target, new WindowBits(host.made.localization))});
+            const figure = room?.userDataManager.getUserDataByIndex(target.objectId)?.figure ?? null;
+
+            hud?.update({target: targetUnit(target, new WindowBits(host.made.localization), figure)});
         });
 
         // The HUD frame's close button clears the frame alone: ask the server to clear the target too.
@@ -72,8 +80,10 @@ export const InteractionFeature: IGameFeature = {
             if(event.key === 'Escape' && target?.tagName !== 'INPUT' && target?.tagName !== 'TEXTAREA') session.select(0);
         });
 
+        host.made.roomSession?.sessionEvents.on(RoomSessionEvent.RSE_STARTED, (event: RoomSessionEvent) => room = event.session);
         host.made.roomSession?.sessionEvents.on(RoomSessionEvent.RSE_ENDED, () =>
         {
+            room = null;
             engine?.setRpgInteractives(null);
             engine?.setRpgTarget(0);
             session.forget();

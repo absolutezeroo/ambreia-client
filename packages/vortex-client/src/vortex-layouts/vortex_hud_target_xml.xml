@@ -42,6 +42,13 @@
                     <var key="zoom_y" value="3" type="Number"/>
                   </variables>
                 </static_bitmap>
+                <widget x="19" y="18" width="34" height="36" params="16" style="3" name="target_head" visible="false">
+                  <variables>
+                    <var key="widget_type" value="avatar_image" type="String"/>
+                    <var key="avatar_image:only_head" value="true" type="Boolean"/>
+                    <var key="avatar_image:cropped" value="true" type="Boolean"/>
+                  </variables>
+                </widget>
               </children>
             </border>
             <text x="88" y="32" width="264" height="16" params="16" style="3" name="target_name" caption="">

@@ -332,8 +332,14 @@ export class HudPanelsView
     {
         const percent = unit.hp !== null && unit.hpMax ? ` (${Math.round(100 * unit.hp / unit.hpMax)}%)` : '';
 
-        this.setIcon(window, `${prefix}_portrait`, unit.portrait);
+        const figure = unit.figure ?? null;
+
+        this.setIcon(window, `${prefix}_portrait`, figure === null ? unit.portrait : null);
+        this._bits.setVisible(window, figure !== null, `${prefix}_head`);
+        if(figure !== null) this._bits.avatar(window, `${prefix}_head`, figure, 2, true);
         this._bits.setText(window, `${prefix}_name`, unit.name);
+        // No HP on the wire for a player target yet (F3b): no bar rather than an empty one.
+        this._bits.setVisible(window, unit.hp !== null, `${prefix}_hp_bar`);
         this._bits.setText(window, prefix === 'boss' ? 'boss_level' : 'target_info', prefix === 'boss' ? (unit.level === null ? '' : this._bits.text('vortex.ui.level.short', 'level', String(unit.level))) : unit.info);
         this.setBar(window, `${prefix}_hp_bar`, unit.hp, unit.hpMax, unit.hp === null || unit.hpMax === null ? '' : `${thousands(unit.hp)} / ${thousands(unit.hpMax)}${percent}`);
         this.fillIcons(window, 'debuff_list', unit.debuffs, `${prefix}.debuffs`);
