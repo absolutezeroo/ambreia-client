@@ -763,10 +763,21 @@ export class TextFieldController extends TextController implements ITextFieldWin
 	 * mid-life, when the field turns out to be multi-line (see
 	 * ensureInputElementKind()).
 	 */
+    /** The field behind each DOM bridge, for the host's click-away blur (TextFieldController.fieldOf()). */
+    // TS-only: Flash's stage knew which TextField had focus; the DOM only knows the element.
+    private static readonly FIELDS = new WeakMap<Element, TextFieldController>();
+
+    /** The text field whose DOM bridge `element` is, if it is one. */
+    public static fieldOf(element: Element | null): TextFieldController | null
+    {
+        return element ? TextFieldController.FIELDS.get(element) ?? null : null;
+    }
+
     private destroyInputElement(): void
     {
         if(this._inputElement)
         {
+            TextFieldController.FIELDS.delete(this._inputElement);
             if(this._boundOnInput) this._inputElement.removeEventListener('input', this._boundOnInput);
             if(this._boundOnKeyDown) this._inputElement.removeEventListener('keydown', this._boundOnKeyDown);
             if(this._boundOnKeyUp) this._inputElement.removeEventListener('keyup', this._boundOnKeyUp);
@@ -865,6 +876,7 @@ export class TextFieldController extends TextController implements ITextFieldWin
 
         document.body.appendChild(el);
         this._inputElement = el;
+        TextFieldController.FIELDS.set(el, this);
     }
 
     /**

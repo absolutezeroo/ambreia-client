@@ -13,6 +13,7 @@ import {RoomEngineEvent} from '@ambreia/iso/scene/events/RoomEngineEvent';
 import type {AssetUrlSource} from '@ambreia/ui/IResourceManager';
 import type {ISkinData} from '@ambreia/ui/index';
 import {mergeElementDescription, mergeSkin} from '@ambreia/ui/assets/SkinMerge';
+import {TextFieldController} from '@ambreia/ui/components/TextFieldController';
 import type {IWindow} from '@ambreia/ui/IWindow';
 import type {WindowController} from '@ambreia/ui/WindowController';
 import {WindowContext} from '@ambreia/ui/WindowContext';
@@ -1568,6 +1569,14 @@ export class VortexApp
         const {x, y} = this.getCanvasCoords(e);
         const vortex = Vortex.instance;
         const hit = vortex.windowManager.findWindowAtPoint(x, y);
+
+        // That prevented default was also the browser's blur: a click outside the focused field kept
+        // the keyboard in it (its placeholder never came back, I/C never reached the game). Flash's
+        // stage moved focus to whatever was clicked, so the field loses it here unless it was the
+        // one clicked.
+        const focusedField = TextFieldController.fieldOf(document.activeElement);
+
+        if(focusedField && (hit as unknown) !== focusedField) (document.activeElement as HTMLElement).blur();
 
         if(!hit)
         {

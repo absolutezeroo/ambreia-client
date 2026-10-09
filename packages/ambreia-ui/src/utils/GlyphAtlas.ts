@@ -530,8 +530,13 @@ export class GlyphAtlas
 
         if(this._style)
         {
-            return (GlyphAtlas._engine as ITextEngine)
-                .measure(text, {...this._style, letterSpacing: spacing}).textWidth;
+            if(!GlyphAtlas.SYSTEM_RUN.test(text)) return this.measureEngineRun(text, spacing);
+
+            let width = 0;
+
+            for(const run of GlyphAtlas.runs(text)) width += run.system ? this.measureSystemRun(run.text) : this.measureEngineRun(run.text, spacing);
+
+            return width;
         }
 
         let width = 0;
@@ -628,6 +633,102 @@ export class GlyphAtlas
      */
     // TS-only: the port's stand-in for Flash rasterising its own TextField.
     private drawTextThroughEngine(
+        ctx: OffscreenCanvasRenderingContext2D,
+        text: string,
+        x: number,
+        y: number,
+        color: string,
+        spacing: number,
+        maxX: number
+    ): number
+    {
+        if(!GlyphAtlas.SYSTEM_RUN.test(text)) return this.drawEngineRun(ctx, text, x, y, color, spacing, maxX);
+
+        let pen = x;
+
+        for(const run of GlyphAtlas.runs(text))
+        {
+            pen += run.system
+                ? this.drawSystemRun(ctx, run.text, pen, y, color, maxX)
+                : this.drawEngineRun(ctx, run.text, pen, y, color, spacing, maxX);
+        }
+
+        return pen - x;
+    }
+
+    /**
+     * What the game's fonts have no glyph for, and the browser draws from its own: emoji (with their
+     * joiners, variation selectors and skin tones) and `•`, the password mask. The engine drew
+     * nothing for them while the DOM bridge under the field — which carries the caret — gave them
+     * their width, so they were invisible and the caret ran ahead of the text.
+     */
+    // TS-only: Flash's TextField fell back to system fonts by itself.
+    private static readonly SYSTEM_RUN = /\p{Extended_Pictographic}|[\u{1F3FB}-\u{1F3FF}]|\u200d|\ufe0f|\u2022/u;
+    private static readonly SYSTEM_RUNS = /((?:\p{Extended_Pictographic}|[\u{1F3FB}-\u{1F3FF}]|\u200d|\ufe0f|\u2022)+)/u;
+
+    /** `text` cut into the engine's runs and the browser's ones (SYSTEM_RUN). */
+    private static runs(text: string): Array<{text: string; system: boolean}>
+    {
+        return text.split(GlyphAtlas.SYSTEM_RUNS).filter(run => run !== '').map(run => ({text: run, system: GlyphAtlas.SYSTEM_RUN.test(run)}));
+    }
+
+    private measureEngineRun(text: string, spacing: number): number
+    {
+        return (GlyphAtlas._engine as ITextEngine).measure(text, {...this._style, letterSpacing: spacing}).textWidth;
+    }
+
+    /** Measured as the DOM bridge measures it: the same CSS font string, the browser's fallback. */
+    private measureSystemRun(text: string): number
+    {
+        this._measureCtx.font = this._fontString;
+
+        return this._measureCtx.measureText(text).width;
+    }
+
+    private drawSystemRun(ctx: OffscreenCanvasRenderingContext2D, text: string, x: number, y: number, color: string, maxX: number): number
+    {
+        const width = this.measureSystemRun(text);
+
+        if(x + width <= maxX)
+        {
+            const font = ctx.font;
+            const fill = ctx.fillStyle;
+            const baseline = ctx.textBaseline;
+
+            ctx.font = this._fontString;
+            ctx.fillStyle = color;
+            ctx.textBaseline = 'alphabetic';
+
+            // The password mask: a round dot in each bullet's advance. The pixel font's own `•`,
+            // drawn by the browser at its small size, came out as a blob.
+            if(GlyphAtlas.BULLETS.test(text)) this.drawBullets(ctx, text.length, x, baseline === 'alphabetic' ? y - this._ascent : y);
+            else ctx.fillText(text, Math.round(x), Math.round(baseline === 'alphabetic' ? y : y + this._ascent));
+            ctx.font = font;
+            ctx.fillStyle = fill;
+            ctx.textBaseline = baseline;
+        }
+
+        return width;
+    }
+
+    private static readonly BULLETS = /^\u2022+$/u;
+
+    private drawBullets(ctx: OffscreenCanvasRenderingContext2D, count: number, x: number, top: number): void
+    {
+        const advance = this.measureSystemRun('\u2022');
+        const radius = Math.max(1.5, Math.min(advance, this._ascent) / 3);
+        const centreY = top + this._ascent / 2 + 1;
+
+        for(let i = 0; i < count; i++)
+        {
+            ctx.beginPath();
+            ctx.arc(x + advance * i + advance / 2, centreY, radius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    // TS-only: drawTextThroughEngine() for a run the engine's font covers.
+    private drawEngineRun(
         ctx: OffscreenCanvasRenderingContext2D,
         text: string,
         x: number,
