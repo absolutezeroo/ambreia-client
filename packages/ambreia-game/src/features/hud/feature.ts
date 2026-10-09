@@ -52,8 +52,8 @@ export const HudFeature: IGameFeature = {
         let view: HudView | null = null;
         let panelsView: HudPanelsView | null = null;
 
-        // No chat message exists on the wire yet (RPG network, F3): what is typed shows here only.
-        const chat = (message: string): void => panels.addChatLine({time: clock(new Date()), channel: 'general', author: state.value.name, message});
+        // What is typed goes to the chat feature (F3c), which sends it; the server's copy comes back as a line.
+        const chat = (message: string): void => void panels.events.emit('say', message);
 
         const show = (): void =>
         {

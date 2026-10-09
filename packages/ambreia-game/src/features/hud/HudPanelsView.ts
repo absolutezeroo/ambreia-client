@@ -11,7 +11,7 @@ import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
 import type {IHabboLocalizationManager} from '../../localization/IHabboLocalizationManager';
 import {WindowBits} from '../character/WindowBits';
 import {barFill} from './PlayerHudState';
-import type {ChatChannel, IChatLine, IHudPanels, IHudUnit, HudPanelsState} from './HudPanelsState';
+import {chatLinesOf, type ChatChannel, type ChatTab, type IChatLine, type IHudPanels, type IHudUnit, type HudPanelsState} from './HudPanelsState';
 
 const log = Logger.getLogger('habbo.features.hud.HudPanelsView');
 
@@ -27,10 +27,19 @@ const TOPBAR_RIGHT_GROUP = 860;
 
 const CHANNELS: Readonly<Record<ChatChannel, {key: string; color: number}>> = {
     general: {key: 'vortex.guild.channel.general', color: 0xf0a030},
+    world: {key: 'vortex.chat.channel.world', color: 0xe8d040},
+    whisper: {key: 'vortex.chat.channel.whisper', color: 0xf080d0},
     group: {key: 'vortex.group.title', color: 0x5ab4f0},
     guild: {key: 'vortex.character.guild', color: 0x7cd14f},
     system: {key: 'vortex.hud.chat.system', color: 0xc890e0}
 };
+
+/** The chat window's tab buttons (vortex_hud_chat_xml); `chat_tab_3` is the whisper tab. */
+const CHAT_TABS: ReadonlyArray<[string, ChatTab]> = [['chat_tab_0', 'general'], ['chat_tab_1', 'group'], ['chat_tab_2', 'guild'], ['chat_tab_3', 'whisper']];
+const TAB_ACTIVE = 0x2a6aa0;
+const TAB_IDLE = 0x55534e;
+/** `[item:item.weapon.rusted_sword]` in a chat line (F3c §10.3). */
+const ITEM_LINK = /\[item:([^\]]+)\]/g;
 
 type Panel = 'topbar' | 'location' | 'quests' | 'party' | 'buffs' | 'target' | 'boss' | 'alert' | 'chat';
 
@@ -81,6 +90,11 @@ export class HudPanelsView
     private readonly _bits: WindowBits;
     /** The arrays each list was last built from: a render that does not change them rebuilds nothing. */
     private readonly _built = new Map<string, unknown>();
+    /** What the chat log was last built from: the lines and the tab (`general|`, `whisper|Arwen`). */
+    private _chatFrom: readonly IChatLine[] | null = null;
+    private _chatTab = '';
+    /** The chat log's rows, to their line: a click on a name opens a whisper with that player. */
+    private readonly _chatRows = new Map<IWindow, IChatLine>();
     private _questsClosed = false;
     /** The top bar's right-hand group, which follows its right edge (stretchTopbar()). */
     private _topbarRight: IWindow[] | null = null;
@@ -270,7 +284,7 @@ export class HudPanelsView
         }
 
         show('chat', true);
-        this.renderChat(panel('chat'), value.chat);
+        this.renderChat(panel('chat'), value);
 
         // After the visibilities: the right column and the warning stack under what is shown.
         this.place();
@@ -345,26 +359,40 @@ export class HudPanelsView
         this.fillIcons(window, 'debuff_list', unit.debuffs, `${prefix}.debuffs`);
     }
 
-    private renderChat(window: IWindowContainer, lines: readonly IChatLine[]): void
+    private renderChat(window: IWindowContainer, value: Readonly<IHudPanels>): void
     {
-        const log = this.rebuild<IItemListWindow>(window, 'chat_log', lines);
+        for(const [name, tab] of CHAT_TABS) this._bits.setColor(window, name, tab === value.chatTab ? TAB_ACTIVE : TAB_IDLE);
+        this._bits.setVisible(window, value.whisperWith !== null, 'chat_tab_3');
+        if(value.whisperWith !== null) this._bits.setText(window, 'chat_tab_3', value.whisperWith);
 
-        if(!log) return;
+        const tab = `${value.chatTab}|${value.whisperWith ?? ''}`;
+        const log = window.findChildByName('chat_log') as IItemListWindow | null;
 
-        for(const line of lines)
+        if(!log || (this._chatFrom === value.chat && this._chatTab === tab)) return;
+
+        this._chatFrom = value.chat;
+        this._chatTab = tab;
+        log.destroyListItems();
+        this._chatRows.clear();
+
+        for(const line of chatLinesOf(value.chat, value.chatTab, value.whisperWith))
         {
             const row = this._windows.buildWidgetLayout('vortex_hud_chat_line_xml') as IWindowContainer | null;
 
             if(!row) return;
 
             const channel = CHANNELS[line.channel];
+            const message = line.message.replace(ITEM_LINK, (_link, id: string) => `[${this._bits.contentName(`${id}.name`, id)}]`);
 
             this._bits.setText(row, 'time_txt', `[${line.time}] `);
             this._bits.setText(row, 'channel_txt', `[${this._bits.text(channel.key)}] `);
             this._bits.setTextColor(row, 'channel_txt', channel.color);
             this._bits.setText(row, 'author_txt', line.author === '' ? '' : `${line.author} : `);
             this._bits.setTextColor(row, 'author_txt', channel.color);
-            this._bits.setText(row, 'message_txt', line.message);
+            this._bits.setText(row, 'message_txt', message);
+            // A scrollable list answers its items' events itself: the row carries the view's.
+            row.procedure = this._onEvent;
+            this._chatRows.set(row, line);
             log.addListItem(row);
         }
 
@@ -451,14 +479,37 @@ export class HudPanelsView
             return;
         }
 
-        if(event.type !== 'WME_CLICK') return;
-
-        // The field opens with its placeholder as its text: the first click clears it.
-        if(window.name === 'chat_input')
+        // The field opens with its placeholder as its text: taking the keyboard clears it. On focus as
+        // well as on click: a field focused another way (Tab, a click its DOM bridge took) kept the
+        // placeholder, and it went out in front of the message.
+        if((event.type === 'WE_FOCUSED' || event.type === 'WME_CLICK') && window.name === 'chat_input')
         {
             const input = window as ITextFieldWindow;
 
             if(input.text === this._bits.text('vortex.hud.chat.placeholder')) input.text = '';
+
+            return;
+        }
+
+        if(event.type !== 'WME_CLICK') return;
+
+        const tab = CHAT_TABS.find(([name]) => WindowBits.ancestor(window, name) !== null);
+
+        if(tab)
+        {
+            this._state.update({chatTab: tab[1]});
+
+            return;
+        }
+
+        // A name in the log (author_txt takes the mouse: params 17) opens the whisper tab with that
+        // player (F3c §10.3): for a whisper, the other one of the conversation, whoever wrote the line.
+        const row = window.name === 'author_txt' ? WindowBits.ancestor(window, 'chat_line') : null;
+        const line = row ? this._chatRows.get(row) ?? null : null;
+
+        if(line && line.author !== '')
+        {
+            this._state.update({chatTab: 'whisper', whisperWith: line.channel === 'whisper' && line.target ? line.target : line.author});
 
             return;
         }
