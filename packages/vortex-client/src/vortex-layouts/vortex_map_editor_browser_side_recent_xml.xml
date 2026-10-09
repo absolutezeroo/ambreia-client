@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_browser_side_recent_xml" width="250" height="657" version="0.1">
+  <window>
+    <container x="0" y="0" width="250" height="657" params="16" style="3" name="side">
+      <children>
+        <border x="0" y="0" width="250" height="170" params="16" style="2" name="groups" color="0xeef2f6">
+          <children>
+            <container x="1" y="1" width="248" height="30" params="16" style="3" name="groups_head">
+              <children>
+                <container x="0" y="0" width="248" height="30" params="16" style="8" color="0xffd9e2ec" background="true"/>
+                <static_bitmap x="10" y="7" width="16" height="16" params="16" style="3" name="groups_icon" tags="%23icon" color="0x3a7ad8">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_clock_time_wait_1_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <text x="32" y="6" width="206" height="16" params="16" style="3" name="groups_title" caption="${vortex.mapeditor.decor.recent}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="12" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </container>
+            <itemlist_vertical x="8" y="36" width="234" height="128" params="16" style="3" name="group_list">
+              <children>
+                <border x="0" y="0" width="234" height="28" params="17" style="2" name="category_row" dynamic_style="lifted_hover" color="0xffffff">
+                  <children>
+                    <static_bitmap x="4" y="6" width="16" height="16" params="16" style="3" name="expand_icon" tags="%23icon" color="0x55534e">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/arrows_media_controls_play_triangle_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                    <static_bitmap x="27" y="6" width="16" height="16" params="16" style="3" name="category_icon" tags="%23icon" color="0x3a7ad8">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/software_clock_time_wait_1_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                    <text x="50" y="6" width="138" height="16" params="16" style="3" name="category_label" caption="${vortex.market.history.today}">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <text x="188" y="6" width="40" height="16" params="16" style="3" name="category_count" caption="">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="text_color" value="0x666666" type="hex"/>
+                        <var key="auto_size" value="right" type="String"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </border>
+                <border x="0" y="0" width="234" height="28" params="17" style="2" name="category_row" dynamic_style="lifted_hover" color="0xffffff">
+                  <children>
+                    <static_bitmap x="4" y="6" width="16" height="16" params="16" style="3" name="expand_icon" tags="%23icon" color="0x55534e">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/arrows_media_controls_play_triangle_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                    <static_bitmap x="25" y="6" width="16" height="16" params="16" style="3" name="category_icon" tags="%23icon" color="0xd84040">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/software_calendar_dates_organizer_month_1_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                    <text x="50" y="6" width="138" height="16" params="16" style="3" name="category_label" caption="${vortex.mapeditor.browser.group.yesterday}">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <text x="188" y="6" width="40" height="16" params="16" style="3" name="category_count" caption="">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="text_color" value="0x666666" type="hex"/>
+                        <var key="auto_size" value="right" type="String"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </border>
+                <border x="0" y="0" width="234" height="28" params="17" style="2" name="category_row" dynamic_style="lifted_hover" color="0xffffff">
+                  <children>
+                    <static_bitmap x="4" y="6" width="16" height="16" params="16" style="3" name="expand_icon" tags="%23icon" color="0x55534e">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/arrows_media_controls_play_triangle_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                    <static_bitmap x="25" y="6" width="16" height="16" params="16" style="3" name="category_icon" tags="%23icon" color="0xd84040">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/software_calendar_dates_organizer_month_2_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                    <text x="50" y="6" width="138" height="16" params="16" style="3" name="category_label" caption="${vortex.mapeditor.browser.group.this_week}">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <text x="188" y="6" width="40" height="16" params="16" style="3" name="category_count" caption="">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="text_color" value="0x666666" type="hex"/>
+                        <var key="auto_size" value="right" type="String"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </border>
+                <border x="0" y="0" width="234" height="28" params="17" style="2" name="category_row" dynamic_style="lifted_hover" color="0xffffff">
+                  <children>
+                    <static_bitmap x="4" y="6" width="16" height="16" params="16" style="3" name="expand_icon" tags="%23icon" color="0x55534e">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/arrows_media_controls_play_triangle_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                    <static_bitmap x="26" y="7" width="16" height="16" params="16" style="3" name="category_icon" tags="%23icon" color="0xd84040">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/software_calendar_dates_organizer_month_3_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                    <text x="50" y="6" width="138" height="16" params="16" style="3" name="category_label" caption="${vortex.mapeditor.browser.group.this_month}">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <text x="188" y="6" width="40" height="16" params="16" style="3" name="category_count" caption="">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="text_color" value="0x666666" type="hex"/>
+                        <var key="auto_size" value="right" type="String"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </border>
+              </children>
+              <variables>
+                <var key="spacing" value="4" type="int"/>
+              </variables>
+            </itemlist_vertical>
+          </children>
+        </border>
+        <border x="0" y="178" width="250" height="479" params="16" style="2" name="filters" color="0xeef2f6">
+          <children>
+            <container x="1" y="1" width="248" height="30" params="16" style="3" name="filters_head">
+              <children>
+                <container x="0" y="0" width="248" height="30" params="16" style="8" color="0xffd9e2ec" background="true"/>
+                <static_bitmap x="9" y="7" width="16" height="16" params="16" style="3" name="filters_icon" tags="%23icon" color="0x3a7ad8">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_filter_sort_funnel_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <text x="32" y="6" width="206" height="16" params="16" style="3" name="filters_title" caption="${vortex.mapeditor.browser.side.filters}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="12" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </container>
+            <text x="10" y="38" width="200" height="16" params="16" style="3" caption="${vortex.market.column.type}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container x="8" y="56" width="234" height="22" params="16" style="3" name="filter_row">
+              <children>
+                <checkbox x="4" y="2" width="18" height="18" params="17" style="3" name="filter_check"/>
+                <static_bitmap x="27" y="3" width="16" height="16" params="16" style="3" name="filter_icon" tags="%23icon" color="0x6a9fd8">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_file_document_page_plus_add_new_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <text x="48" y="3" width="138" height="16" params="16" style="3" name="filter_label" caption="${vortex.ui.all}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="188" y="3" width="40" height="16" params="16" style="3" name="filter_count" caption="">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="auto_size" value="right" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </container>
+            <container x="8" y="79" width="234" height="22" params="16" style="3" name="filter_row">
+              <children>
+                <checkbox x="4" y="2" width="18" height="18" params="17" style="3" name="filter_check"/>
+                <static_bitmap x="27" y="4" width="16" height="16" params="16" style="3" name="filter_icon" tags="%23icon" color="0x6ac0a0">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/map_markers_travel_map_folded_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <text x="48" y="3" width="138" height="16" params="16" style="3" name="filter_label" caption="${vortex.hud.nav.map}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="188" y="3" width="40" height="16" params="16" style="3" name="filter_count" caption="">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="auto_size" value="right" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </container>
+            <container x="8" y="102" width="234" height="22" params="16" style="3" name="filter_row">
+              <children>
+                <checkbox x="4" y="2" width="18" height="18" params="17" style="3" name="filter_check"/>
+                <static_bitmap x="27" y="3" width="16" height="16" params="16" style="3" name="filter_icon" tags="%23icon" color="0xe8d8a8">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/tools_crafting_writing_parchment_scroll_document_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <text x="48" y="3" width="138" height="16" params="16" style="3" name="filter_label" caption="${vortex.mapeditor.browser.kind.template}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="188" y="3" width="40" height="16" params="16" style="3" name="filter_count" caption="">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="auto_size" value="right" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </container>
+            <container x="8" y="125" width="234" height="22" params="16" style="3" name="filter_row">
+              <children>
+                <checkbox x="4" y="2" width="18" height="18" params="17" style="3" name="filter_check"/>
+                <static_bitmap x="27" y="4" width="16" height="16" params="16" style="3" name="filter_icon" tags="%23icon" color="0xe0b060">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/map_markers_scroll_map_location_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <text x="48" y="3" width="138" height="16" params="16" style="3" name="filter_label" caption="${vortex.mapeditor.field.zone}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="188" y="3" width="40" height="16" params="16" style="3" name="filter_count" caption="">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="auto_size" value="right" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </container>
+            <text x="10" y="148" width="200" height="16" params="16" style="3" caption="${vortex.mapeditor.browser.filter.size}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <dropmenu x="8" y="166" width="234" height="24" params="17" style="3" name="size_menu" caption="${vortex.mapeditor.browser.filter.all_sizes}"/>
+            <text x="10" y="196" width="200" height="16" params="16" style="3" caption="${vortex.ui.status}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container x="8" y="214" width="234" height="22" params="16" style="3" name="filter_row">
+              <children>
+                <checkbox x="4" y="2" width="18" height="18" params="17" style="3" name="filter_check"/>
+                <text x="48" y="3" width="138" height="16" params="16" style="3" name="filter_label" caption="${vortex.market.history.all}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="188" y="3" width="40" height="16" params="16" style="3" name="filter_count" caption="">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="auto_size" value="right" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </container>
+            <container x="8" y="237" width="234" height="22" params="16" style="3" name="filter_row">
+              <children>
+                <checkbox x="4" y="2" width="18" height="18" params="17" style="3" name="filter_check"/>
+                <shape x="30" y="7" width="9" height="9" params="16" style="3" name="filter_dot" color="0xa0a098">
+                  <variables>
+                    <var key="shape" value="round_rectangle" type="String"/>
+                    <var key="radius" value="4" type="Number"/>
+                    <var key="stroke_color" value="0xff444444" type="hex"/>
+                    <var key="stroke_thickness" value="1" type="Number"/>
+                  </variables>
+                </shape>
+                <text x="48" y="3" width="138" height="16" params="16" style="3" name="filter_label" caption="${vortex.mapeditor.browser.status.draft}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="188" y="3" width="40" height="16" params="16" style="3" name="filter_count" caption="">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="auto_size" value="right" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </container>
+            <container x="8" y="260" width="234" height="22" params="16" style="3" name="filter_row">
+              <children>
+                <checkbox x="4" y="2" width="18" height="18" params="17" style="3" name="filter_check"/>
+                <shape x="30" y="7" width="9" height="9" params="16" style="3" name="filter_dot" color="0xf0c020">
+                  <variables>
+                    <var key="shape" value="round_rectangle" type="String"/>
+                    <var key="radius" value="4" type="Number"/>
+                    <var key="stroke_color" value="0xff444444" type="hex"/>
+                    <var key="stroke_thickness" value="1" type="Number"/>
+                  </variables>
+                </shape>
+                <text x="48" y="3" width="138" height="16" params="16" style="3" name="filter_label" caption="${vortex.ui.in_progress}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="188" y="3" width="40" height="16" params="16" style="3" name="filter_count" caption="">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="auto_size" value="right" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </container>
+            <container x="8" y="283" width="234" height="22" params="16" style="3" name="filter_row">
+              <children>
+                <checkbox x="4" y="2" width="18" height="18" params="17" style="3" name="filter_check"/>
+                <shape x="30" y="7" width="9" height="9" params="16" style="3" name="filter_dot" color="0x4cc040">
+                  <variables>
+                    <var key="shape" value="round_rectangle" type="String"/>
+                    <var key="radius" value="4" type="Number"/>
+                    <var key="stroke_color" value="0xff444444" type="hex"/>
+                    <var key="stroke_thickness" value="1" type="Number"/>
+                  </variables>
+                </shape>
+                <text x="48" y="3" width="138" height="16" params="16" style="3" name="filter_label" caption="${vortex.mapeditor.browser.status.validated}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="188" y="3" width="40" height="16" params="16" style="3" name="filter_count" caption="">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="auto_size" value="right" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </container>
+            <container x="8" y="306" width="234" height="22" params="16" style="3" name="filter_row">
+              <children>
+                <checkbox x="4" y="2" width="18" height="18" params="17" style="3" name="filter_check"/>
+                <shape x="30" y="7" width="9" height="9" params="16" style="3" name="filter_dot" color="0x4cc040">
+                  <variables>
+                    <var key="shape" value="round_rectangle" type="String"/>
+                    <var key="radius" value="4" type="Number"/>
+                    <var key="stroke_color" value="0xff444444" type="hex"/>
+                    <var key="stroke_thickness" value="1" type="Number"/>
+                  </variables>
+                </shape>
+                <text x="48" y="3" width="138" height="16" params="16" style="3" name="filter_label" caption="${vortex.mapeditor.browser.status.published}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="188" y="3" width="40" height="16" params="16" style="3" name="filter_count" caption="">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="auto_size" value="right" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </container>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

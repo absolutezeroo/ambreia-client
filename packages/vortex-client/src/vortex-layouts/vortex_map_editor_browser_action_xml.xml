@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_browser_action_xml" width="140" height="28" version="0.1">
+  <window>
+    <container x="0" y="0" width="140" height="28" params="16" style="3" name="action">
+      <children>
+        <button_thick x="0" y="0" width="140" height="28" params="131089" style="3" name="action_button" caption="${vortex.mapeditor.browser.action.create_zone}" width_min="140" width_max="140"/>
+        <static_bitmap x="8" y="6" width="16" height="16" params="16" style="3" name="action_icon" tags="%23icon" color="0x40b030">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/software_signs_maths_plus_addition_bonus_add_new_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+      </children>
+    </container>
+  </window>
+</layout>

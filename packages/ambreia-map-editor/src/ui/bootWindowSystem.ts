@@ -26,8 +26,11 @@ const FONTS: readonly [string, string, string, string][] = [
     ['UbuntuThick', 'Ubuntu-thick-b.ttf', 'normal', 'normal']
 ];
 
-/** The owner's editor layouts, read from their source: Glaze writes them there. */
-const EDITOR_LAYOUTS = import.meta.glob('../../../vortex-client/src/vortex-layouts/vortex_map_editor_*.xml', {
+/** The owner's editor layouts, read from their source: Glaze writes them there. The login form is the game's. */
+const EDITOR_LAYOUTS = import.meta.glob([
+    '../../../vortex-client/src/vortex-layouts/vortex_map_editor_*.xml',
+    '../../../vortex-client/src/vortex-layouts/vortex_auth_login_xml.xml'
+], {
     query: '?raw', import: 'default', eager: true
 }) as Record<string, string>;
 
@@ -53,7 +56,7 @@ const baseName = (path: string): string => path.split('/').pop()!.replace(/\.xml
  */
 export async function bootWindowSystem(): Promise<{manager: WindowManager; texts: EditorTexts}>
 {
-    const [images, xml] = await Promise.all([AssetBundle.load('/assets-images.bundle'), AssetBundle.load('/assets-xml.bundle')]);
+    const [images, xml] = await Promise.all([AssetBundle.load('/assets-images.ambreia'), AssetBundle.load('/assets-xml.ambreia')]);
 
     await Promise.all(FONTS.map(async ([family, file, weight, style]) =>
     {

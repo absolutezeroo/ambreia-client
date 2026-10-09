@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_home_xml" width="1440" height="900" version="0.1">
+  <window>
+    <container x="0" y="0" width="1440" height="900" params="1073741840" style="3" name="map_editor_home">
+      <children>
+        <container x="0" y="0" width="1440" height="900" params="16" style="8" name="backdrop_color" color="0xff3a7ab0" background="true"/>
+        <static_bitmap x="0" y="0" width="1440" height="900" params="16" style="3" name="backdrop">
+          <variables>
+            <var key="asset_uri" value="rpg/map_editor_backdrop" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <static_bitmap x="570" y="4" width="300" height="109" params="16" style="3" name="logo">
+          <variables>
+            <var key="asset_uri" value="rpg/map_editor_logo" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <container x="20" y="118" width="1400" height="770" params="16" style="3" name="window_slot">
+          <children/>
+        </container>
+      </children>
+    </container>
+  </window>
+</layout>
