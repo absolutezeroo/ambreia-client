@@ -17,7 +17,10 @@ export const NewStyleHeaders = {
         Incoming.RpgCharacterStatsMessageComposer,
         // F2 Objets: the bag and the equipment (features/inventory).
         Incoming.RpgInventoryMessageComposer,
-        Incoming.RpgItemResultMessageComposer
+        Incoming.RpgItemResultMessageComposer,
+        // F3b Interaction: the usable objects and the target (features/interaction).
+        Incoming.RpgZoneInteractivesMessageComposer,
+        Incoming.RpgTargetMessageComposer
     ]),
     outgoing: new Set<number>([
         Outgoing.RpgCharacterListRequestMessageEvent,
@@ -29,7 +32,8 @@ export const NewStyleHeaders = {
         Outgoing.RpgItemEquipMessageEvent,
         Outgoing.RpgItemUnequipMessageEvent,
         Outgoing.RpgItemDestroyMessageEvent,
-        Outgoing.RpgItemClaimParcelMessageEvent
+        Outgoing.RpgItemClaimParcelMessageEvent,
+        Outgoing.RpgTargetSelectMessageEvent
     ])
 };
 
