@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_character_create_class_card_xml" width="170" height="244" version="0.1">
+  <window>
+    <border x="0" y="0" width="170" height="244" params="17" style="2" name="class_card" dynamic_style="lifted_hover" color="0xf2f2ec">
+      <children>
+        <widget x="53" y="4" width="64" height="110" params="16" style="3" name="avatar_image">
+          <variables>
+            <var key="widget_type" value="avatar_image" type="String"/>
+            <var key="avatar_image:direction" value="3" type="String"/>
+          </variables>
+        </widget>
+        <text x="4" y="118" width="162" height="18" params="16" style="3" name="class_name" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="13" type="uint"/>
+            <var key="auto_size" value="center" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="8" y="138" width="154" height="30" params="16" style="3" name="class_desc" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x666666" type="hex"/>
+            <var key="auto_size" value="center" type="String"/>
+            <var key="multiline" value="true" type="Boolean"/>
+            <var key="word_wrap" value="true" type="Boolean"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <static_bitmap x="8" y="174" width="16" height="16" params="16" style="3" tags="%23icon" color="0xe89ad8">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/rpg_stat_intelligence_intellect_brain_wisdom_thinking_iq_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <text x="30" y="175" width="134" height="16" params="16" style="3" name="class_stat_0" caption="${vortex.stat.intelligence}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <static_bitmap x="8" y="194" width="16" height="16" params="16" style="3" tags="%23icon" color="0x3a7fe0">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/rpg_stat_mp_mana_star_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <text x="30" y="195" width="134" height="16" params="16" style="3" name="class_stat_1" caption="${vortex.stat.mana}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <static_bitmap x="8" y="214" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf08a30">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/rpg_spell_skill_magic_chain_lightning_link_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <text x="30" y="215" width="134" height="16" params="16" style="3" name="class_stat_2" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </border>
+  </window>
+</layout>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_character_create_swatch_xml" width="22" height="22" version="0.1">
+  <window>
+    <border x="0" y="0" width="22" height="22" params="17" style="2" name="swatch" dynamic_style="button" color="0xffffff">
+      <children>
+        <container x="3" y="3" width="16" height="16" params="16" style="8" name="swatch_color" color="0xffc89850" background="true"/>
+      </children>
+    </border>
+  </window>
+</layout>

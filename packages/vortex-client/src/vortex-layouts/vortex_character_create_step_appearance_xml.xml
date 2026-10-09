@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_character_create_step_appearance_xml" width="684" height="381" version="0.1">
+  <window>
+    <container x="0" y="0" width="684" height="381" params="16" style="3" name="step_appearance">
+      <children>
+        <container x="0" y="0" width="200" height="30" params="16" style="3" name="category_tabs">
+          <children>
+            <border x="0" y="0" width="36" height="30" params="17" style="2" name="category_0" dynamic_style="button" color="0xe4e4dc">
+              <children>
+                <static_bitmap x="10" y="7" width="16" height="16" params="16" style="3" tags="%23icon" color="0x5a6070">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_options_settings_tools_mechanics_wrench_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <border x="40" y="0" width="36" height="30" params="17" style="2" name="category_1" dynamic_style="button" color="0xe4e4dc">
+              <children>
+                <static_bitmap x="10" y="7" width="16" height="16" params="16" style="3" tags="%23icon" color="0x5a6070">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/emoji_face_smiling_smiley_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <border x="80" y="0" width="36" height="30" params="17" style="2" name="category_2" dynamic_style="button" color="0xe4e4dc">
+              <children>
+                <static_bitmap x="10" y="7" width="16" height="16" params="16" style="3" tags="%23icon" color="0x5a6070">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/hats_crown_king_monarch_ruler_emperor_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <border x="120" y="0" width="36" height="30" params="17" style="2" name="category_3" dynamic_style="button" color="0xe4e4dc">
+              <children>
+                <static_bitmap x="10" y="7" width="16" height="16" params="16" style="3" tags="%23icon" color="0x5a6070">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/rpg_item_armor_equipment_slot_chest_breastplate_body_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <border x="160" y="0" width="36" height="30" params="17" style="2" name="category_4" dynamic_style="button" color="0xe4e4dc">
+              <children>
+                <static_bitmap x="10" y="7" width="16" height="16" params="16" style="3" tags="%23icon" color="0x5a6070">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/rpg_item_armor_equipment_slot_legs_leggings_legplates_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+          </children>
+        </container>
+        <container x="0" y="38" width="220" height="162" params="16" style="3" name="preset_grid">
+          <children/>
+        </container>
+        <border x="230" y="0" width="220" height="377" params="16" style="2" name="preview_stage" color="0x1e2228">
+          <children>
+            <container x="1" y="1" width="218" height="375" params="16" style="3" name="stage_slot" clipping="true">
+              <children/>
+            </container>
+            <widget x="78" y="80" width="64" height="110" params="16" style="3" name="preview_avatar">
+              <variables>
+                <var key="widget_type" value="avatar_image" type="String"/>
+              </variables>
+            </widget>
+            <border x="8" y="341" width="30" height="30" params="17" style="2" name="rotate_left" dynamic_style="button" color="0x55534e">
+              <children>
+                <static_bitmap x="7" y="7" width="16" height="16" params="16" style="3" tags="%23icon" color="0xffffff">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/arrows_reload_refresh_rotate_counterclockwise_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <border x="180" y="341" width="30" height="30" params="17" style="2" name="rotate_right" dynamic_style="button" color="0x55534e">
+              <children>
+                <static_bitmap x="7" y="7" width="16" height="16" params="16" style="3" tags="%23icon" color="0xffffff">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/arrows_reload_refresh_rotate_clockwise_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+          </children>
+        </border>
+        <container x="460" y="0" width="160" height="72" params="16" style="3" name="hair_palette">
+          <children>
+            <text x="0" y="0" width="160" height="16" params="16" style="3" name="hair_title" caption="${vortex.charcreate.color.hair}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container x="0" y="18" width="160" height="52" params="16" style="3" name="hair_grid">
+              <children/>
+            </container>
+          </children>
+        </container>
+        <container x="460" y="86" width="160" height="72" params="16" style="3" name="skin_palette">
+          <children>
+            <text x="0" y="0" width="160" height="16" params="16" style="3" name="skin_title" caption="${vortex.charcreate.color.skin}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container x="0" y="18" width="160" height="52" params="16" style="3" name="skin_grid">
+              <children/>
+            </container>
+          </children>
+        </container>
+        <container x="460" y="146" width="160" height="72" params="16" style="3" name="eyes_palette">
+          <children>
+            <text x="0" y="0" width="160" height="16" params="16" style="3" name="eyes_title" caption="${vortex.charcreate.color.eyes}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container x="0" y="18" width="160" height="52" params="16" style="3" name="eyes_grid">
+              <children/>
+            </container>
+          </children>
+        </container>
+      </children>
+    </container>
+  </window>
+</layout>

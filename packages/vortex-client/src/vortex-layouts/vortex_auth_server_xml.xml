@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_auth_server_xml" width="380" height="300" version="0.1">
+  <window>
+    <frame x="0" y="0" width="380" height="300" params="32769" style="3" name="server_dialog" caption="${vortex.auth.server.title}" color="0x418db0">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <container x="0" y="4" width="374" height="257" params="16" style="3" name="content">
+          <children>
+            <scrollable_itemlist_vertical x="12" y="8" width="350" height="186" params="16" style="3" name="server_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="4" type="int"/>
+              </variables>
+            </scrollable_itemlist_vertical>
+            <button_thick x="12" y="204" width="350" height="28" params="131089" style="6" color="0x0aa00" name="continue_button" caption="${vortex.auth.continue}" width_min="350" width_max="350"/>
+          </children>
+        </container>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

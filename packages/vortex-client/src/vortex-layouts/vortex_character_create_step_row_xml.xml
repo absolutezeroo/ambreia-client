@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_character_create_step_row_xml" width="170" height="32" version="0.1">
+  <window>
+    <border x="0" y="0" width="170" height="32" params="16" style="2" name="step_row" color="0xcfe3f4">
+      <children>
+        <border x="4" y="4" width="24" height="24" params="16" style="2" name="step_badge" color="0x2a8fd6">
+          <children>
+            <text x="0" y="4" width="24" height="16" params="16" style="3" name="step_number" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0xffffff" type="hex"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+        <text x="36" y="8" width="130" height="16" params="16" style="3" name="step_label" caption="${vortex.character.class}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </border>
+  </window>
+</layout>

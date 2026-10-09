@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_auth_register_xml" width="320" height="380" version="0.1">
+  <window>
+    <frame x="0" y="0" width="320" height="380" params="32769" style="3" name="register_dialog" caption="${vortex.auth.register}" color="0x418db0">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <container x="0" y="4" width="314" height="337" params="16" style="3" name="content">
+          <children>
+            <text x="12" y="6" width="200" height="16" params="16" style="3" name="username_label" caption="${vortex.auth.username}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <border x="12" y="22" width="194" height="26" params="16" style="2" color="0xffffff">
+              <children>
+                <input x="6" y="5" width="182" height="16" params="1" style="0" name="username_input" caption=""/>
+              </children>
+            </border>
+            <container x="212" y="25" width="90" height="20" params="16" style="3" name="username_status">
+              <children>
+                <container x="0" y="0" width="90" height="20" params="16" style="3" name="field_status">
+                  <children>
+                    <static_bitmap x="1" y="2" width="16" height="16" params="16" style="3" name="status_icon" tags="%23icon" color="0x40b030">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/software_signs_checkmark_checkbox_ticked_todo_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                    <text x="22" y="2" width="68" height="16" params="16" style="3" name="status_txt" caption="${vortex.craft.orders.available}">
+                      <variables>
+                        <var key="text_style" value="u_bold" type="String"/>
+                        <var key="font_size" value="10" type="uint"/>
+                        <var key="text_color" value="0x2b9a00" type="hex"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </container>
+              </children>
+            </container>
+            <text x="12" y="54" width="200" height="16" params="16" style="3" name="email_label" caption="${vortex.auth.email}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <border x="12" y="70" width="290" height="26" params="16" style="2" color="0xffffff">
+              <children>
+                <input x="6" y="5" width="278" height="16" params="1" style="0" name="email_input" caption=""/>
+              </children>
+            </border>
+            <text x="12" y="102" width="200" height="16" params="16" style="3" name="password_label" caption="${vortex.auth.password}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <border x="12" y="118" width="194" height="26" params="16" style="2" color="0xffffff">
+              <children>
+                <input x="6" y="5" width="182" height="16" params="1" style="0" name="password_input" caption="">
+                  <variables>
+                    <var key="password" value="true" type="Boolean"/>
+                  </variables>
+                </input>
+              </children>
+            </border>
+            <container x="212" y="120" width="80" height="22" params="16" style="3" name="strength_slot">
+              <children>
+                <container x="0" y="0" width="80" height="20" params="16" style="3" name="password_strength">
+                  <children>
+                    <text x="0" y="0" width="80" height="16" params="16" style="3" name="strength_txt" caption="${vortex.auth.strength.strong}">
+                      <variables>
+                        <var key="text_style" value="u_bold" type="String"/>
+                        <var key="font_size" value="10" type="uint"/>
+                        <var key="text_color" value="0x4caa30" type="hex"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <container x="0" y="16" width="24" height="4" params="16" style="8" name="strength_0" color="0xff4caa30" background="true"/>
+                    <container x="28" y="16" width="24" height="4" params="16" style="8" name="strength_1" color="0xff4caa30" background="true"/>
+                    <container x="56" y="16" width="24" height="4" params="16" style="8" name="strength_2" color="0xff4caa30" background="true"/>
+                  </children>
+                </container>
+              </children>
+            </container>
+            <text x="12" y="150" width="200" height="16" params="16" style="3" name="confirm_label" caption="${vortex.auth.confirm}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <border x="12" y="166" width="194" height="26" params="16" style="2" color="0xffffff">
+              <children>
+                <input x="6" y="5" width="182" height="16" params="1" style="0" name="confirm_input" caption="">
+                  <variables>
+                    <var key="password" value="true" type="Boolean"/>
+                  </variables>
+                </input>
+              </children>
+            </border>
+            <container x="212" y="169" width="90" height="20" params="16" style="3" name="confirm_status">
+              <children>
+                <container x="0" y="0" width="90" height="20" params="16" style="3" name="field_status">
+                  <children>
+                    <static_bitmap x="1" y="2" width="16" height="16" params="16" style="3" name="status_icon" tags="%23icon" color="0x40b030">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/software_signs_checkmark_checkbox_ticked_todo_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                    <text x="22" y="2" width="68" height="16" params="16" style="3" name="status_txt" caption="${vortex.auth.field.matching}">
+                      <variables>
+                        <var key="text_style" value="u_bold" type="String"/>
+                        <var key="font_size" value="10" type="uint"/>
+                        <var key="text_color" value="0x2b9a00" type="hex"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </container>
+              </children>
+            </container>
+            <checkbox x="12" y="202" width="18" height="18" params="17" style="3" name="accept_terms"/>
+            <text x="36" y="204" width="120" height="16" params="16" style="3" caption="${vortex.auth.accept_terms}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <link x="120" y="204" width="160" height="16" params="1" style="3" name="terms_link" caption="${vortex.auth.terms}" treshold="0">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x1077ac" type="hex"/>
+                <var key="auto_size" value="left" type="String"/>
+                <var key="underline" value="true" type="Boolean"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </link>
+            <checkbox x="12" y="226" width="18" height="18" params="17" style="3" name="accept_privacy"/>
+            <text x="36" y="228" width="120" height="16" params="16" style="3" caption="${vortex.auth.accept_privacy}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <link x="110" y="228" width="180" height="16" params="1" style="3" name="privacy_link" caption="${vortex.auth.privacy}" treshold="0">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x1077ac" type="hex"/>
+                <var key="auto_size" value="left" type="String"/>
+                <var key="underline" value="true" type="Boolean"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </link>
+            <button_thick x="12" y="256" width="290" height="28" params="131089" style="6" color="0x0aa00" name="create_button" caption="${vortex.auth.register}" width_min="290" width_max="290"/>
+            <button_thick x="12" y="296" width="290" height="28" params="131089" style="3" name="back_button" caption="${vortex.auth.back}" width_min="290" width_max="290"/>
+          </children>
+        </container>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

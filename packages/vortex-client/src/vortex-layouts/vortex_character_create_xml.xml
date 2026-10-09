@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_character_create_xml" width="900" height="480" version="0.1">
+  <window>
+    <frame x="0" y="0" width="900" height="480" params="32769" style="3" name="character_create" caption="${vortex.charselect.create}" color="0x418db0">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <container x="0" y="4" width="894" height="437" params="16" style="3" name="content">
+          <children>
+            <border x="8" y="4" width="186" height="379" params="16" style="2" name="steps" color="0xe8eef4">
+              <children>
+                <itemlist_vertical x="6" y="6" width="174" height="144" params="16" style="3" name="step_list">
+                  <children>
+                    <border x="0" y="0" width="174" height="32" params="16" style="2" name="step_row" color="0xcfe3f4">
+                      <children>
+                        <border x="4" y="4" width="24" height="24" params="16" style="2" name="step_badge" color="0x2a8fd6">
+                          <children>
+                            <text x="0" y="4" width="24" height="16" params="16" style="3" name="step_number" caption="">
+                              <variables>
+                                <var key="text_style" value="u_bold" type="String"/>
+                                <var key="font_size" value="11" type="uint"/>
+                                <var key="text_color" value="0xffffff" type="hex"/>
+                                <var key="auto_size" value="center" type="String"/>
+                                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                              </variables>
+                            </text>
+                          </children>
+                        </border>
+                        <text x="36" y="8" width="134" height="16" params="16" style="3" name="step_label" caption="${vortex.character.class}">
+                          <variables>
+                            <var key="text_style" value="u_bold" type="String"/>
+                            <var key="font_size" value="11" type="uint"/>
+                            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                          </variables>
+                        </text>
+                      </children>
+                    </border>
+                    <border x="0" y="0" width="174" height="32" params="16" style="2" name="step_row" color="0xf2f2ec">
+                      <children>
+                        <border x="4" y="4" width="24" height="24" params="16" style="2" name="step_badge" color="0xd0d0c8">
+                          <children>
+                            <text x="0" y="4" width="24" height="16" params="16" style="3" name="step_number" caption="">
+                              <variables>
+                                <var key="text_style" value="u_bold" type="String"/>
+                                <var key="font_size" value="11" type="uint"/>
+                                <var key="text_color" value="0x777777" type="hex"/>
+                                <var key="auto_size" value="center" type="String"/>
+                                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                              </variables>
+                            </text>
+                          </children>
+                        </border>
+                        <text x="36" y="8" width="134" height="16" params="16" style="3" name="step_label" caption="${vortex.charcreate.step.appearance}">
+                          <variables>
+                            <var key="text_style" value="u_regular" type="String"/>
+                            <var key="font_size" value="11" type="uint"/>
+                            <var key="text_color" value="0x999999" type="hex"/>
+                            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                          </variables>
+                        </text>
+                      </children>
+                    </border>
+                    <border x="0" y="0" width="174" height="32" params="16" style="2" name="step_row" color="0xf2f2ec">
+                      <children>
+                        <border x="4" y="4" width="24" height="24" params="16" style="2" name="step_badge" color="0xd0d0c8">
+                          <children>
+                            <text x="0" y="4" width="24" height="16" params="16" style="3" name="step_number" caption="">
+                              <variables>
+                                <var key="text_style" value="u_bold" type="String"/>
+                                <var key="font_size" value="11" type="uint"/>
+                                <var key="text_color" value="0x777777" type="hex"/>
+                                <var key="auto_size" value="center" type="String"/>
+                                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                              </variables>
+                            </text>
+                          </children>
+                        </border>
+                        <text x="36" y="8" width="134" height="16" params="16" style="3" name="step_label" caption="${vortex.mapeditor.field.name}">
+                          <variables>
+                            <var key="text_style" value="u_regular" type="String"/>
+                            <var key="font_size" value="11" type="uint"/>
+                            <var key="text_color" value="0x999999" type="hex"/>
+                            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                          </variables>
+                        </text>
+                      </children>
+                    </border>
+                    <border x="0" y="0" width="174" height="32" params="16" style="2" name="step_row" color="0xf2f2ec">
+                      <children>
+                        <border x="4" y="4" width="24" height="24" params="16" style="2" name="step_badge" color="0xd0d0c8">
+                          <children>
+                            <text x="0" y="4" width="24" height="16" params="16" style="3" name="step_number" caption="">
+                              <variables>
+                                <var key="text_style" value="u_bold" type="String"/>
+                                <var key="font_size" value="11" type="uint"/>
+                                <var key="text_color" value="0x777777" type="hex"/>
+                                <var key="auto_size" value="center" type="String"/>
+                                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                              </variables>
+                            </text>
+                          </children>
+                        </border>
+                        <text x="36" y="8" width="134" height="16" params="16" style="3" name="step_label" caption="${vortex.charcreate.step.confirm}">
+                          <variables>
+                            <var key="text_style" value="u_regular" type="String"/>
+                            <var key="font_size" value="11" type="uint"/>
+                            <var key="text_color" value="0x999999" type="hex"/>
+                            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                          </variables>
+                        </text>
+                      </children>
+                    </border>
+                  </children>
+                  <variables>
+                    <var key="spacing" value="4" type="int"/>
+                  </variables>
+                </itemlist_vertical>
+              </children>
+            </border>
+            <container x="202" y="4" width="684" height="381" params="16" style="3" name="step_slot">
+              <children/>
+            </container>
+            <container x="8" y="383" width="878" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+            <button_thick x="8" y="391" width="140" height="28" params="131089" style="3" name="cancel_button" caption="${vortex.ui.cancel}" width_min="140" width_max="140"/>
+            <button_thick x="538" y="391" width="140" height="28" params="131089" style="3" name="previous_button" caption="${vortex.charcreate.previous}" width_min="140" width_max="140"/>
+            <button_thick x="686" y="391" width="200" height="28" params="131089" style="6" color="0x0aa00" name="next_button" caption="${vortex.charcreate.next}" width_min="200" width_max="200"/>
+            <button_thick visible="false" x="686" y="391" width="200" height="28" params="131089" style="6" color="0x0aa00" name="create_button" caption="${vortex.charcreate.create}" width_min="200" width_max="200"/>
+          </children>
+        </container>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>
