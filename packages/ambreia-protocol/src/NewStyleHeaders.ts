@@ -14,13 +14,22 @@ export const NewStyleHeaders = {
         Incoming.RpgCharacterResultMessageComposer,
         Incoming.RpgCharacterStateMessageComposer,
         Incoming.RpgCharacterProgressMessageComposer,
-        Incoming.RpgCharacterStatsMessageComposer
+        Incoming.RpgCharacterStatsMessageComposer,
+        // F2 Objets: the bag and the equipment (features/inventory).
+        Incoming.RpgInventoryMessageComposer,
+        Incoming.RpgItemResultMessageComposer
     ]),
     outgoing: new Set<number>([
         Outgoing.RpgCharacterListRequestMessageEvent,
         Outgoing.RpgCharacterCreateMessageEvent,
         Outgoing.RpgCharacterChooseClassMessageEvent,
-        Outgoing.RpgEnterWorldMessageEvent
+        Outgoing.RpgEnterWorldMessageEvent,
+        Outgoing.RpgItemMoveMessageEvent,
+        Outgoing.RpgItemSplitMessageEvent,
+        Outgoing.RpgItemEquipMessageEvent,
+        Outgoing.RpgItemUnequipMessageEvent,
+        Outgoing.RpgItemDestroyMessageEvent,
+        Outgoing.RpgItemClaimParcelMessageEvent
     ])
 };
 
