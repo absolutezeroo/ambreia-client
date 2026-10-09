@@ -227,9 +227,12 @@ export class TextSkinRenderer extends SkinRenderer
         const typedWindow = window as unknown as { text?: string; displayAsPassword?: boolean };
         const raw = typedWindow.text ?? window.caption;
         // Flash's TextField masked a password itself; here the canvas paints the glyphs (the DOM
-        // input only carries the caret), so the mask is drawn here — `*`, as Flash did: the
-        // client's fonts have no `•`.
-        const text = typedWindow.displayAsPassword && raw ? '*'.repeat([...raw].length) : raw;
+        // input only carries the caret), so the mask is drawn here.
+        // DEVIATION: `•`, not Flash's `*`: the DOM bridge masks with `•`, and the caret it carries
+        //   advanced by that width while the canvas drew narrower `*`, so it drifted off the text a
+        //   little more with every character. GlyphAtlas draws `•` from the browser's fonts, as the
+        //   bridge does (Chrome and Edge mask with `•`).
+        const text = typedWindow.displayAsPassword && raw ? '\u2022'.repeat([...raw].length) : raw;
 
         const tw = window as unknown as ITextWindowShape;
 

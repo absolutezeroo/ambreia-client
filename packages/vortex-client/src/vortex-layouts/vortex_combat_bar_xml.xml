@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_combat_bar_xml" width="38" height="7" version="0.1">
+  <window>
+    <container x="0" y="0" width="38" height="7" params="16" style="3" name="combat_bar">
+      <children>
+        <shape x="0" y="0" width="38" height="7" params="16" style="3" name="bg" color="0x201e19">
+          <variables>
+            <var key="shape" value="round_rectangle" type="String"/>
+            <var key="radius" value="2" type="Number"/>
+            <var key="stroke_color" value="0xff0a0908" type="hex"/>
+            <var key="stroke_thickness" value="1" type="Number"/>
+          </variables>
+        </shape>
+        <shape x="1" y="1" width="36" height="5" params="16" style="3" name="fill" color="0xd83a2a">
+          <variables>
+            <var key="shape" value="round_rectangle" type="String"/>
+            <var key="radius" value="2" type="Number"/>
+          </variables>
+        </shape>
+      </children>
+    </container>
+  </window>
+</layout>

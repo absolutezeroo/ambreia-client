@@ -137,9 +137,12 @@ export class AvatarInfoWidget extends RoomWidgetBase implements IContextMenuPare
         log.debug(`Name bubble for "${userData.name}" (webId ${userData.webID}, object ${objectId})`);
 
         const view = new UserNameView(this);
+        // DEVIATION: an RPG monster is a pet whose name is its content id (`monster.forest.wolf`, M1a
+        //   §9.1): the bubble shows its translated name, `<id>.name`.
+        const name = userData.name.startsWith('monster.') ? this._localizations?.getLocalization(`${userData.name}.name`, userData.name) ?? userData.name : userData.name;
 
         UserNameView.setup(
-            view, userData.webID, userData.name, -1, userData.type, objectId,
+            view, userData.webID, name, -1, userData.type, objectId,
             UserNameView.DEFAULT_BG_COLOR, UserNameView.DEFAULT_FADE_DELAY_MS, userData.isBlocked
         );
 

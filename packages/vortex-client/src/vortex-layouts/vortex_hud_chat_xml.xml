@@ -5,10 +5,13 @@
       <children>
         <border x="0" y="0" width="500" height="230" params="16" style="9" name="chat" color="0x686661">
           <children>
-            <button x="8" y="6" width="90" height="24" params="131089" style="6" color="0x55534e" name="chat_tab_0" caption="${vortex.guild.channel.general}" width_min="90" width_max="90"/>
-            <button x="104" y="6" width="90" height="24" params="131089" style="6" color="0x55534e" name="chat_tab_1" caption="${vortex.group.title}" width_min="90" width_max="90"/>
-            <button x="200" y="6" width="90" height="24" params="131089" style="6" color="0x55534e" name="chat_tab_2" caption="${vortex.character.guild}" width_min="90" width_max="90"/>
-            <border x="296" y="6" width="26" height="26" params="17" style="6" name="add_tab_button" color="0x55534e" dynamic_style="button">
+            <itemlist_horizontal x="8" y="6" width="414" height="26" params="16" style="3" name="tab_bar">
+              <children/>
+              <variables>
+                <var key="spacing" value="4" type="int"/>
+              </variables>
+            </itemlist_horizontal>
+            <border x="96" y="6" width="26" height="26" params="17" style="6" name="add_tab_button" color="0x55534e" dynamic_style="button">
               <children>
                 <static_bitmap x="5" y="5" width="16" height="16" params="16" style="3" tags="%23icon" color="0xffffff">
                   <variables>
@@ -23,7 +26,7 @@
               <children>
                 <static_bitmap x="5" y="5" width="16" height="16" params="16" style="3" tags="%23icon" color="0xffffff">
                   <variables>
-                    <var key="asset_uri" value="rpg/ui-icons/software_signs_maths_plus_addition_bonus_add_new_icon" type="String"/>
+                    <var key="asset_uri" value="rpg/ui-icons/software_options_settings_cogwheel_gear_mechanics_icon" type="String"/>
                     <var key="stretched_x" value="false" type="Boolean"/>
                     <var key="stretched_y" value="false" type="Boolean"/>
                   </variables>
@@ -53,7 +56,11 @@
             </border>
             <border x="44" y="192" width="412" height="30" params="16" style="3" color="0x201e19" blend="0.8">
               <children>
-                <input x="8" y="7" width="396" height="16" params="1" style="0" name="chat_input" caption="${vortex.hud.chat.placeholder}"/>
+                <input x="8" y="7" width="396" height="16" params="1" style="0" name="chat_input" caption="${vortex.hud.chat.placeholder}">
+                  <variables>
+                    <var key="text_color" value="0xe8e6de" type="hex"/>
+                  </variables>
+                </input>
               </children>
             </border>
             <border x="462" y="192" width="30" height="30" params="17" style="6" name="emoji_button" color="0x55534e" dynamic_style="button">

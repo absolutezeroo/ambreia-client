@@ -13,6 +13,10 @@ export class AvatarAction
     public static readonly CARRY_OBJECT: string = 'cri';
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/enum/AvatarAction.as::USE_OBJECT
     public static readonly USE_OBJECT: string = 'usei';
+    /** Ambreia: a weapon held in guard, `wpn=<weapon id>` (vortex-client/tools/build-weapon-handitems.mjs). */
+    public static readonly WIELD: string = 'wpn';
+    /** Ambreia: one swing of the weapon, `atk=<weapon id>`. */
+    public static readonly ATTACK: string = 'atk';
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/enum/AvatarAction.as::EFFECT
     public static readonly EFFECT: string = 'fx';
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/enum/AvatarAction.as::TALK

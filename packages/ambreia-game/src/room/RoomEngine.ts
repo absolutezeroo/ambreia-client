@@ -303,6 +303,11 @@ export interface IPendingFurnitureData {
     synchronized: boolean;
 }
 
+/** TS-only (RPG F3c §16): the RP actions played as Habbo expressions (AvatarAction.getExpressionTime() ids). */
+const RPG_EXPRESSIONS: Readonly<Record<string, number>> = {wave: 1, laugh: 3, sad: 4, clap: 7};
+/** Habbo's « surprised » face (AvatarAction.GESTURE_SURPRISED). */
+const RPG_SURPRISED_GESTURE = 3;
+
 /**
  * One queued wall item. Its `data` is a string where the floor item's is an `IStuffData` — the
  * wall message carries the legacy blob, not a parsed one.
@@ -544,6 +549,8 @@ export class RoomEngine extends Component implements IRoomEngine,
     private _rpgInteractives: ReadonlyMap<number, string> | null = null;
     /** TS-only (RPG F3b §7.3): the avatar (room object id) under the target circle; 0 for none. */
     private _rpgTargetId = 0;
+    /** TS-only (RPG F3c §16): avatars dancing from an RP action; their first step stops it. */
+    private readonly _rpgDancers = new Set<number>();
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_1821.as::getSelectedAvatarId()
     private _selectedAvatarId: number = -1;
@@ -5016,7 +5023,33 @@ export class RoomEngine extends Component implements IRoomEngine,
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::updateObjectUserPosture()
     updateObjectUserPosture(roomId: number, roomIndex: number, posture: string, parameter: string): boolean 
     {
+        // TS-only (RPG F3c §16): an RP dance lasts until the avatar walks; the server keeps nothing.
+        if(posture === 'mv' && this._rpgDancers.delete(roomIndex)) this.updateObjectUserAction(roomId, roomIndex, RoomObjectVariableEnum.AVATAR_DANCE, 0);
+
         return this.updateRoomObjectUserPosture(roomId, roomIndex, posture, parameter);
+    }
+
+    /**
+     * TS-only (RPG F3c §16): plays an RP action on an avatar of the active room, with Habbo's own
+     * animations: wave, laugh, cry and respect (the raised hand, for `clap`) are expressions,
+     * `surprised` a face, `dance` the first dance until the avatar walks. Unknown keys play nothing.
+     */
+    playRpgEmote(roomIndex: number, key: string): boolean
+    {
+        const roomId = this._activeRoomId;
+
+        if(key === 'dance')
+        {
+            this._rpgDancers.add(roomIndex);
+
+            return this.updateObjectUserAction(roomId, roomIndex, RoomObjectVariableEnum.AVATAR_DANCE, 1);
+        }
+
+        if(key === 'surprised') return this.updateObjectUserGesture(roomId, roomIndex, RPG_SURPRISED_GESTURE);
+
+        const expression = RPG_EXPRESSIONS[key];
+
+        return expression !== undefined && this.updateObjectUserAction(roomId, roomIndex, RoomObjectVariableEnum.AVATAR_EXPRESSION, expression);
     }
 
     /**
@@ -6068,6 +6101,33 @@ export class RoomEngine extends Component implements IRoomEngine,
         this._roomInstanceData.clear();
 
         super.dispose();
+    }
+
+    /**
+     * TS-only (RPG M1a §9.3): the screen point centred above an avatar or a monster of the active
+     * room (its bounding box's top), written into `out` — the combat overlay asks every frame, so
+     * nothing is allocated here. False when the object or its canvas is not there.
+     */
+    getRpgAnchor(objectId: number, out: {x: number; y: number}): boolean
+    {
+        const canvas = this._renderingCanvases.get(this._activeRoomId * 1000 + 1);
+        const geometry = canvas?.geometry ?? null;
+        const object = this.getRoomObject(this._activeRoomId, objectId, RoomObjectCategoryEnum.OBJECT_CATEGORY_USER);
+        const visualization = object?.getVisualization() ?? null;
+
+        if(canvas === undefined || geometry === null || object === null || visualization === null) return false;
+
+        const screenPoint = geometry.getScreenPoint(object.getLocation());
+
+        if(screenPoint === null) return false;
+
+        const bounds = visualization.boundingRectangle;
+        const scale = canvas.scale;
+
+        out.x = (bounds.x + bounds.width / 2 + screenPoint.x) * scale + canvas.width / 2 + canvas.screenOffsetX;
+        out.y = (bounds.y + screenPoint.y) * scale + canvas.height / 2 + canvas.screenOffsetY;
+
+        return true;
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::getRoomObjectBoundingRectangle()

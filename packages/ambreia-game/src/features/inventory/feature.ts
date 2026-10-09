@@ -120,7 +120,12 @@ export const InventoryFeature: IGameFeature = {
 
         const sessionEvents = host.made.roomSession?.sessionEvents;
 
-        sessionEvents?.on(RoomSessionEvent.RSE_STARTED, () => inWorld = true);
+        sessionEvents?.on(RoomSessionEvent.RSE_STARTED, () =>
+        {
+            inWorld = true;
+            // Item names are in the chat's links too, not only in the windows.
+            void loadTexts();
+        });
         sessionEvents?.on(RoomSessionEvent.RSE_ENDED, () =>
         {
             inWorld = false;

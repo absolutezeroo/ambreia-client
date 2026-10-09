@@ -1,4 +1,5 @@
 import {EventEmitter} from 'eventemitter3';
+import {ALL_TAB, DEFAULT_CHAT_SETTINGS, type ChatChannel, type IChatLine, type IChatSettings, type IChatTab} from './chatModel';
 
 /** A quest the tracker follows: its icon, name, current objective and progress (`2 / 5`). */
 export interface IQuestLine
@@ -48,17 +49,7 @@ export interface IHudUnit
     debuffs: string[];
 }
 
-export type ChatChannel = 'general' | 'group' | 'guild' | 'system';
-
-export interface IChatLine
-{
-    /** `14:22` */
-    time: string;
-    channel: ChatChannel;
-    /** Empty for a system line. */
-    author: string;
-    message: string;
-}
+export type {ChatChannel, IChatLine} from './chatModel';
 
 /**
  * The HUD around the player frame and the action bar (RPG spec §16.3, mockup/glaze/hud_*.png):
@@ -84,6 +75,12 @@ export interface IHudPanels
     /** The warning under the boss (`Frappe sismique dans 3 seconde(s) !`). */
     alert: string | null;
     chat: IChatLine[];
+    /** The chat's tabs, « Général » first; `chatTab` is the open one's id. */
+    chatTabs: IChatTab[];
+    chatTab: string;
+    /** Where what is typed in « Général » goes (the bubble button). */
+    sayChannel: ChatChannel;
+    chatSettings: Readonly<IChatSettings>;
 }
 
 /** The chat keeps this many lines; older ones scroll away for good. */
@@ -91,11 +88,15 @@ export const CHAT_HISTORY = 50;
 
 export class HudPanelsState
 {
-    /** `nav`: a top bar button was clicked (`nav_inventory`…); the feature that owns the window opens it. */
-    readonly events = new EventEmitter<{changed: [Readonly<IHudPanels>]; nav: [string]}>();
+    /**
+     * `nav`: a top bar button was clicked (`nav_inventory`…), the feature that owns the window opens
+     * it; `say`: the player typed a chat line (Enter), the chat feature sends it; `emote`: an RP
+     * action of the palette (`wave`…), the chat feature asks for it.
+     */
+    readonly events = new EventEmitter<{changed: [Readonly<IHudPanels>]; nav: [string]; say: [string]; emote: [string]}>();
     private _value: IHudPanels = {
         gold: null, gems: null, tokens: null, questAlert: false, zoneName: '', zonePlayers: null,
-        quests: [], party: [], buffs: [], target: null, boss: null, alert: null, chat: []
+        quests: [], party: [], buffs: [], target: null, boss: null, alert: null, chat: [], chatTabs: [ALL_TAB], chatTab: ALL_TAB.id, sayChannel: 'world', chatSettings: DEFAULT_CHAT_SETTINGS
     };
 
     get value(): Readonly<IHudPanels>
@@ -108,6 +109,12 @@ export class HudPanelsState
     {
         this._value = {...this._value, ...values};
         this.events.emit('changed', this._value);
+    }
+
+    /** The open tab (« Général » when its id is gone). */
+    get openTab(): IChatTab
+    {
+        return this._value.chatTabs.find(tab => tab.id === this._value.chatTab) ?? ALL_TAB;
     }
 
     addChatLine(line: IChatLine): void

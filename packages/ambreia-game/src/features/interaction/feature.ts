@@ -11,20 +11,27 @@ import {RpgInteractionSession} from './RpgInteractionSession';
 
 const log = Logger.getLogger('habbo.features.interaction');
 
+/** The target frame's portrait for a monster (vortex_hud_target_xml's own). */
+const MONSTER_PORTRAIT = 'rpg/ui-icons/rpg_creature_archetypes_giant_ogre_troll_cyclops_monster_icon';
+
 /**
- * The HUD's target frame for an RpgTarget: the head (`figure`, from the room's Users), name,
- * `Niv. 6 · Guerrier`; no HP or effects on the wire yet.
+ * The HUD's target frame for an RpgTarget: a player's head (`figure`, from the room's Users), name
+ * and `Niv. 6 · Guerrier`; a monster's portrait, translated name (`<id>.name`, M1a §9.1) and level.
+ * HP when the combat knows them (`health`, M1a §9.2); no effects on the wire yet.
  */
-export function targetUnit(target: RpgTargetMessage, bits: WindowBits, figure: string | null): IHudPanels['target']
+export function targetUnit(target: RpgTargetMessage, bits: WindowBits, figure: string | null, health: {health: number; maxHealth: number} | null = null): IHudPanels['target']
 {
     if(target.objectId === 0) return null;
 
     const level = bits.text('vortex.ui.level.short', 'level', String(target.level));
     const className = target.classId === '' ? '' : bits.contentName(`vortex.${target.classId}`, target.classId);
+    const monster = target.kind === 'monster';
 
     return {
-        name: target.name, portrait: null, figure, level: target.level, info: className === '' ? level : `${level} · ${className}`,
-        hp: null, hpMax: null, debuffs: [], cast: null
+        name: monster ? bits.contentName(`${target.name}.name`, target.name) : target.name,
+        portrait: monster ? MONSTER_PORTRAIT : null, figure: monster ? null : figure,
+        level: target.level, info: className === '' ? level : `${level} · ${className}`,
+        hp: health?.health ?? null, hpMax: health?.maxHealth ?? null, debuffs: [], cast: null
     };
 }
 
@@ -57,7 +64,7 @@ export const InteractionFeature: IGameFeature = {
             engine?.setRpgTarget(target.objectId);
             const figure = room?.userDataManager.getUserDataByIndex(target.objectId)?.figure ?? null;
 
-            hud?.update({target: targetUnit(target, new WindowBits(host.made.localization), figure)});
+            hud?.update({target: targetUnit(target, new WindowBits(host.made.localization), figure, host.made.combat?.healthOf(target.objectId) ?? null)});
         });
 
         // The HUD frame's close button clears the frame alone: ask the server to clear the target too.

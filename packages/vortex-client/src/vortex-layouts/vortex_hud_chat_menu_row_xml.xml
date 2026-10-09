@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_hud_chat_menu_row_xml" width="168" height="24" version="0.1">
+  <window>
+    <border x="0" y="0" width="168" height="24" params="17" style="6" name="menu_row" color="0x55534e" dynamic_style="button">
+      <children>
+        <static_bitmap x="5" y="4" width="16" height="16" params="16" style="3" name="row_icon" tags="%23icon" color="0xffffff">
+          <variables>
+            <var key="asset_uri" value="" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <static_bitmap x="146" y="4" width="16" height="16" params="16" style="3" name="row_check" tags="%23icon" color="0x2a6aa0" visible="false">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/software_signs_checkmark_checkbox_ticked_todo_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+        <text x="27" y="4" width="116" height="16" params="16" style="3" name="row_label" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </border>
+  </window>
+</layout>

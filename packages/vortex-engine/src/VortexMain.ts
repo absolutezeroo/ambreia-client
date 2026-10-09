@@ -12,6 +12,7 @@ import type {RoomSessionManager} from '@ambreia/game/session/RoomSessionManager'
 import {RoomSessionEvent} from '@ambreia/game/session/events/RoomSessionEvent';
 import type {SessionDataManager} from '@ambreia/game/session/SessionDataManager';
 import type {AvatarRenderManager} from '@ambreia/avatar/AvatarRenderManager';
+import {AvatarAssetDownloadManager} from '@ambreia/avatar/AvatarAssetDownloadManager';
 import type {HabboWindowManager} from '@ambreia/game/window/HabboWindowManager';
 import type {RoomUI} from '@ambreia/game/ui/RoomUI';
 import {Core} from '@ambreia/kernel/Core';
@@ -490,12 +491,13 @@ export class VortexMain implements IVortexMain
         //
         // The whole progress path was ported into CoreComponentContext — the counters,
         // updateLoadingProcess(), the LibraryProgressEvent — and nobody called it, so both
-        // counters read 0 and the bar had only the three init steps to move on. The two
-        // mandatory avatar libraries are downloaded here by AvatarAssetDownloadManager rather
-        // than by the core, so that is where the matching updateLoadingProcess() call lives.
+        // counters read 0 and the bar had only the three init steps to move on. The mandatory
+        // avatar libraries (AS3's two, plus Ambreia's weapons) are downloaded here by
+        // AvatarAssetDownloadManager rather than by the core, so that is where the matching
+        // updateLoadingProcess() call lives.
         this._loadingEvents.on('progress', this.onProgressEvent);
 
-        ctx.readConfigDocument({'asset-libraries': ['hh_human_body', 'hh_human_item']}, this._loadingEvents);
+        ctx.readConfigDocument({'asset-libraries': [...AvatarAssetDownloadManager.MANDATORY_LIBRARIES]}, this._loadingEvents);
 
         this._totalInitSteps = ctx.getNumberOfFilesPending() + ctx.getNumberOfFilesLoaded() + VortexMain.INIT_STEPS;
 
