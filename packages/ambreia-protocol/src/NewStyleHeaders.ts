@@ -24,7 +24,13 @@ export const NewStyleHeaders = {
         // F3c Chat: the chat window's lines and refusals (features/chat).
         Incoming.RpgChatMessageComposer,
         Incoming.RpgChatResultMessageComposer,
-        Incoming.RpgEmoteMessageComposer
+        Incoming.RpgEmoteMessageComposer,
+        // M1a Combat: blows, health, death (features/combat).
+        Incoming.RpgCombatEventsMessageComposer,
+        Incoming.RpgVitalsMessageComposer,
+        Incoming.RpgSelfVitalsMessageComposer,
+        Incoming.RpgDeathMessageComposer,
+        Incoming.RpgCombatResultMessageComposer
     ]),
     outgoing: new Set<number>([
         Outgoing.RpgCharacterListRequestMessageEvent,
