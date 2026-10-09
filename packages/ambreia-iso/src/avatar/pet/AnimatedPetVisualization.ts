@@ -85,6 +85,7 @@ export class AnimatedPetVisualization extends AnimatedFurnitureVisualization
     // null) without changing getString()'s signature across the whole engine.
     private _posture: string | null = null;
     private _gesture: string | null = null;
+    private _gestureSequence: number = 0;
     private _isSleeping: boolean = false;
     // AS3: .../src/com/sulake/habbo/room/object/visualization/pet/AnimatedPetVisualization.as::_headDirection
     private _headDirection: number = 0;
@@ -227,6 +228,20 @@ export class AnimatedPetVisualization extends AnimatedFurnitureVisualization
             // the head and tail rendered at double their intended displacement.
             const posture = model.getString('figure_posture');
             const gesture = model.getString('figure_gesture');
+            const gestureSequence = model.getNumber('figure_gesture_sequence');
+
+            // DEVIATION: AS3 only reacts to a different gesture. A gesture sent again (PetLogic
+            // stamps each one) replays from its first frame: a monster's `atk` on every swing.
+            if(!isNaN(gestureSequence) && gestureSequence !== this._gestureSequence)
+            {
+                this._gestureSequence = gestureSequence;
+                this._gesture = null;
+
+                const gestureState = this._animationStates[AnimatedPetVisualization.GESTURE_ANIMATION_INDEX];
+
+                gestureState.animationId = -1;
+                gestureState.resetAnimationFrames(true);
+            }
 
             this.validateActions(posture, gesture);
 
@@ -322,6 +337,19 @@ export class AnimatedPetVisualization extends AnimatedFurnitureVisualization
                     allOver = false;
                 }
             }
+        }
+
+        // DEVIATION: AS3 holds a gesture's last frame until PetLogic clears it (3 s). An animated
+        // gesture (it ran past its first frame: a monster's `atk`, `hit`) gives the layers back to the
+        // posture once over; a one-frame gesture (Habbo's expressions) is still held.
+        const gesture = this._animationStates[AnimatedPetVisualization.GESTURE_ANIMATION_INDEX];
+
+        if(gesture.animationOver && gesture.animationId >= 0 && gesture.frameCounter > 1)
+        {
+            // The setter keeps the layers' last frames; dropping them is what lets the posture show.
+            gesture.animationId = -1;
+            gesture.resetAnimationFrames(true);
+            result |= ~0;
         }
 
         this._allAnimationsOver = allOver;

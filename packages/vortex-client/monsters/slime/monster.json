@@ -1,0 +1,7 @@
+{
+  "id": "slime",
+  "aseprite": "slime.aseprite",
+  "anchor": [32, 46],
+  "directions": [2, 0],
+  "scale": 1
+}

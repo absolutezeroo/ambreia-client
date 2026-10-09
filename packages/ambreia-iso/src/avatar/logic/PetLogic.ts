@@ -28,6 +28,9 @@ export class PetLogic extends MovingObjectLogic
     // Timed actions
     private _talkEndTime = 0;
     private _gestureEndTime = 0;
+    // TS-only: stamps each gesture message so the visualization replays a gesture sent again while
+    // the model still holds it (a monster's `atk` every swing).
+    private _gestureSequence = 0;
     private _expressionEndTime = 0;
 
     // Selection state
@@ -167,6 +170,7 @@ export class PetLogic extends MovingObjectLogic
             if(message instanceof RoomObjectAvatarPetGestureUpdateMessage)
             {
                 model.setString('figure_gesture', message.gesture);
+                model.setNumber('figure_gesture_sequence', ++this._gestureSequence);
                 this._gestureEndTime = Date.now() + 3000;
                 return;
             }

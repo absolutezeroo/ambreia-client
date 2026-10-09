@@ -49,10 +49,19 @@ export const CombatFeature: IGameFeature = {
             if(target && host.made.interaction?.targetId === objectId) host.made.hud?.update({target: {...target, hp: health, hpMax: maxHealth}});
         });
 
+        // A monster's own art (tools/build-monsters.mjs) plays these pet gestures; a pet without them
+        // plays nothing.
+        const gesture = (objectId: number, name: string): void =>
+        {
+            if(room && isMonster(objectId)) host.made.roomEngine?.updateObjectPetGesture(room.roomId, objectId, name);
+        };
+
         session.events.on('hits', message =>
         {
             for(const hit of message.hits)
             {
+                gesture(hit.attackerId, 'atk');
+                if(hit.outcome !== 'miss' && !hit.killed) gesture(hit.targetId, 'hit');
                 overlayOf()?.hit(hit.targetId, hit.amount, hit.outcome);
                 // A dead monster leaves the room (UserRemove); a dead player stays, as a ghost.
                 if(hit.killed && isMonster(hit.targetId)) overlay?.remove(hit.targetId);
