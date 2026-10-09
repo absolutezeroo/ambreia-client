@@ -32,6 +32,7 @@ import path from 'node:path';
 import zlib from 'node:zlib';
 import crypto from 'node:crypto';
 import sharp from 'sharp';
+import {optimise as optimiseImage} from './lossless-webp.mjs';
 import {compressManifest, encodePiece, inflateManifest} from '@ambreia/common/assets/pack/AmbreiaPiece';
 import type {IPieceImage} from '@ambreia/common/assets/pack/AmbreiaPiece';
 import {decodeManifest, encodeManifest} from '@ambreia/common/assets/pack/ManifestCodec';
@@ -138,39 +139,8 @@ function readBundle(file: string): IBundleFile[] | string
     }
 }
 
-async function pixels(image: Buffer): Promise<{data: Buffer; width: number; height: number}>
-{
-    // sRGB, 8 bits, RGBA whatever the source (greyscale, 16 bits): the comparison reads 4 bytes a pixel.
-    const {data, info} = await sharp(image, {limitInputPixels: false}).toColourspace('srgb').ensureAlpha().raw({depth: 'uchar'}).toBuffer({resolveWithObject: true});
-
-    if(info.channels !== 4) throw new Error(`${info.channels} channels after conversion`);
-
-    return {data, width: info.width, height: info.height};
-}
-
 /** Lossless WebP of `png`, or the PNG itself when the WebP would not show the same pixels. */
-async function optimise(png: Buffer): Promise<{bytes: Buffer; format: 'webp' | 'png'}>
-{
-    try
-    {
-        const webp = await sharp(png, {limitInputPixels: false}).webp({lossless: true, effort: 6, quality: QUALITY}).toBuffer();
-        const [a, b] = await Promise.all([pixels(png), pixels(webp)]);
-
-        if(a.width !== b.width || a.height !== b.height) return {bytes: png, format: 'png'};
-
-        for(let i = 0; i < a.data.length; i += 4)
-        {
-            if(a.data[i + 3] !== b.data[i + 3]) return {bytes: png, format: 'png'};
-            if(a.data[i + 3] !== 0 && (a.data[i] !== b.data[i] || a.data[i + 1] !== b.data[i + 1] || a.data[i + 2] !== b.data[i + 2])) return {bytes: png, format: 'png'};
-        }
-
-        return {bytes: webp, format: 'webp'};
-    }
-    catch
-    {
-        return {bytes: png, format: 'png'};
-    }
-}
+const optimise = (png: Buffer): Promise<{bytes: Buffer; format: 'webp' | 'png'}> => optimiseImage(png, QUALITY);
 
 const sha1 = (data: Uint8Array): string => crypto.createHash('sha1').update(data).digest('hex');
 const canonical = (json: Buffer): string => JSON.stringify(JSON.parse(json.toString('utf8')));

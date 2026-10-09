@@ -13,7 +13,7 @@ const HABBO_LAYOUT = 'bully_report_xml';
 // The one atlas whose embedded name is not its file name (see the client's App.ts).
 const ATLAS_FILES: Record<string, string> = {skin_ubuntu_bg_9: 'ubuntu_bg_9'};
 
-const [images, xml] = await Promise.all([AssetBundle.load('/assets-images.bundle'), AssetBundle.load('/assets-xml.bundle')]);
+const [images, xml] = await Promise.all([AssetBundle.load('/assets-images.ambreia'), AssetBundle.load('/assets-xml.ambreia')]);
 
 // The two families the skins draw their text in; the window system measures with them.
 await Promise.all([['Volter', 'Volter.ttf', 'normal'], ['Volter', 'Volter Bold.ttf', 'bold'], ['Ubuntu', 'Ubuntu.ttf', 'normal'], ['Ubuntu', 'Ubuntu-b.ttf', 'bold']]

@@ -10,7 +10,7 @@ import {existsSync, readdirSync, readFileSync, statSync, writeFileSync} from 'fs
  *   charset and the resolved path is confined to the layouts directory (no
  *   traversal).
  * - `GET /glaze/layouts` returns every source layout **newer than the shipped
- *   `assets-xml.bundle`**. The editor loads its layouts from that prebuilt bundle
+ *   `assets-xml.ambreia`**. The editor loads its layouts from that prebuilt bundle
  *   while Save writes to the sources, so without this a saved layout was still the
  *   old one after a page reload — a re-theme, or any other edit, never came back.
  *   Normally the list is empty; after a save it holds the one file that changed.
@@ -28,7 +28,7 @@ function glazeSavePlugin(): Plugin
      * next asset build, while the file the client actually reads never changed.
      */
     const vortexLayoutsDir = resolve(__dirname, '../vortex-client/src/vortex-layouts');
-    const xmlBundle = resolve(__dirname, '../vortex-client/public/assets-xml.bundle');
+    const xmlBundle = resolve(__dirname, '../vortex-client/public/assets-xml.ambreia');
 
     /** Where a layout came from: its own directory if it has one there, else the dump's. */
     const dirFor = (name: string): string =>
@@ -145,7 +145,7 @@ function glazeSavePlugin(): Plugin
  * Glaze imports only the @ambreia/* packages (the window system, nothing of the engine or the
  * client). One thing it shares with vortex-client is data, not code:
  *  - `publicDir` points at vortex-client's built `public/` so the two
- *    `.bundle` files are served at glaze's root exactly as they are for the
+ *    `.ambreia` bundles are served at glaze's root exactly as they are for the
  *    client. Run `pnpm --filter vortex-client build:bundle` (or `pnpm --filter
  *    vortex-glaze bundle`) once if they are missing.
  */

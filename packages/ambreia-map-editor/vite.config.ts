@@ -6,7 +6,7 @@ import {defineConfig} from 'vite';
 // picking. Tauri dev loads this server, so the proxy covers the app too.
 //
 // The window system's skins, layouts and fonts are the client's asset bundles
-// (vortex-client/public/assets-*.bundle, `pnpm --filter vortex-client build:bundle`), served as
+// (vortex-client/public/assets-*.ambreia, `pnpm --filter vortex-client build:bundle`), served as
 // this page's public files the way Glaze and the ui sandbox serve them.
 export default defineConfig({
     clearScreen: false,

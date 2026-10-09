@@ -26,7 +26,7 @@ tools/
 !packages/vortex-imager/tools/*.mjs
 !packages/ambreia-*/tools/
 !packages/ambreia-*/tools/**/*.mjs
-*.bundle
+packages/vortex-client/public/*.ambreia
 *.log
 .DS_Store
 .env

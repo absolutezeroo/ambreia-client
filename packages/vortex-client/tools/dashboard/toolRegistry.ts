@@ -112,7 +112,7 @@ export const TOOLS: readonly ToolDefinition[] = [
     {
         id: 'bundle-assets',
         label: 'Bundle assets',
-        description: 'Empaquette les assets en .bundle. Tourne aussi automatiquement avant dev/build.',
+        description: 'Empaquette les assets en .ambreia (assets-images, assets-xml). Tourne aussi automatiquement avant dev/build.',
         script: 'bundle-assets.mjs',
         options: [
             inputPath('input', 'Dossier assets source (--input)', '--input', SRC_ASSETS),

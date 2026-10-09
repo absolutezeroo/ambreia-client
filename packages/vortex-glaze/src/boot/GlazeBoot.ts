@@ -147,8 +147,8 @@ export class GlazeBoot
         Logger.setNamespaceLevel('habbo.window.ResourceManager', LogLevel.ERROR);
 
         const [imageBundle, xmlBundle] = await Promise.all([
-            this.loadBundle('/assets-images.bundle'),
-            this.loadBundle('/assets-xml.bundle')
+            this.loadBundle('/assets-images.ambreia'),
+            this.loadBundle('/assets-xml.ambreia')
         ]);
 
         const windowManager = this.buildWindowSubsystem();

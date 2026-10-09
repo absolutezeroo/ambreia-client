@@ -1,15 +1,23 @@
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
+import zlib from 'node:zlib';
+import crypto from 'node:crypto';
 import {fileURLToPath} from 'node:url';
+import {optimise} from './lossless-webp.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const DEFAULT_ASSETS_DIR = path.resolve(__dirname, '../src/assets');
 const DEFAULT_OUTPUT_DIR = path.resolve(__dirname, '../public');
-const DEFAULT_IMAGES_BUNDLE = 'assets-images.bundle';
-const DEFAULT_XML_BUNDLE = 'assets-xml.bundle';
+const DEFAULT_IMAGES_BUNDLE = 'assets-images.ambreia';
+const DEFAULT_XML_BUNDLE = 'assets-xml.ambreia';
+
+// Lossless WebP of each PNG, kept by the PNG's sha1 (`<sha1>.webp`, or an empty `<sha1>.png` when
+// the PNG stays): `pnpm dev` runs this every time, and only a new or changed image is re-encoded.
+const WEBP_CACHE = path.resolve(__dirname, '../.ambreia-build/bundle-images');
 
 const IMAGE_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp', '.avif', '.svg']);
 
@@ -109,8 +117,63 @@ async function collectFiles(basePath)
 	return result;
 }
 
-async function writeBundle(outputPath, files)
+async function readOptimised(file)
 {
+	const png = await fs.readFile(file.absolute);
+
+	if (file.ext !== '.png') return png;
+
+	const digest = crypto.createHash('sha1').update(png).digest('hex');
+	const cached = await fs.readFile(path.join(WEBP_CACHE, `${digest}.webp`)).catch(() => null);
+
+	if (cached) return cached;
+	if (await fs.access(path.join(WEBP_CACHE, `${digest}.png`)).then(() => true, () => false)) return png;
+
+	const {bytes, format} = await optimise(png);
+
+	await fs.writeFile(path.join(WEBP_CACHE, `${digest}.${format}`), format === 'webp' ? bytes : '');
+
+	return bytes;
+}
+
+/** `fn` over `items`, `limit` at a time, results in order. */
+async function mapPool(items, limit, fn)
+{
+	const results = new Array(items.length);
+	let next = 0;
+
+	await Promise.all(Array.from({length: limit}, async () =>
+	{
+		while (next < items.length)
+		{
+			const index = next++;
+
+			results[index] = await fn(items[index]);
+		}
+	}));
+
+	return results;
+}
+
+/** "AMBB", u16 version 1, u16 flags (1 = deflate-raw body), body: see AssetBundle.ts. */
+async function writeAmbreia(outputPath, files, read)
+{
+	const body = await bundleBody(files, read);
+	const deflated = zlib.deflateRawSync(body, {level: 9});
+	const compress = deflated.length < body.length * 0.9;
+	const header = Buffer.alloc(8);
+
+	header.write('AMBB', 0, 'latin1');
+	header.writeUInt16BE(1, 4);
+	header.writeUInt16BE(compress ? 1 : 0, 6);
+	await fs.writeFile(outputPath, Buffer.concat([header, compress ? deflated : body]));
+
+	return {raw: body.length, written: 8 + (compress ? deflated : body).length};
+}
+
+async function bundleBody(files, read)
+{
+	const contents = await mapPool(files, os.availableParallelism(), read);
 	const headerSize = 8;
 	const recordHeaders = [];
 	const dataBuffers = [];
@@ -121,9 +184,9 @@ async function writeBundle(outputPath, files)
 
 	let dataOffset = 0;
 
-	for (const file of files)
+	for (const [index, file] of files.entries())
 	{
-		const content = await fs.readFile(file.absolute);
+		const content = contents[index];
 		const keyBytes = Buffer.from(file.key, 'utf8');
 
 		if (keyBytes.length > 0xffff)
@@ -149,13 +212,7 @@ async function writeBundle(outputPath, files)
 		dataOffset += content.length;
 	}
 
-	const payloadParts = [
-		Buffer.from(header),
-		...recordHeaders,
-		...dataBuffers
-	];
-
-	await fs.writeFile(outputPath, Buffer.concat(payloadParts));
+	return Buffer.concat([Buffer.from(header), ...recordHeaders, ...dataBuffers]);
 }
 
 async function build()
@@ -177,11 +234,14 @@ async function build()
 	console.log(`[bundle-assets] Images: ${imageFiles.length} files`);
 	console.log(`[bundle-assets] Other text/binary: ${xmlFiles.length} files`);
 
-	await writeBundle(options.imagesBundle, imageFiles);
-	await writeBundle(options.xmlBundle, xmlFiles);
+	await fs.mkdir(WEBP_CACHE, {recursive: true});
 
-	console.log(`[bundle-assets] Created ${path.relative(process.cwd(), options.imagesBundle)}`);
-	console.log(`[bundle-assets] Created ${path.relative(process.cwd(), options.xmlBundle)}`);
+	for (const [output, files, read] of [[options.imagesBundle, imageFiles, readOptimised], [options.xmlBundle, xmlFiles, (file) => fs.readFile(file.absolute)]])
+	{
+		const {raw, written} = await writeAmbreia(output, files, read);
+
+		console.log(`[bundle-assets] Created ${path.relative(process.cwd(), output)}: ${(written / 1e6).toFixed(1)} MB (${(raw / 1e6).toFixed(1)} MB unpacked)`);
+	}
 }
 
 build().catch((error) =>

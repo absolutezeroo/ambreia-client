@@ -1,11 +1,15 @@
 /**
  * Runtime loader for the packed asset bundle.
  *
- * Fetches a single `.bundle` file containing packed binary/text assets,
+ * Fetches a single `.ambreia` bundle file containing packed binary/text assets,
  * parses the manifest header, and provides methods to extract individual
  * assets as blob URLs, ImageBitmaps, or raw text.
  *
- * Bundle format (binary manifest):
+ * File: "AMBB", u16 version (1), u16 flags (1 = the body is deflate-raw), then the body. A `.png`
+ * entry may hold lossless WebP bytes (checked pixel by pixel at build): its key keeps `.png`, so
+ * callers do not change, and `getBlob()` types it from its bytes.
+ *
+ * Body (binary manifest):
  *   [4 bytes: version (uint32 big-endian)]
  *   [4 bytes: entry count (uint32 big-endian)]
  *   repeated N times:
@@ -40,7 +44,7 @@ interface IBundleManifest
  *
  * Usage:
  * ```typescript
- * const bundle = await AssetBundle.load(`${import.meta.env.BASE_URL}assets-images.bundle`, ratio => { ... });
+ * const bundle = await AssetBundle.load(`${import.meta.env.BASE_URL}assets-images.ambreia`, ratio => { ... });
  * const bitmap = await bundle.getImageBitmap('images/habbo_blue_skin.png');
  * const xml = bundle.getText('window-layouts/main_window.xml');
  * const url = bundle.getUrl('images/icon_name.png');
@@ -74,7 +78,7 @@ export class AssetBundle
 	 * Uses ReadableStream to track download progress byte-by-byte,
 	 * providing real-time feedback for the loading screen.
 	 *
-	 * @param url - URL to the .bundle file
+	 * @param url - URL to the .ambreia bundle
 	 * @param onProgress - Optional callback receiving a ratio from 0.0 to 1.0
 	 * @returns The loaded AssetBundle
 	 */
@@ -101,7 +105,27 @@ export class AssetBundle
             buffer = await response.arrayBuffer();
         }
 
-        return AssetBundle.parse(buffer);
+        return AssetBundle.parse(await AssetBundle.unwrap(buffer));
+    }
+
+    /** The body of an .ambreia bundle file, inflated when the build deflated it. */
+    private static async unwrap(buffer: ArrayBuffer): Promise<ArrayBuffer>
+    {
+        const view = new DataView(buffer);
+
+        // An unknown path on a Vite dev server answers 200 with index.html: say so, not "bad version".
+        if(view.byteLength < 8 || AssetBundle._decoder.decode(new Uint8Array(buffer, 0, 4)) !== 'AMBB')
+        {
+            throw new Error('[AssetBundle] Not an .ambreia bundle (wrong URL, or a .bundle from before the format change: run build:bundle)');
+        }
+
+        const version = view.getUint16(4, false);
+
+        if(version !== 1) throw new Error(`[AssetBundle] Unsupported .ambreia bundle version: ${version}`);
+
+        if(!(view.getUint16(6, false) & 1)) return buffer.slice(8);
+
+        return new Response(new Blob([new Uint8Array(buffer, 8)]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer();
     }
 
     /**
@@ -238,12 +262,11 @@ export class AssetBundle
 
         if(!entry) return null;
 
-        const type = this.getMimeType(key);
-
         // Pass a Uint8Array view (no copy) rather than ArrayBuffer.slice() (a copy):
         // the Blob constructor copies the bytes into its own storage anyway, so the
         // extra slice() was a redundant second copy of every bundled asset.
         const bytes = new Uint8Array(this._data, this._dataOffset + entry.offset, entry.size);
+        const type = AssetBundle.isWebp(bytes) ? 'image/webp' : this.getMimeType(key);
 
         return new Blob([bytes], {type});
     }
@@ -317,6 +340,13 @@ export class AssetBundle
         if(!prefix) return keys;
 
         return keys.filter(k => k.startsWith(prefix));
+    }
+
+    /** "RIFF" ‥ "WEBP": a `.png` key the build stored as lossless WebP. */
+    private static isWebp(bytes: Uint8Array): boolean
+    {
+        return bytes.length >= 12 && bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46
+            && bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50;
     }
 
     /**
