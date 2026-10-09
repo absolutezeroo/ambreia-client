@@ -29,7 +29,6 @@
   "pet.configuration": "dog,cat,croco,terrier,bear,pig,lion,rhino,spider,turtle,chicken,frog,dragon,monster,monkey,horse,monsterplant,bunnyeaster,bunnyevil,bunnydepressed,bunnylove,pigeongood,pigeonevil,demonmonkey,bearbaby,terrierbaby,gnome,gnome,kittenbaby,puppybaby,pigletbaby,haloompa,fools,pterosaur,velociraptor,cow,dragondog",
   "pet.dynamic.download.name.template": "%type%.nitro",
   "pet.dynamic.download.url": "${flash.client.url}",
-  "productdata.load.url": "${url.prefix}/gamedata/productdata_json/1",
   "room.camera.follow_user": "true",
   "room.dragging.always_center": "0",
   "seasonalcurrency.id.84": "vortex",

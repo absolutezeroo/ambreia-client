@@ -13,7 +13,6 @@ import {IID_HabboLocalizationManager} from '../iid/IIDHabboLocalizationManager';
 import {IID_HabboWindowManager} from '../iid/IIDHabboWindowManager';
 import {IID_RoomSessionManager} from '../iid/IIDRoomSessionManager';
 import {FurnitureDataParser} from '@ambreia/iso/furniture/data/FurnitureDataParser';
-import {ProductDataParser} from './product/ProductDataParser';
 import {BadgeInfo} from './BadgeInfo';
 import {BadgeImageManager} from './BadgeImageManager';
 import {FurniIconImageManager} from './FurniIconImageManager';
@@ -22,8 +21,6 @@ import type {IHabboLocalizationManager} from '../localization/IHabboLocalization
 import type {IHabboWindowManager} from '../window/IHabboWindowManager';
 import type {IFurnitureData} from '@ambreia/iso/furniture/data/IFurnitureData';
 import type {IFurniDataListener} from '@ambreia/iso/furniture/data/IFurniDataListener';
-import type {IProductData} from './product/IProductData';
-import type {IProductDataListener} from './product/IProductDataListener';
 import type {IRoomSessionManager} from './IRoomSessionManager';
 import type {IHabboConfigurationManager} from '../configuration/IHabboConfigurationManager';
 
@@ -209,12 +206,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
     private _furniDataListenersNotified: boolean = false;
     // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::_furniDataListeners
     private _furniDataListeners: Set<IFurniDataListener> = new Set();
-    // Product data - owned by SessionDataManager (AS3 pattern)
-    private _products: Map<string, IProductData> = new Map();
-    private _productDataParser: ProductDataParser | null = null;
-    private _productDataReady: boolean = false;
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::_productDataListeners
-    private _productDataListeners: Set<IProductDataListener> = new Set();
 
     constructor(context: IContext)
     {
@@ -943,20 +934,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
     }
 
     /**
-	 * @see source_as_win63/habbo/session/SessionDataManager.as line 808
-	 */
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::getProductData()
-    getProductData(productCode: string): IProductData | null
-    {
-        if(!this._productDataReady)
-        {
-            this.loadProductData();
-        }
-
-        return this._products.get(productCode) ?? null;
-    }
-
-    /**
 	 * @see source_as_win63/habbo/session/SessionDataManager.as line 817
 	 */
     // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::getFloorItemData()
@@ -1042,29 +1019,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
     }
 
     /**
-	 * @see source_as_win63/habbo/session/SessionDataManager.as line 1024
-	 */
-    /**
-	 * Load product data if not already loaded.
-	 * @see source_as_win63/habbo/session/SessionDataManager.as line 1024
-	 */
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::loadProductData()
-    loadProductData(listener?: IProductDataListener): boolean
-    {
-        if(this._productDataReady)
-        {
-            return true;
-        }
-
-        if(listener)
-        {
-            this._productDataListeners.add(listener);
-        }
-
-        return false;
-    }
-
-    /**
 	 * @see source_as_win63/habbo/session/SessionDataManager.as line 1122
 	 */
     // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::getFurniData()
@@ -1106,19 +1060,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
         {
             return null;
         }
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::addProductsReadyEventListener()
-    addProductsReadyEventListener(listener: IProductDataListener): void
-    {
-        if(this._productDataReady)
-        {
-            listener.productDataReady();
-
-            return;
-        }
-
-        this._productDataListeners.add(listener);
     }
 
     /**
@@ -1352,11 +1293,9 @@ export class SessionDataManager extends Component implements ISessionDataManager
         // Dispose parsers
         this._furnitureDataParser?.dispose();
         this._loadingFurnitureDataParser?.dispose();
-        this._productDataParser?.dispose();
 
         this._furnitureDataParser = null;
         this._loadingFurnitureDataParser = null;
-        this._productDataParser = null;
 
         // Remove all message event handlers
         for(const event of this._messageEvents)
@@ -1372,8 +1311,8 @@ export class SessionDataManager extends Component implements ISessionDataManager
     }
 
     /**
-	 * Called when configuration properties (furnidata.load.url, productdata.load.url) are available.
-	 * Triggers furniture and product data loading.
+	 * Called when configuration properties (furnidata.load.url) are available.
+	 * Triggers furniture data loading.
 	 *
 	 * In AS3 this is the onConfigurationComplete callback from the
 	 * IIDHabboConfigurationManager dependency.
@@ -1383,14 +1322,12 @@ export class SessionDataManager extends Component implements ISessionDataManager
     // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::onConfigurationComplete()
     onConfigurationComplete(): void
     {
-        this._products = new Map();
         this._floorItems = new Map();
         this._wallItems = new Map();
         this._floorItemsByName = new Map();
         this._wallItemsByName = new Map();
 
         this.initFurnitureData();
-        this.initProductData();
         this.initBadgeImageManager();
         this.initFurniIconImageManager();
     }
@@ -1499,31 +1436,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
     }
 
     /**
-	 * Initialize product data parser and start loading
-	 * @see source_as_win63/habbo/session/SessionDataManager.as line 325 initProductData()
-	 */
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::initProductData()
-    private initProductData(): void
-    {
-        if(this._productDataParser)
-        {
-            this._productDataParser.dispose();
-            this._productDataParser = null;
-        }
-
-        if(this.propertyExists('productdata.load.url'))
-        {
-            const url = this.getProperty('productdata.load.url');
-
-            this._productDataParser = new ProductDataParser(url, this._products);
-            this._productDataParser.events.on('PDP_product_data_ready', () =>
-            {
-                this.onProductsReady();
-            });
-        }
-    }
-
-    /**
 	 * Handle furniture data ready
 	 * @see source_as_win63/habbo/session/SessionDataManager.as line 337 onFurnitureReady()
 	 */
@@ -1548,28 +1460,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
         }
 
         log.info(`Furniture data ready: ${this._floorItems.size} floor, ${this._wallItems.size} wall items`);
-    }
-
-    /**
-	 * Handle product data ready
-	 * @see source_as_win63/habbo/session/SessionDataManager.as line 1050 onProductsReady()
-	 */
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::onProductsReady()
-    private onProductsReady(): void
-    {
-        this._productDataReady = true;
-
-        for(const listener of this._productDataListeners)
-        {
-            if(listener != null && !listener.disposed)
-            {
-                listener.productDataReady();
-            }
-        }
-
-        this._productDataListeners.clear();
-
-        log.info(`Product data ready: ${this._products.size} products`);
     }
 
     /**

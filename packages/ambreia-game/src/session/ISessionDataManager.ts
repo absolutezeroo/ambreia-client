@@ -13,8 +13,6 @@ import type {IHabboGroupInfoManager} from './IHabboGroupInfoManager';
 import type {IRoomSessionManager} from './IRoomSessionManager';
 import type {IFurnitureData} from '@ambreia/iso/furniture/data/IFurnitureData';
 import type {IFurniDataListener} from '@ambreia/iso/furniture/data/IFurniDataListener';
-import type {IProductData} from './product/IProductData';
-import type {IProductDataListener} from './product/IProductDataListener';
 import type {BadgeInfo} from './BadgeInfo';
 
 /**
@@ -223,9 +221,6 @@ export interface ISessionDataManager extends IDisposable
     getGroupBadgeSmallAssetName(badge: string): string | null;
 
     // Furniture data
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::getProductData()
-    getProductData(productCode: string): IProductData | null;
-
     // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::getFloorItemData()
     getFloorItemData(itemId: number): IFurnitureData | null;
 
@@ -247,16 +242,10 @@ export interface ISessionDataManager extends IDisposable
     // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::getWallItemDataByName()
     getWallItemDataByName(name: string, index?: number): IFurnitureData | null;
 
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::loadProductData()
-    loadProductData(listener?: IProductDataListener): boolean;
-
     // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::getFurniData()
     getFurniData(listener: IFurniDataListener): IFurnitureData[] | null;
 
     getXmlWindow(name: string): IWindow | null;
-
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::addProductsReadyEventListener()
-    addProductsReadyEventListener(listener: IProductDataListener): void;
 
     // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::removeFurniDataListener()
     removeFurniDataListener(listener: IFurniDataListener): void;
