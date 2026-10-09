@@ -20,7 +20,10 @@ export const NewStyleHeaders = {
         Incoming.RpgItemResultMessageComposer,
         // F3b Interaction: the usable objects and the target (features/interaction).
         Incoming.RpgZoneInteractivesMessageComposer,
-        Incoming.RpgTargetMessageComposer
+        Incoming.RpgTargetMessageComposer,
+        // F3c Chat: the chat window's lines and refusals (features/chat).
+        Incoming.RpgChatMessageComposer,
+        Incoming.RpgChatResultMessageComposer
     ]),
     outgoing: new Set<number>([
         Outgoing.RpgCharacterListRequestMessageEvent,
@@ -33,7 +36,8 @@ export const NewStyleHeaders = {
         Outgoing.RpgItemUnequipMessageEvent,
         Outgoing.RpgItemDestroyMessageEvent,
         Outgoing.RpgItemClaimParcelMessageEvent,
-        Outgoing.RpgTargetSelectMessageEvent
+        Outgoing.RpgTargetSelectMessageEvent,
+        Outgoing.RpgChatSendMessageEvent
     ])
 };
 
