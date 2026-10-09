@@ -1,5 +1,6 @@
 import EventEmitter from 'eventemitter3';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
+import type {AmbreiaDirectory} from '@ambreia/common/assets/pack/AmbreiaDirectory';
 import type {IAvatarEffectListener} from './IAvatarEffectListener';
 import type {AvatarStructure} from './AvatarStructure';
 import {EffectAssetDownloadLibrary} from './EffectAssetDownloadLibrary';
@@ -47,7 +48,9 @@ export class EffectAssetDownloadManager extends EventEmitter
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/EffectAssetDownloadManager.as::_initDownloadBuffer
     private _initDownloadBuffer: [number, IAvatarEffectListener | null][];
     private _isReady: boolean;
-    private _downloadUrl: string;
+    // DEVIATION: AS3 holds the libraries' URL template; the port holds the effects family's
+    // .ambreia directory (spec 2026-10-09-ambreia-everything).
+    private _directory: AmbreiaDirectory;
     private _assetLibrary: IAssetLibrary;
 
     /**
@@ -62,7 +65,7 @@ export class EffectAssetDownloadManager extends EventEmitter
     private _aliasCollection: AssetAliasCollection | null;
 
     constructor(
-        downloadUrl: string,
+        directory: AmbreiaDirectory,
         structure: AvatarStructure,
         assetLibrary: IAssetLibrary,
         aliasCollection: AssetAliasCollection | null = null
@@ -71,7 +74,7 @@ export class EffectAssetDownloadManager extends EventEmitter
         super();
 
         this._structure = structure;
-        this._downloadUrl = downloadUrl;
+        this._directory = directory;
         this._assetLibrary = assetLibrary;
         this._aliasCollection = aliasCollection;
         this._effectMap = new Map();
@@ -249,7 +252,7 @@ export class EffectAssetDownloadManager extends EventEmitter
         const library = new EffectAssetDownloadLibrary(
             libName,
             revision,
-            this._downloadUrl,
+            this._directory,
             this._assetLibrary
         );
 

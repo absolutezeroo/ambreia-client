@@ -6,7 +6,7 @@ export {AssetLoaderEventType, AssetLoaderEvent,} from './AssetLoaderEvent';
 export {BinaryFileLoader} from './BinaryFileLoader';
 export {BitmapFileLoader} from './BitmapFileLoader';
 export {AssetLoaderErrorCodes} from './IAssetLoader';
-export {NitroBundleLoader} from './NitroBundleLoader';
+export {AmbreiaPieceLoader} from './AmbreiaPieceLoader';
 export {SoundFileLoader} from './SoundFileLoader';
 export {TextFileLoader} from './TextFileLoader';
 
@@ -18,4 +18,4 @@ export type {
     IFrameInfo,
     IAssetInfo,
     IAssetAlias,
-} from './NitroBundleLoader';
+} from './AmbreiaPieceLoader';

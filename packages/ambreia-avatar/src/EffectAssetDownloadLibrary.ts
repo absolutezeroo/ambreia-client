@@ -1,6 +1,7 @@
 import EventEmitter from 'eventemitter3';
 import type {AssetLoaderEvent} from '@ambreia/common/assets/loaders/AssetLoaderEvent';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
+import type {AmbreiaDirectory} from '@ambreia/common/assets/pack/AmbreiaDirectory';
 import type {NitroAsset} from '@ambreia/common/assets/NitroAsset';
 import {AssetLoaderEventType} from '@ambreia/common/assets/loaders/AssetLoaderEvent';
 import {Logger} from '@ambreia/common/utils/Logger';
@@ -32,18 +33,20 @@ export class EffectAssetDownloadLibrary extends EventEmitter
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/EffectAssetDownloadLibrary.as::_revision
     private _revision: string;
     // AS3: .../src/com/sulake/habbo/avatar/EffectAssetDownloadLibrary.as::_downloadUrl
-    private _downloadUrl: string;
+    // DEVIATION: AS3 holds a URL template; the port holds the effects family's .ambreia directory
+    // (spec 2026-10-09-ambreia-everything).
+    private _directory: AmbreiaDirectory;
     private _assetLibrary: IAssetLibrary;
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/EffectAssetDownloadLibrary.as::_state
     private _state: number;
 
-    constructor(name: string, revision: string, downloadUrl: string, assetLibrary: IAssetLibrary) 
+    constructor(name: string, revision: string, directory: AmbreiaDirectory, assetLibrary: IAssetLibrary)
     {
         super();
 
         this._name = name;
         this._revision = revision;
-        this._downloadUrl = downloadUrl;
+        this._directory = directory;
         this._assetLibrary = assetLibrary;
         this._state = EffectAssetDownloadLibrary.STATE_IDLE;
         this._animation = null;
@@ -108,24 +111,11 @@ export class EffectAssetDownloadLibrary extends EventEmitter
             return;
         }
 
-        const url = this._downloadUrl
-            .replace('%libname%', this._name)
-            .replace('%revision%', this._revision);
+        log.debug(`Downloading effect: ${this._name} (revision ${this._revision}) from ${this._directory.url}`);
 
-        if(!url || url === this._downloadUrl) 
+        try
         {
-            log.warn(`No valid download URL for effect: ${this._name}`);
-            this._state = EffectAssetDownloadLibrary.STATE_READY;
-            this.emit(EffectAssetDownloadLibrary.COMPLETE, this);
-
-            return;
-        }
-
-        log.debug(`Downloading effect: ${this._name} from ${url}`);
-
-        try 
-        {
-            const loader = this._assetLibrary.loadAssetFromFile(this._name, url, 'application/x-nitro-bundle');
+            const loader = this._assetLibrary.loadPiece(this._name, this._directory);
 
             if(!loader) 
             {

@@ -18,6 +18,8 @@ import {Core} from '@ambreia/kernel/Core';
 import type {CoreComponentContext} from '@ambreia/kernel/runtime/CoreComponentContext';
 import {AssetLibrary} from '@ambreia/game/core/assets/index';
 import {Logger} from '@ambreia/common/utils/Logger';
+import {openAssetDirectories} from '@ambreia/common/assets/pack/AssetDirectories';
+import type {IAssetDirectories} from '@ambreia/common/assets/pack/AssetDirectories';
 import {IID_Core} from '@ambreia/kernel/iid/IIDCore';
 import {IID_AssetLibrary} from '@ambreia/kernel/iid/IIDAssetLibrary';
 import {IID_HabboConfigurationManager} from '@ambreia/game/iid/IIDHabboConfigurationManager';
@@ -74,6 +76,7 @@ export class AvatarRenderService
     private _configuration: HabboConfigurationManager | null = null;
     private _context: CoreComponentContext | null = null;
     private _assets: AssetLibrary | null = null;
+    private _assetDirectories: IAssetDirectories | null = null;
 
     /** Effect ids whose library has arrived, or whose download has already been waited out. */
     private _settledEffects: Set<number> = new Set();
@@ -287,6 +290,12 @@ export class AvatarRenderService
         return this._configuration;
     }
 
+    /** The families' .ambreia directories, opened at boot from the client's config.json; null before. */
+    get assetDirectories(): IAssetDirectories | null
+    {
+        return this._assetDirectories;
+    }
+
     async dispose(): Promise<void>
     {
         this._renderManager?.dispose();
@@ -399,13 +408,17 @@ export class AvatarRenderService
 
         this._configuration = configuration;
 
-        log.debug(`Avatar libraries: ${configuration.getProperty('flash.dynamic.avatar.download.url')}`);
+        // `${url.prefix}` is the asset host here (createConfiguration), as in the client.
+        const directories = openAssetDirectories(this._config.assetPacks, text => configuration.interpolate(text));
+
+        this._assetDirectories = directories;
+        log.debug(`Avatar libraries: ${directories.clothing.url}, effects: ${directories.effects.url}`);
 
         const renderManager = new AvatarRenderManager({
             assets,
             data: this.readAvatarData(),
-            downloadUrl: configuration.getProperty('flash.dynamic.avatar.download.url'),
-            downloadNameTemplate: configuration.getProperty('flash.dynamic.avatar.download.name.template')
+            clothing: directories.clothing,
+            effects: directories.effects
         });
 
         context.attachInstance(IID_AvatarRenderManager, renderManager);

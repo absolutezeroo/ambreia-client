@@ -1,17 +1,19 @@
-// The asset-packs feature (plan 2026-10-08-asset-packs): once the configuration is loaded, each
-// configured .ambreia directory stands in for the .nitro directory the client downloads that family from.
+// The asset-packs feature (spec 2026-10-09-ambreia-everything): once the configuration is loaded it
+// opens one .ambreia directory per family for the avatar renderer and the room engine.
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {AssetPacks} from '@ambreia/common/assets/pack/AssetPacks';
 import {ConfigError, loadConfig} from '@ambreia/kernel/config/loadConfig';
 import {featureSections} from '@ambreia/kernel/feature/defineFeature';
 import {AssetPacksFeature} from '../src/features/asset-packs/feature';
 import type {IEngineHost} from '../src/features/index';
 
-const PROPERTIES: Record<string, string> = {
-    'url.prefix': 'http://assets',
-    'flash.dynamic.download.url': 'http://assets/dcr/hof_furni/',
-    'flash.dynamic.avatar.download.url': 'http://assets/gordon/PRODUCTION/'
+const PROPERTIES: Record<string, string> = {'url.prefix': 'http://assets'};
+const ALL = {
+    clothing: '${url.prefix}/ambreia/clothing/',
+    effects: '${url.prefix}/ambreia/effects/',
+    room: '${url.prefix}/ambreia/room/',
+    pets: '${url.prefix}/ambreia/pets/',
+    furniture: '${url.prefix}/ambreia/furniture/'
 };
 
 function host(initialized: boolean): {host: IEngineHost; complete: () => void}
@@ -24,49 +26,44 @@ function host(initialized: boolean): {host: IEngineHost; complete: () => void}
         events: {once: (_event: string, listener: () => void) => { onComplete = listener; }}
     };
 
-    return {host: {made: {configuration}} as unknown as IEngineHost, complete: () => onComplete?.()};
+    return {host: {made: {configuration, assetDirectories: null}} as unknown as IEngineHost, complete: () => onComplete?.()};
 }
 
 const create = (config: Record<string, unknown>, made: IEngineHost): unknown =>
     AssetPacksFeature.create({context: null as never, config: {enabled: true, ...config}, app: {} as never, host: made});
 
-test('the configured packs are mounted on the download directories once the configuration completes', () =>
+test('the five directories are opened once the configuration completes, ${url.prefix} resolved', () =>
 {
     const {host: made, complete} = host(false);
 
-    create({furniture: '${url.prefix}/ambreia/furniture/', clothing: '${url.prefix}/ambreia/clothing/'}, made);
-    assert.equal(AssetPacks.resolve('http://assets/dcr/hof_furni/throne.nitro'), null);
+    create(ALL, made);
+    assert.equal(made.made.assetDirectories, null);
 
     complete();
 
-    try
-    {
-        assert.equal(AssetPacks.resolve('http://assets/dcr/hof_furni/throne.nitro')?.pack.url, 'http://assets/ambreia/furniture/');
-        assert.equal(AssetPacks.resolve('http://assets/gordon/PRODUCTION/hh_human_body.nitro')?.pack.url, 'http://assets/ambreia/clothing/');
-    }
-    finally
-    {
-        AssetPacks.unmountAll();
-    }
+    assert.equal(made.made.assetDirectories?.room.url, 'http://assets/ambreia/room/');
+    assert.equal(made.made.assetDirectories?.furniture.url, 'http://assets/ambreia/furniture/');
 });
 
-test('without packs configured nothing is mounted: every .nitro loads as before', () =>
+test('a family left out of config.json is an error that names it, and nothing is opened', () =>
 {
-    create({}, host(true).host);
+    const {host: made} = host(true);
+    const withoutPets = Object.fromEntries(Object.entries(ALL).filter(([family]) => family !== 'pets'));
 
-    assert.equal(AssetPacks.resolve('http://assets/dcr/hof_furni/throne.nitro'), null);
+    assert.throws(() => create(withoutPets, made), /pets/);
+    assert.equal(made.made.assetDirectories, null);
 });
 
-test('a misspelt pack key is a configuration error, not a silently unused pack', () =>
+test('a misspelt family key is a configuration error, not a silently unused directory', () =>
 {
-    const sources = [{name: 'defaults', values: {app: {server: {host: 'ws://test'}}}}, {name: 'config.json', values: {'asset-packs': {furnture: 'x'}}}];
+    const sources = [{name: 'defaults', values: {app: {server: {host: 'ws://test'}}}}, {name: 'config.json', values: {'asset-packs': {...ALL, furnture: 'x'}}}];
 
     assert.throws(() => loadConfig(sources, featureSections([AssetPacksFeature])), ConfigError);
 });
 
 test('a key that is not 32 bytes of base64url is a configuration error', () =>
 {
-    const sources = [{name: 'defaults', values: {app: {server: {host: 'ws://test'}}}}, {name: 'config.json', values: {'asset-packs': {key: 'too-short'}}}];
+    const sources = [{name: 'defaults', values: {app: {server: {host: 'ws://test'}}}}, {name: 'config.json', values: {'asset-packs': {...ALL, key: 'too-short'}}}];
 
     assert.throws(() => loadConfig(sources, featureSections([AssetPacksFeature])), ConfigError);
 });

@@ -1,12 +1,23 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {AssetLibrary} from '@ambreia/common/assets/AssetLibrary';
+import {AmbreiaDirectory} from '@ambreia/common/assets/pack/AmbreiaDirectory';
 import {setPlatform, BROWSER_PLATFORM} from '@ambreia/common/platform/Platform';
 import {AvatarRenderManager} from '../src/AvatarRenderManager';
+import {AvatarAssetDownloadLibrary} from '../src/AvatarAssetDownloadLibrary';
+import {EffectAssetDownloadLibrary} from '../src/EffectAssetDownloadLibrary';
 import {readAvatarData, AVATAR_DATA_FILES, AVATAR_ACTION_OFFSET_FILES} from '../src/AvatarData';
 
 // No DOM here: the constructor's parse of the shipped data gets an empty document.
 const EMPTY_DOCUMENT = {documentElement: null, getElementsByTagName: () => [], querySelectorAll: () => []} as unknown as Document;
+
+/** A directory that has nothing and records what it was asked for. */
+const recording = (family: string, asked: string[]): AmbreiaDirectory => new AmbreiaDirectory(`http://assets/ambreia/${family}/`, async (url) =>
+{
+    asked.push(url);
+
+    return null;
+});
 
 test('the render manager is built from options alone and owns its events', () =>
 {
@@ -14,7 +25,7 @@ test('the render manager is built from options alone and owns its events', () =>
 
     try
     {
-        const manager = new AvatarRenderManager({assets: new AssetLibrary('avatar'), data: readAvatarData(() => ''), downloadUrl: '', downloadNameTemplate: ''});
+        const manager = new AvatarRenderManager({assets: new AssetLibrary('avatar'), data: readAvatarData(() => ''), clothing: recording('clothing', []), effects: recording('effects', [])});
 
         assert.equal(manager.isReady, false);
         assert.equal(typeof manager.events.on, 'function');
@@ -25,6 +36,25 @@ test('the render manager is built from options alone and owns its events', () =>
     {
         setPlatform(BROWSER_PLATFORM);
     }
+});
+
+test('a figure library is asked of the clothing directory and an effect of the effects one, never a .nitro', async () =>
+{
+    const asked: string[] = [];
+    const library = new AvatarAssetDownloadLibrary('hh_human_body', '1', recording('clothing', asked), new AssetLibrary('clothing'));
+    const effect = new EffectAssetDownloadLibrary('Dance1', '1', recording('effects', asked), new AssetLibrary('effects'));
+    const done = Promise.all([
+        new Promise(resolve => library.once(AvatarAssetDownloadLibrary.COMPLETE, resolve)),
+        new Promise(resolve => effect.once(EffectAssetDownloadLibrary.COMPLETE, resolve))
+    ]);
+
+    library.startDownloading();
+    effect.startDownloading();
+    await done;
+
+    assert.ok(asked.includes('http://assets/ambreia/clothing/ambreia.json'), asked.join(' '));
+    assert.ok(asked.includes('http://assets/ambreia/effects/ambreia.json'), asked.join(' '));
+    assert.ok(asked.every(url => !url.endsWith('.nitro')), asked.join(' '));
 });
 
 test('the avatar data names every missing file at once', () =>

@@ -32,6 +32,7 @@ import type {IRoomInstance} from '@ambreia/iso/IRoomInstance';
 import type {IRoomObjectController} from '@ambreia/iso/object/IRoomObjectController';
 import {RoomContentLoadedEvent} from '@ambreia/iso/events/RoomContentLoadedEvent';
 import {RoomContentLoader} from '@ambreia/iso/scene/RoomContentLoader';
+import type {IRoomContentDirectories} from '@ambreia/iso/scene/IRoomContentDirectories';
 import {RoomObjectFactory} from '@ambreia/iso/scene/RoomObjectFactory';
 import {createRoomRegistries} from '@ambreia/iso/object/createRoomRegistries';
 import {DEFAULT_ROOM_MODULES} from '@ambreia/iso/defaultRoomModules';
@@ -90,7 +91,8 @@ export class RoomStack
     static async boot(
         context: CoreComponentContext,
         assetLibrary: IAssetLibrary,
-        configuration: HabboConfigurationManager
+        configuration: HabboConfigurationManager,
+        directories: IRoomContentDirectories
     ): Promise<RoomStack>
     {
         // `RoomManager.createRoomObject()` reads the three external image base URLs it pushes
@@ -119,11 +121,10 @@ export class RoomStack
 
         contentLoader.furniDataSource = stack.createFurniDataSource();
         contentLoader.visualizationFactory = visualizationFactory;
-        // Two arguments, not three: `initialize()` stopped taking an asset library when content
-        // types got one collection each. The stray one was landing in `configurationManager`,
-        // and only went unnoticed because `AssetLibrary` is a `Component` and its `getProperty()`
-        // forwards to the same configuration anyway.
-        contentLoader.initialize(new EventEmitter(), configuration);
+        // No asset library here: `initialize()` stopped taking one when content types got one
+        // collection each. The third argument is where the content comes from, the families'
+        // .ambreia directories (spec 2026-10-09-ambreia-everything).
+        contentLoader.initialize(new EventEmitter(), configuration, directories);
 
         roomManager.setObjectFactory(objectFactory);
         roomManager.setVisualizationFactory(visualizationFactory);

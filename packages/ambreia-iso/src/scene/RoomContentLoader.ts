@@ -21,7 +21,8 @@ import {AssetLibraryCollection} from '@ambreia/common/assets/AssetLibraryCollect
 import type {IFurniDataSource, IRoomContentConfiguration} from './IRoomContentConfiguration';
 import type {IFurnitureData} from '../furniture/data/IFurnitureData';
 import type {IFurniDataListener} from '../furniture/data/IFurniDataListener';
-import type {IRoomContentListener} from './IRoomContentListener';
+import type {IRoomContentDirectories} from './IRoomContentDirectories';
+import type {AmbreiaDirectory} from '@ambreia/common/assets/pack/AmbreiaDirectory';
 import type {NitroAsset} from '@ambreia/common/assets/NitroAsset';
 import {FurnitureLights} from '../furniture/FurnitureLights';
 import type {AssetLoaderEvent} from '@ambreia/common/assets/loaders/AssetLoaderEvent';
@@ -33,6 +34,13 @@ import {PetColorResult} from './PetColorResult';
 import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('habbo.room.RoomContentLoader');
+
+/** A piece of room content: which family's directory, and the piece's name in it. */
+interface IContentPiece
+{
+    directory: AmbreiaDirectory;
+    name: string;
+}
 
 export class RoomContentLoader implements IRoomContentLoader, IFurniDataListener
 {
@@ -181,18 +189,10 @@ export class RoomContentLoader implements IRoomContentLoader, IFurniDataListener
     // --- AS3 var_3642: pendingFurniData ---
     private _pendingFurniData: boolean = false;
     // --- Configuration URLs (AS3 var_4646, var_4721, var_4542, var_4243, var_4790) ---
-    private _furnitureDownloadUrl: string = '';
-    private _furnitureDownloadNameTemplate: string = '';
-    private _furnitureIconDownloadNameTemplate: string = '';
-    private _petDownloadUrl: string = '';
-    private _petDownloadNameTemplate: string = '';
-    // --- AS3 var_3839/iconAssets ---
-    // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/room/RoomContentLoader.as::_iconAssets
-    private _iconAssets: IAssetLibrary | null = null;
-
-    // --- AS3 var_581/iconListener ---
-    // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/room/RoomContentLoader.as::_iconListener
-    private _iconListener: IRoomContentListener | null = null;
+    // DEVIATION: AS3 reads five URL/template properties here; the port reads pieces from the
+    // families' .ambreia directories (spec 2026-10-09-ambreia-everything). AS3's iconAssets and
+    // iconListener (catalogue icon PNGs) went with them: an icon is the furni rendered at scale 1.
+    private _directories: IRoomContentDirectories | null = null;
 
     // --- AS3 var_1813: ignored furni types ---
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/room/RoomContentLoader.as::_ignoredFurniTypes
@@ -233,24 +233,6 @@ export class RoomContentLoader implements IRoomContentLoader, IFurniDataListener
         this._visualizationFactory = factory;
     }
 
-    /**
-	 * @see sources/win63_version/habbo/room/class_1835.as::set iconAssets()
-	 */
-    // AS3: sources/win63_version/habbo/room/class_1835.as::set iconAssets()
-    set iconAssets(assets: IAssetLibrary)
-    {
-        this._iconAssets = assets;
-    }
-
-    /**
-	 * @see sources/win63_version/habbo/room/class_1835.as::set iconListener()
-	 */
-    // AS3: sources/win63_version/habbo/room/class_1835.as::set iconListener()
-    set iconListener(listener: IRoomContentListener)
-    {
-        this._iconListener = listener;
-    }
-
     // AS3: sources/win63_version/habbo/room/class_1835.as::_sessionDataManager
     private _furniDataSource: IFurniDataSource | null = null;
 
@@ -279,8 +261,8 @@ export class RoomContentLoader implements IRoomContentLoader, IFurniDataListener
 	 * Initialize the content loader with dependencies.
 	 *
 	 * @param stateEvents EventEmitter to emit CONTENT_LOADER_READY when ready
-	 * @param assetLibrary Asset library for loading Nitro bundles
-	 * @param configurationManager Configuration manager for URL templates
+	 * @param configurationManager The hotel properties (`gpu.ignored_furni`, `pet.configuration`…)
+	 * @param directories The furniture, pets and room .ambreia directories the content comes from
 	 *
 	 * @see AS3 RoomContentLoader.initialize() lines 181-192
 	 */
@@ -289,16 +271,11 @@ export class RoomContentLoader implements IRoomContentLoader, IFurniDataListener
     // library of its own. The port's third parameter existed only to feed the shared-library design
     // that made two content types share one asset namespace, so it goes with it.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_2288.as::initialize()
-    initialize(stateEvents: EventEmitter, configurationManager: IRoomContentConfiguration): void
+    initialize(stateEvents: EventEmitter, configurationManager: IRoomContentConfiguration, directories: IRoomContentDirectories): void
     {
         this._stateEvents = stateEvents;
         this._configurationManager = configurationManager;
-
-        this._furnitureDownloadUrl = configurationManager.getProperty('flash.dynamic.download.url');
-        this._furnitureDownloadNameTemplate = configurationManager.getProperty('flash.dynamic.download.name.template');
-        this._furnitureIconDownloadNameTemplate = configurationManager.getProperty('flash.dynamic.icon.download.name.template');
-        this._petDownloadUrl = configurationManager.getProperty('pet.dynamic.download.url');
-        this._petDownloadNameTemplate = configurationManager.getProperty('pet.dynamic.download.name.template');
+        this._directories = directories;
 
         this._state = RoomContentLoader.STATE_INITIALIZING;
 
@@ -362,8 +339,7 @@ export class RoomContentLoader implements IRoomContentLoader, IFurniDataListener
 
         this._stateEvents = null;
         this._visualizationFactory = null;
-        this._iconAssets = null;
-        this._iconListener = null;
+        this._directories = null;
         this._furniDataSource = null;
         this._configurationManager = null;
     }
@@ -741,11 +717,11 @@ export class RoomContentLoader implements IRoomContentLoader, IFurniDataListener
             return false;
         }
 
-        const urls = multiType !== null ? this.getObjectContentURLs(multiType) : this.getObjectContentURLs(type);
+        const pieces = this.getObjectContentPieces(multiType ?? type);
 
-        if(urls.length > 0)
+        if(pieces.length > 0)
         {
-            const loadPromise = this.loadObjectContentFromUrls(type, urls, events, assetLibrary);
+            const loadPromise = this.loadObjectContentPieces(type, pieces, events, assetLibrary);
             this._loadingTypes.set(type, loadPromise);
 
             return true;
@@ -818,81 +794,6 @@ export class RoomContentLoader implements IRoomContentLoader, IFurniDataListener
             if(dispatcher !== null)
             {
                 dispatcher.emit(RoomContentLoadedEvent.CONTENT_LOAD_SUCCESS, contentType);
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-	 * @see sources/win63_version/habbo/room/class_1835.as::getObjectUrl()
-	 */
-    // AS3: sources/win63_version/habbo/room/class_1835.as::getObjectUrl()
-    getObjectUrl(type: string, param: string): string | null
-    {
-        let multiType: string | null = null;
-
-        if(type && type.indexOf(',') >= 0)
-        {
-            multiType = type;
-            type = multiType.split(',')[0];
-        }
-
-        const urls = multiType !== null ? this.getObjectContentURLs(multiType, param, true) : this.getObjectContentURLs(type, param, true);
-
-        if(urls.length > 0)
-        {
-            return urls[0];
-        }
-
-        return null;
-    }
-
-    /**
-	 * @see sources/win63_version/habbo/room/class_1835.as::loadThumbnailContent()
-	 */
-    // AS3: sources/win63_version/habbo/room/class_1835.as::loadThumbnailContent()
-    loadThumbnailContent(typeId: number, type: string, param: string, _events: EventEmitter): boolean
-    {
-        if(this._iconAssets === null || this._iconListener === null)
-        {
-            log.warn(`loadThumbnailContent: bailing out (iconAssets=${!!this._iconAssets}, iconListener=${!!this._iconListener})`);
-
-            return false;
-        }
-
-        let multiType: string | null = null;
-
-        if(type && type.indexOf(',') >= 0)
-        {
-            multiType = type;
-            type = multiType.split(',')[0];
-        }
-
-        const urls = multiType !== null ? this.getObjectContentURLs(multiType, param, true) : this.getObjectContentURLs(type, param, true);
-
-        if(urls.length > 0)
-        {
-            for(const url of urls)
-            {
-                try
-                {
-                    const loader = this._iconAssets.loadAssetFromFile([type, param].join('_'), url, 'image/png', typeId);
-
-                    loader.events.on('event', (event: AssetLoaderEvent) =>
-                    {
-                        if(event.type === AssetLoaderEventType.COMPLETE)
-                        {
-                            this._iconListener!.iconLoaded(loader.assetLoader?.id ?? typeId, loader.assetName, true);
-                        }
-                    });
-                }
-                catch (error)
-                {
-                    log.warn(`loadThumbnailContent: loadAssetFromFile(${[type, param].join('_')}, ${url}) threw`, error);
-                }
             }
 
             return true;
@@ -1354,50 +1255,43 @@ export class RoomContentLoader implements IRoomContentLoader, IFurniDataListener
 	 * @see sources/win63_version/habbo/room/class_1835.as::getObjectContentURLs()
 	 */
     // AS3: sources/win63_version/habbo/room/class_1835.as::getObjectContentURLs()
-    private getObjectContentURLs(type: string, param: string | null = null, icon: boolean = false): string[]
+    // DEVIATION: a piece in one of the families' .ambreia directories instead of a URL (spec
+    // 2026-10-09-ambreia-everything); there is no icon variant, the icon is a scale-1 render.
+    private getObjectContentPieces(type: string): IContentPiece[]
     {
+        const directories = this._directories;
+
+        if(directories === null) return [];
+
         const contentType = this.getContentType(type);
+        const room = (name: string): IContentPiece[] => [{directory: directories.room, name}];
 
         switch(contentType)
         {
             case RoomContentLoader.PLACE_HOLDER_FURNITURE:
-                return [this.resolveLocalOrAssetBaseUrl('PlaceHolderFurniture.nitro')];
+                return room('PlaceHolderFurniture');
             case RoomContentLoader.PLACE_HOLDER_WALL_ITEM:
-                return [this.resolveLocalOrAssetBaseUrl('PlaceHolderWallItem.nitro')];
+                return room('PlaceHolderWallItem');
             case RoomContentLoader.PLACE_HOLDER_PET:
-                return [this.resolveLocalOrAssetBaseUrl('PlaceHolderPet.nitro')];
+                return room('PlaceHolderPet');
             case RoomContentLoader.ROOM_CONTENT:
-                return [this.resolveLocalOrAssetBaseUrl('HabboRoomContent.nitro')];
+                return room('HabboRoomContent');
             case RoomContentLoader.TILE_CURSOR:
-                return [this.resolveLocalOrAssetBaseUrl('TileCursor.nitro')];
+                return room('TileCursor');
             case RoomContentLoader.SELECTION_ARROW:
-                return [this.resolveLocalOrAssetBaseUrl('SelectionArrow.nitro')];
+                return room('SelectionArrow');
             default:
             {
                 const category = this.getObjectCategory(contentType);
 
                 if(category === RoomObjectCategoryEnum.OBJECT_CATEGORY_FURNITURE || category === RoomObjectCategoryEnum.OBJECT_CATEGORY_WALL)
                 {
-                    const alias = this.getRoomObjectAlias(contentType);
-                    let name = icon ? this._furnitureIconDownloadNameTemplate : this._furnitureDownloadNameTemplate;
-                    name = name.replace(/%typeid%/g, alias);
-                    name = name.replace(/%revision%/g, String(this.getObjectRevision(contentType)));
-
-                    if(icon)
-                    {
-                        const hasIndexedParam = param !== null && param !== '' && this._activeObjectTypeIds.has(`${type}*${param}`);
-                        name = name.replace(/%param%/g, hasIndexedParam ? `_${param}` : '');
-                    }
-
-                    return [this._furnitureDownloadUrl + name];
+                    return [{directory: directories.furniture, name: this.getRoomObjectAlias(contentType)}];
                 }
 
                 if(category === RoomObjectCategoryEnum.OBJECT_CATEGORY_USER)
                 {
-                    let name = this._petDownloadUrl + this._petDownloadNameTemplate;
-                    name = name.replace(/%type%/g, contentType);
-
-                    return [name];
+                    return [{directory: directories.pets, name: contentType}];
                 }
             }
         }
@@ -1406,39 +1300,29 @@ export class RoomContentLoader implements IRoomContentLoader, IFurniDataListener
     }
 
     /**
-	 * @see sources/win63_version/habbo/room/class_1835.as::resolveLocalOrAssetBaseUrl()
-	 */
-    // AS3: sources/win63_version/habbo/room/class_1835.as::resolveLocalOrAssetBaseUrl()
-    private resolveLocalOrAssetBaseUrl(fileName: string): string
-    {
-        return this._petDownloadUrl + fileName;
-    }
-
-    /**
 	 * @see sources/win63_version/habbo/room/class_1835.as::loadObjectContent()
 	 */
     // AS3: sources/win63_version/habbo/room/class_1835.as::loadObjectContent()
-    private async loadObjectContentFromUrls(type: string, urls: string[], events: EventEmitter, assetLibrary: IAssetLibrary): Promise<void>
+    private async loadObjectContentPieces(type: string, pieces: IContentPiece[], events: EventEmitter, assetLibrary: IAssetLibrary): Promise<void>
     {
         await new Promise<void>((resolve) =>
         {
-            let remaining = urls.length;
+            let remaining = pieces.length;
             let failed = false;
 
-            for(const url of urls)
+            for(const piece of pieces)
             {
-                // loadAssetFromFile() throws synchronously (rather than emitting an ERROR event) when
+                // loadPiece() throws synchronously (rather than emitting an ERROR event) when
                 // the shared asset library already has an asset registered under `type` - this is not
                 // an AS3 code path (AS3 gives each content type its own AssetLibraryCollection, so the
                 // name can never collide), but a synchronous throw here would otherwise reject this
                 // promise with nothing ever catching it, permanently leaving `type` stuck in
                 // _loadingTypes with no graphic asset collection. Route it through the same
                 // onContentLoadError()/CONTENT_LOAD_FAILURE path the async loader ERROR event already
-                // uses below, instead of letting it surface as an unhandled rejection - matching the
-                // same try/catch this file already uses around loadThumbnailContent()'s loadAssetFromFile().
+                // uses below, instead of letting it surface as an unhandled rejection.
                 try
                 {
-                    const loader = assetLibrary.loadAssetFromFile(type, url);
+                    const loader = assetLibrary.loadPiece(type, piece.directory, piece.name);
 
                     loader.events.on('event', (event: AssetLoaderEvent) =>
                     {
@@ -1455,7 +1339,7 @@ export class RoomContentLoader implements IRoomContentLoader, IFurniDataListener
                         else if(event.type === AssetLoaderEventType.ERROR)
                         {
                             failed = true;
-                            this.onContentLoadError(type, url);
+                            this.onContentLoadError(type, piece);
                             this._loadingTypes.delete(type);
                             events.emit(RoomContentLoadedEvent.CONTENT_LOAD_FAILURE, type);
                             resolve();
@@ -1465,8 +1349,8 @@ export class RoomContentLoader implements IRoomContentLoader, IFurniDataListener
                 catch (error)
                 {
                     failed = true;
-                    log.error(`Failed to load asset content for ${type} at ${url}`, error);
-                    this.onContentLoadError(type, url);
+                    log.error(`Failed to load asset content for ${type}: ${piece.name} from ${piece.directory.url}`, error);
+                    this.onContentLoadError(type, piece);
                     this._loadingTypes.delete(type);
                     events.emit(RoomContentLoadedEvent.CONTENT_LOAD_FAILURE, type);
                     resolve();
@@ -1479,21 +1363,24 @@ export class RoomContentLoader implements IRoomContentLoader, IFurniDataListener
 	 * @see sources/win63_version/habbo/room/class_1835.as::onContentLoadError()
 	 */
     // AS3: sources/win63_version/habbo/room/class_1835.as::onContentLoadError()
-    private onContentLoadError(type: string, failedUrl: string): void
+    // DEVIATION: AS3 throws for a critical piece, which Flash shows from the event handler. Here the
+    // caller is an asset loader's async callback: a throw became an unhandled rejection that also
+    // skipped the loader's cleanup. The room cannot draw without it, so it is an error log.
+    private onContentLoadError(type: string, failed: IContentPiece): void
     {
-        const placeHolderTypes = this.getPlaceHolderTypes();
-
-        for(const placeHolderType of placeHolderTypes)
+        for(const placeHolderType of this.getPlaceHolderTypes())
         {
-            const urls = this.getObjectContentURLs(placeHolderType);
+            const [placeHolder] = this.getObjectContentPieces(placeHolderType);
 
-            if(urls.length > 0 && failedUrl !== '' && failedUrl.indexOf(urls[0]) === 0)
+            if(placeHolder && placeHolder.directory === failed.directory && placeHolder.name === failed.name)
             {
-                throw new Error(`Failed to load critical room content asset: ${failedUrl}`);
+                log.error(`Failed to load critical room content: ${failed.name} from ${failed.directory.url} — rooms cannot draw`);
+
+                return;
             }
         }
 
-        log.warn(`Failed to load content asset ${type}: ${failedUrl}`);
+        log.warn(`Failed to load content ${type}: ${failed.name} from ${failed.directory.url}`);
     }
 
     /**

@@ -2,6 +2,7 @@ import type {IDisposable} from '../IDisposable';
 import type {IAsset} from './IAsset';
 import type {AssetTypeDeclaration} from './AssetTypeDeclaration';
 import type {AssetLoaderStruct} from './AssetLoaderStruct';
+import type {AmbreiaDirectory} from './pack/AmbreiaDirectory';
 
 /**
  * IAssetLibrary Interface
@@ -35,6 +36,9 @@ export interface IAssetLibrary extends IDisposable
 
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/core/assets/IAssetLibrary.as::loadAssetFromFile()
     loadAssetFromFile(name: string, url: string, mimeType?: string, id?: number): AssetLoaderStruct;
+
+    /** Loads the piece `piece` (default: `name`) of an .ambreia directory as the asset `name` (AmbreiaPieceLoader). */
+    loadPiece(name: string, directory: AmbreiaDirectory, piece?: string, id?: number): AssetLoaderStruct;
 
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/core/assets/IAssetLibrary.as::getAssetByName()
     getAssetByName(name: string): IAsset | null;

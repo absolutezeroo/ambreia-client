@@ -21,7 +21,7 @@ import type {IRoomEngine} from './IRoomEngine';
 import {RoomAreaSelectionManager} from './utils/RoomAreaSelectionManager';
 import type {IRoomCreator} from './IRoomCreator';
 import type {IRoomEngineServices} from './IRoomEngineServices';
-import type {IRoomContentListener} from '@ambreia/iso/scene/IRoomContentListener';
+import type {IRoomContentDirectories} from '@ambreia/iso/scene/IRoomContentDirectories';
 import type {IRoomInstance} from '@ambreia/iso/IRoomInstance';
 import type {IRoomManager} from '@ambreia/iso/IRoomManager';
 import type {IRoomManagerListener} from '@ambreia/iso/IRoomManagerListener';
@@ -98,7 +98,6 @@ import {SelectedRoomObjectData} from '@ambreia/iso/scene/utils/SelectedRoomObjec
 import {TileObjectMap} from '@ambreia/iso/scene/utils/TileObjectMap';
 import {LegacyWallGeometry} from '@ambreia/iso/scene/utils/LegacyWallGeometry';
 import {RoomPlaneParser} from '@ambreia/iso/scene/object/RoomPlaneParser';
-import {NumberBank} from '@ambreia/iso/utils/NumberBank';
 import {RoomData} from '@ambreia/iso/scene/utils/RoomData';
 import {Logger} from "../core/index";
 import {RoomVisualizationData} from '@ambreia/iso/scene/object/visualization/room/RoomVisualizationData';
@@ -348,7 +347,6 @@ export class RoomEngine extends Component implements IRoomEngine,
     IRoomCreator,
     IRoomEngineServices,
     IUpdateReceiver,
-    IRoomContentListener,
     IRoomRenderingCanvasMouseListener 
 {
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_1821.as::USER_ALLOWED_DIRECTIONS
@@ -372,14 +370,6 @@ export class RoomEngine extends Component implements IRoomEngine,
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::ROOM_TEMP_ID
     private static readonly ROOM_TEMP_ID: string = 'temporary_room';
-
-    /** How many thumbnail requests may be outstanding at once — AS3's `new NumberBank(1000)`. */
-    // Name DERIVED: AS3 holds two `NumberBank`s and both field names are obfuscated
-    // (`_SafeStr_5795` and `_SafeStr_6137`, `_SafeCls_90.as:209/213`, built side by side at
-    // l.443-444). This is the size argument to the first, the one the generic room-object
-    // thumbnail path reserves from at l.4185.
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::initComponent()
-    private static readonly THUMBNAIL_ID_POOL_SIZE: number = 1000;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::OBJECT_ID_ROOM
     public static readonly OBJECT_ID_ROOM: number = -1;
@@ -501,25 +491,6 @@ export class RoomEngine extends Component implements IRoomEngine,
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_1821.as::_objectPlacementSource
     private _objectPlacementSource: string | null = '';
 
-    // DEVIATION: AS3 keys these by an `AssetCallbackInfo` holding `{id, listeners}` in a map of its
-    //   own; the port's map goes straight to the listener list, and the id lives in the counter
-    //   below.
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/AssetCallbackInfo.as
-    private _pendingThumbnailListeners: Map<string, IGetImageListener[]> = new Map();
-
-    /**
-     * The thumbnail-request id pool.
-     *
-     * A bounded pool rather than a counter, as AS3 has it: ids come back through
-     * `freeNumber()` when a request resolves, and `reserveNumber()` answers -1 once a thousand
-     * are outstanding — which is the signal `getGenericRoomObjectThumbnail()` gives up on. A
-     * counter that only ever grows cannot say "too many in flight", so the give-up branch had
-     * nothing to fire on and a leak had nothing to show for itself.
-     */
-    // Name DERIVED: AS3's field is `_SafeStr_5795` (l.213), obfuscated; named after what it hands
-    // out. See THUMBNAIL_ID_POOL_SIZE above for the pair it belongs to.
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::getGenericRoomObjectThumbnail()
-    private readonly _thumbnailIdBank: NumberBank = new NumberBank(RoomEngine.THUMBNAIL_ID_POOL_SIZE);
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::_SafeStr_7265
     private _pendingImageListeners: Map<number, IGetImageListener> = new Map();
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::_SafeStr_6137
@@ -588,11 +559,16 @@ export class RoomEngine extends Component implements IRoomEngine,
 
     // The host's renderer, for screenshots: the game does not own the application (J6).
     private readonly _renderer: () => Renderer | null;
+    // TS-only: the room content's .ambreia directories (spec 2026-10-09-ambreia-everything), read when
+    // the content loader starts — after features/asset-packs opened them.
+    private readonly _directories: () => IRoomContentDirectories | null;
 
-    constructor(context: IContext, assetLibrary: IAssetLibrary | null = null, renderer: () => Renderer | null = () => null)
+    constructor(context: IContext, assetLibrary: IAssetLibrary | null = null, renderer: () => Renderer | null = () => null,
+        directories: () => IRoomContentDirectories | null = () => null)
     {
         super(context, 0, assetLibrary);
         this._renderer = renderer;
+        this._directories = directories;
         // The object types come from registries filled by the room modules (J4).
         const registries = createRoomRegistries(DEFAULT_ROOM_MODULES);
 
@@ -1877,28 +1853,6 @@ export class RoomEngine extends Component implements IRoomEngine,
         this.events.emit('objectsInitialized', type);
     }
 
-    // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/room/RoomEngine.as::iconLoaded()
-    iconLoaded(typeId: number, type: string, success: boolean): void 
-    {
-        this.events.emit('iconLoaded', typeId, type, success);
-
-        const listeners = this._pendingThumbnailListeners.get(type);
-
-        if(!listeners) 
-        {
-            log.warn(`iconLoaded(${typeId}, ${type}, ${success}): no pending listeners for key "${type}" (pending keys: ${[...this._pendingThumbnailListeners.keys()].join(', ')})`);
-
-            return;
-        }
-
-        this._pendingThumbnailListeners.delete(type);
-
-        const asset = success ? this.assets?.getAssetByName(type) ?? null : null;
-        const texture = (asset?.content as Texture | null) ?? null;
-
-        this.deliverIconTexture(typeId, texture, listeners);
-    }
-
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::getFurnitureType()
     getFurnitureType(type: number): string | null 
     {
@@ -2052,24 +2006,6 @@ export class RoomEngine extends Component implements IRoomEngine,
     getObjectMoverIconSpriteVisible(): boolean 
     {
         return this._moverIconSprite?.visible ?? false;
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::getFurnitureIconUrl()
-    getFurnitureIconUrl(type: number): string | null
-    {
-        const activeType = this._contentLoader?.getActiveObjectType(type) ?? null;
-        const colorIndex = this._contentLoader ? String(this._contentLoader.getActiveObjectColorIndex(type)) : '';
-
-        return this._contentLoader?.getObjectUrl(activeType ?? '', colorIndex) ?? null;
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::getWallItemIconUrl()
-    getWallItemIconUrl(type: number, param: string | null = null): string | null
-    {
-        const wallType = this._contentLoader?.getWallItemType(type, param) ?? null;
-        const colorIndex = this._contentLoader ? String(this._contentLoader.getWallItemColorIndex(type)) : '';
-
-        return this._contentLoader?.getObjectUrl(wallType ?? '', colorIndex) ?? null;
     }
 
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/room/RoomEngine.as::getFurnitureIcon()
@@ -6251,79 +6187,6 @@ export class RoomEngine extends Component implements IRoomEngine,
         geometry?.dispose();
     }
 
-    // See ImageResult.ts for why this is always asynchronous, unlike AS3.
-    private deliverIconTexture(id: number, texture: Texture | null, listeners: IGetImageListener[]): void
-    {
-        // Every path below ends the request, so the id goes back to the pool on each of them —
-        // this is the only funnel a thumbnail request can leave through. `freeNumber()` ignores
-        // an id it never lent, which is what makes it safe to call for the image-id path too.
-        if(texture === null)
-        {
-            log.warn(`deliverIconTexture(${id}): no texture (asset missing or load failed)`);
-
-            this._thumbnailIdBank.freeNumber(id);
-
-            for(const listener of listeners) listener.imageFailed(id);
-
-            return;
-        }
-
-        const canvas = this.pixiTextureToCanvas(texture);
-
-        if(canvas === null)
-        {
-            log.warn(`deliverIconTexture(${id}): pixiTextureToCanvas() returned null`);
-
-            this._thumbnailIdBank.freeNumber(id);
-
-            for(const listener of listeners) listener.imageFailed(id);
-
-            return;
-        }
-
-        createImageBitmap(canvas)
-            .then((bitmap) => 
-            {
-                // Each listener gets its own ImageBitmap instance (matching AS3's
-                // BitmapData.clone() per-listener) so one owner closing its bitmap
-                // doesn't invalidate another listener's copy.
-                this._thumbnailIdBank.freeNumber(id);
-
-                for(let i = 0; i < listeners.length; i++)
-                {
-                    const copy = i === listeners.length - 1 ? bitmap : this.cloneImageBitmap(bitmap);
-
-                    if(copy !== null) listeners[i].imageReady(id, copy);
-                    else listeners[i].imageFailed(id);
-                }
-            })
-            .catch((error) =>
-            {
-                log.warn(`deliverIconTexture(${id}): createImageBitmap() failed`, error);
-
-                this._thumbnailIdBank.freeNumber(id);
-
-                for(const listener of listeners) listener.imageFailed(id);
-            });
-    }
-
-    private cloneImageBitmap(bitmap: ImageBitmap): ImageBitmap | null 
-    {
-        try 
-        {
-            const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
-            const ctx = canvas.getContext('2d')!;
-
-            ctx.drawImage(bitmap, 0, 0);
-
-            return canvas.transferToImageBitmap();
-        }
-        catch
-        {
-            return null;
-        }
-    }
-
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_1821.as::setSelectedObjectData()
     setSelectedObjectData(
         roomId: number, id: number, category: number, loc: IVector3d, dir: IVector3d, operation: string,
@@ -7225,80 +7088,18 @@ export class RoomEngine extends Component implements IRoomEngine,
     }
 
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/room/RoomEngine.as::_Str_22095() (getGenericRoomObjectThumbnail)
-    // TS simplification: uses a simple incrementing id counter instead of AS3's
-    // reserve/free NumberIdGenerator pool (no functional difference for callers,
-    // which only compare the returned id against 0/-1 or match it in imageReady()).
+    // DEVIATION: AS3 downloads the catalogue icon PNG (icons/<type>_icon.png). The port renders the
+    // furni at scale 1, where its visualization draws the `_icon_` assets of its piece in its
+    // variant's colour: the icon PNGs are gone (spec 2026-10-09-ambreia-everything §2).
     private getGenericRoomObjectThumbnail(
         type: string | null,
         param: string,
         listener: IGetImageListener,
-        _extraData: string | null = null,
-        _stuffData: unknown = null
+        extraData: string | null = null,
+        stuffData: unknown = null
     ): ImageResult 
     {
-        const result = new ImageResult();
-        result.id = -1;
-
-        if(!this.assets || type === null) 
-        {
-            log.warn(`getGenericRoomObjectThumbnail: bailing out early (assets=${!!this.assets}, type=${type})`);
-
-            return result;
-        }
-
-        const assetName = [type, param].join('_');
-
-        if(!this.assets.hasAsset(assetName))
-        {
-            const id = this._thumbnailIdBank.reserveNumber();
-
-            // -1 means a thousand requests are already outstanding. AS3 gives up here and hands
-            // back the untouched result, whose id is already -1.
-            if(id < 0)
-            {
-                log.warn('getGenericRoomObjectThumbnail: thumbnail id pool exhausted');
-
-                return result;
-            }
-
-            result.id = id;
-            result.data = null;
-
-            let pending = this._pendingThumbnailListeners.get(assetName);
-
-            if(!pending) 
-            {
-                pending = [];
-                this._pendingThumbnailListeners.set(assetName, pending);
-                this._contentLoader?.loadThumbnailContent(id, type, param, this.events);
-            }
-
-            pending.push(listener);
-        }
-        else 
-        {
-            // TS deviation: AS3 returns the bitmap synchronously here (id=0).
-            // Texture->ImageBitmap conversion is async in the browser, so this
-            // path also resolves via the id>0 pending callback (see ImageResult.ts).
-            const id = this._thumbnailIdBank.reserveNumber();
-
-            if(id < 0)
-            {
-                log.warn('getGenericRoomObjectThumbnail: thumbnail id pool exhausted');
-
-                return result;
-            }
-
-            result.id = id;
-            result.data = null;
-
-            const asset = this.assets.getAssetByName(assetName);
-            const texture = (asset?.content as Texture | null) ?? null;
-
-            this.deliverIconTexture(id, texture, [listener]);
-        }
-
-        return result;
+        return this.getGenericRoomObjectImage(type, param, new Vector3d(), 1, listener, 0, extraData, stuffData);
     }
 
     /**
@@ -7910,7 +7711,7 @@ export class RoomEngine extends Component implements IRoomEngine,
      * extract.canvas() is correct for any texture but pays a synchronous GPU->CPU readback
      * each call, and onRoomContentReady() makes 304 of them back to back — measured as a
      * ~800 ms frame in the boot log. Room bundle frames all share one TextureSource built by
-     * NitroBundleLoader from `Texture.from(imageBitmap)`, so the pixels are already in memory
+     * the piece loader from `Texture.from(imageBitmap)`, so the pixels are already in memory
      * and a plain drawImage() of the frame rect produces the same canvas without touching the
      * GPU.
      *
@@ -9998,17 +9799,24 @@ export class RoomEngine extends Component implements IRoomEngine,
         // comes from the same configuration. So the first initialisation stands.
         if(this._contentLoaderInitialized) return;
 
+        // TS-only: the room content's .ambreia directories (features/asset-packs). Checked before the
+        // flag so a later completion retries when they were missing.
+        const directories = this._directories();
+
+        if(directories === null)
+        {
+            log.error('No .ambreia directories (asset-packs): the room content cannot load');
+
+            return;
+        }
+
         this._contentLoaderInitialized = true;
 
         // AS3: _roomContentLoader.visualizationFactory = _visualizationFactory
         this._contentLoader.visualizationFactory = this._visualizationFactory;
-        // AS3: _roomContentLoader.iconAssets = assets
-        this._contentLoader.iconAssets = this.assets;
-        // AS3: _roomContentLoader.iconListener = this
-        this._contentLoader.iconListener = this;
 
         // AS3: var_1634.initialize(events, this)
-        this._contentLoader.initialize(this.events, this._configurationManager);
+        this._contentLoader.initialize(this.events, this._configurationManager, directories);
 
         if(this._sessionDataManager)
         {

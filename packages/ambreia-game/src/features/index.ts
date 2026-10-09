@@ -1,5 +1,7 @@
 import type {Renderer} from 'pixi.js';
 import type {AssetLibrary} from '@ambreia/common/assets/AssetLibrary';
+import type {IAssetDirectories} from '@ambreia/common/assets/pack/AssetDirectories';
+import {Logger} from '@ambreia/common/utils/Logger';
 import {RoomManager} from '@ambreia/iso/RoomManager';
 import {HabboRoomRendererFactory} from '@ambreia/iso/scene/renderer/HabboRoomRendererFactory';
 import {AvatarRenderManager} from '@ambreia/avatar/AvatarRenderManager';
@@ -41,10 +43,14 @@ import {IID_AvatarRenderManager} from '../iid/IIDAvatarRenderManager';
 import {IID_HabboWindowManager} from '../iid/IIDHabboWindowManager';
 import {IID_RoomUI} from '../iid/IIDRoomUI';
 
+const log = Logger.getLogger('habbo.features.GameFeatures');
+
 /** What the features made, read back by VortexMain for its own wiring after the boot. */
 export interface IEngineManagers
 {
     configuration: HabboConfigurationManager | null;
+    /** One .ambreia directory per asset family (features/asset-packs); null until the configuration completes. */
+    assetDirectories: IAssetDirectories | null;
     communication: HabboCommunicationManager | null;
     demo: HabboCommunicationDemo | null;
     localization: HabboLocalizationManager | null;
@@ -88,7 +94,7 @@ const feature = (declaration: IGameFeature): IGameFeature => declaration;
 export function emptyManagers(): IEngineManagers
 {
     return {
-        configuration: null, communication: null, demo: null, localization: null, roomManager: null, roomSession: null,
+        configuration: null, assetDirectories: null, communication: null, demo: null, localization: null, roomManager: null, roomSession: null,
         sessionData: null, roomEngine: null, avatarRenderer: null, windowManager: null, roomUI: null, character: null,
         hud: null, inventory: null, interaction: null
     };
@@ -205,12 +211,12 @@ const SessionData = feature({
 const RoomEngines = feature({
     id: 'room-engine',
     provides: [IID_RoomEngine],
-    create: ({context, host}) => (host.made.roomEngine = new RoomEngine(context, host.assets, () => host.renderer()))
+    create: ({context, host}) => (host.made.roomEngine = new RoomEngine(context, host.assets, () => host.renderer(), () => host.made.assetDirectories))
 });
 
 /**
- * The avatar renderer: a plain class since J2, built from four configuration keys once the
- * configuration is complete and registered then. Nothing requires it, so the boot's dependency
+ * The avatar renderer: a plain class since J2, built from the clothing and effects .ambreia
+ * directories (features/asset-packs) once the configuration is complete, and registered then. Nothing requires it, so the boot's dependency
  * check does not wait for it.
  */
 const AvatarRenderer = feature({
@@ -222,13 +228,22 @@ const AvatarRenderer = feature({
         const configuration = made.configuration;
         const start = (): void =>
         {
+            const directories = made.assetDirectories;
+
             if(made.avatarRenderer !== null || configuration === null) return;
+
+            if(directories === null)
+            {
+                log.error('No .ambreia directories (asset-packs): avatars cannot load');
+
+                return;
+            }
 
             made.avatarRenderer = new AvatarRenderManager({
                 assets: host.assets,
                 data: host.avatarData,
-                downloadUrl: configuration.getProperty('flash.dynamic.avatar.download.url'),
-                downloadNameTemplate: configuration.getProperty('flash.dynamic.avatar.download.name.template'),
+                clothing: directories.clothing,
+                effects: directories.effects,
                 onLibraryLoaded: name => Core.instance?.updateLoadingProcess(name, 'complete')
             });
             context.attachInstance(IID_AvatarRenderManager, made.avatarRenderer);

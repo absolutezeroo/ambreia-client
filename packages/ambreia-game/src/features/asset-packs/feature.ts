@@ -1,30 +1,30 @@
 import {z} from 'zod';
 import {Logger} from '@ambreia/common/utils/Logger';
-import {AmbreiaDirectory, httpBytes} from '@ambreia/common/assets/pack/AmbreiaDirectory';
-import {decodeMasterKey, encryptedLayout} from '@ambreia/common/assets/pack/AmbreiaLayout';
-import {AssetPacks} from '@ambreia/common/assets/pack/AssetPacks';
+import {ASSET_FAMILIES, openAssetDirectories} from '@ambreia/common/assets/pack/AssetDirectories';
+import type {IAssetPacksSettings} from '@ambreia/common/assets/pack/AssetDirectories';
 import type {IGameFeature} from '../GameFeature';
 
 const log = Logger.getLogger('habbo.features.AssetPacks');
 
-/** The configuration key holding the directory each family's .nitro files are fetched from. */
-const DIRECTORIES = {
-    clothing: 'flash.dynamic.avatar.download.url',
-    furniture: 'flash.dynamic.download.url'
-} as const;
+/** A directory URL; it may use the configuration's `${…}` variables (`${url.prefix}/ambreia/room/`). */
+const directory = z.string().min(1).optional();
 
 /**
- * .ambreia directories (plan 2026-10-08-asset-packs): per family, one optimised `.ambreia` file per
- * piece standing in for its `.nitro`. A directory URL may use the configuration's `${…}` variables
- * (`${url.prefix}/ambreia/furniture/`). Mounted once the configuration is loaded, before the avatar
- * renderer starts downloading; a piece the directory lacks, or a directory that cannot be read,
- * still loads from its .nitro.
+ * Every asset family as an .ambreia directory (spec 2026-10-09-ambreia-everything): clothing,
+ * effects, room, pets, furniture. Opened once the configuration is loaded, before the avatar renderer
+ * and the room engine read them from `made.assetDirectories`. There is no .nitro left to fall back
+ * on: a family missing from config.json is an error at boot.
  */
 export const AssetPacksFeature: IGameFeature = {
     id: 'asset-packs',
     config: z.object({
-        clothing: z.string().min(1).optional(),
-        furniture: z.string().min(1).optional(),
+        clothing: directory,
+        effects: directory,
+        room: directory,
+        pets: directory,
+        furniture: directory,
+        /** The hotel's catalogue icons: the client never reads them, the imager and tools do. */
+        icons: directory,
         /**
          * The master key of encrypted directories (base64url, 32 bytes). Provisional: config.json is
          * public, so this only keeps out a direct look at an URL and the guessing of names; the key
@@ -34,39 +34,34 @@ export const AssetPacksFeature: IGameFeature = {
     }),
     create: ({config, host}) =>
     {
-        const settings = config as {clothing?: string; furniture?: string; key?: string};
-        const layout = settings.key ? encryptedLayout(decodeMasterKey(settings.key)) : null;
-
-        // WebCrypto exists only on a secure origin (https, localhost): elsewhere every encrypted
-        // directory falls back to the .nitro files, and this says why.
-        layout?.catch((error: unknown) => log.warn(`asset-packs: the key cannot be used (${String((error as Error | null)?.message ?? error)}) — encrypted directories are skipped`));
+        const settings = config as IAssetPacksSettings;
         const configuration = host.made.configuration;
 
-        if(!configuration || (!settings.clothing && !settings.furniture)) return null;
-
-        const mount = (): void =>
+        if(!configuration)
         {
-            for(const family of ['clothing', 'furniture'] as const)
+            log.error('asset-packs: no configuration — no asset will load');
+
+            return null;
+        }
+
+        const open = (): void =>
+        {
+            try
             {
-                const packUrl = settings[family];
-
-                if(!packUrl) continue;
-
-                const directory = configuration.getProperty(DIRECTORIES[family]);
-
-                if(!directory)
-                {
-                    log.warn(`${family} pack configured but ${DIRECTORIES[family]} is empty: not mounted`);
-                    continue;
-                }
-
-                AssetPacks.mount(directory, new AmbreiaDirectory(configuration.interpolate(packUrl), httpBytes, layout));
-                log.info(`${family}: ${configuration.interpolate(packUrl)} stands in for ${directory}*.nitro`);
+                host.made.assetDirectories = openAssetDirectories(settings, text => configuration.interpolate(text));
             }
+            catch (error)
+            {
+                log.error(`${(error as Error).message} in config.json: nothing from those families will display`);
+
+                throw error;
+            }
+
+            log.info(`asset-packs: ${ASSET_FAMILIES.map(family => host.made.assetDirectories![family].url).join(', ')}`);
         };
 
-        if(configuration.isInitialized()) mount();
-        else configuration.events.once('complete', mount);
+        if(configuration.isInitialized()) open();
+        else configuration.events.once('complete', open);
 
         return null;
     }

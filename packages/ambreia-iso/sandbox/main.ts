@@ -1,8 +1,7 @@
 import {Application} from 'pixi.js';
 import {AssetLibrary} from '@ambreia/common/assets/AssetLibrary';
-import {AmbreiaDirectory, httpBytes} from '@ambreia/common/assets/pack/AmbreiaDirectory';
-import {decodeMasterKey, encryptedLayout} from '@ambreia/common/assets/pack/AmbreiaLayout';
-import {AssetPacks} from '@ambreia/common/assets/pack/AssetPacks';
+import {openAssetDirectories} from '@ambreia/common/assets/pack/AssetDirectories';
+import type {IAssetPacksSettings} from '@ambreia/common/assets/pack/AssetDirectories';
 import {IsoStage} from '../src/IsoStage';
 import type {IIsoView} from '../src/IsoView';
 import type {IIsoRoomData} from '../src/IIsoRoomData';
@@ -32,21 +31,10 @@ const MODULES: Record<string, IsoModule> = {scene: registerScene, furniture: reg
 const modules = (params.get('modules') ?? 'scene,furniture,avatars,effects').split(',').map(name => MODULES[name]).filter(Boolean);
 const canvasHost = params.get('host') === 'canvas';
 
-// ?pack=1: the furniture comes from /ambreia/furniture/*.ambreia instead of /dcr/hof_furni/*.nitro —
-// the same room either way (plan 2026-10-08-asset-packs). ?key= gives an encrypted directory its
-// master key (local testing only: a key in a URL is a key given away).
-const key = params.get('key');
+declare const __AMBREIA_ASSET_PACKS__: IAssetPacksSettings;
 
-if(params.get('pack') === '1') AssetPacks.mount('/dcr/hof_furni/', new AmbreiaDirectory('/ambreia/furniture/', httpBytes, key ? encryptedLayout(decodeMasterKey(key)) : null));
-
-// The hotel's properties the room content needs, on this origin (vite proxies them).
-const PROPERTIES: Record<string, string> = {
-    'flash.dynamic.download.url': '/dcr/hof_furni/',
-    'flash.dynamic.download.name.template': '%typeid%.nitro',
-    'flash.dynamic.icon.download.name.template': 'icons/%typeid%%param%_icon.png',
-    'pet.dynamic.download.url': '/gordon/vortex-assets-PRODUCTION-202601121522-867048149/',
-    'pet.dynamic.download.name.template': '%type%.nitro'
-};
+// The client's config.json → asset-packs, read by vite.config.ts: every family on this origin's /ambreia/.
+const directories = openAssetDirectories(__AMBREIA_ASSET_PACKS__);
 
 async function furniData(): Promise<IFurnitureData[]>
 {
@@ -84,8 +72,8 @@ async function avatarRenderer(): Promise<AvatarRenderManager | null>
     const manager = new AvatarRenderManager({
         assets: new AssetLibrary('iso-sandbox-avatars'),
         data: readAvatarData(file => CONFIGURATIONS[`../../vortex-client/src/assets/configurations/${file}`] ?? null),
-        downloadUrl: PROPERTIES['pet.dynamic.download.url'],
-        downloadNameTemplate: '%libname%.nitro'
+        clothing: directories.clothing,
+        effects: directories.effects
     });
 
     if(!manager.isReady) await new Promise(done => manager.events.once(AvatarRenderEvent.AVATAR_RENDER_READY, done));
@@ -93,7 +81,7 @@ async function avatarRenderer(): Promise<AvatarRenderManager | null>
     return manager;
 }
 
-const stage = await IsoStage.create({assets: new AssetLibrary('iso-sandbox'), property: key => PROPERTIES[key] ?? '', furniData: await furniData(), modules, renderer, avatarRenderer: await avatarRenderer()});
+const stage = await IsoStage.create({assets: new AssetLibrary('iso-sandbox'), property: () => '', directories, furniData: await furniData(), modules, renderer, avatarRenderer: await avatarRenderer()});
 
 // ?zone=stairs: stairs, a raised landing and a walkway, to look at how heights read (solid sides).
 // ?zone=big&furni=2000: a 64 × 64 floor (the format's limit) with the sample zone's furniture

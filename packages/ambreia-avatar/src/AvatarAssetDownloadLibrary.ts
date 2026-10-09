@@ -1,6 +1,7 @@
 import EventEmitter from 'eventemitter3';
 import type {AssetLoaderEvent} from '@ambreia/common/assets/loaders/AssetLoaderEvent';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
+import type {AmbreiaDirectory} from '@ambreia/common/assets/pack/AmbreiaDirectory';
 import {AssetLoaderEventType} from '@ambreia/common/assets/loaders/AssetLoaderEvent';
 import {Logger} from '@ambreia/common/utils/Logger';
 
@@ -10,7 +11,7 @@ const log = Logger.getLogger('habbo.avatar.AvatarAssetDownloadLibrary');
  * Manages downloading a single avatar asset library (spritesheet).
  *
  * In AS3, this extends EventDispatcherWrapper and loads SWF libraries via LibraryLoader.
- * In our PixiJS v8 port, we use the AssetLibrary system to load .nitro bundles.
+ * In our PixiJS v8 port, the library is a piece of the clothing family's .ambreia directory.
  *
  * @see sources/win63_version/habbo/avatar/AvatarAssetDownloadLibrary.as
  * @see sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/AvatarAssetDownloadLibrary.as
@@ -28,18 +29,20 @@ export class AvatarAssetDownloadLibrary extends EventEmitter
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/AvatarAssetDownloadLibrary.as::_revision
     private _revision: string;
     // AS3: .../src/com/sulake/habbo/avatar/AvatarAssetDownloadLibrary.as::_downloadUrl
-    private _downloadUrl: string;
+    // DEVIATION: AS3 holds a URL template; the port holds the clothing family's .ambreia directory
+    // (spec 2026-10-09-ambreia-everything).
+    private _directory: AmbreiaDirectory;
     private _assetLibrary: IAssetLibrary;
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/AvatarAssetDownloadLibrary.as::_state
     private _state: number;
 
-    constructor(libraryName: string, revision: string, downloadUrl: string, assetLibrary: IAssetLibrary) 
+    constructor(libraryName: string, revision: string, directory: AmbreiaDirectory, assetLibrary: IAssetLibrary)
     {
         super();
 
         this._libraryName = libraryName;
         this._revision = revision;
-        this._downloadUrl = downloadUrl;
+        this._directory = directory;
         this._assetLibrary = assetLibrary;
         this._state = AvatarAssetDownloadLibrary.STATE_IDLE;
         this._isMandatory = false;
@@ -87,7 +90,7 @@ export class AvatarAssetDownloadLibrary extends EventEmitter
      * Begins downloading this library's assets.
      *
      * In AS3 this creates a URLRequest and loads via LibraryLoader into the asset library.
-     * Here we use the AssetLibrary.loadAssetFromFile() system to load the .nitro bundle.
+     * Here AssetLibrary.loadPiece() reads the library's piece from the clothing directory.
      * On completion (or error), emits COMPLETE.
      */
     // AS3: .../src/com/sulake/habbo/avatar/AvatarAssetDownloadLibrary.as::startDownloading()
@@ -106,24 +109,11 @@ export class AvatarAssetDownloadLibrary extends EventEmitter
             return;
         }
 
-        const url = this._downloadUrl
-            .replace('%libname%', this._libraryName)
-            .replace('%revision%', this._revision);
+        log.debug(`Downloading: ${this._libraryName} (revision ${this._revision}) from ${this._directory.url}`);
 
-        if(!url || url === this._downloadUrl) 
+        try
         {
-            log.warn(`No valid download URL for: ${this._libraryName}`);
-            this._state = AvatarAssetDownloadLibrary.STATE_READY;
-            this.emit(AvatarAssetDownloadLibrary.COMPLETE, this);
-
-            return;
-        }
-
-        log.debug(`Downloading: ${this._libraryName} from ${url}`);
-
-        try 
-        {
-            const loader = this._assetLibrary.loadAssetFromFile(this._libraryName, url, 'application/x-nitro-bundle');
+            const loader = this._assetLibrary.loadPiece(this._libraryName, this._directory);
 
             if(!loader) 
             {

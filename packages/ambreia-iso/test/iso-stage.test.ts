@@ -10,10 +10,27 @@ import {RoomObjectCategoryEnum} from '../src/scene/object/RoomObjectCategoryEnum
 import type {IIsoRoomData} from '../src/IIsoRoomData';
 import {RoomObjectVariableEnum} from '../src/scene/object/RoomObjectVariableEnum';
 import {RoomManager} from '../src/RoomManager';
+import {readFileSync} from 'node:fs';
+import {Logger, LogLevel} from '@ambreia/common/utils/Logger';
+import {ASSET_FAMILIES, openAssetDirectories} from '@ambreia/common/assets/pack/AssetDirectories';
+import type {IAssetDirectories} from '@ambreia/common/assets/pack/AssetDirectories';
+import type {FetchBytes} from '@ambreia/common/assets/pack/AmbreiaDirectory';
 
 // A room loaded out of session against the asset server, as the map editor will (plan D5).
 const ASSETS = process.env.AMBREIA_ASSETS?.replace(/\/+$/, '') ?? null;
 const SKIP = ASSETS === null && 'set AMBREIA_ASSETS to the asset server (e.g. http://vortex-assets.local)';
+
+/** The client's config.json → asset-packs, `${url.prefix}` at the asset server (as the client reads it). */
+function testDirectories(base: string): IAssetDirectories
+{
+    const config = JSON.parse(readFileSync(new URL('../../vortex-client/public/config.json', import.meta.url), 'utf8')) as {'asset-packs'?: Record<string, string>};
+
+    return openAssetDirectories(config['asset-packs'] ?? {}, text => text.replace('${url.prefix}', base));
+}
+
+/** Every family under one fake host, fetched through `fetch`. */
+const everyFamily = (host: string, fetch?: FetchBytes): IAssetDirectories =>
+    openAssetDirectories(Object.fromEntries(ASSET_FAMILIES.map(family => [family, `${host}/ambreia/${family}/`])), text => text, fetch);
 
 async function furniData(base: string): Promise<IFurnitureData[]>
 {
@@ -39,14 +56,7 @@ test('a 3×3 room with a floor and a wall furni loads out of session', {skip: SK
     const data = await furniData(base);
     const chair = data.find(item => item.className === 'chair_polyfon');
     const poster = data.find(item => item.className === 'poster');
-    const properties: Record<string, string> = {
-        'flash.dynamic.download.url': `${base}/dcr/hof_furni/`,
-        'flash.dynamic.download.name.template': '%typeid%.nitro',
-        'flash.dynamic.icon.download.name.template': 'icons/%typeid%%param%_icon.png',
-        'pet.dynamic.download.url': `${base}/gordon/vortex-assets-PRODUCTION-202601121522-867048149/`,
-        'pet.dynamic.download.name.template': '%type%.nitro'
-    };
-    const stage = await IsoStage.create({assets: new AssetLibrary('iso-test'), property: key => properties[key] ?? '', furniData: data});
+    const stage = await IsoStage.create({assets: new AssetLibrary('iso-test'), property: () => '', furniData: data, directories: testDirectories(base)});
     const tiles = Array.from({length: 9}, () => ({height: 0, walkable: true, hole: false}));
     const room: IIsoRoomData = {
         floor: {width: 3, length: 3, tiles},
@@ -72,13 +82,7 @@ test('the view projects tiles, follows the camera, and points back at items and 
     const base = ASSETS!;
     const data = await furniData(base);
     const chair = data.find(item => item.className === 'chair_polyfon')!;
-    const properties: Record<string, string> = {
-        'flash.dynamic.download.url': `${base}/dcr/hof_furni/`,
-        'flash.dynamic.download.name.template': '%typeid%.nitro',
-        'pet.dynamic.download.url': `${base}/gordon/vortex-assets-PRODUCTION-202601121522-867048149/`,
-        'pet.dynamic.download.name.template': '%type%.nitro'
-    };
-    const stage = await IsoStage.create({assets: new AssetLibrary('iso-view-test'), property: key => properties[key] ?? '', furniData: data});
+    const stage = await IsoStage.create({assets: new AssetLibrary('iso-view-test'), property: () => '', furniData: data, directories: testDirectories(base)});
     const tiles = Array.from({length: 9}, () => ({height: 0, walkable: true, hole: false}));
 
     await stage.loadRoom('v', {floor: {width: 3, length: 3, tiles}, decor: [], wallDecor: []});
@@ -121,13 +125,7 @@ test('the view projects tiles, follows the camera, and points back at items and 
 
 async function emptyStage(base: string, name: string): Promise<IsoStage>
 {
-    const properties: Record<string, string> = {
-        'flash.dynamic.download.url': `${base}/dcr/hof_furni/`,
-        'flash.dynamic.download.name.template': '%typeid%.nitro',
-        'pet.dynamic.download.url': `${base}/gordon/vortex-assets-PRODUCTION-202601121522-867048149/`,
-        'pet.dynamic.download.name.template': '%type%.nitro'
-    };
-    const stage = await IsoStage.create({assets: new AssetLibrary(name), property: key => properties[key] ?? '', furniData: await furniData(base)});
+    const stage = await IsoStage.create({assets: new AssetLibrary(name), property: () => '', furniData: await furniData(base), directories: testDirectories(base)});
 
     await stage.loadRoom('r', {floor: {width: 3, length: 3, tiles: Array.from({length: 9}, () => ({height: 0, walkable: true, hole: false}))}, decor: [], wallDecor: []});
 
@@ -183,8 +181,9 @@ test('a boot that times out stops pumping the room manager', {timeout: 30_000}, 
     {
         await assert.rejects(IsoStage.create({
             assets: new AssetLibrary('iso-timeout'),
-            property: key => (key === 'pet.dynamic.download.url' ? 'http://content.invalid/' : ''),
+            property: () => '',
             furniData: [],
+            directories: everyFamily('http://content.invalid'),
             bootTimeoutMs: 300
         }), /did not load/);
 
@@ -198,4 +197,34 @@ test('a boot that times out stops pumping the room manager', {timeout: 30_000}, 
         RoomManager.prototype.update = original;
         globalThis.fetch = originalFetch;
     }
+});
+
+test('the room asks the room directory for its own bundles, never a .nitro; a missing one is a loud error', {timeout: 30_000}, async () =>
+{
+    setPlatform(nodePlatform());
+
+    const asked: string[] = [];
+    const errors: string[] = [];
+    const directories = everyFamily('http://assets', async (url) =>
+    {
+        asked.push(url);
+
+        return null;
+    });
+
+    Logger.onRecord(record => { if(record.level === LogLevel.ERROR) errors.push(record.args.map(String).join(' ')); });
+
+    try
+    {
+        // Nothing is served, so the room's bundles never load and create() gives up.
+        await assert.rejects(IsoStage.create({assets: new AssetLibrary('iso-room-dirs'), property: () => '', furniData: [], directories, bootTimeoutMs: 500}));
+    }
+    finally
+    {
+        Logger.onRecord(null);
+    }
+
+    assert.ok(asked.some(url => url.startsWith('http://assets/ambreia/room/')), asked.join(' '));
+    assert.ok(asked.every(url => !url.endsWith('.nitro')), asked.join(' '));
+    assert.ok(errors.some(message => /critical room content: PlaceHolder\w+ from http:\/\/assets\/ambreia\/room\//.test(message)), errors.join(' | '));
 });

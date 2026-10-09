@@ -32,12 +32,13 @@ export class FurnitureSprites
     }
 
     /**
-     * The catalogue's small picture of a furni: the hotel's own icon, a static file (`sofa_silo*2`
-     * is `sofa_silo_2_icon.png`), not a render the imager would have to load the furni for.
+     * The catalogue's small picture of a furni: the imager's render at scale 1, which draws the
+     * furni's `_icon_` assets in its variant's colour (the hotel's icon PNGs are gone, spec
+     * 2026-10-09-ambreia-everything §3). The imager keeps it on disk after the first ask.
      */
     static thumbnail(className: string): string
     {
-        return `/dcr/hof_furni/icons/${encodeURIComponent(className.replace('*', '_'))}_icon.png`;
+        return `${IMAGING}/furniture?class=${encodeURIComponent(className)}&size=icon`;
     }
 
     /** The inspector's picture of a furni. */

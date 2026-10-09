@@ -1,4 +1,6 @@
 import {AssetLibrary} from '@ambreia/common/assets/AssetLibrary';
+import {openAssetDirectories} from '@ambreia/common/assets/pack/AssetDirectories';
+import type {IAssetDirectories, IAssetPacksSettings} from '@ambreia/common/assets/pack/AssetDirectories';
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {IIsoFloorItem, IIsoRoomData, IIsoWallItem} from '@ambreia/iso/IIsoRoomData';
 import {IsoStage} from '@ambreia/iso/IsoStage';
@@ -24,15 +26,21 @@ const BACKGROUND = 0x10131a;
 const MAX_WIDTH = 2560;
 const MAX_HEIGHT = 1600;
 
-/** The hotel's content, on this origin (the dev server proxies them to the asset server). */
-const PROPERTIES: Record<string, string> = {
-    'flash.dynamic.download.url': '/dcr/hof_furni/',
-    'flash.dynamic.download.name.template': '%typeid%.nitro',
-    'flash.dynamic.icon.download.name.template': 'icons/%typeid%%param%_icon.png',
-    // The room's own content (HabboRoomContent, placeholders, tile cursor) lives beside the pets.
-    'pet.dynamic.download.url': '/gordon/vortex-assets-PRODUCTION-202601121522-867048149/',
-    'pet.dynamic.download.name.template': '%type%.nitro'
-};
+/**
+ * The families' .ambreia directories from the client's config.json (served here: the client's public
+ * folder is this page's), `${url.prefix}` dropped so they are this origin's `/ambreia/<family>/`,
+ * which the dev server proxies to the asset server.
+ */
+async function loadAssetDirectories(): Promise<IAssetDirectories>
+{
+    const response = await fetch('/config.json');
+
+    if(!response.ok) throw new Error(`/config.json: HTTP ${response.status} — copy config.example.json and fill asset-packs`);
+
+    const config = await response.json() as {'asset-packs'?: IAssetPacksSettings};
+
+    return openAssetDirectories(config['asset-packs'] ?? {}, text => text.replace('${url.prefix}', ''));
+}
 
 /**
  * The room as the game draws it -- floor, walls and every furni through @ambreia/iso -- behind the
@@ -75,7 +83,8 @@ export class IsoBackdrop
         {
             const stage = await IsoStage.create({
                 assets: new AssetLibrary('map-editor'),
-                property: key => PROPERTIES[key] ?? '',
+                property: () => '',
+                directories: await loadAssetDirectories(),
                 furniData: await loadFurniData(),
                 modules: [registerScene, registerFurniture],
                 renderer: await IsoStage.createOffscreenRenderer(MAX_WIDTH, MAX_HEIGHT, BACKGROUND)

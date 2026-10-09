@@ -116,8 +116,9 @@ async function bootRooms(): Promise<InstanceType<typeof RoomRenderService> | nul
     const context = avatars.context;
     const assetLibrary = avatars.assetLibrary;
     const configuration = avatars.configuration;
+    const directories = avatars.assetDirectories;
 
-    if(context === null || assetLibrary === null || configuration === null)
+    if(context === null || assetLibrary === null || configuration === null || directories === null)
     {
         log.warn('Avatar core is not available — furniture and room rendering are disabled');
 
@@ -126,7 +127,7 @@ async function bootRooms(): Promise<InstanceType<typeof RoomRenderService> | nul
 
     try
     {
-        return new RoomRenderService(await RoomStack.boot(context, assetLibrary, configuration));
+        return new RoomRenderService(await RoomStack.boot(context, assetLibrary, configuration, directories));
     }
     catch (error)
     {

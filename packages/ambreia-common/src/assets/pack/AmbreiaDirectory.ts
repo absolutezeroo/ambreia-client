@@ -37,10 +37,10 @@ interface IOpenDirectory
 }
 
 /**
- * A directory of .ambreia pieces standing in for a directory of .nitro bundles (plan
- * 2026-10-08-asset-packs). Its descriptor and dictionary are read once; then a piece is one request,
- * plus one for an image several pieces share. An encrypted directory needs the layout of its master
- * key: without it, or with another key, the directory is unusable and the .nitro files load.
+ * A directory of .ambreia pieces, one per bundle of an asset family (plan 2026-10-08-asset-packs, spec
+ * 2026-10-09-ambreia-everything). Its descriptor and dictionary are read once; then a piece is one
+ * request, plus one for an image several pieces share. An encrypted directory needs the layout of its
+ * master key: without it, or with another key, the directory is unusable and nothing from it loads.
  */
 export class AmbreiaDirectory
 {
@@ -55,13 +55,13 @@ export class AmbreiaDirectory
         this.url = url.endsWith('/') ? url : `${url}/`;
     }
 
-    /** True once the directory failed to open: its pieces load from their .nitro again. */
+    /** True once the directory failed to open: none of its pieces will load. */
     get broken(): boolean
     {
         return this._broken;
     }
 
-    /** The files of the piece's .nitro (`<name>.json`, then its images), or null if the directory lacks it. */
+    /** The piece's files (`<name>.json`, then its images, as its source bundle had them), or null if the directory lacks it. */
     async read(name: string): Promise<Array<{name: string; data: Uint8Array}> | null>
     {
         const {descriptor, dictionary, layout} = await this.open();

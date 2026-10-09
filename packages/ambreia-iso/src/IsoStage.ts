@@ -3,6 +3,7 @@ import {autoDetectRenderer} from 'pixi.js';
 import type {Renderer} from 'pixi.js';
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
+import type {IRoomContentDirectories} from './scene/IRoomContentDirectories';
 import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
 import {RoomManager} from './RoomManager';
 import type {IRoomInstance} from './IRoomInstance';
@@ -59,8 +60,10 @@ export interface IIsoStageOptions
 {
     /** Shared artwork (pets read their common layers from it). */
     assets: IAssetLibrary;
-    /** A configuration property, already interpolated (`flash.dynamic.download.url`…). */
+    /** A configuration property, already interpolated (`gpu.ignored_furni`, `pet.configuration`…). */
     property(key: string): string;
+    /** Where the room content comes from: the furniture, pets and room .ambreia directories. */
+    directories: IRoomContentDirectories;
     /** The hotel's furnidata: what tells a furni class from a wall item, and its revision. */
     furniData: readonly IFurnitureData[];
     /** The room modules; default scene, furniture, avatars and effects. */
@@ -143,7 +146,7 @@ export class IsoStage
             removeFurniDataListener: (): void => {}
         };
         loader.visualizationFactory = visualizations;
-        loader.initialize(new EventEmitter(), {getProperty: (key: string): string => options.property(key)});
+        loader.initialize(new EventEmitter(), {getProperty: (key: string): string => options.property(key)}, options.directories);
 
         manager.setObjectFactory(new RoomObjectFactory(registries.logics));
         manager.setVisualizationFactory(visualizations);

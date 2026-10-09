@@ -492,14 +492,12 @@ export class AvatarRenderManager implements IAvatarRenderManager
     // AS3: sources/win63_version/habbo/avatar/class_49.as::onConfigurationComplete()
     private initDownloadManagers(): void
     {
-        const {downloadUrl, downloadNameTemplate, data} = this._options;
-        // An unresolved `${…}` template downloads nothing rather than a broken URL.
-        const libraryUrl = downloadUrl && !downloadUrl.includes('${') ? downloadUrl + downloadNameTemplate : '';
+        const {clothing, effects, data} = this._options;
 
         this._aliasCollection.setAssetLibrary(this._options.assets);
 
         this._avatarAssetDownloadManager = new AvatarAssetDownloadManager(
-            libraryUrl,
+            clothing,
             this._structure,
             this._options.assets,
             this._aliasCollection,
@@ -508,7 +506,7 @@ export class AvatarRenderManager implements IAvatarRenderManager
             this._options.onLibraryLoaded ?? null
         );
         this._effectAssetDownloadManager = new EffectAssetDownloadManager(
-            libraryUrl,
+            effects,
             this._structure,
             this._options.assets,
             this._aliasCollection

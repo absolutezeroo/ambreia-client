@@ -20,7 +20,8 @@ import {BinaryFileLoader} from './loaders/BinaryFileLoader';
 import {TextFileLoader} from './loaders/TextFileLoader';
 import {BitmapFileLoader} from './loaders/BitmapFileLoader';
 import {SoundFileLoader} from './loaders/SoundFileLoader';
-import {NitroBundleLoader} from './loaders/NitroBundleLoader';
+import {AmbreiaPieceLoader} from './loaders/AmbreiaPieceLoader';
+import type {AmbreiaDirectory} from './pack/AmbreiaDirectory';
 
 /**
  * Asset library events
@@ -405,20 +406,52 @@ export class AssetLibrary implements IAssetLibrary
 
         const loader = new declaration.loaderClass(declaration.mimeType, url, id);
 
+        return this.track(name, url, loader, declaration);
+    }
+
+    // TS-only: .ambreia pieces (spec 2026-10-09-ambreia-everything) — a name in a directory, not a URL.
+    loadPiece(name: string, directory: AmbreiaDirectory, piece: string = name, id: number = -1): AssetLoaderStruct
+    {
+        if(this.hasAsset(name))
+        {
+            throw new Error(`Asset with name ${name} already exists`);
+        }
+
+        const key = AmbreiaPieceLoader.key(directory, piece);
+        const pending = this._pendingLoads.get(key);
+
+        if(pending && pending.assetName === name) return pending;
+
+        const declaration = this.getAssetTypeDeclarationByMimeType(AmbreiaPieceLoader.MIME_TYPE, true);
+
+        if(!declaration) throw new Error(`Asset type declaration for MIME type ${AmbreiaPieceLoader.MIME_TYPE} not found`);
+
+        const loader = new AmbreiaPieceLoader(AmbreiaPieceLoader.MIME_TYPE, undefined, id);
+        const struct = this.track(name, key, loader, declaration);
+
+        // After the listeners: a piece in the directory's cache may complete synchronously enough to matter.
+        loader.loadPiece(directory, piece);
+
+        return struct;
+    }
+
+    /** Follows a started load under `key` until it completes or fails. */
+    private track(name: string, key: string, loader: IAssetLoader, declaration: AssetTypeDeclaration): AssetLoaderStruct
+    {
         // Create struct to track loading
         const struct = new AssetLoaderStruct(name, loader);
-        this._pendingLoads.set(url, struct);
+        this._pendingLoads.set(key, struct);
 
         // Listen for load events
         loader.events.on(AssetLoaderEventType.COMPLETE, (event: AssetLoaderEvent) =>
-            this.handleAssetLoadEvent(event, loader, struct, declaration!)
+            this.handleAssetLoadEvent(event, loader, struct, declaration)
         );
 
         loader.events.on(AssetLoaderEventType.ERROR, (event: AssetLoaderEvent) =>
-            this.handleAssetLoadEvent(event, loader, struct, declaration!)
+            this.handleAssetLoadEvent(event, loader, struct, declaration)
         );
 
-        loader.events.on(AssetLoaderEventType.PROGRESS, (event: AssetLoaderEvent) => 
+        loader.events.on(AssetLoaderEventType.PROGRESS, (event: AssetLoaderEvent) =>
         {
             struct.dispatchEvent(new AssetLoaderEvent(event.type, event.status));
         });
@@ -795,9 +828,9 @@ export class AssetLibrary implements IAssetLibrary
             true
         );
 
-        // Nitro bundle (our custom format)
+        // .ambreia pieces (spec 2026-10-09-ambreia-everything): no extension, nothing resolves a URL to them.
         this.registerAssetTypeDeclaration(
-            new AssetTypeDeclaration('application/x-nitro-bundle', NitroAsset as AssetClass, NitroBundleLoader as unknown as AssetLoaderClass, 'nitro'),
+            new AssetTypeDeclaration(AmbreiaPieceLoader.MIME_TYPE, NitroAsset as AssetClass, AmbreiaPieceLoader as unknown as AssetLoaderClass),
             true
         );
 
@@ -823,8 +856,8 @@ export class AssetLibrary implements IAssetLibrary
                 // Create asset from loaded content
                 const asset = new declaration.assetClass(declaration, loader.url);
 
-                // For NitroBundleLoader, pass the loader itself to preserve textures/spritesheet
-                if(loader instanceof NitroBundleLoader) 
+                // For a piece loader, pass the loader itself to preserve textures/spritesheet
+                if(loader instanceof AmbreiaPieceLoader)
                 {
                     asset.setUnknownContent(loader);
                 }

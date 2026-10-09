@@ -4,6 +4,7 @@ import type {IAssetLibrary} from './IAssetLibrary';
 import {AssetLibrary, AssetLibraryEvents} from './AssetLibrary';
 import type {AssetTypeDeclaration} from './AssetTypeDeclaration';
 import type {AssetLoaderStruct} from './AssetLoaderStruct';
+import type {AmbreiaDirectory} from './pack/AmbreiaDirectory';
 
 /**
  * AssetLibraryCollection
@@ -240,6 +241,12 @@ export class AssetLibraryCollection implements IAssetLibrary
     loadAssetFromFile(name: string, url: string, mimeType?: string, id?: number): AssetLoaderStruct
     {
         return this.binLibrary.loadAssetFromFile(name, url, mimeType, id);
+    }
+
+    // TS-only: .ambreia pieces go to the same private library as files (spec 2026-10-09-ambreia-everything).
+    loadPiece(name: string, directory: AmbreiaDirectory, piece?: string, id?: number): AssetLoaderStruct
+    {
+        return this.binLibrary.loadPiece(name, directory, piece, id);
     }
 
     /**

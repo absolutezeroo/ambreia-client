@@ -9,10 +9,6 @@ import {AmbreiaDirectory} from '../src/assets/pack/AmbreiaDirectory';
 import {encryptedLayout, generateMasterKey, plainLayout} from '../src/assets/pack/AmbreiaLayout';
 import type {IAmbreiaLayout} from '../src/assets/pack/AmbreiaLayout';
 import type {FetchBytes} from '../src/assets/pack/AmbreiaDirectory';
-import {AssetPacks} from '../src/assets/pack/AssetPacks';
-import {NitroBundleLoader} from '../src/assets/loaders/NitroBundleLoader';
-import {AssetLoaderEventType} from '../src/assets/loaders/AssetLoaderEvent';
-import {BROWSER_PLATFORM, setPlatform} from '../src/platform/Platform';
 
 const manifest = (name: string): Record<string, unknown> => ({
     type: 'ca',
@@ -128,7 +124,7 @@ test('a piece the directory lacks answers null', async () =>
     assert.equal(await new AmbreiaDirectory('http://assets/ambreia/furniture/', fetch).read('missing'), null);
 });
 
-test('a directory without its descriptor is unusable: every piece loads from its .nitro', async () =>
+test('a directory without its descriptor is unusable', async () =>
 {
     const {fetch} = await directory(['a'], {descriptor: false});
     const dir = new AmbreiaDirectory('http://assets/ambreia/furniture/', fetch);
@@ -142,87 +138,6 @@ test('a piece built with another dictionary is refused rather than decoded wrong
     const {fetch} = await directory(['a'], {dictionaryId: 'ffffffffffffffff'});
 
     await assert.rejects(new AmbreiaDirectory('http://assets/ambreia/furniture/', fetch).read('a'), /dictionary/);
-});
-
-test('a mounted directory answers for the .nitro URLs of the directory it replaces only', () =>
-{
-    const dir = new AmbreiaDirectory('http://assets/ambreia/furniture/', async () => null);
-
-    AssetPacks.mount('http://assets/dcr/hof_furni', dir);
-
-    assert.deepEqual(AssetPacks.resolve('http://assets/dcr/hof_furni/throne.nitro?v=3'), {pack: dir, name: 'throne'});
-    assert.equal(AssetPacks.resolve('http://assets/dcr/hof_furni/icons/throne_icon.png'), null);
-    assert.equal(AssetPacks.resolve('http://assets/dcr/hof_furni/sub/throne.nitro'), null);
-    assert.equal(AssetPacks.resolve('http://assets/gordon/hh_human_body.nitro'), null);
-
-    AssetPacks.unmountAll();
-    assert.equal(AssetPacks.resolve('http://assets/dcr/hof_furni/throne.nitro'), null);
-});
-
-/** Loads `url` with a NitroBundleLoader; records what global fetch was asked and what got decoded. */
-async function loadThroughLoader(url: string): Promise<{loader: NitroBundleLoader; fetched: string[]; decoded: string[]; ok: boolean}>
-{
-    const fetched: string[] = [];
-    const decoded: string[] = [];
-    const original = globalThis.fetch;
-
-    globalThis.fetch = (async (input: string | URL | Request) => { fetched.push(String(input)); throw new TypeError('network down'); }) as typeof fetch;
-    setPlatform({...BROWSER_PLATFORM, decodeImage: async (_bytes, mimeType) => { decoded.push(mimeType); return {width: 58, height: 108} as unknown as CanvasImageSource; }});
-
-    try
-    {
-        const loader = new NitroBundleLoader('application/x-nitro-bundle');
-        const ok = await new Promise<boolean>(resolve =>
-        {
-            loader.events.once(AssetLoaderEventType.COMPLETE, () => resolve(true));
-            loader.events.once(AssetLoaderEventType.ERROR, () => resolve(false));
-            loader.load(url);
-        });
-
-        return {loader, fetched, decoded, ok};
-    }
-    finally
-    {
-        globalThis.fetch = original;
-        setPlatform(BROWSER_PLATFORM);
-    }
-}
-
-test('NitroBundleLoader reads a mounted piece from its .ambreia file, never from the .nitro URL', async () =>
-{
-    AssetPacks.mount('http://assets/dcr/hof_furni/', new AmbreiaDirectory('http://assets/ambreia/furniture/', (await directory(['throne'])).fetch));
-
-    try
-    {
-        const {loader, fetched, decoded, ok} = await loadThroughLoader('http://assets/dcr/hof_furni/throne.nitro');
-
-        assert.equal(ok, true);
-        assert.deepEqual(fetched, []);
-        assert.deepEqual(decoded, ['image/webp']);
-        assert.equal(loader.jsonData?.name, 'throne');
-        assert.equal(loader.textures.size, 2);
-    }
-    finally
-    {
-        AssetPacks.unmountAll();
-    }
-});
-
-test('a piece missing from the mounted directory loads from its .nitro URL as before', async () =>
-{
-    AssetPacks.mount('http://assets/dcr/hof_furni/', new AmbreiaDirectory('http://assets/ambreia/furniture/', (await directory(['throne'])).fetch));
-
-    try
-    {
-        const {fetched} = await loadThroughLoader('http://assets/dcr/hof_furni/chair.nitro');
-
-        // The loader's own retries (`?retry=n`) included: every request is for the .nitro file.
-        assert.ok(fetched.length > 0 && fetched.every(url => url.startsWith('http://assets/dcr/hof_furni/chair.nitro')), fetched.join(' '));
-    }
-    finally
-    {
-        AssetPacks.unmountAll();
-    }
 });
 
 test('an encrypted directory reads back with its key; what it serves is noise under names nobody can guess', async () =>
@@ -244,7 +159,7 @@ test('an encrypted directory reads back with its key; what it serves is noise un
     }
 });
 
-test('an encrypted directory without the key, or with another one, is unusable: the .nitro files load', async () =>
+test('an encrypted directory without the key, or with another one, is unusable', async () =>
 {
     const {fetch} = await directory(['throne'], {layout: await encryptedLayout(generateMasterKey())});
     const withoutKey = new AmbreiaDirectory('http://assets/ambreia/furniture/', fetch);
@@ -265,36 +180,4 @@ test('an encrypted piece served under the name of another does not decrypt', asy
     files.set(`${dir}${await layout.path({kind: 'piece', name: 'chair'})}`, files.get(`${dir}${await layout.path({kind: 'piece', name: 'throne'})}`)!);
 
     await assert.rejects(new AmbreiaDirectory(dir, fetch, encryptedLayout(key)).read('chair'));
-});
-
-test('a piece that downloads but does not decode falls back to its .nitro instead of retrying the piece', async () =>
-{
-    const {fetch, requested} = await directory(['throne']);
-    const fetched: string[] = [];
-    const original = globalThis.fetch;
-
-    AssetPacks.mount('http://assets/dcr/hof_furni/', new AmbreiaDirectory('http://assets/ambreia/furniture/', fetch));
-    globalThis.fetch = (async (input: string | URL | Request) => { fetched.push(String(input)); throw new TypeError('network down'); }) as typeof fetch;
-    setPlatform({...BROWSER_PLATFORM, decodeImage: async () => { throw new Error('undecodable image'); }});
-
-    try
-    {
-        const loader = new NitroBundleLoader('application/x-nitro-bundle');
-
-        await new Promise<void>(resolve =>
-        {
-            loader.events.once(AssetLoaderEventType.ERROR, () => resolve());
-            loader.events.once(AssetLoaderEventType.COMPLETE, () => resolve());
-            loader.load('http://assets/dcr/hof_furni/throne.nitro');
-        });
-
-        assert.equal(requested.filter(url => url.endsWith('throne.ambreia')).length, 1);
-        assert.ok(fetched.length > 0 && fetched[0] === 'http://assets/dcr/hof_furni/throne.nitro', fetched.join(' '));
-    }
-    finally
-    {
-        globalThis.fetch = original;
-        setPlatform(BROWSER_PLATFORM);
-        AssetPacks.unmountAll();
-    }
 });

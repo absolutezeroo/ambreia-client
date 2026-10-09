@@ -1,5 +1,6 @@
 import EventEmitter from 'eventemitter3';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
+import type {AmbreiaDirectory} from '@ambreia/common/assets/pack/AmbreiaDirectory';
 import type {IAvatarFigureContainer} from './IAvatarFigureContainer';
 import type {IAvatarImageListener} from './IAvatarImageListener';
 import type {AvatarStructure} from './AvatarStructure';
@@ -58,7 +59,9 @@ export class AvatarAssetDownloadManager extends EventEmitter
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/AvatarAssetDownloadManager.as::_initDownloadBuffer
     private _initDownloadBuffer: [IAvatarFigureContainer, IAvatarImageListener | null][];
     private _isReady: boolean;
-    private _downloadUrl: string;
+    // DEVIATION: AS3 holds the libraries' URL template; the port holds the clothing family's
+    // .ambreia directory (spec 2026-10-09-ambreia-everything).
+    private _directory: AmbreiaDirectory;
     private _assetLibrary: IAssetLibrary;
     private _aliasCollection: AssetAliasCollection | null;
     private _mandatoryLibs: string[];
@@ -69,7 +72,7 @@ export class AvatarAssetDownloadManager extends EventEmitter
     private readonly _libraryLoadedCallback: ((libraryName: string) => void) | null;
 
     constructor(
-        downloadUrl: string,
+        directory: AmbreiaDirectory,
         structure: AvatarStructure,
         assetLibrary: IAssetLibrary,
         aliasCollection: AssetAliasCollection | null = null,
@@ -83,7 +86,7 @@ export class AvatarAssetDownloadManager extends EventEmitter
         this._libraryLoadedCallback = libraryLoadedCallback;
 
         this._structure = structure;
-        this._downloadUrl = downloadUrl;
+        this._directory = directory;
         this._assetLibrary = assetLibrary;
         this._aliasCollection = aliasCollection;
         this._renderReadyProvider = renderReadyProvider;
@@ -311,7 +314,7 @@ export class AvatarAssetDownloadManager extends EventEmitter
             const library = new AvatarAssetDownloadLibrary(
                 libName,
                 revision,
-                this._downloadUrl,
+                this._directory,
                 this._assetLibrary
             );
 

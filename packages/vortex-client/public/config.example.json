@@ -15,6 +15,10 @@
   },
   "asset-packs": {
     "clothing": "${url.prefix}/ambreia/clothing/",
-    "furniture": "${url.prefix}/ambreia/furniture/"
+    "effects": "${url.prefix}/ambreia/effects/",
+    "room": "${url.prefix}/ambreia/room/",
+    "pets": "${url.prefix}/ambreia/pets/",
+    "furniture": "${url.prefix}/ambreia/furniture/",
+    "icons": "${url.prefix}/ambreia/icons/"
   }
 }

@@ -2,8 +2,8 @@ import type {Spritesheet, Texture} from 'pixi.js';
 import type {ILazyAsset} from './ILazyAsset';
 import type {IAsset} from './IAsset';
 import type {AssetTypeDeclaration} from './AssetTypeDeclaration';
-import type {IAssetData} from './loaders/NitroBundleLoader';
-import {NitroBundleLoader} from './loaders/NitroBundleLoader';
+import type {IAssetData} from './loaders/AmbreiaPieceLoader';
+import {AmbreiaPieceLoader} from './loaders/AmbreiaPieceLoader';
 import {Logger} from '../utils/Logger';
 
 /**
@@ -156,9 +156,9 @@ export class NitroAsset implements ILazyAsset
         this._spritesheet = null;
         this._baseTexture = null;
 
-        // For NitroBundleLoader, extract data immediately before the loader is disposed
+        // For a piece loader, extract data immediately before the loader is disposed
         // This transfers ownership of textures/spritesheet from loader to asset
-        if(content instanceof NitroBundleLoader)
+        if(content instanceof AmbreiaPieceLoader)
         {
             const loader = content;
             this._jsonData = loader.jsonData;
@@ -188,7 +188,7 @@ export class NitroAsset implements ILazyAsset
             return;
         }
 
-        if(this._unknown instanceof NitroBundleLoader)
+        if(this._unknown instanceof AmbreiaPieceLoader)
         {
             const loader = this._unknown;
             this._jsonData = loader.jsonData;

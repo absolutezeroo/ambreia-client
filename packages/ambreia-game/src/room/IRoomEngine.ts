@@ -68,9 +68,6 @@ export interface IRoomEngine extends IDisposable {
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/room/RoomEngine.as::getFurnitureIcon()
     getFurnitureIcon(type: number, listener: IGetImageListener, param?: string | null, stuffData?: unknown): ImageResult;
 
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/IRoomEngine.as::getFurnitureIconUrl()
-    getFurnitureIconUrl(type: number): string | null;
-
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/IRoomEngine.as::selectRoomObject()
     selectRoomObject(roomId: number, id: number, category: number): void;
 
@@ -97,9 +94,6 @@ export interface IRoomEngine extends IDisposable {
 
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/room/RoomEngine.as::getWallItemIcon()
     getWallItemIcon(type: number, listener: IGetImageListener, param?: string | null): ImageResult;
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/IRoomEngine.as::getWallItemIconUrl()
-    getWallItemIconUrl(type: number, param?: string | null): string | null;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::getFurnitureImage()
     getFurnitureImage(

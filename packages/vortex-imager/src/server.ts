@@ -27,6 +27,7 @@ import {BadgeCodeError} from './badge/BadgeCode';
 import {BadgeRenderError} from './badge/BadgeRenderService';
 import type {RoomRenderService} from './room/RoomRenderService';
 import type {ImagerQuery} from './room/FurnitureRequest';
+import {readHotelIcon} from './room/FurnitureIcon';
 import {
     ContentUnavailableError,
     furnitureCacheKey,
@@ -306,6 +307,9 @@ export function createServer(deps: IServerDependencies): FastifyInstance
 
 async function renderFurniture(deps: IServerDependencies, query: ImagerQuery, reply: FastifyReply): Promise<void>
 {
+    // `size=icon&class=…`: the hotel's own icon when the icons directory has it (FurnitureIcon).
+    if(await sendHotelIcon(deps, query, reply)) return;
+
     const rooms = deps.rooms;
 
     if(rooms === null)
@@ -492,6 +496,34 @@ async function resolveFigure(
     const player = await deps.database.findPlayerLook(user);
 
     return player === null ? null : {figure: player.figure, gender: player.gender};
+}
+
+/** True when it answered with the hotel's icon; false leaves the request to the furni render. */
+async function sendHotelIcon(deps: IServerDependencies, query: ImagerQuery, reply: FastifyReply): Promise<boolean>
+{
+    const icons = deps.avatars.assetDirectories?.icons ?? null;
+    const className = typeof query.class === 'string' ? query.class : null;
+    const size = typeof query.size === 'string' ? query.size.toLowerCase() : null;
+
+    if(icons === null || className === null || size !== 'icon') return false;
+
+    try
+    {
+        const icon = await readHotelIcon(icons, className);
+
+        if(icon === null) return false;
+
+        await reply.header('Content-Type', icon.contentType).header('Cache-Control', CACHE_CONTROL).send(icon.bytes);
+
+        return true;
+    }
+    catch (error)
+    {
+        // A broken directory or an undecodable piece: the render still answers.
+        log.once(`hotel-icon:${icons.url}`).warn(`Icons from ${icons.url} unavailable (${(error as Error).message}): rendering instead`);
+
+        return false;
+    }
 }
 
 function sendImage(reply: FastifyReply, buffer: Buffer, cacheHit: boolean): void

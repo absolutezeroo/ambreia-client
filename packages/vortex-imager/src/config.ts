@@ -10,6 +10,7 @@
 import {readFileSync} from 'node:fs';
 import {dirname, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import type {IAssetPacksSettings} from '@ambreia/common/assets/pack/AssetDirectories';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -40,6 +41,12 @@ export interface IImagerConfig
 
     /** Directory holding the embedded avatar XMLs (geometry, part sets, animation, figure). */
     avatarConfigDir: string;
+
+    /**
+	 * The client's config.json → `asset-packs`: the families' .ambreia directories and their key. The
+	 * same file the client reads, so the imager never renders from other assets than the game.
+	 */
+    assetPacks: IAssetPacksSettings;
 
     /** `null` disables username lookups; `?figure=` still works. */
     database: IDatabaseConfig | null;
@@ -142,6 +149,24 @@ function loadEnvFile(): void
     }
 }
 
+/** `asset-packs` of the client's config.json (IMAGER_CLIENT_CONFIG, default the client package's own). */
+function readAssetPacks(): IAssetPacksSettings
+{
+    const file = env('IMAGER_CLIENT_CONFIG', resolve(HERE, '../../vortex-client/public/config.json'));
+    let text: string;
+
+    try
+    {
+        text = readFileSync(file, 'utf8');
+    }
+    catch
+    {
+        throw new Error(`IMAGER_CLIENT_CONFIG: ${file} not found — copy config.example.json and fill asset-packs`);
+    }
+
+    return (JSON.parse(text) as {'asset-packs'?: IAssetPacksSettings})['asset-packs'] ?? {};
+}
+
 export function loadConfig(): IImagerConfig
 {
     loadEnvFile();
@@ -160,6 +185,7 @@ export function loadConfig(): IImagerConfig
             'IMAGER_AVATAR_CONFIG_DIR',
             resolve(HERE, '../../vortex-client/src/assets/configurations')
         ),
+        assetPacks: readAssetPacks(),
         database: database === null
             ? null
             : {
