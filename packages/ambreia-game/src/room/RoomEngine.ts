@@ -43,6 +43,7 @@ import type {IRoomSession} from '../session/IRoomSession';
 import {RoomObjectCategoryEnum} from '@ambreia/iso/scene/object/RoomObjectCategoryEnum';
 import {RoomObjectOperationEnum} from '@ambreia/iso/scene/object/RoomObjectOperationEnum';
 import {RoomObjectAvatarSelectedMessage} from '@ambreia/iso/scene/messages/RoomObjectAvatarSelectedMessage';
+import {RoomObjectAvatarTargetUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectAvatarTargetUpdateMessage';
 import {RoomObjectSelectedMessage} from '@ambreia/iso/scene/messages/RoomObjectSelectedMessage';
 import {RoomObjectVisibilityUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectVisibilityUpdateMessage';
 import {LookToMessageComposer} from '@ambreia/protocol/outgoing/room/avatar/LookToMessageComposer';
@@ -565,6 +566,13 @@ export class RoomEngine extends Component implements IRoomEngine,
     // of resetting to the default rotation on every copy.
     private _repeatedPlacementDirection: number = -1;
     private _selectedObject: { roomId: number; id: number; category: number } | null = null;
+    /**
+     * TS-only (RPG F3b §7.3): the zone's usable floor objects, by id, as RpgZoneInteractives lists
+     * them; null outside a zone, where the Habbo click path stays. Set by features/interaction.
+     */
+    private _rpgInteractives: ReadonlyMap<number, string> | null = null;
+    /** TS-only (RPG F3b §7.3): the avatar (room object id) under the target circle; 0 for none. */
+    private _rpgTargetId = 0;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_1821.as::getSelectedAvatarId()
     private _selectedAvatarId: number = -1;
@@ -8577,6 +8585,10 @@ export class RoomEngine extends Component implements IRoomEngine,
     {
         if(this._connection === null) return true;
 
+        // DEVIATION: in an RPG zone a furni's own state change (its logic's double click) sends
+        // nothing: the single click on a listed object already used it (handleObjectMouseEvent()).
+        if(this._rpgInteractives !== null) return true;
+
         // DEVIATION: AS3 refuses furni below usage policy 2 here while the room is in wired
         // play-test mode; the RPG has no wired, so no play-test mode.
         const session = this._roomSessionManager?.getSession(roomId) ?? null;
@@ -8986,6 +8998,25 @@ export class RoomEngine extends Component implements IRoomEngine,
             // arrives next and walks the avatar — clicking a pet to open its panel walked you onto
             // the tile under it, and clicking another player walked you at them.
             if(event.eventId !== '') this.setMouseEventId(0, 'click', event.eventId);
+        }
+
+        // DEVIATION: in an RPG zone the decor is frozen (F3b §7.3): a click on an object the server
+        //   listed uses it, any other object does nothing — no ClickFurni, no info stand. Walking onto
+        //   a walkable one still works as in AS3 below.
+        if(this._rpgInteractives !== null
+            && (category === RoomObjectCategoryEnum.OBJECT_CATEGORY_FURNITURE || category === RoomObjectCategoryEnum.OBJECT_CATEGORY_WALL))
+        {
+            if(category === RoomObjectCategoryEnum.OBJECT_CATEGORY_FURNITURE && this._rpgInteractives.has(objId))
+            {
+                this._connection?.send(new UseFurnitureMessageComposer(objId, 0));
+            }
+
+            if(this.isWhereYouClickWhereYouGo() && this.handleMoveTargetFurni(event))
+            {
+                if(event.eventId !== '') this.setMouseEventId(0, 'click', event.eventId);
+            }
+
+            return;
         }
 
         // AS3: _SafeCls_1821.as::handleRoomObjectMouseClick() — a plain (unmodified) furni click
@@ -9426,6 +9457,31 @@ export class RoomEngine extends Component implements IRoomEngine,
     selectAvatar(roomId: number, objectId: number): void
     {
         this.setSelectedAvatar(roomId, objectId, true);
+    }
+
+    /** TS-only (RPG F3b §7.3): the zone's usable objects (id → interaction), or null to leave the zone's rules. */
+    setRpgInteractives(objects: ReadonlyMap<number, string> | null): void
+    {
+        this._rpgInteractives = objects;
+    }
+
+    /** TS-only (RPG F3b §7.3): moves the target circle to this avatar of the active room; 0 takes it away. */
+    setRpgTarget(objectId: number): void
+    {
+        if(objectId === this._rpgTargetId) return;
+
+        this.markRpgTarget(this._rpgTargetId, false);
+        this._rpgTargetId = objectId;
+        this.markRpgTarget(objectId, true);
+    }
+
+    private markRpgTarget(objectId: number, targeted: boolean): void
+    {
+        if(objectId === 0) return;
+
+        const object = this.getRoomObject(this._activeRoomId, objectId, RoomObjectCategoryEnum.OBJECT_CATEGORY_USER) as IRoomObjectController | null;
+
+        object?.getEventHandler()?.processUpdateMessage(new RoomObjectAvatarTargetUpdateMessage(targeted));
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::getSelectedAvatarId()

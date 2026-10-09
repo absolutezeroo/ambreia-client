@@ -27,6 +27,8 @@ import type {RpgCharacterSession} from './character/RpgCharacterSession';
 import {InventoryFeature} from './inventory/feature';
 import type {RpgInventorySession} from './inventory/RpgInventorySession';
 import type {HudPanelsState} from './hud/HudPanelsState';
+import {InteractionFeature} from './interaction/feature';
+import type {RpgInteractionSession} from './interaction/RpgInteractionSession';
 import {IID_HabboConfigurationManager} from '../iid/IIDHabboConfigurationManager';
 import {IID_HabboCommunicationManager} from '../iid/IIDHabboCommunicationManager';
 import {IID_HabboLocalizationManager} from '../iid/IIDHabboLocalizationManager';
@@ -59,6 +61,8 @@ export interface IEngineManagers
     hud: HudPanelsState | null;
     /** The played character's bag and equipment (features/inventory, Objets §17). */
     inventory: RpgInventorySession | null;
+    /** The zone's usable objects and the player's target (features/interaction, F3b). */
+    interaction: RpgInteractionSession | null;
 }
 
 /** The engine's own objects the features are made with: none of them is configuration. */
@@ -86,7 +90,7 @@ export function emptyManagers(): IEngineManagers
     return {
         configuration: null, communication: null, demo: null, localization: null, roomManager: null, roomSession: null,
         sessionData: null, roomEngine: null, avatarRenderer: null, windowManager: null, roomUI: null, character: null,
-        hud: null, inventory: null
+        hud: null, inventory: null, interaction: null
     };
 }
 
@@ -282,5 +286,6 @@ export const GAME_FEATURES: readonly IGameFeature[] = [
     LoadingBarFeature,
     CharacterFeature,
     HudFeature,
-    InventoryFeature
+    InventoryFeature,
+    InteractionFeature
 ];

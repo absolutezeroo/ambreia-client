@@ -7,6 +7,7 @@ import {MutedBubble} from './MutedBubble';
 import {TypingBubble} from './TypingBubble';
 import {GuideStatusBubble} from './GuideStatusBubble';
 import {NumberBubble} from './NumberBubble';
+import {TargetCircle} from './TargetCircle';
 import {ExpressionAdditionFactory} from './ExpressionAdditionFactory';
 
 /** The additions AvatarVisualization built itself before J4, now behind the effects module. */
@@ -35,6 +36,11 @@ export class AvatarAdditionFactory implements IAvatarAdditionFactory
     public number(id: number, visualization: AvatarVisualization, value: number): IAvatarAddition
     {
         return new NumberBubble(id, value, visualization);
+    }
+
+    public target(id: number): IAvatarAddition
+    {
+        return new TargetCircle(id);
     }
 
     public expression(id: number, type: number, visualization: AvatarVisualization): IExpressionAddition | null

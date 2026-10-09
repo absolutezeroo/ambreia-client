@@ -133,6 +133,9 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/room/object/visualization/avatar/AvatarVisualization.as::ADDITION_ID_GUIDE_STATUS_BUBBLE
     private static readonly ADDITION_ID_GUIDE_STATUS_BUBBLE: number = 7;
 
+    /** TS-only (RPG F3b §7.3): the ring under the player's target. */
+    private static readonly ADDITION_ID_TARGET_CIRCLE: number = 8;
+
     /** Minimum time between geometry updates in milliseconds. */
     private static readonly GEOMETRY_UPDATE_INTERVAL_MS: number = 41;
 
@@ -1079,6 +1082,21 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
                     this.removeAddition(AvatarVisualization.ADDITION_ID_GUIDE_STATUS_BUBBLE);
                     changed = true;
                 }
+            }
+
+            // TS-only (RPG F3b §7.3): the target circle, while the server says this avatar is the target.
+            const targeted = (model.getNumber(RoomObjectVariableEnum.AVATAR_RPG_TARGET) | 0) !== 0;
+            const circle = this.getAddition(AvatarVisualization.ADDITION_ID_TARGET_CIRCLE);
+
+            if(targeted && circle === null && AvatarVisualization.additions)
+            {
+                this.addAddition(AvatarVisualization.additions.target(AvatarVisualization.ADDITION_ID_TARGET_CIRCLE));
+                changed = true;
+            }
+            else if(!targeted && circle !== null)
+            {
+                this.removeAddition(AvatarVisualization.ADDITION_ID_TARGET_CIRCLE);
+                changed = true;
             }
 
             // Number bubble addition

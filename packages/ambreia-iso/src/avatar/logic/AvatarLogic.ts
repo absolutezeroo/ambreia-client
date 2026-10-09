@@ -35,6 +35,8 @@ import {RoomObjectAvatarPlayerValueUpdateMessage} from '../../scene/messages/Roo
 import {RoomObjectAvatarBlockedUpdateMessage} from '../../scene/messages/RoomObjectAvatarBlockedUpdateMessage';
 import {RoomObjectAvatarFlatControlUpdateMessage} from '../../scene/messages/RoomObjectAvatarFlatControlUpdateMessage';
 import {RoomObjectAvatarGuideStatusUpdateMessage} from '../../scene/messages/RoomObjectAvatarGuideStatusUpdateMessage';
+import {RoomObjectAvatarTargetUpdateMessage} from '../../scene/messages/RoomObjectAvatarTargetUpdateMessage';
+import {RoomObjectVariableEnum} from '../../scene/object/RoomObjectVariableEnum';
 import {RoomObjectAvatarOwnMessage} from '../../scene/messages/RoomObjectAvatarOwnMessage';
 
 export class AvatarLogic extends MovingObjectLogic
@@ -344,6 +346,13 @@ export class AvatarLogic extends MovingObjectLogic
         if(message instanceof RoomObjectAvatarGuideStatusUpdateMessage)
         {
             model.setNumber('figure_guide_status', message.guideStatus);
+            return;
+        }
+
+        // TS-only (RPG F3b §7.3): the player's target, drawn by AvatarVisualization's target circle.
+        if(message instanceof RoomObjectAvatarTargetUpdateMessage)
+        {
+            model.setNumber(RoomObjectVariableEnum.AVATAR_RPG_TARGET, message.targeted ? 1 : 0);
             return;
         }
 

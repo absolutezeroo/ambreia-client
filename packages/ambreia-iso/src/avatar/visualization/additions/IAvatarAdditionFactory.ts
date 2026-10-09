@@ -19,5 +19,7 @@ export interface IAvatarAdditionFactory
     typing(id: number, visualization: AvatarVisualization): ITypingAddition;
     guide(id: number, visualization: AvatarVisualization, status: number): IAvatarAddition;
     number(id: number, visualization: AvatarVisualization, value: number): IAvatarAddition;
+    /** TS-only (RPG F3b §7.3): the ring under the player's target. */
+    target(id: number): IAvatarAddition;
     expression(id: number, type: number, visualization: AvatarVisualization): IExpressionAddition | null;
 }
