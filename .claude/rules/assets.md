@@ -34,15 +34,28 @@ paths:
 - **Shipped assets can lag the primary dump**: check before assuming a code gap.
   `src/assets/configurations/HabboAvatarGeometry.xml` has 9 bodyparts and no `order-*` attributes
   where the WIN63 dump has 11 (`petl`/`petr`).
-- **`.ambreia` directories stand in for directories of `.nitro`** (plan `docs/superpowers/plans/2026-10-08-asset-packs.md`):
-  one `<name>.ambreia` per bundle, images used by several pieces once in `images/<sha1>`, the
-  manifests (`ManifestCodec`) deflated with `dictionary/<id>.bin`, `ambreia.json` at the root.
-  `build-ambreia.ts` is incremental and checks everything (lossless WebP per pixel, manifests, a
-  read-back); unreadable bundles are listed in `report.json`. The `asset-packs` feature mounts
-  `config.json` → `asset-packs.{clothing,furniture}` (directory URLs) on the avatar / furniture
-  download directories; `NitroBundleLoader` reads a mounted piece and falls back to the `.nitro`
-  when it is missing. Image *data* is identical; browsers premultiply PNG and WebP alpha with
-  different rounding, so semi-transparent pixels can render up to 2/255 apart (invisible).
+- **Every asset family is an `.ambreia` directory, and nothing reads a `.nitro`** (spec
+  `docs/superpowers/specs/2026-10-09-ambreia-everything-design.md`): `ambreia/{clothing,effects,room,pets,furniture}/`
+  on the asset server, one `<name>.ambreia` per bundle, images used by several pieces once in
+  `images/<sha1>`, the manifests (`ManifestCodec`) deflated with `dictionary/<id>.bin`,
+  `ambreia.json` at the root. The `.nitro` sources live outside anything served
+  (`C:/laragon/ambreia-sources/<family>/`, filled by `tools/gather-ambreia-sources.mjs`);
+  `build:ambreia:all` builds the five families (`build-ambreia.ts`: incremental, lossless WebP per
+  pixel, manifests and a read-back checked; unreadable bundles in `<family>.report.json`) and writes
+  `.ambreia-build/coverage.json`: figure-map and effect-map libraries, pets and room bundles with no
+  piece. A missing mandatory library (`hh_human_body`, `hh_human_item`) or room bundle fails it.
+- **Loading a piece:** the `asset-packs` feature opens the five directories from `config.json` →
+  `asset-packs.{clothing,effects,room,pets,furniture,key}` (all required) into
+  `made.assetDirectories`; the avatar renderer and `RoomContentLoader` load with
+  `AssetLibrary.loadPiece(assetName, directory, piece)` (`AmbreiaPieceLoader`). A missing piece warns
+  once and does not display; a directory that cannot be read (wrong key, no WebCrypto off a secure
+  origin) is an error once. In game, a furni icon is the furni rendered at scale 1 (its `_icon_`
+  assets). The hotel's own icons (`<class>[_<colour>]_icon`, which differ from that render for about
+  four in ten furni) are the optional `icons` family; tools get them from the imager
+  (`/habbo-imaging/furniture?class=…&size=icon`), which renders the furni only when there is none. The imager, the
+  iso sandbox and the map editor read the same `config.json` section. Image *data* is identical to
+  the source; browsers premultiply PNG and WebP alpha with different rounding, so semi-transparent
+  pixels can render up to 2/255 apart (invisible).
 - **The client's own assets ship as two `.ambreia` bundles** (`public/assets-images.ambreia`,
   `assets-xml.ambreia`, written by `tools/bundle-assets.mjs` on `predev`/`prebuild`): an `AMBB`
   header over one entry table (`AssetBundle.ts`), the body deflated when that pays (the XML one).
@@ -51,7 +64,8 @@ paths:
   so a rebuild re-encodes only changed images. Not encrypted (owner's choice).
 - **Encrypted `.ambreia` directories** (`build:ambreia --key-file=<file>`): AES-256-GCM per file and
   HMAC file names from one 32-byte master key (`AmbreiaLayout`). The key file lives outside anything
-  served (the tool refuses a key inside the output) and the client gets it from `asset-packs.key`.
+  served (the tool refuses a key inside the output) and the client, the imager and the dev tools get
+  it from `config.json` → `asset-packs.key`.
   That config is public, so this stops a direct look at an URL and name guessing, not a player:
   the key belongs in a server message after login. A directory needs the key it was built with
   (`ambreia.json` → `keyId`); a change of key or encryption is a build into an empty folder (the

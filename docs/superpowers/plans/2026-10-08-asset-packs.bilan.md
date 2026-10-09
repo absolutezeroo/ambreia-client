@@ -1,5 +1,8 @@
 # Bilan — `.ambreia` (vêtements, mobis) (2026-10-08)
 
+> **Suite (2026-10-09) :** toutes les familles sont en `.ambreia` et plus aucun `.nitro` n'est lu.
+> Voir `docs/superpowers/specs/2026-10-09-ambreia-everything-design.md`.
+
 Plan : `2026-10-08-asset-packs.md` (avec ses deux révisions). Branche `asset-packs`, partie de `master` c2dcff63.
 
 ## Ce qui existe
