@@ -23,7 +23,8 @@ export const NewStyleHeaders = {
         Incoming.RpgTargetMessageComposer,
         // F3c Chat: the chat window's lines and refusals (features/chat).
         Incoming.RpgChatMessageComposer,
-        Incoming.RpgChatResultMessageComposer
+        Incoming.RpgChatResultMessageComposer,
+        Incoming.RpgEmoteMessageComposer
     ]),
     outgoing: new Set<number>([
         Outgoing.RpgCharacterListRequestMessageEvent,
@@ -37,7 +38,8 @@ export const NewStyleHeaders = {
         Outgoing.RpgItemDestroyMessageEvent,
         Outgoing.RpgItemClaimParcelMessageEvent,
         Outgoing.RpgTargetSelectMessageEvent,
-        Outgoing.RpgChatSendMessageEvent
+        Outgoing.RpgChatSendMessageEvent,
+        Outgoing.RpgEmoteMessageEvent
     ])
 };
 
