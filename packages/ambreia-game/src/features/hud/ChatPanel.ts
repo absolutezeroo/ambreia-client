@@ -236,6 +236,16 @@ export class ChatPanel
             return true;
         }
 
+        // Left empty, the field shows its placeholder again.
+        if(event.type === 'WE_UNFOCUSED' && window.name === 'chat_input')
+        {
+            const input = window as ITextFieldWindow;
+
+            if(input.text.trim() === '') input.text = this._bits.text('vortex.hud.chat.placeholder');
+
+            return true;
+        }
+
         if(event.type !== 'WME_CLICK') return false;
 
         this.wake();

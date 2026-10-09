@@ -56,7 +56,11 @@
             </border>
             <border x="44" y="192" width="412" height="30" params="16" style="3" color="0x201e19" blend="0.8">
               <children>
-                <input x="8" y="7" width="396" height="16" params="1" style="0" name="chat_input" caption="${vortex.hud.chat.placeholder}"/>
+                <input x="8" y="7" width="396" height="16" params="1" style="0" name="chat_input" caption="${vortex.hud.chat.placeholder}">
+                  <variables>
+                    <var key="text_color" value="0xe8e6de" type="hex"/>
+                  </variables>
+                </input>
               </children>
             </border>
             <border x="462" y="192" width="30" height="30" params="17" style="6" name="emoji_button" color="0x55534e" dynamic_style="button">

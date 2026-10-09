@@ -295,6 +295,16 @@ export class InventoryView
             return;
         }
 
+        // Left empty, the field shows its placeholder again (its caption, the layout's text).
+        if(event.type === 'WE_UNFOCUSED' && window.name === 'search_input')
+        {
+            const input = window as ITextFieldWindow;
+
+            if(input.text.trim() === '') input.text = this._bits.text('vortex.mapeditor.spawns.search');
+
+            return;
+        }
+
         if(event.type === 'WKE_KEY_UP' && window.name === 'search_input')
         {
             this._search = (window as ITextFieldWindow).text.trim().toLowerCase();
