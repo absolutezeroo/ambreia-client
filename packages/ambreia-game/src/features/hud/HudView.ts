@@ -9,13 +9,9 @@ import type {IAvatarImageWidget} from '@ambreia/ui/kit/widgets/IAvatarImageWidge
 import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
 import {barFill, cooldownLabel} from './PlayerHudState';
 import type {IActionSlot, IPlayerHud, PlayerHudState} from './PlayerHudState';
+import {hudTop, LAYER, MARGIN} from './HudPanelsView';
 
 const log = Logger.getLogger('habbo.features.hud.HudView');
-
-/** Gap between the HUD and the edges of the desktop. */
-const MARGIN = 12;
-/** The window context layer the HUD lives on (the default one, under dialogs). */
-const LAYER = 1;
 /** How often a running cooldown's seconds are redrawn; nothing ticks when none runs. */
 const COOLDOWN_TICK_MS = 250;
 
@@ -117,17 +113,33 @@ export class HudView
         return true;
     }
 
-    /** Frame top left, bar bottom centre of the desktop the windows were built on. */
+    /**
+     * Frame top left (under the top bar while it shows); bar at the bottom, centred in the room the
+     * chat (bottom left) and the target (bottom right) leave it, and over the target only when the
+     * desktop is too narrow for the three. Both panels are found by name on the desktop
+     * (HudPanelsView builds them and calls relayout() when they move).
+     */
     private place(): void
     {
-        const desktop = this._windows.getDesktop(LAYER);
+        const desktop = this._windows.getDesktop(LAYER) as IWindowContainer | null;
 
         if(!desktop || !this._player || !this._bar) return;
 
+        const chat = desktop.findChildByName('hud_chat');
+        const target = desktop.findChildByName('hud_target');
+        const left = chat?.visible ? chat.x + chat.width + MARGIN : 0;
+        const right = target?.visible ? target.x - MARGIN : desktop.width;
+
         this._player.x = MARGIN;
-        this._player.y = MARGIN;
-        this._bar.x = Math.round((desktop.width - this._bar.width) / 2);
+        this._player.y = hudTop(desktop);
+        this._bar.x = Math.max(left, Math.round(Math.min((desktop.width - this._bar.width) / 2, (left + right - this._bar.width) / 2)));
         this._bar.y = desktop.height - this._bar.height - MARGIN;
+    }
+
+    /** Lays the frame and the bar out again: the panels around them moved or came and went. */
+    relayout(): void
+    {
+        this.place();
     }
 
     private render(value: Readonly<IPlayerHud>): void

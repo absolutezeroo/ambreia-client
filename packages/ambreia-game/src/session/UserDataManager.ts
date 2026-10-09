@@ -163,6 +163,12 @@ export class UserDataManager implements IUserDataManager
         this._userBadges.set(userId, badges);
     }
 
+    // TS-only: see IUserDataManager.getUserCount().
+    getUserCount(type: number): number
+    {
+        return this._usersByTypeAndWebId.get(type)?.size ?? 0;
+    }
+
     // AS3: .../src/com/sulake/habbo/session/UserDataManager.as::removeUserDataByRoomIndex()
     removeUserDataByRoomIndex(roomIndex: number): void
     {

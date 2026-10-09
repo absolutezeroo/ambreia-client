@@ -14,7 +14,7 @@
             </static_bitmap>
           </children>
         </border>
-        <scrollable_itemgrid_vertical x="0" y="34" width="68" height="68" params="16" style="3" name="buff_grid"/>
+        <itemgrid_vertical x="0" y="34" width="68" height="68" params="16" style="3" name="buff_grid"/>
       </children>
     </container>
   </window>

@@ -80,6 +80,9 @@ export interface IUserDataManager extends IDisposable
     // AS3: .../src/com/sulake/habbo/session/UserDataManager.as::removeUserDataByRoomIndex()
     removeUserDataByRoomIndex(roomIndex: number): void;
 
+    /** TS-only: how many of one type (UserDataType) are in the room — the HUD's "N players here". */
+    getUserCount(type: number): number;
+
     /**
 	 * Update user figure
 	 */

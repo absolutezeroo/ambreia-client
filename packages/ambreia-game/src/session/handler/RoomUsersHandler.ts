@@ -242,6 +242,13 @@ export class RoomUsersHandler extends BaseHandler
         }
 
         session.userDataManager.removeUserDataByRoomIndex(parser.roomIndex);
+
+        // DEVIATION: AS3 raises RSUDUE only for arrivals. A departure raises it too, with no one
+        // added, so what counts the room's users (the HUD) hears both.
+        this.listener.sessionEvents?.emit(
+            RoomSessionUserDataUpdateEvent.RSUDUE_USER_DATA_UPDATE,
+            new RoomSessionUserDataUpdateEvent(session)
+        );
     }
 
     // AS3: .../src/com/sulake/habbo/session/handler/RoomUsersHandler.as::onBlockUserUpdate()
