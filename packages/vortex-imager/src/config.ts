@@ -11,6 +11,7 @@ import {readFileSync} from 'node:fs';
 import {dirname, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import type {IAssetPacksSettings} from '@ambreia/common/assets/pack/AssetDirectories';
+import {Logger} from '@ambreia/common/utils/Logger';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -149,7 +150,11 @@ function loadEnvFile(): void
     }
 }
 
-/** `asset-packs` of the client's config.json (IMAGER_CLIENT_CONFIG, default the client package's own). */
+/**
+ * `asset-packs` of the client's config.json (IMAGER_CLIENT_CONFIG, default the client package's own).
+ * Without the file, every family is the asset host's default directory and there is no key: the
+ * imager still starts, and an encrypted directory says why it cannot be read.
+ */
 function readAssetPacks(): IAssetPacksSettings
 {
     const file = env('IMAGER_CLIENT_CONFIG', resolve(HERE, '../../vortex-client/public/config.json'));
@@ -161,7 +166,9 @@ function readAssetPacks(): IAssetPacksSettings
     }
     catch
     {
-        throw new Error(`IMAGER_CLIENT_CONFIG: ${file} not found — copy config.example.json and fill asset-packs`);
+        Logger.getLogger('imager.config').warn(`IMAGER_CLIENT_CONFIG: ${file} not found — default asset directories, no key (copy config.example.json and fill asset-packs)`);
+
+        return {};
     }
 
     return (JSON.parse(text) as {'asset-packs'?: IAssetPacksSettings})['asset-packs'] ?? {};

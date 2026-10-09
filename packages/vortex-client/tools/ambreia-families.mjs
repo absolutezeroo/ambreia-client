@@ -38,10 +38,10 @@ export function iconBundle(name, png)
 export const ROOM_BUNDLES = ['HabboRoomContent', 'TileCursor', 'SelectionArrow', 'PlaceHolderFurniture', 'PlaceHolderWallItem', 'PlaceHolderPet'];
 
 /**
- * The figure libraries the avatar renderer waits for before drawing anyone
- * (AvatarAssetDownloadManager._mandatoryLibs): without them no figure draws.
+ * Base figure libraries (`hh_*`) the figure map names but no source has ever held: the build does
+ * not block on them. Every other `hh_*` library does — without one, every figure draws broken.
  */
-export const MANDATORY_CLOTHING = ['hh_human_body', 'hh_human_item'];
+export const KNOWN_ABSENT_BASE = ['hh_human_fx', 'hh_pets'];
 
 const unique = names => [...new Set(names)];
 
@@ -61,14 +61,15 @@ export function gordonSelection({figureLibs, effectLibs, pets, gordonNames})
 }
 
 /**
- * The names each family lacks. A mandatory figure library or a room bundle missing blocks: no figure
- * or no room draws at all without it. Anything else is only listed (known gaps: spec, out of scope).
+ * The names each family lacks. A base figure library (`hh_*`, minus KNOWN_ABSENT_BASE) or a room
+ * bundle missing blocks: figures or rooms draw broken without it. Anything else is only listed
+ * (known gaps: spec, out of scope).
  */
 export function coverage({figureLibs, effectLibs, pets, available})
 {
     const lacking = (names, family) => unique(names).filter(name => !available[family].has(name));
     const missing = {clothing: lacking(figureLibs, 'clothing'), effects: lacking(effectLibs, 'effects'), pets: lacking(pets, 'pets'), room: lacking(ROOM_BUNDLES, 'room')};
-    const blocking = [...missing.clothing.filter(name => MANDATORY_CLOTHING.includes(name)).map(name => `clothing/${name}`), ...missing.room.map(name => `room/${name}`)];
+    const blocking = [...missing.clothing.filter(name => name.startsWith('hh_') && !KNOWN_ABSENT_BASE.includes(name)).map(name => `clothing/${name}`), ...missing.room.map(name => `room/${name}`)];
 
     return {missing, blocking};
 }

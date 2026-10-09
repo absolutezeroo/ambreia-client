@@ -43,7 +43,9 @@ paths:
   `build:ambreia:all` builds the five families (`build-ambreia.ts`: incremental, lossless WebP per
   pixel, manifests and a read-back checked; unreadable bundles in `<family>.report.json`) and writes
   `.ambreia-build/coverage.json`: figure-map and effect-map libraries, pets and room bundles with no
-  piece. A missing mandatory library (`hh_human_body`, `hh_human_item`) or room bundle fails it.
+  piece. A missing base library (`hh_*`, minus `KNOWN_ABSENT_BASE`) or room bundle fails it.
+  A family `config.json` leaves out defaults to `${url.prefix}/ambreia/<family>/`, so only the key of
+  encrypted directories has to come from it.
 - **Loading a piece:** the `asset-packs` feature opens the five directories from `config.json` →
   `asset-packs.{clothing,effects,room,pets,furniture,key}` (all required) into
   `made.assetDirectories`; the avatar renderer and `RoomContentLoader` load with

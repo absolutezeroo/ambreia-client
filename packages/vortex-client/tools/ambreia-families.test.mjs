@@ -66,5 +66,6 @@ test('a missing mandatory library or room bundle blocks; any other missing piece
     assert.deepEqual(result.missing.clothing, ['hh_human_item', 'hh_human_face', 'hh_pets', 'shirt_lost']);
     assert.deepEqual(result.missing.effects, ['Cat']);
     assert.deepEqual(result.missing.room, ['TileCursor']);
-    assert.deepEqual(result.blocking, ['clothing/hh_human_item', 'room/TileCursor']);
+    // hh_pets is known absent from every source (KNOWN_ABSENT_BASE); every other hh_* lib blocks.
+    assert.deepEqual(result.blocking, ['clothing/hh_human_item', 'clothing/hh_human_face', 'room/TileCursor']);
 });

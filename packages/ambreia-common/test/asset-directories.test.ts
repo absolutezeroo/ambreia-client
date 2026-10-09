@@ -63,20 +63,19 @@ function load(library: AssetLibrary, name: string, directory: AmbreiaDirectory):
     });
 }
 
-test('every family gets its directory, ${…} resolved; a family left out is named', () =>
+test('every family gets its directory, ${…} resolved; one config.json leaves out is the asset host\'s ambreia/<family>/', () =>
 {
-    const urls = Object.fromEntries(ASSET_FAMILIES.map(family => [family, `\${url.prefix}/ambreia/${family}/`]));
-    const directories = openAssetDirectories(urls, text => text.replace('${url.prefix}', 'http://assets'));
+    const prefix = (text: string): string => text.replace('${url.prefix}', 'http://assets');
+    const directories = openAssetDirectories({pets: '${url.prefix}/elsewhere/pets/'}, prefix);
 
-    assert.equal(directories.pets.url, 'http://assets/ambreia/pets/');
+    assert.equal(directories.pets.url, 'http://assets/elsewhere/pets/');
     assert.equal(directories.furniture.url, 'http://assets/ambreia/furniture/');
-    assert.throws(() => openAssetDirectories({...urls, effects: undefined}), /effects/);
+    assert.equal(openAssetDirectories({}, prefix).clothing.url, 'http://assets/ambreia/clothing/');
 });
 
-test('the icons family is optional: opened when configured, null otherwise', () =>
+test('the icons family defaults like the others; only tools ever read it', () =>
 {
-    assert.equal(openAssetDirectories(EVERY_FAMILY).icons, null);
-    assert.equal(openAssetDirectories({...EVERY_FAMILY, icons: '${url.prefix}/ambreia/icons/'}, text => text.replace('${url.prefix}', 'http://assets')).icons?.url, 'http://assets/ambreia/icons/');
+    assert.equal(openAssetDirectories({}, text => text.replace('${url.prefix}', 'http://assets')).icons.url, 'http://assets/ambreia/icons/');
 });
 
 test('loadPiece registers the piece under its name, its textures parsed, never fetching a .nitro', async () =>
@@ -123,6 +122,56 @@ test('a piece can be registered under another asset name (the room type `room` i
     finally
     {
         setPlatform(BROWSER_PLATFORM);
+    }
+});
+
+test('a request that fails once while the directory opens is not fatal: the loader\'s retry loads the piece', async () =>
+{
+    const {fetch} = await served(['throne']);
+    let failures = 1;
+    const flaky: FetchBytes = async (url) =>
+    {
+        if(url.endsWith('ambreia.json') && failures-- > 0) throw new TypeError('network down');
+
+        return fetch(url);
+    };
+    const directory = new AmbreiaDirectory(DIR, flaky);
+
+    setPlatform({...BROWSER_PLATFORM, decodeImage: async () => ({width: 4, height: 4}) as unknown as CanvasImageSource});
+
+    try
+    {
+        assert.equal(await load(new AssetLibrary('flaky'), 'throne', directory), true);
+        assert.equal(directory.broken, false);
+    }
+    finally
+    {
+        setPlatform(BROWSER_PLATFORM);
+    }
+});
+
+test('a directory with no descriptor stays broken: that is not going to change by asking again', async () =>
+{
+    const directory = new AmbreiaDirectory(DIR, async () => null);
+
+    await assert.rejects(directory.read('throne'), /not an \.ambreia directory/);
+    assert.equal(directory.broken, true);
+});
+
+test('without WebCrypto (http on a LAN address) the key is refused with the reason, not a TypeError', async () =>
+{
+    const key = generateMasterKey();
+    const original = Object.getOwnPropertyDescriptor(globalThis, 'crypto')!;
+
+    Object.defineProperty(globalThis, 'crypto', {value: undefined, configurable: true});
+
+    try
+    {
+        await assert.rejects(encryptedLayout(key), /WebCrypto is unavailable.*https or localhost/);
+    }
+    finally
+    {
+        Object.defineProperty(globalThis, 'crypto', original);
     }
 });
 

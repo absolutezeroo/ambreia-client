@@ -65,6 +65,9 @@ export function decodeMasterKey(text: string): Uint8Array
 
 export async function encryptedLayout(masterKey: Uint8Array): Promise<IAmbreiaLayout>
 {
+    // A browser hides WebCrypto off a secure origin: say so rather than fail on `undefined.importKey`.
+    if(!globalThis.crypto?.subtle) throw new Error('WebCrypto is unavailable: the page is not a secure origin (https or localhost)');
+
     const subtle = crypto.subtle;
     const master = await subtle.importKey('raw', buffer(masterKey), 'HKDF', false, ['deriveKey', 'deriveBits']);
     const hkdf = (info: string): HkdfParams => ({name: 'HKDF', hash: 'SHA-256', salt: new Uint8Array(), info: utf8(info)});

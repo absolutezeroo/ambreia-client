@@ -24,13 +24,13 @@ test('asset-packs comes from the client config.json IMAGER_CLIENT_CONFIG names',
     }
 });
 
-test('a missing client config.json is an error that says what to do', () =>
+test('without a client config.json the imager still starts, on the asset host\'s default directories', () =>
 {
     process.env.IMAGER_CLIENT_CONFIG = join(tmpdir(), 'no-such-dir', 'config.json');
 
     try
     {
-        assert.throws(() => loadConfig(), /config\.example\.json/);
+        assert.deepEqual(loadConfig().assetPacks, {});
     }
     finally
     {

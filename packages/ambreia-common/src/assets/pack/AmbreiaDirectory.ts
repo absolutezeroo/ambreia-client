@@ -29,6 +29,9 @@ export interface IAmbreiaDescriptor
     keyId?: string | null;
 }
 
+/** A reason the directory will never open, whatever is asked again. */
+class DirectoryBroken extends Error {}
+
 interface IOpenDirectory
 {
     descriptor: IAmbreiaDescriptor;
@@ -85,35 +88,47 @@ export class AmbreiaDirectory
         return [{name: `${name}.json`, data: new TextEncoder().encode(JSON.stringify(manifest))}, ...images];
     }
 
+    /**
+     * The descriptor, dictionary and layout, read once. What asking again cannot change (no
+     * descriptor, no key or another one, a key WebCrypto refuses, no dictionary) breaks the
+     * directory for good; a request that failed (network, 5xx) only forgets the attempt, so the next
+     * read tries again.
+     */
     private open(): Promise<IOpenDirectory>
     {
+        const broken = (message: string): DirectoryBroken => new DirectoryBroken(message);
+
         this._open ??= (async () =>
         {
             const raw = await this._fetch(`${this.url}ambreia.json`);
 
-            if(!raw) throw new Error(`${this.url}ambreia.json not found: not an .ambreia directory`);
+            if(!raw) throw broken(`${this.url}ambreia.json not found: not an .ambreia directory`);
 
             const descriptor = JSON.parse(new TextDecoder().decode(raw)) as IAmbreiaDescriptor;
             let layout = plainLayout();
 
             if(descriptor.encrypted)
             {
-                const given = await this._layout;
+                const given = await Promise.resolve(this._layout).catch((error: unknown) =>
+                {
+                    throw broken(`${this.url}: the key cannot be used (${String((error as Error | null)?.message ?? error)})`);
+                });
 
-                if(!given?.encrypted) throw new Error(`${this.url} is encrypted and no key was given`);
-                if(given.keyId !== descriptor.keyId) throw new Error(`${this.url} needs key ${descriptor.keyId}, the key given is ${given.keyId}`);
+                if(!given?.encrypted) throw broken(`${this.url} is encrypted and no key was given`);
+                if(given.keyId !== descriptor.keyId) throw broken(`${this.url} needs key ${descriptor.keyId}, the key given is ${given.keyId}`);
 
                 layout = given;
             }
 
             const dictionary = await this.get(layout, {kind: 'dictionary', id: descriptor.dictionary});
 
-            if(!dictionary) throw new Error(`${this.url}: the dictionary ${descriptor.dictionary} is missing`);
+            if(!dictionary) throw broken(`${this.url}: the dictionary ${descriptor.dictionary} is missing`);
 
             return {descriptor, dictionary, layout};
         })().catch((error: unknown) =>
         {
-            this._broken = true;
+            if(error instanceof DirectoryBroken) this._broken = true;
+            else this._open = null;
 
             throw error;
         });

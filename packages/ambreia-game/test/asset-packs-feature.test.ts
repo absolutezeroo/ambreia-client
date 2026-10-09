@@ -45,13 +45,13 @@ test('the five directories are opened once the configuration completes, ${url.pr
     assert.equal(made.made.assetDirectories?.furniture.url, 'http://assets/ambreia/furniture/');
 });
 
-test('a family left out of config.json is an error that names it, and nothing is opened', () =>
+test('without an asset-packs section the asset host\'s ambreia/<family>/ is used: a config.json-less deploy still boots', () =>
 {
     const {host: made} = host(true);
-    const withoutPets = Object.fromEntries(Object.entries(ALL).filter(([family]) => family !== 'pets'));
 
-    assert.throws(() => create(withoutPets, made), /pets/);
-    assert.equal(made.made.assetDirectories, null);
+    create({}, made);
+
+    assert.equal(made.made.assetDirectories?.pets.url, 'http://assets/ambreia/pets/');
 });
 
 test('a misspelt family key is a configuration error, not a silently unused directory', () =>
