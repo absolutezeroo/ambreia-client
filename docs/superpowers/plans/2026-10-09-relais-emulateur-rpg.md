@@ -9,7 +9,7 @@ note dit seulement quoi faire, dans quel ordre, et comment le prouver.
 | F3a personnages | `vortex-rpg-emulator/docs/superpowers/specs/2026-10-08-rpg-network-characters-design.md` §6 | fait (`features/character`) |
 | F2 Objets | `…/specs/2026-10-08-rpg-items-design.md` **§17** | fait (`rpg-character` : 96d00598, 6b1fb4d1) |
 | F3b Interaction | `…/specs/2026-10-09-rpg-interaction-design.md` **§7** (§7.3 = côté client) | fait (`rpg-character` : 3f705caa, 9afe1f1c, bcec2224) |
-| F3c Chat | `…/specs/2026-10-09-rpg-chat-design.md` **§10** (§10.3 = côté client) | rien |
+| F3c Chat | `…/specs/2026-10-09-rpg-chat-design.md` **§10** (§10.3 = côté client) | fait (`rpg-character` : d932b3c9, 62ca4e04) |
 
 ## 0. Avant tout
 
