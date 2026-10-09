@@ -3083,6 +3083,12 @@ export class RoomEngine extends Component implements IRoomEngine,
         // the RPG has no wired, so no play-test mode.
         const session = this._roomSessionManager?.getSession(this._activeRoomId) ?? null;
 
+        // DEVIATION: since the core cut (2026-10-07) the server takes no furni move, rotation or
+        //   pickup (no MoveObject, MoveWallItem nor PickupObject in its Headers.cs): the decor is the
+        //   map editor's. The modifier shortcuts (Shift, Ctrl, Alt-drag) and the move button used to
+        //   move or turn a furni on screen alone, where the server never heard of it.
+        if(category === RoomObjectCategoryEnum.OBJECT_CATEGORY_FURNITURE || category === RoomObjectCategoryEnum.OBJECT_CATEGORY_WALL) return false;
+
         switch(action)
         {
             // AS3: _SafeCls_1821.as::modifyRoomObject() "OBJECT_ROTATE_POSITIVE"/"OBJECT_ROTATE_NEGATIVE" case
