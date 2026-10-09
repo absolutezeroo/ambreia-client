@@ -1,0 +1,17 @@
+{
+  "vortex.inventory.action.drop": "Drop",
+  "vortex.inventory.action.quest": "See the quest",
+  "vortex.inventory.action.recipes": "See recipes",
+  "vortex.inventory.action.unequip": "Unequip",
+  "vortex.inventory.action.use": "Use",
+  "vortex.inventory.bag_count": "%count% / %max%",
+  "vortex.inventory.bag_full": "Your bag is full.",
+  "vortex.inventory.details": "Details",
+  "vortex.inventory.drop.confirm": "Drop %item%? This cannot be undone.",
+  "vortex.inventory.effects": "Effects",
+  "vortex.inventory.no_selection": "Select an item to see its details.",
+  "vortex.inventory.quest_note": "Quest item: it can be neither dropped nor sold.",
+  "vortex.inventory.rarity.uncommon": "Uncommon",
+  "vortex.inventory.tab.items": "Items",
+  "vortex.inventory.value": "Value"
+}

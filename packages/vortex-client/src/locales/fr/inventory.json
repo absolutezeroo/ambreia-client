@@ -1,0 +1,17 @@
+{
+  "vortex.inventory.action.drop": "Jeter",
+  "vortex.inventory.action.quest": "Voir la quête",
+  "vortex.inventory.action.recipes": "Voir les recettes",
+  "vortex.inventory.action.unequip": "Déséquiper",
+  "vortex.inventory.action.use": "Utiliser",
+  "vortex.inventory.bag_count": "%count% / %max%",
+  "vortex.inventory.bag_full": "Votre sac est plein.",
+  "vortex.inventory.details": "Détails",
+  "vortex.inventory.drop.confirm": "Jeter %item% ? Cette action est définitive.",
+  "vortex.inventory.effects": "Effets",
+  "vortex.inventory.no_selection": "Sélectionnez un objet pour voir ses détails.",
+  "vortex.inventory.quest_note": "Objet de quête : il ne peut être ni jeté ni vendu.",
+  "vortex.inventory.rarity.uncommon": "Peu commun",
+  "vortex.inventory.tab.items": "Objets",
+  "vortex.inventory.value": "Valeur"
+}

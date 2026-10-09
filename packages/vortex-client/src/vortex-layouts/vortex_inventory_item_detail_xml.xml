@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_inventory_item_detail_xml" width="280" height="500" version="0.1">
+  <window>
+    <container x="0" y="0" width="280" height="500" params="16" style="3" name="item_detail">
+      <children>
+        <text x="0" y="2" width="260" height="16" params="16" style="3" name="detail_title" caption="${vortex.inventory.details}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0x24607f" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="0" y="22" width="280" height="478" params="16" style="2" name="detail_panel" color="0xdde8f1">
+          <children>
+            <container x="0" y="0" width="280" height="478" params="16" style="3" name="detail">
+              <children>
+                <border x="10" y="10" width="64" height="64" params="16" style="2" name="item_frame" color="0xe4e4dc">
+                  <children>
+                    <static_bitmap x="16" y="16" width="32" height="32" params="16" style="3" name="item_icon">
+                      <variables>
+                        <var key="asset_uri" value="" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                  </children>
+                </border>
+                <text x="84" y="12" width="186" height="18" params="16" style="3" name="item_name" caption="">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="13" type="uint"/>
+                    <var key="text_color" value="0x555555" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="84" y="32" width="186" height="16" params="16" style="3" name="item_rarity" caption="">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x555555" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="84" y="48" width="186" height="16" params="16" style="3" name="item_kind" caption="">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="10" y="84" width="260" height="46" params="16" style="3" name="item_desc" caption="">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="multiline" value="true" type="Boolean"/>
+                    <var key="word_wrap" value="true" type="Boolean"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <container x="10" y="136" width="260" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+                <text x="10" y="144" width="200" height="16" params="16" style="3" name="effects_title" caption="${vortex.inventory.effects}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x24607f" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <itemlist_vertical x="10" y="164" width="260" height="144" params="16" style="3" name="effects_list">
+                  <children/>
+                  <variables>
+                    <var key="spacing" value="4" type="int"/>
+                  </variables>
+                </itemlist_vertical>
+                <container x="10" y="360" width="260" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+                <static_bitmap x="10" y="370" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf0c030">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/rpg_coin_gold_currency_money_gp_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <text x="30" y="370" width="120" height="16" params="16" style="3" name="value_label" caption="${vortex.inventory.value}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="150" y="370" width="120" height="16" params="16" style="3" name="item_value" caption="">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="auto_size" value="right" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <container x="10" y="392" width="260" height="32" params="16" style="3" name="quest_note_box">
+                  <children>
+                    <static_bitmap x="0" y="2" width="16" height="16" params="16" style="3" tags="%23icon" color="0xe0b050">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/map_markers_doorway_enterance_exit_locked_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                    <text x="20" y="2" width="240" height="30" params="16" style="3" name="quest_note" caption="${vortex.inventory.quest_note}">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="10" type="uint"/>
+                        <var key="text_color" value="0x8a6a10" type="hex"/>
+                        <var key="multiline" value="true" type="Boolean"/>
+                        <var key="word_wrap" value="true" type="Boolean"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </container>
+                <button_thick x="10" y="434" width="127" height="28" params="131089" style="6" color="0x0aa00" name="primary_action" caption="${vortex.inventory.action.use}" width_min="127" width_max="127"/>
+                <button_thick x="143" y="434" width="127" height="28" params="131089" style="6" color="0xd23a2a" name="secondary_action" caption="${vortex.inventory.action.drop}" width_min="127" width_max="127"/>
+              </children>
+            </container>
+            <container x="0" y="0" width="280" height="478" params="16" style="3" name="no_selection">
+              <children>
+                <container x="0" y="0" width="280" height="96" params="144" style="3" name="empty_state">
+                  <children>
+                    <border x="116" y="4" width="48" height="48" params="16" style="2" color="0xe8e8e2">
+                      <children>
+                        <static_bitmap x="16" y="16" width="16" height="16" params="16" style="3" name="empty_icon" tags="%23icon" color="0x808078">
+                          <variables>
+                            <var key="asset_uri" value="rpg/ui-icons/map_markers_store_shopping_bag_1_icon" type="String"/>
+                            <var key="stretched_x" value="false" type="Boolean"/>
+                            <var key="stretched_y" value="false" type="Boolean"/>
+                          </variables>
+                        </static_bitmap>
+                      </children>
+                    </border>
+                    <text x="8" y="60" width="264" height="32" params="16" style="3" name="empty_message" caption="${vortex.inventory.no_selection}">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="text_color" value="0x888888" type="hex"/>
+                        <var key="auto_size" value="center" type="String"/>
+                        <var key="multiline" value="true" type="Boolean"/>
+                        <var key="word_wrap" value="true" type="Boolean"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </container>
+              </children>
+            </container>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>
