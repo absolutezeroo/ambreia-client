@@ -3,8 +3,11 @@ import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 import type {ITextWindow} from '@ambreia/ui/components/ITextWindow';
 import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
 
-/** Under the HUD (layer 1): the bars and numbers belong to the room. */
-const LAYER = 0;
+/**
+ * The HUD's layer, at the bottom of it (build()): on the room's own layer (0) a click activates the
+ * room view, which comes to the front and covered the bars.
+ */
+const LAYER = 1;
 /** vortex_combat_bar_xml's fill at full health. */
 const BAR_FILL = 36;
 const BAR_HALF = 19;
@@ -122,7 +125,8 @@ export class CombatOverlay
             return null;
         }
 
-        desktop.addChild(window);
+        // Under the HUD's panels, which come later and stay above.
+        desktop.addChildAt(window, 0);
 
         return window;
     }
