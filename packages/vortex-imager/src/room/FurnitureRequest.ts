@@ -136,6 +136,9 @@ export interface IRoomRequest
 
 /** `size=` → the geometry scale to build at, and how the finished image is resized. */
 const SIZE_MAP: Record<string, { scale: number; zoom: number }> = {
+    // The catalogue icon: at scale 1 a furni's visualization draws its `_icon_` assets, in the
+    // colour of its variant (FurnitureVisualization: isIcon = size 1).
+    icon: {scale: 1, zoom: 1},
     s: {scale: 32, zoom: 1},
     m: {scale: 64, zoom: 1},
     l: {scale: 64, zoom: 2},
