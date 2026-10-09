@@ -1,0 +1,4 @@
+{
+  "_": "Furni lights the analysis cannot guess (tools/furni-lights.ts). layer: the letters of the layers that give light, when they are not additive; radius in tiles; intensity 0..1; spread: a light that faces the furni's front (0: the half in front, 0.7: a narrow cone); states: the states that give light (only the images their animations show); none: no light at all.",
+  "tv_luxus": {"layer": "def", "states": [1], "radius": 3.5, "intensity": 0.8, "spread": 0.35}
+}
