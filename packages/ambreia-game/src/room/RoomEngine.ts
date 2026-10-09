@@ -6167,6 +6167,33 @@ export class RoomEngine extends Component implements IRoomEngine,
         super.dispose();
     }
 
+    /**
+     * TS-only (RPG M1a §9.3): the screen point centred above an avatar or a monster of the active
+     * room (its bounding box's top), written into `out` — the combat overlay asks every frame, so
+     * nothing is allocated here. False when the object or its canvas is not there.
+     */
+    getRpgAnchor(objectId: number, out: {x: number; y: number}): boolean
+    {
+        const canvas = this._renderingCanvases.get(this._activeRoomId * 1000 + 1);
+        const geometry = canvas?.geometry ?? null;
+        const object = this.getRoomObject(this._activeRoomId, objectId, RoomObjectCategoryEnum.OBJECT_CATEGORY_USER);
+        const visualization = object?.getVisualization() ?? null;
+
+        if(canvas === undefined || geometry === null || object === null || visualization === null) return false;
+
+        const screenPoint = geometry.getScreenPoint(object.getLocation());
+
+        if(screenPoint === null) return false;
+
+        const bounds = visualization.boundingRectangle;
+        const scale = canvas.scale;
+
+        out.x = (bounds.x + bounds.width / 2 + screenPoint.x) * scale + canvas.width / 2 + canvas.screenOffsetX;
+        out.y = (bounds.y + screenPoint.y) * scale + canvas.height / 2 + canvas.screenOffsetY;
+
+        return true;
+    }
+
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::getRoomObjectBoundingRectangle()
     getRoomObjectBoundingRectangle(roomId: number, objectId: number, category: number, canvasId: number): IRoomEngineRectangle | null 
     {

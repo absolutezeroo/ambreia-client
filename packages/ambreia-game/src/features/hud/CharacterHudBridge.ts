@@ -8,10 +8,18 @@ function xpValues(xp: number, xpToNext: number): {xp: number; xpMax: number; xpL
     return xpToNext > 0 ? {xp, xpMax: xpToNext, xpLabel: null} : {xp: 1, xpMax: 1, xpLabel: 'MAX'};
 }
 
-/** Current HP and mana are the maxima until combat (M1) sends them: F3a §5.6, full bars. */
-function vitals(stats: IRpgStatBlock): {hp: number; hpMax: number; mana: number; manaMax: number}
+/**
+ * The maxima from the stats; the current HP and mana are the combat's (RpgSelfVitals, M1a §9.2),
+ * kept within the new maxima, and full until it has sent any (F3a §5.6).
+ */
+function vitals(stats: IRpgStatBlock, hud: PlayerHudState): {hp: number; hpMax: number; mana: number; manaMax: number}
 {
-    return {hp: stats.maxHealth, hpMax: stats.maxHealth, mana: stats.maxMana, manaMax: stats.maxMana};
+    const {hp, mana} = hud.value;
+
+    return {
+        hp: Math.min(hp ?? stats.maxHealth, stats.maxHealth), hpMax: stats.maxHealth,
+        mana: Math.min(mana ?? stats.maxMana, stats.maxMana), manaMax: stats.maxMana
+    };
 }
 
 /**
@@ -25,11 +33,11 @@ export function bindCharacterToHud(session: IRpgCharacterSession, hud: PlayerHud
     {
         const played = session.played;
 
-        hud.update({level: message.level, ...xpValues(message.xp, message.xpToNext), ...vitals(message.stats), ...(played ? {name: played.name, figure: played.figure} : {})});
+        hud.update({level: message.level, ...xpValues(message.xp, message.xpToNext), ...vitals(message.stats, hud), ...(played ? {name: played.name, figure: played.figure} : {})});
     };
     const onProgress = (message: {level: number; xp: number; xpToNext: number}): void =>
         hud.update({level: message.level, ...xpValues(message.xp, message.xpToNext)});
-    const onStats = (message: {stats: IRpgStatBlock}): void => hud.update(vitals(message.stats));
+    const onStats = (message: {stats: IRpgStatBlock}): void => hud.update(vitals(message.stats, hud));
 
     session.events.on('state', onState);
     session.events.on('progress', onProgress);

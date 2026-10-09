@@ -15,6 +15,10 @@ const log = Logger.getLogger('habbo.features.hud.HudView');
 /** How often a running cooldown's seconds are redrawn; nothing ticks when none runs. */
 const COOLDOWN_TICK_MS = 250;
 
+/** vortex_hud_player_xml's frame colour, and its colour in combat (M1a §6.3). */
+const FRAME_COLOR = 0x686661;
+const IN_COMBAT_COLOR = 0x8a3a30;
+
 /**
  * The player frame (vortex_hud_player_xml: portrait, name, level, HP, mana, XP) and the action bar
  * (vortex_hud_action_bar_xml, four skill and four item slots of vortex_hud_action_slot_xml), drawn
@@ -148,6 +152,10 @@ export class HudView
 
         if(!player) return;
 
+        const frame = player.findChildByName('player_frame');
+        const frameColor = value.inCombat ? IN_COMBAT_COLOR : FRAME_COLOR;
+
+        if(frame && frame.color !== frameColor) frame.color = frameColor;
         this.setText(player, 'player_name', value.name);
         this.setText(player, 'level_txt', value.level === null ? '' : String(value.level));
         this.setBar(player, 'hp_bar', value.hp, value.hpMax);

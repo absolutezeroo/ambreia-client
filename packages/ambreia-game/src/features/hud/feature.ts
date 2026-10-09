@@ -51,6 +51,7 @@ export const HudFeature: IGameFeature = {
         const panels = new HudPanelsState();
 
         host.made.hud = panels;
+        host.made.hudPlayer = state;
         // The chat settings the player chose on this browser (the cog).
         panels.update({chatSettings: loadChatSettings(ChatPanel.storage())});
         let view: HudView | null = null;

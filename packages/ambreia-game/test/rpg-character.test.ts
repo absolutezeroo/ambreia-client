@@ -61,7 +61,7 @@ test('a client request leaves under its own header, serialized in the server ord
     assert.deepEqual(sent, [[Outgoing.RpgEnterWorldMessageEvent, [7]]]);
 });
 
-test('the HUD shows the state, then follows progress and stats; HP and mana stay full until M1', () =>
+test('the HUD shows the state, then follows progress and stats; current HP and mana stay within the maxima', () =>
 {
     const session = new RpgCharacterSession();
     const hud = new PlayerHudState();
@@ -76,7 +76,13 @@ test('the HUD shows the state, then follows progress and stats; HP and mana stay
     deliver(Incoming.RpgCharacterProgressMessageComposer, 7, 15, 450);
     deliver(Incoming.RpgCharacterStatsMessageComposer, 13, 8, 10, 170, 90, 4, 620, 130, 100, 13);
 
-    assert.deepEqual([hud.value.level, hud.value.xp, hud.value.xpMax, hud.value.hpMax, hud.value.hp], [7, 15, 450, 170, 170]);
+    // The current HP are the combat's (RpgSelfVitals, M1a): a higher maximum leaves them as they were.
+    assert.deepEqual([hud.value.level, hud.value.xp, hud.value.xpMax, hud.value.hpMax, hud.value.hp], [7, 15, 450, 170, 160]);
+
+    // A lower maximum caps them.
+    deliver(Incoming.RpgCharacterStatsMessageComposer, 13, 8, 10, 120, 60, 4, 620, 130, 100, 13);
+
+    assert.deepEqual([hud.value.hp, hud.value.hpMax, hud.value.mana, hud.value.manaMax], [120, 120, 60, 60]);
 });
 
 test('at the maximum level the XP bar is full and reads MAX', () =>

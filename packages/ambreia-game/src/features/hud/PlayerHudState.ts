@@ -28,6 +28,8 @@ export interface IPlayerHud
     xpMax: number | null;
     /** Shown on the XP bar instead of "xp / max" (e.g. MAX at the maximum level). */
     xpLabel?: string | null;
+    /** In combat (M1a §6.3): the frame turns red. */
+    inCombat?: boolean;
     skills: IActionSlot[];
     items: IActionSlot[];
 }
