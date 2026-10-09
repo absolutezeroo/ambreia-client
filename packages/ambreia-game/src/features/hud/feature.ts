@@ -47,6 +47,8 @@ export const HudFeature: IGameFeature = {
     {
         const state = new PlayerHudState();
         const panels = new HudPanelsState();
+
+        host.made.hud = panels;
         let view: HudView | null = null;
         let panelsView: HudPanelsView | null = null;
 

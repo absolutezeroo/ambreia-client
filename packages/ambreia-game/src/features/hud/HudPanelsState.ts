@@ -89,7 +89,8 @@ export const CHAT_HISTORY = 50;
 
 export class HudPanelsState
 {
-    readonly events = new EventEmitter<{changed: [Readonly<IHudPanels>]}>();
+    /** `nav`: a top bar button was clicked (`nav_inventory`…); the feature that owns the window opens it. */
+    readonly events = new EventEmitter<{changed: [Readonly<IHudPanels>]; nav: [string]}>();
     private _value: IHudPanels = {
         gold: null, gems: null, tokens: null, questAlert: false, zoneName: '', zonePlayers: null,
         quests: [], party: [], buffs: [], target: null, boss: null, alert: null, chat: []

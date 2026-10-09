@@ -75,7 +75,7 @@
                   </variables>
                 </itemlist_vertical>
                 <container x="10" y="360" width="260" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
-                <static_bitmap x="10" y="370" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf0c030">
+                <static_bitmap x="10" y="370" width="16" height="16" params="16" style="3" name="value_icon" tags="%23icon" color="0xf0c030">
                   <variables>
                     <var key="asset_uri" value="rpg/ui-icons/rpg_coin_gold_currency_money_gp_icon" type="String"/>
                     <var key="stretched_x" value="false" type="Boolean"/>

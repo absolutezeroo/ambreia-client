@@ -57,6 +57,14 @@ export function hudTop(desktop: IWindowContainer): number
     return topbar?.visible ? topbar.y + topbar.height + GAP : MARGIN;
 }
 
+/** The `nav_*` region `window` is in, if any. */
+function navButton(window: IWindow): string | null
+{
+    for(let at: IWindow | null = window; at; at = at.parent) if(at.name.startsWith('nav_')) return at.name;
+
+    return null;
+}
+
 /** `12450` → `12 450`. */
 const thousands = (value: number): string => String(value).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
@@ -464,7 +472,16 @@ export class HudPanelsView
             return;
         }
 
-        // The top bar's buttons and the panels' other buttons open windows that do not exist yet.
+        // The top bar's buttons: the feature owning the window listens (an unanswered one opens nothing).
+        const nav = WindowBits.ancestor(window, 'hud_topbar') ? navButton(window) : null;
+
+        if(nav)
+        {
+            this._state.events.emit('nav', nav);
+
+            return;
+        }
+
         log.debug(`HUD: ${window.name} has nothing to open yet`);
     };
 

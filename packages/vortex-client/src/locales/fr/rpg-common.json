@@ -34,6 +34,7 @@
   "vortex.stat.mana_regen": "Régénération de mana",
   "vortex.stat.move_speed": "Vitesse de déplacement",
   "vortex.stat.physical_damage": "Dégâts physiques",
+  "vortex.stat.power": "Puissance",
   "vortex.stat.speed": "Vitesse",
   "vortex.stat.strength": "Force",
   "vortex.stat.strength.desc": "Augmente les dégâts physiques.",
