@@ -52,16 +52,19 @@ export function cooldownLabel(slot: IActionSlot, now: number): string | null
     return String(Math.ceil((slot.cooldownEnd - now) / 1000));
 }
 
-// The mock-up's bar: four skills, four items (vortex_hud_action_bar_xml holds 4 slots a side).
-const SLOTS_PER_BAR = 4;
+/** The server's action bar (M1b §9: `Vortex:Skills:ActionBarSize`), keys 1 to 6. */
+export const SKILL_SLOTS = 6;
+/** The mock-up's item side (consumables, later): keys 7, 8, 9 and 0. */
+const ITEM_SLOTS = 4;
 
 export class PlayerHudState
 {
-    readonly events = new EventEmitter<{changed: [Readonly<IPlayerHud>]}>();
+    /** `use`: a slot was clicked; the feature that fills the bar acts on it. */
+    readonly events = new EventEmitter<{changed: [Readonly<IPlayerHud>]; use: [ActionBar, number]}>();
     private _value: IPlayerHud = {
         name: '', figure: '', level: null, hp: null, hpMax: null, mana: null, manaMax: null, xp: null, xpMax: null,
-        skills: Array.from({length: SLOTS_PER_BAR}, (_, i) => ({icon: null, key: String(i + 1)})),
-        items: Array.from({length: SLOTS_PER_BAR}, (_, i) => ({icon: null, key: String(SLOTS_PER_BAR + i + 1)}))
+        skills: Array.from({length: SKILL_SLOTS}, (_, i) => ({icon: null, key: String(i + 1)})),
+        items: Array.from({length: ITEM_SLOTS}, (_, i) => ({icon: null, key: String((SKILL_SLOTS + i + 1) % 10)}))
     };
 
     get value(): Readonly<IPlayerHud>
@@ -82,6 +85,13 @@ export class PlayerHudState
         if(index < 0 || index >= slots.length) throw new Error(`HUD ${bar}: no slot ${index} (0 to ${slots.length - 1})`);
 
         this._value = {...this._value, [bar]: slots.map((current, i) => (i === index ? {...current, ...slot} : current))};
+        this.events.emit('changed', this._value);
+    }
+
+    /** Every slot of a bar at once, one `changed`: each entry merges into the slot at its index. */
+    setSlots(bar: ActionBar, slots: readonly Partial<IActionSlot>[]): void
+    {
+        this._value = {...this._value, [bar]: this._value[bar].map((current, i) => ({...current, ...slots[i]}))};
         this.events.emit('changed', this._value);
     }
 

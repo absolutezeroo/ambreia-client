@@ -24,12 +24,12 @@ test('a cooldown shows whole seconds left, rounded up, and nothing once over', (
     assert.equal(cooldownLabel({icon: null, key: '2'}, 0), null);
 });
 
-test('the bar starts with four skill and four item slots, keys 1 to 8, empty', () =>
+test('the bar starts with six skill slots (the server bar) and four item slots, keys 1 to 0, empty', () =>
 {
     const state = new PlayerHudState();
 
-    assert.deepEqual(state.value.skills.map(slot => [slot.key, slot.icon]), [['1', null], ['2', null], ['3', null], ['4', null]]);
-    assert.deepEqual(state.value.items.map(slot => slot.key), ['5', '6', '7', '8']);
+    assert.deepEqual(state.value.skills.map(slot => [slot.key, slot.icon]), [['1', null], ['2', null], ['3', null], ['4', null], ['5', null], ['6', null]]);
+    assert.deepEqual(state.value.items.map(slot => slot.key), ['7', '8', '9', '0']);
 });
 
 test('an update merges and tells the view once', () =>

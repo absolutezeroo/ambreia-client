@@ -253,6 +253,10 @@ export class HudPanelsView
 
             this.renderUnit(window, 'target', target);
             this._bits.setVisible(window, target.cast !== null, 'cast_title', 'cast_icon', 'cast_name', 'cast_bar');
+            // The icon's frame has no name of its own.
+            const castFrame = window.findChildByName('cast_icon')?.parent ?? null;
+
+            if(castFrame && castFrame !== window) castFrame.visible = target.cast !== null;
 
             if(target.cast)
             {

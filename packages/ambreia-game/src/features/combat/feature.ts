@@ -32,7 +32,7 @@ export const CombatFeature: IGameFeature = {
         {
             const windows = host.made.windowManager;
 
-            if(!overlay && windows) overlay = new CombatOverlay(windows, () => host.made.roomEngine, () => bits().text('vortex.combat.miss'));
+            if(!overlay && windows) overlay = new CombatOverlay(windows, () => host.made.roomEngine, key => bits().text(key));
 
             return overlay;
         };
@@ -57,6 +57,21 @@ export const CombatFeature: IGameFeature = {
                 // A dead monster leaves the room (UserRemove); a dead player stays, as a ghost.
                 if(hit.killed && isMonster(hit.targetId)) overlay?.remove(hit.targetId);
             }
+        });
+
+        // Skills and statuses (M1b): the numbers, a monster killed by one leaves, the cast bars.
+        session.events.on('outcomes', outcomes =>
+        {
+            for(const outcome of outcomes)
+            {
+                overlayOf()?.hit(outcome.targetObjectId, outcome.amount, outcome.outcome, outcome.absorbed);
+                if(outcome.killed && isMonster(outcome.targetObjectId)) overlay?.remove(outcome.targetObjectId);
+            }
+        });
+        session.events.on('cast', (objectId, cast) =>
+        {
+            if(cast) overlayOf()?.startCast(objectId, cast.durationMs, cast.channel);
+            else overlay?.endCast(objectId);
         });
 
         session.events.on('self', vitals => host.made.hudPlayer?.update({

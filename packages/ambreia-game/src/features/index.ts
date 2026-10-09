@@ -35,6 +35,8 @@ import {ChatFeature} from './chat/feature';
 import type {RpgChatSession} from './chat/RpgChatSession';
 import {CombatFeature} from './combat/feature';
 import type {RpgCombatSession} from './combat/RpgCombatSession';
+import {SkillsFeature} from './skills/feature';
+import type {RpgSkillSession} from './skills/RpgSkillSession';
 import type {PlayerHudState} from './hud/PlayerHudState';
 import {IID_HabboConfigurationManager} from '../iid/IIDHabboConfigurationManager';
 import {IID_HabboCommunicationManager} from '../iid/IIDHabboCommunicationManager';
@@ -80,6 +82,8 @@ export interface IEngineManagers
     hudPlayer: PlayerHudState | null;
     /** The zone's fight: blows, health, death (features/combat, M1a). */
     combat: RpgCombatSession | null;
+    /** The player's skills, the bar, cooldowns and statuses (features/skills, M1b). */
+    skills: RpgSkillSession | null;
 }
 
 /** The engine's own objects the features are made with: none of them is configuration. */
@@ -107,7 +111,7 @@ export function emptyManagers(): IEngineManagers
     return {
         configuration: null, assetDirectories: null, communication: null, demo: null, localization: null, roomManager: null, roomSession: null,
         sessionData: null, roomEngine: null, avatarRenderer: null, windowManager: null, roomUI: null, character: null,
-        hud: null, inventory: null, interaction: null, chat: null, hudPlayer: null, combat: null
+        hud: null, inventory: null, interaction: null, chat: null, hudPlayer: null, combat: null, skills: null
     };
 }
 
@@ -315,5 +319,6 @@ export const GAME_FEATURES: readonly IGameFeature[] = [
     InventoryFeature,
     InteractionFeature,
     ChatFeature,
-    CombatFeature
+    CombatFeature,
+    SkillsFeature
 ];

@@ -551,6 +551,8 @@ export class RoomEngine extends Component implements IRoomEngine,
     private _rpgTargetId = 0;
     /** TS-only (RPG F3c §16): avatars dancing from an RP action; their first step stops it. */
     private readonly _rpgDancers = new Set<number>();
+    /** TS-only (RPG M1b §6.6): the next floor click picks this tile for a ground skill instead of walking. */
+    private _rpgTilePick: ((x: number, y: number) => void) | null = null;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_1821.as::getSelectedAvatarId()
     private _selectedAvatarId: number = -1;
@@ -8586,6 +8588,17 @@ export class RoomEngine extends Component implements IRoomEngine,
                 // walked the avatar to wherever the rectangle finished.
                 if(this.isMoveBlocked()) return;
 
+                // TS-only (RPG M1b §6.6): a ground skill waits for its tile; the click is not a walk.
+                const pick = this._rpgTilePick;
+
+                if(pick !== null)
+                {
+                    this._rpgTilePick = null;
+                    pick(tileX, tileY);
+
+                    return;
+                }
+
                 // The floor plane's own height at that tile - the surface actually pointed at, which
                 // for a click on bare floor is the one the server should walk to even when a raised
                 // item shares the tile.
@@ -9324,6 +9337,12 @@ export class RoomEngine extends Component implements IRoomEngine,
     setRpgInteractives(objects: ReadonlyMap<number, string> | null): void
     {
         this._rpgInteractives = objects;
+    }
+
+    /** TS-only (RPG M1b §6.6): the next floor click calls `pick` with its tile instead of walking; null cancels. */
+    pickRpgTile(pick: ((x: number, y: number) => void) | null): void
+    {
+        this._rpgTilePick = pick;
     }
 
     /** TS-only (RPG F3b §7.3): moves the target circle to this avatar of the active room; 0 takes it away. */

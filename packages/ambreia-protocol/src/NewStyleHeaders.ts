@@ -30,7 +30,15 @@ export const NewStyleHeaders = {
         Incoming.RpgVitalsMessageComposer,
         Incoming.RpgSelfVitalsMessageComposer,
         Incoming.RpgDeathMessageComposer,
-        Incoming.RpgCombatResultMessageComposer
+        Incoming.RpgCombatResultMessageComposer,
+        // M1b Skills: the bar, casts, cooldowns, statuses (features/skills).
+        Incoming.RpgSkillsMessageComposer,
+        Incoming.RpgSkillResultMessageComposer,
+        Incoming.RpgCastStartMessageComposer,
+        Incoming.RpgCastEndMessageComposer,
+        Incoming.RpgCooldownsMessageComposer,
+        Incoming.RpgStatusesMessageComposer,
+        Incoming.RpgSkillEventsMessageComposer
     ]),
     outgoing: new Set<number>([
         Outgoing.RpgCharacterListRequestMessageEvent,
@@ -45,7 +53,10 @@ export const NewStyleHeaders = {
         Outgoing.RpgItemClaimParcelMessageEvent,
         Outgoing.RpgTargetSelectMessageEvent,
         Outgoing.RpgChatSendMessageEvent,
-        Outgoing.RpgEmoteMessageEvent
+        Outgoing.RpgEmoteMessageEvent,
+        Outgoing.RpgSkillCastMessageEvent,
+        Outgoing.RpgActionBarSetMessageEvent,
+        Outgoing.RpgCastCancelMessageEvent
     ])
 };
 

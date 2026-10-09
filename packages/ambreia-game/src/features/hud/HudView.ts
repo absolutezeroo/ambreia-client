@@ -21,7 +21,7 @@ const IN_COMBAT_COLOR = 0x8a3a30;
 
 /**
  * The player frame (vortex_hud_player_xml: portrait, name, level, HP, mana, XP) and the action bar
- * (vortex_hud_action_bar_xml, four skill and four item slots of vortex_hud_action_slot_xml), drawn
+ * (vortex_hud_action_bar_xml, six skill and four item slots of vortex_hud_action_slot_xml), drawn
  * from a PlayerHudState. The frame sits top left, the bar bottom centre, both kept there when the
  * desktop is resized.
  */
@@ -104,6 +104,11 @@ export class HudView
 
                 if(!slot || !list) continue;
 
+                // A click on the slot uses it, as its key does (features/skills).
+                slot.procedure = (event: WindowEvent) =>
+                {
+                    if(event.type === 'WME_CLICK') this._state.events.emit('use', bar, i);
+                };
                 list.addListItem(slot);
                 this._slots[bar].push(slot);
             }
@@ -171,7 +176,25 @@ export class HudView
             value[bar].forEach((slot, i) => this.renderSlot(this._slots[bar][i] ?? null, slot));
         }
 
+        this.fitBar(value.items.some(slot => slot.icon !== null));
         this.syncTicker(value);
+    }
+
+    /**
+     * The item side shows only once it holds something (consumables come after M1b): an empty one
+     * only widened the bar over the target frame on a 1280 px desktop.
+     */
+    private fitBar(items: boolean): void
+    {
+        const bar = this._bar;
+        const side = bar?.findChildByName('item_bar') ?? null;
+        const skills = bar?.findChildByName('skill_bar') ?? null;
+
+        if(!bar || !side || !skills || side.visible === items) return;
+
+        side.visible = items;
+        bar.width = items ? side.x + side.width : skills.width;
+        this.place();
     }
 
     private renderSlot(window: IWindowContainer | null, slot: IActionSlot): void

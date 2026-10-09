@@ -17,6 +17,12 @@ const NUMBER_RISE = 28;
 const NUMBER_HALF = 40;
 
 const COLORS = {hit: 0xff5050, crit: 0xffc030, miss: 0xd0d0c8, heal: 0x60e060};
+/** A cast fills, a channel empties (M1b §6.3); the bar sits under the health bar. */
+const CAST_COLOR = 0xe8b830;
+const CHANNEL_COLOR = 0x5aa0e8;
+const CAST_DROP = 8;
+/** A cast whose RpgCastEnd never came goes this long after its end. */
+const CAST_GRACE_MS = 1000;
 
 interface IBar
 {
@@ -25,6 +31,15 @@ interface IBar
     /** A monster's bar always shows; a player's only while hurt (M1a §9.3). */
     always: boolean;
     hurt: boolean;
+}
+
+interface ICast
+{
+    window: IWindowContainer;
+    fill: IWindow | null;
+    born: number;
+    duration: number;
+    channel: boolean;
 }
 
 interface INumber
@@ -41,13 +56,15 @@ export interface IAnchorSource
 }
 
 /**
- * The combat over the room (M1a §9.3): a health bar above each monster and each hurt player, and
- * the damage numbers rising from whoever was hit (a crit bigger, « Raté » for a miss). Windows on
+ * The combat over the room (M1a §9.3): a health bar above each monster and each hurt player, a
+ * cast bar under it while one casts (M1b §10.3), and the numbers rising from whoever was hit or
+ * healed (a crit bigger, « Raté » for a miss). Windows on
  * the room's layer, moved every frame while any is shown; the frame loop allocates nothing.
  */
 export class CombatOverlay
 {
     private readonly _bars = new Map<number, IBar>();
+    private readonly _casts = new Map<number, ICast>();
     private readonly _numbers: INumber[] = [];
     private readonly _spare: ITextWindow[] = [];
     private readonly _point = {x: 0, y: 0};
@@ -57,7 +74,8 @@ export class CombatOverlay
     constructor(
         private readonly _windows: IHabboWindowManager,
         private readonly _anchors: () => IAnchorSource | null,
-        private readonly _missText: () => string
+        /** A translated text: `vortex.combat.miss`… */
+        private readonly _text: (key: string) => string
     ) {}
 
     setHealth(objectId: number, health: number, maxHealth: number, always: boolean): void
@@ -80,16 +98,20 @@ export class CombatOverlay
         this.run();
     }
 
-    hit(objectId: number, amount: number, outcome: string): void
+    /** `hit`, `crit`, `miss` (M1a), `dodge`, `heal` (M1b); `absorbed`: what a shield took. */
+    hit(objectId: number, amount: number, outcome: string, absorbed = 0): void
     {
         const window = this._spare.pop() ?? this.build('vortex_combat_number_xml') as ITextWindow | null;
 
         if(!window) return;
 
         const crit = outcome === 'crit';
+        const missed = outcome === 'miss' || outcome === 'dodge';
 
-        window.caption = outcome === 'miss' ? this._missText() : `-${amount}${crit ? ' !' : ''}`;
-        window.textColor = outcome === 'miss' ? COLORS.miss : crit ? COLORS.crit : COLORS.hit;
+        window.caption = missed ? this._text(`vortex.combat.${outcome}`)
+            : outcome === 'heal' ? `+${amount}`
+                : amount === 0 && absorbed > 0 ? this._text('vortex.combat.absorbed') : `-${amount}${crit ? ' !' : ''}`;
+        window.textColor = missed || (amount === 0 && absorbed > 0) ? COLORS.miss : outcome === 'heal' ? COLORS.heal : crit ? COLORS.crit : COLORS.hit;
         window.fontSize = crit ? 16 : 12;
         window.blend = 1;
         window.visible = false;
@@ -97,17 +119,42 @@ export class CombatOverlay
         this.run();
     }
 
-    /** The object left the room (or died): its bar goes. */
+    /** A cast or a channel began over this object (RpgCastStart). */
+    startCast(objectId: number, durationMs: number, channel: boolean): void
+    {
+        this.endCast(objectId);
+
+        const window = this.build('vortex_combat_bar_xml') as IWindowContainer | null;
+        const fill = window?.findChildByName('fill') ?? null;
+
+        if(!window) return;
+
+        if(fill) fill.color = channel ? CHANNEL_COLOR : CAST_COLOR;
+        this._casts.set(objectId, {window, fill, born: performance.now(), duration: Math.max(1, durationMs), channel});
+        this.run();
+    }
+
+    endCast(objectId: number): void
+    {
+        this._casts.get(objectId)?.window.destroy();
+        this._casts.delete(objectId);
+    }
+
+    /** The object left the room (or died): its bars go. */
     remove(objectId: number): void
     {
         this._bars.get(objectId)?.window.destroy();
         this._bars.delete(objectId);
+        this.endCast(objectId);
     }
 
     clear(): void
     {
         for(const bar of this._bars.values()) bar.window.destroy();
         this._bars.clear();
+
+        for(const cast of this._casts.values()) cast.window.destroy();
+        this._casts.clear();
 
         for(const number of this._numbers) number.window.destroy();
         this._numbers.length = 0;
@@ -145,7 +192,7 @@ export class CombatOverlay
         const anchors = this._anchors();
         const point = this._point;
         const now = performance.now();
-        let again = this._numbers.length > 0;
+        let again = this._numbers.length > 0 || this._casts.size > 0;
 
         for(const [objectId, bar] of this._bars)
         {
@@ -158,6 +205,29 @@ export class CombatOverlay
 
             bar.window.x = Math.round(point.x - BAR_HALF);
             bar.window.y = Math.round(point.y - 10);
+        }
+
+        for(const [objectId, cast] of this._casts)
+        {
+            const age = now - cast.born;
+
+            if(age >= cast.duration + CAST_GRACE_MS)
+            {
+                // Deleting the current entry while iterating a Map is safe.
+                this.endCast(objectId);
+                continue;
+            }
+
+            const shown = anchors !== null && anchors.getRpgAnchor(objectId, point);
+
+            cast.window.visible = shown;
+            if(!shown) continue;
+
+            const done = Math.min(1, age / cast.duration);
+
+            if(cast.fill) cast.fill.width = Math.max(1, Math.round(BAR_FILL * (cast.channel ? 1 - done : done)));
+            cast.window.x = Math.round(point.x - BAR_HALF);
+            cast.window.y = Math.round(point.y - 10 + CAST_DROP);
         }
 
         for(let i = this._numbers.length - 1; i >= 0; i--)
