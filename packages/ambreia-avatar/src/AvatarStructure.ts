@@ -125,8 +125,12 @@ export class AvatarStructure
             const riDef = this._partSetsData.getPartDefinition('ri');
             const liDef = this._partSetsData.getPartDefinition('li');
 
+            // DEVIATION: Ambreia adds `rib`, the half of a weapon behind the body (geometry: behind).
+            const ribDef = this._partSetsData.getPartDefinition('rib');
+
             if(riDef) riDef.appendToFigure = true;
             if(liDef) liDef.appendToFigure = true;
+            if(ribDef) ribDef.appendToFigure = true;
 
             return true;
         }

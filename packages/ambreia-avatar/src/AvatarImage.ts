@@ -517,6 +517,12 @@ export class AvatarImage implements IAvatarImage, IAvatarEffectListener
                 this.addActionData(actionType, param || '');
                 break;
 
+            // TS-only: Ambreia's weapons. The id names the parts directly, no CarryItem-style param table.
+            case AvatarAction.WIELD:
+            case AvatarAction.ATTACK:
+                this.addActionData(actionType, param || '');
+                break;
+
             case AvatarAction.CARRY_OBJECT:
             case AvatarAction.USE_OBJECT:
             {

@@ -38,6 +38,16 @@ export class AvatarAssetDownloadManager extends EventEmitter
     private static readonly LIB_BODY: string = 'hh_human_body';
     // AS3: .../src/com/sulake/habbo/avatar/AvatarAssetDownloadManager.as::LIB_ITEMS
     private static readonly LIB_ITEMS: string = 'hh_human_item';
+    // Ambreia's weapons, carried like hand items (vortex-client/tools/build-weapon-handitems.mjs).
+    // Hand items are never asked for by a figure, so only a mandatory library gets downloaded.
+    private static readonly LIB_WEAPONS: string = 'ambreia_weapons';
+
+    /** Downloaded before any avatar renders; VortexMain counts them on the loading bar. */
+    public static readonly MANDATORY_LIBRARIES: readonly string[] = [
+        AvatarAssetDownloadManager.LIB_BODY,
+        AvatarAssetDownloadManager.LIB_ITEMS,
+        AvatarAssetDownloadManager.LIB_WEAPONS
+    ];
 
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/AvatarAssetDownloadManager.as::_structure
     private _structure: AvatarStructure;
@@ -98,10 +108,8 @@ export class AvatarAssetDownloadManager extends EventEmitter
         this._currentDownloadSet = new Set();
         this._initDownloadBuffer = [];
         this._isReady = false;
-        this._mandatoryLibs = [
-            AvatarAssetDownloadManager.LIB_BODY,
-            AvatarAssetDownloadManager.LIB_ITEMS
-        ];
+        // DEVIATION: AS3 lists LIB_BODY and LIB_ITEMS only; Ambreia adds LIB_WEAPONS.
+        this._mandatoryLibs = [...AvatarAssetDownloadManager.MANDATORY_LIBRARIES];
     }
 
     /**
