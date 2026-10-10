@@ -97,8 +97,9 @@ export class RoomStack
         // into every visualization through these options; empty ones silently give every
         // visualization empty base URLs.
         const roomManager = new RoomManager({
-            property: (key: string): string => properties.getProperty(key),
-            flag: (key: string): boolean => properties.getBoolean(key)
+            externalImageUrl: (): string => properties.getProperty('stories.image_url_base'),
+            extraDataServiceUrl: (): string => properties.getProperty('extra_data_service_url'),
+            extraDataBatches: (): boolean => properties.getBoolean('extra_data_batches_enabled')
         });
 
         // `RoomEngine`'s own wiring (`_visualizationFactory.assets = assetLibrary`). Furniture

@@ -9,7 +9,7 @@ import {TypingBubble} from './TypingBubble';
 import {GuideStatusBubble} from './GuideStatusBubble';
 import {NumberBubble} from './NumberBubble';
 import {SheetAddition} from './SheetAddition';
-import {TargetCircle} from './TargetCircle';
+import {SelectionRing} from './SelectionRing';
 import {ExpressionAdditionFactory} from './ExpressionAdditionFactory';
 
 /** The additions AvatarVisualization built itself before J4, now behind the effects module. */
@@ -40,9 +40,9 @@ export class AvatarAdditionFactory implements IAvatarAdditionFactory
         return new NumberBubble(id, value, visualization);
     }
 
-    public target(id: number): IAvatarAddition
+    public selectionRing(id: number): IAvatarAddition
     {
-        return new TargetCircle(id);
+        return new SelectionRing(id);
     }
 
     public sheet(id: number, frames: readonly Texture[], ms: number, loop: boolean, anchorX: number, anchorY: number): IAvatarAddition

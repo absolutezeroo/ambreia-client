@@ -196,9 +196,11 @@ const Rooms = feature({
     provides: [IID_RoomManager],
     create: ({context, host}) =>
     {
+        // The engine knows no property key: the client's legacy keys are mapped here.
         const manager = new RoomManager({
-            property: (key: string): string => context.configuration?.getProperty(key) ?? '',
-            flag: (key: string): boolean => context.configuration?.getBoolean(key) ?? false
+            externalImageUrl: (): string => context.configuration?.getProperty('stories.image_url_base') ?? '',
+            extraDataServiceUrl: (): string => context.configuration?.getProperty('extra_data_service_url') ?? '',
+            extraDataBatches: (): boolean => context.configuration?.getBoolean('extra_data_batches_enabled') ?? false
         });
 
         host.made.roomManager = manager;

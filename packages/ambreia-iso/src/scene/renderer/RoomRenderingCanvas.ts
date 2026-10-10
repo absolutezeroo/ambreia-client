@@ -502,11 +502,17 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
     private static readonly HOLE_SOFT_FROM: number = 0.75;
     private static readonly HOLE_TEXTURE_SIZE: number = 256;
     /**
-     * See through, in a disc, the raised floor that hides the player's avatar or a tile under the pointer
+     * See through, in a disc, the raised floor that hides the own avatar or a tile under the pointer
      * (updateOcclusion()). The game turns it on; an editor showing the room as built leaves it off.
      */
     // TS-only: see updateOcclusion().
     public seeThrough: boolean = false;
+    /**
+     * What may hide the own avatar and be seen through or x-rayed: a furni, by default (not an avatar,
+     * a pet, a bot, the room or the tile cursor). A host with other object types says which occlude.
+     */
+    // TS-only: see SortableSprite.fadable.
+    public isOccluder: (object: IRoomObject) => boolean = RoomRenderingCanvas.isFurni;
     // TS-only: the buildings (RoomPlaneData.sortGroup) and furni (object ids) see-through this frame.
     private readonly _fadedGroups: Set<number> = new Set();
     private readonly _fadedFurni: Set<string> = new Set();
@@ -1791,7 +1797,7 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
             sortable.worldY = location.y;
             sortable.direction = object.getDirection()?.x ?? 0;
             sortable.objectType = object.getType();
-            sortable.fadable = sprite.spriteType !== RoomObjectSpriteType.ROOM_PLANE && RoomRenderingCanvas.isFurni(object);
+            sortable.fadable = sprite.spriteType !== RoomObjectSpriteType.ROOM_PLANE && this.isOccluder(object);
             sortable.sprite = sprite;
 
             // An avatar's drawn sprite is one composed bitmap and has no library asset name of its
@@ -2174,10 +2180,10 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
     }
 
     /**
-     * Sees through what hides the player, as an RPG does with a building the player walks behind:
+     * Sees through what hides the own avatar, as a game does with a building it walks behind:
      *
      * - while a raised floor building (RoomPlaneData.sortGroup: the raised tiles joined edge to edge)
-     *   or a furni hides the player's own avatar, a disc around the avatar is seen through it
+     *   or a furni hides the own avatar, a disc around the avatar is seen through it
      *   (updateHoles()). It hides it when, drawn after it, it is opaque somewhere the avatar is
      *   (hidesOwn()).
      * - the building whose side (a wall) is under the pointer and hides something to point at
@@ -2564,9 +2570,9 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
 
     /**
      * A furni: not an avatar (user, pet, bot), the room or the tile cursor. A pet's object is typed by
-     * its content type (`dog`, a monster's own), never `pet` (RoomEngine.addObjectUser()): it is told
-     * by the `pet_type` its logic sets — without that, a monster faded like a furni hiding the player,
-     * was cut out of the discs and turned the player behind it into an x-ray.
+     * its content type (`dog`), never `pet` (the host's addObjectUser()): it is told by the `pet_type`
+     * its logic sets — without that, a pet faded like a furni hiding the own avatar, was cut out of the
+     * discs and turned the avatar behind it into an x-ray.
      */
     // TS-only: see SortableSprite.fadable.
     private static isFurni(object: IRoomObject): boolean
