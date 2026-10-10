@@ -9,7 +9,9 @@ import {child, setText, setVisible} from '../ui/bind';
 import type {EditorTexts} from '../ui/EditorTexts';
 import {BROWSER_TABS, type BrowserAction, type BrowserTab} from './BROWSER_TABS';
 import {BrowserTabUi, type IBrowserHost} from './BrowserTabUi';
+import {CreateZoneDialog} from './CreateZoneDialog';
 import type {HomeScreen} from './HomeScreen';
+import {type IZonePreview, ZonePreviews} from './ZonePreviews';
 import {ZoneMarks} from './ZoneMarks';
 
 const SYNC_OK = 0xff4cc040;
@@ -27,6 +29,7 @@ export class MapBrowser implements IBrowserHost
     private readonly _window: IWindowContainer;
     private readonly _content: IWindowContainer | null;
     private readonly _tabs = new Map<BrowserTab, BrowserTabUi>();
+    private readonly _previews: ZonePreviews;
     private _tab: BrowserTab = 'zones';
     private _zones: IZoneSummary[] = [];
     private _notice = '';
@@ -39,6 +42,7 @@ export class MapBrowser implements IBrowserHost
         if(!window) throw new Error('vortex_map_editor_browser_xml is not registered');
 
         this._window = window;
+        this._previews = new ZonePreviews(_api, _manager, () => this.render());
         this._content = child<IWindowContainer>(window, 'tab_content');
         // The browser is the editor's home: nothing to close to.
         setVisible(window, 'header_button_close', false);
@@ -65,6 +69,7 @@ export class MapBrowser implements IBrowserHost
     {
         this._home.mount(this._window);
         this._window.enable();
+        this._previews.resume();
         await this.reload();
         this.notice(notice);
 
@@ -96,6 +101,11 @@ export class MapBrowser implements IBrowserHost
                 this.changed();
                 break;
         }
+    }
+
+    preview(zone: IZoneSummary): IZonePreview | null
+    {
+        return this._previews.get(zone);
     }
 
     changed(): void
@@ -161,36 +171,47 @@ export class MapBrowser implements IBrowserHost
         this.render();
     }
 
-    /** A new zone, blank or a copy of template (a published zone); then it opens. */
+    /** A new zone, blank or a copy of template (a published zone), through the creation dialog; then it opens. */
     private async create(template: IZoneSummary | null): Promise<void>
     {
-        const key = window.prompt(template ? `Nouvelle zone depuis « ${template.name} » : clé (a-z, 0-9, _)` : 'Clé de la nouvelle zone (a-z, 0-9, _) :')?.trim();
-
-        if(!key) return;
-
-        const name = window.prompt('Nom affiché :', template?.name ?? '')?.trim();
-
-        if(!name) return;
-
-        try
+        let created: IZoneSummary | null = null;
+        const dialog = new CreateZoneDialog(this._manager, this._texts, template, async (key, name) =>
         {
-            const zone = await this._api.createZone(key, name, template?.key);
+            try
+            {
+                created = await this._api.createZone(key, name, template?.key);
 
-            this.marks.created(zone.key);
-            this.open(zone);
-        }
-        catch (error)
-        {
-            const code = (error as {code?: string}).code;
+                return null;
+            }
+            catch (error)
+            {
+                const code = (error as {code?: string}).code;
 
-            this.notice(code === 'editor.zone_exists' ? 'Cette clé existe déjà.' : code === 'editor.zone_key_invalid' ? 'Clé invalide : minuscules, chiffres et _.' : describe(error));
-        }
+                if(code === 'editor.zone_exists') return this._texts.get('vortex.mapeditor.create.error.exists');
+                if(code === 'editor.zone_key_invalid') return this._texts.get('vortex.mapeditor.create.error.invalid');
+
+                return describe(error);
+            }
+        });
+
+        // The browser waits under the dialog.
+        this._window.disable();
+
+        const made = await dialog.show();
+
+        this._window.enable();
+        if(!made || !created) return;
+
+        this.marks.created((created as IZoneSummary).key);
+        this.open(created);
     }
 
     private open(zone: IZoneSummary): void
     {
         if(!this._resolve) return;
 
+        // The editor takes the room stage the previews draw with.
+        this._previews.pause();
         this.marks.opened(zone.key);
         this._window.disable();
         this.notice(`Ouverture de ${zone.name}…`);

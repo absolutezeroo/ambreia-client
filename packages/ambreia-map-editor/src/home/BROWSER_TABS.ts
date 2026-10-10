@@ -20,7 +20,7 @@ export interface IBrowserTabSpec
 
 const B = 'vortex.mapeditor.browser';
 
-/** What each tab of the zone browser lists and offers. A template is a published zone (the server copies it). */
+/** What each tab of the zone browser lists and offers. */
 export const BROWSER_TABS: Readonly<Record<BrowserTab, IBrowserTabSpec>> = {
     zones: {
         button: 'tab_zones', search: `${B}.search.zones`, column: `${B}.col.zone`, count: `${B}.count.zones`,
@@ -30,7 +30,8 @@ export const BROWSER_TABS: Readonly<Record<BrowserTab, IBrowserTabSpec>> = {
     templates: {
         button: 'tab_templates', search: `${B}.search.templates`, column: `${B}.col.template`, count: `${B}.count.templates`,
         toolbar: ['refresh'], detail: ['use_template', 'edit'],
-        zones: all => all.filter(z => z.publishedVersion !== null)
+        // Marked as a template in its settings, and published: the server copies the published version.
+        zones: all => all.filter(z => z.template === true && z.publishedVersion !== null)
     },
     mine: {
         button: 'tab_mine', search: `${B}.search.mine`, column: `${B}.col.map`, count: `${B}.count.maps`,

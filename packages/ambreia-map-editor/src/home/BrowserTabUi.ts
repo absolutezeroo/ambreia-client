@@ -1,4 +1,5 @@
 import type {IItemListWindow} from '@ambreia/ui/components/IItemListWindow';
+import type {IStaticBitmapWrapperWindow} from '@ambreia/ui/components/IStaticBitmapWrapperWindow';
 import type {ITextFieldWindow} from '@ambreia/ui/components/ITextFieldWindow';
 import type {IWindow} from '@ambreia/ui/IWindow';
 import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
@@ -6,6 +7,8 @@ import type {IZoneSummary} from '@ambreia/map-editor-core/api/IZoneSummary';
 import {CheckBinding, child, children, ChoiceBinding, onClick, onWindowClick, SearchField, setEnabled, setImage, setText, setVisible} from '../ui/bind';
 import type {EditorTexts} from '../ui/EditorTexts';
 import {BROWSER_TABS, type BrowserAction, type BrowserTab} from './BROWSER_TABS';
+import {ZONE_TYPES} from './ZONE_TYPES';
+import type {IZonePreview} from './ZonePreviews';
 import type {ZoneMarks} from './ZoneMarks';
 
 const B = 'vortex.mapeditor.browser';
@@ -16,6 +19,7 @@ const STAR_OFF = 0xffc8c8c0;
 const PUBLISHED = {pill: 0xffc8eab0, dot: 0xff4caa30, text: `${B}.status.published`};
 const DRAFT = {pill: 0xfff6e3b0, dot: 0xfff0a020, text: `${B}.status.draft`};
 const ACTION_GAP = 6;
+const ICONS = 'rpg/ui-icons/';
 
 const ACTIONS: Readonly<Record<BrowserAction, {text: string; icon: string}>> = {
     create_zone: {text: `${B}.action.create_zone`, icon: 'software_signs_maths_plus_addition_bonus_add_new_icon'},
@@ -28,6 +32,8 @@ const ACTIONS: Readonly<Record<BrowserAction, {text: string; icon: string}>> = {
 };
 
 type Predicate = (zone: IZoneSummary, marks: ZoneMarks) => boolean;
+type Sort = 'modified' | 'name' | 'opened';
+type Size = 'all' | 'small' | 'medium' | 'large';
 
 const startOfDay = (): number => new Date().setHours(0, 0, 0, 0);
 const openedSince = (from: () => number, to: () => number = () => Infinity): Predicate =>
@@ -39,12 +45,20 @@ const openedSince = (from: () => number, to: () => number = () => Infinity): Pre
     };
 const draft: Predicate = z => z.publishedVersion === null;
 const published: Predicate = z => z.publishedVersion !== null;
+const modifiedAt = (z: IZoneSummary): number => (z.modifiedAt ? Date.parse(z.modifiedAt) : 0);
+const side = (z: IZoneSummary): number => Math.max(z.width ?? 0, z.length ?? 0);
+
+/** Each side panel caption that names a zone type, to that type's test. */
+const BY_TYPE: Readonly<Record<string, Predicate>> = Object.fromEntries(Object.entries(ZONE_TYPES)
+    .flatMap(([type, {labels}]) => labels.map(label => [label, (z: IZoneSummary) => z.type === type] as const)));
 
 /**
- * The side panels' groups (category_row) the server's data can answer, by their caption's key.
- * The others (regions, themes, guilds…) need fields the zone list does not carry yet: shown disabled.
+ * The side panels' groups (category_row) the zone list can answer, by their caption's key; the
+ * zones tab's regions are built from the data. The others (Ville, Événement…) have no field
+ * behind them yet: shown disabled.
  */
 const GROUPS: Readonly<Record<string, Predicate>> = {
+    ...BY_TYPE,
     [`${B}.group.all_templates`]: () => true,
     [`${B}.group.all_projects`]: () => true,
     [`${B}.group.favorite_maps`]: () => true,
@@ -56,24 +70,43 @@ const GROUPS: Readonly<Record<string, Predicate>> = {
     [`${B}.group.this_month`]: openedSince(() => Date.now() - 30 * DAY)
 };
 
-/** The filters (filter_row) the data can answer: a status unticked hides its zones. */
-const STATUS_FILTERS: Readonly<Record<string, Predicate>> = {
+/** The filters (filter_row) that hide what they match once unticked: statuses and types. */
+const INCLUDE_FILTERS: Readonly<Record<string, Predicate>> = {
+    ...BY_TYPE,
     [`${B}.status.draft`]: draft,
     [`${B}.status.published`]: published
 };
 /** Ticked, these keep only the favourites. */
 const FAVORITE_FILTERS = new Set([`${B}.filter.favorites_only`, 'vortex.mapeditor.decor.favourites']);
 
+/** The size menu: by the floor's longer side (a zone is at most 64 × 64). */
+const SIZES: Readonly<Record<Size, (z: IZoneSummary) => boolean>> = {
+    all: () => true,
+    small: z => side(z) > 0 && side(z) <= 16,
+    medium: z => side(z) > 16 && side(z) <= 32,
+    large: z => side(z) > 32
+};
+
 const keyOf = (window: IWindow | null): string => /^\$\{(.+)\}$/.exec(window?.caption ?? '')?.[1] ?? '';
 
 const date = (ms: number): string => new Date(ms).toLocaleDateString('fr-FR');
 const time = (ms: number): string => new Date(ms).toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'});
+
+interface IGroup
+{
+    readonly label: string;
+    readonly test: Predicate;
+    readonly row: IWindow;
+    readonly color: number;
+}
 
 export interface IBrowserHost
 {
     readonly zones: readonly IZoneSummary[];
     readonly marks: ZoneMarks;
     act(action: BrowserAction, zone: IZoneSummary | null): void;
+    /** The zone's rendered preview, or null until it is drawn. */
+    preview(zone: IZoneSummary): IZonePreview | null;
     /** Something the tabs show changed (a favourite): every tab re-reads. */
     changed(): void;
 }
@@ -89,17 +122,23 @@ export class BrowserTabUi
 
     private readonly _list: IItemListWindow | null;
     private readonly _search: SearchField;
-    private readonly _sort: ChoiceBinding<'name' | 'opened'>;
+    private readonly _sort: ChoiceBinding<Sort>;
+    private readonly _sizes: ChoiceBinding<Size>[] = [];
     private readonly _filters: {binding: CheckBinding; row: IWindow; count: (zones: IZoneSummary[]) => number}[] = [];
     private readonly _detailActions: {action: BrowserAction; button: IWindow | null}[] = [];
     private readonly _hidden = new Set<string>();
-    private _sortValue: 'name' | 'opened';
+    private readonly _groups: IGroup[] = [];
+    /** The list the regions are built in (the zones tab's), and the regions it shows. */
+    private _regionList: IItemListWindow | null = null;
+    private _regionsShown = '';
+    private _sortValue: Sort;
+    private _size: Size = 'all';
     private _favoritesOnly = false;
-    private _group: {key: string; row: IWindow; color: number} | null = null;
-    private _groupRows: {key: string; row: IWindow; color: number}[] = [];
+    private _group: IGroup | null = null;
     private _rows: {key: string; window: IWindow; color: number}[] = [];
     private _shown = '';
     private _detailShown = '';
+    private _detailPreview = '';
     private _selected: string | null = null;
 
     constructor(
@@ -116,21 +155,24 @@ export class BrowserTabUi
 
         this.window = body;
         this._list = child<IItemListWindow>(body, 'map_list');
-        this._sortValue = _tab === 'recent' ? 'opened' : 'name';
+        this._sortValue = _tab === 'recent' ? 'opened' : 'modified';
 
         // The hint is the tab's: set before SearchField reads it as the hint.
         const input = child<ITextFieldWindow>(body, 'search_input');
 
         if(input) input.text = _texts.get(spec.search);
         this._search = new SearchField(body, 'search_input', () => this.render());
-        this._sort = new ChoiceBinding<'name' | 'opened'>(body, 'sort_menu', () => this._sortValue, value =>
+        this._sort = new ChoiceBinding<Sort>(body, 'sort_menu', () => this._sortValue, value =>
         {
             this._sortValue = value;
             this.render();
-        }).options([['name', _texts.get(spec.column)], ['opened', _texts.get(`${B}.sort.opened`)]]);
+        }).options([
+            ['modified', _texts.get(`${B}.sort.modified`)],
+            ['opened', _texts.get(`${B}.sort.opened`)],
+            ['name', _texts.get(spec.column)]
+        ]);
 
         setText(body, 'col_name', _texts.get(spec.column));
-        setText(body, 'col_date', _texts.get(`${B}.sort.opened`));
         setVisible(body, 'sort_icon', false);
 
         this.mountSide();
@@ -142,18 +184,22 @@ export class BrowserTabUi
     /** The zones the tab lists, filtered and sorted, as the rows show them. */
     get visible(): IZoneSummary[]
     {
-        const {zones, marks} = this._host;
+        const {marks} = this._host;
         const query = this._search.query.toLowerCase();
-        const group = this._group ? GROUPS[this._group.key] : null;
-        const hits = BROWSER_TABS[this._tab].zones(zones, marks).filter(z =>
-            (!query || `${z.key} ${z.name}`.toLowerCase().includes(query))
-            && (!group || group(z, marks))
+        const group = this._group;
+        const hits = this.tabZones().filter(z =>
+            (!query || `${z.key} ${z.name} ${z.region ?? ''} ${z.authorName ?? ''}`.toLowerCase().includes(query))
+            && (!group || group.test(z, marks))
             && (!this._favoritesOnly || marks.isFavorite(z.key))
-            && ![...this._hidden].some(status => STATUS_FILTERS[status](z, marks)));
+            && SIZES[this._size](z)
+            && ![...this._hidden].some(key => INCLUDE_FILTERS[key](z, marks)));
 
-        if(this._sortValue === 'opened') return hits.sort((a, b) => (marks.openedAt(b.key) ?? 0) - (marks.openedAt(a.key) ?? 0));
-
-        return this._tab === 'recent' && !query ? hits : hits.sort((a, b) => a.name.localeCompare(b.name));
+        switch(this._sortValue)
+        {
+            case 'opened': return hits.sort((a, b) => (marks.openedAt(b.key) ?? 0) - (marks.openedAt(a.key) ?? 0));
+            case 'modified': return hits.sort((a, b) => modifiedAt(b) - modifiedAt(a));
+            default: return hits.sort((a, b) => a.name.localeCompare(b.name));
+        }
     }
 
     get selected(): IZoneSummary | null
@@ -165,40 +211,46 @@ export class BrowserTabUi
     get summary(): string
     {
         const count = this._texts.get(BROWSER_TABS[this._tab].count, {count: this.visible.length});
-        const group = this._group ? this._texts.get(this._group.key) : null;
 
-        return group ? `${count} | ${this._texts.get(`${B}.active_filter`, {filter: group})}` : count;
+        return this._group ? `${count} | ${this._texts.get(`${B}.active_filter`, {filter: this._group.label})}` : count;
     }
 
     render(): void
     {
-        const zones = this.visible;
+        const zones = this.tabZones();
         const marks = this._host.marks;
 
+        this.fillRegions(zones);
         this._sort.render();
+        for(const size of this._sizes) size.render();
         for(const filter of this._filters)
         {
             filter.binding.render();
-            setText(filter.row, 'filter_count', `(${filter.count(BROWSER_TABS[this._tab].zones(this._host.zones, marks))})`);
+            setText(filter.row, 'filter_count', `(${filter.count(zones)})`);
         }
-        for(const g of this._groupRows)
+        for(const g of this._groups)
         {
-            setText(g.row, 'category_count', `(${BROWSER_TABS[this._tab].zones(this._host.zones, marks).filter(z => GROUPS[g.key](z, marks)).length})`);
+            setText(g.row, 'category_count', `(${zones.filter(z => g.test(z, marks)).length})`);
 
             const color = g === this._group ? SELECTED : g.color;
 
             if(g.row.color !== color) g.row.color = color;
         }
 
-        this.fillRows(zones);
+        this.fillRows(this.visible);
         this.fillDetail();
+    }
+
+    private tabZones(): IZoneSummary[]
+    {
+        return BROWSER_TABS[this._tab].zones(this._host.zones, this._host.marks);
     }
 
     private fillRows(zones: IZoneSummary[]): void
     {
         const list = this._list;
         const marks = this._host.marks;
-        const key = JSON.stringify(zones.map(z => [z, marks.isFavorite(z.key), marks.openedAt(z.key)]));
+        const key = JSON.stringify(zones.map(z => [z, marks.isFavorite(z.key), this._host.preview(z)?.thumb]));
 
         if(list && key !== this._shown)
         {
@@ -229,22 +281,29 @@ export class BrowserTabUi
 
     private fillRow(row: IWindow, zone: IZoneSummary): void
     {
-        const opened = this._host.marks.openedAt(zone.key);
         const status = zone.publishedVersion === null ? DRAFT : PUBLISHED;
+        const type = zone.type ? ZONE_TYPES[zone.type] : undefined;
+        const modified = modifiedAt(zone);
         const star = child(row, 'favorite_icon');
 
         setText(row, 'map_name', zone.name);
-        setText(row, 'map_desc', `${zone.key} · room ${zone.roomId}${zone.lockedByAccountId ? ' · verrouillée' : ''}`);
-        // The zone list has no type, size nor author yet (server ZoneSummary): left blank.
-        for(const name of ['type_icon', 'type_txt', 'admin_icon']) setVisible(row, name, false);
-        for(const name of ['size_txt', 'cells_txt', 'author_name']) setText(row, name, '');
-        setText(row, 'date_txt', opened === null ? '' : date(opened));
-        setText(row, 'time_txt', opened === null ? '' : time(opened));
+        setText(row, 'map_desc', `${zone.key}${zone.region ? ` · ${zone.region}` : ''}${zone.lockedByAccountId ? ' · verrouillée' : ''}`);
+        setVisible(row, 'type_icon', !!type);
+        setText(row, 'type_txt', type ? this._texts.get(type.text) : (zone.type ?? ''));
+        if(type) setImage(row, 'type_icon', ICONS + type.icon);
+        setText(row, 'size_txt', zone.width ? `${zone.width} × ${zone.length}` : '');
+        setText(row, 'cells_txt', zone.width ? `${(zone.width * (zone.length ?? 0)).toLocaleString('fr-FR')} cases` : '');
+        setText(row, 'author_name', zone.authorName ?? '');
+        // No rank on the zone list: the crown would claim one.
+        setVisible(row, 'admin_icon', false);
+        setText(row, 'date_txt', modified ? date(modified) : '');
+        setText(row, 'time_txt', modified ? time(modified) : '');
         setText(row, 'status_txt', this._texts.get(status.text));
         if(star) star.color = this._host.marks.isFavorite(zone.key) ? STAR_ON : STAR_OFF;
         Object.assign(child(row, 'status_pill') ?? {}, {color: status.pill});
         Object.assign(child(row, 'status_dot') ?? {}, {color: status.dot});
 
+        this.showPreview(children(row, 'thumb').pop() ?? null, this._host.preview(zone)?.thumb ?? null);
         onClick(row, 'favorite_button', () => this.toggleFavorite(zone.key));
         onWindowClick(row, () => this.select(zone.key));
         row.addEventListener('WME_DOUBLE_CLICK', () => this._host.act('edit', zone));
@@ -256,28 +315,28 @@ export class BrowserTabUi
         const zone = this.selected;
         const list = child<IItemListWindow>(body, 'detail_list');
         const star = child(body, 'detail_favorite_icon');
-        const opened = zone ? this._host.marks.openedAt(zone.key) : null;
 
         setText(body, 'detail_name', zone?.name ?? '');
         setVisible(body, 'detail_favorite', !!zone);
         if(star && zone) star.color = this._host.marks.isFavorite(zone.key) ? STAR_ON : STAR_OFF;
         for(const {action, button} of this._detailActions) setEnabled(button, !!zone && (action !== 'use_template' || zone.publishedVersion !== null));
 
-        const rows: [string, string][] = zone ? [
-            [`${B}.detail.map_id`, zone.key],
-            [`${B}.detail.validation`, zone.publishedVersion === null
-                ? `${this._texts.get(DRAFT.text)} (v${zone.latestVersion})`
-                : `${this._texts.get(PUBLISHED.text)} v${zone.publishedVersion} · dernière v${zone.latestVersion}`],
-            [`${B}.detail.source`, `Room ${zone.roomId}${zone.lockedByAccountId ? ` · verrouillée par le compte ${zone.lockedByAccountId}` : ''}`],
-            [`${B}.detail.opened`, opened === null ? '-' : `${date(opened)} ${time(opened)}`]
-        ] : [];
+        const preview = zone ? this._host.preview(zone)?.full ?? '' : '';
+
+        if(preview !== this._detailPreview)
+        {
+            this._detailPreview = preview;
+            this.showPreview(child(body, 'detail_preview'), preview || null);
+        }
+
+        const rows = zone ? this.detailRows(zone) : [];
         const key = JSON.stringify(rows);
 
         if(!list || key === this._detailShown) return;
 
         this._detailShown = key;
         list.destroyListItems();
-        list.populate(rows.map(([label, value]) =>
+        list.populate(rows.map(([label, value, icon]) =>
         {
             const row = this._build('vortex_map_editor_browser_detail_row_xml');
 
@@ -285,51 +344,89 @@ export class BrowserTabUi
             {
                 setText(row, 'detail_label', this._texts.get(label));
                 setText(row, 'detail_value', value);
-                setVisible(row, 'detail_icon', false);
+                setVisible(row, 'detail_icon', !!icon);
+                if(icon) setImage(row, 'detail_icon', ICONS + icon);
             }
 
             return row;
         }).filter((r): r is IWindow => !!r));
     }
 
+    /** Puts the preview asset in container (a row's thumb, detail_preview) in place of the one there; null empties it. */
+    private showPreview(container: IWindow | null, asset: string | null): void
+    {
+        const box = container as IWindowContainer | null;
+
+        if(!box) return;
+        while(box.numChildren > 0) box.getChildAt(0)?.destroy();
+        if(!asset) return;
+
+        const preview = this._build('vortex_map_editor_preview_xml');
+
+        if(!preview) return;
+        // The layout's root is the bitmap itself.
+        preview.rectangle = {x: 0, y: 0, width: box.width, height: box.height};
+        (preview as IStaticBitmapWrapperWindow).assetUri = asset;
+        box.addChild(preview);
+    }
+
+    /** The detail panel's lines: label key, value, and the value's icon when it has one. */
+    private detailRows(zone: IZoneSummary): [string, string, string?][]
+    {
+        const type = zone.type ? ZONE_TYPES[zone.type] : undefined;
+        const opened = this._host.marks.openedAt(zone.key);
+        const modified = modifiedAt(zone);
+        const dash = (value?: string): string => value || '-';
+
+        return [
+            [`${B}.detail.map_id`, zone.key],
+            [`${B}.detail.type`, type ? this._texts.get(type.text) : dash(zone.type), type?.icon],
+            [`${B}.detail.region`, dash(zone.region)],
+            [`${B}.detail.dimensions`, zone.width ? `${zone.width} × ${zone.length} (${zone.width * (zone.length ?? 0)} cases)` : '-'],
+            [`${B}.detail.author`, dash(zone.authorName)],
+            [`${B}.detail.modified`, modified ? `${date(modified)} ${time(modified)}` : '-'],
+            [`${B}.detail.validation`, zone.publishedVersion === null
+                ? `${this._texts.get(DRAFT.text)} (v${zone.latestVersion})`
+                : `${this._texts.get(PUBLISHED.text)} v${zone.publishedVersion} · dernière v${zone.latestVersion}`],
+            [`${B}.detail.source`, `Room ${zone.roomId}${zone.lockedByAccountId ? ` · verrouillée par le compte ${zone.lockedByAccountId}` : ''}`],
+            [`${B}.detail.opened`, opened === null ? '-' : `${date(opened)} ${time(opened)}`]
+        ];
+    }
+
     /** The tab's side panel in side_slot, its groups and filters bound where the data allows. */
     private mountSide(): void
     {
         const slot = child<IWindowContainer>(this.window, 'side_slot');
-        const side = this._build(`vortex_map_editor_browser_side_${this._tab}_xml`);
+        const panel = this._build(`vortex_map_editor_browser_side_${this._tab}_xml`);
 
-        if(!slot || !side) return;
+        if(!slot || !panel) return;
 
-        slot.addChild(side);
+        slot.addChild(panel);
 
-        for(const row of children(side, 'category_row'))
+        const rows = children(panel, 'category_row');
+
+        // A group list the layout leaves empty (the zones tab's Régions) is filled from the data.
+        if(!rows.length) this._regionList = child<IItemListWindow>(panel, 'group_list');
+
+        for(const row of rows)
         {
             const key = keyOf(child(row, 'category_label'));
 
             setVisible(row, 'expand_icon', false);
-            if(!GROUPS[key])
+            if(GROUPS[key]) this.bindGroup(row, this._texts.get(key), GROUPS[key]);
+            else
             {
                 setEnabled(row, false);
                 setText(row, 'category_count', '');
-                continue;
             }
-
-            const group = {key, row, color: row.color};
-
-            this._groupRows.push(group);
-            onWindowClick(row, () =>
-            {
-                this._group = this._group === group ? null : group;
-                this.render();
-            });
         }
 
-        for(const row of children(side, 'filter_row'))
+        for(const row of children(panel, 'filter_row'))
         {
             const key = keyOf(child(row, 'filter_label'));
-            const status = STATUS_FILTERS[key];
+            const include = INCLUDE_FILTERS[key];
 
-            if(status)
+            if(include)
             {
                 const binding = new CheckBinding(row, 'filter_check', () => !this._hidden.has(key), checked =>
                 {
@@ -338,7 +435,7 @@ export class BrowserTabUi
                     this.render();
                 });
 
-                this._filters.push({binding, row, count: zones => zones.filter(z => status(z, this._host.marks)).length});
+                this._filters.push({binding, row, count: zones => zones.filter(z => include(z, this._host.marks)).length});
             }
             else if(FAVORITE_FILTERS.has(key))
             {
@@ -357,7 +454,60 @@ export class BrowserTabUi
             }
         }
 
-        for(const menu of children(side, 'size_menu')) setEnabled(menu, false);
+        for(const menu of children(panel, 'size_menu'))
+        {
+            this._sizes.push(new ChoiceBinding<Size>(menu.parent ?? panel, 'size_menu', () => this._size, size =>
+            {
+                this._size = size;
+                this.render();
+            }).options([
+                ['all', this._texts.get(`${B}.filter.all_sizes`)],
+                ['small', 'Jusqu\'à 16 × 16'],
+                ['medium', '17 à 32'],
+                ['large', '33 à 64']
+            ]));
+        }
+    }
+
+    private bindGroup(row: IWindow, label: string, test: Predicate): void
+    {
+        const group: IGroup = {label, test, row, color: row.color};
+
+        this._groups.push(group);
+        onWindowClick(row, () =>
+        {
+            this._group = this._group === group ? null : group;
+            this.render();
+        });
+    }
+
+    /** The zones tab's Régions: one category_row per region the zones name, rebuilt when that set changes. */
+    private fillRegions(zones: IZoneSummary[]): void
+    {
+        const list = this._regionList;
+        const regions = [...new Set(zones.map(z => z.region).filter((r): r is string => !!r))].sort((a, b) => a.localeCompare(b));
+        const key = JSON.stringify(regions);
+
+        if(!list || key === this._regionsShown) return;
+
+        this._regionsShown = key;
+        // The old region rows are still in the list here: their groups go with them.
+        this._groups.splice(0, this._groups.length, ...this._groups.filter(g => g.row.parent !== list));
+        if(this._group && !this._groups.includes(this._group)) this._group = null;
+        list.destroyListItems();
+        list.populate(regions.map(region =>
+        {
+            const row = this._build('vortex_map_editor_browser_category_row_xml');
+
+            if(row)
+            {
+                setText(row, 'category_label', region);
+                setVisible(row, 'expand_icon', false);
+                this.bindGroup(row, region, z => z.region === region);
+            }
+
+            return row;
+        }).filter((r): r is IWindow => !!r));
     }
 
     /** One action button per action: the toolbar's right-aligned in a row, the details' two per row. */
@@ -374,7 +524,7 @@ export class BrowserTabUi
             const button = child(window, 'action_button');
 
             if(button) button.caption = this._texts.get(ACTIONS[action].text);
-            setImage(window, 'action_icon', `rpg/ui-icons/${ACTIONS[action].icon}`);
+            setImage(window, 'action_icon', ICONS + ACTIONS[action].icon);
             onClick(window, 'action_button', () => this._host.act(action, this.selected));
 
             if(toolbar) window.x = container.width - (actions.length - i) * (window.width + ACTION_GAP) + ACTION_GAP;

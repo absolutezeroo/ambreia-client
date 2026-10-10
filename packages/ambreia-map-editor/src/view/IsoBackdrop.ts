@@ -105,6 +105,12 @@ export class IsoBackdrop
         return this._view !== null;
     }
 
+    /** Resolves once the documents given so far are in the room, their furni loaded (or given up on). */
+    settled(): Promise<void>
+    {
+        return this._queue;
+    }
+
     /**
      * Follows the document: a new floor or walls rebuild the room, furni are added, moved or
      * removed. With a `level`, the tiles of any other height are holes and the furni standing on

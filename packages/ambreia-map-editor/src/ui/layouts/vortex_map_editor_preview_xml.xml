@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The editor's own: a zone preview the browser renders with @ambreia/iso (home/ZonePreviews),
+     placed in the owner's thumb and detail_preview containers. Not a hit target: a click goes to
+     the row under it. -->
+<layout name="vortex_map_editor_preview_xml" width="312" height="170" version="0.1">
+  <window>
+    <static_bitmap x="0" y="0" width="312" height="170" params="16" style="3" name="preview">
+      <variables>
+        <var key="stretched_x" value="false" type="Boolean"/>
+        <var key="stretched_y" value="false" type="Boolean"/>
+      </variables>
+    </static_bitmap>
+  </window>
+</layout>
