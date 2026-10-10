@@ -11,6 +11,7 @@ import {RpgCastEndMessageParser} from '../src/parser/rpg/skills/RpgCastEndMessag
 import {RpgCooldownsMessageParser} from '../src/parser/rpg/skills/RpgCooldownsMessageParser';
 import {RpgStatusesMessageParser} from '../src/parser/rpg/skills/RpgStatusesMessageParser';
 import {RpgSkillEventsMessageParser} from '../src/parser/rpg/skills/RpgSkillEventsMessageParser';
+import {RpgTelegraphsMessageParser} from '../src/parser/rpg/skills/RpgTelegraphsMessageParser';
 import {RpgSkillCastMessage} from '../src/outgoing/rpg/skills/RpgSkillCastMessage';
 import {RpgSkillCastMessageSerializer} from '../src/serializer/rpg/skills/RpgSkillCastMessageSerializer';
 import {RpgActionBarSetMessage} from '../src/outgoing/rpg/skills/RpgActionBarSetMessage';
@@ -75,4 +76,16 @@ test('RpgSkillCast, RpgActionBarSet and RpgCastCancel write in the server order'
     assert.deepEqual(new RpgSkillCastMessageSerializer().serialize(new RpgSkillCastMessage('skill.archer.volley', 0, 7, 9)), ['skill.archer.volley', 0, 7, 9]);
     assert.deepEqual(new RpgActionBarSetMessageSerializer().serialize(new RpgActionBarSetMessage(2, '')), [2, '']);
     assert.deepEqual(new RpgCastCancelMessageSerializer().serialize(new RpgCastCancelMessage()), []);
+});
+
+test('RpgTelegraphs: each cast, then its cells (M1c §9)', () =>
+{
+    assert.deepEqual(new RpgTelegraphsMessageParser().parse(wire(2,
+        40, 'skill.monster.quake', 'circle', 2000, 5, 5, 5, 4, 5, 6, 5, 5, 4, 5, 6,
+        41, 'skill.monster.root_lash', 'line', 1500, 3, 1, 0, 2, 0, 3, 0)).telegraphs, [
+        {casterObjectId: 40, skillId: 'skill.monster.quake', shape: 'circle', delayMs: 2000,
+            cells: [{x: 5, y: 5}, {x: 4, y: 5}, {x: 6, y: 5}, {x: 5, y: 4}, {x: 5, y: 6}]},
+        {casterObjectId: 41, skillId: 'skill.monster.root_lash', shape: 'line', delayMs: 1500,
+            cells: [{x: 1, y: 0}, {x: 2, y: 0}, {x: 3, y: 0}]}
+    ]);
 });

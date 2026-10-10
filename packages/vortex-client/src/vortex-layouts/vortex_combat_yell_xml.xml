@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_combat_yell_xml" width="240" height="20" version="0.1">
+  <window>
+    <text x="0" y="0" width="240" height="20" params="16" style="3" name="combat_yell" caption="">
+      <filters>
+        <DropShadowFilter distance="1" alpha="1" blurX="0" blurY="0"/>
+      </filters>
+      <variables>
+        <var key="text_style" value="u_bold" type="String"/>
+        <var key="font_size" value="13" type="uint"/>
+        <var key="text_color" value="0xffb040" type="hex"/>
+        <var key="auto_size" value="center" type="String"/>
+        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+      </variables>
+    </text>
+  </window>
+</layout>

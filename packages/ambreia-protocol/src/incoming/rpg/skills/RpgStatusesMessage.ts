@@ -1,6 +1,7 @@
 export interface IRpgStatus
 {
     readonly statusId: string;
+    /** -1: no end (a boss phase's status, M1c): the client shows no timer for any status yet. */
     readonly remainingMs: number;
     readonly stacks: number;
 }

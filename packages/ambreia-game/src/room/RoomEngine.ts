@@ -9,8 +9,8 @@
  * IMPORTANT: RoomEngine depends on IRoomManager for room instance management.
  * It does NOT manage rooms directly - that's RoomManager's responsibility.
  */
-import type {Container, Renderer, Ticker} from 'pixi.js';
-import {Sprite, Texture} from 'pixi.js';
+import type {Renderer, Ticker} from 'pixi.js';
+import {Container, Graphics, Sprite, Texture} from 'pixi.js';
 import {Component, ComponentDependency, type IContext, type IUpdateReceiver} from '../core/runtime/index';
 import {extractCanvas} from '@ambreia/iso/renderer/TextureExtractor';
 import {createRoomRegistries} from '@ambreia/iso/object/createRoomRegistries';
@@ -307,6 +307,10 @@ export interface IPendingFurnitureData {
 const RPG_EXPRESSIONS: Readonly<Record<string, number>> = {wave: 1, laugh: 3, sad: 4, clap: 7};
 /** Habbo's « surprised » face (AvatarAction.GESTURE_SURPRISED). */
 const RPG_SURPRISED_GESTURE = 3;
+/** RPG M1c: a tile's corners around its location, in drawing order. */
+const RPG_TILE_CORNERS: ReadonlyArray<readonly [number, number]> = [[-0.5, -0.5], [0.5, -0.5], [0.5, 0.5], [-0.5, 0.5]];
+/** RPG M1c: a telegraph whose RpgCastEnd never came hides this long after its impact. */
+const RPG_TELEGRAPH_GRACE_MS = 1500;
 
 /**
  * One queued wall item. Its `data` is a string where the floor item's is an `IStuffData` — the
@@ -553,6 +557,10 @@ export class RoomEngine extends Component implements IRoomEngine,
     private readonly _rpgDancers = new Set<number>();
     /** TS-only (RPG M1b §6.6): the next floor click picks this tile for a ground skill instead of walking. */
     private _rpgTilePick: ((x: number, y: number) => void) | null = null;
+    /** TS-only (RPG M1c): the step time of each slowed avatar of the active room (setRpgStepTime()). */
+    private readonly _rpgStepTimes = new Map<number, number>();
+    /** TS-only (RPG M1c §9): the telegraphed casts' cells on the floor, by caster. */
+    private readonly _rpgTelegraphs = new Map<number, Container>();
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_1821.as::getSelectedAvatarId()
     private _selectedAvatarId: number = -1;
@@ -3215,6 +3223,9 @@ export class RoomEngine extends Component implements IRoomEngine,
         {
             return false;
         }
+
+        // A slowed combatant's step lasts as long as the server's (setRpgStepTime()), not Habbo's 500 ms.
+        if(Number.isNaN(animationTime) && roomId === this._activeRoomId) animationTime = this._rpgStepTimes.get(objectId) ?? NaN;
 
         const resolvedLocation = location ?? object.getLocation();
         const resolvedDirection = direction ?? object.getDirection();
@@ -9362,6 +9373,85 @@ export class RoomEngine extends Component implements IRoomEngine,
         this.markRpgTarget(this._rpgTargetId, false);
         this._rpgTargetId = objectId;
         this.markRpgTarget(objectId, true);
+    }
+
+    /**
+     * TS-only (RPG M1c §9): the cells a telegraphed cast will hit, outlined on the active room's
+     * floor and filling up until the impact; a caster's new telegraph replaces its last. The cells
+     * are the server's: nothing is computed here. Gone at clearRpgTelegraph(), or hidden a moment
+     * after the impact should its RpgCastEnd not come.
+     */
+    // ponytail: drawn on the canvas overlay, over the avatars standing in it (tinted red); a decal
+    // sorted under them needs a sprite in the canvas's own list (_display is indexed by sprite).
+    showRpgTelegraph(casterId: number, cells: readonly {x: number; y: number}[], delayMs: number, color: number): void
+    {
+        this.clearRpgTelegraph(casterId);
+
+        const canvas = this._renderingCanvases.get(this._activeRoomId * 1000 + 1);
+        const geometry = canvas?.geometry ?? null;
+        const floor = this.getLegacyGeometry(this._activeRoomId);
+
+        if(canvas === undefined || geometry === null || cells.length === 0) return;
+
+        const fill = new Graphics();
+        const outline = new Graphics();
+
+        for(const cell of cells)
+        {
+            const z = floor?.getTileHeight(cell.x, cell.y) ?? 0;
+            const points: number[] = [];
+
+            // A tile spans half a unit on each side of its location.
+            for(const [dx, dy] of RPG_TILE_CORNERS)
+            {
+                const point = geometry.getScreenPoint(new Vector3d(cell.x + dx, cell.y + dy, z));
+
+                if(point !== null) points.push(point.x, point.y);
+            }
+
+            if(points.length < 8) continue;
+
+            fill.poly(points).fill({color});
+            outline.poly(points).stroke({width: 1, color, alpha: 0.9});
+        }
+
+        const telegraph = new Container({label: `telegraph_${casterId}`});
+        const born = performance.now();
+        const duration = Math.max(1, delayMs);
+
+        telegraph.addChild(fill, outline);
+        telegraph.onRender = () =>
+        {
+            const age = performance.now() - born;
+
+            fill.alpha = 0.12 + 0.43 * Math.min(1, age / duration);
+            if(age > duration + RPG_TELEGRAPH_GRACE_MS) telegraph.visible = false;
+        };
+        canvas.overlay.addChild(telegraph);
+        this._rpgTelegraphs.set(casterId, telegraph);
+    }
+
+    /**
+     * TS-only (RPG M1c): how long this avatar of the active room takes over one step, while a slow
+     * stretches the server's walk (500 ms × 100 / (100 − slow %)); null gives it Habbo's back.
+     */
+    setRpgStepTime(objectId: number, ms: number | null): void
+    {
+        if(ms === null) this._rpgStepTimes.delete(objectId);
+        else this._rpgStepTimes.set(objectId, ms);
+    }
+
+    /** TS-only (RPG M1c §9): takes this caster's telegraph away (its RpgCastEnd); null takes them all. */
+    clearRpgTelegraph(casterId: number | null): void
+    {
+        for(const [id, telegraph] of this._rpgTelegraphs)
+        {
+            if(casterId !== null && id !== casterId) continue;
+
+            // A canvas disposed with its room destroyed it already.
+            if(!telegraph.destroyed) telegraph.destroy({children: true});
+            this._rpgTelegraphs.delete(id);
+        }
     }
 
     private markRpgTarget(objectId: number, targeted: boolean): void

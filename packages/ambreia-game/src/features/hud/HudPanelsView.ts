@@ -57,6 +57,9 @@ function navButton(window: IWindow): string | null
 }
 
 /** `12450` → `12 450`. */
+/** The target frame's border by rank (M1c): vortex_hud_target_xml's grey, gold for an elite, red for a boss. */
+const RANK_FRAMES: Readonly<Record<string, number>> = {normal: 0x686661, elite: 0xd8a830, boss: 0xc03028};
+
 const thousands = (value: number): string => String(value).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
 /**
@@ -242,7 +245,7 @@ export class HudPanelsView
 
         if(show('quests', value.quests.length > 0 && !this._questsClosed)) this.renderQuests(panel('quests'), value);
         if(show('party', value.party.length > 0)) this.renderParty(panel('party'), value);
-        if(show('buffs', value.buffs.length > 0)) this.fillIcons(panel('buffs'), 'buff_grid', value.buffs, 'buffs');
+        if(show('buffs', value.buffs.length > 0)) this.fillIcons(panel('buffs'), 'buff_grid', value.buffs, 'buffs', value.buffTimes);
         if(show('boss', value.boss !== null)) this.renderUnit(panel('boss'), 'boss', value.boss!);
         if(show('alert', value.alert !== null)) this._bits.setText(panel('alert'), 'alert_txt', value.alert!);
 
@@ -342,6 +345,10 @@ export class HudPanelsView
         this._bits.setText(window, prefix === 'boss' ? 'boss_level' : 'target_info', prefix === 'boss' ? (unit.level === null ? '' : this._bits.text('vortex.ui.level.short', 'level', String(unit.level))) : unit.info);
         this.setBar(window, `${prefix}_hp_bar`, unit.hp, unit.hpMax, unit.hp === null || unit.hpMax === null ? '' : `${thousands(unit.hp)} / ${thousands(unit.hpMax)}${percent}`);
         this.fillIcons(window, 'debuff_list', unit.debuffs, `${prefix}.debuffs`);
+
+        const frame = window.findChildByName(`${prefix}_frame`);
+
+        if(frame) frame.color = RANK_FRAMES[unit.rank ?? 'normal'] ?? RANK_FRAMES.normal;
     }
 
     /**
@@ -363,7 +370,7 @@ export class HudPanelsView
     }
 
     /** One vortex_hud_buff_xml per icon. A party member's list is rebuilt with its frame, so it has no key. */
-    private fillIcons(window: IWindowContainer, name: string, icons: readonly string[], key?: string): void
+    private fillIcons(window: IWindowContainer, name: string, icons: readonly string[], key?: string, times?: readonly string[]): void
     {
         const holder = key === undefined
             ? window.findChildByName(name) as IItemListWindow | IItemGridWindow | null
@@ -371,13 +378,14 @@ export class HudPanelsView
 
         if(!holder) return;
 
-        for(const icon of icons)
+        for(const [i, icon] of icons.entries())
         {
             const box = this._windows.buildWidgetLayout('vortex_hud_buff_xml') as IWindowContainer | null;
 
             if(!box) return;
 
             this.setIcon(box, 'buff_icon', icon);
+            this._bits.setText(box, 'buff_time', times?.[i] ?? '');
 
             if('addGridItem' in holder) holder.addGridItem(box);
             else holder.addListItem(box);

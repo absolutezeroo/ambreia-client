@@ -1,6 +1,7 @@
 import type {IWindow} from '@ambreia/ui/IWindow';
 import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 import type {ITextWindow} from '@ambreia/ui/components/ITextWindow';
+import type {IStaticBitmapWrapperWindow} from '@ambreia/ui/components/IStaticBitmapWrapperWindow';
 import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
 
 /**
@@ -15,6 +16,9 @@ const BAR_HALF = 19;
 const NUMBER_MS = 1000;
 const NUMBER_RISE = 28;
 const NUMBER_HALF = 40;
+/** A monster's yell (M1c) stays over it this long, fading in its last quarter. */
+const YELL_MS = 4000;
+const YELL_HALF = 120;
 
 const COLORS = {hit: 0xff5050, crit: 0xffc030, miss: 0xd0d0c8, heal: 0x60e060};
 /** A cast fills, a channel empties (M1b §6.3); the bar sits under the health bar. */
@@ -42,6 +46,12 @@ interface ICast
     channel: boolean;
 }
 
+interface IYell
+{
+    window: ITextWindow;
+    born: number;
+}
+
 interface INumber
 {
     window: ITextWindow;
@@ -66,6 +76,9 @@ export class CombatOverlay
     private readonly _bars = new Map<number, IBar>();
     private readonly _casts = new Map<number, ICast>();
     private readonly _numbers: INumber[] = [];
+    private readonly _yells = new Map<number, IYell>();
+    /** A status icon beside the health bar of whoever is slowed or stunned (M1c). */
+    private readonly _marks = new Map<number, IStaticBitmapWrapperWindow>();
     private readonly _spare: ITextWindow[] = [];
     private readonly _point = {x: 0, y: 0};
     private _frame: number | null = null;
@@ -98,7 +111,7 @@ export class CombatOverlay
         this.run();
     }
 
-    /** `hit`, `crit`, `miss` (M1a), `dodge`, `heal` (M1b); `absorbed`: what a shield took. */
+    /** `hit`, `crit`, `miss` (M1a), `dodge`, `heal` (M1b), `immune` (M1c); `absorbed`: what a shield took. */
     hit(objectId: number, amount: number, outcome: string, absorbed = 0): void
     {
         const window = this._spare.pop() ?? this.build('vortex_combat_number_xml') as ITextWindow | null;
@@ -106,7 +119,7 @@ export class CombatOverlay
         if(!window) return;
 
         const crit = outcome === 'crit';
-        const missed = outcome === 'miss' || outcome === 'dodge';
+        const missed = outcome === 'miss' || outcome === 'dodge' || outcome === 'immune';
 
         window.caption = missed ? this._text(`vortex.combat.${outcome}`)
             : outcome === 'heal' ? `+${amount}`
@@ -116,6 +129,55 @@ export class CombatOverlay
         window.blend = 1;
         window.visible = false;
         this._numbers.push({window, objectId, born: performance.now()});
+        this.run();
+    }
+
+    /** A monster yells (RpgMonsterYell): the text over it, a newer yell replacing it. */
+    yell(objectId: number, text: string): void
+    {
+        let yell = this._yells.get(objectId);
+
+        if(!yell)
+        {
+            const window = this.build('vortex_combat_yell_xml') as ITextWindow | null;
+
+            if(!window) return;
+
+            yell = {window, born: 0};
+            this._yells.set(objectId, yell);
+        }
+
+        yell.window.caption = text;
+        yell.window.visible = false;
+        yell.born = performance.now();
+        this.run();
+    }
+
+    /** The icon of what holds this object back (a slow, a stun) beside its bar; null takes it away. */
+    mark(objectId: number, icon: string | null): void
+    {
+        let mark = this._marks.get(objectId);
+
+        if(icon === null)
+        {
+            mark?.destroy();
+            this._marks.delete(objectId);
+
+            return;
+        }
+
+        if(!mark)
+        {
+            const window = this.build('vortex_combat_mark_xml') as IStaticBitmapWrapperWindow | null;
+
+            if(!window) return;
+
+            mark = window;
+            mark.visible = false;
+            this._marks.set(objectId, mark);
+        }
+
+        if(mark.assetUri !== icon) mark.assetUri = icon;
         this.run();
     }
 
@@ -146,6 +208,9 @@ export class CombatOverlay
         this._bars.get(objectId)?.window.destroy();
         this._bars.delete(objectId);
         this.endCast(objectId);
+        this._yells.get(objectId)?.window.destroy();
+        this._yells.delete(objectId);
+        this.mark(objectId, null);
     }
 
     clear(): void
@@ -158,6 +223,12 @@ export class CombatOverlay
 
         for(const number of this._numbers) number.window.destroy();
         this._numbers.length = 0;
+
+        for(const yell of this._yells.values()) yell.window.destroy();
+        this._yells.clear();
+
+        for(const mark of this._marks.values()) mark.destroy();
+        this._marks.clear();
     }
 
     private build(layout: string): IWindow | null
@@ -192,7 +263,7 @@ export class CombatOverlay
         const anchors = this._anchors();
         const point = this._point;
         const now = performance.now();
-        let again = this._numbers.length > 0 || this._casts.size > 0;
+        let again = this._numbers.length > 0 || this._casts.size > 0 || this._yells.size > 0 || this._marks.size > 0;
 
         for(const [objectId, bar] of this._bars)
         {
@@ -249,6 +320,38 @@ export class CombatOverlay
             number.window.x = Math.round(point.x - NUMBER_HALF);
             number.window.y = Math.round(point.y - 30 - (age / NUMBER_MS) * NUMBER_RISE);
             number.window.blend = 1 - age / NUMBER_MS;
+        }
+
+        for(const [objectId, mark] of this._marks)
+        {
+            const shown = anchors !== null && anchors.getRpgAnchor(objectId, point);
+
+            mark.visible = shown;
+            if(!shown) continue;
+
+            mark.x = Math.round(point.x + BAR_HALF + 2);
+            mark.y = Math.round(point.y - 14);
+        }
+
+        for(const [objectId, yell] of this._yells)
+        {
+            const age = now - yell.born;
+
+            if(age >= YELL_MS)
+            {
+                yell.window.destroy();
+                this._yells.delete(objectId);
+                continue;
+            }
+
+            const shown = anchors !== null && anchors.getRpgAnchor(objectId, point);
+
+            yell.window.visible = shown;
+            if(!shown) continue;
+
+            yell.window.x = Math.round(point.x - YELL_HALF);
+            yell.window.y = Math.round(point.y - 52);
+            yell.window.blend = Math.min(1, 4 * (1 - age / YELL_MS));
         }
 
         // While anything is on screen: bars follow walking avatars, numbers rise.

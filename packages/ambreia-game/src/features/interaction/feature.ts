@@ -16,7 +16,8 @@ const MONSTER_PORTRAIT = 'rpg/ui-icons/rpg_creature_archetypes_giant_ogre_troll_
 
 /**
  * The HUD's target frame for an RpgTarget: a player's head (`figure`, from the room's Users), name
- * and `Niv. 6 · Guerrier`; a monster's portrait, translated name (`<id>.name`, M1a §9.1) and level.
+ * and `Niv. 6 · Guerrier`; a monster's portrait, translated name (`<id>.name`, M1a §9.1), level and
+ * rank (`Niv. 8 · Élite`, M1c: the frame's border too).
  * HP when the combat knows them (`health`, M1a §9.2); no effects on the wire yet.
  */
 export function targetUnit(target: RpgTargetMessage, bits: WindowBits, figure: string | null, health: {health: number; maxHealth: number} | null = null): IHudPanels['target']
@@ -26,11 +27,13 @@ export function targetUnit(target: RpgTargetMessage, bits: WindowBits, figure: s
     const level = bits.text('vortex.ui.level.short', 'level', String(target.level));
     const className = target.classId === '' ? '' : bits.contentName(`vortex.${target.classId}`, target.classId);
     const monster = target.kind === 'monster';
+    const rank = target.rank === 'elite' ? bits.text('vortex.hud.elite') : target.rank === 'boss' ? bits.text('vortex.hud.boss') : '';
+    const info = [level, className, rank].filter(part => part !== '').join(' · ');
 
     return {
         name: monster ? bits.contentName(`${target.name}.name`, target.name) : target.name,
         portrait: monster ? MONSTER_PORTRAIT : null, figure: monster ? null : figure,
-        level: target.level, info: className === '' ? level : `${level} · ${className}`,
+        level: target.level, info, rank: target.rank,
         hp: health?.health ?? null, hpMax: health?.maxHealth ?? null, debuffs: [], cast: null
     };
 }

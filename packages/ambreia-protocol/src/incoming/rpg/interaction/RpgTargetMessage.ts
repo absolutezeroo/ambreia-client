@@ -13,6 +13,8 @@ export class RpgTargetMessage
         readonly name: string,
         readonly level: number,
         /** `class.warrior`… */
-        readonly classId: string
+        readonly classId: string,
+        /** `normal`, `elite` or `boss` (M1c §9); a player is `normal`. */
+        readonly rank: string
     ) {}
 }

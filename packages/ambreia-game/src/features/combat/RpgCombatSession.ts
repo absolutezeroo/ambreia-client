@@ -12,6 +12,8 @@ import {RpgVitalsMessageParser} from '@ambreia/protocol/parser/rpg/combat/RpgVit
 import {RpgSelfVitalsMessageParser} from '@ambreia/protocol/parser/rpg/combat/RpgSelfVitalsMessageParser';
 import {RpgDeathMessageParser} from '@ambreia/protocol/parser/rpg/combat/RpgDeathMessageParser';
 import {RpgCombatResultMessageParser} from '@ambreia/protocol/parser/rpg/combat/RpgCombatResultMessageParser';
+import type {RpgMonsterYellMessage} from '@ambreia/protocol/incoming/rpg/combat/RpgMonsterYellMessage';
+import {RpgMonsterYellMessageParser} from '@ambreia/protocol/parser/rpg/combat/RpgMonsterYellMessageParser';
 import type {IRpgSkillOutcome} from '@ambreia/protocol/incoming/rpg/skills/RpgSkillEventsMessage';
 
 export interface IRpgCombatSessionEvents
@@ -21,12 +23,16 @@ export interface IRpgCombatSessionEvents
     self: [RpgSelfVitalsMessage];
     death: [RpgDeathMessage];
     result: [RpgCombatResultMessage];
+    /** A monster yells (M1c: a boss's phase). */
+    yell: [RpgMonsterYellMessage];
     /** A combatant's health as last known changed (a blow or a vitals line). */
     health: [objectId: number, health: number, maxHealth: number];
     /** What skills and statuses did (M1b RpgSkillEvents, reported by features/skills). */
     outcomes: [readonly IRpgSkillOutcome[]];
     /** A cast began over this combatant (M1b RpgCastStart); null: it ended. */
     cast: [objectId: number, cast: {durationMs: number; channel: boolean} | null];
+    /** What holds this combatant back (a slow, a stun: its status icon), reported by features/skills; null: nothing. */
+    mark: [objectId: number, icon: string | null];
 }
 
 /** The combat's messages: the client's counterpart of the server's combat map (M1a §9.2). */
@@ -37,7 +43,8 @@ export function rpgCombatMap(announce: <E extends keyof IRpgCombatSessionEvents>
         .incoming(Incoming.RpgVitalsMessageComposer, new RpgVitalsMessageParser(), {handle: message => announce('vitals', message)})
         .incoming(Incoming.RpgSelfVitalsMessageComposer, new RpgSelfVitalsMessageParser(), {handle: message => announce('self', message)})
         .incoming(Incoming.RpgDeathMessageComposer, new RpgDeathMessageParser(), {handle: message => announce('death', message)})
-        .incoming(Incoming.RpgCombatResultMessageComposer, new RpgCombatResultMessageParser(), {handle: message => announce('result', message)});
+        .incoming(Incoming.RpgCombatResultMessageComposer, new RpgCombatResultMessageParser(), {handle: message => announce('result', message)})
+        .incoming(Incoming.RpgMonsterYellMessageComposer, new RpgMonsterYellMessageParser(), {handle: message => announce('yell', message)});
 }
 
 /**
@@ -77,6 +84,12 @@ export class RpgCombatSession
     cast(objectId: number, cast: {durationMs: number; channel: boolean} | null): void
     {
         this.events.emit('cast', objectId, cast);
+    }
+
+    /** A slow or a stun holds this combatant back (its icon), or no longer (null): the overlay marks it. */
+    mark(objectId: number, icon: string | null): void
+    {
+        this.events.emit('mark', objectId, icon);
     }
 
     /** The room was left: its combatants with it. */

@@ -31,6 +31,8 @@ export const NewStyleHeaders = {
         Incoming.RpgSelfVitalsMessageComposer,
         Incoming.RpgDeathMessageComposer,
         Incoming.RpgCombatResultMessageComposer,
+        // M1c: a monster's yell (features/combat).
+        Incoming.RpgMonsterYellMessageComposer,
         // M1b Skills: the bar, casts, cooldowns, statuses (features/skills).
         Incoming.RpgSkillsMessageComposer,
         Incoming.RpgSkillResultMessageComposer,
@@ -38,7 +40,9 @@ export const NewStyleHeaders = {
         Incoming.RpgCastEndMessageComposer,
         Incoming.RpgCooldownsMessageComposer,
         Incoming.RpgStatusesMessageComposer,
-        Incoming.RpgSkillEventsMessageComposer
+        Incoming.RpgSkillEventsMessageComposer,
+        // M1c: the telegraphed casts' cells (features/skills).
+        Incoming.RpgTelegraphsMessageComposer
     ]),
     outgoing: new Set<number>([
         Outgoing.RpgCharacterListRequestMessageEvent,

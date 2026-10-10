@@ -8,6 +8,7 @@ import {RpgVitalsMessageParser} from '../src/parser/rpg/combat/RpgVitalsMessageP
 import {RpgSelfVitalsMessageParser} from '../src/parser/rpg/combat/RpgSelfVitalsMessageParser';
 import {RpgDeathMessageParser} from '../src/parser/rpg/combat/RpgDeathMessageParser';
 import {RpgCombatResultMessageParser} from '../src/parser/rpg/combat/RpgCombatResultMessageParser';
+import {RpgMonsterYellMessageParser} from '../src/parser/rpg/combat/RpgMonsterYellMessageParser';
 
 function wire(...values: Array<number | string | boolean>): IMessageDataWrapper
 {
@@ -38,4 +39,10 @@ test('RpgVitals, RpgSelfVitals, RpgDeath and RpgCombatResult read in the server 
     assert.equal(new RpgDeathMessageParser().parse(wire(5)).respawnSeconds, 5);
     assert.equal(new RpgCombatResultMessageParser().parse(wire('safe_zone')).code, 'safe_zone');
     assert.throws(() => new RpgSelfVitalsMessageParser().parse(wire(80, 100, 30, 64)), /past the end/);
+});
+
+test('RpgMonsterYell: object, text key (M1c §9)', () =>
+{
+    assert.deepEqual({...new RpgMonsterYellMessageParser().parse(wire(40, 'monster.grove.guardian.phase2'))},
+        {objectId: 40, textKey: 'monster.grove.guardian.phase2'});
 });

@@ -16,6 +16,8 @@ import {RpgCastEndMessageParser} from '@ambreia/protocol/parser/rpg/skills/RpgCa
 import {RpgCooldownsMessageParser} from '@ambreia/protocol/parser/rpg/skills/RpgCooldownsMessageParser';
 import {RpgStatusesMessageParser} from '@ambreia/protocol/parser/rpg/skills/RpgStatusesMessageParser';
 import {RpgSkillEventsMessageParser} from '@ambreia/protocol/parser/rpg/skills/RpgSkillEventsMessageParser';
+import type {RpgTelegraphsMessage} from '@ambreia/protocol/incoming/rpg/skills/RpgTelegraphsMessage';
+import {RpgTelegraphsMessageParser} from '@ambreia/protocol/parser/rpg/skills/RpgTelegraphsMessageParser';
 import {RpgSkillCastMessage} from '@ambreia/protocol/outgoing/rpg/skills/RpgSkillCastMessage';
 import {RpgActionBarSetMessage} from '@ambreia/protocol/outgoing/rpg/skills/RpgActionBarSetMessage';
 import {RpgCastCancelMessage} from '@ambreia/protocol/outgoing/rpg/skills/RpgCastCancelMessage';
@@ -32,6 +34,8 @@ export interface IRpgSkillSessionEvents
     cooldowns: [RpgCooldownsMessage];
     statuses: [RpgStatusesMessage];
     events: [RpgSkillEventsMessage];
+    /** Telegraphed casts began (M1c): the cells they will hit. */
+    telegraphs: [RpgTelegraphsMessage];
 }
 
 /** The skills' messages: the client's counterpart of the server's skills map (M1b §10). */
@@ -45,6 +49,7 @@ export function rpgSkillMap(announce: <E extends keyof IRpgSkillSessionEvents>(e
         .incoming(Incoming.RpgCooldownsMessageComposer, new RpgCooldownsMessageParser(), {handle: message => announce('cooldowns', message)})
         .incoming(Incoming.RpgStatusesMessageComposer, new RpgStatusesMessageParser(), {handle: message => announce('statuses', message)})
         .incoming(Incoming.RpgSkillEventsMessageComposer, new RpgSkillEventsMessageParser(), {handle: message => announce('events', message)})
+        .incoming(Incoming.RpgTelegraphsMessageComposer, new RpgTelegraphsMessageParser(), {handle: message => announce('telegraphs', message)})
         .outgoing(RpgSkillCastMessage, Outgoing.RpgSkillCastMessageEvent, new RpgSkillCastMessageSerializer())
         .outgoing(RpgActionBarSetMessage, Outgoing.RpgActionBarSetMessageEvent, new RpgActionBarSetMessageSerializer())
         .outgoing(RpgCastCancelMessage, Outgoing.RpgCastCancelMessageEvent, new RpgCastCancelMessageSerializer());
@@ -63,6 +68,7 @@ export interface ISkillEffect
 export interface ISkillDefinition
 {
     readonly id: string;
+    /** Empty for a monster's skill (M1c): no class learns it. */
     readonly classes: readonly string[];
     /** Learned on reaching this level. */
     readonly level: number;
@@ -78,6 +84,18 @@ export interface ISkillDefinition
     /** Tiles; 0 for a skill on oneself or around oneself. */
     readonly range: number;
     readonly cooldownMs: number;
+    /** The area a monster's skill warns of before it lands (M1c); null for the others. */
+    readonly telegraph?: ISkillTelegraph | null;
+}
+
+/** A telegraphed skill's area (M1c): the server sends the cells, this only describes them. */
+export interface ISkillTelegraph
+{
+    /** `circle`, `line` or `cone`. */
+    readonly shape: string;
+    readonly size: number;
+    readonly width: number;
+    readonly angle: number;
 }
 
 /** What the client reads of a status's definition (GET /api/public/content/definitions/status, M1b §5.3). */
@@ -87,6 +105,47 @@ export interface IStatusDefinition
     /** `buff`, `debuff`, `dot`, `hot`, `stun`, `slow`, `shield`. */
     readonly type: string;
     readonly durationMs: number;
+    /** A slow's grip on the walk and the attacks, 1–90 (M1c); absent for the others. */
+    readonly slowPercent?: number;
+}
+
+/** Habbo's step, and so the server's walk tick when nothing slows it (AvatarTickMs). */
+export const STEP_MS = 500;
+
+/**
+ * What holds a combatant back (M1c): the status to mark it with (a stun before a slow), and how
+ * long a step takes — the strongest slow, slows do not add up (500 × 100 / (100 − %)); null when
+ * nothing slows it. A status whose definition is not loaded counts for nothing.
+ */
+export function holdBack(statuses: readonly IRpgStatus[], definition: (statusId: string) => IStatusDefinition | null): {statusId: string | null; stepMs: number | null}
+{
+    let slow = 0;
+    let slowId: string | null = null;
+    let stunId: string | null = null;
+
+    for(const status of statuses)
+    {
+        const def = definition(status.statusId);
+
+        if(def?.type === 'stun') stunId ??= status.statusId;
+        else if(def?.type === 'slow' && (def.slowPercent ?? 0) > slow)
+        {
+            slow = Math.min(90, def.slowPercent ?? 0);
+            slowId = status.statusId;
+        }
+    }
+
+    return {statusId: stunId ?? slowId, stepMs: slow > 0 ? Math.round(STEP_MS * 100 / (100 - slow)) : null};
+}
+
+/** A status's time left under its icon: `4 s`, `2 min`; nothing for one without end (-1). */
+export function statusTime(remainingMs: number): string
+{
+    if(remainingMs < 0) return '';
+
+    const seconds = Math.ceil(remainingMs / 1000);
+
+    return seconds >= 60 ? `${Math.ceil(seconds / 60)} min` : `${seconds} s`;
 }
 
 /** A bar slot's skill id: `skill:<id>` → `<id>`, anything else (empty, a later `item:`) → null. */

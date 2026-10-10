@@ -47,6 +47,8 @@ export interface IHudUnit
     hpMax: number | null;
     /** Icons of the effects on it. */
     debuffs: string[];
+    /** `normal`, `elite` or `boss` (M1c): the target frame's border. */
+    rank?: string;
 }
 
 export type {ChatChannel, IChatLine} from './chatModel';
@@ -70,6 +72,8 @@ export interface IHudPanels
     party: IPartyMember[];
     /** Icons of the effects on the player. */
     buffs: string[];
+    /** Under each of `buffs`, its time left (`4 s`), or nothing for an effect without end; none: no times. */
+    buffTimes?: string[];
     target: (IHudUnit & {cast: IHudCast | null}) | null;
     boss: IHudUnit | null;
     /** The warning under the boss (`Frappe sismique dans 3 seconde(s) !`). */

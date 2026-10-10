@@ -31,11 +31,13 @@ test('RpgZoneInteractives: count, then each object and its interaction', () =>
     assert.deepEqual(new RpgZoneInteractivesMessageParser().parse(wire(0)).objects, []);
 });
 
-test('RpgTarget: object, kind, name, level, class', () =>
+test('RpgTarget: object, kind, name, level, class, rank', () =>
 {
-    assert.deepEqual({...new RpgTargetMessageParser().parse(wire(4, 'player', 'Boromir', 6, 'class.warrior'))},
-        {objectId: 4, kind: 'player', name: 'Boromir', level: 6, classId: 'class.warrior'});
-    assert.throws(() => new RpgTargetMessageParser().parse(wire(0, '', '', 0)), /past the end/);
+    assert.deepEqual({...new RpgTargetMessageParser().parse(wire(4, 'player', 'Boromir', 6, 'class.warrior', 'normal'))},
+        {objectId: 4, kind: 'player', name: 'Boromir', level: 6, classId: 'class.warrior', rank: 'normal'});
+    assert.deepEqual({...new RpgTargetMessageParser().parse(wire(31, 'monster', 'monster.forest.alpha_wolf', 4, '', 'elite'))},
+        {objectId: 31, kind: 'monster', name: 'monster.forest.alpha_wolf', level: 4, classId: '', rank: 'elite'});
+    assert.throws(() => new RpgTargetMessageParser().parse(wire(0, '', '', 0, '')), /past the end/);
 });
 
 test('RpgTargetSelect writes the object id', () =>

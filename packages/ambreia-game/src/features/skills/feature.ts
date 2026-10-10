@@ -3,11 +3,12 @@ import type {IRpgCastStart} from '@ambreia/protocol/incoming/rpg/skills/RpgCastS
 import type {IRpgStatus} from '@ambreia/protocol/incoming/rpg/skills/RpgStatusesMessage';
 import {RoomSessionEvent} from '../../session/events/RoomSessionEvent';
 import type {IRoomSession} from '../../session/IRoomSession';
+import {UserDataType} from '../../session/UserData';
 import type {IGameFeature} from '../GameFeature';
 import {WindowBits} from '../character/WindowBits';
 import {chatClock} from '../hud/chatModel';
 import {SKILL_SLOTS} from '../hud/PlayerHudState';
-import {barSkill, RpgSkillSession, type ISkillDefinition, type IStatusDefinition} from './RpgSkillSession';
+import {barSkill, holdBack, RpgSkillSession, statusTime, type ISkillDefinition, type IStatusDefinition} from './RpgSkillSession';
 import {SKILL_IMAGES, skillIcon, statusIcon} from './skillArt';
 import {SKILL_WINDOW_IMAGES, SkillsWindow} from './SkillsWindow';
 
@@ -15,6 +16,9 @@ const log = Logger.getLogger('habbo.features.skills');
 
 /** How often the target frame's cast bar moves while its target casts. */
 const CAST_TICK_MS = 100;
+/** A telegraph's cells (M1c): red under a monster's cast, the cast bar's gold under a player's. */
+const HOSTILE_TELEGRAPH = 0xe03030;
+const FRIENDLY_TELEGRAPH = 0xe8b830;
 
 /** A cast running in the zone, by caster: the target frame shows its target's. */
 interface IRunningCast
@@ -37,7 +41,10 @@ const typing = (event: KeyboardEvent): boolean =>
  * RpgCooldowns; keys 1–6 (or a click on a slot) cast on the current target; a ground skill waits for
  * a floor click (RoomEngine.pickRpgTile()); K opens the skills window, where the bar is arranged.
  * The casts, numbers and health go through the combat session (its overlay draws them); the
- * statuses show on the player's effects panel and the target frame; refusals are system lines.
+ * statuses show on the player's effects panel and the target frame; refusals are system lines. A
+ * telegraphed cast (M1c) shows its cells on the floor (RoomEngine.showRpgTelegraph()). The player's
+ * effects show their time left; a slow or a stun marks its combatant, and a slowed one walks at the
+ * server's pace (RoomEngine.setRpgStepTime()).
  */
 export const SkillsFeature: IGameFeature = {
     id: 'skills',
@@ -49,6 +56,11 @@ export const SkillsFeature: IGameFeature = {
         let room: IRoomSession | null = null;
         let window: SkillsWindow | null = null;
         let castTicker: ReturnType<typeof setInterval> | null = null;
+        /** The player's own statuses with their end (Date.now() clock; null: none), and the HUD's second hand. */
+        let ownStatuses: {statusId: string; end: number | null}[] = [];
+        let statusTicker: ReturnType<typeof setInterval> | null = null;
+        /** The combatants a slow or a stun holds back: marked over their head, slowed steps. */
+        const heldBack = new Set<number>();
         let definitions: Promise<void> | null = null;
 
         host.made.skills = session;
@@ -174,11 +186,23 @@ export const SkillsFeature: IGameFeature = {
             renderTarget();
         });
 
+        // A telegraphed cast (M1c): its cells on the floor until its RpgCastEnd, also in a room's entry burst.
+        session.events.on('telegraphs', message =>
+        {
+            for(const telegraph of message.telegraphs)
+            {
+                const hostile = room?.userDataManager.getUserDataByIndex(telegraph.casterObjectId)?.type === UserDataType.PET;
+
+                host.made.roomEngine?.showRpgTelegraph(telegraph.casterObjectId, telegraph.cells, telegraph.delayMs, hostile ? HOSTILE_TELEGRAPH : FRIENDLY_TELEGRAPH);
+            }
+        });
+
         session.events.on('castEnd', message =>
         {
             for(const end of message.ends)
             {
                 casts.delete(end.casterObjectId);
+                host.made.roomEngine?.clearRpgTelegraph(end.casterObjectId);
                 host.made.combat?.cast(end.casterObjectId, null);
                 // The player's own cast that did not go off says why (a walk cancels it on purpose: no line).
                 if(end.casterObjectId === self() && (end.reason === 'interrupted' || end.reason === 'failed'))
@@ -190,11 +214,46 @@ export const SkillsFeature: IGameFeature = {
             renderTarget();
         });
 
+        // The player's effects panel: each icon with its time left, ticking while one has an end.
+        const renderOwn = (): void =>
+        {
+            const now = Date.now();
+
+            ownStatuses = ownStatuses.filter(status => status.end === null || status.end > now);
+            host.made.hud?.update({
+                buffs: ownStatuses.map(status => statusIcon(status.statusId)),
+                buffTimes: ownStatuses.map(status => status.end === null ? '' : statusTime(status.end - now))
+            });
+
+            const ticking = ownStatuses.some(status => status.end !== null);
+
+            if(ticking && statusTicker === null) statusTicker = setInterval(renderOwn, 1000);
+            else if(!ticking && statusTicker !== null)
+            {
+                clearInterval(statusTicker);
+                statusTicker = null;
+            }
+        };
+
         session.events.on('statuses', message =>
         {
+            const now = Date.now();
+
             for(const combatant of message.combatants)
             {
-                if(combatant.objectId === self()) host.made.hud?.update({buffs: icons(combatant.statuses)});
+                if(combatant.objectId === self())
+                {
+                    ownStatuses = combatant.statuses.map(status => ({statusId: status.statusId, end: status.remainingMs < 0 ? null : now + status.remainingMs}));
+                    renderOwn();
+                }
+
+                // A slow or a stun (M1c): its icon over the combatant, and its steps as long as the server's.
+                const held = holdBack(combatant.statuses, id => session.statusDefinition(id));
+
+                host.made.combat?.mark(combatant.objectId, held.statusId === null ? null : statusIcon(held.statusId));
+                host.made.roomEngine?.setRpgStepTime(combatant.objectId, held.stepMs);
+                if(held.statusId === null) heldBack.delete(combatant.objectId);
+                else heldBack.add(combatant.objectId);
             }
 
             renderTarget();
@@ -238,9 +297,15 @@ export const SkillsFeature: IGameFeature = {
             room = null;
             casts.clear();
             session.forget();
+            host.made.roomEngine?.clearRpgTelegraph(null);
+            for(const objectId of heldBack) host.made.roomEngine?.setRpgStepTime(objectId, null);
+            heldBack.clear();
+            ownStatuses = [];
+            if(statusTicker !== null) clearInterval(statusTicker);
+            statusTicker = null;
             window?.hide();
             host.made.roomEngine?.pickRpgTile(null);
-            host.made.hud?.update({buffs: []});
+            host.made.hud?.update({buffs: [], buffTimes: []});
         });
 
         // Dev hook: `__ambreia.skills.session`, `.open()`.

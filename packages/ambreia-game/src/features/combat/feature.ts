@@ -13,8 +13,9 @@ const log = Logger.getLogger('habbo.features.combat');
 /**
  * The fight in a zone (M1a §9.3): health bars over the monsters and the hurt players, the damage
  * numbers, the target frame's HP, the player frame's HP and mana and its « in combat » colour, the
- * death countdown, and the refused attacks as system lines. A click on a monster targets and
- * attacks it through features/interaction (RpgTargetSelect); this feature only shows the fight.
+ * death countdown, a monster's yell (M1c), and the refused attacks as system lines. A click on a
+ * monster targets and attacks it through features/interaction (RpgTargetSelect); this feature only
+ * shows the fight.
  */
 export const CombatFeature: IGameFeature = {
     id: 'combat',
@@ -77,10 +78,29 @@ export const CombatFeature: IGameFeature = {
                 if(outcome.killed && isMonster(outcome.targetObjectId)) overlay?.remove(outcome.targetObjectId);
             }
         });
+        session.events.on('mark', (objectId, icon) =>
+        {
+            if(icon) overlayOf()?.mark(objectId, icon);
+            else overlay?.mark(objectId, null);
+        });
         session.events.on('cast', (objectId, cast) =>
         {
             if(cast) overlayOf()?.startCast(objectId, cast.durationMs, cast.channel);
             else overlay?.endCast(objectId);
+        });
+
+        // A boss's phase (M1c): its line over it and in the log, from the content's texts.
+        session.events.on('yell', yell =>
+        {
+            const text = bits();
+            const line = text.textOr(yell.textKey, yell.textKey);
+            const id = room?.userDataManager.getUserDataByIndex(yell.objectId)?.name ?? '';
+
+            overlayOf()?.yell(yell.objectId, line);
+            host.made.hud?.addChatLine({
+                time: chatClock(Date.now() / 1000), channel: 'system', author: '',
+                message: text.text('vortex.combat.yell', 'monster', text.contentName(`${id}.name`, id), 'text', line)
+            });
         });
 
         session.events.on('self', vitals => host.made.hudPlayer?.update({

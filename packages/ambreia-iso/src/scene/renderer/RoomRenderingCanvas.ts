@@ -452,6 +452,26 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
         if(value !== null) this._master.addChildAt(value.view, this._master.getChildIndex(this._xray));
     }
 
+    private _overlay: Container | null = null;
+
+    /**
+     * Drawings over the room objects, under the x-ray copies, in the objects' own space: a point at
+     * the geometry's screen point of a location lands where that location's sprites do (the game's
+     * telegraphs, RoomEngine.showRpgTelegraph()). Made on first use.
+     */
+    // TS-only: no AS3 counterpart.
+    get overlay(): Container
+    {
+        if(this._overlay === null)
+        {
+            this._overlay = new Container({label: 'overlay', eventMode: 'none', interactiveChildren: false});
+            this._master.addChildAt(this._overlay, this._master.getChildIndex(this._display) + 1);
+            this._displayTransformDirty = true;
+        }
+
+        return this._overlay;
+    }
+
     /** The renderer the x-ray masks are stamped with (updateXray()); null leaves hidden avatars hidden. */
     // TS-only: see updateXray().
     public pixiRenderer: (() => Renderer | null) | null = null;
@@ -1771,7 +1791,7 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
             sortable.worldY = location.y;
             sortable.direction = object.getDirection()?.x ?? 0;
             sortable.objectType = object.getType();
-            sortable.fadable = sprite.spriteType !== RoomObjectSpriteType.ROOM_PLANE && RoomRenderingCanvas.isFurni(sortable.objectType);
+            sortable.fadable = sprite.spriteType !== RoomObjectSpriteType.ROOM_PLANE && RoomRenderingCanvas.isFurni(object);
             sortable.sprite = sprite;
 
             // An avatar's drawn sprite is one composed bitmap and has no library asset name of its
@@ -2542,12 +2562,20 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
         return false;
     }
 
-    /** A furni, by object type: not an avatar (user, pet, bot), the room or the tile cursor. */
+    /**
+     * A furni: not an avatar (user, pet, bot), the room or the tile cursor. A pet's object is typed by
+     * its content type (`dog`, a monster's own), never `pet` (RoomEngine.addObjectUser()): it is told
+     * by the `pet_type` its logic sets — without that, a monster faded like a furni hiding the player,
+     * was cut out of the discs and turned the player behind it into an x-ray.
+     */
     // TS-only: see SortableSprite.fadable.
-    private static isFurni(type: string): boolean
+    private static isFurni(object: IRoomObject): boolean
     {
+        const type = object.getType();
+
         return type !== RoomObjectUserTypes.USER && type !== RoomObjectUserTypes.PET && type !== RoomObjectUserTypes.BOT
-            && type !== RoomObjectUserTypes.RENTABLE_BOT && type !== 'room' && type !== 'tile_cursor';
+            && type !== RoomObjectUserTypes.RENTABLE_BOT && type !== 'room' && type !== 'tile_cursor'
+            && !object.getModel().hasNumber(RoomObjectVariableEnum.PET_TYPE);
     }
 
     /** The drawn rectangle of a sprite, left, top, right, bottom (a mirrored one extends leftward). */
@@ -2892,6 +2920,10 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
         this._xray.scale.set(this._scale);
         this._holes.position.set(this._screenOffsetX, this._screenOffsetY);
         this._holes.scale.set(this._scale);
+        // The sprites add half the canvas to their screen point (updateSprite()); the pivot does it here.
+        this._overlay?.position.set(this._screenOffsetX, this._screenOffsetY);
+        this._overlay?.scale.set(this._scale);
+        this._overlay?.pivot.set(-Math.floor(this._width / 2), -Math.floor(this._height / 2));
 
         if(this._display.x !== this._screenOffsetX) 
         {

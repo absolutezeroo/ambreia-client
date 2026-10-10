@@ -29,7 +29,9 @@ export const STATUS_ICONS: Readonly<Record<string, string>> = {
     'status.burning': `${STATUSES}icon_17`,
     'status.frozen': `${STATUSES}icon_02`,
     'status.renewed': `${STATUSES}icon_09`,
-    'status.aegis': `${STATUSES}icon_22`
+    'status.aegis': `${STATUSES}icon_22`,
+    'status.enraged': `${STATUSES}icon_14`,
+    'status.howling': `${STATUSES}icon_39`
 };
 
 const FALLBACK_SKILL = `${SKILLS}warrior_skill_icon_10`;

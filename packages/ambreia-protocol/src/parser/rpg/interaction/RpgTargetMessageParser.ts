@@ -7,6 +7,6 @@ export class RpgTargetMessageParser implements IIncomingParser<RpgTargetMessage>
 {
     parse(wrapper: IMessageDataWrapper): RpgTargetMessage
     {
-        return new RpgTargetMessage(wrapper.readInt(), wrapper.readString(), wrapper.readString(), wrapper.readInt(), wrapper.readString());
+        return new RpgTargetMessage(wrapper.readInt(), wrapper.readString(), wrapper.readString(), wrapper.readInt(), wrapper.readString(), wrapper.readString());
     }
 }

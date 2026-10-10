@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_combat_mark_xml" width="16" height="16" version="0.1">
+  <window>
+    <static_bitmap x="0" y="0" width="16" height="16" params="16" style="3" name="combat_mark" tags="%23icon">
+      <variables>
+        <var key="asset_uri" value="rpg/status-effects/icon_02" type="String"/>
+        <var key="stretched_x" value="true" type="Boolean"/>
+        <var key="stretched_y" value="true" type="Boolean"/>
+      </variables>
+    </static_bitmap>
+  </window>
+</layout>
