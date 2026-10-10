@@ -78,7 +78,6 @@ the origin is the tile centre on the floor.
     {"name": "snout", "bone": "head", "cone": {"from": [2.7, 0, -0.4], "to": [9.7, 0, -1.9], "radius": [2.4, 1.1]}, "material": "muzzle", "blend": 1.5},
     {"name": "wing", "bone": "wing.l", "membrane": {"points": [[0, 0, 0], [-4, 6, 8], [-14, 1, -4]], "thickness": 0.45}, "material": "membrane", "blend": 0}
   ],
-  "mirror": ["leg.r", "ear.r", "wing.r"],
   "decals": [
     {"kind": "eye", "bone": "head", "at": [3.1, 2, 1], "mirror": true, "colours": ["#e8b545", "#141418"]},
     {"kind": "pixel", "bone": "head", "at": [10.6, 0, -1], "colours": ["#101014"], "size": [1, 2]}
@@ -90,23 +89,24 @@ the origin is the tile centre on the floor.
 }
 ```
 
-- **Bones** form a tree (`parent`); `at` is the joint relative to the parent. A pose gives a bone a
-  `rotate` (degrees about its joint: about `u` first, then `s`, then `v`) and/or a `move` (added to
-  `at`, in the parent's space). Forward kinematics place every
-  bone; shapes and decals are in their bone's space, so they follow.
+- **Bones** form a tree (`parent`); `at` is the joint **in model space at rest**. A pose gives a bone
+  a `rotate` (degrees about its joint: about `u` first, then `s`, then `v`) and/or a `move` (added to
+  its joint). Shapes and decals are written **in model space at rest** and follow their bone.
 - **Shapes**: `ellipsoid`, `cone` (round cone, two radii) or `membrane` (triangle, thickness).
   `blend` is the smooth-minimum radius with what is drawn before (0 = hard edge). Order matters only
   for blending.
-- **Mirror**: `leg.r` is generated from `leg.l` by negating `s` (bones, shapes, decals). A rig only
-  writes one side.
+- **Mirror**: a bone named `*.l` gets a `*.r` twin (`s` negated). Shapes and decals on a `*.l` bone
+  are mirrored onto the twin unless `"mirror": false`; `"mirror": true` mirrors one on a central bone
+  (ears, eyes). A pose on a `*.l` bone moves its twin too, mirrored, unless the frame names the twin.
 - **Materials** pick a ramp, then the first `when` that matches: `normalUp`, `normalForward`
-  (model-space normal), `height` (`v` of the point), `along` (position 0..1 along a cone). `texture`
+  (the normal at rest), `height` (`v` of the point at rest), `forward` (its `u`), `along` (position 0..1
+  along a cone). `texture`
   is `fur`, `scales` or none; `specular` 0..1, `shininess`, `glint` (a colour).
 - **Decals**: `eye` (iris + pupil toward the facing side), `pixel` (a colour, a size). A decal shows
   only where the surface at its pixel is that point (depth test) and faces the camera.
 - **Animations**: the five names `build-monsters` knows. Each frame is a pose and a duration; `idle`
   and `walk` loop, `attack` and `hit` play once, `death` holds its last frame. `idle` and `walk` are
-  required.
+  required. A frame may set `"flash": true`: the hit flash, the whole sprite pale.
 
 Validation refuses, with the path of the error (`shapes[3].cone.radius`): an unknown bone or
 material, a cycle in the bones, a ramp that is not 5 colours, a missing `idle`/`walk`, a pose naming
