@@ -1,4 +1,5 @@
 import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
+import type {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
 import type {IWindow} from '@ambreia/ui/IWindow';
 import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 import type {IDropMenuWindow} from '@ambreia/ui/components/IDropMenuWindow';
@@ -14,7 +15,16 @@ import {SKILL_SLOTS} from '../hud/PlayerHudState';
 import {barSkill, type ISkillDefinition, type RpgSkillSession} from './RpgSkillSession';
 import {skillIcon} from './skillArt';
 
-type SkillsTab = 'tab_active' | 'tab_shortcuts';
+type SkillsTab = 'tab_active' | 'tab_passive' | 'tab_specs' | 'tab_shortcuts';
+
+const TABS: readonly SkillsTab[] = ['tab_active', 'tab_passive', 'tab_specs', 'tab_shortcuts'];
+
+const TAB_LAYOUTS: Readonly<Record<SkillsTab, string>> = {
+    tab_active: 'vortex_skill_tab_active_xml',
+    tab_passive: 'vortex_skill_tab_passive_xml',
+    tab_specs: 'vortex_skill_tab_specs_xml',
+    tab_shortcuts: 'vortex_skill_tab_shortcuts_xml'
+};
 
 /** What a skill does first, for its tag and the filter (M1b §6.6: its camp is its first effect's). */
 type SkillTag = 'damage' | 'heal' | 'effect';
@@ -22,9 +32,14 @@ type SkillTag = 'damage' | 'heal' | 'effect';
 /** The filter menu's entries, « Toutes » first. */
 const FILTERS: ReadonlyArray<SkillTag | null> = [null, 'damage', 'heal', 'effect'];
 
+/** The mock-up's bars: eight keys, the skills' six (M1b §9) then the HUD's first two item slots. */
+const BAR_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8'];
+/** The extra shortcuts of skills_shortcuts.png. */
+const EXTRA_KEYS = ['Q', 'E', 'R'];
+
 const UI = 'rpg/ui-icons/';
 
-/** The stat lines' icons (tinted, vortex_character_stat_row_xml): the mock-up's star, hourglass, eye, fist. */
+/** The stat lines' icons (tinted, vortex_character_stat_row_xml): the mock-up's star, hourglass, eye, flame, fist. */
 const STAT_LOOK = {
     mana: {icon: `${UI}rpg_stat_mp_mana_star_icon`, color: 0x3080e0},
     cooldown: {icon: `${UI}boardgames_chess_clock_timer_icon`, color: 0xa07840},
@@ -38,21 +53,27 @@ const STAT_LOOK = {
 /** Read by name at run time: decoded at load (IGameFeature.images). */
 export const SKILL_WINDOW_IMAGES: readonly string[] = [...new Set(Object.values(STAT_LOOK).map(look => look.icon))];
 
+/** skills_active.png shows five stat lines: the list's height holds no more. */
+const STAT_LINES = 5;
+
 /** The tag's colours (vortex_skill_header_xml's own for damage). */
 const TAG_COLORS: Readonly<Record<SkillTag, number>> = {damage: 0xf6c0b8, heal: 0xc8ecc0, effect: 0xdcd0f0};
 
-/** The states of states_skills.png: a tile, a bar slot and a list row, idle, selected, locked. */
+/** The states of states_skills.png: a tile, a bar slot and a list row, idle, selected, locked, disabled. */
 const TILE = 0xe4e4dc;
 const TILE_SELECTED = 0xfdefb6;
 const TILE_LOCKED = 0xd8d8d0;
 const ROW = 0xf2f2ec;
 const LOCKED_TEXT = 0xa0a098;
-
-/** The stat list's height once the ranks' part is gone: seven lines (cost, cooldown, range, cast, three effects). */
-const STATS_HEIGHT = 7 * 22;
+const SLOT_OFF = 0.5;
+/** The header's progress: green while ranks remain, yellow at the maximum (« En-tête au niveau max »). */
+const PROGRESS = 0x6cbb2d;
+const PROGRESS_MAX = 0xf0b030;
 
 /** A stat row's value ends this far from the detail's right edge, as in skills_active.png. */
 const STAT_VALUE_RIGHT = 56;
+/** A press becomes a drag past this many pixels. */
+const DRAG_START = 4;
 
 interface IStatLine
 {
@@ -81,15 +102,16 @@ export function tagOf(definition: ISkillDefinition): SkillTag
 }
 
 /**
- * The skills window (K, vortex_skill_xml, mockup/glaze/skills_*.png). « Actives »: the class's
- * skills as tiles (learned ones with their level, the others locked), filter and search, the
- * selected one's tag, description and stats (M1b §5, the server's definitions), and the action
- * bar. « Raccourcis »: the learned skills as a list, the main bar, the selected slot's details,
- * clear and restore. A skill chosen then a slot clicked puts it there; every change is an
- * RpgActionBarSet, and the window follows the RpgSkills that comes back.
+ * The skills window (K, vortex_skill_xml), as mockup/glaze/skills_*.png draws it, whole.
+ * « Actives »: the class's skills as tiles (learned ones with their level, the others locked),
+ * filter and search, the selected one's rank, tag, description, stats and next level, and the
+ * action bar. « Raccourcis »: the learned skills, the main bar, the extra shortcuts, the selected
+ * slot's details and the bar's management. A skill dragged (or chosen, then a slot clicked) onto a
+ * slot goes there: an RpgActionBarSet, and the window follows the RpgSkills that comes back.
  *
- * Not on the wire in M1b, so disabled or hidden: the passives and specialisations tabs, the skills'
- * ranks (progress, « Niveau suivant », « Améliorer »), the extra shortcuts and the shortcut settings.
+ * What M1b has no data for is drawn in its empty or maximum state (states_skills.png) and does
+ * nothing: each skill has one rank (« Niveau 1 / 1 », « Niveau maximum atteint »), there are no
+ * passives nor specialisations, slots 7–8 and Q/E/R wait for the consumables, the settings are off.
  */
 export class SkillsWindow
 {
@@ -105,9 +127,12 @@ export class SkillsWindow
     private _slot = 0;
     private _filter: SkillTag | null = null;
     private _search = '';
+    /** A learned skill pressed: dragged once the pointer moved, dropped on a slot or anywhere. */
+    private _drag: {skillId: string; x: number; y: number; ghost: IWindowContainer | null} | null = null;
     private _disposed = false;
 
     private readonly _onSkills = (): void => this.render();
+    private readonly _onPointerMove = (event: PointerEvent): void => this.moveDrag(event.clientX, event.clientY);
 
     constructor(
         private readonly _windows: IHabboWindowManager,
@@ -142,6 +167,7 @@ export class SkillsWindow
 
     hide(): void
     {
+        this.endDrag();
         if(this._window) this._window.visible = false;
     }
 
@@ -157,69 +183,47 @@ export class SkillsWindow
 
         const window = buildFrame(this._windows, 'vortex_skill_xml', this._onEvent);
         const content = window?.findChildByName('tab_content') as IWindowContainer | null;
-        const active = this._windows.buildWidgetLayout('vortex_skill_tab_active_xml') as IWindowContainer | null;
-        const shortcuts = this._windows.buildWidgetLayout('vortex_skill_tab_shortcuts_xml') as IWindowContainer | null;
-        const header = this._windows.buildWidgetLayout('vortex_skill_header_xml') as IWindowContainer | null;
-        const headerSlot = active?.findChildByName('skill_header_slot') as IWindowContainer | null;
 
-        if(!window || !content || !active || !shortcuts || !header || !headerSlot)
+        if(!window || !content) return false;
+
+        for(const tab of TABS)
         {
-            for(const built of [header, shortcuts, active, window]) built?.destroy();
+            const built = this._windows.buildWidgetLayout(TAB_LAYOUTS[tab]) as IWindowContainer | null;
 
-            return false;
+            if(!built)
+            {
+                window.destroy();
+                this._tabs.clear();
+
+                return false;
+            }
+
+            this._tabs.set(tab, built);
+            content.addChild(built);
         }
 
         this._window = window;
-        this._header = header;
-        this._tabs.set('tab_active', active);
-        this._tabs.set('tab_shortcuts', shortcuts);
-        content.addChild(active);
-        content.addChild(shortcuts);
-        headerSlot.addChild(header);
+        this._header = this.addHeader('tab_active');
+        this.buildPassives();
+        this.buildSpecs();
+        this.buildFilters();
+        this.buildBar('tab_active', 'action_bar_slots', BAR_KEYS);
+        this.buildBar('tab_shortcuts', 'main_bar_slots', BAR_KEYS);
+        this.buildBar('tab_shortcuts', 'extra_slots', EXTRA_KEYS);
 
-        // The skills have no ranks in M1b: no progress, next level nor upgrade. The stats take
-        // their room (an effect line or two more than the mock-up's five), the rule under them follows.
-        this._bits.setVisible(header, false, 'skill_progress', 'points');
-        this._bits.setVisible(active, false, 'next_level_title', 'upgrade_list', 'upgrade_button', 'upgrade_hint');
-
-        const stats = active.findChildByName('stat_list');
-        const detail = active.findChildByName('skill_detail') as IWindowContainer | null;
-
-        if(stats && detail)
-        {
-            for(let i = 0; i < detail.numChildren; i++)
-            {
-                const rule = detail.getChildAt(i);
-
-                // The unnamed 1 px rule under the stats.
-                if(rule && rule.height === 1 && rule.y > stats.y) rule.y = stats.y + STATS_HEIGHT + 4;
-            }
-
-            stats.height = STATS_HEIGHT;
-        }
-        this._bits.setText(active, 'bar_hint', this._bits.text('vortex.skill.action_bar.assign'));
-        // No extra shortcuts nor shortcut settings on the server yet.
-        this._bits.setText(shortcuts, 'extra_hint', this._bits.text('vortex.skill.soon'));
-        for(const name of ['show_shortcuts', 'swap_bars', 'out_of_combat', 'reset_shortcuts_button']) shortcuts.findChildByName(name)?.disable();
-
+        const active = this._tabs.get('tab_active')!;
+        const shortcuts = this._tabs.get('tab_shortcuts')!;
         const grid = active.findChildByName('skill_grid') as IItemGridWindow | null;
 
         // The layout's `spacing` does not reach a scrollable grid's inner grid (InventoryView).
         if(grid) grid.spacing = 6;
 
-        const menus = [...this._tabs.values()].map(tab => tab.findChildByName('type_filter') as IDropMenuWindow | null);
-
-        // All filled before any is set: setting one tells the other (onSelected()).
-        for(const menu of menus) menu?.populate(FILTERS.map(filter => this.filterName(filter)));
-        for(const menu of menus) if(menu) menu.selection = 0;
-
-        this.buildSlots('tab_active', 'action_bar_slots');
-        this.buildSlots('tab_shortcuts', 'main_bar_slots');
+        // One rank per skill in M1b: the next level's title says so without a number.
+        this._bits.setText(active, 'next_level_title', this._bits.text('vortex.skill.next_level.title'));
+        active.findChildByName('upgrade_button')?.disable();
+        for(const name of ['show_shortcuts', 'swap_bars', 'out_of_combat']) shortcuts.findChildByName(name)?.disable();
 
         const tabs = window.findChildByName('tab_context') as ITabContextWindow | null;
-
-        for(const name of ['tab_passive', 'tab_specs']) tabs?.getTabItemByName(name)?.disable();
-
         const first = tabs?.getTabItemByName(this._tab);
 
         if(tabs?.selector && first) tabs.selector.setSelected(first);
@@ -228,24 +232,99 @@ export class SkillsWindow
         return true;
     }
 
-    private buildSlots(tab: SkillsTab, listName: string): void
+    /** A vortex_skill_header_xml in the tab's skill_header_slot. */
+    private addHeader(tab: SkillsTab): IWindowContainer | null
+    {
+        const slot = this._tabs.get(tab)?.findChildByName('skill_header_slot') as IWindowContainer | null;
+        const header = slot ? this._windows.buildWidgetLayout('vortex_skill_header_xml') as IWindowContainer | null : null;
+
+        if(slot && header) slot.addChild(header);
+
+        return header;
+    }
+
+    /** No passive skill in M1b: the tab in its empty state, its banner, its upgrade off. */
+    private buildPassives(): void
+    {
+        const tab = this._tabs.get('tab_passive')!;
+        const banner = this._windows.buildWidgetLayout('vortex_skill_info_banner_xml') as IWindowContainer | null;
+
+        if(banner) (tab.findChildByName('info_banner_slot') as IWindowContainer | null)?.addChild(banner);
+
+        const header = this.addHeader('tab_passive');
+
+        if(header)
+        {
+            this._bits.setVisible(header, false, 'skill_icon', 'skill_progress', 'skill_tag', 'skill_level');
+            this._bits.setText(header, 'skill_name', this._bits.text('vortex.skill.passive.none'));
+            this._bits.setText(header, 'skill_desc', '');
+        }
+
+        this._bits.setText(tab, 'current_effect', '');
+        this._bits.setText(tab, 'next_effect', '');
+        // The layout's captions wait for a rank and a cost: without a passive, their bare words.
+        this._bits.setText(tab, 'next_level_title', this._bits.text('vortex.skill.next_level.title'));
+        this._bits.setText(tab, 'upgrade_button', this._bits.text('vortex.skill.upgrade.bare'));
+        tab.findChildByName('upgrade_button')?.disable();
+    }
+
+    /** No specialisation in M1b: no tree, no point, its buttons off. */
+    private buildSpecs(): void
+    {
+        const tab = this._tabs.get('tab_specs')!;
+        const header = this.addHeader('tab_specs');
+
+        this._bits.setText(tab, 'points_txt', this._bits.text('vortex.skill.specs.points', 'count', '0'));
+        this._bits.setVisible(tab, false, 'next_level_title');
+        this._bits.setText(tab, 'add_point_button', this._bits.text('vortex.skill.specs.no_point'));
+        for(const name of ['reset_all_button', 'add_point_button']) tab.findChildByName(name)?.disable();
+
+        if(header)
+        {
+            this._bits.setVisible(header, false, 'skill_icon', 'skill_progress', 'skill_tag', 'skill_level');
+            this._bits.setText(header, 'skill_name', this._bits.text('vortex.skill.specs.none'));
+            this._bits.setText(header, 'skill_desc', '');
+        }
+    }
+
+    private buildFilters(): void
+    {
+        const menus = [...this._tabs.values()].map(tab => tab.findChildByName('type_filter') as IDropMenuWindow | null);
+
+        // All filled before any is set: setting one tells the others (onSelected()).
+        for(const menu of menus) menu?.populate(FILTERS.map(filter => this.filterName(filter)));
+        for(const menu of menus) if(menu) menu.selection = 0;
+    }
+
+    /** A bar of vortex_skill_action_slot_xml, one per key; only the skills' six take a skill. */
+    private buildBar(tab: SkillsTab, listName: string, keys: readonly string[]): void
     {
         const list = this._tabs.get(tab)?.findChildByName(listName) as IItemListWindow | null;
         const slots: IWindowContainer[] = [];
 
-        for(let i = 0; i < SKILL_SLOTS; i++)
+        keys.forEach((key, i) =>
         {
             const slot = this._windows.buildWidgetLayout('vortex_skill_action_slot_xml') as IWindowContainer | null;
 
-            if(!slot || !list) break;
+            if(!slot || !list) return;
 
-            this._bits.setText(slot, 'slot_key', String(i + 1));
-            slot.procedure = this._onEvent;
+            this._bits.setText(slot, 'slot_key', key);
             list.addListItem(slot);
-            slots.push(slot);
-        }
 
-        this._slots.set(tab, slots);
+            if(keys === BAR_KEYS && i < SKILL_SLOTS)
+            {
+                slot.procedure = this._onEvent;
+                slots.push(slot);
+            }
+            else
+            {
+                // Consumables and extra keys come later: an empty « + », dimmed.
+                this.renderSlot(slot, null, false);
+                slot.blend = SLOT_OFF;
+            }
+        });
+
+        if(keys === BAR_KEYS) this._slots.set(tab, slots);
     }
 
     private showTab(): void
@@ -323,33 +402,75 @@ export class SkillsWindow
             grid.addGridItem(tile);
         }
 
-        const header = this._header;
         const selected = this._selected;
         const definition = selected === null ? null : this._session.definition(selected);
+        const learned = selected !== null && this._session.known.includes(selected);
 
-        if(header)
+        if(this._header)
         {
-            header.visible = selected !== null;
-
-            if(selected !== null)
-            {
-                const tag = definition === null ? null : tagOf(definition);
-
-                this.setIcon(header, 'skill_icon', selected);
-                this._bits.setText(header, 'skill_name', this.name(selected));
-                this._bits.setText(header, 'skill_level', definition === null ? '' : this._bits.text('vortex.skill.learned_at', 'level', String(definition.level)));
-                this._bits.setText(header, 'skill_desc', this._bits.textOr(`${selected}.description`, ''));
-                this._bits.setVisible(header, tag !== null, 'skill_tag');
-
-                if(tag !== null)
-                {
-                    this._bits.setColor(header, 'skill_tag', TAG_COLORS[tag]);
-                    this._bits.setText(header, 'skill_tag_txt', this.filterName(tag));
-                }
-            }
+            this._header.visible = selected !== null;
+            if(selected !== null) this.renderHeader(this._header, selected, definition, learned);
         }
 
         this.renderStats(tab, definition);
+        this.renderNextLevel(tab, definition, learned);
+    }
+
+    /** Icon, name, rank and its bar, tag, description (skills_active.png's top right). */
+    private renderHeader(header: IWindowContainer, skillId: string, definition: ISkillDefinition | null, learned: boolean): void
+    {
+        const tag = definition === null ? null : tagOf(definition);
+        const rank = learned ? 1 : 0;
+
+        this.setIcon(header, 'skill_icon', skillId);
+        this._bits.setText(header, 'skill_name', this.name(skillId));
+        this._bits.setText(header, 'skill_level', this._bits.text('vortex.skill.rank', 'level', String(rank), 'max', '1'));
+        this._bits.setText(header, 'skill_desc', this._bits.textOr(`${skillId}.description`, ''));
+        this.setProgress(header, rank, 1);
+        this._bits.setVisible(header, tag !== null, 'skill_tag');
+
+        if(tag !== null)
+        {
+            this._bits.setColor(header, 'skill_tag', TAG_COLORS[tag]);
+            this._bits.setText(header, 'skill_tag_txt', this.filterName(tag));
+        }
+    }
+
+    /** The header's bar: `rank / max`, « Niveau max » in yellow once full. */
+    private setProgress(header: IWindowContainer, rank: number, max: number): void
+    {
+        const progress = header.findChildByName('skill_progress') as IWindowContainer | null;
+        const background = progress?.findChildByName('bg') ?? null;
+        const fill = progress?.findChildByName('fill') ?? null;
+
+        if(!progress || !background || !fill) return;
+
+        const full = rank >= max;
+
+        fill.visible = rank > 0;
+        fill.width = Math.round(background.width * Math.min(1, rank / max));
+        fill.color = full ? PROGRESS_MAX : PROGRESS;
+        this._bits.setText(progress, 'points', full ? this._bits.text('vortex.skill.max_rank') : `${rank} / ${max}`);
+    }
+
+    /** « Niveau suivant » and « Améliorer »: none in M1b, so the maximum's state, or what unlocks it. */
+    private renderNextLevel(tab: IWindowContainer, definition: ISkillDefinition | null, learned: boolean): void
+    {
+        const list = tab.findChildByName('upgrade_list') as IItemListWindow | null;
+        const button = tab.findChildByName('upgrade_button');
+        const level = String(definition?.level ?? '');
+
+        list?.destroyListItems();
+
+        const row = this._windows.buildWidgetLayout('vortex_skill_upgrade_row_xml') as IWindowContainer | null;
+
+        if(row && list)
+        {
+            this._bits.setText(row, 'upgrade_txt', learned ? this._bits.text('vortex.skill.no_next') : this._bits.text('vortex.skill.unlock_at', 'level', level));
+            list.addListItem(row);
+        }
+
+        if(button) button.caption = learned ? this._bits.text('vortex.skill.max_rank.button') : this._bits.text('vortex.skill.required_level', 'level', level);
     }
 
     private renderShortcuts(learned: readonly ISkillEntry[]): void
@@ -369,7 +490,7 @@ export class SkillsWindow
 
             this.setIcon(row, 'skill_icon', entry.skillId);
             this._bits.setText(row, 'skill_name', this.name(entry.skillId));
-            this._bits.setText(row, 'skill_level', this._bits.text('vortex.ui.level.short', 'level', String(entry.level)));
+            this._bits.setText(row, 'skill_level', this._bits.text('vortex.skill.rank.short', 'level', '1'));
             row.color = entry.skillId === this._selected ? TILE_SELECTED : ROW;
             row.procedure = this._onEvent;
             this._skills.set(row, entry.skillId);
@@ -384,9 +505,9 @@ export class SkillsWindow
 
         this.setIcon(detail, 'shortcut_icon', skillId);
         this._bits.setText(detail, 'shortcut_name', skillId === null ? this._bits.text('vortex.skill.shortcuts.empty') : this.name(skillId));
-        this._bits.setText(detail, 'shortcut_level', skillId === null ? '' : this._bits.text('vortex.ui.level.short', 'level', String(this._session.definition(skillId)?.level ?? '')));
+        this._bits.setText(detail, 'shortcut_level', skillId === null ? '' : this._bits.text('vortex.skill.rank', 'level', '1', 'max', '1'));
         this._bits.setText(detail, 'shortcut_desc', skillId === null ? '' : this._bits.textOr(`${skillId}.description`, ''));
-        this._bits.setText(detail, 'assigned_key', String(this._slot + 1));
+        this._bits.setText(detail, 'assigned_key', BAR_KEYS[this._slot]);
 
         const unassign = detail.findChildByName('unassign_button');
 
@@ -413,7 +534,7 @@ export class SkillsWindow
         }
     }
 
-    /** Cost, cooldown, range, cast time, then what it does, from the server's definition. */
+    /** The mock-up's lines from the server's definition: cost, cooldown, range, effect, base amount. */
     private renderStats(tab: IWindowContainer, definition: ISkillDefinition | null): void
     {
         const list = tab.findChildByName('stat_list') as IItemListWindow | null;
@@ -424,7 +545,7 @@ export class SkillsWindow
 
         if(!definition) return;
 
-        for(const line of this.statLines(definition))
+        for(const line of this.statLines(definition).slice(0, STAT_LINES))
         {
             const row = this._windows.buildWidgetLayout('vortex_character_stat_row_xml') as IWindowContainer | null;
             const value = row?.findChildByName('value') ?? null;
@@ -444,6 +565,7 @@ export class SkillsWindow
         }
     }
 
+    /** In skills_active.png's order; the cast time last, shown when the list has room for it. */
     private statLines(definition: ISkillDefinition): IStatLine[]
     {
         const text = this._bits;
@@ -454,18 +576,14 @@ export class SkillsWindow
         const lines: IStatLine[] = [
             {look: STAT_LOOK.mana, label: text.text('vortex.skill.mana_cost'), value: String(definition.cost)},
             {look: STAT_LOOK.cooldown, label: text.text('vortex.skill.cooldown'), value: definition.cooldownMs > 0 ? seconds(definition.cooldownMs) : text.text('vortex.skill.none')},
-            {look: STAT_LOOK.range, label: text.text('vortex.skill.range'), value: definition.range > 0 ? text.text('vortex.skill.tiles', 'count', String(definition.range)) : text.text('vortex.skill.range.self')},
-            {
-                look: STAT_LOOK.cast,
-                label: text.text(definition.type === 'channel' ? 'vortex.skill.channel_time' : 'vortex.skill.cast_time'),
-                value: definition.type === 'cast' ? seconds(definition.castMs) : definition.type === 'channel' ? seconds(definition.channelMs) : text.text('vortex.skill.instant')
-            }
+            {look: STAT_LOOK.range, label: text.text('vortex.skill.range'), value: definition.range > 0 ? text.text('vortex.skill.tiles', 'count', String(definition.range)) : text.text('vortex.skill.range.self')}
         ];
+        const amounts: IStatLine[] = [];
 
         for(const effect of definition.effects)
         {
-            if(effect.kind === 'damage') lines.push({look: STAT_LOOK.damage, label: text.text('vortex.skill.base_damage'), value: amount(effect.base, effect.coefficient)});
-            else if(effect.kind === 'heal') lines.push({look: STAT_LOOK.heal, label: text.text('vortex.skill.base_heal'), value: amount(effect.base, effect.coefficient)});
+            if(effect.kind === 'damage') amounts.push({look: STAT_LOOK.damage, label: text.text('vortex.skill.base_damage'), value: amount(effect.base, effect.coefficient)});
+            else if(effect.kind === 'heal') amounts.push({look: STAT_LOOK.heal, label: text.text('vortex.skill.base_heal'), value: amount(effect.base, effect.coefficient)});
             else if(effect.kind === 'apply_status' && effect.status !== null)
             {
                 const status = this._session.statusDefinition(effect.status);
@@ -479,7 +597,11 @@ export class SkillsWindow
             }
         }
 
-        return lines;
+        return [...lines, ...amounts, {
+            look: STAT_LOOK.cast,
+            label: text.text(definition.type === 'channel' ? 'vortex.skill.channel_time' : 'vortex.skill.cast_time'),
+            value: definition.type === 'cast' ? seconds(definition.castMs) : definition.type === 'channel' ? seconds(definition.channelMs) : text.text('vortex.skill.instant')
+        }];
     }
 
     private filterName(filter: SkillTag | null): string
@@ -510,6 +632,14 @@ export class SkillsWindow
         return slot ? (this._slots.get(this._tab) ?? []).indexOf(slot as IWindowContainer) : -1;
     }
 
+    /** The bar slot of the shown tab under this desktop point, or -1. */
+    private slotAt(x: number, y: number): number
+    {
+        const point = {x, y};
+
+        return (this._slots.get(this._tab) ?? []).findIndex(slot => slot.hitTestGlobalPoint(point));
+    }
+
     /** The tile or row `window` is in: its skill, or null. */
     private skillOf(window: IWindow): string | null
     {
@@ -521,6 +651,65 @@ export class SkillsWindow
         }
 
         return null;
+    }
+
+    private startDrag(skillId: string, x: number, y: number): void
+    {
+        this.endDrag();
+        this._drag = {skillId, x, y, ghost: null};
+        globalThis.addEventListener?.('pointermove', this._onPointerMove);
+    }
+
+    /** Past DRAG_START the skill's icon follows the pointer, over everything. */
+    private moveDrag(x: number, y: number): void
+    {
+        const drag = this._drag;
+
+        if(!drag) return;
+
+        if(!drag.ghost)
+        {
+            if(Math.abs(x - drag.x) < DRAG_START && Math.abs(y - drag.y) < DRAG_START) return;
+
+            const desktop = this._window?.parent as IWindowContainer | null;
+            const ghost = this._windows.buildWidgetLayout('vortex_skill_action_slot_xml') as IWindowContainer | null;
+
+            if(!desktop || !ghost) return;
+
+            this.renderSlot(ghost, drag.skillId, true);
+            this._bits.setText(ghost, 'slot_key', '');
+            ghost.blend = 0.85;
+            desktop.addChild(ghost);
+            drag.ghost = ghost;
+        }
+
+        drag.ghost.x = Math.round(x - drag.ghost.width / 2);
+        drag.ghost.y = Math.round(y - drag.ghost.width / 2);
+    }
+
+    /** The drop: on a slot of the shown tab, the skill goes there. */
+    private drop(x: number, y: number): void
+    {
+        const drag = this._drag;
+
+        this.endDrag();
+
+        if(!drag?.ghost) return;
+
+        const slot = this.slotAt(x, y);
+
+        if(slot >= 0)
+        {
+            this._slot = slot;
+            this._session.setBar(slot, `skill:${drag.skillId}`);
+        }
+    }
+
+    private endDrag(): void
+    {
+        globalThis.removeEventListener?.('pointermove', this._onPointerMove);
+        this._drag?.ghost?.destroy();
+        this._drag = null;
     }
 
     /** The learned skills in level order, then empty slots: what choosing the class does (M1b §9). */
@@ -537,9 +726,9 @@ export class SkillsWindow
         // From the tab button or from its context, depending on who dispatches it.
         const name = window.name === 'tab_context' ? (window as ITabContextWindow).selector?.getSelected()?.name ?? '' : window.name;
 
-        if((name === 'tab_active' || name === 'tab_shortcuts') && name !== this._tab)
+        if(TABS.includes(name as SkillsTab) && name !== this._tab)
         {
-            this._tab = name;
+            this._tab = name as SkillsTab;
             this.showTab();
             this.render();
 
@@ -552,12 +741,12 @@ export class SkillsWindow
 
         this._filter = FILTERS[selection] ?? null;
 
-        // Both tabs' menus say the same.
+        // Every tab's menu says the same.
         for(const tab of this._tabs.values())
         {
             const menu = tab.findChildByName('type_filter') as IDropMenuWindow | null;
 
-            // Only on a change: the other menu's own event comes back here.
+            // Only on a change: the other menus' own events come back here.
             if(menu && menu !== window && menu.selection !== selection && selection < menu.numMenuItems) menu.selection = selection;
         }
 
@@ -613,12 +802,25 @@ export class SkillsWindow
             return;
         }
 
+        // A learned skill pressed may be dragged; its release, over a slot or not, ends the drag.
+        if(event.type === 'WME_DOWN' || event.type === 'WME_UP' || event.type === 'WME_UP_OUTSIDE')
+        {
+            const mouse = event as WindowMouseEvent;
+            const skillId = this.skillOf(window);
+
+            if(event.type !== 'WME_DOWN') this.drop(mouse.stageX, mouse.stageY);
+            else if(skillId !== null && this._session.known.includes(skillId)) this.startDrag(skillId, mouse.stageX, mouse.stageY);
+
+            return;
+        }
+
         if(event.type !== 'WME_CLICK') return;
 
         switch(window.name)
         {
             case 'header_button_close': this.hide(); return;
             case 'reset_bar_button':
+            case 'reset_shortcuts_button':
             case 'restore_defaults_button': this.restoreDefaults(); return;
             case 'clear_all_button': for(let i = 0; i < SKILL_SLOTS; i++) this._session.setBar(i, ''); return;
             case 'unassign_button': this._session.setBar(this._slot, ''); return;
@@ -644,6 +846,7 @@ export class SkillsWindow
         if(this._disposed) return;
 
         this._disposed = true;
+        this.endDrag();
         this._session.events.off('skills', this._onSkills);
         this._window?.destroy();
         this._window = this._header = null;
