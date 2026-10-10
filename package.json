@@ -29,7 +29,7 @@
   "dependencies": {
     "vite": "^6.4.3"
   },
-  "packageManager": "pnpm@11.8.0",
+  "packageManager": "pnpm@12.11.2",
   "engines": {
     "node": ">=22",
     "pnpm": ">=11"
