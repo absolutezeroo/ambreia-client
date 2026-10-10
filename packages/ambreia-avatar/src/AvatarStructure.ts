@@ -132,6 +132,11 @@ export class AvatarStructure
             if(liDef) liDef.appendToFigure = true;
             if(ribDef) ribDef.appendToFigure = true;
 
+            // Ambreia's `rif`: the part of a weapon drawn over the arm (geometry: rightarm).
+            const rifDef = this._partSetsData.getPartDefinition('rif');
+
+            if(rifDef) rifDef.appendToFigure = true;
+
             return true;
         }
 

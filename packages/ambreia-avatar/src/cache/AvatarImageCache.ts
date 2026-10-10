@@ -672,7 +672,7 @@ export class AvatarImageCache
                 }
                 // DEVIATION: Ambreia's `rib` (the weapon behind the body) is drawn like `ri`, so both
                 // halves of a weapon share one placement.
-                else if(currentPartType === 'ri' || currentPartType === 'rib')
+                else if(currentPartType === 'ri' || currentPartType === 'rib' || currentPartType === 'rif')
                 {
                     isPartFlipped = true;
                 }

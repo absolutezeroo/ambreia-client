@@ -31,8 +31,9 @@ export const PART_BASE = 9000;
 // Bows and crossbows are held differently (left hand, across the body): not swung.
 const SKIPPED = new Set([8, 9, 10, 11, 28, 29, 30, 31]);
 // The icons' own axes: the blade runs from the hilt toward the top-right, its edge faces top-left.
-const ICON_TIP = [Math.SQRT1_2, -Math.SQRT1_2];
-const ICON_EDGE = [-Math.SQRT1_2, -Math.SQRT1_2];
+export const ICON_AXES = {tip: [Math.SQRT1_2, -Math.SQRT1_2], edge: [-Math.SQRT1_2, -Math.SQRT1_2]};
+/** A weapon drawn upright: tip up, edge to the left. */
+export const UPRIGHT_AXES = {tip: [0, -1], edge: [-1, 0]};
 // The hand closes this many pixels above the end of the handle.
 const GRIP = 3;
 
@@ -107,7 +108,7 @@ export function scale2x({data, width, height})
 }
 
 /** Where the hand closes, in icon pixels: GRIP px up the blade from the end of the handle, mid-width. */
-export function iconGrip(icon)
+export function iconGrip(icon, {tip} = ICON_AXES)
 {
     const pixels = [];
 
@@ -115,7 +116,7 @@ export function iconGrip(icon)
     {
         if(icon.data[(y * icon.width + x) * 4 + 3] === 0) continue;
 
-        pixels.push([x + 0.5, y + 0.5, (x + 0.5) * ICON_TIP[0] + (y + 0.5) * ICON_TIP[1]]);
+        pixels.push([x + 0.5, y + 0.5, (x + 0.5) * tip[0] + (y + 0.5) * tip[1]]);
     }
 
     if(pixels.length === 0) throw new Error('empty icon');
@@ -132,7 +133,7 @@ export function iconGrip(icon)
  * and edge axes, sampled from the icon at 8x (Scale2x three times) so the palette stays the icon's.
  * Returns the two layers on one box and the grip's pixel inside it.
  */
-export function drawFrame(icon, big, grip, frame, direction, trailFrom = null)
+export function drawFrame(icon, big, grip, frame, direction, trailFrom = null, {tip, edge: side} = ICON_AXES)
 {
     const blade = unit(frame.blade);
     const raw = frame.edge;
@@ -153,8 +154,8 @@ export function drawFrame(icon, big, grip, frame, direction, trailFrom = null)
 
     const toScreen = (x, y) =>
     {
-        const a = (x - grip[0]) * ICON_TIP[0] + (y - grip[1]) * ICON_TIP[1];
-        const p = (x - grip[0]) * ICON_EDGE[0] + (y - grip[1]) * ICON_EDGE[1];
+        const a = (x - grip[0]) * tip[0] + (y - grip[1]) * tip[1];
+        const p = (x - grip[0]) * side[0] + (y - grip[1]) * side[1];
 
         return [a * T[0] + p * E[0], a * T[1] + p * E[1], a, p];
     };
@@ -163,7 +164,7 @@ export function drawFrame(icon, big, grip, frame, direction, trailFrom = null)
     {
         const a = (sx * E[1] - sy * E[0]) / D, p = (T[0] * sy - T[1] * sx) / D;
 
-        return [grip[0] + a * ICON_TIP[0] + p * ICON_EDGE[0], grip[1] + a * ICON_TIP[1] + p * ICON_EDGE[1], a, p];
+        return [grip[0] + a * tip[0] + p * side[0], grip[1] + a * tip[1] + p * side[1], a, p];
     };
     const hand = HAND_BODY[frame.pose];
     const inFront = (a, p) => hand.f + a * blade.f + (edge ? p * edge.f : 0) >= 0;
@@ -270,13 +271,6 @@ function nitro(files)
     return Buffer.concat(parts);
 }
 
-async function readIcon(file)
-{
-    const {data, info} = await sharp(file).ensureAlpha().raw().toBuffer({resolveWithObject: true});
-
-    return {data, width: info.width, height: info.height};
-}
-
 /** Shelf packing of the images into one sheet, 1 px apart. */
 function pack(images, sheetWidth)
 {
@@ -290,6 +284,68 @@ function pack(images, sheetWidth)
     }
 
     return y + row;
+}
+
+/** Every frame of one weapon, both layers, as named avatar assets with their offsets. */
+export function weaponImages(id, icon, axes = ICON_AXES)
+{
+    const images = [];
+    const big = scale2x(scale2x(scale2x(icon))), grip = iconGrip(icon, axes);
+
+    SWING.forEach((frame, k) =>
+    {
+        for(let direction = 0; direction < 8; direction++)
+        {
+            const trailFrom = frame.trail ? {frame: SWING[frame.trail.from], alpha: frame.trail.alpha} : null;
+            const drawn = drawFrame(icon, big, grip, frame, direction, trailFrom, axes);
+            const hand = HAND[frame.pose][direction];
+
+            // A few stray pixels (a pommel past the body plane) are not worth a second image.
+            const [larger, smaller] = opaque(drawn.front) >= opaque(drawn.back) ? [drawn.front, drawn.back] : [drawn.back, drawn.front];
+
+            if(opaque(smaller) < 8) merge(smaller, larger);
+
+            for(const [part, pixels] of [['ri', drawn.front], ['rib', drawn.back]])
+            {
+                if(opaque(pixels) === 0) continue;
+
+                images.push({name: `h_${frame.pose}_${part}_${id}_${direction}_${k}`, width: drawn.width, height: drawn.height, pixels,
+                    asset: {x: drawn.grip[0] - hand[0], y: drawn.grip[1] - hand[1]}});
+            }
+        }
+    });
+
+    return images;
+}
+
+/** The `ambreia_weapons` bundle holding `images` on one sheet. */
+export async function libraryNitro(images)
+{
+    images.sort((a, b) => b.height - a.height);
+
+    const sheetWidth = 2048, sheetHeight = pack(images, sheetWidth);
+    const pixels = Buffer.alloc(sheetWidth * sheetHeight * 4);
+    const frames = {}, assets = {};
+
+    for(const image of images)
+    {
+        for(let line = 0; line < image.height; line++) image.pixels.copy(pixels, ((image.y + line) * sheetWidth + image.x) * 4, line * image.width * 4, (line + 1) * image.width * 4);
+
+        frames[`${LIBRARY}_${image.name}`] = {frame: {x: image.x, y: image.y, w: image.width, h: image.height}, sourceSize: {w: image.width, h: image.height}, spriteSourceSize: {x: 0, y: 0, w: image.width, h: image.height}, rotated: false, trimmed: false};
+        assets[image.name] = image.asset;
+    }
+
+    const png = await sharp(pixels, {raw: {width: sheetWidth, height: sheetHeight, channels: 4}}).png().toBuffer();
+    const json = {type: 'avatar', name: LIBRARY, assets, spritesheet: {meta: {image: `${LIBRARY}.png`, format: 'RGBA8888', size: {w: sheetWidth, h: sheetHeight}, scale: 1}, frames}};
+
+    return nitro([[`${LIBRARY}.json`, Buffer.from(JSON.stringify(json))], [`${LIBRARY}.png`, png]]);
+}
+
+export async function readIcon(file)
+{
+    const {data, info} = await sharp(file).ensureAlpha().raw().toBuffer({resolveWithObject: true});
+
+    return {data, width: info.width, height: info.height};
 }
 
 async function main()
@@ -312,47 +368,10 @@ async function main()
 
         if(n === undefined || SKIPPED.has(Number(n))) continue;
 
-        const id = PART_BASE + Number(n), icon = await readIcon(join(ICONS, file));
-        const big = scale2x(scale2x(scale2x(icon))), grip = iconGrip(icon);
+        const id = PART_BASE + Number(n);
 
         ids.push(id);
-
-        SWING.forEach((frame, k) =>
-        {
-            for(let direction = 0; direction < 8; direction++)
-            {
-                const trailFrom = frame.trail ? {frame: SWING[frame.trail.from], alpha: frame.trail.alpha} : null;
-                const drawn = drawFrame(icon, big, grip, frame, direction, trailFrom);
-                const hand = HAND[frame.pose][direction];
-
-                // A few stray pixels (a pommel past the body plane) are not worth a second image.
-                const [larger, smaller] = opaque(drawn.front) >= opaque(drawn.back) ? [drawn.front, drawn.back] : [drawn.back, drawn.front];
-
-                if(opaque(smaller) < 8) merge(smaller, larger);
-
-                for(const [part, pixels] of [['ri', drawn.front], ['rib', drawn.back]])
-                {
-                    if(opaque(pixels) === 0) continue;
-
-                    images.push({name: `h_${frame.pose}_${part}_${id}_${direction}_${k}`, width: drawn.width, height: drawn.height, pixels,
-                        asset: {x: drawn.grip[0] - hand[0], y: drawn.grip[1] - hand[1]}});
-                }
-            }
-        });
-    }
-
-    images.sort((a, b) => b.height - a.height);
-
-    const sheetWidth = 2048, sheetHeight = pack(images, sheetWidth);
-    const pixels = Buffer.alloc(sheetWidth * sheetHeight * 4);
-    const frames = {}, assets = {};
-
-    for(const image of images)
-    {
-        for(let line = 0; line < image.height; line++) image.pixels.copy(pixels, ((image.y + line) * sheetWidth + image.x) * 4, line * image.width * 4, (line + 1) * image.width * 4);
-
-        frames[`${LIBRARY}_${image.name}`] = {frame: {x: image.x, y: image.y, w: image.width, h: image.height}, sourceSize: {w: image.width, h: image.height}, spriteSourceSize: {x: 0, y: 0, w: image.width, h: image.height}, rotated: false, trimmed: false};
-        assets[image.name] = image.asset;
+        images.push(...weaponImages(id, await readIcon(join(ICONS, file))));
     }
 
     const mapFile = join(CONFIGURATIONS, 'AmbreiaFigureMap.xml');
@@ -364,14 +383,11 @@ async function main()
 
     if(!map.includes(`<lib id="${LIBRARY}"`)) throw new Error('AmbreiaFigureMap.xml not patched: </map> not found');
 
-    console.log(`${ids.length} weapons × ${SWING.length} frames × 8 directions: ${images.length} images, sheet ${sheetWidth}x${sheetHeight}`);
+    console.log(`${ids.length} weapons × ${SWING.length} frames × 8 directions: ${images.length} images`);
 
     if(dryRun) return;
 
-    const png = await sharp(pixels, {raw: {width: sheetWidth, height: sheetHeight, channels: 4}}).png().toBuffer();
-    const json = {type: 'avatar', name: LIBRARY, assets, spritesheet: {meta: {image: `${LIBRARY}.png`, format: 'RGBA8888', size: {w: sheetWidth, h: sheetHeight}, scale: 1}, frames}};
-
-    writeFileSync(join(outDir, `${LIBRARY}.nitro`), nitro([[`${LIBRARY}.json`, Buffer.from(JSON.stringify(json))], [`${LIBRARY}.png`, png]]));
+    writeFileSync(join(outDir, `${LIBRARY}.nitro`), await libraryNitro(images));
     writeFileSync(mapFile, map);
     writeFileSync(actionsFile, actions);
     console.log(`wrote ${join(outDir, `${LIBRARY}.nitro`)}, AmbreiaFigureMap.xml`);
