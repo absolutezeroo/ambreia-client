@@ -23,7 +23,7 @@ export function newElement<K extends LayerKey>(layer: K, doc: ZoneDocument, cell
         passages: {id, area: [here], destinationZone: doc.settings.id, destinationEntry: ''},
         zones: {id, kind: 'Safe', name: '', polygon: square, priority: 0},
         npcs: {id, template: '', name: '', cell: here, rotation: 2, interactions: ['talk']},
-        spawns: {id, area: [here], monster: '', min: 1, max: 3, respawnSeconds: 30, wanderRadius: 3, aggroRadius: 5, levelMin: 1, levelMax: 5},
+        spawns: {id, area: [here], monster: '', min: 1, max: 3, respawnSeconds: 30, wanderRadius: 3, aggroRadius: 5, levelMin: 1, levelMax: 5, aoiActivation: true},
         resources: {id, cell: here, template: ''},
         chests: {id, decor: '', lootTable: ''},
         interactives: {id, decor: '', interaction: 'door'},

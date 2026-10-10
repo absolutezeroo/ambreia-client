@@ -24,6 +24,7 @@ Le proxy de Vite envoie `/api` vers `http://127.0.0.1:8080` et `/habbo-imaging` 
 | Sol | Sélection (S), Ajouter case (A), Supprimer case (D), Monter (R), Descendre (F), Rectangle (C), Remplir (B), Non marchable (W, Maj : marchable), Porte (P), Spawn joueur (J) ; hauteur à peindre 0–7 ou plus ; modèles de salle |
 | Mobis | Catalogue par catégorie, Favoris, Récents, recherche ; clic sur un mobi puis sur le sol pour le poser ; Sélection (S), Déplacer (M), Rotation (R), Ctrl+C / Ctrl+V (sous le pointeur) / Ctrl+D, Suppr, Verrouiller |
 | Paramètres | Nom, région, capacité, type de map, niveau, PvP, musique, météo, modèle |
+| Spawns | Monstres du serveur (`GET /api/editor/monsters`) par nom français, rang et comportement ; quantité, réapparition, errance, aggro, niveaux, groupe, activation AOI (oui par défaut), conditions. Un id que le serveur ne sert plus reste dans la liste, « inconnu », et la sauvegarde le refuse |
 | Validation | Les contrôles locaux en continu ; « Vérifier la map » ajoute ceux du serveur |
 
 À droite, les propriétés de la sélection (mobi, cases) ou de la salle. En bas : mini-carte
@@ -31,4 +32,4 @@ Le proxy de Vite envoie `/api` vers `http://127.0.0.1:8080` et `/habbo-imaging` 
 (cliquer une ligne pour y revenir). Vue : clic droit pour déplacer, molette pour zoomer ; le menu
 Affichage règle la grille, les hauteurs, les murs et les vrais mobis.
 
-PNJ, Spawns de monstres, Zones, Triggers et Audio arrivent avec les calques RPG (lot B).
+PNJ, Zones, Triggers et Audio arrivent avec les calques RPG (lot B).

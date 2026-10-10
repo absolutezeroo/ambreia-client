@@ -9,7 +9,13 @@ const label = (options: readonly (readonly [string, string])[], value: string) =
  * An element's line in a list: title, detail, and whether it is complete enough to play (a
  * spawn with no monster, a passage with no destination… show an orange dot).
  */
-export function describeElement(layer: LayerKey, element: Record<string, unknown>, doc: ZoneDocument): {title: string; sub: string; complete: boolean}
+export function describeElement(
+    layer: LayerKey,
+    element: Record<string, unknown>,
+    doc: ZoneDocument,
+    /** A monster id's French name (monsterLabels.monsterName()). */
+    monster: (id: string) => string = id => id
+): {title: string; sub: string; complete: boolean}
 {
     const id = String(element.id);
     const at = (c: unknown) =>
@@ -24,7 +30,7 @@ export function describeElement(layer: LayerKey, element: Record<string, unknown
     switch(layer)
     {
         case 'npcs': return {title: String(element.name || id), sub: `${element.template || 'modèle ?'} - ${at(element.cell)}`, complete: !!element.template};
-        case 'spawns': return {title: id, sub: `${element.monster || 'monstre ?'} x${element.min ?? 1}-${element.max ?? 1} - ${count(element.area)}`, complete: !!element.monster};
+        case 'spawns': return {title: id, sub: `${element.monster ? monster(String(element.monster)) : 'monstre ?'} x${element.min ?? 1}-${element.max ?? 1} - ${count(element.area)}`, complete: !!element.monster};
         case 'zones': return {title: String(element.name || id), sub: `${label(AREA_KINDS, String(element.kind))} - priorité ${element.priority ?? 0}`, complete: true};
         case 'entries': return {title: id, sub: `${label(ENTRY_KINDS, String(element.kind))} - ${at(element.cell)}`, complete: true};
         case 'passages': return {

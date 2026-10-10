@@ -6,7 +6,7 @@ import {CheckBinding, child, ChoiceBinding, NumberBinding, setEnabled, setText, 
 import type {EditorTexts} from '../EditorTexts';
 import {RuleListUi} from '../forms/RuleListUi';
 import type {IPanelUi} from '../IPanelUi';
-import {MONSTERS} from './MONSTERS';
+import {monsterDetail, monsterName, monsterOptions} from './monsterLabels';
 
 const FIELDS = [
     'spawn_monster', 'spawn_min', 'spawn_max', 'spawn_respawn', 'spawn_wander', 'spawn_aggro', 'spawn_level_min',
@@ -15,8 +15,8 @@ const FIELDS = [
 
 /**
  * "Propriétés du spawn" (vortex_map_editor_inspect_spawn_xml): the monster, how many, how often,
- * how far it wanders and aggroes, its levels, its group, AOI activation and its conditions. Saved
- * and validated now; monsters come alive with the RPG.
+ * how far it wanders and aggroes, its levels, its group, AOI activation and its conditions. The
+ * monsters are the server's (GET /api/editor/monsters), by French name, rank and behaviour.
  */
 export class SpawnInspectorUi implements IPanelUi
 {
@@ -41,7 +41,8 @@ export class SpawnInspectorUi implements IPanelUi
             new NumberBinding(_window, 'spawn_level_min', () => spawn()?.levelMin ?? 1, levelMin => set({levelMin}), 1, 200),
             new NumberBinding(_window, 'spawn_level_max', () => spawn()?.levelMax ?? 1, levelMax => set({levelMax}), 1, 200),
             new TextBinding(_window, 'spawn_group', () => spawn()?.group ?? '', group => set({group: group.trim() || null})),
-            new CheckBinding(_window, 'spawn_aoi', () => spawn()?.aoiActivation ?? false, aoiActivation => set({aoiActivation}))
+            // The server's default when the field is absent (ZoneSpawn.AoiActivation).
+            new CheckBinding(_window, 'spawn_aoi', () => spawn()?.aoiActivation ?? true, aoiActivation => set({aoiActivation}))
         ];
         this._conditions = new RuleListUi<ZoneCondition>(child<IItemListWindow>(_window, 'condition_list'), app, texts, 'conditions', build,
             () => spawn()?.conditions ?? [], conditions => set({conditions}));
@@ -51,13 +52,16 @@ export class SpawnInspectorUi implements IPanelUi
     render(): void
     {
         const spawn = this._app.world.current('spawns');
-        const used = (this._app.doc.spawns ?? []).map(s => s.monster).filter(Boolean);
-        const monsters = [...new Set([...MONSTERS, ...used])];
+        const app = this._app;
+        const used = (app.doc.spawns ?? []).map(s => s.monster);
+        const monster = spawn?.monster ?? '';
 
         for(const name of FIELDS) setEnabled(child(this._window, name), !!spawn);
         setText(this._window, 'spawn_title', spawn ? spawn.id : 'Aucun spawn sélectionné');
         setText(this._window, 'spawn_area', spawn ? `${spawn.area.length} cases - outil Rectangle ou Polygone pour les dessiner` : 'Choisissez un spawn dans la liste.');
-        this._monster.options([['', 'Monstre ?'], ...monsters.map(m => [m, m] as const)]).render();
+        this._monster.options([['', 'Monstre ?'], ...monsterOptions(app.monsters, used, app.texts)]).render();
+        setText(this._window, 'spawn_monster_detail', monsterDetail(monster, app.monster(monster)));
+        setText(this._window, 'spawn_monster_id', monster && monsterName(monster, app.texts) !== monster ? monster : '');
         for(const part of this._parts) part.render();
         this._conditions.render();
     }

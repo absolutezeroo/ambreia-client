@@ -1,4 +1,6 @@
+import {Logger} from '@ambreia/common/utils/Logger';
 import {EditorApiClient} from '@ambreia/map-editor-core/api/EditorApiClient';
+import type {IEditorMonster} from '@ambreia/map-editor-core/api/IEditorMonster';
 import type {IFurniturePaletteEntry} from '@ambreia/map-editor-core/api/IFurniturePaletteEntry';
 import type {IZoneSummary} from '@ambreia/map-editor-core/api/IZoneSummary';
 import {blankZone} from '@ambreia/map-editor-core/zone/blankZone';
@@ -15,6 +17,7 @@ import './style.css';
 const root = document.getElementById('app')!;
 const stage = document.getElementById('stage')!;
 const api = new EditorApiClient();
+const log = Logger.getLogger('map-editor.main');
 
 /**
  * Everything is the owner's windows (@ambreia/ui) on one canvas: the home screen with the login,
@@ -42,6 +45,7 @@ async function boot(): Promise<void>
 
     const browser = new MapBrowser(manager, home, api, texts);
     let palette: IFurniturePaletteEntry[] | null = null;
+    let bestiary: Promise<[IEditorMonster[], Map<string, string>]> | null = null;
     let notice = '';
 
     for(;;)
@@ -59,6 +63,7 @@ async function boot(): Promise<void>
             const app = new EditorApp(api, zone, doc, palette);
 
             app.zones = await api.listZones();
+            [app.monsters, app.texts] = await (bestiary ??= loadBestiary());
             home.hide();
 
             const ui = new EditorUi(manager, texts, app, host);
@@ -76,6 +81,30 @@ async function boot(): Promise<void>
             home.show();
         }
     }
+}
+
+/**
+ * The monsters a spawn can name and their names, once per run. A server without the route (or
+ * without texts) leaves the menu to the ids the zone already has, and the ids as names.
+ */
+async function loadBestiary(): Promise<[IEditorMonster[], Map<string, string>]>
+{
+    const [monsters, texts] = await Promise.all([
+        api.monsters().catch((error: unknown) =>
+        {
+            log.warn('no monster list from the server — the spawn menu offers only the ids the zone has', error);
+
+            return [];
+        }),
+        api.texts().catch((error: unknown) =>
+        {
+            log.warn('no content texts — monsters show their ids', error);
+
+            return new Map<string, string>();
+        })
+    ]);
+
+    return [monsters, texts];
 }
 
 /** Null when the session cookie is good; otherwise what to tell on the login ('' for no session). */

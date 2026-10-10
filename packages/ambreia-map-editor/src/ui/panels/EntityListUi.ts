@@ -5,6 +5,7 @@ import type {LayerKey} from '@ambreia/map-editor-core/zone/LayerKey';
 import type {EditorApp} from '../../app/EditorApp';
 import {onWindowClick, setText} from '../bind';
 import {describeElement} from './describeElement';
+import {monsterName} from './monsterLabels';
 
 const SELECTED = 0xffcfe6ff;
 const COMPLETE = 0xff3d9a46;
@@ -36,7 +37,7 @@ export class EntityListUi
         if(!list) return;
 
         const items = ((app.doc[this._layer] ?? []) as unknown as Record<string, unknown>[])
-            .map(e => ({e, d: describeElement(this._layer, e, app.doc)}))
+            .map(e => ({e, d: describeElement(this._layer, e, app.doc, id => monsterName(id, app.texts))}))
             .filter(({e, d}) => !query || `${e.id} ${d.title} ${d.sub}`.toLowerCase().includes(query.toLowerCase()));
         const key = JSON.stringify(items.map(i => [i.e.id, i.d]));
 

@@ -69,3 +69,21 @@ test('the test ticket names the cell when there is one', async () =>
 
     assert.deepEqual(seen, ['http://x/api/editor/zones/v/test?x=2&y=3', 'http://x/api/editor/zones/v/test']);
 });
+
+test('the monsters come from the editor route, the names from the content texts', async () =>
+{
+    const guardian = {id: 'monster.grove.guardian', rank: 'boss', behavior: 'melee', aggressive: true, figure: '12 0 6A8F3A'};
+    const seen: string[] = [];
+    const api = new EditorApiClient('', async url =>
+    {
+        seen.push(url);
+
+        return url.endsWith('/monsters')
+            ? new Response(JSON.stringify([guardian]))
+            : new Response('# comment\r\nmonster.grove.guardian.name=Gardien du bosquet\r\nbroken line\r\n');
+    });
+
+    assert.deepEqual(await api.monsters(), [guardian]);
+    assert.deepEqual([...await api.texts()], [['monster.grove.guardian.name', 'Gardien du bosquet']]);
+    assert.deepEqual(seen, ['/api/editor/monsters', '/api/public/content/texts/fr']);
+});

@@ -1,4 +1,5 @@
 import type {EditorApiClient} from '@ambreia/map-editor-core/api/EditorApiClient';
+import type {IEditorMonster} from '@ambreia/map-editor-core/api/IEditorMonster';
 import type {IFurniturePaletteEntry} from '@ambreia/map-editor-core/api/IFurniturePaletteEntry';
 import type {IZoneSummary} from '@ambreia/map-editor-core/api/IZoneSummary';
 import {editTiles} from '@ambreia/map-editor-core/commands/editTiles';
@@ -65,6 +66,9 @@ export class EditorApp
     serverFindings: IZoneFinding[] = [];
     /** Every zone of the world: the destinations a passage or a teleport can aim at. */
     zones: IZoneSummary[] = [];
+    /** The monsters a spawn can name (GET /api/editor/monsters), and the content's texts for their names. */
+    monsters: readonly IEditorMonster[] = [];
+    texts: ReadonlyMap<string, string> = new Map();
     savedVersion: number | null;
     publishedVersion: number | null;
     status = '';
@@ -140,6 +144,12 @@ export class EditorApp
     furniture(definition: number): IFurniturePaletteEntry | null
     {
         return this._furniture.get(definition) ?? null;
+    }
+
+    /** The served monster of this id, or null (unknown or retired). */
+    monster(id: string): IEditorMonster | null
+    {
+        return this.monsters.find(m => m.id === id) ?? null;
     }
 
     get localFindings(): IZoneFinding[]

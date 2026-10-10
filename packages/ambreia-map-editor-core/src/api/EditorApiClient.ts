@@ -1,6 +1,7 @@
 import type {IZoneFinding} from '../validation/IZoneFinding';
 import type {ZoneCell, ZoneDocument} from '../zone/Zone.generated';
 import {EditorApiError} from './EditorApiError';
+import type {IEditorMonster} from './IEditorMonster';
 import type {IFurniturePaletteEntry} from './IFurniturePaletteEntry';
 import type {IZoneSaveResult} from './IZoneSaveResult';
 import type {IZoneSummary} from './IZoneSummary';
@@ -94,6 +95,28 @@ export class EditorApiClient
     palette(): Promise<IFurniturePaletteEntry[]>
     {
         return this.json('GET', '/api/editor/furniture');
+    }
+
+    /** The monsters a spawn can name, by id order (M1c). */
+    monsters(): Promise<IEditorMonster[]>
+    {
+        return this.json('GET', '/api/editor/monsters');
+    }
+
+    /** The content's texts (`key=value` lines): the monsters' names, `<id>.name`. */
+    async texts(language = 'fr'): Promise<Map<string, string>>
+    {
+        const res = await this.ok(await this.send('GET', `/api/public/content/texts/${enc(language)}`));
+        const texts = new Map<string, string>();
+
+        for(const line of (await res.text()).split(/\r?\n/))
+        {
+            const at = line.indexOf('=');
+
+            if(at > 0 && !line.startsWith('#')) texts.set(line.slice(0, at).trim(), line.slice(at + 1).trim());
+        }
+
+        return texts;
     }
 
     private async json<T>(method: string, path: string, body?: unknown): Promise<T>
