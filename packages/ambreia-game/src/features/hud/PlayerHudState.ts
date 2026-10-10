@@ -8,6 +8,26 @@ export interface IActionSlot
     key: string;
     count?: number;
     cooldownEnd?: number;
+    /** Mana cost: the slot greys when the player cannot afford it (hudRules.unavailable()). */
+    cost?: number;
+    /** Outlined for a moment after its key or a click (hudRules.SELECTED_MS). */
+    selected?: boolean;
+    /** What its tooltip says (vortex_hud_slot_tip_xml); none: no tooltip. */
+    tip?: ISlotTip;
+}
+
+/** The tooltip of a slot: a skill (tag, cost and cooldown, effect) or a consumable (quantity). */
+export interface ISlotTip
+{
+    title: string;
+    /** The pill at the right (« Attaque », « Soin »), empty for none. */
+    tag: string;
+    /** Under the title: rank, cost, cooldown, or the quantity. */
+    meta: string;
+    text: string;
+    /** The highlighted line (an effect), empty for none. */
+    effect: string;
+    shortcut: string;
 }
 
 /**

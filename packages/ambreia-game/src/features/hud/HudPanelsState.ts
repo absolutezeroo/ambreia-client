@@ -49,6 +49,10 @@ export interface IHudUnit
     debuffs: string[];
     /** `normal`, `elite` or `boss` (M1c): the target frame's border. */
     rank?: string;
+    /** Its room object, for the casts the skills feature follows by caster. */
+    objectId?: number;
+    /** What it casts, when it does (the boss frame's cast line, the target frame's). */
+    cast?: IHudCast | null;
 }
 
 export type {ChatChannel, IChatLine} from './chatModel';
@@ -74,6 +78,14 @@ export interface IHudPanels
     buffs: string[];
     /** Under each of `buffs`, its time left (`4 s`), or nothing for an effect without end; none: no times. */
     buffTimes?: string[];
+    /** Under each of `buffs`, whether it ends within seconds (the red outline). */
+    buffExpiring?: boolean[];
+    /** Under each of `buffs`, its tooltip: the effect's name, then its time left on a second line. */
+    buffTips?: string[];
+    /** The party member whose frame is selected (their name), the target panel shows them. */
+    partySelected: string | null;
+    /** The bottom bar's button whose window is open (`nav_inventory`), for its active mark. */
+    navOpen: string | null;
     target: (IHudUnit & {cast: IHudCast | null}) | null;
     boss: IHudUnit | null;
     /** The warning under the boss (`Frappe sismique dans 3 seconde(s) !`). */
@@ -100,7 +112,7 @@ export class HudPanelsState
     readonly events = new EventEmitter<{changed: [Readonly<IHudPanels>]; nav: [string]; say: [string]; emote: [string]}>();
     private _value: IHudPanels = {
         gold: null, gems: null, tokens: null, questAlert: false, zoneName: '', zonePlayers: null,
-        quests: [], party: [], buffs: [], target: null, boss: null, alert: null, chat: [], chatTabs: [ALL_TAB], chatTab: ALL_TAB.id, sayChannel: 'world', chatSettings: DEFAULT_CHAT_SETTINGS
+        quests: [], party: [], buffs: [], partySelected: null, navOpen: null, target: null, boss: null, alert: null, chat: [], chatTabs: [ALL_TAB], chatTab: ALL_TAB.id, sayChannel: 'world', chatSettings: DEFAULT_CHAT_SETTINGS
     };
 
     get value(): Readonly<IHudPanels>

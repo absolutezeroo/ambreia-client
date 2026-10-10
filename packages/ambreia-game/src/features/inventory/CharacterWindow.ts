@@ -6,32 +6,36 @@ import type {ITabContextWindow} from '@ambreia/ui/components/ITabContextWindow';
 import type {IRpgStatBlock} from '@ambreia/protocol/incoming/rpg/characters/IRpgStatBlock';
 import {RpgItemUnequipMessage} from '@ambreia/protocol/outgoing/rpg/items/RpgItemUnequipMessage';
 import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
-import type {WindowBits} from '../character/WindowBits';
+import {WindowBits} from '../character/WindowBits';
 import {CharacterSheet, fillStatRow} from './CharacterSheet';
-import {buildFrame} from './InventoryView';
-import {STATS, type IStatLine} from './items';
+import {buildFrame, LAYER} from './InventoryView';
+import {itemKind, STATS, type IStatLine} from './items';
+import {HudTooltips} from '../hud/HudTooltips';
 import type {IRpgInventorySession} from './IRpgInventorySession';
 
 /**
  * The stats tab's sections (vortex_character_tab_stats_xml): what the server's ten stats fill
  * (F3a §6.2). The mock-up's other lines (magic damage, block…) have no stat behind them yet.
  */
-const SECTIONS: ReadonlyArray<{list: string; row: string; lines: readonly IStatLine[]}> = [
-    {list: 'attributes_list', row: 'vortex_character_attribute_row_xml', lines: [STATS.strength, STATS.agility, STATS.intelligence]},
-    {list: 'offense_list', row: 'vortex_character_stat_row_xml', lines: [STATS.power, STATS.critical]},
-    {list: 'defense_list', row: 'vortex_character_stat_row_xml', lines: [STATS.armor, STATS.dodge]},
-    {list: 'secondary_list', row: 'vortex_character_stat_row_xml', lines: [STATS.speed, STATS.health, STATS.mana]}
+const SECTIONS: ReadonlyArray<{list: string; row: string; lines: readonly IStatLine[]; help: string}> = [
+    {list: 'attributes_list', row: 'vortex_character_attribute_row_xml', lines: [STATS.strength, STATS.agility, STATS.intelligence], help: 'attributes'},
+    {list: 'offense_list', row: 'vortex_character_stat_row_xml', lines: [STATS.power, STATS.critical], help: 'offense'},
+    {list: 'defense_list', row: 'vortex_character_stat_row_xml', lines: [STATS.armor, STATS.dodge], help: 'defense'},
+    {list: 'secondary_list', row: 'vortex_character_stat_row_xml', lines: [STATS.speed, STATS.health, STATS.mana], help: 'secondary'}
 ];
 
 /**
  * The character window (C, vortex_character_xml, mockup/glaze/character_stats.png): its stats tab,
- * the character sheet beside the stat sections. Overview, titles and reputation have nothing on
- * the wire yet and stay disabled. Unequipping from the sheet works as in the inventory.
+ * the character sheet beside the stat sections, each section's « ? » opening its help
+ * (vortex_character_help_xml), a tooltip on an equipped slot. Overview, titles and reputation have
+ * nothing on the wire yet and stay disabled. Unequipping from the sheet works as in the inventory.
  */
 export class CharacterWindow
 {
     private _window: IWindowContainer | null = null;
     private _sheet: CharacterSheet | null = null;
+    private _help: IWindowContainer | null = null;
+    private readonly _tips: HudTooltips;
     private readonly _rows: Array<{row: IWindowContainer; line: IStatLine}> = [];
     private _disposed = false;
 
@@ -46,6 +50,7 @@ export class CharacterWindow
     )
     {
         _session.events.on('inventory', this._onInventory);
+        this._tips = new HudTooltips(_windows, LAYER);
     }
 
     get visible(): boolean
@@ -71,6 +76,8 @@ export class CharacterWindow
     hide(): void
     {
         if(this._window) this._window.visible = false;
+        if(this._help) this._help.visible = false;
+        this._tips.out();
     }
 
     renderStats(): void
@@ -116,9 +123,6 @@ export class CharacterWindow
             }
         }
 
-        // The stat sections have no help text yet.
-        this._bits.setVisible(tab, false, 'attributes_help', 'offense_help', 'defense_help', 'secondary_help');
-
         const tabs = window.findChildByName('tab_context') as ITabContextWindow | null;
 
         for(const name of ['tab_overview', 'tab_titles', 'tab_reputation']) tabs?.getTabItemByName(name)?.disable();
@@ -140,13 +144,61 @@ export class CharacterWindow
         for(const {row, line} of this._rows) fillStatRow(this._bits, row, line, stats);
     }
 
+    /** A section's « ? »: its help beside the window, one help window reused. */
+    private showHelp(section: string): void
+    {
+        this._help ??= buildFrame(this._windows, 'vortex_character_help_xml', (event, window) =>
+        {
+            if(event.type === 'WME_CLICK' && window.name === 'header_button_close' && this._help) this._help.visible = false;
+        });
+
+        const help = this._help;
+        const owner = this._window;
+
+        if(!help || !owner) return;
+
+        help.caption = this._bits.text(`vortex.character.stats.${section}`);
+        this._bits.setText(help, 'help_txt', this._bits.text(`vortex.character.stats.${section}.help`));
+        help.x = Math.max(0, Math.min((owner.parent?.width ?? owner.x + owner.width + help.width) - help.width, owner.x + owner.width + 8));
+        help.y = owner.y;
+        help.visible = true;
+        help.activate();
+    }
+
+    /** An equipped slot's tooltip: the item's name, kind and description. */
+    private slotTip(window: IWindow): {layout: string; fill: (tip: IWindowContainer) => void} | null
+    {
+        const item = this._sheet?.equippedAt(window)?.item ?? null;
+
+        if(!item) return null;
+
+        return {layout: 'vortex_character_equipment_tip_xml', fill: tip =>
+        {
+            this._bits.setText(tip, 'item_name', this._bits.contentName(`${item.definitionId}.name`, item.definitionId));
+            this._bits.setText(tip, 'item_slot', itemKind(item.definitionId));
+            this._bits.setText(tip, 'item_desc', this._bits.textOr(`${item.definitionId}.description`, ''));
+            // No rarity or bonus on the wire (Objets §17).
+            this._bits.setText(tip, 'item_rarity', '');
+        }};
+    }
+
     private readonly _onEvent = (event: WindowEvent, window: IWindow): void =>
     {
+        if(this._tips.handle(event, () => this.slotTip(window))) return;
         if(event.type !== 'WME_CLICK') return;
 
         if(window.name === 'header_button_close')
         {
             this.hide();
+
+            return;
+        }
+
+        const help = SECTIONS.find(section => WindowBits.ancestor(window, `${section.help}_help`) !== null);
+
+        if(help)
+        {
+            this.showHelp(help.help);
 
             return;
         }
@@ -162,6 +214,9 @@ export class CharacterWindow
 
         this._disposed = true;
         this._session.events.off('inventory', this._onInventory);
+        this._tips.dispose();
+        this._help?.destroy();
+        this._help = null;
         this._window?.destroy();
         this._window = null;
         this._sheet = null;

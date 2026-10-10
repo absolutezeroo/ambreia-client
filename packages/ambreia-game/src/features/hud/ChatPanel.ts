@@ -31,8 +31,8 @@ const LINE_TEXTS = ['time_txt', 'channel_txt', 'author_txt', 'message_txt'];
 const IDLE_BLEND = 0.15;
 const TEXT_SIZE_ORDER: readonly ChatTextSize[] = ['small', 'normal', 'large'];
 
-/** An entry of the chat's menus: a disabled one is greyed (« bientôt »). */
-interface IMenuItem
+/** An entry of the HUD's menus (the chat's, the + and « plus » ones): a disabled one is greyed. */
+export interface IMenuItem
 {
     label: string;
     icon: string | null;
@@ -343,7 +343,8 @@ export class ChatPanel
         return input;
     }
 
-    private toggleMenu(owner: string, anchor: IWindow, items: IMenuItem[], light: boolean): void
+    /** Opens the menu of `owner` above `anchor`, or closes it when it is the one open. */
+    toggleMenu(owner: string, anchor: IWindow, items: IMenuItem[], light: boolean): void
     {
         const reopen = this._menuOwner !== owner;
 
@@ -600,7 +601,10 @@ export class ChatPanel
 
         anchor.getGlobalRectangle(rect);
         popup.x = Math.max(0, Math.min(desktop.width - popup.width, alignRight ? rect.x + rect.width - popup.width : rect.x));
-        popup.y = Math.max(0, rect.y - popup.height - 4);
+        // Above the anchor, or below it when there is no room above (the + button sits at the top).
+        const above = rect.y - popup.height - 4;
+
+        popup.y = above >= 0 ? above : Math.min(desktop.height - popup.height, rect.y + rect.height + 4);
     }
 
     private setHeight(window: IWindowContainer, name: string, height: number): void

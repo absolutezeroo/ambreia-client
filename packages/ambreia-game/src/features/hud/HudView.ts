@@ -7,9 +7,12 @@ import type {IStaticBitmapWrapperWindow} from '@ambreia/ui/components/IStaticBit
 import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
 import type {IAvatarImageWidget} from '@ambreia/ui/kit/widgets/IAvatarImageWidget';
 import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
+import type {WindowBits} from '../character/WindowBits';
 import {barFill, cooldownLabel} from './PlayerHudState';
 import type {IActionSlot, IPlayerHud, PlayerHudState} from './PlayerHudState';
-import {hudTop, LAYER, MARGIN} from './HudPanelsView';
+import {unavailable} from './hudRules';
+import {HudTooltips, type ITooltip} from './HudTooltips';
+import {LAYER, MARGIN} from './HudPanelsView';
 
 const log = Logger.getLogger('habbo.features.hud.HudView');
 /** How often a running cooldown's seconds are redrawn; nothing ticks when none runs. */
@@ -18,25 +21,55 @@ const COOLDOWN_TICK_MS = 250;
 /** vortex_hud_player_xml's frame colour, and its colour in combat (M1a §6.3). */
 const FRAME_COLOR = 0x686661;
 const IN_COMBAT_COLOR = 0x8a3a30;
+/** The bottom bar's shortcut slots (mock-up of 2026-10-10): keys only until the server assigns them. */
+const SHORTCUT_KEYS = ['Q', 'E', 'R'];
+/** The bottom bar's menu buttons, in the layout's order. */
+const NAV_BUTTONS = ['nav_menu', 'nav_inventory', 'nav_shop', 'nav_quests', 'nav_map', 'nav_guild'];
+/** The player frame's bars and what their tooltips say (vortex_hud_tip_xml). */
+const BAR_TIPS: Readonly<Record<string, {key: string; icon: string; color: number}>> = {
+    hp_bar: {key: 'vortex.hud.tip.hp', icon: 'rpg/ui-icons/rpg_stat_hp_health_heart_icon', color: 0xe03a3a},
+    mana_bar: {key: 'vortex.hud.tip.mana', icon: 'rpg/ui-icons/rpg_stat_mp_mana_star_icon', color: 0x3a7fe0},
+    xp_bar: {key: 'vortex.hud.tip.xp', icon: 'rpg/ui-icons/boardgames_card_star_icon', color: 0x6cbb2d}
+};
+
+/** What the bottom bar's buttons do; the features owning the windows answer `nav`. */
+export interface IHudActions
+{
+    nav(name: string): void;
+    /** The « plus » button: its menu, above the button. */
+    more(anchor: IWindow): void;
+    screenshot(): void;
+}
 
 /**
- * The player frame (vortex_hud_player_xml: portrait, name, level, HP, mana, XP) and the action bar
- * (vortex_hud_action_bar_xml, six skill and four item slots of vortex_hud_action_slot_xml), drawn
- * from a PlayerHudState. The frame sits top left, the bar bottom centre, both kept there when the
- * desktop is resized.
+ * The player frame (vortex_hud_player_xml: portrait, name, level, HP, mana, XP) and the bottom bar
+ * (vortex_hud_action_bar_xml, mock-up of 2026-10-10: the menu, six skill and four item slots of
+ * vortex_hud_action_slot_xml, the Q E R shortcuts, the utilities), drawn from a PlayerHudState.
+ * The frame sits top left, the bar bottom centre, both kept there when the desktop is resized. A
+ * slot shows its cooldown, greys when the player cannot afford it, and is outlined for a moment
+ * after its key; the bars and the slots have tooltips.
  */
 export class HudView
 {
     private _player: IWindowContainer | null = null;
     private _bar: IWindowContainer | null = null;
     private readonly _slots: {skills: IWindowContainer[]; items: IWindowContainer[]} = {skills: [], items: []};
+    private readonly _tips: HudTooltips;
     private _ticker: ReturnType<typeof setInterval> | null = null;
     private _disposed = false;
 
     private readonly _onChange = (value: Readonly<IPlayerHud>): void => this.render(value);
     private readonly _onResize = (): void => this.place();
 
-    constructor(private readonly _windows: IHabboWindowManager, private readonly _state: PlayerHudState) {}
+    constructor(
+        private readonly _windows: IHabboWindowManager,
+        private readonly _state: PlayerHudState,
+        private readonly _bits: WindowBits,
+        private readonly _actions: IHudActions
+    )
+    {
+        this._tips = new HudTooltips(_windows, LAYER);
+    }
 
     get visible(): boolean
     {
@@ -69,9 +102,23 @@ export class HudView
     {
         this._state.events.off('changed', this._onChange);
         this.stopTicker();
+        this._tips.out();
 
         if(this._player) this._player.visible = false;
         if(this._bar) this._bar.visible = false;
+    }
+
+    /** The menu button whose window is open gets the mark under it; the quests one its « ! ». */
+    setNav(open: string | null, questAlert: boolean): void
+    {
+        for(const name of NAV_BUTTONS)
+        {
+            const button = this._bar?.findChildByName(name) as IWindowContainer | null;
+
+            if(button) this._bits.setVisible(button, name === open, 'active_bar');
+        }
+
+        if(this._bar) this._bits.setVisible(this._bar, questAlert, 'quest_badge');
     }
 
     /** Builds both windows once; false (said once) when a layout is missing. */
@@ -104,15 +151,32 @@ export class HudView
 
                 if(!slot || !list) continue;
 
-                // A click on the slot uses it, as its key does (features/skills).
+                // A click on the slot uses it, as its key does (features/skills); a hover describes it.
                 slot.procedure = (event: WindowEvent) =>
                 {
+                    if(this._tips.handle(event, () => this.slotTip(this._state.value[bar][i] ?? null))) return;
                     if(event.type === 'WME_CLICK') this._state.events.emit('use', bar, i);
                 };
                 list.addListItem(slot);
                 this._slots[bar].push(slot);
             }
         }
+
+        // The shortcut side: three slots with their keys, nothing to assign to them yet.
+        const shortcuts = this._bar.findChildByName('shortcut_slots') as IItemListWindow | null;
+
+        for(const key of SHORTCUT_KEYS)
+        {
+            const slot = this._windows.buildWidgetLayout('vortex_hud_action_slot_xml') as IWindowContainer | null;
+
+            if(!slot || !shortcuts) break;
+
+            this.renderSlot(slot, {icon: null, key});
+            shortcuts.addListItem(slot);
+        }
+
+        this._bar.procedure = this._onBarEvent;
+        this._player.procedure = this._onPlayerEvent;
 
         // buildFromXML() hands the windows back unattached, as AS3's did: the caller places them.
         desktop.addChild(this._player);
@@ -122,26 +186,16 @@ export class HudView
         return true;
     }
 
-    /**
-     * Frame top left (under the top bar while it shows); bar at the bottom, centred in the room the
-     * chat (bottom left) and the target (bottom right) leave it, and over the target only when the
-     * desktop is too narrow for the three. Both panels are found by name on the desktop
-     * (HudPanelsView builds them and calls relayout() when they move).
-     */
+    /** Frame top left; the bar centred at the bottom (the chat and the target sit above it, HudPanelsView). */
     private place(): void
     {
         const desktop = this._windows.getDesktop(LAYER) as IWindowContainer | null;
 
         if(!desktop || !this._player || !this._bar) return;
 
-        const chat = desktop.findChildByName('hud_chat');
-        const target = desktop.findChildByName('hud_target');
-        const left = chat?.visible ? chat.x + chat.width + MARGIN : 0;
-        const right = target?.visible ? target.x - MARGIN : desktop.width;
-
         this._player.x = MARGIN;
-        this._player.y = hudTop(desktop);
-        this._bar.x = Math.max(left, Math.round(Math.min((desktop.width - this._bar.width) / 2, (left + right - this._bar.width) / 2)));
+        this._player.y = MARGIN;
+        this._bar.x = Math.max(0, Math.round((desktop.width - this._bar.width) / 2));
         this._bar.y = desktop.height - this._bar.height - MARGIN;
     }
 
@@ -173,31 +227,13 @@ export class HudView
 
         for(const bar of ['skills', 'items'] as const)
         {
-            value[bar].forEach((slot, i) => this.renderSlot(this._slots[bar][i] ?? null, slot));
+            value[bar].forEach((slot, i) => this.renderSlot(this._slots[bar][i] ?? null, slot, value.mana));
         }
 
-        this.fitBar(value.items.some(slot => slot.icon !== null));
         this.syncTicker(value);
     }
 
-    /**
-     * The item side shows only once it holds something (consumables come after M1b): an empty one
-     * only widened the bar over the target frame on a 1280 px desktop.
-     */
-    private fitBar(items: boolean): void
-    {
-        const bar = this._bar;
-        const side = bar?.findChildByName('item_bar') ?? null;
-        const skills = bar?.findChildByName('skill_bar') ?? null;
-
-        if(!bar || !side || !skills || side.visible === items) return;
-
-        side.visible = items;
-        bar.width = items ? side.x + side.width : skills.width;
-        this.place();
-    }
-
-    private renderSlot(window: IWindowContainer | null, slot: IActionSlot): void
+    private renderSlot(window: IWindowContainer | null, slot: IActionSlot, mana: number | null = null): void
     {
         if(!window) return;
 
@@ -219,6 +255,8 @@ export class HudView
             count.caption = String(slot.count ?? '');
         }
 
+        this._bits.setVisible(window, slot.icon !== null && unavailable(slot.cost ?? null, mana), 'unavailable_veil');
+        this._bits.setVisible(window, slot.selected === true, 'selected');
         this.renderCooldown(window, slot, Date.now());
     }
 
@@ -266,6 +304,74 @@ export class HudView
         this._ticker = null;
     }
 
+    /** A slot's tooltip (vortex_hud_slot_tip_xml), from what the feature filling the bar said of it. */
+    private slotTip(slot: IActionSlot | null): ITooltip | null
+    {
+        const tip = slot?.tip;
+
+        if(!tip || slot.icon === null) return null;
+
+        return {layout: 'vortex_hud_slot_tip_xml', fill: window =>
+        {
+            const icon = window.findChildByName('tip_icon') as IStaticBitmapWrapperWindow | null;
+
+            if(icon && slot.icon) icon.assetUri = slot.icon;
+            this._bits.setText(window, 'tip_title', tip.title);
+            this._bits.setText(window, 'tip_tag_txt', tip.tag);
+            this._bits.setVisible(window, tip.tag !== '', 'tip_tag');
+            this._bits.setText(window, 'tip_meta', tip.meta);
+            this._bits.setText(window, 'tip_txt', tip.text);
+            this._bits.setText(window, 'tip_effect', tip.effect);
+            this._bits.setText(window, 'tip_shortcut', tip.shortcut);
+        }};
+    }
+
+    /** A bar's tooltip (vortex_hud_tip_xml): what HP, mana or XP are. */
+    private barTip(name: string): ITooltip | null
+    {
+        const tip = BAR_TIPS[name];
+
+        if(!tip) return null;
+
+        return {layout: 'vortex_hud_tip_xml', fill: window =>
+        {
+            const icon = window.findChildByName('tip_icon') as IStaticBitmapWrapperWindow | null;
+
+            if(icon) icon.assetUri = tip.icon;
+            this._bits.setColor(window, 'tip_icon', tip.color);
+            this._bits.setText(window, 'tip_title', this._bits.text(tip.key));
+            this._bits.setText(window, 'tip_txt', this._bits.text(`${tip.key}.desc`));
+        }};
+    }
+
+    private readonly _onPlayerEvent = (event: WindowEvent, window: IWindow): void =>
+    {
+        const bar = Object.keys(BAR_TIPS).find(name => HudTooltips.under(window, this._player!, name) !== null) ?? null;
+
+        this._tips.handle(event, () => (bar === null ? null : this.barTip(bar)));
+    };
+
+    /** The bar's menu and utility buttons (the slots have their own procedures). */
+    private readonly _onBarEvent = (event: WindowEvent, window: IWindow): void =>
+    {
+        if(event.type !== 'WME_CLICK' || !this._bar) return;
+
+        const nav = NAV_BUTTONS.find(name => HudTooltips.under(window, this._bar!, name) !== null);
+
+        if(nav)
+        {
+            this._actions.nav(nav);
+
+            return;
+        }
+
+        const more = HudTooltips.under(window, this._bar, 'more_button');
+
+        if(more) this._actions.more(more);
+        else if(HudTooltips.under(window, this._bar, 'screenshot_button')) this._actions.screenshot();
+        else if(HudTooltips.under(window, this._bar, 'social_button')) this._actions.nav('nav_social');
+    };
+
     private setText(container: IWindowContainer, name: string, text: string): void
     {
         const window = container.findChildByName(name);
@@ -295,6 +401,7 @@ export class HudView
 
         this._disposed = true;
         this.hide();
+        this._tips.dispose();
         this._player?.removeEventListener(WindowEvent.WE_PARENT_RESIZED, this._onResize);
         this._player?.destroy();
         this._bar?.destroy();

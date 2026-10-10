@@ -1,13 +1,15 @@
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {IRpgCastStart} from '@ambreia/protocol/incoming/rpg/skills/RpgCastStartMessage';
 import type {IRpgStatus} from '@ambreia/protocol/incoming/rpg/skills/RpgStatusesMessage';
+import type {IHudCast} from '../hud/HudPanelsState';
 import {RoomSessionEvent} from '../../session/events/RoomSessionEvent';
 import type {IRoomSession} from '../../session/IRoomSession';
 import {UserDataType} from '../../session/UserData';
 import type {IGameFeature} from '../GameFeature';
 import {WindowBits} from '../character/WindowBits';
 import {chatClock} from '../hud/chatModel';
-import {SKILL_SLOTS} from '../hud/PlayerHudState';
+import {SKILL_SLOTS, type ISlotTip} from '../hud/PlayerHudState';
+import {expiring, SELECTED_MS} from '../hud/hudRules';
 import {barSkill, holdBack, RpgSkillSession, statusTime, type IClassDefinition, type ISkillDefinition, type IStatusDefinition} from './RpgSkillSession';
 import {SKILL_IMAGES, skillIcon, statusIcon} from './skillArt';
 import {SKILL_WINDOW_IMAGES, SkillsWindow} from './SkillsWindow';
@@ -72,33 +74,64 @@ export const SkillsFeature: IGameFeature = {
         const targetId = (): number => host.made.interaction?.targetId ?? 0;
         const icons = (statuses: readonly IRpgStatus[]): string[] => statuses.map(status => statusIcon(status.statusId));
 
-        // The HUD's skill slots: the bar's icons, each with the end of its cooldown.
+        // A slot's tooltip (vortex_hud_slot_tip_xml): name, rank, cost and cooldown, description, key.
+        const slotTip = (skillId: string, key: number): ISlotTip =>
+        {
+            const text = bits();
+            const definition = session.definition(skillId);
+            const meta = [text.text('vortex.skill.rank.short', 'level', '1')];
+
+            if(definition) meta.push(`${text.text('vortex.skill.mana_cost')} : ${definition.cost}`, `${text.text('vortex.skill.cooldown.short')} : ${(definition.cooldownMs / 1000).toFixed(definition.cooldownMs % 1000 ? 1 : 0)} s`);
+
+            return {title: skillName(skillId), tag: '', meta: meta.join(' · '), text: text.textOr(`${skillId}.description`, ''), effect: '', shortcut: text.text('vortex.hud.shortcut', 'key', String(key))};
+        };
+
+        // The HUD's skill slots: the bar's icons, each with the end of its cooldown, its cost and its tooltip.
         const renderBar = (): void => host.made.hudPlayer?.setSlots('skills', Array.from({length: SKILL_SLOTS}, (_, i) =>
         {
             const skillId = barSkill(session.bar[i] ?? '');
 
-            return {icon: skillId === null ? null : skillIcon(skillId), cooldownEnd: skillId === null ? undefined : session.readyAt(skillId)};
+            if(skillId === null) return {icon: null, cooldownEnd: undefined, cost: undefined, tip: undefined};
+
+            return {icon: skillIcon(skillId), cooldownEnd: session.readyAt(skillId), cost: session.definition(skillId)?.cost, tip: slotTip(skillId, i + 1)};
         }));
 
-        // The target frame: its effects and what it casts.
+        /** What `objectId` casts right now for a frame's cast line, and whether it is still going. */
+        const castOf = (objectId: number): {cast: IHudCast | null; casting: boolean} =>
+        {
+            const cast = casts.get(objectId) ?? null;
+            const elapsed = cast ? Math.min(cast.durationMs, Date.now() - cast.start) / 1000 : 0;
+
+            return {
+                cast: cast && {icon: skillIcon(cast.skillId), name: skillName(cast.skillId), elapsed, duration: cast.durationMs / 1000},
+                casting: cast !== null && elapsed < cast.durationMs / 1000
+            };
+        };
+
+        // The target frame (its effects and what it casts) and the boss frame's cast line.
         const renderTarget = (): void =>
         {
             const hud = host.made.hud;
             const target = hud?.value.target ?? null;
+            const boss = hud?.value.boss ?? null;
             const id = targetId();
+            let casting = false;
 
-            if(!hud || !target || id === 0) return;
+            if(hud && target && id !== 0)
+            {
+                const own = castOf(id);
 
-            const cast = casts.get(id) ?? null;
-            const elapsed = cast ? Math.min(cast.durationMs, Date.now() - cast.start) / 1000 : 0;
+                hud.update({target: {...target, debuffs: icons(session.statusesOf(id)), cast: own.cast}});
+                casting ||= own.casting;
+            }
 
-            hud.update({target: {
-                ...target,
-                debuffs: icons(session.statusesOf(id)),
-                cast: cast && {icon: skillIcon(cast.skillId), name: skillName(cast.skillId), elapsed, duration: cast.durationMs / 1000}
-            }});
+            if(hud && boss?.objectId !== undefined)
+            {
+                const own = castOf(boss.objectId);
 
-            const casting = cast !== null && elapsed < cast.durationMs / 1000;
+                if(own.cast !== null || boss.cast) hud.update({boss: {...boss, cast: own.cast}});
+                casting ||= own.casting;
+            }
 
             if(casting && castTicker === null) castTicker = setInterval(renderTarget, CAST_TICK_MS);
             else if(!casting && castTicker !== null)
@@ -147,6 +180,12 @@ export const SkillsFeature: IGameFeature = {
             const skillId = barSkill(session.bar[slot] ?? '');
 
             if(skillId === null) return;
+
+            // The slot shows it was taken, briefly (mock-up: « sélectionné »).
+            const hudPlayer = host.made.hudPlayer;
+
+            hudPlayer?.setSlot('skills', slot, {selected: true});
+            setTimeout(() => hudPlayer?.setSlot('skills', slot, {selected: false}), SELECTED_MS);
 
             if(session.definition(skillId)?.target === 'ground')
             {
@@ -221,9 +260,14 @@ export const SkillsFeature: IGameFeature = {
             const now = Date.now();
 
             ownStatuses = ownStatuses.filter(status => status.end === null || status.end > now);
+            const text = bits();
+
             host.made.hud?.update({
                 buffs: ownStatuses.map(status => statusIcon(status.statusId)),
-                buffTimes: ownStatuses.map(status => status.end === null ? '' : statusTime(status.end - now))
+                buffTimes: ownStatuses.map(status => status.end === null ? '' : statusTime(status.end - now)),
+                buffExpiring: ownStatuses.map(status => expiring(status.end === null ? null : status.end - now)),
+                buffTips: ownStatuses.map(status => text.contentName(`${status.statusId}.name`, status.statusId)
+                    + (status.end === null ? '' : `\n${text.text('vortex.hud.remaining', 'seconds', String(Math.ceil((status.end - now) / 1000)))}`))
             });
 
             const ticking = ownStatuses.some(status => status.end !== null);
@@ -268,6 +312,11 @@ export const SkillsFeature: IGameFeature = {
         {
             if(bar === 'skills') use(slot);
         });
+        // The + menu's « Compétences ».
+        host.made.hud?.events.on('nav', name =>
+        {
+            if(name === 'nav_skills') openWindow();
+        });
 
         globalThis.addEventListener?.('keydown', (event: KeyboardEvent) =>
         {
@@ -306,7 +355,7 @@ export const SkillsFeature: IGameFeature = {
             statusTicker = null;
             window?.hide();
             host.made.roomEngine?.pickRpgTile(null);
-            host.made.hud?.update({buffs: [], buffTimes: []});
+            host.made.hud?.update({buffs: [], buffTimes: [], buffExpiring: [], buffTips: []});
         });
 
         // Dev hook: `__ambreia.skills.session`, `.open()`.

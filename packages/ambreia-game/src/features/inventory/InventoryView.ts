@@ -74,7 +74,8 @@ export class InventoryView
         private readonly _bits: WindowBits,
         private readonly _session: IRpgInventorySession,
         private readonly _stats: () => IRpgStatBlock | null,
-        private readonly _figure: () => string
+        private readonly _figure: () => string,
+        private readonly _currency: () => {gold: number | null; gems: number | null} = () => ({gold: null, gems: null})
     )
     {
         _session.events.on('inventory', this._onInventory);
@@ -126,8 +127,8 @@ export class InventoryView
         slot.addChild(this._sheet.window);
         if(this._detail) slot.addChild(this._detail);
 
-        // Not on the wire yet (Objets §17): currency, rarity, item effects and value, the filter.
-        this._bits.setVisible(window, false, 'gold_icon', 'gold_amount', 'gems_icon', 'gems_amount', 'filter_menu');
+        // Not on the wire yet (Objets §17): rarity, item effects and value, the filter.
+        this._bits.setVisible(window, false, 'filter_menu');
         if(this._detail) this._bits.setVisible(this._detail, false, 'item_rarity', 'effects_title', 'effects_list', 'value_icon', 'value_label', 'item_value');
 
         // The layout's `spacing` var does not reach a scrollable grid's inner grid (ScrollableItemGridWindow
@@ -157,6 +158,11 @@ export class InventoryView
 
         if(!selected) this._selected = 0;
 
+        const currency = this._currency();
+        const thousands = (value: number | null): string => String(value ?? 0).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+
+        this._bits.setText(window, 'gold_amount', thousands(currency.gold));
+        this._bits.setText(window, 'gems_amount', thousands(currency.gems));
         this.renderGrid(window, items, bagSize);
         this._bits.setText(window, 'bag_count', this._bits.text('vortex.inventory.bag_count',
             'count', String(items.filter(item => item.container === 0).length), 'max', String(bagSize)));

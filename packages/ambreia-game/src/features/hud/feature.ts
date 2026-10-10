@@ -9,6 +9,7 @@ import {HudPanelsState, type IChatLine} from './HudPanelsState';
 import {bindCharacterToHud} from './CharacterHudBridge';
 import {ChatPanel} from './ChatPanel';
 import {CHAT_ICONS, loadChatSettings} from './chatModel';
+import {WindowBits} from '../character/WindowBits';
 
 // The demo's icons: read by name (static_bitmap asset_uri set at run time), so declared to be
 // decoded at load (IGameFeature.images). The server's skills, quests and effects will come with
@@ -59,6 +60,23 @@ export const HudFeature: IGameFeature = {
 
         // What is typed goes to the chat feature (F3c), which sends it; the server's copy comes back as a line.
         const chat = (message: string): void => void panels.events.emit('say', message);
+        // The camera button: the canvas as it is, saved as a PNG by the browser.
+        const screenshot = (): void =>
+        {
+            const canvas = globalThis.document?.getElementById('vortex-canvas') as HTMLCanvasElement | null;
+
+            canvas?.toBlob(blob =>
+            {
+                if(!blob) return;
+
+                const link = document.createElement('a');
+
+                link.href = URL.createObjectURL(blob);
+                link.download = `ambreia-${Date.now()}.png`;
+                link.click();
+                URL.revokeObjectURL(link.href);
+            });
+        };
 
         const show = (): void =>
         {
@@ -66,15 +84,18 @@ export const HudFeature: IGameFeature = {
 
             if(!windows) return;
 
-            // The panels first: the frame and the bar are laid out around the top bar and the chat.
-            panelsView ??= new HudPanelsView(windows, panels, host.made.localization, chat, () => view?.relayout());
-            view ??= new HudView(windows, state);
+            // The panels first: the chat and the target are laid out above the bottom bar.
+            const nav = (name: string): void => void panels.events.emit('nav', name);
+
+            panelsView ??= new HudPanelsView(windows, panels, host.made.localization, chat, () => view?.relayout(), nav);
+            view ??= new HudView(windows, state, new WindowBits(host.made.localization), {nav, more: anchor => panelsView?.moreMenu(anchor), screenshot});
             // The played character's name and figure (F3a); the session data's only without a character list.
             const played = host.made.character?.played ?? null;
 
             state.update({name: played?.name ?? host.made.sessionData?.userName ?? '', figure: played?.figure ?? host.made.sessionData?.figure ?? ''});
             panelsView.show();
             view.show();
+            view.setNav(panels.value.navOpen, panels.value.questAlert);
         };
         const hide = (): void =>
         {
@@ -86,6 +107,8 @@ export const HudFeature: IGameFeature = {
 
         // The played character fills the HUD (F3a): level, XP, and the bars' maxima.
         if(host.made.character) bindCharacterToHud(host.made.character, state);
+        // The bottom bar marks the button whose window is open, and the quests one with its « ! ».
+        panels.events.on('changed', value => view?.setNav(value.navOpen, value.questAlert));
 
         const sessionEvents = host.made.roomSession?.sessionEvents;
 

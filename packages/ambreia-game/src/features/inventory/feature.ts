@@ -74,9 +74,24 @@ export const InventoryFeature: IGameFeature = {
             if(!inWorld || !windows) return;
 
             void loadTexts();
-            if(which === 'inventory') (inventory ??= new InventoryView(windows, bits(), session, () => stats, figure)).toggle();
+            if(which === 'inventory') (inventory ??= new InventoryView(windows, bits(), session, () => stats, figure, currency)).toggle();
             else (character ??= new CharacterWindow(windows, bits(), session, () => stats, figure)).toggle();
+            // The bottom bar's button of the bag shows its window is open.
+            host.made.hud?.update({navOpen: inventory?.visible ? 'nav_inventory' : null});
         };
+        // The bag shows the gold and gems the HUD knows (the top bar used to).
+        const currency = (): {gold: number | null; gems: number | null} => ({gold: host.made.hud?.value.gold ?? null, gems: host.made.hud?.value.gems ?? null});
+        let lastCurrency = '';
+
+        host.made.hud?.events.on('changed', value =>
+        {
+            const now = `${value.gold}/${value.gems}`;
+
+            if(now === lastCurrency) return;
+
+            lastCurrency = now;
+            inventory?.renderStats();
+        });
 
         const onStats = (message: {stats: IRpgStatBlock}): void =>
         {
@@ -101,6 +116,7 @@ export const InventoryFeature: IGameFeature = {
         host.made.hud?.events.on('nav', name =>
         {
             if(name === 'nav_inventory') open('inventory');
+            else if(name === 'nav_character') open('character');
         });
 
         // I and C, unless a text field has the keyboard (the window system's fields are DOM inputs).
