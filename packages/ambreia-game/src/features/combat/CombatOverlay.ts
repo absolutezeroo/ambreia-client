@@ -216,6 +216,15 @@ export class CombatOverlay
         this.mark(objectId, null);
     }
 
+    /** Drops what belongs to objects no longer in the room (`alive` says which still are). */
+    prune(alive: (objectId: number) => boolean): void
+    {
+        for(const objectId of [...this._bars.keys(), ...this._casts.keys(), ...this._yells.keys(), ...this._marks.keys()])
+        {
+            if(!alive(objectId)) this.remove(objectId);
+        }
+    }
+
     clear(): void
     {
         for(const bar of this._bars.values()) bar.window.destroy();

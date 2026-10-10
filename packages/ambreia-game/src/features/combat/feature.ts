@@ -1,5 +1,6 @@
 import {Logger} from '@ambreia/common/utils/Logger';
 import {RoomSessionEvent} from '../../session/events/RoomSessionEvent';
+import {RoomSessionUserDataUpdateEvent} from '../../session/events/RoomSessionUserDataUpdateEvent';
 import type {IRoomSession} from '../../session/IRoomSession';
 import {UserDataType} from '../../session/UserData';
 import type {IGameFeature} from '../GameFeature';
@@ -37,6 +38,22 @@ export const CombatFeature: IGameFeature = {
         let overlay: CombatOverlay | null = null;
         let room: IRoomSession | null = null;
         let countdown: ReturnType<typeof setInterval> | null = null;
+        // Every delayed effect belongs to the zone it was fired in: a flight or a hit that lands after
+        // a zone change would play on whatever object holds the same id in the next room. The epoch
+        // changes on RSE_ENDED and a pending timer whose epoch is gone does nothing.
+        let epoch = 0;
+        const pending = new Set<ReturnType<typeof setTimeout>>();
+        const later = (run: () => void, delayMs: number): void =>
+        {
+            const at = epoch;
+            const handle = setTimeout(() =>
+            {
+                pending.delete(handle);
+                if(epoch === at) run();
+            }, delayMs);
+
+            pending.add(handle);
+        };
 
         host.made.combat = session;
 
@@ -95,7 +112,7 @@ export const CombatFeature: IGameFeature = {
                 else if(cell) vfx.burstAt(sheet, cell.x, cell.y);
             };
 
-            if(phase.delayMs > 0) setTimeout(go, phase.delayMs);
+            if(phase.delayMs > 0) later(go, phase.delayMs);
             else go();
 
             return phase.delayMs;
@@ -173,7 +190,7 @@ export const CombatFeature: IGameFeature = {
                 const hit = MISSED.has(outcome.outcome) ? null : skillSet(outcome.sourceId)?.hit ?? null;
                 const delay = flight + (hit?.delayMs ?? 0);
 
-                if(hit) setTimeout(() => play({...hit, delayMs: 0}, outcome.targetObjectId), delay);
+                if(hit) later(() => play({...hit, delayMs: 0}, outcome.targetObjectId), delay);
                 overlayOf()?.hit(outcome.targetObjectId, outcome.amount, outcome.outcome, outcome.absorbed, delay);
                 if(outcome.killed && isMonster(outcome.targetObjectId)) overlay?.remove(outcome.targetObjectId);
             }
@@ -262,9 +279,27 @@ export const CombatFeature: IGameFeature = {
         const sessionEvents = host.made.roomSession?.sessionEvents;
 
         sessionEvents?.on(RoomSessionEvent.RSE_STARTED, (event: RoomSessionEvent) => room = event.session);
+        // A player who leaves hurt took their bar's object id with them; without this the overlay
+        // kept an invisible bar per departed player for the whole visit (a monster's goes on kill).
+        sessionEvents?.on(RoomSessionUserDataUpdateEvent.RSUDUE_USER_DATA_UPDATE, (event: RoomSessionUserDataUpdateEvent) =>
+        {
+            if(event.addedUsers.length === 0) overlay?.prune(objectId => event.session.userDataManager.getUserDataByIndex(objectId) !== null);
+        });
         sessionEvents?.on(RoomSessionEvent.RSE_ENDED, () =>
         {
             room = null;
+            epoch++;
+            for(const handle of pending) clearTimeout(handle);
+            pending.clear();
+
+            // The death countdown belonged to that zone's ghost; the next zone starts clean.
+            if(countdown !== null)
+            {
+                clearInterval(countdown);
+                countdown = null;
+                host.made.hud?.update({alert: null});
+            }
+
             session.forget();
             overlay?.clear();
             // The canvas took the sprites with it; the loops' handles would only hold their closures.
@@ -289,7 +324,7 @@ export const CombatFeature: IGameFeature = {
                 if(what === 'cast')
                 {
                     session.cast(objectId, {durationMs: 2000, channel: false, skillId});
-                    setTimeout(() => session.cast(objectId, null), 2000);
+                    later(() => session.cast(objectId, null), 2000);
 
                     return;
                 }
@@ -304,7 +339,7 @@ export const CombatFeature: IGameFeature = {
                     return;
                 }
 
-                ['hit', 'crit', 'miss'].forEach((outcome, i) => setTimeout(() => session.events.emit('hits', new RpgCombatEventsMessage([
+                ['hit', 'crit', 'miss'].forEach((outcome, i) => later(() => session.events.emit('hits', new RpgCombatEventsMessage([
                     {attackerId: self, targetId: objectId, amount: 7 * (i + 1), outcome, health: 28 - 7 * i, maxHealth: 40, killed: false}
                 ])), i * 700));
             }
