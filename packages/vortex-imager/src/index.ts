@@ -180,12 +180,11 @@ async function boot(): Promise<void>
  */
 async function bootRooms(avatars: AvatarService): Promise<RoomService | null>
 {
-    const context = avatars.context;
     const assetLibrary = avatars.assetLibrary;
-    const configuration = avatars.configuration;
+    const properties = avatars.properties;
     const directories = avatars.assetDirectories;
 
-    if(context === null || assetLibrary === null || configuration === null || directories === null)
+    if(assetLibrary === null || properties === null || directories === null)
     {
         log.warn('Avatar core is not available — furniture and room rendering are disabled');
 
@@ -194,7 +193,7 @@ async function bootRooms(avatars: AvatarService): Promise<RoomService | null>
 
     try
     {
-        return new RoomRenderService(await RoomStack.boot(context, assetLibrary, configuration, directories));
+        return new RoomRenderService(await RoomStack.boot(assetLibrary, properties, directories));
     }
     catch (error)
     {

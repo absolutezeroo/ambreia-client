@@ -10,5 +10,5 @@
         "declaration": false,
         "noEmit": true
     },
-    "include": ["src/**/*", "../vortex-engine/src/**/*"]
+    "include": ["src/**/*"]
 }

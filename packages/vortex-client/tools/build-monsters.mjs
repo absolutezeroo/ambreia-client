@@ -20,7 +20,7 @@ import {petNames} from './ambreia-families.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const MONSTERS = resolve(HERE, '../monsters');
-const LEGACY_DEFAULTS = resolve(HERE, '../../ambreia-game/src/configuration/legacy.defaults.json');
+const LEGACY_DEFAULTS = resolve(HERE, '../../ambreia-common/src/config/legacy.defaults.json');
 const SIZE = 64;
 /** FurnitureVisualization.UPDATE_INTERVAL: a pet animation advances one frame per 41 ms. */
 export const FRAME_MS = 41;

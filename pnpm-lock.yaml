@@ -390,24 +390,9 @@ importers:
       '@ambreia/common':
         specifier: workspace:*
         version: link:../ambreia-common
-      '@ambreia/game':
-        specifier: workspace:*
-        version: link:../ambreia-game
       '@ambreia/iso':
         specifier: workspace:*
         version: link:../ambreia-iso
-      '@ambreia/kernel':
-        specifier: workspace:*
-        version: link:../ambreia-kernel
-      '@ambreia/net':
-        specifier: workspace:*
-        version: link:../ambreia-net
-      '@ambreia/protocol':
-        specifier: workspace:*
-        version: link:../ambreia-protocol
-      '@ambreia/ui':
-        specifier: workspace:*
-        version: link:../ambreia-ui
       '@napi-rs/canvas':
         specifier: ^0.1.71
         version: 0.1.100
@@ -426,12 +411,6 @@ importers:
       mysql2:
         specifier: ^3.12.0
         version: 3.23.2(@types/node@22.19.10)
-      pako:
-        specifier: ^2.1.0
-        version: 2.1.0
-      vortex-engine:
-        specifier: workspace:*
-        version: link:../vortex-engine
     devDependencies:
       '@types/node':
         specifier: ^22.10.0

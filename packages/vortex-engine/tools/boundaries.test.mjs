@@ -278,3 +278,17 @@ test('game features: another feature is reached only through its I*.ts or events
     assert.equal(kit.length, 0);
     assert.equal(own.length, 0);
 });
+
+test('imager: the game, the kernel and the engine shell are refused; avatar, iso and common are allowed', async () =>
+{
+    const probe = 'packages/vortex-imager/src/avatar/Probe.ts';
+    const game = await wallHits("import {LEGACY_DEFAULTS} from '@ambreia/game/configuration/legacyDefaults';\nexport {LEGACY_DEFAULTS};\n", probe);
+    const kernel = await wallHits("import {Core} from '@ambreia/kernel/Core';\nexport {Core};\n", probe);
+    const engine = await wallHits("import {Vortex} from 'vortex-engine/src/Vortex';\nexport {Vortex};\n", probe);
+    const allowed = await wallHits("import {RoomManager} from '@ambreia/iso/RoomManager';\nimport {AvatarRenderManager} from '@ambreia/avatar/AvatarRenderManager';\nimport {Logger} from '@ambreia/common/utils/Logger';\nexport {RoomManager, AvatarRenderManager, Logger};\n", probe);
+
+    assert.equal(game.length, 1);
+    assert.equal(kernel.length, 1);
+    assert.equal(engine.length, 1);
+    assert.equal(allowed.length, 0);
+});

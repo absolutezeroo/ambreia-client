@@ -332,6 +332,20 @@ export default tseslint.config(
         }
     })),
     {
+        // The imager is the avatar and room engines run in Node: it stands on @ambreia/avatar, iso
+        // and common, and on nothing of the game, the kernel or the client (spec §3; AV-02).
+        files: ['packages/vortex-imager/src/**/*.ts'],
+        rules:
+        {
+            'no-restricted-imports': wall(
+                {
+                    regex: '^@ambreia/(game|kernel|net|protocol|ui)(/|$)|(^|/)vortex-(engine|client|glaze)(/|$)|(^|/)ambreia-[a-z]+/src(/|$)',
+                    message: `vortex-imager stands on @ambreia/avatar, @ambreia/iso and @ambreia/common only (${WALLS_SPEC}).`
+                }
+            )
+        }
+    },
+    {
         // Glaze is the window system's own editor: it stands on @ambreia/ui and @ambreia/common, so
         // what it can do is what any other host of the window system can (spec §11, J3).
         files: ['packages/vortex-glaze/src/**/*.ts'],

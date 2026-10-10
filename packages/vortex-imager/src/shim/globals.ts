@@ -40,7 +40,6 @@ export function installGlobals(options: IGlobalsOptions): void
     installCanvas();
     installXml();
     installDocument();
-    installStorage();
 
     if(options.assetsRoot !== null) installFileBackedFetch(options.assetsRoot, options.assetsBaseUrl);
 }
@@ -110,36 +109,6 @@ function installDocument(): void
         },
         body: host.body,
         documentElement: host.documentElement
-    };
-}
-
-/**
- * An in-memory `localStorage`.
- *
- * `HabboConfigurationManager.initEmbeddedConfigurations()` reads the browser's stored hotel
- * choice (`vortex_environment`) before falling back to the first entry of
- * `live.environment.list`. There is no stored choice on a server, and the imager sets its
- * environment explicitly anyway, so an empty store is exactly the right answer — it just has
- * to exist, because the read is unguarded.
- */
-function installStorage(): void
-{
-    const globals = globalThis as Record<string, unknown>;
-
-    if(typeof globals.localStorage !== 'undefined') return;
-
-    const store = new Map<string, string>();
-
-    globals.localStorage = {
-        get length(): number
-        {
-            return store.size;
-        },
-        getItem: (key: string): string | null => store.get(key) ?? null,
-        setItem: (key: string, value: string): void => void store.set(key, String(value)),
-        removeItem: (key: string): void => void store.delete(key),
-        clear: (): void => store.clear(),
-        key: (index: number): string | null => [...store.keys()][index] ?? null
     };
 }
 
