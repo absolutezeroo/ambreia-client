@@ -1,0 +1,89 @@
+{
+  "id": "ogre",
+  "ramps": {
+    "skin": ["#26301e", "#3f5130", "#5d7442", "#7f9658", "#a8b97c"],
+    "belly": ["#3a3f22", "#5a6436", "#7d8a4d", "#a1ad6a", "#c6cf92"],
+    "cloth": ["#2a1c14", "#46301f", "#664630", "#8a6343", "#ad8560"],
+    "tusk": ["#6b6150", "#9a8f78", "#c8bea4", "#e6dfca", "#faf6ea"],
+    "wood": ["#241710", "#3d281a", "#5a3d27", "#7a5638", "#9c7350"],
+    "nail": ["#2a2622", "#3e3832", "#57504a", "#736b63", "#918a82"]
+  },
+  "materials": {
+    "skin": {"ramp": "skin", "specular": 0.5, "shininess": 24},
+    "belly": {"ramp": "belly", "when": [{"normalUp": [0.45, 1], "ramp": "skin"}], "specular": 0.4, "shininess": 20},
+    "foot": {"ramp": "skin", "when": [{"forward": [4.6, 99], "ramp": "nail"}], "specular": 0.5, "shininess": 24},
+    "cloth": {"ramp": "cloth", "texture": "fur"},
+    "tusk": {"ramp": "tusk", "specular": 1, "shininess": 12, "glint": "#ffffff"},
+    "wood": {"ramp": "wood", "texture": "fur", "specular": 0.2},
+    "nail": {"ramp": "nail", "specular": 0.8, "shininess": 16}
+  },
+  "bones": {
+    "body": {"at": [0, 0, 20]},
+    "head": {"parent": "body", "at": [3, 0, 28]},
+    "arm.l": {"parent": "body", "at": [0, 10.5, 26.5]},
+    "leg.l": {"parent": "body", "at": [0.6, 4.2, 16]}
+  },
+  "shapes": [
+    {"name": "thigh", "bone": "leg.l", "ellipsoid": {"center": [0.6, 4.2, 12.8], "radii": [3.9, 3.4, 4.4]}, "material": "skin", "blend": 2},
+    {"name": "knee", "bone": "leg.l", "ellipsoid": {"center": [1.8, 4.54, 8.4], "radii": [2.4, 2.4, 2.2]}, "material": "skin", "blend": 1.5},
+    {"name": "shin", "bone": "leg.l", "cone": {"from": [1.2, 4.62, 8.6], "to": [0.6, 4.62, 2.4], "radius": [2.8, 2.4]}, "material": "skin", "blend": 1.5},
+    {"name": "foot", "bone": "leg.l", "ellipsoid": {"center": [2.5, 4.62, 1.3], "radii": [3.7, 2.6, 1.5]}, "material": "foot", "blend": 1.2},
+    {"name": "belly", "bone": "body", "ellipsoid": {"center": [2.8, 0, 15.8], "radii": [7.6, 8.2, 7.2]}, "material": "belly", "blend": 0},
+    {"name": "loincloth", "bone": "body", "ellipsoid": {"center": [1.5, 0, 11.4], "radii": [7.4, 7.8, 2.8]}, "material": "cloth", "blend": 1},
+    {"name": "flap", "bone": "body", "membrane": {"points": [[5.5, -3, 11.2], [5.5, 3, 11.2], [6.6, 0, 5.8]], "thickness": 0.5}, "material": "cloth", "blend": 0},
+    {"name": "ribs", "bone": "body", "ellipsoid": {"center": [0, 0, 23.5], "radii": [5.5, 8.5, 6]}, "material": "skin", "blend": 3},
+    {"name": "pec", "bone": "body", "mirror": true, "ellipsoid": {"center": [2, 4, 24.2], "radii": [4.4, 4.4, 3.6]}, "material": "skin", "blend": 2},
+    {"name": "traps", "bone": "body", "ellipsoid": {"center": [-1.5, 0, 29], "radii": [4.8, 7, 4]}, "material": "skin", "blend": 3},
+    {"name": "shoulder", "bone": "body", "mirror": true, "ellipsoid": {"center": [0, 9.8, 27], "radii": [4.4, 4.2, 4.2]}, "material": "skin", "blend": 2.5},
+    {"name": "head", "bone": "head", "ellipsoid": {"center": [3.6, 0, 30.4], "radii": [4, 4, 4]}, "material": "skin", "blend": 3},
+    {"name": "brow", "bone": "head", "ellipsoid": {"center": [6, 0, 32.3], "radii": [1.5, 3.6, 1.2]}, "material": "skin", "blend": 1},
+    {"name": "nose", "bone": "head", "ellipsoid": {"center": [7.3, 0, 30.6], "radii": [1.6, 1.4, 1.5]}, "material": "skin", "blend": 1},
+    {"name": "jaw", "bone": "head", "ellipsoid": {"center": [6, 0, 28], "radii": [3, 3.8, 2.2]}, "material": "skin", "blend": 1},
+    {"name": "tusk", "bone": "head", "mirror": true, "cone": {"from": [6.8, 1.8, 28.6], "to": [8, 2.02, 31.6], "radius": [1.05, 0.35]}, "material": "tusk", "blend": 0},
+    {"name": "ear", "bone": "head", "mirror": true, "cone": {"from": [3, 3.78, 31.5], "to": [2, 6.3, 33.6], "radius": [1.3, 0.3]}, "material": "skin", "blend": 0.8},
+    {"name": "upper arm", "bone": "arm.l", "cone": {"from": [0, 10.5, 26.5], "to": [1, 12.3, 19.5], "radius": [3.2, 2.6]}, "material": "skin", "blend": 2},
+    {"name": "forearm", "bone": "arm.l", "ellipsoid": {"center": [2.2, 12.4, 16], "radii": [3.2, 3.2, 4.2]}, "material": "skin", "blend": 1.5},
+    {"name": "wrist", "bone": "arm.l", "cone": {"from": [2.5, 12, 14], "to": [3, 11.8, 11.5], "radius": [2.4, 2.2]}, "material": "skin", "blend": 1},
+    {"name": "fist", "bone": "arm.l", "ellipsoid": {"center": [3.4, 11.6, 10], "radii": [3, 2.8, 3]}, "material": "skin", "blend": 1.2},
+    {"name": "haft", "bone": "arm.l", "mirror": false, "cone": {"from": [3.4, 11.6, 10], "to": [8.8, 11.8, 2.8], "radius": [1.2, 2.2]}, "material": "wood", "blend": 0.3},
+    {"name": "club head", "bone": "arm.l", "mirror": false, "cone": {"from": [8.8, 11.8, 2.8], "to": [10.6, 11.9, 0.6], "radius": [3.4, 3.1]}, "material": "wood", "blend": 0.8},
+    {"name": "knot", "bone": "arm.l", "mirror": false, "ellipsoid": {"center": [6.1, 12.7, 6.4], "radii": [1.5, 1.5, 1.5]}, "material": "wood", "blend": 0.6},
+    {"name": "stud", "bone": "arm.l", "mirror": false, "ellipsoid": {"center": [10.6, 14.4, 1.6], "radii": [1.1, 1.1, 1.1]}, "material": "nail", "blend": 0.2}
+  ],
+  "decals": [
+    {"kind": "pixel", "bone": "head", "at": [6.9, 1.6, 31.3], "mirror": true, "colours": ["#e3c24a"]},
+    {"kind": "pixel", "bone": "head", "at": [8.6, 0.6, 30.3], "mirror": true, "colours": ["#1b2414"]},
+    {"kind": "pixel", "bone": "head", "at": [8.6, 0, 29], "colours": ["#1a1f12"]},
+    {"kind": "pixel", "bone": "head", "at": [8.6, 0.7, 29], "mirror": true, "colours": ["#1a1f12"]},
+    {"kind": "pixel", "bone": "head", "at": [8.4, 1.4, 29], "mirror": true, "colours": ["#1a1f12"]},
+    {"kind": "pixel", "bone": "body", "at": [10.2, 0, 15.2], "colours": ["#3f4a28"]}
+  ],
+  "animations": {
+    "idle": [
+      {"ms": 300},
+      {"ms": 280, "pose": {"head": {"rotate": [0, -4, 0]}, "arm.l": {"rotate": [-3, 0, 0]}}}
+    ],
+    "walk": [
+      {"ms": 160, "pose": {"leg.l": {"rotate": [0, 15, 0]}, "leg.r": {"rotate": [0, -15, 0]}, "arm.l": {"rotate": [0, -12, 0]}, "arm.r": {"rotate": [0, 12, 0]}, "body": {"rotate": [0, 0, 4]}}},
+      {"ms": 160},
+      {"ms": 160, "pose": {"leg.l": {"rotate": [0, -15, 0]}, "leg.r": {"rotate": [0, 15, 0]}, "arm.l": {"rotate": [0, 12, 0]}, "arm.r": {"rotate": [0, -12, 0]}, "body": {"rotate": [0, 0, -4]}}},
+      {"ms": 160}
+    ],
+    "attack": [
+      {"ms": 220, "pose": {"arm.l": {"rotate": [0, 165, 0]}, "arm.r": {"rotate": [0, 0, 0]}, "body": {"rotate": [0, 6, 0]}}},
+      {"ms": 90, "pose": {"arm.l": {"rotate": [0, 60, 0]}, "arm.r": {"rotate": [0, 0, 0]}, "body": {"rotate": [0, -8, 0]}}},
+      {"ms": 200, "pose": {"arm.l": {"rotate": [0, 25, 0]}, "arm.r": {"rotate": [0, 0, 0]}, "body": {"rotate": [0, -12, 0], "move": [1, 0, -1]}}},
+      {"ms": 160}
+    ],
+    "hit": [
+      {"ms": 90, "flash": true, "pose": {"body": {"rotate": [0, 8, 0], "move": [-1.5, 0, 0]}}},
+      {"ms": 160, "pose": {"body": {"rotate": [0, 8, 0], "move": [-1.5, 0, 0]}}}
+    ],
+    "death": [
+      {"ms": 200, "pose": {"body": {"rotate": [0, -15, 0]}, "head": {"rotate": [0, -15, 0]}}},
+      {"ms": 200, "pose": {"body": {"rotate": [0, -50, 0], "move": [0, 0, -6]}}},
+      {"ms": 260, "pose": {"body": {"rotate": [0, -85, 0], "move": [0, 0, -13]}, "arm.l": {"rotate": [0, 60, 0]}}},
+      {"ms": 600, "pose": {"body": {"rotate": [0, -85, 0], "move": [0, 0, -13]}, "arm.l": {"rotate": [0, 60, 0]}}}
+    ]
+  }
+}

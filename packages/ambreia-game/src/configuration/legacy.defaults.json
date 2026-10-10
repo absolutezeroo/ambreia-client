@@ -21,7 +21,7 @@
   "image.library.badgepart.url": "${url.prefix}/c_images/Badgeparts/",
   "image.library.url": "${url.prefix}/c_images/",
   "link.format.userpage": "${url.prefix}/profile/%username%",
-  "pet.configuration": "dog,cat,croco,terrier,bear,pig,lion,rhino,spider,turtle,chicken,frog,dragon,monster,monkey,horse,monsterplant,bunnyeaster,bunnyevil,bunnydepressed,bunnylove,pigeongood,pigeonevil,demonmonkey,bearbaby,terrierbaby,gnome,gnome,kittenbaby,puppybaby,pigletbaby,haloompa,fools,pterosaur,velociraptor,cow,dragondog,slime,wolf",
+  "pet.configuration": "dog,cat,croco,terrier,bear,pig,lion,rhino,spider,turtle,chicken,frog,dragon,monster,monkey,horse,monsterplant,bunnyeaster,bunnyevil,bunnydepressed,bunnylove,pigeongood,pigeonevil,demonmonkey,bearbaby,terrierbaby,gnome,gnome,kittenbaby,puppybaby,pigletbaby,haloompa,fools,pterosaur,velociraptor,cow,dragondog,slime,wolf,ogre,drake",
   "room.camera.follow_user": "true",
   "room.dragging.always_center": "0",
   "seasonalcurrency.id.84": "vortex",

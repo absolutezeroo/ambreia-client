@@ -1,0 +1,116 @@
+{
+  "id": "drake",
+  "ramps": {
+    "scale": ["#34101a", "#621b22", "#932b28", "#bf4a2f", "#e6813f"],
+    "belly": ["#5a3812", "#8a5d1d", "#b98a30", "#ddb553", "#f3dc8c"],
+    "membrane": ["#250b18", "#431326", "#652035", "#873446", "#a9525a"],
+    "horn": ["#5e5546", "#8c826d", "#bab09a", "#dcd5c0", "#f6f2e4"],
+    "claw": ["#141216", "#221f24", "#332f35", "#47424a", "#5e5862"]
+  },
+  "materials": {
+    "scale": {"ramp": "scale", "when": [{"normalUp": [-1, -0.35], "ramp": "belly"}], "texture": "scales", "specular": 0.9, "shininess": 28, "glint": "#ffd27a"},
+    "limb": {"ramp": "scale", "specular": 0.9, "shininess": 28, "glint": "#ffd27a"},
+    "belly": {"ramp": "belly", "specular": 0.6, "shininess": 20},
+    "membrane": {"ramp": "membrane", "specular": 0.3},
+    "horn": {"ramp": "horn", "specular": 1, "shininess": 14, "glint": "#ffffff"},
+    "claw": {"ramp": "claw", "specular": 0.8, "shininess": 16}
+  },
+  "bones": {
+    "body": {"at": [0, 0, 19]},
+    "neck": {"parent": "body", "at": [12, 0, 24]},
+    "head": {"parent": "neck", "at": [20.3, 0, 36]},
+    "jaw": {"parent": "head", "at": [23, 0, 35.2]},
+    "tail": {"parent": "body", "at": [-14, 0, 19]},
+    "tail2": {"parent": "tail", "at": [-22, 0, 15]},
+    "tail3": {"parent": "tail2", "at": [-29, 0, 9.5]},
+    "fleg.l": {"parent": "body", "at": [7.5, 4.8, 16]},
+    "hleg.l": {"parent": "body", "at": [-11, 4.8, 15]},
+    "wing.l": {"parent": "body", "at": [3, 5.2, 27]}
+  },
+  "shapes": [
+    {"name": "chest", "bone": "body", "ellipsoid": {"center": [6, 0, 20], "radii": [8.5, 6.2, 7.2]}, "material": "scale", "blend": 0},
+    {"name": "body", "bone": "body", "cone": {"from": [6, 0, 19], "to": [-10, 0, 18], "radius": [6.4, 5.4]}, "material": "scale", "blend": 3},
+    {"name": "hips", "bone": "body", "ellipsoid": {"center": [-11, 0, 18], "radii": [6, 5.4, 5.6]}, "material": "scale", "blend": 3},
+    {"name": "shoulder", "bone": "fleg.l", "ellipsoid": {"center": [7.5, 4.8, 16], "radii": [3.6, 2.6, 4.6]}, "material": "limb", "blend": 2},
+    {"name": "foreleg", "bone": "fleg.l", "cone": {"from": [8.5, 5.28, 12], "to": [8.8, 5.52, 1.8], "radius": [2.2, 1.7]}, "material": "limb", "blend": 1.5},
+    {"name": "front foot", "bone": "fleg.l", "ellipsoid": {"center": [10.4, 5.52, 1.2], "radii": [2.6, 2.2, 1.2]}, "material": "limb", "blend": 1},
+    {"name": "front claw", "bone": "fleg.l", "cone": {"from": [12, 4.32, 1.3], "to": [13.8, 4.08, 0.5], "radius": [0.5, 0.15]}, "material": "claw", "blend": 0.2},
+    {"name": "front claw", "bone": "fleg.l", "cone": {"from": [12, 5.52, 1.3], "to": [13.8, 5.52, 0.5], "radius": [0.5, 0.15]}, "material": "claw", "blend": 0.2},
+    {"name": "front claw", "bone": "fleg.l", "cone": {"from": [12, 6.72, 1.3], "to": [13.8, 6.96, 0.5], "radius": [0.5, 0.15]}, "material": "claw", "blend": 0.2},
+    {"name": "thigh", "bone": "hleg.l", "ellipsoid": {"center": [-11, 4.8, 15], "radii": [4.8, 2.8, 5.6]}, "material": "limb", "blend": 2.5},
+    {"name": "shin", "bone": "hleg.l", "cone": {"from": [-11.5, 5.28, 10.5], "to": [-15, 5.38, 6], "radius": [2.4, 1.6]}, "material": "limb", "blend": 1.5},
+    {"name": "metatarsus", "bone": "hleg.l", "cone": {"from": [-15, 5.38, 6], "to": [-11, 5.52, 1.6], "radius": [1.6, 1.5]}, "material": "limb", "blend": 1},
+    {"name": "hind foot", "bone": "hleg.l", "ellipsoid": {"center": [-9, 5.52, 1.2], "radii": [2.6, 2.2, 1.2]}, "material": "limb", "blend": 1},
+    {"name": "hind claw", "bone": "hleg.l", "cone": {"from": [-7.4, 4.32, 1.3], "to": [-5.6, 4.08, 0.5], "radius": [0.5, 0.15]}, "material": "claw", "blend": 0.2},
+    {"name": "hind claw", "bone": "hleg.l", "cone": {"from": [-7.4, 5.52, 1.3], "to": [-5.6, 5.52, 0.5], "radius": [0.5, 0.15]}, "material": "claw", "blend": 0.2},
+    {"name": "hind claw", "bone": "hleg.l", "cone": {"from": [-7.4, 6.72, 1.3], "to": [-5.6, 6.96, 0.5], "radius": [0.5, 0.15]}, "material": "claw", "blend": 0.2},
+    {"name": "neck", "bone": "neck", "cone": {"from": [12, 0, 24], "to": [16, 0, 30], "radius": [4, 2.9]}, "material": "scale", "blend": 3},
+    {"name": "upper neck", "bone": "neck", "cone": {"from": [16, 0, 30], "to": [20.3, 0, 36], "radius": [2.9, 2.6]}, "material": "scale", "blend": 2.5},
+    {"name": "skull", "bone": "head", "ellipsoid": {"center": [22.5, 0, 37.5], "radii": [3.6, 2.9, 2.8]}, "material": "scale", "blend": 2},
+    {"name": "brow", "bone": "head", "mirror": true, "ellipsoid": {"center": [24.1, 1.6, 39], "radii": [2, 0.9, 0.8]}, "material": "scale", "blend": 0.8},
+    {"name": "snout", "bone": "head", "cone": {"from": [24, 0, 37], "to": [29.5, 0, 35.5], "radius": [2.3, 1.6]}, "material": "scale", "blend": 1.5},
+    {"name": "jaw", "bone": "jaw", "cone": {"from": [23, 0, 35.2], "to": [28.8, 0, 34.2], "radius": [1.6, 1.1]}, "material": "belly", "blend": 0.6},
+    {"name": "fang", "bone": "jaw", "mirror": true, "cone": {"from": [27.4, 0.9, 34.9], "to": [27.6, 0.9, 35.9], "radius": [0.35, 0.1]}, "material": "horn", "blend": 0},
+    {"name": "horn", "bone": "head", "mirror": true, "cone": {"from": [21, 1.5, 39.5], "to": [18.5, 2.18, 42.5], "radius": [1, 0.6]}, "material": "horn", "blend": 0.4},
+    {"name": "horn tip", "bone": "head", "mirror": true, "cone": {"from": [18.5, 2.18, 42.5], "to": [15.5, 2.55, 43.5], "radius": [0.6, 0.15]}, "material": "horn", "blend": 0.2},
+    {"name": "spike", "bone": "body", "cone": {"from": [-16, 0, 22.5], "to": [-17.8, 0, 26.6], "radius": [1.2, 0.15]}, "material": "horn", "blend": 0.4},
+    {"name": "spike", "bone": "body", "cone": {"from": [-12, 0, 22.7], "to": [-13.8, 0, 26.8], "radius": [1.2, 0.15]}, "material": "horn", "blend": 0.4},
+    {"name": "spike", "bone": "body", "cone": {"from": [-8, 0, 22.9], "to": [-9.8, 0, 27], "radius": [1.2, 0.15]}, "material": "horn", "blend": 0.4},
+    {"name": "spike", "bone": "body", "cone": {"from": [-4, 0, 23.1], "to": [-5.8, 0, 27.2], "radius": [1.2, 0.15]}, "material": "horn", "blend": 0.4},
+    {"name": "spike", "bone": "body", "cone": {"from": [0, 0, 23.3], "to": [-1.8, 0, 27.4], "radius": [1.2, 0.15]}, "material": "horn", "blend": 0.4},
+    {"name": "spike", "bone": "body", "cone": {"from": [4, 0, 23.5], "to": [2.2, 0, 27.6], "radius": [1.2, 0.15]}, "material": "horn", "blend": 0.4},
+    {"name": "spike", "bone": "neck", "cone": {"from": [8, 0, 26], "to": [6.2, 0, 30.1], "radius": [1.2, 0.15]}, "material": "horn", "blend": 0.4},
+    {"name": "tail", "bone": "tail", "cone": {"from": [-14, 0, 19], "to": [-22, 0, 15], "radius": [4.6, 2.9]}, "material": "scale", "blend": 2.5},
+    {"name": "tail2", "bone": "tail2", "cone": {"from": [-22, 0, 15], "to": [-29, 0, 9.5], "radius": [2.9, 1.7]}, "material": "scale", "blend": 1.5},
+    {"name": "tail3", "bone": "tail3", "cone": {"from": [-29, 0, 9.5], "to": [-34, 0, 6.5], "radius": [1.7, 0.9]}, "material": "scale", "blend": 1},
+    {"name": "spade", "bone": "tail3", "membrane": {"points": [[-33, 0, 9], [-40, 0, 6.2], [-34, 0, 2.6]], "thickness": 0.6}, "material": "membrane", "blend": 0},
+    {"name": "wing arm", "bone": "wing.l", "cone": {"from": [3, 5.2, 27], "to": [-1, 11, 36], "radius": [1.9, 1.2]}, "material": "limb", "blend": 1.2},
+    {"name": "wing forearm", "bone": "wing.l", "cone": {"from": [-1, 11, 36], "to": [-5, 13.5, 43], "radius": [1.2, 0.8]}, "material": "limb", "blend": 0.8},
+    {"name": "wing claw", "bone": "wing.l", "cone": {"from": [-5, 13.5, 43], "to": [-3.5, 13.5, 44.8], "radius": [0.5, 0.1]}, "material": "horn", "blend": 0.2},
+    {"name": "finger", "bone": "wing.l", "cone": {"from": [-5, 13.5, 43], "to": [-13, 17, 41], "radius": [0.75, 0.25]}, "material": "limb", "blend": 0.3},
+    {"name": "finger", "bone": "wing.l", "cone": {"from": [-5, 13.5, 43], "to": [-17, 14, 33], "radius": [0.75, 0.25]}, "material": "limb", "blend": 0.3},
+    {"name": "finger", "bone": "wing.l", "cone": {"from": [-5, 13.5, 43], "to": [-16, 9.5, 26], "radius": [0.75, 0.25]}, "material": "limb", "blend": 0.3},
+    {"name": "wing", "bone": "wing.l", "membrane": {"points": [[3, 5.2, 27], [-1, 11, 36], [-11, 5.5, 22.5]], "thickness": 0.45}, "material": "membrane", "blend": 0},
+    {"name": "wing", "bone": "wing.l", "membrane": {"points": [[-1, 11, 36], [-5, 13.5, 43], [-11, 5.5, 22.5]], "thickness": 0.45}, "material": "membrane", "blend": 0},
+    {"name": "wing", "bone": "wing.l", "membrane": {"points": [[-5, 13.5, 43], [-13, 17, 41], [-11.7, 14.84, 38.98]], "thickness": 0.45}, "material": "membrane", "blend": 0},
+    {"name": "wing", "bone": "wing.l", "membrane": {"points": [[-5, 13.5, 43], [-11.7, 14.84, 38.98], [-17, 14, 33]], "thickness": 0.45}, "material": "membrane", "blend": 0},
+    {"name": "wing", "bone": "wing.l", "membrane": {"points": [[-5, 13.5, 43], [-17, 14, 33], [-12.7, 12.33, 33.96]], "thickness": 0.45}, "material": "membrane", "blend": 0},
+    {"name": "wing", "bone": "wing.l", "membrane": {"points": [[-5, 13.5, 43], [-12.7, 12.33, 33.96], [-16, 9.5, 26]], "thickness": 0.45}, "material": "membrane", "blend": 0},
+    {"name": "wing", "bone": "wing.l", "membrane": {"points": [[-5, 13.5, 43], [-16, 9.5, 26], [-10.7, 9.48, 30.44]], "thickness": 0.45}, "material": "membrane", "blend": 0},
+    {"name": "wing", "bone": "wing.l", "membrane": {"points": [[-5, 13.5, 43], [-10.7, 9.48, 30.44], [-11, 5.5, 22.5]], "thickness": 0.45}, "material": "membrane", "blend": 0}
+  ],
+  "decals": [
+    {"kind": "eye", "bone": "head", "at": [24.9, 1.9, 38.1], "mirror": true, "colours": ["#f5d04a", "#16100c"]},
+    {"kind": "pixel", "bone": "head", "at": [29.7, 0.8, 36.4], "mirror": true, "colours": ["#1a0a0c"]}
+  ],
+  "animations": {
+    "idle": [
+      {"ms": 300},
+      {"ms": 260, "pose": {"neck": {"rotate": [0, 3, 0]}, "wing.l": {"rotate": [6, 0, 0]}, "tail": {"rotate": [0, 0, 4]}}},
+      {"ms": 300},
+      {"ms": 260, "pose": {"tail": {"rotate": [0, 0, -4]}}}
+    ],
+    "walk": [
+      {"ms": 130, "pose": {"fleg.l": {"rotate": [0, 16, 0]}, "fleg.r": {"rotate": [0, -16, 0]}, "hleg.l": {"rotate": [0, -16, 0]}, "hleg.r": {"rotate": [0, 16, 0]}, "tail": {"rotate": [0, 0, 6]}}},
+      {"ms": 130},
+      {"ms": 130, "pose": {"fleg.l": {"rotate": [0, -16, 0]}, "fleg.r": {"rotate": [0, 16, 0]}, "hleg.l": {"rotate": [0, 16, 0]}, "hleg.r": {"rotate": [0, -16, 0]}, "tail": {"rotate": [0, 0, -6]}}},
+      {"ms": 130}
+    ],
+    "attack": [
+      {"ms": 180, "pose": {"body": {"rotate": [0, 8, 0], "move": [0, 0, 2]}, "neck": {"rotate": [0, 12, 0]}, "wing.l": {"rotate": [18, 0, 0]}}},
+      {"ms": 100, "pose": {"body": {"rotate": [0, 4, 0], "move": [3, 0, 1]}, "neck": {"rotate": [0, -18, 0]}, "jaw": {"rotate": [0, -30, 0]}, "wing.l": {"rotate": [28, -8, 0]}}},
+      {"ms": 200, "pose": {"body": {"move": [4, 0, 0]}, "neck": {"rotate": [0, -14, 0]}, "jaw": {"rotate": [0, -30, 0]}, "wing.l": {"rotate": [20, 0, 0]}}},
+      {"ms": 140, "pose": {"body": {"move": [1, 0, 0]}}}
+    ],
+    "hit": [
+      {"ms": 90, "flash": true, "pose": {"body": {"move": [-2, 0, 0]}, "neck": {"rotate": [0, 10, 0]}}},
+      {"ms": 150, "pose": {"body": {"move": [-2, 0, 0]}, "neck": {"rotate": [0, 10, 0]}}}
+    ],
+    "death": [
+      {"ms": 180, "pose": {"neck": {"rotate": [0, -25, 0]}, "body": {"move": [0, 0, -2]}}},
+      {"ms": 180, "pose": {"body": {"rotate": [40, 0, 0], "move": [0, 0, -6]}, "neck": {"rotate": [0, -30, 0]}}},
+      {"ms": 220, "pose": {"body": {"rotate": [80, 0, 0], "move": [0, 0, -11]}, "neck": {"rotate": [0, -35, 0]}, "wing.l": {"rotate": [-20, 0, 0]}}},
+      {"ms": 600, "pose": {"body": {"rotate": [80, 0, 0], "move": [0, 0, -11]}, "neck": {"rotate": [0, -35, 0]}, "wing.l": {"rotate": [-20, 0, 0]}}}
+    ]
+  }
+}

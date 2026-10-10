@@ -1,0 +1,19 @@
+{
+  "id": "drake",
+  "aseprite": "drake.aseprite",
+  "anchor": [
+    56,
+    66
+  ],
+  "directions": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "scale": 1
+}
