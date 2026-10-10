@@ -36,9 +36,22 @@ export function guardReason(filePath, repoRoot)
     return READ_ONLY.find(rule => rule.test(rel))?.reason ?? null;
 }
 
-// Paths of .ts files that `git status --porcelain` reports as present and changed (modified, added,
-// renamed or untracked); deleted files have nothing to typecheck.
-export function changedTypeScript(porcelain)
+// What `pnpm check` covers: package sources, tests and tools in every form they take (.ts, .mts,
+// .mjs, and the .json/.xml the game reads — layouts, locales, configuration), the repo's own
+// scripts, and the root manifests the check itself depends on. A docs or markdown edit is not it.
+const CHECKED_PATH = /^(packages\/[^/]+\/.+\.(ts|mts|mjs|json|xml)|\.claude\/scripts\/.+\.mjs|package\.json|eslint\.config\.mjs|tsconfig\.json|pnpm-workspace\.yaml)$/;
+
+/** Whether an edit to this repo-relative path can turn `pnpm check` red. */
+export function isCheckedSource(path)
+{
+    return CHECKED_PATH.test(path) && !path.includes('/node_modules/') && !path.includes('/dist/');
+}
+
+// Paths that `git status --porcelain` reports as present and changed (modified, added, renamed or
+// untracked) among the sources `pnpm check` covers; deleted files have nothing to check. The RPG
+// work is XML and JSON heavy (layouts, locales): a session that edits only those used to end with
+// no check at all.
+export function changedSources(porcelain)
 {
     const files = [];
 
@@ -52,7 +65,7 @@ export function changedTypeScript(porcelain)
         const status = line.slice(0, 2);
         const path = line.slice(3).split(' -> ').pop();
 
-        if(status.includes('D') || !path.endsWith('.ts'))
+        if(status.includes('D') || !isCheckedSource(path))
         {
             continue;
         }
@@ -62,6 +75,9 @@ export function changedTypeScript(porcelain)
 
     return files;
 }
+
+/** @deprecated the old name of changedSources(); kept for one release so a stale hook still runs. */
+export const changedTypeScript = changedSources;
 
 // Order-independent identity of a set of [path, mtimeMs] pairs: the Stop hook skips the check when
 // the files are exactly those it last saw pass.

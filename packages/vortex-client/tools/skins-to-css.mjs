@@ -182,7 +182,7 @@ function shadowPresets()
             const attrs = block[1];
             const num = (key, fallback) =>
             {
-                const m = attrs.match(new RegExp(key + '\s*=\s*"([^"]*)"'));
+                const m = attrs.match(new RegExp(key + '\\s*=\\s*"([^"]*)"'));
 
                 return m && m[1] !== '' ? Number(m[1]) : fallback;
             };
@@ -811,11 +811,9 @@ async function skinToCss(name, skin, cache, warnings, index, options, tints)
                 ...selectorsFor(layoutClass, state.name, options),
                 ...aliases.flatMap((alias) => selectorsFor(alias, state.name, options))
             ];
-        const selector = selectorList.join(',' + NEWLINE);
-        // ::before has to be appended to EVERY selector: in a comma list it binds
-        // to the last one only, so the tint would apply to `.skin:hover` and to
-        // nothing else.
-        const beforeSelector = selectorList.map((sel) => sel + '::before').join(',' + NEWLINE);
+        // Note for whoever emits a ::before rule from selectorList: in a comma list ::before binds
+        // to the last selector only, so it has to be appended to EVERY selector or the tint would
+        // apply to `.skin:hover` and to nothing else. (Two unused joins stood here; nothing read them.)
 
         // Recolourable pieces are MULTIPLIED by the tint, not filled with it.
         //
