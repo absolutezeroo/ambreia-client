@@ -39,3 +39,12 @@ test('a JSON syntax error or a rig error comes back as an error, without throwin
     bad.shapes[0].material = 'scales';
     assert.match((await loadAndRender(folder(JSON.stringify(bad)), null)).error, /shapes\[0\]\.material/);
 });
+
+test('a render a newer save has made stale stops early', async () =>
+{
+    let checks = 0;
+    const result = await loadAndRender(folder(JSON.stringify(rig)), null, () => ++checks > 1);
+
+    assert.equal(result.stale, true);
+    assert.equal(checks, 2);
+});

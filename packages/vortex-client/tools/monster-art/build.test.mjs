@@ -81,6 +81,53 @@ test('hand retouches are kept on a rebuild; a changed tag or canvas is refused u
     assert.equal(buildMonsterArt(dir, {dropRetouche: true}).keptRetouche, false);
 });
 
+/** Builds, then puts one magenta pixel on frame 0 of the given layer (adding the layer if it is new). */
+function retouch(dir, layerName)
+{
+    buildMonsterArt(dir);
+
+    const path = join(dir, 'blob.aseprite'), old = readAsepriteLayers(readFileSync(path));
+    const layers = old.layers.map(({name, visible}) => ({name, visible}));
+    let index = layers.findIndex(l => l.name === layerName);
+
+    if(index < 0)
+    {
+        layers.push({name: layerName, visible: true});
+        index = layers.length - 1;
+    }
+
+    const mark = Buffer.alloc(old.width * old.height * 4);
+
+    mark.writeUInt32BE(0xff00ffff, 0);
+    writeFileSync(path, writeAseprite({
+        width: old.width, height: old.height, tags: old.tags, layers,
+        frames: old.frames.map((f, i) => ({duration: f.duration, cels: layers.map((_, l) => (l === index && i === 0 ? mark : f.cels[l] ?? null))}))
+    }));
+}
+
+test('retouches are refused when the anchor moved, even with the same canvas size', () =>
+{
+    const dir = folderWith(rig());
+
+    retouch(dir, 'retouche');
+
+    // The canvas keeps its size but the art would sit one pixel lower against the retouches.
+    const manifest = JSON.parse(readFileSync(join(dir, 'monster.json'), 'utf8'));
+
+    manifest.anchor = [manifest.anchor[0], manifest.anchor[1] - 1];
+    writeFileSync(join(dir, 'monster.json'), JSON.stringify(manifest));
+    assert.throws(() => buildMonsterArt(dir), /anchor/);
+});
+
+test('a hand-made layer is not lost silently: the rebuild refuses and names it', () =>
+{
+    const dir = folderWith(rig());
+
+    retouch(dir, 'eyes fix');
+    assert.throws(() => buildMonsterArt(dir), /eyes fix/);
+    assert.equal(buildMonsterArt(dir, {dropRetouche: true}).keptRetouche, false);
+});
+
 test('a broken rig is refused with the path of the error', () =>
 {
     const bad = rig();

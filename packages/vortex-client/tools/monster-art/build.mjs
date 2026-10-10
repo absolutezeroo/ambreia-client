@@ -23,26 +23,35 @@ export const LAYERS = [
     {name: 'retouche', visible: true}
 ];
 
-/** The hand edits of an existing file, frame by frame, or null when there are none. */
-export function keptRetouche(path, {tags, width, height}, dropRetouche)
+/**
+ * The hand edits of an existing file, frame by frame, or null when there are none. Refuses whatever
+ * would lose or misplace them: changed tags, another canvas or anchor, pixels on a layer the tool does
+ * not write (they belong on retouche).
+ */
+export function keptRetouche(path, {tags, width, height, anchor}, dropRetouche)
 {
-    if(!existsSync(path)) return null;
+    if(dropRetouche || !existsSync(path)) return null;
 
     const old = readAsepriteLayers(readFileSync(path));
+    const lose = what => new Error(`${what}: rerun with --drop-retouche to lose them`);
+    const foreign = old.layers.find((l, i) => !LAYERS.some(k => k.name === l.name) && old.frames.some(f => f.cels[i]));
+
+    if(foreign) throw lose(`layer "${foreign.name}" is not one the tool writes and holds hand edits (move them to retouche)`);
+
     const layer = old.layers.findIndex(l => l.name === 'retouche');
 
-    if(layer < 0 || old.frames.every(f => !f.cels[layer]) || dropRetouche) return null;
+    if(layer < 0 || old.frames.every(f => !f.cels[layer])) return null;
 
     const changed = tags.find((t, i) => old.tags[i]?.name !== t.name || old.tags[i].from !== t.from || old.tags[i].to !== t.to);
 
-    if(changed || old.tags.length !== tags.length)
-    {
-        throw new Error(`the retouche layer has hand edits and tag ${changed?.name ?? old.tags[tags.length]?.name} changed: rerun with --drop-retouche to lose them`);
-    }
-    if(old.width !== width || old.height !== height)
-    {
-        throw new Error(`the retouche layer has hand edits and the canvas changed (${old.width}×${old.height} → ${width}×${height}): rerun with --drop-retouche to lose them`);
-    }
+    if(changed || old.tags.length !== tags.length) throw lose(`the retouche layer has hand edits and tag ${changed?.name ?? old.tags[tags.length]?.name} changed`);
+    if(old.width !== width || old.height !== height) throw lose(`the retouche layer has hand edits and the canvas changed (${old.width}×${old.height} → ${width}×${height})`);
+
+    // Same size, another anchor: every unchanged frame would slide under its retouches.
+    const manifest = join(dirname(path), 'monster.json');
+    const was = existsSync(manifest) ? JSON.parse(readFileSync(manifest, 'utf8')).anchor : null;
+
+    if(was && (was[0] !== anchor[0] || was[1] !== anchor[1])) throw lose(`the retouche layer has hand edits and the anchor moved (${was.join(', ')} → ${anchor.join(', ')})`);
 
     return old.frames.map(f => f.cels[layer]);
 }
@@ -66,7 +75,7 @@ export function buildMonsterArt(folder, {dropRetouche = false} = {})
     }
 
     const path = join(folder, `${rig.id}.aseprite`);
-    const retouche = keptRetouche(path, {tags, width: canvas.width, height: canvas.height}, dropRetouche);
+    const retouche = keptRetouche(path, {tags, width: canvas.width, height: canvas.height, anchor: [canvas.anchorX, canvas.anchorY]}, dropRetouche);
 
     if(retouche)
     {

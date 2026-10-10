@@ -16,6 +16,8 @@ function parse(buffer)
     if(depth !== 32 && depth !== 16 && depth !== 8) throw new Error(`unsupported colour depth ${depth}`);
 
     const layers = [], tags = [], frames = [], palette = [];
+    // Visibility of the current layer's ancestors, by child level: a layer shows only if they all do.
+    const shown = [];
     const string = at => [buffer.toString('utf8', at + 2, at + 2 + buffer.readUInt16LE(at)), at + 2 + buffer.readUInt16LE(at)];
     let offset = 128;
 
@@ -33,9 +35,12 @@ function parse(buffer)
 
             if(type === CHUNK_LAYER)
             {
-                const flags = buffer.readUInt16LE(body), layerType = buffer.readUInt16LE(body + 2);
+                const flags = buffer.readUInt16LE(body), layerType = buffer.readUInt16LE(body + 2), level = buffer.readUInt16LE(body + 4);
 
-                layers.push({name: string(body + 16)[0], visible: (flags & 1) !== 0, image: layerType === 0, opacity: buffer.readUInt8(body + 12)});
+                // Flag 64: a reference layer (an image traced over), never part of the art.
+                shown[level] = (flags & 1) !== 0 && (flags & 64) === 0;
+                shown.length = level + 1;
+                layers.push({name: string(body + 16)[0], visible: shown.every(Boolean), image: layerType === 0, opacity: buffer.readUInt8(body + 12)});
             }
             else if(type === CHUNK_CEL)
             {
@@ -235,7 +240,8 @@ function celChunk(layerIndex, data, width, height)
 
 /**
  * Writes RGBA frames as an .aseprite. One layer: `frames[i].data` (named `layer`). Several:
- * `layers` [{name, visible}] and `frames[i].cels`, one full-canvas buffer (or null) per layer.
+ * `layers` [{name, visible, group?, level?, reference?}] and `frames[i].cels`, one full-canvas buffer
+ * (or null) per layer.
  */
 export function writeAseprite({width, height, frames, tags = [], layer = 'Layer 1', layers})
 {
@@ -252,12 +258,14 @@ export function writeAseprite({width, height, frames, tags = [], layer = 'Layer 
             palette.writeUInt32LE(1, 0);
             palette.writeUInt8(255, 20 + 5);
             chunks.push(chunk(CHUNK_PALETTE, palette));
-            for(const {name, visible} of layerList)
+            for(const {name, visible, group, level, reference} of layerList)
             {
                 const head = Buffer.alloc(16);
 
-                // Flags: 1 visible, 2 editable.
-                head.writeUInt16LE(visible === false ? 2 : 3, 0);
+                // Flags: 1 visible, 2 editable, 64 reference. Type 1 is a group; children follow it one level deeper.
+                head.writeUInt16LE((visible === false ? 0 : 1) | 2 | (reference ? 64 : 0), 0);
+                head.writeUInt16LE(group ? 1 : 0, 2);
+                head.writeUInt16LE(level ?? 0, 4);
                 head.writeUInt8(255, 12);
                 chunks.push(chunk(CHUNK_LAYER, Buffer.concat([head, aseString(name)])));
             }

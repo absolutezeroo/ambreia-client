@@ -23,8 +23,11 @@ async function png(buffer, canvas)
     return `data:image/png;base64,${data.toString('base64')}`;
 }
 
-/** Renders the rig (one animation, or all); an error (JSON, rig) comes back as {error}. */
-export async function loadAndRender(folder, only)
+/**
+ * Renders the rig (one animation, or all); an error (JSON, rig) comes back as {error}. `isStale` is
+ * asked before each frame: true (a newer save) stops the render with {stale: true}.
+ */
+export async function loadAndRender(folder, only, isStale = () => false)
 {
     try
     {
@@ -34,6 +37,8 @@ export async function loadAndRender(folder, only)
 
         for(const f of frameList(rig).filter(f => !only || f.animation === only))
         {
+            if(isStale()) return {stale: true};
+
             const layers = renderFrame(rig, canvas, f.direction, f.frame), images = {};
 
             for(const pass of PASSES) images[pass] = await png(layers[pass], canvas);
@@ -120,23 +125,30 @@ function main()
     }
 
     const folder = join(MONSTERS, id), clients = new Set();
-    let current = loadAndRender(folder, only).then(r => ({id, ...r}));
-    let timer = null;
+    let generation = 0, latest = null, timer = null;
+    // Each save starts a render and makes the one running stale; the pages get only the newest.
+    const render = () =>
+    {
+        const mine = ++generation;
 
-    // Saving rig.json renders again (debounced: editors write in several steps), then tells the pages.
+        return loadAndRender(folder, only, () => mine !== generation).then(r =>
+        {
+            if(r.stale) return latest;
+            latest = {id, ...r};
+            console.log(r.error ? `error: ${r.error}` : `rendered ${r.frames.length} frames`);
+            for(const res of clients) res.write('data: reload\n\n');
+
+            return latest;
+        });
+    };
+    const first = render();
+
+    // Saving rig.json renders again (debounced: editors write in several steps).
     watch(folder, (_event, file) =>
     {
         if(file !== 'rig.json') return;
         clearTimeout(timer);
-        timer = setTimeout(() =>
-        {
-            current = loadAndRender(folder, only).then(r => ({id, ...r}));
-            current.then(r =>
-            {
-                console.log(r.error ? `error: ${r.error}` : `rendered ${r.frames.length} frames`);
-                for(const res of clients) res.write('data: reload\n\n');
-            });
-        }, 250);
+        timer = setTimeout(render, 250);
     });
 
     createServer(async (req, res) =>
@@ -144,7 +156,7 @@ function main()
         if(req.url === '/data')
         {
             res.writeHead(200, {'content-type': 'application/json'});
-            res.end(JSON.stringify(await current));
+            res.end(JSON.stringify(latest ?? await first));
         }
         else if(req.url === '/events')
         {
