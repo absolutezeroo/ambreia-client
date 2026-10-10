@@ -381,6 +381,17 @@ async function loadClientConfig(): Promise<IKernelConfig>
     return config;
 }
 
+/** Removes one query parameter from the page URL without a navigation (the rest of the URL stays). */
+function stripQueryParameter(name: string): void
+{
+    const url = new URL(window.location.href);
+
+    if(!url.searchParams.has(name)) return;
+
+    url.searchParams.delete(name);
+    window.history.replaceState(window.history.state, '', url);
+}
+
 /**
  * The client cannot start: an invalid configuration or a feature waiting on one that is missing.
  * Shown instead of the hotel, with every reason, so a deployment mistake is read, not guessed.
@@ -587,6 +598,11 @@ export class VortexApp
 
             throw error;
         }
+
+        // The ticket is read: take it off the address bar, the history and every Referer. A reload
+        // then lands on the login screen instead of re-bootstrapping against a ticket the server
+        // may already have consumed; the site hands a fresh one per frame (_onDisconnectAcknowledged).
+        if(kernelConfig.app.sso) stripQueryParameter('sso');
 
         // `??=`: a link the site posted while config.json was loading is newer than `?link=`.
         this._startLink ??= kernelConfig.app.startLink ?? null;
