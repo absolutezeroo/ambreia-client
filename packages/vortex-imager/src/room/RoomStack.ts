@@ -25,7 +25,6 @@ import {EventEmitter} from 'eventemitter3';
 import {createCanvas} from '@napi-rs/canvas';
 import type {Canvas} from '@napi-rs/canvas';
 import {Logger} from '@ambreia/common/utils/Logger';
-import type {CoreComponentContext} from '@ambreia/kernel/runtime/CoreComponentContext';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import {RoomManager} from '@ambreia/iso/RoomManager';
 import type {IRoomInstance} from '@ambreia/iso/IRoomInstance';
@@ -41,10 +40,10 @@ import {RoomObjectCategoryEnum} from '@ambreia/iso/scene/object/RoomObjectCatego
 import {RoomVisualizationData} from '@ambreia/iso/scene/object/visualization/room/RoomVisualizationData';
 import type {NitroAsset} from '@ambreia/common/assets/NitroAsset';
 import {FurnitureDataParser} from '@ambreia/iso/furniture/data/FurnitureDataParser';
+import type {IFurniDataLocalization} from '@ambreia/iso/furniture/data/FurnitureDataParser';
 import type {IFurnitureData} from '@ambreia/iso/furniture/data/IFurnitureData';
 import type {IFurniDataSource} from '@ambreia/iso/scene/IRoomContentConfiguration';
-import type {IHabboLocalizationManager} from '@ambreia/game/localization/IHabboLocalizationManager';
-import type {HabboConfigurationManager} from '@ambreia/game/configuration/HabboConfigurationManager';
+import type {ImagerProperties} from '../ImagerProperties';
 
 const log = Logger.getLogger('imager.room.RoomStack');
 
@@ -81,32 +80,26 @@ export class RoomStack
     }
 
     /**
-	 * Brings the pipeline up on an already-booted core.
-	 *
-	 * It takes the avatar service's context rather than building its own: the asset library,
-	 * the configuration manager and the DI container are the same ones, and a second
-	 * `HabboConfigurationManager` would mean a second `external_variables` download and two
-	 * copies of the hotel config that can disagree.
+	 * Brings the pipeline up on the avatar service's asset library and properties rather than
+	 * its own: one copy of each, nothing to disagree.
 	 */
     static async boot(
-        context: CoreComponentContext,
         assetLibrary: IAssetLibrary,
-        configuration: HabboConfigurationManager,
+        properties: ImagerProperties,
         directories: IRoomContentDirectories
     ): Promise<RoomStack>
     {
-        // `RoomManager.createRoomObject()` reads the three external image base URLs it pushes
-        // into every visualization through these options; empty ones silently give every
-        // visualization empty base URLs.
-        context.configuration = configuration;
-
         const contentLoader = new RoomContentLoader();
         const registries = createRoomRegistries(DEFAULT_ROOM_MODULES);
         const visualizationFactory = new RoomObjectVisualizationFactory(registries.visualizations);
         const objectFactory = new RoomObjectFactory(registries.logics);
+        // `RoomManager.createRoomObject()` reads the three external image base URLs it pushes
+        // into every visualization through these options; empty ones silently give every
+        // visualization empty base URLs.
         const roomManager = new RoomManager({
-            property: (key: string): string => configuration.getProperty(key),
-            flag: (key: string): boolean => configuration.getBoolean(key)
+            externalImageUrl: (): string => properties.getProperty('stories.image_url_base'),
+            extraDataServiceUrl: (): string => properties.getProperty('extra_data_service_url'),
+            extraDataBatches: (): boolean => properties.getBoolean('extra_data_batches_enabled')
         });
 
         // `RoomEngine`'s own wiring (`_visualizationFactory.assets = assetLibrary`). Furniture
@@ -117,14 +110,14 @@ export class RoomStack
 
         const stack = new RoomStack(contentLoader, roomManager);
 
-        await stack.loadFurniData(configuration);
+        await stack.loadFurniData(properties);
 
         contentLoader.furniDataSource = stack.createFurniDataSource();
         contentLoader.visualizationFactory = visualizationFactory;
         // No asset library here: `initialize()` stopped taking one when content types got one
         // collection each. The third argument is where the content comes from, the families'
         // .ambreia directories (spec 2026-10-09-ambreia-everything).
-        contentLoader.initialize(new EventEmitter(), configuration, directories);
+        contentLoader.initialize(new EventEmitter(), properties, directories);
 
         roomManager.setObjectFactory(objectFactory);
         roomManager.setVisualizationFactory(visualizationFactory);
@@ -420,9 +413,9 @@ export class RoomStack
 	 * fills are handed to the content loader through a source object of the shape it reads
 	 * (exactly two methods — see {@link createFurniDataSource}).
 	 */
-    private async loadFurniData(configuration: HabboConfigurationManager): Promise<void>
+    private async loadFurniData(properties: ImagerProperties): Promise<void>
     {
-        const url = configuration.getProperty('furnidata.load.url');
+        const url = properties.getProperty('furnidata.load.url');
 
         if(!url)
         {
@@ -475,9 +468,9 @@ export class RoomStack
  * `IHabboLocalizationManager` is a large interface and stubbing all of it would hide which
  * single member is actually reached.
  */
-function createLocalizationSink(): IHabboLocalizationManager
+function createLocalizationSink(): IFurniDataLocalization
 {
-    return {updateLocalization: (): void => {}} as unknown as IHabboLocalizationManager;
+    return {updateLocalization: (): void => {}};
 }
 
 /** The part of a shim `Texture` this file reads — see `render/composeSprites.ts` for why. */

@@ -633,11 +633,23 @@ export class ComponentContext extends Component implements IContext
         // Component reads `dependencies` in its constructor, before a subclass field exists, so the
         // carrier's class captures the list itself. With dependencies the carrier starts locked and
         // the instance is announced once they resolve, exactly like a Component's own interfaces.
+        // The carrier's dispose (the context's, at Core.dispose()) takes the instance with it: the
+        // lifecycle the DI gives a Component ends the same way for the object it carries.
+        const disposable = instance as {dispose?: () => void; disposed?: boolean} | null;
         const Carrier = class extends Component
         {
             protected override get dependencies(): Array<ComponentDependency<any>>
             {
                 return dependencies;
+            }
+
+            override dispose(): void
+            {
+                if(this.disposed) return;
+
+                super.dispose();
+
+                if(typeof disposable?.dispose === 'function' && disposable.disposed !== true) disposable.dispose();
             }
         };
         const carrier = new Carrier(this);

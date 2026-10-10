@@ -3,6 +3,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {ConfigError, loadConfig} from '@ambreia/kernel/config/loadConfig';
+import {FeatureScope} from '@ambreia/kernel/feature/FeatureScope';
 import {featureSections} from '@ambreia/kernel/feature/defineFeature';
 import {AssetPacksFeature} from '../src/features/asset-packs/feature';
 import type {IEngineHost} from '../src/features/index';
@@ -30,7 +31,7 @@ function host(initialized: boolean): {host: IEngineHost; complete: () => void}
 }
 
 const create = (config: Record<string, unknown>, made: IEngineHost): unknown =>
-    AssetPacksFeature.create({context: null as never, config: {enabled: true, ...config}, app: {} as never, host: made});
+    AssetPacksFeature.create({context: null as never, config: {enabled: true, ...config}, app: {} as never, host: made, scope: new FeatureScope()});
 
 test('the five directories are opened once the configuration completes, ${url.prefix} resolved', () =>
 {

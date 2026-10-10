@@ -16,8 +16,8 @@ export default defineConfig({
         strictPort: true,
         fs: {allow: [resolve(__dirname, '../..')]},
         proxy: {
-            '/api': {target: process.env.AMBREIA_API ?? 'http://127.0.0.1:8080', changeOrigin: true},
-            '/habbo-imaging': {target: process.env.AMBREIA_IMAGER ?? 'http://127.0.0.1:8081', changeOrigin: true},
+            '/api': {target: process.env.AMBREIA_API ?? 'http://localhost:8080', changeOrigin: true},
+            '/habbo-imaging': {target: process.env.AMBREIA_IMAGER ?? 'http://localhost:8081', changeOrigin: true},
             // The room engine's content (@ambreia/iso): furnidata, and the .ambreia directories the
             // client's config.json names (furniture, room, pets…).
             '/gamedata': {target: process.env.AMBREIA_ASSETS ?? 'http://vortex-assets.local', changeOrigin: true},

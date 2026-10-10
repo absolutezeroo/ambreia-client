@@ -9,9 +9,9 @@ import type {IStaticBitmapWrapperWindow} from '@ambreia/ui/components/IStaticBit
 import type {ITabContextWindow} from '@ambreia/ui/components/ITabContextWindow';
 import type {ITextFieldWindow} from '@ambreia/ui/components/ITextFieldWindow';
 import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
-import {WindowBits} from '../character/WindowBits';
-import {buildFrame} from '../inventory/InventoryView';
-import {SKILL_SLOTS} from '../hud/PlayerHudState';
+import {WindowBits} from '../../ui/kit/WindowBits';
+import {buildFrame} from '../../ui/kit/buildFrame';
+import {SKILL_SLOTS} from '../hud/IHud';
 import {barSkill, type ISkillDefinition, type RpgSkillSession} from './RpgSkillSession';
 import {skillIcon} from './skillArt';
 

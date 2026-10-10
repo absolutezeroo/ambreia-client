@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {nodeWindowManager} from './node-window-host';
 import type {WindowManager} from '../src/kit/WindowManager';
 import type {IWindowUpdateReceiver} from '../src/IWindowUpdateReceiver';
+import type {IWindowContainer} from '../src/IWindowContainer';
 
 function manager(): WindowManager
 {
@@ -82,4 +83,23 @@ test('a receiver that removes itself during update does not make the next one sk
     assert.equal(r.calls, 1);
 
     wm.dispose();
+});
+
+test('a disposed manager leaves its modal container behind: the next manager builds its own', () =>
+{
+    const xml = '<layout><window><container name="modal_probe" x="0" y="0" width="40" height="20"/></window></layout>';
+    const modalLayer = (wm: WindowManager): IWindowContainer => wm.getDesktop(3) as unknown as IWindowContainer;
+
+    const first = manager();
+
+    first.buildModalDialogFromXML(xml);
+    assert.equal(modalLayer(first).numChildren, 1, 'the first manager hosts the modal container');
+    first.dispose();
+
+    const second = manager();
+
+    second.buildModalDialogFromXML(xml);
+    assert.equal(modalLayer(second).numChildren, 1, 'the second manager gets a container of its own');
+
+    second.dispose();
 });

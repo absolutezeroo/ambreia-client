@@ -62,6 +62,8 @@ export interface IIsoStageOptions
     assets: IAssetLibrary;
     /** A configuration property, already interpolated (`gpu.ignored_furni`, `pet.configuration`…). */
     property(key: string): string;
+    /** The external content furni may show (pictures, extra data); none when absent, as an editor wants. */
+    externalContent?: Readonly<{imageUrl: string; extraDataServiceUrl: string; batches: boolean}>;
     /** Where the room content comes from: the furniture, pets and room .ambreia directories. */
     directories: IRoomContentDirectories;
     /** The hotel's furnidata: what tells a furni class from a wall item, and its revision. */
@@ -133,9 +135,11 @@ export class IsoStage
         const registries = createRoomRegistries(options.modules ?? DEFAULT_ROOM_MODULES);
         const visualizations = new RoomObjectVisualizationFactory(registries.visualizations);
         const loader = new RoomContentLoader();
+        const external = options.externalContent ?? null;
         const manager = new RoomManager({
-            property: (key: string): string => options.property(key),
-            flag: (key: string): boolean => ['1', 'true'].includes(options.property(key))
+            externalImageUrl: (): string => external?.imageUrl ?? '',
+            extraDataServiceUrl: (): string => external?.extraDataServiceUrl ?? '',
+            extraDataBatches: (): boolean => external?.batches ?? false
         });
 
         visualizations.assets = options.assets;

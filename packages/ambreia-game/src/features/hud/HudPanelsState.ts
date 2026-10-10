@@ -1,61 +1,9 @@
 import {EventEmitter} from 'eventemitter3';
-import {ALL_TAB, DEFAULT_CHAT_SETTINGS, type ChatChannel, type IChatLine, type IChatSettings, type IChatTab} from './chatModel';
+import type {IHudPanels} from './IHud';
+import {ALL_TAB, DEFAULT_CHAT_SETTINGS, type IChatLine, type IChatTab} from '../../ui/kit/chatModel';
 
-/** A quest the tracker follows: its icon, name, current objective and progress (`2 / 5`). */
-export interface IQuestLine
-{
-    icon: string | null;
-    title: string;
-    objective: string;
-    count: string;
-}
-
-/** A party member's frame: portrait, level, HP and the effects on them. */
-export interface IPartyMember
-{
-    name: string;
-    figure: string;
-    level: number | null;
-    hp: number | null;
-    hpMax: number | null;
-    /** Icons of the effects on them. */
-    buffs: string[];
-    dead: boolean;
-}
-
-/** What is being cast: icon, name, and how far along (seconds). */
-export interface IHudCast
-{
-    icon: string | null;
-    name: string;
-    elapsed: number;
-    duration: number;
-}
-
-/** A monster or player shown as the target or as the boss. */
-export interface IHudUnit
-{
-    name: string;
-    /** Asset name of the portrait. */
-    portrait: string | null;
-    /** A player's figure: the frame shows its head instead of the portrait. */
-    figure?: string | null;
-    level: number | null;
-    /** The line under the name (`Niv. 35 · Boss`). */
-    info: string;
-    hp: number | null;
-    hpMax: number | null;
-    /** Icons of the effects on it. */
-    debuffs: string[];
-    /** `normal`, `elite` or `boss` (M1c): the target frame's border. */
-    rank?: string;
-    /** Its room object, for the casts the skills feature follows by caster. */
-    objectId?: number;
-    /** What it casts, when it does (the boss frame's cast line, the target frame's). */
-    cast?: IHudCast | null;
-}
-
-export type {ChatChannel, IChatLine} from './chatModel';
+export type {ChatChannel, IChatLine} from '../../ui/kit/chatModel';
+export type {IQuestLine, IPartyMember, IHudCast, IHudUnit, IHudPanels} from './IHud';
 
 /**
  * The HUD around the player frame and the action bar (RPG spec §16.3, mockup/glaze/hud_*.png):
@@ -63,43 +11,6 @@ export type {ChatChannel, IChatLine} from './chatModel';
  * and empty are "nothing to show": each panel stays hidden until it has something. The server
  * sends none of it yet; `__ambreia.hud.demo()` fills it meanwhile.
  */
-export interface IHudPanels
-{
-    gold: number | null;
-    gems: number | null;
-    tokens: number | null;
-    /** The "!" on the quests button: something new in the journal. */
-    questAlert: boolean;
-    zoneName: string;
-    zonePlayers: number | null;
-    quests: IQuestLine[];
-    party: IPartyMember[];
-    /** Icons of the effects on the player. */
-    buffs: string[];
-    /** Under each of `buffs`, its time left (`4 s`), or nothing for an effect without end; none: no times. */
-    buffTimes?: string[];
-    /** Under each of `buffs`, whether it ends within seconds (the red outline). */
-    buffExpiring?: boolean[];
-    /** Under each of `buffs`, its tooltip: the effect's name, then its time left on a second line. */
-    buffTips?: string[];
-    /** The party member whose frame is selected (their name), the target panel shows them. */
-    partySelected: string | null;
-    /** The bottom bar's button whose window is open (`nav_inventory`), for its active mark. */
-    navOpen: string | null;
-    target: (IHudUnit & {cast: IHudCast | null}) | null;
-    boss: IHudUnit | null;
-    /** The warning under the boss (`Frappe sismique dans 3 seconde(s) !`). */
-    alert: string | null;
-    chat: IChatLine[];
-    /** The chat's tabs, « Général » first; `chatTab` is the open one's id. */
-    chatTabs: IChatTab[];
-    chatTab: string;
-    /** Where what is typed in « Général » goes (the bubble button). */
-    sayChannel: ChatChannel;
-    chatSettings: Readonly<IChatSettings>;
-}
-
-/** The chat keeps this many lines; older ones scroll away for good. */
 export const CHAT_HISTORY = 50;
 
 export class HudPanelsState

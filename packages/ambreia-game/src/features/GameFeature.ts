@@ -1,8 +1,12 @@
 import type {HostFeature} from '@ambreia/kernel/feature/defineFeature';
 import type {IKernelConfig} from '@ambreia/kernel/config/loadConfig';
+import {FeatureDependencyError} from '@ambreia/kernel/feature/bootFeatures';
 import {RoomWidgetRegistry} from '../ui/RoomWidgetRegistry';
 import type {IRoomWidgetDefinition} from '../ui/RoomWidgetRegistry';
-import type {IEngineHost} from './index';
+import type {IEngineHost, IEngineManagers} from './index';
+
+/** A slot of `host.made`: what an earlier feature made, read by the ones after it. */
+export type MadeSlot = keyof IEngineManagers;
 
 /**
  * A feature of the game (spec §4): the kernel's declaration, plus what the game reads off it
@@ -15,6 +19,39 @@ export interface IGameFeature extends HostFeature<IEngineHost>
     readonly images?: readonly string[];
     /** Room widget types it builds, by AS3 type code (`RWE_…`). */
     readonly roomWidgets?: Readonly<Record<string, IRoomWidgetDefinition>>;
+    /**
+     * The slots of `host.made` create() reads at once: checked non-null before it runs
+     * (guardedFeatures()), so a feature listed before what it needs fails the boot by name
+     * instead of attaching nothing in silence. A slot read later, in a callback, is not one.
+     */
+    readonly requires?: readonly MadeSlot[];
+}
+
+/**
+ * The features with their `requires` enforced: a required slot still null when a feature is
+ * created is a FeatureDependencyError naming both, before create() runs. The kernel checks what
+ * the DI knows (the interfaces); this is the same promise for what the game passes by hand.
+ */
+export function guardedFeatures(features: readonly IGameFeature[]): IGameFeature[]
+{
+    return features.map(feature =>
+    {
+        const requires = feature.requires ?? [];
+
+        if(requires.length === 0) return feature;
+
+        return {
+            ...feature,
+            create: made =>
+            {
+                const missing = requires.filter(slot => made.host.made[slot] === null);
+
+                if(missing.length > 0) throw new FeatureDependencyError(missing.map(slot => `Feature "${feature.id}" needs host.made.${slot}, which no feature before it made`));
+
+                return feature.create(made);
+            }
+        };
+    });
 }
 
 const enabled = (features: readonly IGameFeature[], config: IKernelConfig): IGameFeature[] =>

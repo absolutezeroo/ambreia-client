@@ -33,6 +33,12 @@ export class RenderCache
         return this._entries.size;
     }
 
+    /** The disk tier, once the asset build it is keyed on is known (after the avatar pipeline boots). */
+    attachDisk(disk: DiskCache | null): void
+    {
+        this._disk = disk;
+    }
+
     async resolve(key: string, render: () => Promise<Buffer>): Promise<{ buffer: Buffer; hit: boolean }>
     {
         const cached = this._entries.get(key);

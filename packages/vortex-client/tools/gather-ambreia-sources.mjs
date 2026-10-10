@@ -19,7 +19,7 @@ const GORDON = flag('gordon', 'C:/laragon/www/vortex-assets/gordon/vortex-assets
 const CLOTHING = flag('clothing', path.join(process.env.USERPROFILE ?? '', 'Desktop/clothing'));
 const FURNITURE = flag('furniture', 'C:/laragon/www/vortex-assets/dcr/hof_furni');
 const CONFIGURATIONS = path.resolve(HERE, '../src/assets/configurations');
-const LEGACY = path.resolve(HERE, '../../ambreia-game/src/configuration/legacy.defaults.json');
+const LEGACY = path.resolve(HERE, '../../ambreia-common/src/config/legacy.defaults.json');
 
 let copied = 0;
 let kept = 0;

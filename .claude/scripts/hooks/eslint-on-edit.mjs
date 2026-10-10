@@ -19,8 +19,9 @@ const file = resolve(input.cwd ?? repo, target);
 const rel = relative(repo, file).split(sep).join('/');
 const eslint = join(repo, 'node_modules', 'eslint', 'bin', 'eslint.js');
 
-// Same scope as lint-staged: package sources and tools. Anything else (docs, configs) is not linted.
-if(rel.startsWith('..') || !/^packages\/[^/]+\/(src|tools)\/.+\.(ts|mjs)$/.test(rel) || !existsSync(eslint) || !existsSync(file))
+// Package sources, tests, tools and sandboxes: what `pnpm lint` covers. Anything else (docs,
+// configs) is not linted.
+if(rel.startsWith('..') || !/^packages\/[^/]+\/(src|test|tools|sandbox)\/.+\.(ts|mjs)$/.test(rel) || !existsSync(eslint) || !existsSync(file))
 {
     process.exit(0);
 }

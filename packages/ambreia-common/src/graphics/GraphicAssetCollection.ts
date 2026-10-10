@@ -36,7 +36,9 @@ export class GraphicAssetCollection implements IGraphicAssetCollection
     private _paletteAssetNames: string[] = [];
     private _textures: Map<string, Texture> = new Map();
     private _referenceCount: number = 0;
-    private _lastReferenceTimestamp: number = 0;
+    // From its creation, not 0: a collection loaded but not yet referenced (a placeholder, a
+    // furni still arriving) gets the same grace before purge() as one that was just released.
+    private _lastReferenceTimestamp: number = Date.now();
     private _disposed: boolean = false;
 
     get disposed(): boolean

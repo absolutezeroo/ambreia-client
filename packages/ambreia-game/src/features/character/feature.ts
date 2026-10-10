@@ -3,7 +3,7 @@ import {RoomSessionEvent} from '../../session/events/RoomSessionEvent';
 import type {IGameFeature} from '../GameFeature';
 import {CharacterScreen} from './CharacterScreen';
 import {RpgCharacterSession} from './RpgCharacterSession';
-import {WindowBits} from './WindowBits';
+import {WindowBits} from '../../ui/kit/WindowBits';
 
 const log = Logger.getLogger('habbo.features.character');
 
@@ -16,15 +16,17 @@ const log = Logger.getLogger('habbo.features.character');
  */
 export const CharacterFeature: IGameFeature = {
     id: 'character',
-    create: ({host}) =>
+    requires: ['roomSession', 'communication'],
+    create: ({host, scope}) =>
     {
         const session = new RpgCharacterSession();
+        const on = scope.bind(session.events);
         let screen: CharacterScreen | null = null;
         let inWorld = false;
 
         host.made.character = session;
 
-        session.events.on('characters', () =>
+        on('characters', () =>
         {
             const windows = host.made.windowManager;
 
@@ -35,13 +37,20 @@ export const CharacterFeature: IGameFeature = {
         });
 
         // Dev hook: the screen as it is (`__ambreia.characters.screen()`).
-        const root = globalThis as unknown as {__ambreia?: Record<string, unknown>};
+        scope.hook('characters', {session, screen: () => screen});
 
-        root.__ambreia = {...(root.__ambreia ?? {}), characters: {session, screen: () => screen}};
-
-        host.made.roomSession?.sessionEvents.on(RoomSessionEvent.RSE_STARTED, () =>
+        scope.bind(host.made.roomSession?.sessionEvents)(RoomSessionEvent.RSE_STARTED, () =>
         {
             inWorld = true;
+            screen?.dispose();
+            screen = null;
+        });
+
+        // The server forgot the player with the connection: the characters screen is the way back in.
+        scope.bind(host.made.communication?.lifecycle)('reset', () => { inWorld = false; });
+
+        scope.own(session).add(() =>
+        {
             screen?.dispose();
             screen = null;
         });

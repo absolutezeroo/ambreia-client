@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {expiring, lowHp, placeTip, unavailable} from '../src/features/hud/hudRules';
+import {expiring, lowHp, placeTip, unavailable} from '../src/ui/kit/hudRules';
 
 test('a party member is in danger under a quarter of their health, never when dead or unknown', () =>
 {

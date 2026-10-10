@@ -8,8 +8,8 @@ import {PlayerHudState} from './PlayerHudState';
 import {HudPanelsState, type IChatLine} from './HudPanelsState';
 import {bindCharacterToHud} from './CharacterHudBridge';
 import {ChatPanel} from './ChatPanel';
-import {CHAT_ICONS, loadChatSettings} from './chatModel';
-import {WindowBits} from '../character/WindowBits';
+import {CHAT_ICONS, loadChatSettings} from '../../ui/kit/chatModel';
+import {WindowBits} from '../../ui/kit/WindowBits';
 
 // The demo's icons: read by name (static_bitmap asset_uri set at run time), so declared to be
 // decoded at load (IGameFeature.images). The server's skills, quests and effects will come with
@@ -46,7 +46,8 @@ const clock = (date: Date): string => `${String(date.getHours()).padStart(2, '0'
 export const HudFeature: IGameFeature = {
     id: 'hud',
     images: [...CHAT_ICONS, ...DEMO_SKILLS, ...DEMO_ITEMS, ...DEMO_QUESTS, ...DEMO_BUFFS, ...DEMO_DEBUFFS, DEMO_BOSS],
-    create: ({host}) =>
+    requires: ['character', 'roomSession', 'communication'],
+    create: ({host, scope}) =>
     {
         const state = new PlayerHudState();
         const panels = new HudPanelsState();
@@ -106,15 +107,43 @@ export const HudFeature: IGameFeature = {
             panels.update({zonePlayers: event.session.userDataManager.getUserCount(UserDataType.USER)});
 
         // The played character fills the HUD (F3a): level, XP, and the bars' maxima.
-        if(host.made.character) bindCharacterToHud(host.made.character, state);
+        if(host.made.character) scope.add(bindCharacterToHud(host.made.character, state));
         // The bottom bar marks the button whose window is open, and the quests one with its « ! ».
-        panels.events.on('changed', value => view?.setNav(value.navOpen, value.questAlert));
+        scope.bind(panels.events)('changed', value => view?.setNav(value.navOpen, value.questAlert));
 
-        const sessionEvents = host.made.roomSession?.sessionEvents;
+        // A lost session being brought back is said in the alert line, attempt by attempt; the
+        // line clears when the session is back, and the disconnect dialog takes over when it is not.
+        const lifecycle = host.made.communication?.lifecycle ?? null;
+        let reconnectNotice = false;
 
-        sessionEvents?.on(RoomSessionEvent.RSE_STARTED, show);
-        sessionEvents?.on(RoomSessionEvent.RSE_ENDED, hide);
-        sessionEvents?.on(RoomSessionUserDataUpdateEvent.RSUDUE_USER_DATA_UPDATE, countPlayers);
+        scope.bind(lifecycle)('change', (_from, to) =>
+        {
+            if(to === 'reconnecting')
+            {
+                reconnectNotice = true;
+                panels.update({alert: new WindowBits(host.made.localization).text('vortex.connection.reconnecting', 'attempt', String(lifecycle?.attempt ?? 0))});
+            }
+            else if(reconnectNotice)
+            {
+                reconnectNotice = false;
+                panels.update({alert: null});
+            }
+        });
+
+        const sessionOn = scope.bind(host.made.roomSession?.sessionEvents);
+
+        sessionOn(RoomSessionEvent.RSE_STARTED, show);
+        sessionOn(RoomSessionEvent.RSE_ENDED, hide);
+        sessionOn(RoomSessionUserDataUpdateEvent.RSUDUE_USER_DATA_UPDATE, countPlayers);
+        scope.add(() =>
+        {
+            view?.dispose();
+            panelsView?.dispose();
+            view = null;
+            panelsView = null;
+            panels.events.removeAllListeners();
+            state.events.removeAllListeners();
+        });
 
         const hook: IHudDevHook = {
             state,
@@ -165,9 +194,7 @@ export const HudFeature: IGameFeature = {
                 });
             }
         };
-        const root = globalThis as unknown as {__ambreia?: Record<string, unknown>};
-
-        root.__ambreia = {...(root.__ambreia ?? {}), hud: hook};
+        scope.hook('hud', hook);
 
         return null;
     }

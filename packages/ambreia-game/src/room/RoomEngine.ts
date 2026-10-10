@@ -43,7 +43,7 @@ import type {IRoomSession} from '../session/IRoomSession';
 import {RoomObjectCategoryEnum} from '@ambreia/iso/scene/object/RoomObjectCategoryEnum';
 import {RoomObjectOperationEnum} from '@ambreia/iso/scene/object/RoomObjectOperationEnum';
 import {RoomObjectAvatarSelectedMessage} from '@ambreia/iso/scene/messages/RoomObjectAvatarSelectedMessage';
-import {RoomObjectAvatarTargetUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectAvatarTargetUpdateMessage';
+import {RoomObjectAvatarSelectionRingUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectAvatarSelectionRingUpdateMessage';
 import {RoomObjectSelectedMessage} from '@ambreia/iso/scene/messages/RoomObjectSelectedMessage';
 import {RoomObjectVisibilityUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectVisibilityUpdateMessage';
 import {LookToMessageComposer} from '@ambreia/protocol/outgoing/room/avatar/LookToMessageComposer';
@@ -6216,10 +6216,10 @@ export class RoomEngine extends Component implements IRoomEngine,
         const stop = (): void =>
         {
             // The room may have gone with its visualization.
-            if(!visualization.disposed) visualization.removeRpgAddition(id);
+            if(!visualization.disposed) visualization.removeExternalAddition(id);
         };
 
-        visualization.addRpgAddition(addition);
+        visualization.addExternalAddition(addition);
         if(!loop) setTimeout(stop, frames.length * ms);
 
         return stop;
@@ -9547,7 +9547,7 @@ export class RoomEngine extends Component implements IRoomEngine,
 
         const object = this.getRoomObject(this._activeRoomId, objectId, RoomObjectCategoryEnum.OBJECT_CATEGORY_USER) as IRoomObjectController | null;
 
-        object?.getEventHandler()?.processUpdateMessage(new RoomObjectAvatarTargetUpdateMessage(targeted));
+        object?.getEventHandler()?.processUpdateMessage(new RoomObjectAvatarSelectionRingUpdateMessage(targeted));
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::getSelectedAvatarId()

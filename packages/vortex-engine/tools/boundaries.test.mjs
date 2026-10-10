@@ -260,3 +260,35 @@ test('game: core/ never reaches out of core/, at any depth', async () =>
     assert.equal((await wallHits(probe('Loc', '../localization/Localization'), 'packages/ambreia-game/src/core/communication/Probe.ts')).length, 0);
     assert.equal((await wallHits(probe('RoomEngine', '../../../room/RoomEngine'), 'packages/ambreia-game/src/core/runtime/events/Probe.ts')).length, 1);
 });
+
+test('game features: another feature is reached only through its I*.ts or events.ts; the kit and the game are open', async () =>
+{
+    const probe = 'packages/ambreia-game/src/features/skills/Probe.ts';
+    const refused = await wallHits("import {chatClock} from '../hud/chatModel';\nexport {chatClock};\n", probe);
+    const deep = await wallHits("import {x} from '../hud/widgets/Thing';\nexport {x};\n", probe);
+    const contract = await wallHits("import type {IHudPanels} from '../hud/IHud';\nexport type {IHudPanels};\n", probe);
+    const events = await wallHits("import {HudEvents} from '../hud/events';\nexport {HudEvents};\n", probe);
+    const kit = await wallHits("import {WindowBits} from '../../ui/kit/WindowBits';\nexport {WindowBits};\n", probe);
+    const own = await wallHits("import {SkillsWindow} from './SkillsWindow';\nimport type {IGameFeature} from '../GameFeature';\nexport {SkillsWindow};\nexport type {IGameFeature};\n", probe);
+
+    assert.equal(refused.length, 1);
+    assert.equal(deep.length, 1);
+    assert.equal(contract.length, 0);
+    assert.equal(events.length, 0);
+    assert.equal(kit.length, 0);
+    assert.equal(own.length, 0);
+});
+
+test('imager: the game, the kernel and the engine shell are refused; avatar, iso and common are allowed', async () =>
+{
+    const probe = 'packages/vortex-imager/src/avatar/Probe.ts';
+    const game = await wallHits("import {LEGACY_DEFAULTS} from '@ambreia/game/configuration/legacyDefaults';\nexport {LEGACY_DEFAULTS};\n", probe);
+    const kernel = await wallHits("import {Core} from '@ambreia/kernel/Core';\nexport {Core};\n", probe);
+    const engine = await wallHits("import {Vortex} from 'vortex-engine/src/Vortex';\nexport {Vortex};\n", probe);
+    const allowed = await wallHits("import {RoomManager} from '@ambreia/iso/RoomManager';\nimport {AvatarRenderManager} from '@ambreia/avatar/AvatarRenderManager';\nimport {Logger} from '@ambreia/common/utils/Logger';\nexport {RoomManager, AvatarRenderManager, Logger};\n", probe);
+
+    assert.equal(game.length, 1);
+    assert.equal(kernel.length, 1);
+    assert.equal(engine.length, 1);
+    assert.equal(allowed.length, 0);
+});

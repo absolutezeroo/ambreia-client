@@ -204,10 +204,10 @@ async function send(message: string): Promise<number>
         body: JSON.stringify({
             message: message.slice(0, MAX_MESSAGE),
 
-            // Sliced like the other two short fields. It was the one field sent whole, and the
-            // client is served under a base path with an `?sso=` ticket on it — a URL long enough
-            // to trip SubmitReportRequest.IsValid, which answers 400 and says nothing about why.
-            page: (location.pathname + location.search).slice(0, MAX_CONTEXT),
+            // The path only: the query carried the `?sso=` ticket (App.ts strips it at boot, but a
+            // report must never persist a session ticket in the reports table either) and `?link=`,
+            // which says nothing about the page. Sliced like the other two short fields.
+            page: location.pathname.slice(0, MAX_CONTEXT),
 
             // The browser, not a version number: there is no build stamp in this client, and for a
             // rendering bug "which browser" answers more than "which commit" would. Sliced to the

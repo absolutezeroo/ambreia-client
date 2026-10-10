@@ -133,8 +133,8 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/room/object/visualization/avatar/AvatarVisualization.as::ADDITION_ID_GUIDE_STATUS_BUBBLE
     private static readonly ADDITION_ID_GUIDE_STATUS_BUBBLE: number = 7;
 
-    /** TS-only (RPG F3b §7.3): the ring under the player's target. */
-    private static readonly ADDITION_ID_TARGET_CIRCLE: number = 8;
+    /** TS-only: the ring under an avatar the host points out. */
+    private static readonly ADDITION_ID_SELECTION_RING: number = 8;
 
     /** Minimum time between geometry updates in milliseconds. */
     private static readonly GEOMETRY_UPDATE_INTERVAL_MS: number = 41;
@@ -179,7 +179,7 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/room/object/visualization/avatar/AvatarVisualization.as::_additions
     private _additions: Map<number, IAvatarAddition> | null = null;
     /** An addition came or went outside a model change: the next update lays the sprites out again. */
-    // TS-only: see addRpgAddition().
+    // TS-only: see addExternalAddition().
     private _additionsDirty: boolean = false;
 
     /**
@@ -470,7 +470,7 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
             this._forceUpdate = false;
         }
 
-        // An RPG addition came or went: the sprites are laid out again below, and the avatar's own
+        // An external addition came or went: the sprites are laid out again below, and the avatar's own
         // are filled again with the rest (needsSpriteUpdate), as after a model change.
         const additionsChanged = this._additionsDirty;
 
@@ -680,19 +680,19 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
     }
 
     /**
-     * Adds an addition from outside the model (RPG: a sheet played on the ground, RoomEngine): the
-     * next update gives it its sprite, where a model-driven addition gets one with the model change.
+     * Adds an addition from outside the model (the host's: a sheet played on the ground): the next
+     * update gives it its sprite, where a model-driven addition gets one with the model change.
      */
     // TS-only: AS3's additions all follow the model.
-    addRpgAddition(addition: IAvatarAddition): void
+    addExternalAddition(addition: IAvatarAddition): void
     {
         this.addAddition(addition);
         this._additionsDirty = true;
     }
 
-    /** Takes an RPG addition away; its sprite goes at the next update. */
-    // TS-only: see addRpgAddition().
-    removeRpgAddition(id: number): void
+    /** Takes an external addition away; its sprite goes at the next update. */
+    // TS-only: see addExternalAddition().
+    removeExternalAddition(id: number): void
     {
         if(!this.getAddition(id)) return;
 
@@ -1116,18 +1116,18 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
                 }
             }
 
-            // TS-only (RPG F3b §7.3): the target circle, while the server says this avatar is the target.
-            const targeted = (model.getNumber(RoomObjectVariableEnum.AVATAR_RPG_TARGET) | 0) !== 0;
-            const circle = this.getAddition(AvatarVisualization.ADDITION_ID_TARGET_CIRCLE);
+            // TS-only: the selection ring, while the host points this avatar out.
+            const pointedOut = (model.getNumber(RoomObjectVariableEnum.AVATAR_SELECTION_RING) | 0) !== 0;
+            const ring = this.getAddition(AvatarVisualization.ADDITION_ID_SELECTION_RING);
 
-            if(targeted && circle === null && AvatarVisualization.additions)
+            if(pointedOut && ring === null && AvatarVisualization.additions)
             {
-                this.addAddition(AvatarVisualization.additions.target(AvatarVisualization.ADDITION_ID_TARGET_CIRCLE));
+                this.addAddition(AvatarVisualization.additions.selectionRing(AvatarVisualization.ADDITION_ID_SELECTION_RING));
                 changed = true;
             }
-            else if(!targeted && circle !== null)
+            else if(!pointedOut && ring !== null)
             {
-                this.removeAddition(AvatarVisualization.ADDITION_ID_TARGET_CIRCLE);
+                this.removeAddition(AvatarVisualization.ADDITION_ID_SELECTION_RING);
                 changed = true;
             }
 

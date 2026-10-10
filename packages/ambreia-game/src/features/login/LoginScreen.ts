@@ -172,6 +172,12 @@ export class LoginScreen
         this._dialog.y = Math.round((slot.height - this._dialog.height) / 2);
         this._dialog.procedure = this._onEvent;
 
+        // A frame hides on its header X (FrameController.close()); on a screen that is the only way
+        // forward the X is taken out instead of left dead.
+        const headerClose = this._dialog.findChildByName('header_button_close');
+
+        if(headerClose) headerClose.visible = false;
+
         // The layouts say `password`; the text field's property is `display_as_password`.
         for(const name of ['password_input', 'confirm_input'])
         {

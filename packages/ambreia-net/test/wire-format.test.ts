@@ -3,6 +3,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {WireFormatter} from '../src/wireformat/WireFormatter';
 import {Short} from '../src/util/Short';
+import {Float} from '../src/util/Float';
 import type {IConnection} from '../src/connection/IConnection';
 
 const PLAIN = {getServerToClientEncryption: () => null} as unknown as IConnection;
@@ -47,4 +48,27 @@ test('two frames in one buffer split into two messages, a partial third waits', 
 
     assert.deepEqual(messages.map(m => m.getMessageId()), [1, 2]);
     assert.equal(buffer.length, 5);
+});
+
+test('a null or undefined field is refused, not skipped', () =>
+{
+    const formatter = new WireFormatter();
+
+    assert.throws(() => formatter.encode(7, [1, undefined, 'x']), /field 1 of message 7/);
+    assert.throws(() => formatter.encode(7, [null]), /field 0 of message 7/);
+});
+
+test('a bare number is an int: a fraction is truncated, a Float is written as one', () =>
+{
+    const formatter = new WireFormatter();
+    const asInt = formatter.encode(9, [1.75]);
+    const asFloat = formatter.encode(9, [new Float(1.75)]);
+
+    // 4 length + 2 header + 4 bytes of value, both ways; the int reads back as 1.
+    assert.equal(asInt.length, 10);
+    assert.equal(asFloat.length, 10);
+    asInt.position = 6;
+    assert.equal(asInt.readInt(), 1);
+    asFloat.position = 6;
+    assert.equal(asFloat.readFloat(), 1.75);
 });

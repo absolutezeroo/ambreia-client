@@ -14,18 +14,13 @@
  */
 import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
-import {Core} from '@ambreia/kernel/Core';
-import type {CoreComponentContext} from '@ambreia/kernel/runtime/CoreComponentContext';
-import {AssetLibrary} from '@ambreia/game/core/assets/index';
+import {AssetLibrary} from '@ambreia/common/assets/AssetLibrary';
+import {LEGACY_DEFAULTS} from '@ambreia/common/config/legacyDefaults';
 import {Logger} from '@ambreia/common/utils/Logger';
+import {ImagerProperties} from '../ImagerProperties';
+import {ContentUnavailableError} from '../room/FurnitureRequest';
 import {openAssetDirectories} from '@ambreia/common/assets/pack/AssetDirectories';
 import type {IAssetDirectories} from '@ambreia/common/assets/pack/AssetDirectories';
-import {IID_Core} from '@ambreia/kernel/iid/IIDCore';
-import {IID_AssetLibrary} from '@ambreia/kernel/iid/IIDAssetLibrary';
-import {IID_HabboConfigurationManager} from '@ambreia/game/iid/IIDHabboConfigurationManager';
-import {IID_AvatarRenderManager} from '@ambreia/game/iid/IIDAvatarRenderManager';
-import {HabboConfigurationManager} from '@ambreia/game/configuration/HabboConfigurationManager';
-import {LEGACY_DEFAULTS} from '@ambreia/game/configuration/legacyDefaults';
 import {AvatarRenderManager} from '@ambreia/avatar/AvatarRenderManager';
 import {readAvatarData, type IAvatarData} from '@ambreia/avatar/AvatarData';
 import {AvatarRenderEvent} from '@ambreia/avatar/enum/AvatarRenderEvent';
@@ -73,8 +68,7 @@ export class AvatarRenderService
 {
     private _config: IImagerConfig;
     private _renderManager: AvatarRenderManager | null = null;
-    private _configuration: HabboConfigurationManager | null = null;
-    private _context: CoreComponentContext | null = null;
+    private _properties: ImagerProperties | null = null;
     private _assets: AssetLibrary | null = null;
     private _assetDirectories: IAssetDirectories | null = null;
 
@@ -142,9 +136,12 @@ export class AvatarRenderService
             // re-resolves the action set once the library is in.
             if(request.effectId > 0 && !this.isEffectSettled(request.effectId))
             {
+                // Not rendered without it: the image would be cached, in memory and on disk, under
+                // the key of the image *with* the effect, and served as it for the rest of time.
+                // A 503 with Retry-After says "not yet" and nothing is stored.
                 await withTimeout(effectReady, EFFECT_TIMEOUT_MS).catch(() =>
                 {
-                    log.warn(`Effect ${request.effectId} did not load in time; rendering without it`);
+                    throw new ContentUnavailableError(`Effect ${request.effectId} did not load within ${EFFECT_TIMEOUT_MS} ms`);
                 });
 
                 this._settledEffects.add(request.effectId);
@@ -259,35 +256,26 @@ export class AvatarRenderService
     /**
 	 * Reads a resolved hotel property. The badge renderer needs
 	 * `image.library.badgepart.url` from the same properties the avatars come from,
-	 * so it goes through the configuration manager this service already owns rather than
+	 * so it goes through the properties this service already owns rather than
 	 * getting its own copy of the hotel config.
 	 */
     getProperty(key: string): string
     {
-        return this._configuration?.getProperty(key) ?? '';
+        return this._properties?.getProperty(key) ?? '';
     }
 
     /**
-	 * The booted core, for a second pipeline to hang off.
-	 *
-	 * `RoomStack` takes these three rather than building its own: the DI container, the asset
-	 * library and the configuration manager are the same ones, and a second
-	 * `HabboConfigurationManager` would mean two copies of the properties free to disagree. Null until {@link boot}
-	 * resolves.
+	 * What a second pipeline hangs off: `RoomStack` takes the asset library and the properties
+	 * rather than building its own, so there is one copy of each. Null until {@link boot} resolves.
 	 */
-    get context(): CoreComponentContext | null
-    {
-        return this._context;
-    }
-
     get assetLibrary(): AssetLibrary | null
     {
         return this._assets;
     }
 
-    get configuration(): HabboConfigurationManager | null
+    get properties(): ImagerProperties | null
     {
-        return this._configuration;
+        return this._properties;
     }
 
     /** The families' .ambreia directories, opened at boot from the client's config.json; null before. */
@@ -300,8 +288,8 @@ export class AvatarRenderService
     {
         this._renderManager?.dispose();
         this._renderManager = null;
-
-        Core.dispose();
+        this._assets?.dispose();
+        this._assets = null;
     }
 
     /**
@@ -376,7 +364,11 @@ export class AvatarRenderService
             };
 
             renderManager.downloadFigure(container, listener);
-        }), FIGURE_TIMEOUT_MS);
+        }), FIGURE_TIMEOUT_MS).catch(() =>
+        {
+            // Transient like a furniture library that is not in yet: 503 + Retry-After, not a 500.
+            throw new ContentUnavailableError(`The figure's libraries did not load within ${FIGURE_TIMEOUT_MS} ms`);
+        });
     }
 
     private requireRenderManager(): AvatarRenderManager
@@ -391,25 +383,17 @@ export class AvatarRenderService
 
     private async initialize(): Promise<void>
     {
-        const context = Core.instantiate() as CoreComponentContext;
-
-        context.registerInterface(IID_Core, context);
-
         const assets = new AssetLibrary();
 
-        this._context = context;
         this._assets = assets;
 
-        context.attachInstance(IID_AssetLibrary, assets);
+        // The client's own starting properties (legacy.defaults.json), with `url.prefix` at the asset
+        // host: the imager is told where to read, and every `${url.prefix}` resolves through it.
+        const properties = new ImagerProperties({...LEGACY_DEFAULTS, 'url.prefix': this._config.assetsBaseUrl});
 
-        context.initialize();
+        this._properties = properties;
 
-        const configuration = this.createConfiguration(context);
-
-        this._configuration = configuration;
-
-        // `${url.prefix}` is the asset host here (createConfiguration), as in the client.
-        const directories = openAssetDirectories(this._config.assetPacks, text => configuration.interpolate(text));
+        const directories = openAssetDirectories(this._config.assetPacks, text => properties.interpolate(text));
 
         this._assetDirectories = directories;
         log.debug(`Avatar libraries: ${directories.clothing.url}, effects: ${directories.effects.url}`);
@@ -421,9 +405,7 @@ export class AvatarRenderService
             effects: directories.effects
         });
 
-        context.attachInstance(IID_AvatarRenderManager, renderManager);
-
-        await withTimeout(new Promise<void>((resolve) =>
+        const ready = new Promise<void>((resolve) =>
         {
             if(renderManager.isReady)
             {
@@ -433,25 +415,25 @@ export class AvatarRenderService
             }
 
             renderManager.events.once(AvatarRenderEvent.AVATAR_RENDER_READY, () => resolve());
-        }), READY_TIMEOUT_MS);
+        });
+
+        // An unreachable asset host (DNS, connection refused) used to be a 120 s wait: the directory
+        // reader forgets a failed fetch so the next read tries again, and nothing in the ready wait
+        // ever learns of it. Reading a piece that cannot exist settles the question at once: null
+        // (the directory is fine, the piece is not there) or the network error, with the URL.
+        const probe = directories.clothing.read('__ambreia_probe__').then(
+            () => new Promise<never>(() => undefined),
+            (error: unknown) =>
+            {
+                throw new Error(`${directories.clothing.url} cannot be read: ${String((error as Error | null)?.message ?? error)}`);
+            }
+        );
+
+        await withTimeout(Promise.race([ready, probe]), READY_TIMEOUT_MS);
 
         this._renderManager = renderManager;
 
         log.info('Avatar pipeline ready');
-    }
-
-    /**
-	 * The client's own starting properties (legacy.defaults.json), with `url.prefix` at the asset
-	 * host: the imager is told where to read, and every `${url.prefix}` resolves through it.
-	 */
-    private createConfiguration(context: CoreComponentContext): HabboConfigurationManager
-    {
-        const configuration = new HabboConfigurationManager(context);
-
-        context.attachComponent(configuration, [IID_HabboConfigurationManager]);
-        configuration.load({...LEGACY_DEFAULTS, 'url.prefix': this._config.assetsBaseUrl});
-
-        return configuration;
     }
 
     /** The client's Ambreia*.xml files, read from the same folder as the client bundles them. */

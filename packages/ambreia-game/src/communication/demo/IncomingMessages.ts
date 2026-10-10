@@ -66,6 +66,9 @@ const log = Logger.getLogger('habbo.communication.demo.IncomingMessages');
  */
 export class IncomingMessages
 {
+    /** How long the server has to complete the Diffie-Hellman exchange once the socket is open. */
+    private static readonly HANDSHAKE_TIMEOUT_MS = 15000;
+
     private _demo: HabboCommunicationDemo;
     // AS3: sources/win63_version/habbo/communication/demo/class_1762.as::_communication
     private _communication: IHabboCommunicationManager;
@@ -76,11 +79,18 @@ export class IncomingMessages
     private _privateKey: string = '';
     private _isHandshaking: boolean = false;
     private _wasDisconnected: boolean = false;
+    /** The handshake deadline, armed when the socket opens and cleared when encryption is on. */
+    private _handshakeTimer: ReturnType<typeof setTimeout> | null = null;
     // AS3: sources/win63_version/habbo/communication/demo/class_1762.as::_rsa
     private _rsa: RSA;
 
     private _boundOnConnected: () => void;
     private _boundOnDisconnected: () => void;
+    /** A reconnect that ran out of attempts is the one disconnect the player is told about. */
+    private readonly _onLifecycle = (from: string, to: string): void =>
+    {
+        if(from === 'reconnecting' && to === 'failed') this._demo.disconnected(-3, '');
+    };
 
     constructor(demo: HabboCommunicationDemo, communication: IHabboCommunicationManager)
     {
@@ -101,6 +111,7 @@ export class IncomingMessages
 
         connection.on('connected', this._boundOnConnected);
         connection.on('disconnected', this._boundOnDisconnected);
+        this._communication.lifecycle.on('change', this._onLifecycle);
 
         // Register message handlers - matches AS3 order
         this.addHabboConnectionMessageEvent(new LoginFailedHotelClosedMessageEvent(this.onLoginFailedHotelClosed.bind(this)));
@@ -127,6 +138,8 @@ export class IncomingMessages
             connection.off('disconnected', this._boundOnDisconnected);
         }
 
+        this._communication.lifecycle.off('change', this._onLifecycle);
+
         for(const event of this._messageEvents)
         {
             this._communication.removeMessageEvent(event);
@@ -134,6 +147,33 @@ export class IncomingMessages
 
         this._messageEvents = [];
         this._keyExchange = null;
+        this.clearHandshakeTimer();
+    }
+
+    private clearHandshakeTimer(): void
+    {
+        if(this._handshakeTimer === null) return;
+
+        clearTimeout(this._handshakeTimer);
+        this._handshakeTimer = null;
+    }
+
+    /**
+     * The handshake cannot complete: a wrong RSA modulus (the decrypted prime is garbage and BigInt
+     * throws), an invalid server key, or no answer in time. Without this the error died in the
+     * message handler's catch and `waitForAuthentication()` waited forever on a silent screen.
+     */
+    // TS-only: AS3 had no failure path here; its handshake either completed or the socket closed.
+    private failHandshake(connection: {close(): void} | null, error: Error): void
+    {
+        this.clearHandshakeTimer();
+
+        if(!this._isHandshaking) return;
+
+        log.error(`Handshake failed: ${error.message}`);
+        this._isHandshaking = false;
+        this._demo.dispatchLoginStepEvent(HabboCommunicationEvent.HANDSHAKE_FAIL);
+        connection?.close();
     }
 
     /**
@@ -163,6 +203,12 @@ export class IncomingMessages
 
         this._demo.dispatchLoginStepEvent(HabboCommunicationEvent.HANDSHAKING);
 
+        this.clearHandshakeTimer();
+        this._handshakeTimer = setTimeout(
+            () => this.failHandshake(connection, new Error(`no completed handshake after ${IncomingMessages.HANDSHAKE_TIMEOUT_MS} ms`)),
+            IncomingMessages.HANDSHAKE_TIMEOUT_MS
+        );
+
         connection.sendUnencrypted(new ClientHelloMessageComposer());
         connection.sendUnencrypted(new InitDiffieHandshakeMessageComposer());
     }
@@ -183,6 +229,18 @@ export class IncomingMessages
 
         if(!parser) return;
 
+        try
+        {
+            this.completeInitDiffieHandshake(connection, parser);
+        }
+        catch (error)
+        {
+            this.failHandshake(connection, error as Error);
+        }
+    }
+
+    private completeInitDiffieHandshake(connection: NonNullable<IMessageEvent['connection']>, parser: InitDiffieHandshakeMessageParser): void
+    {
         const primeDecimal = this._rsa.decryptString(parser.encryptedPrime);
         const generatorDecimal = this._rsa.decryptString(parser.encryptedGenerator);
 
@@ -245,15 +303,25 @@ export class IncomingMessages
 
         if(!parser) return;
 
+        try
+        {
+            this.completeDiffieHandshake(connection, parser);
+        }
+        catch (error)
+        {
+            this.failHandshake(connection, error as Error);
+        }
+    }
+
+    private completeDiffieHandshake(connection: NonNullable<IMessageEvent['connection']>, parser: CompleteDiffieHandshakeMessageParser): void
+    {
+        if(!this._keyExchange) throw new Error('CompleteDiffieHandshake before InitDiffieHandshake');
+
         const serverPublicKey = this._rsa.decryptString(parser.encryptedPublicKey);
 
         this._keyExchange.generateSharedKey(serverPublicKey, 10);
 
-        if(!this._keyExchange.isValidServerPublicKey())
-        {
-            log.error('Invalid server public key');
-            return;
-        }
+        if(!this._keyExchange.isValidServerPublicKey()) throw new Error('Invalid server public key');
 
         const sharedKeyHex = this._keyExchange.getSharedKey(16).toUpperCase();
         const keyBytes = CryptoTools.hexStringToByteArray(sharedKeyHex);
@@ -272,6 +340,7 @@ export class IncomingMessages
 
         connection.setEncryption(clientToServer, serverToClient!);
 
+        this.clearHandshakeTimer();
         this._isHandshaking = false;
 
         this._demo.dispatchLoginStepEvent(HabboCommunicationEvent.HANDSHAKED);
@@ -429,10 +498,18 @@ export class IncomingMessages
     // AS3: sources/win63_version/habbo/communication/demo/class_1762.as::onConnectionDisconnected()
     private onConnectionDisconnected(): void
     {
+        this.clearHandshakeTimer();
+
         if(this._isHandshaking)
         {
             this._demo.dispatchLoginStepEvent(HabboCommunicationEvent.HANDSHAKE_FAIL);
         }
+
+        this._isHandshaking = false;
+
+        // The communication manager decided first (its callback runs before this event): a session
+        // being brought back is not a disconnect to tell the player about.
+        if(this._communication.lifecycle.state === 'reconnecting') return;
 
         if(!this._wasDisconnected)
         {
@@ -446,15 +523,8 @@ export class IncomingMessages
     // AS3: sources/win63_version/habbo/communication/demo/class_1762.as::generateRandomHexString()
     private generateRandomHexString(byteLength: number): string
     {
-        let result = '';
-
-        for(let i = 0; i < byteLength; i++)
-        {
-            const byte = Math.floor(Math.random() * 255);
-
-            result += byte.toString(16).padStart(2, '0');
-        }
-
-        return result;
+        // DEVIATION: AS3 drew the Diffie-Hellman private key from Math.random; a predictable key
+        //   makes the RC4 key recoverable by anyone reading the plain-text handshake. WebCrypto.
+        return CryptoTools.randomHexString(byteLength);
     }
 }

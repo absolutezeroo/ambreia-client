@@ -12,7 +12,7 @@ import {RpgEnterWorldMessage} from '@ambreia/protocol/outgoing/rpg/characters/Rp
 import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
 import type {IRpgCharacterSession} from './IRpgCharacterSession';
 import {CharacterCreateView, type ICharacterDraft} from './CharacterCreateView';
-import {WindowBits} from './WindowBits';
+import {WindowBits} from '../../ui/kit/WindowBits';
 
 const log = Logger.getLogger('habbo.features.character.CharacterScreen');
 
@@ -90,6 +90,12 @@ export class CharacterScreen
         this._bits.setVisible(this._window, false, 'selected_zone', 'selected_details');
         desktop.addChild(this._window);
         this._window.procedure = this._onEvent;
+
+        // A frame hides on its header X (FrameController.close()); on a screen that is the only way
+        // forward the X is taken out instead of left dead.
+        const headerClose = this._window.findChildByName('header_button_close');
+
+        if(headerClose) headerClose.visible = false;
         this._window.addEventListener('WE_PARENT_RESIZED', this._onResize);
         this.place();
 

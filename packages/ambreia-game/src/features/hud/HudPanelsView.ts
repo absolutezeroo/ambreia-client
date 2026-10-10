@@ -7,12 +7,12 @@ import type {IItemGridWindow} from '@ambreia/ui/components/IItemGridWindow';
 import type {IStaticBitmapWrapperWindow} from '@ambreia/ui/components/IStaticBitmapWrapperWindow';
 import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
 import type {IHabboLocalizationManager} from '../../localization/IHabboLocalizationManager';
-import {WindowBits} from '../character/WindowBits';
+import {WindowBits} from '../../ui/kit/WindowBits';
 import {barFill} from './PlayerHudState';
 import type {IHudCast, IHudPanels, IHudUnit, IPartyMember, HudPanelsState} from './HudPanelsState';
 import {ChatPanel, type IMenuItem} from './ChatPanel';
-import {HudTooltips, type ITooltip} from './HudTooltips';
-import {lowHp} from './hudRules';
+import {HudTooltips, type ITooltip} from '../../ui/kit/HudTooltips';
+import {lowHp} from '../../ui/kit/hudRules';
 
 const log = Logger.getLogger('habbo.features.hud.HudPanelsView');
 

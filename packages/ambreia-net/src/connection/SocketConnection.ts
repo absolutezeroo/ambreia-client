@@ -16,6 +16,22 @@ import type {IPacketTap} from './IPacketTap';
 import {MessageDataWrapper} from '../messages/MessageDataWrapper';
 import {PreEncryptionMessageComposer} from '../messages/PreEncryptionMessageComposer';
 import {PacketLogger} from '../PacketLogger';
+import {isProductionBuild} from '@ambreia/common/utils/BuildEnv';
+
+const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]', '::1']);
+
+/** True for a socket URL that stays on this machine. */
+function isLoopback(url: string): boolean
+{
+    try
+    {
+        return LOOPBACK_HOSTS.has(new URL(url).hostname);
+    }
+    catch
+    {
+        return false;
+    }
+}
 
 const log = Logger.getLogger('core.communication.connection.SocketConnection');
 
@@ -131,10 +147,6 @@ export class SocketConnection extends EventEmitter<IConnectionEvents> implements
         let url: string;
         if(host.startsWith('ws://') || host.startsWith('wss://'))
         {
-            if(host.startsWith('ws://'))
-            {
-                log.warn('Insecure WebSocket connection (ws://). Use wss:// in production.');
-            }
             url = host;
         }
         else
@@ -142,6 +154,30 @@ export class SocketConnection extends EventEmitter<IConnectionEvents> implements
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             url = port > 0 ? `${protocol}//${host}:${port}` : `${protocol}//${host}`;
         }
+
+        if(url.startsWith('ws://'))
+        {
+            // Plain-text WebSockets stay a development convenience (a local emulator). A production
+            // build refuses them anywhere but on this machine (spec §7 rule 4): the RC4 handshake does
+            // not protect against a third party on the network, and a wrong `app.server.host` must
+            // fail here, named, rather than send the SSO ticket in clear.
+            if(isProductionBuild() && !isLoopback(url))
+            {
+                const error = new Error(`Refusing an insecure WebSocket (${url}) in production: use wss://`);
+
+                log.error(error.message);
+                this._callback?.connectionError?.(error);
+
+                return false;
+            }
+
+            log.warn('Insecure WebSocket connection (ws://). Use wss:// in production.');
+        }
+
+        // A retry (next port, second attempt) must not leave the previous socket's handlers alive:
+        // its late `onclose` flipped `_connected` and announced a disconnect over a connection that
+        // was still being opened.
+        this.detachSocket();
 
         try
         {
@@ -466,6 +502,23 @@ export class SocketConnection extends EventEmitter<IConnectionEvents> implements
         this.removeAllListeners();
 
         this._disposed = true;
+    }
+
+    /** Forgets the current socket: handlers off, closed if still open or opening. */
+    private detachSocket(): void
+    {
+        const socket = this._socket;
+
+        if(!socket) return;
+
+        socket.onopen = null;
+        socket.onclose = null;
+        socket.onerror = null;
+        socket.onmessage = null;
+
+        if(socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING) socket.close();
+
+        this._socket = null;
     }
 
     private setupEventListeners(): void

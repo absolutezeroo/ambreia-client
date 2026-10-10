@@ -4,7 +4,7 @@
 // packages/ambreia-game/src/features/combat/vfxSheets.generated.ts, keyed `<folder>/<name>`, the
 // name the content's `vfx` phases use (content/skill/*.json → "sheet") and the key the bundler gives
 // the image (rpg/vfx/<folder>/<name>, tools/bundle-assets.mjs). Runs before every `pnpm dev` and as
-// `pnpm gen:vfx`. Where a sheet is pinned (body, feet) is the content's to say, not the art's.
+// `pnpm gen:vfx`; `--check` only tells whether the committed file is current (pre-commit). Where a sheet is pinned (body, feet) is the content's to say, not the art's.
 import {existsSync, readdirSync, readFileSync, writeFileSync} from 'node:fs';
 import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -67,9 +67,23 @@ ${lines.join(',\n')}
 `;
 }
 
+/** `--check`: true when the committed file is what the sheets render to (the pre-commit hook's question). */
+export function isUpToDate(sheets = readSheets(), out = OUT)
+{
+    return existsSync(out) && readFileSync(out, 'utf8') === render(sheets);
+}
+
 if(process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url))
 {
     const sheets = readSheets();
+
+    if(process.argv.includes('--check'))
+    {
+        if(isUpToDate(sheets)) process.exit(0);
+
+        console.error(`[vfx] ${OUT} is stale: run pnpm gen:vfx and commit it`);
+        process.exit(1);
+    }
 
     writeFileSync(OUT, render(sheets));
     console.log(`[vfx] ${sheets.size} sheets → ${OUT}`);

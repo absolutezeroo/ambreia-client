@@ -21,6 +21,22 @@
 :80 {
 	encode zstd gzip
 
+	# --- headers every response carries --------------------------------------------------------
+	# The SSO ticket rides on `?sso=` in the page URL: `same-origin` keeps it out of the Referer of
+	# anything cross-origin the page may load. `nosniff` stops a script served as HTML (the SPA
+	# fallback) from being executed as one. `frame-ancestors 'self'` says out loud what the design
+	# assumes: the site frames this client from the same origin (SiteChannel.ts), nobody else does.
+	# The full policy is Report-Only on purpose: the client decodes WebAssembly (truffle-text), draws
+	# from blob: and data: URLs and dials wss://, and a wrong directive would blank the game; enforce
+	# it only once the browser console shows no violation through login and a room.
+	header {
+		Referrer-Policy same-origin
+		X-Content-Type-Options nosniff
+		Content-Security-Policy "frame-ancestors 'self'"
+		Content-Security-Policy-Report-Only "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self' data:; connect-src 'self' wss: ws:; worker-src 'self' blob:; media-src 'self' blob:; object-src 'none'; base-uri 'self'"
+		-Server
+	}
+
 	# The asset tree is its own resource (Dockerfile.assets) on its own hostname, but the client
 	# still asks THIS host for it — see the asset section below. Reaching it only through the
 	# absolute URLs in gamedata/hashes.json was the original plan and it does not hold: hashes.json
@@ -97,6 +113,14 @@
 		reverse_proxy {$ASSETS_UPSTREAM}:80
 	}
 
+	# The `.ambreia` families (clothing, effects, room, pets, furniture, icons): the asset-packs
+	# feature defaults every family to `${url.prefix}/ambreia/<family>/`, i.e. THIS origin, and
+	# vite.config.ts proxies the same path in development. Without this route the request fell into
+	# the SPA fallback and `ambreia.json` came back as index.html: "not an .ambreia directory".
+	handle /ambreia/* {
+		reverse_proxy {$ASSETS_UPSTREAM}:80
+	}
+
 	# --- the client itself -------------------------------------------------------------------------
 	# Build output first, and deliberately outside the fallback below. Every name under /assets is
 	# content-hashed, so a request for one that is missing is a bug and must answer 404. Inside the
@@ -104,6 +128,9 @@
 	# fails later and elsewhere. The site next door shipped with no sprite sheet exactly that way.
 	handle /assets/* {
 		root * /srv
+		# Content-hashed names: a byte never changes under the same URL, so the browser may keep it
+		# forever and skip the revalidation round-trip on every load of the 4 MB bundle.
+		header Cache-Control "public, max-age=31536000, immutable"
 		file_server
 	}
 
@@ -111,6 +138,10 @@
 	# a deep link must answer with index.html rather than 404.
 	handle {
 		root * /srv
+		# index.html, config.json and the two assets-*.ambreia bundles are not hashed: `no-cache`
+		# makes every load revalidate them (ETag), so a deploy never pairs a new index.html with a
+		# stale bundle whose layout keys the new code expects — the silent "blank window" skew.
+		header Cache-Control "no-cache"
 		try_files {path} /index.html
 		file_server
 	}

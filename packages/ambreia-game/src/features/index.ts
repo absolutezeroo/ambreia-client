@@ -36,6 +36,8 @@ import type {RpgChatSession} from './chat/RpgChatSession';
 import {CombatFeature} from './combat/feature';
 import type {RpgCombatSession} from './combat/RpgCombatSession';
 import {SkillsFeature} from './skills/feature';
+import {InputFeature} from './input/feature';
+import type {IInputBindings} from './input/IInputBindings';
 import type {RpgSkillSession} from './skills/RpgSkillSession';
 import type {PlayerHudState} from './hud/PlayerHudState';
 import {IID_HabboConfigurationManager} from '../iid/IIDHabboConfigurationManager';
@@ -84,6 +86,8 @@ export interface IEngineManagers
     combat: RpgCombatSession | null;
     /** The player's skills, the bar, cooldowns and statuses (features/skills, M1b). */
     skills: RpgSkillSession | null;
+    /** The keyboard: the bindings of the features (features/input). */
+    input: IInputBindings | null;
 }
 
 /** The engine's own objects the features are made with: none of them is configuration. */
@@ -111,7 +115,7 @@ export function emptyManagers(): IEngineManagers
     return {
         configuration: null, assetDirectories: null, communication: null, demo: null, localization: null, roomManager: null, roomSession: null,
         sessionData: null, roomEngine: null, avatarRenderer: null, windowManager: null, roomUI: null, character: null,
-        hud: null, inventory: null, interaction: null, chat: null, hudPlayer: null, combat: null, skills: null
+        hud: null, inventory: null, interaction: null, chat: null, hudPlayer: null, combat: null, skills: null, input: null
     };
 }
 
@@ -139,11 +143,12 @@ const Communication = feature({
     id: 'communication',
     essential: 'the client has no server without it',
     provides: [IID_HabboCommunicationManager],
-    create: ({context, host}) =>
+    create: ({context, host, scope}) =>
     {
         const manager = new HabboCommunicationManager(context);
 
         host.made.communication = manager;
+        scope.hook('connection', {state: () => manager.lifecycle.describe()});
 
         return manager;
     },
@@ -192,9 +197,11 @@ const Rooms = feature({
     provides: [IID_RoomManager],
     create: ({context, host}) =>
     {
+        // The engine knows no property key: the client's legacy keys are mapped here.
         const manager = new RoomManager({
-            property: (key: string): string => context.configuration?.getProperty(key) ?? '',
-            flag: (key: string): boolean => context.configuration?.getBoolean(key) ?? false
+            externalImageUrl: (): string => context.configuration?.getProperty('stories.image_url_base') ?? '',
+            extraDataServiceUrl: (): string => context.configuration?.getProperty('extra_data_service_url') ?? '',
+            extraDataBatches: (): boolean => context.configuration?.getBoolean('extra_data_batches_enabled') ?? false
         });
 
         host.made.roomManager = manager;
@@ -213,7 +220,17 @@ const RoomRenderers = feature({
 const RoomSessions = feature({
     id: 'room-session',
     provides: [IID_RoomSessionManager],
-    create: ({context, host}) => (host.made.roomSession = new RoomSessionManager(context))
+    create: ({context, host, scope}) =>
+    {
+        const manager = new RoomSessionManager(context);
+
+        host.made.roomSession = manager;
+        // The session the server knew is gone (a drop, a kick): every room session ends with it, so
+        // the HUD, the widgets and the features start clean when the server puts the player back.
+        scope.bind(host.made.communication?.lifecycle)('reset', () => manager.disposeAllSessions());
+
+        return manager;
+    }
 });
 
 /** The user's data once authenticated (AS3: HabboSessionDataManagerLib). */
@@ -237,7 +254,7 @@ const RoomEngines = feature({
 const AvatarRenderer = feature({
     id: 'avatar-renderer',
     provides: [IID_AvatarRenderManager],
-    create: ({context, host}) =>
+    create: ({context, host, scope}) =>
     {
         const made = host.made;
         const configuration = made.configuration;
@@ -265,7 +282,7 @@ const AvatarRenderer = feature({
         };
 
         if(configuration?.isInitialized()) start();
-        else configuration?.events.once('complete', start);
+        else scope.bindOnce(configuration?.events)('complete', start);
 
         return null;
     }
@@ -314,6 +331,7 @@ export const GAME_FEATURES: readonly IGameFeature[] = [
     SessionData, RoomEngines, AvatarRenderer, Windows, RoomUserInterface,
     AvatarInfoFeature,
     LoadingBarFeature,
+    InputFeature,
     CharacterFeature,
     HudFeature,
     InventoryFeature,

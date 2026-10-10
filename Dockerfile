@@ -14,7 +14,21 @@ WORKDIR /src
 # --- dependency layer ---------------------------------------------------------------------------
 # The lockfile and every package manifest first. As long as no dependency moves, editing a source
 # file reuses this layer instead of resolving and downloading the whole workspace again.
+# Every workspace manifest, not only the host packages: pnpm resolves the `@ambreia/*` importers from
+# the lockfile only when their package.json is present. With a subset, `pnpm install --frozen-lockfile`
+# still exits 0 but leaves dangling workspace links and installs none of their dependencies (zod, pako),
+# and `tsc`/`vite build` fail later. tools/docker-manifests.test.mjs keeps this list equal to the lockfile.
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY packages/ambreia-avatar/package.json packages/ambreia-avatar/
+COPY packages/ambreia-common/package.json packages/ambreia-common/
+COPY packages/ambreia-game/package.json packages/ambreia-game/
+COPY packages/ambreia-iso/package.json packages/ambreia-iso/
+COPY packages/ambreia-kernel/package.json packages/ambreia-kernel/
+COPY packages/ambreia-map-editor/package.json packages/ambreia-map-editor/
+COPY packages/ambreia-map-editor-core/package.json packages/ambreia-map-editor-core/
+COPY packages/ambreia-net/package.json packages/ambreia-net/
+COPY packages/ambreia-protocol/package.json packages/ambreia-protocol/
+COPY packages/ambreia-ui/package.json packages/ambreia-ui/
 COPY packages/vortex-client/package.json packages/vortex-client/
 COPY packages/vortex-engine/package.json packages/vortex-engine/
 COPY packages/vortex-glaze/package.json packages/vortex-glaze/

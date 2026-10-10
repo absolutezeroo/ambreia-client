@@ -4,13 +4,15 @@ import type {IAttachInstanceOptions} from '../runtime/IContext';
 import type {CoreComponentContext} from '../runtime/CoreComponentContext';
 import type {IID} from '../runtime/IID';
 import type {AppConfig} from '../config/AppConfig';
+import type {FeatureScope} from './FeatureScope';
 
 /** What a feature's create() gives the kernel to register: a component, a plain instance, or nothing. */
 export type FeatureProduct = Component | {instance: unknown; attach?: IAttachInstanceOptions} | null;
 
 /**
- * What create() receives: the DI context, its own section (and only it, §5.2), `app`, and the
- * host's own objects (the client's bundles and application, which are not configuration).
+ * What create() receives: the DI context, its own section (and only it, §5.2), `app`, the
+ * host's own objects (the client's bundles and application, which are not configuration), and the
+ * scope the kernel releases when the feature is disposed: what create() hooks up goes through it.
  */
 export interface IFeatureContext<C, H = unknown>
 {
@@ -18,6 +20,7 @@ export interface IFeatureContext<C, H = unknown>
     readonly config: Readonly<C & {enabled: boolean}>;
     readonly app: Readonly<AppConfig>;
     readonly host: H;
+    readonly scope: FeatureScope;
 }
 
 /**
@@ -41,6 +44,12 @@ export interface IFeature<S extends z.ZodObject = z.ZodObject, H = unknown>
      * the place for work that needs the product registered (the configuration's download).
      */
     afterAttach?(product: FeatureProduct, feature: IFeatureContext<z.infer<S>, H>): void | Promise<void>;
+    /**
+     * Runs when the kernel is disposed (IKernelReport.dispose()), in reverse boot order, before the
+     * feature's scope is released: for what create() made outside the scope (a view, a global).
+     * A Component product is disposed by the DI with its context, not here.
+     */
+    dispose?(product: FeatureProduct, feature: IFeatureContext<z.infer<S>, H>): void;
 }
 
 /** A feature of a given host, any section: what a host's feature list is typed with. */

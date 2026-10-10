@@ -31,4 +31,7 @@ export interface IFrameWindow extends IWindowContainer
     helpPage: string;
 
     resizeToFitContent(): void;
+
+    // TS-only: WE_CLOSE (cancelable) → hidden → WE_CLOSED; what the header's close button does.
+    close(): boolean;
 }

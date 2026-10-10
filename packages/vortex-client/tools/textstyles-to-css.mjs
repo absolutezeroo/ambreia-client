@@ -95,7 +95,7 @@ function parseArgs(argv)
     // `--font-url /fonts/` silently arrives as `C:/Program Files/Git/fonts/` and
     // every @font-face points at a file the browser refuses to load. Prefix the
     // command with MSYS_NO_PATHCONV=1.
-    if(/^[A-Za-z]:[\/]/.test(args.fontUrl))
+    if(/^[A-Za-z]:[/]/.test(args.fontUrl))
     {
         console.warn(`  WARNING: --font-url looks like a Windows path (${args.fontUrl}).`);
         console.warn('  Git Bash converted it. Re-run with MSYS_NO_PATHCONV=1.');

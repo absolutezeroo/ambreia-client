@@ -35,7 +35,7 @@ import {RoomObjectAvatarPlayerValueUpdateMessage} from '../../scene/messages/Roo
 import {RoomObjectAvatarBlockedUpdateMessage} from '../../scene/messages/RoomObjectAvatarBlockedUpdateMessage';
 import {RoomObjectAvatarFlatControlUpdateMessage} from '../../scene/messages/RoomObjectAvatarFlatControlUpdateMessage';
 import {RoomObjectAvatarGuideStatusUpdateMessage} from '../../scene/messages/RoomObjectAvatarGuideStatusUpdateMessage';
-import {RoomObjectAvatarTargetUpdateMessage} from '../../scene/messages/RoomObjectAvatarTargetUpdateMessage';
+import {RoomObjectAvatarSelectionRingUpdateMessage} from '../../scene/messages/RoomObjectAvatarSelectionRingUpdateMessage';
 import {RoomObjectVariableEnum} from '../../scene/object/RoomObjectVariableEnum';
 import {RoomObjectAvatarOwnMessage} from '../../scene/messages/RoomObjectAvatarOwnMessage';
 
@@ -349,10 +349,10 @@ export class AvatarLogic extends MovingObjectLogic
             return;
         }
 
-        // TS-only (RPG F3b §7.3): the player's target, drawn by AvatarVisualization's target circle.
-        if(message instanceof RoomObjectAvatarTargetUpdateMessage)
+        // TS-only: the host points this avatar out; AvatarVisualization draws the ring.
+        if(message instanceof RoomObjectAvatarSelectionRingUpdateMessage)
         {
-            model.setNumber(RoomObjectVariableEnum.AVATAR_RPG_TARGET, message.targeted ? 1 : 0);
+            model.setNumber(RoomObjectVariableEnum.AVATAR_SELECTION_RING, message.shown ? 1 : 0);
             return;
         }
 

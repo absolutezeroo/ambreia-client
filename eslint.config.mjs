@@ -27,7 +27,11 @@ export default tseslint.config(
             '**/*.generated.ts',
             // The dev server's esbuild output of the engine (vite-plugin-engine-bundle.mjs), gitignored.
             // It held 1,821 of the 1,828 errors `eslint .` reported on 2026-10-07.
-            '**/.vortex-dev/**'
+            '**/.vortex-dev/**',
+            // The design-habbo-window skill's preview snippets run page-side through
+            // Runtime.evaluate after compose.mjs injects their helpers (find, place, text…): they are
+            // not modules, and linting them as such is 414 no-undef for nothing.
+            '.claude/skills/**/previews/**'
         ]
     },
     js.configs.recommended,
@@ -291,6 +295,24 @@ export default tseslint.config(
             )
         }
     },
+    {
+        // A feature imports another feature only through its contract: an `I*.ts` file or its
+        // `events.ts` (spec §3 rule 4). What two features share is kit, under game/src/ui/kit.
+        files: ['packages/ambreia-game/src/features/*/**/*.ts'],
+        rules:
+        {
+            'no-restricted-imports': wall(
+                {
+                    regex: '(^|/)vortex-(engine|client|glaze|imager)(/|$)|(^|/)ambreia-[a-z]+/src(/|$)',
+                    message: `@ambreia/game never imports the host packages (${WALLS_SPEC}).`
+                },
+                {
+                    regex: '^\\.\\./(?!\\.\\.(/|$))[^/]+/(?!(I[A-Z][^/]*|events)$).+',
+                    message: `A feature imports another feature only through its I*.ts or events.ts; shared code goes to game/src/ui/kit (${WALLS_SPEC} rule 4).`
+                }
+            )
+        }
+    },
     // game/src/core is the game's bottom layer: it never reaches out of core/. Its folders share
     // names with the game's (communication, localization), so the wall counts the climb per depth.
     ...[1, 2, 3].map(depth => ({
@@ -309,6 +331,20 @@ export default tseslint.config(
             )
         }
     })),
+    {
+        // The imager is the avatar and room engines run in Node: it stands on @ambreia/avatar, iso
+        // and common, and on nothing of the game, the kernel or the client (spec §3; AV-02).
+        files: ['packages/vortex-imager/src/**/*.ts'],
+        rules:
+        {
+            'no-restricted-imports': wall(
+                {
+                    regex: '^@ambreia/(game|kernel|net|protocol|ui)(/|$)|(^|/)vortex-(engine|client|glaze)(/|$)|(^|/)ambreia-[a-z]+/src(/|$)',
+                    message: `vortex-imager stands on @ambreia/avatar, @ambreia/iso and @ambreia/common only (${WALLS_SPEC}).`
+                }
+            )
+        }
+    },
     {
         // Glaze is the window system's own editor: it stands on @ambreia/ui and @ambreia/common, so
         // what it can do is what any other host of the window system can (spec §11, J3).

@@ -4,7 +4,7 @@ import type {IRpgStatBlock} from '@ambreia/protocol/incoming/rpg/characters/IRpg
 import type {RpgItemResultMessage} from '@ambreia/protocol/incoming/rpg/items/RpgItemResultMessage';
 import {RoomSessionEvent} from '../../session/events/RoomSessionEvent';
 import type {IGameFeature} from '../GameFeature';
-import {WindowBits} from '../character/WindowBits';
+import {WindowBits} from '../../ui/kit/WindowBits';
 import {CharacterWindow} from './CharacterWindow';
 import {InventoryView} from './InventoryView';
 import {ITEM_ICONS, parseTexts, STAT_ICONS} from './items';
@@ -21,9 +21,12 @@ const log = Logger.getLogger('habbo.features.inventory');
 export const InventoryFeature: IGameFeature = {
     id: 'inventory',
     images: [...ITEM_ICONS, ...STAT_ICONS],
-    create: ({app, host}) =>
+    requires: ['character', 'hud', 'roomSession', 'input'],
+    create: ({app, host, scope}) =>
     {
         const session = new RpgInventorySession();
+        const hudOn = scope.bind(host.made.hud?.events);
+        const characterOn = scope.bind(host.made.character?.events);
         let stats: IRpgStatBlock | null = host.made.character?.state?.stats ?? null;
         let inventory: InventoryView | null = null;
         let character: CharacterWindow | null = null;
@@ -83,7 +86,7 @@ export const InventoryFeature: IGameFeature = {
         const currency = (): {gold: number | null; gems: number | null} => ({gold: host.made.hud?.value.gold ?? null, gems: host.made.hud?.value.gems ?? null});
         let lastCurrency = '';
 
-        host.made.hud?.events.on('changed', value =>
+        hudOn('changed', value =>
         {
             const now = `${value.gold}/${value.gems}`;
 
@@ -99,10 +102,10 @@ export const InventoryFeature: IGameFeature = {
             refresh();
         };
 
-        host.made.character?.events.on('state', onStats);
-        host.made.character?.events.on('stats', onStats);
+        characterOn('state', onStats);
+        characterOn('stats', onStats);
 
-        session.events.on('result', (result: RpgItemResultMessage) =>
+        scope.bind(session.events)('result', (result: RpgItemResultMessage) =>
         {
             if(result.code === 'ok') return;
 
@@ -113,36 +116,27 @@ export const InventoryFeature: IGameFeature = {
             windows?.alert(text.text('vortex.hud.nav.inventory'), text.textOr(`vortex.inventory.error.${result.code}`, text.text('vortex.inventory.error.failed')), 0, dialog => dialog.dispose());
         });
 
-        host.made.hud?.events.on('nav', name =>
+        hudOn('nav', name =>
         {
             if(name === 'nav_inventory') open('inventory');
             else if(name === 'nav_character') open('character');
         });
 
-        // I and C, unless a text field has the keyboard (the window system's fields are DOM inputs).
-        const onKey = (event: KeyboardEvent): void =>
-        {
-            const target = event.target as {tagName?: string} | null;
+        // I and C (`requires` has the keyboard made before this).
+        const input = host.made.input!;
 
-            if(event.ctrlKey || event.altKey || event.metaKey || target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA') return;
+        scope.add(input.bind('inventory', 'i', () => open('inventory')));
+        scope.add(input.bind('inventory', 'c', () => open('character')));
 
-            const key = event.key.toLowerCase();
+        const sessionOn = scope.bind(host.made.roomSession?.sessionEvents);
 
-            if(key === 'i') open('inventory');
-            else if(key === 'c') open('character');
-        };
-
-        globalThis.addEventListener?.('keydown', onKey);
-
-        const sessionEvents = host.made.roomSession?.sessionEvents;
-
-        sessionEvents?.on(RoomSessionEvent.RSE_STARTED, () =>
+        sessionOn(RoomSessionEvent.RSE_STARTED, () =>
         {
             inWorld = true;
             // Item names are in the chat's links too, not only in the windows.
             void loadTexts();
         });
-        sessionEvents?.on(RoomSessionEvent.RSE_ENDED, () =>
+        sessionOn(RoomSessionEvent.RSE_ENDED, () =>
         {
             inWorld = false;
             inventory?.hide();
@@ -150,9 +144,14 @@ export const InventoryFeature: IGameFeature = {
         });
 
         // Dev hook: `__ambreia.inventory.open()`.
-        const root = globalThis as unknown as {__ambreia?: Record<string, unknown>};
-
-        root.__ambreia = {...(root.__ambreia ?? {}), inventory: {session, open: () => open('inventory'), character: () => open('character')}};
+        scope.own(session).add(() =>
+        {
+            inventory?.dispose();
+            character?.dispose();
+            inventory = null;
+            character = null;
+        });
+        scope.hook('inventory', {session, open: () => open('inventory'), character: () => open('character')});
 
         return null;
     },

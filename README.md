@@ -122,8 +122,9 @@ https page. Writing one down breaks two of the three.
 
 One trap worth knowing: `connection.info.host` / `.port` in that file are read by
 `HabboCommunicationManager.updateHostParameters()` but are **not** what the socket dials.
-`packages/vortex-client/index.html`'s `VortexConfig.connection` is — `127.0.0.1:40001` when served
-locally, the page's own origin through `/ws` otherwise. Change the emulator's port there.
+`@ambreia/kernel`'s `browserSources()` default is — `ws://127.0.0.1:40001` when served locally, the
+page's own origin through `/ws` otherwise — and `app.server.host` in `packages/vortex-client/public/config.json`
+(gitignored, see `config.example.json`) overrides it for a shared development server or a deployment.
 
 `localization_configuration_txt.txt` lists the languages, one hotel per entry:
 

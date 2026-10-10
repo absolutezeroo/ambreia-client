@@ -9,7 +9,7 @@ import type {ITextFieldWindow} from '@ambreia/ui/components/ITextFieldWindow';
 import type {IRpgClassEntry} from '@ambreia/protocol/incoming/rpg/characters/IRpgClassEntry';
 import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
 import {nameRules, partColor, withPartColor, withPartSet} from './CharacterLook';
-import {WindowBits} from './WindowBits';
+import {WindowBits} from '../../ui/kit/WindowBits';
 
 const log = Logger.getLogger('habbo.features.character.CharacterCreateView');
 
@@ -104,6 +104,12 @@ export class CharacterCreateView
         this._window.x = Math.round((parent.width - this._window.width) / 2);
         this._window.y = Math.round((parent.height - this._window.height) / 2);
         this._window.procedure = this._onEvent;
+
+        // A frame hides on its header X (FrameController.close()); on a screen that is the only way
+        // forward the X is taken out instead of left dead.
+        const headerClose = this._window.findChildByName('header_button_close');
+
+        if(headerClose) headerClose.visible = false;
         this.goTo('class');
 
         return true;

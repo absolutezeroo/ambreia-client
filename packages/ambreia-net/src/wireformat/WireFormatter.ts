@@ -2,10 +2,14 @@ import {ByteArray} from '../util/ByteArray';
 import {Byte} from '../util/Byte';
 import {Short} from '../util/Short';
 import {Long} from '../util/Long';
+import {Float} from '../util/Float';
+import {Logger} from '@ambreia/common/utils/Logger';
 import {MessageDataWrapper} from '../messages/MessageDataWrapper';
 import type {IMessageDataWrapper} from '../messages/IMessageDataWrapper';
 import type {IWireFormatter} from './IWireFormatter';
 import type {IConnection} from '../connection/IConnection';
+
+const log = Logger.getLogger('core.communication.wireformat.WireFormatter');
 
 /**
  * Wire format encoder/decoder implementation
@@ -35,6 +39,9 @@ export class WireFormatter implements IWireFormatter
     private static readonly MAX_DATA_SIZE = 1048576;
 
     private _disposed: boolean = false;
+    /** The message being encoded and the index of the top-level field, for the encoder's diagnostics. */
+    private _messageId = 0;
+    private _fieldIndex = 0;
 
     get disposed(): boolean
     {
@@ -56,9 +63,12 @@ export class WireFormatter implements IWireFormatter
         message.writeShort(messageId);
 
         // Write each parameter based on type
-        for(const param of messageArray)
+        this._messageId = messageId;
+
+        for(let index = 0; index < messageArray.length; index++)
         {
-            this.writeValue(message, param);
+            this._fieldIndex = index;
+            this.writeValue(message, messageArray[index]);
         }
 
         // Update message length (excluding the 4-byte length field itself)
@@ -208,7 +218,9 @@ export class WireFormatter implements IWireFormatter
     {
         if(value === null || value === undefined)
         {
-            return;
+            // Skipping it shifted every later field by one and the server read garbage from a
+            // message that looked sent: a missing value is the composer's bug, named here.
+            throw new Error(`A null or undefined value cannot be written to the wire (field ${this._fieldIndex} of message ${this._messageId})`);
         }
 
         if(typeof value === 'string')
@@ -240,18 +252,22 @@ export class WireFormatter implements IWireFormatter
             message.writeBytes(value);
             value.position = savedPosition;
         }
+        else if(value instanceof Float)
+        {
+            message.writeFloat(value.value);
+        }
         else if(typeof value === 'number')
         {
-            // Default number type is int
-            if(Number.isInteger(value))
+            // A bare number is an int, as every server-side PopInt expects. A fraction used to be
+            // written as a float: four bytes the server read as an integer, with every later field
+            // still aligned so nothing failed loudly. Truncated and said once per message; a real
+            // float is written through the Float wrapper.
+            if(!Number.isInteger(value))
             {
-                message.writeInt(value);
+                log.once(`float:${this._messageId}:${this._fieldIndex}`).warn(`Message ${this._messageId}, field ${this._fieldIndex}: non-integer ${value} written as int ${Math.trunc(value)} — wrap it in Float if a float is meant`);
             }
-            else
-            {
-                // Float for non-integers
-                message.writeFloat(value);
-            }
+
+            message.writeInt(Math.trunc(value));
         }
         else if(Array.isArray(value))
         {

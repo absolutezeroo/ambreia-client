@@ -12,7 +12,7 @@ plan of the current milestone in `docs/superpowers/plans/`. The server is `../vo
 ```bash
 pnpm install                 # dependencies (pnpm 11, Node >= 22)
 pnpm dev                     # client dev server on :5173 (also starts the imager on :8081)
-pnpm check                   # typecheck client+engine+glaze+imager, then all tool tests (~45 s): the gate
+pnpm check                   # typecheck, lint, then every test (~80 s): the gate (CI runs it on every push)
 pnpm typecheck               # just the typecheck
 pnpm test                    # node:test over packages/*/tools and .claude/scripts, then packages/*/test/*.test.ts via tsx
 node --test <file.test.mjs>  # one test file
@@ -27,7 +27,7 @@ pnpm --filter vortex-client build:ambreia <dir of .nitro> <out dir>   # lossless
 ## Done means verified
 
 1. `pnpm check` is green, and you show its last lines. A Stop hook runs it anyway when the session
-   changed `.ts` files, and blocks while it is red.
+   changed a source it covers (`.ts`, `.mjs`, `.json`, `.xml` under `packages/`), and blocks while it is red.
 2. A visible change is looked at: use the `run-vortex-client` skill and compare screenshots.
 3. A wire change matches the emulator's serializer/parser for that message.
 4. Say what you did not verify. "Should work" is not a result.
@@ -43,7 +43,7 @@ pnpm --filter vortex-client build:ambreia <dir of .nitro> <out dir>   # lossless
 | `packages/ambreia-kernel` | `@ambreia/kernel`: DI (`runtime/`), typed config (`config/`: Zod, `app` + `legacy` + one section per feature, `config.json`), features (`feature/`: `defineFeature`, `bootFeatures`) — imports `@ambreia/common` only |
 | `packages/ambreia-iso` | `@ambreia/iso`: room engine — core (`src/`), `scene/`, `furniture/`, `avatar/`, `effects/`, each with its `register*` module; `IsoStage` loads a room out of session (zone format); `pnpm --filter @ambreia/iso sandbox` — imports `@ambreia/common` and `@ambreia/avatar` only |
 | `packages/ambreia-protocol` | `@ambreia/protocol`: `Headers.generated.ts` (from the emulator), `HabboMessages.ts`, the inherited messages, parsers and composers — imports `@ambreia/common`, `net`, `iso` only |
-| `packages/ambreia-game` | `@ambreia/game`: the game over the engines — `features/` (`GAME_FEATURES`, `IGameFeature`: images, room widgets; one folder per feature, e.g. `loading-bar/`), `core/` (DI wrappers), `avatar` incl. the editor, `communication`, `configuration`, `localization`, `room` (RoomEngine, the message handler: the glue over `iso`), `session`, `ui` (room desktop, `RoomWidgetRegistry`), `window` (`HabboWindowManager extends WindowManager`), `iid/` — never imports the host packages |
+| `packages/ambreia-game` | `@ambreia/game`: the game over the engines — `features/` (`GAME_FEATURES`, `IGameFeature`: images, room widgets; one folder per feature, e.g. `loading-bar/`), `core/` (DI wrappers), `avatar` incl. the editor, `communication`, `configuration`, `localization`, `room` (RoomEngine, the message handler: the glue over `iso`), `session`, `ui` (room desktop, `RoomWidgetRegistry`; `ui/kit/` is what two features share: a feature imports another only through its `I*.ts`/`events.ts`, ESLint checks it), `window` (`HabboWindowManager extends WindowManager`), `iid/` — never imports the host packages |
 | `packages/vortex-engine` | The host shell: `Vortex`, `VortexMain` (boots `GAME_FEATURES` through the kernel), their interfaces |
 | `packages/vortex-client` | App shell: boot (`src/App.ts`), display classes, assets, `src/vortex-layouts/` (new window XML) |
 | `packages/vortex-glaze` | Live window-layout editor — imports `@ambreia/ui` and `@ambreia/common` only (ESLint wall) |
@@ -343,6 +343,10 @@ authority on every message; `sources/HABBO-ARCTURUS-DAYBREAK/` is not this proje
    - **Composer**: `extends MessageComposer<TupleType>` with `_data` and `getMessageArray()`
    - **Parser**: `implements IMessageParser` with `flush()` + `parse(wrapper)`
    - **Event**: `extends MessageEvent implements IMessageEvent` with `callback` parameter in constructor
+   - A list's count is read with `readCount(wrapper)` (`@ambreia/protocol/parser/readCount`), never a bare
+     `readInt()`: it refuses a count the frame cannot hold before any item is read.
+   - On the wire a bare `number` is an **int** (a fraction is truncated with a warning); a float is
+     written through `@ambreia/net/util/Float`; `null`/`undefined` throw instead of shifting the fields.
 5. **Message ids come from `Headers.generated.ts`**, written by `pnpm gen:headers` from the emulator's `Headers.cs` and checked by the pre-commit hook. New registrations use `Incoming.X` / `Outgoing.X`; never type an id by hand, never take one from the AS3 registry.
 6. **A new message uses the new style** (spec §6, `@ambreia/net/style/MessageMap`): a plain class, an
    `IIncomingParser` or `IOutgoingSerializer`, an `IMessageHandler`, and a `MessageMap` per domain

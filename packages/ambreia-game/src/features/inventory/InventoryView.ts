@@ -1,4 +1,3 @@
-import {Logger} from '@ambreia/common/utils/Logger';
 import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import type {IWindow} from '@ambreia/ui/IWindow';
 import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
@@ -12,42 +11,17 @@ import {RpgItemEquipMessage} from '@ambreia/protocol/outgoing/rpg/items/RpgItemE
 import {RpgItemUnequipMessage} from '@ambreia/protocol/outgoing/rpg/items/RpgItemUnequipMessage';
 import {RpgItemDestroyMessage} from '@ambreia/protocol/outgoing/rpg/items/RpgItemDestroyMessage';
 import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
-import {WindowBits} from '../character/WindowBits';
+import {WindowBits} from '../../ui/kit/WindowBits';
+import {buildFrame} from '../../ui/kit/buildFrame';
 import {CharacterSheet} from './CharacterSheet';
 import {bagView, isEquipment, itemIcon, itemKind, itemTab, type InventoryTab} from './items';
 import type {IRpgInventorySession} from './IRpgInventorySession';
 
-const log = Logger.getLogger('habbo.features.inventory.InventoryView');
-
-/** The HUD's layer (HudPanelsView.LAYER): the windows open over it. */
-export const LAYER = 1;
 const SELECTED = 0xffb8d8f0;
 const IDLE = 0xffe4e4dc;
 /** vortex_inventory_xml's item_grid `spacing`. */
 const GRID_SPACING = 4;
 const TABS = new Set<string>(['tab_equipment', 'tab_items', 'tab_resources', 'tab_quests'] satisfies InventoryTab[]);
-
-/** Builds a frame layout on the desktop, centred, its events to `procedure`; null if it does not build. */
-export function buildFrame(windows: IHabboWindowManager, layout: string, procedure: (event: WindowEvent, window: IWindow) => void): IWindowContainer | null
-{
-    const desktop = windows.getDesktop(LAYER) as IWindowContainer | null;
-    const window = windows.buildWidgetLayout(layout, LAYER) as IWindowContainer | null;
-
-    if(!window || !desktop)
-    {
-        log.error(`${layout} did not build — the window will not open`);
-        window?.destroy();
-
-        return null;
-    }
-
-    desktop.addChild(window);
-    window.procedure = procedure;
-    window.x = Math.round((desktop.width - window.width) / 2);
-    window.y = Math.max(0, Math.round((desktop.height - window.height) / 2));
-
-    return window;
-}
 
 /**
  * The inventory window (I, vortex_inventory_xml, mockup/glaze/preview_inventory_*.png): the bag's

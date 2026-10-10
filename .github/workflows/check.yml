@@ -1,0 +1,24 @@
+# The gate CLAUDE.md names ("Done means verified": pnpm check is green), run on every push and pull
+# request so a commit from a machine without the emulator or the asset host is still checked. What
+# needs those stays on the owner's machine: gen-headers --check (it skips without Headers.cs), the
+# avatar and iso render tests (they skip without AMBREIA_ASSETS), and pnpm build (a release file).
+name: check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        # The version comes from package.json's packageManager field.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check

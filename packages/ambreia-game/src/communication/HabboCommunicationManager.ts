@@ -11,6 +11,9 @@ import type {IHabboCommunicationManager} from './IHabboCommunicationManager';
 import type {ICoreCommunicationManager} from '../core/communication/ICoreCommunicationManager';
 import type {IConnection} from '@ambreia/net/connection/IConnection';
 import type {IConnectionCallback} from '@ambreia/net/connection/IConnectionCallback';
+import {ConnectionLifecycle, DEFAULT_RECONNECT_POLICY} from '@ambreia/net/connection/ConnectionLifecycle';
+import type {IReconnectPolicy} from '@ambreia/net/connection/ConnectionLifecycle';
+import {onSocketClosed} from './reconnect';
 import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
 import type {IMessageConfiguration} from '@ambreia/net/messages/IMessageConfiguration';
 import type {IEncryption} from '@ambreia/net/encryption/IEncryption';
@@ -53,6 +56,12 @@ export class HabboCommunicationManager extends Component implements IHabboCommun
     private _mode: number = 0;
     private _tcpNoDelay: boolean = true;
     private _messageQueue: string = '';
+    // TS-only: the one connection state (NP-01, NP-13), and the reconnect it drives.
+    public readonly lifecycle = new ConnectionLifecycle();
+    private _reconnectPolicy: IReconnectPolicy = DEFAULT_RECONNECT_POLICY;
+    private _reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+    /** The next close is the client's own or the server's stated one: not a loss to bring back. */
+    private _expectClose: boolean = false;
 
     constructor(context: IContext)
     {
@@ -271,7 +280,37 @@ export class HabboCommunicationManager extends Component implements IHabboCommun
     // AS3: .../src/com/sulake/habbo/communication/HabboCommunicationManager.as::disconnect()
     disconnect(): void
     {
+        this._expectClose = true;
+        this.cancelReconnect();
         this._connection?.close();
+        this.lifecycle.to('closed', 'client');
+    }
+
+    /** How a lost session is brought back (tests shorten it). */
+    setReconnectPolicy(policy: IReconnectPolicy): void
+    {
+        this._reconnectPolicy = policy;
+    }
+
+    private cancelReconnect(): void
+    {
+        if(this._reconnectTimer === null) return;
+
+        clearTimeout(this._reconnectTimer);
+        this._reconnectTimer = null;
+    }
+
+    /** A reconnect attempt: a new socket on the same connection, the port loop from its start. */
+    private reconnectNow(): void
+    {
+        this._reconnectTimer = null;
+
+        if(this.disposed || !this._connection || !this._config) return;
+
+        this._connectionAttempt = 1;
+        this._portIndex = -1;
+        this._connection.createSocket();
+        this.tryNextPort();
     }
 
     onMessage(listener: (event: IMessageEvent) => void): () => void
@@ -403,6 +442,9 @@ export class HabboCommunicationManager extends Component implements IHabboCommun
     {
         log.info(`Connecting to ${host}:${port}...`);
 
+        // A reconnect attempt keeps its state: the attempt is what the HUD shows.
+        if(this.lifecycle.state !== 'reconnecting') this.lifecycle.to('connecting', `${host}:${port}`);
+
         this._connectionActions?.setConnecting();
     }
 
@@ -410,6 +452,7 @@ export class HabboCommunicationManager extends Component implements IHabboCommun
     {
         log.info('Connected to server');
 
+        this.lifecycle.to('handshaking');
         this._connectionActions?.setConnected();
     }
 
@@ -427,21 +470,44 @@ export class HabboCommunicationManager extends Component implements IHabboCommun
 	 * reacts to the server's own disconnect *message* instead
 	 * (`_SafeCls_98.disconnected()` → `loginFlow.showDisconnected()`), which only exists
 	 * when the server had a chance to send it.
+	 *
+	 * Since 2026-10-10 a session the server knew (`ready`) that goes without a close frame is brought
+	 * back with the same ticket (the server refreshes its expiry on every use,
+	 * docs/CLIENT-SERVER-ARCHITECTURE.md §5), attempt after attempt (reconnect.ts).
 	 */
     connectionClosed(code?: number, wasClean?: boolean): void
     {
-        const closedByPeer = code === 1000 || code === 1001;
+        const verdict = onSocketClosed({
+            code: code ?? null, expected: this._expectClose, state: this.lifecycle.state,
+            attempt: this.lifecycle.attempt, policy: this._reconnectPolicy
+        });
 
-        log.info(`Connection closed (code=${code ?? 'n/a'}, clean=${wasClean ?? 'n/a'})`);
+        this._expectClose = false;
+        log.info(`Connection closed (code=${code ?? 'n/a'}, clean=${wasClean ?? 'n/a'}): ${verdict.kind}`);
 
-        if(!closedByPeer)
+        switch(verdict.kind)
         {
-            log.debug('Close was not peer-initiated; keeping the session alive');
+            case 'retry':
+                this.cancelReconnect();
+                this.lifecycle.attempt = verdict.attempt;
+                this.lifecycle.to('reconnecting', `attempt ${verdict.attempt}/${this._reconnectPolicy.maxAttempts} in ${verdict.delayMs} ms`);
+                this._reconnectTimer = setTimeout(() => this.reconnectNow(), verdict.delayMs);
 
-            return;
+                return;
+            case 'failed':
+                this.lifecycle.to('failed', `no session after ${this._reconnectPolicy.maxAttempts} reconnect attempts`);
+                this.events.emit(HabboCommunicationManagerEvent.CONNECTION_ERROR, new Error('The connection was lost and could not be brought back'));
+                this._connectionActions?.setDisconnected();
+
+                return;
+            case 'closed':
+                this.lifecycle.to('closed', `code ${code ?? 'n/a'}`);
+                this._connectionActions?.setDisconnected();
+
+                return;
+            case 'ignore':
+                log.debug('Close before any session; the port loop decides');
         }
-
-        this._connectionActions?.setDisconnected();
     }
 
     connectionError(error: Error): void
@@ -508,9 +574,18 @@ export class HabboCommunicationManager extends Component implements IHabboCommun
             if(step === HabboCommunicationEvent.AUTHENTICATED)
             {
                 this._connection?.isAuthenticated();
+                this.lifecycle.to('ready');
                 this._connectionActions?.setAuthenticated();
                 this.events.emit(HabboCommunicationManagerEvent.AUTHENTICATED);
             }
+        });
+
+        // The server said why it closes (DisconnectReason): the socket's close that follows is meant.
+        this.events.on(HabboCommunicationManagerEvent.DISCONNECTED, (reason: number) =>
+        {
+            this._expectClose = true;
+            this.cancelReconnect();
+            this.lifecycle.to('closed', `server reason ${reason}`);
         });
     }
 
@@ -554,6 +629,10 @@ export class HabboCommunicationManager extends Component implements IHabboCommun
             {
                 log.error('Failed to connect after all attempts');
 
+                // A reconnect attempt that opened no socket counts as one more loss.
+                if(this.lifecycle.state === 'reconnecting') this.connectionClosed(undefined, false);
+                else this.lifecycle.to('failed', 'no port answered');
+
                 return;
             }
 
@@ -564,6 +643,14 @@ export class HabboCommunicationManager extends Component implements IHabboCommun
 
         this._connection.timeout = this._connectionAttempt * 10000;
         this._connection.init(this._config.host, port, this._tcpNoDelay);
+    }
+
+    override dispose(): void
+    {
+        if(this.disposed) return;
+
+        this.cancelReconnect();
+        super.dispose();
     }
 
     private appendMessageQueue(direction: string, messageId: string): void

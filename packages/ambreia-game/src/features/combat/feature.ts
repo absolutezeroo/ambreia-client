@@ -1,10 +1,12 @@
+import type {IScopedTimer} from '@ambreia/kernel/feature/FeatureScope';
 import {Logger} from '@ambreia/common/utils/Logger';
 import {RoomSessionEvent} from '../../session/events/RoomSessionEvent';
+import {RoomSessionUserDataUpdateEvent} from '../../session/events/RoomSessionUserDataUpdateEvent';
 import type {IRoomSession} from '../../session/IRoomSession';
 import {UserDataType} from '../../session/UserData';
 import type {IGameFeature} from '../GameFeature';
-import {WindowBits} from '../character/WindowBits';
-import {chatClock} from '../hud/chatModel';
+import {WindowBits} from '../../ui/kit/WindowBits';
+import {chatClock} from '../../ui/kit/chatModel';
 import {RpgCombatEventsMessage} from '@ambreia/protocol/incoming/rpg/combat/RpgCombatEventsMessage';
 import {CombatOverlay} from './CombatOverlay';
 import {CombatVfx} from './CombatVfx';
@@ -30,13 +32,31 @@ const MISSED = new Set(['miss', 'dodge', 'immune']);
 export const CombatFeature: IGameFeature = {
     id: 'combat',
     images: VFX_IMAGES,
-    create: ({host}) =>
+    requires: ['roomEngine', 'hud', 'hudPlayer', 'roomSession'],
+    create: ({host, scope}) =>
     {
         const session = new RpgCombatSession();
         const vfx = new CombatVfx(host.assets, () => host.made.roomEngine);
+        const on = scope.bind(session.events);
         let overlay: CombatOverlay | null = null;
         let room: IRoomSession | null = null;
-        let countdown: ReturnType<typeof setInterval> | null = null;
+        let countdown: IScopedTimer | null = null;
+        // Every delayed effect belongs to the zone it was fired in: a flight or a hit that lands after
+        // a zone change would play on whatever object holds the same id in the next room. The epoch
+        // changes on RSE_ENDED and a pending timer whose epoch is gone does nothing.
+        let epoch = 0;
+        const pending = new Set<IScopedTimer>();
+        const later = (run: () => void, delayMs: number): void =>
+        {
+            const at = epoch;
+            const handle = scope.timeout(() =>
+            {
+                pending.delete(handle);
+                if(epoch === at) run();
+            }, delayMs);
+
+            pending.add(handle);
+        };
 
         host.made.combat = session;
 
@@ -52,7 +72,7 @@ export const CombatFeature: IGameFeature = {
         /** A monster is a pet of the room (M1a §9.1). */
         const isMonster = (objectId: number): boolean => room?.userDataManager.getUserDataByIndex(objectId)?.type === UserDataType.PET;
 
-        session.events.on('health', (objectId, health, maxHealth) =>
+        on('health', (objectId, health, maxHealth) =>
         {
             overlayOf()?.setHealth(objectId, health, maxHealth, isMonster(objectId));
 
@@ -95,7 +115,7 @@ export const CombatFeature: IGameFeature = {
                 else if(cell) vfx.burstAt(sheet, cell.x, cell.y);
             };
 
-            if(phase.delayMs > 0) setTimeout(go, phase.delayMs);
+            if(phase.delayMs > 0) later(go, phase.delayMs);
             else go();
 
             return phase.delayMs;
@@ -118,7 +138,7 @@ export const CombatFeature: IGameFeature = {
             return flight > 0 ? flight + (set?.hit?.delayMs ?? 0) : land();
         };
 
-        session.events.on('hits', message =>
+        on('hits', message =>
         {
             for(const hit of message.hits)
             {
@@ -149,7 +169,7 @@ export const CombatFeature: IGameFeature = {
         // same report, which follow at once.
         const flights = new Map<string, number>();
 
-        session.events.on('impacts', impacts =>
+        on('impacts', impacts =>
         {
             for(const impact of impacts)
             {
@@ -165,7 +185,7 @@ export const CombatFeature: IGameFeature = {
         });
 
         // Skills and statuses (M1b): the numbers, a monster killed by one leaves, the cast bars.
-        session.events.on('outcomes', outcomes =>
+        on('outcomes', outcomes =>
         {
             for(const outcome of outcomes)
             {
@@ -173,14 +193,14 @@ export const CombatFeature: IGameFeature = {
                 const hit = MISSED.has(outcome.outcome) ? null : skillSet(outcome.sourceId)?.hit ?? null;
                 const delay = flight + (hit?.delayMs ?? 0);
 
-                if(hit) setTimeout(() => play({...hit, delayMs: 0}, outcome.targetObjectId), delay);
+                if(hit) later(() => play({...hit, delayMs: 0}, outcome.targetObjectId), delay);
                 overlayOf()?.hit(outcome.targetObjectId, outcome.amount, outcome.outcome, outcome.absorbed, delay);
                 if(outcome.killed && isMonster(outcome.targetObjectId)) overlay?.remove(outcome.targetObjectId);
             }
 
             flights.clear();
         });
-        session.events.on('mark', (objectId, icon) =>
+        on('mark', (objectId, icon) =>
         {
             if(icon) overlayOf()?.mark(objectId, icon);
             else overlay?.mark(objectId, null);
@@ -189,7 +209,7 @@ export const CombatFeature: IGameFeature = {
         // A skill's `cast` loops on its caster from its RpgCastStart to its RpgCastEnd.
         const incantations = new Map<number, () => void>();
 
-        session.events.on('cast', (objectId, cast) =>
+        on('cast', (objectId, cast) =>
         {
             incantations.get(objectId)?.();
             incantations.delete(objectId);
@@ -210,7 +230,7 @@ export const CombatFeature: IGameFeature = {
         });
 
         // A boss's phase (M1c): its line over it and in the log, from the content's texts.
-        session.events.on('yell', yell =>
+        on('yell', yell =>
         {
             const text = bits();
             const line = text.textOr(yell.textKey, yell.textKey);
@@ -223,32 +243,32 @@ export const CombatFeature: IGameFeature = {
             });
         });
 
-        session.events.on('self', vitals => host.made.hudPlayer?.update({
+        on('self', vitals => host.made.hudPlayer?.update({
             hp: vitals.health, hpMax: vitals.maxHealth, mana: vitals.mana, manaMax: vitals.maxMana, inCombat: vitals.inCombat
         }));
 
         // A ghost until the respawn (M1a §8.1): the HUD's warning counts down.
-        session.events.on('death', death =>
+        on('death', death =>
         {
             let left = death.respawnSeconds;
             const show = (): void => host.made.hud?.update({alert: left > 0 ? bits().text('vortex.combat.dead', 'seconds', String(left)) : null});
 
-            if(countdown !== null) clearInterval(countdown);
+            countdown?.clear();
             show();
-            countdown = setInterval(() =>
+            countdown = scope.interval(() =>
             {
                 left--;
                 show();
 
-                if(left <= 0 && countdown !== null)
+                if(left <= 0)
                 {
-                    clearInterval(countdown);
+                    countdown?.clear();
                     countdown = null;
                 }
             }, 1000);
         });
 
-        session.events.on('result', result =>
+        on('result', result =>
         {
             const text = bits();
 
@@ -259,12 +279,30 @@ export const CombatFeature: IGameFeature = {
             });
         });
 
-        const sessionEvents = host.made.roomSession?.sessionEvents;
+        const sessionOn = scope.bind(host.made.roomSession?.sessionEvents);
 
-        sessionEvents?.on(RoomSessionEvent.RSE_STARTED, (event: RoomSessionEvent) => room = event.session);
-        sessionEvents?.on(RoomSessionEvent.RSE_ENDED, () =>
+        sessionOn(RoomSessionEvent.RSE_STARTED, (event: RoomSessionEvent) => room = event.session);
+        // A player who leaves hurt took their bar's object id with them; without this the overlay
+        // kept an invisible bar per departed player for the whole visit (a monster's goes on kill).
+        sessionOn(RoomSessionUserDataUpdateEvent.RSUDUE_USER_DATA_UPDATE, (event: RoomSessionUserDataUpdateEvent) =>
+        {
+            if(event.addedUsers.length === 0) overlay?.prune(objectId => event.session.userDataManager.getUserDataByIndex(objectId) !== null);
+        });
+        sessionOn(RoomSessionEvent.RSE_ENDED, () =>
         {
             room = null;
+            epoch++;
+            for(const handle of pending) handle.clear();
+            pending.clear();
+
+            // The death countdown belonged to that zone's ghost; the next zone starts clean.
+            if(countdown !== null)
+            {
+                countdown.clear();
+                countdown = null;
+                host.made.hud?.update({alert: null});
+            }
+
             session.forget();
             overlay?.clear();
             // The canvas took the sprites with it; the loops' handles would only hold their closures.
@@ -278,9 +316,13 @@ export const CombatFeature: IGameFeature = {
         // `simulate(objectId, 'cast', 'skill.mage.flame_burst')` loops that skill's cast visual on
         // the object for two seconds; `simulate(objectId, 'skill', 'skill.mage.flame_burst')` lands
         // that skill on it.
-        const root = globalThis as unknown as {__ambreia?: Record<string, unknown>};
-
-        root.__ambreia = {...(root.__ambreia ?? {}), combat: {
+        scope.own(session).add(() =>
+        {
+            overlay?.dispose();
+            overlay = null;
+            vfx.dispose();
+        });
+        scope.hook('combat', {
             session,
             simulate: (objectId: number, what = 'blows', skillId = 'skill.mage.flame_burst') =>
             {
@@ -289,7 +331,7 @@ export const CombatFeature: IGameFeature = {
                 if(what === 'cast')
                 {
                     session.cast(objectId, {durationMs: 2000, channel: false, skillId});
-                    setTimeout(() => session.cast(objectId, null), 2000);
+                    later(() => session.cast(objectId, null), 2000);
 
                     return;
                 }
@@ -304,11 +346,11 @@ export const CombatFeature: IGameFeature = {
                     return;
                 }
 
-                ['hit', 'crit', 'miss'].forEach((outcome, i) => setTimeout(() => session.events.emit('hits', new RpgCombatEventsMessage([
+                ['hit', 'crit', 'miss'].forEach((outcome, i) => later(() => session.events.emit('hits', new RpgCombatEventsMessage([
                     {attackerId: self, targetId: objectId, amount: 7 * (i + 1), outcome, health: 28 - 7 * i, maxHealth: 40, killed: false}
                 ])), i * 700));
             }
-        }};
+        });
 
         return null;
     },

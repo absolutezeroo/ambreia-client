@@ -3,6 +3,9 @@ npx lint-staged
 # Message ids come from the emulator (docs/superpowers/specs/2026-10-07-client-architecture-design.md §6).
 node packages/vortex-engine/tools/gen-headers.mjs --check || exit 1
 
+# The combat sheets' geometry is generated from packages/vortex-client/spells (pnpm gen:vfx).
+node packages/vortex-client/tools/build-vfx-sheets.mjs --check || exit 1
+
 # AGENTS.md and .github/copilot-instructions.md are generated from CLAUDE.md + .claude/rules/.
 node .claude/scripts/sync-agent-docs.mjs || exit 1
 

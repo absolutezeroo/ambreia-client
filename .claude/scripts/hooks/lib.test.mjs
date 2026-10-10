@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { join, resolve } from 'node:path';
-import { changedTypeScript, fingerprint, guardReason } from './lib.mjs';
+import { changedSources, fingerprint, guardReason, isCheckedSource } from './lib.mjs';
 
 const REPO = resolve('/work/vortex-rpg-client');
 
@@ -38,7 +38,7 @@ test('ordinary sources, vortex layouts and files outside the repo are allowed', 
     assert.equal(guardReason(resolve('/elsewhere/sources/notes.md'), REPO), null);
 });
 
-test('changedTypeScript keeps modified, added, renamed and untracked .ts, never deleted ones', () =>
+test('changedSources keeps modified, added, renamed and untracked sources, never deleted ones', () =>
 {
     const porcelain = [
         ' M packages/a/src/One.ts',
@@ -47,14 +47,19 @@ test('changedTypeScript keeps modified, added, renamed and untracked .ts, never 
         '?? packages/a/src/Four.ts',
         ' D packages/a/src/Gone.ts',
         ' M docs/notes.md',
-        'MM packages/a/tools/x.mjs'
+        'MM packages/a/tools/x.mjs',
+        '?? packages/a/src/layouts/five.xml',
+        ' M packages/a/src/locales/fr/six.json'
     ].join('\n');
 
-    assert.deepEqual(changedTypeScript(porcelain), [
+    assert.deepEqual(changedSources(porcelain), [
         'packages/a/src/One.ts',
         'packages/a/src/Two.ts',
         'packages/a/src/Three.ts',
-        'packages/a/src/Four.ts'
+        'packages/a/src/Four.ts',
+        'packages/a/tools/x.mjs',
+        'packages/a/src/layouts/five.xml',
+        'packages/a/src/locales/fr/six.json'
     ]);
 });
 
@@ -65,4 +70,19 @@ test('fingerprint changes when a file or its mtime changes, not when the order d
     assert.equal(a, fingerprint([['y.ts', 2], ['x.ts', 1]]));
     assert.notEqual(a, fingerprint([['x.ts', 1], ['y.ts', 3]]));
     assert.notEqual(a, fingerprint([['x.ts', 1]]));
+});
+
+test('every source kind pnpm check covers is a checked source; docs and markdown are not', () =>
+{
+    for(const path of ['packages/ambreia-game/src/features/hud/feature.ts', 'packages/vortex-client/src/vortex-layouts/vortex_hud_xml.xml',
+        'packages/vortex-client/src/locales/fr/hud.json', 'packages/vortex-client/tools/bundle-assets.mjs', 'packages/ambreia-net/test/wire-format.test.ts',
+        '.claude/scripts/hooks/lib.mjs', 'package.json', 'eslint.config.mjs'])
+    {
+        assert.ok(isCheckedSource(path), path);
+    }
+
+    for(const path of ['docs/PATTERNS.md', 'CLAUDE.md', 'packages/ambreia-ui/README.md', 'Caddyfile', 'packages/x/node_modules/y/index.mjs'])
+    {
+        assert.ok(!isCheckedSource(path), path);
+    }
 });

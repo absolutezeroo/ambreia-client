@@ -88,7 +88,7 @@ function parseInsertRows(sql, table) {
   const marker = new RegExp(`INSERT(?:\\s+IGNORE)?\\s+INTO\\s+\`${table}\`[^)]*\\)\\s*VALUES`, 'g');
   const rows = [];
 
-  for (let m; (m = marker.exec(sql)) !== null; ) {
+  while (marker.exec(sql) !== null) {
     let i = marker.lastIndex;
     let row = null;
     let field = '';

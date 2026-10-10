@@ -1,3 +1,4 @@
+import {devHook} from '@ambreia/common/utils/BuildEnv';
 import {EventEmitter} from 'eventemitter3';
 import type {HabboConfigurationManager} from '@ambreia/game/configuration/HabboConfigurationManager';
 import type {HabboCommunicationManager} from '@ambreia/game/communication/HabboCommunicationManager';
@@ -30,7 +31,7 @@ import {Vortex} from './Vortex';
 import {bootFeatures} from '@ambreia/kernel/feature/bootFeatures';
 import type {IKernelReport} from '@ambreia/kernel/feature/bootFeatures';
 import {GAME_FEATURES, emptyManagers} from '@ambreia/game/features/index';
-import {roomWidgetRegistry} from '@ambreia/game/features/GameFeature';
+import {roomWidgetRegistry, guardedFeatures} from '@ambreia/game/features/GameFeature';
 import type {IEngineHost} from '@ambreia/game/features/index';
 
 import {PacketLogger} from '@ambreia/net/PacketLogger';
@@ -391,16 +392,13 @@ export class VortexMain implements IVortexMain
         // A fingerprint of the boot, read by the dev tools and by J5's before/after comparison:
         // what was attached in which order, what still waits, every configuration property.
         // TS-only: introspection, read-only.
-        (globalThis as unknown as {__ambreia?: Record<string, unknown>}).__ambreia = {
-            ...((globalThis as unknown as {__ambreia?: Record<string, unknown>}).__ambreia ?? {}),
-            kernel: () => this._kernelReport?.features.map(feature => ({...feature, state: feature.state()})) ?? [],
-            boot: () => ({
-                attached: (Core.instance as CoreComponentContext | null)?.describeAttached() ?? [],
-                locked: (Core.instance as CoreComponentContext | null)?.describeLockedComponents() ?? [],
-                configuration: [...((this._configurationManager as unknown as {_configurationData?: Map<string, string>})?._configurationData ?? new Map()).entries()].sort(([a], [b]) => a.localeCompare(b)),
-                progress: [...this._progressLog]
-            })
-        };
+        devHook('kernel', () => this._kernelReport?.features.map(feature => ({...feature, state: feature.state()})) ?? []);
+        devHook('boot', () => ({
+            attached: (Core.instance as CoreComponentContext | null)?.describeAttached() ?? [],
+            locked: (Core.instance as CoreComponentContext | null)?.describeLockedComponents() ?? [],
+            configuration: [...((this._configurationManager as unknown as {_configurationData?: Map<string, string>})?._configurationData ?? new Map()).entries()].sort(([a], [b]) => a.localeCompare(b)),
+            progress: [...this._progressLog]
+        }));
 
         this.addInitializationProgressListeners();
     }
@@ -439,6 +437,10 @@ export class VortexMain implements IVortexMain
         // Dispose RoomMessageHandler (not a Component, needs manual dispose)
         this._roomMessageHandler?.dispose();
         this._roomMessageHandler = null;
+
+        // The features first, last booted first: their listeners on the managers go before the managers.
+        this._kernelReport?.dispose();
+        this._kernelReport = null;
 
         // Nullify Habbo manager refs (inverse init order)
         this._avatarEditor = null;
@@ -539,7 +541,7 @@ export class VortexMain implements IVortexMain
             made
         };
 
-        this._kernelReport = await bootFeatures(ctx, GAME_FEATURES, config.kernel, host);
+        this._kernelReport = await bootFeatures(ctx, guardedFeatures(GAME_FEATURES), config.kernel, host);
 
         this._configurationManager = made.configuration;
         this._habboCommunicationManager = made.communication;

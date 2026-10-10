@@ -4,7 +4,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {
     ALL_TAB, channelTab, chatLinesOf, chatSend, DEFAULT_CHAT_SETTINGS, EMOTICONS, loadChatSettings, saveChatSettings, splitEmoticons, whisperTab, type IChatLine
-} from '../src/features/hud/chatModel';
+} from '../src/ui/kit/chatModel';
 
 test('« Général » writes where the bubble says; a tab in its channel; commands win', () =>
 {

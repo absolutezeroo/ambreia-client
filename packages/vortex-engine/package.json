@@ -14,10 +14,8 @@
     "@ambreia/protocol": "workspace:*",
     "@ambreia/ui": "workspace:*",
     "eventemitter3": "^5.0.1",
-    "inversify": "^6.2.1",
     "pako": "^2.1.0",
-    "pixi.js": "^8.6.6",
-    "reflect-metadata": "^0.2.2"
+    "pixi.js": "^8.6.6"
   },
   "devDependencies": {
     "@types/pako": "^2.0.3",

@@ -1,62 +1,11 @@
 import {EventEmitter} from 'eventemitter3';
+import {SKILL_SLOTS} from './IHud';
+import type {IActionSlot, IPlayerHud, ActionBar} from './IHud';
+
+export type {IActionSlot, ISlotTip, IPlayerHud, ActionBar} from './IHud';
+export {SKILL_SLOTS} from './IHud';
 
 /** One action bar slot: what it holds, its key, and the end of its cooldown (ms, Date.now() clock). */
-export interface IActionSlot
-{
-    /** Asset name of the icon (`rpg/skills/warrior_skill_icon_1`), null for an empty slot. */
-    icon: string | null;
-    key: string;
-    count?: number;
-    cooldownEnd?: number;
-    /** Mana cost: the slot greys when the player cannot afford it (hudRules.unavailable()). */
-    cost?: number;
-    /** Outlined for a moment after its key or a click (hudRules.SELECTED_MS). */
-    selected?: boolean;
-    /** What its tooltip says (vortex_hud_slot_tip_xml); none: no tooltip. */
-    tip?: ISlotTip;
-}
-
-/** The tooltip of a slot: a skill (tag, cost and cooldown, effect) or a consumable (quantity). */
-export interface ISlotTip
-{
-    title: string;
-    /** The pill at the right (« Attaque », « Soin »), empty for none. */
-    tag: string;
-    /** Under the title: rank, cost, cooldown, or the quantity. */
-    meta: string;
-    text: string;
-    /** The highlighted line (an effect), empty for none. */
-    effect: string;
-    shortcut: string;
-}
-
-/**
- * What the HUD shows of the player (RPG spec §16.3: portrait, level, HP, mana, XP, action bar).
- * Null is "not known yet": the server sends these (stats are server-side, §5.2), the client never
- * makes them up — until the RPG network exists (F3) only the dev hook fills them.
- */
-export interface IPlayerHud
-{
-    name: string;
-    figure: string;
-    level: number | null;
-    hp: number | null;
-    hpMax: number | null;
-    mana: number | null;
-    manaMax: number | null;
-    xp: number | null;
-    xpMax: number | null;
-    /** Shown on the XP bar instead of "xp / max" (e.g. MAX at the maximum level). */
-    xpLabel?: string | null;
-    /** In combat (M1a §6.3): the frame turns red. */
-    inCombat?: boolean;
-    skills: IActionSlot[];
-    items: IActionSlot[];
-}
-
-export type ActionBar = 'skills' | 'items';
-
-/** Width of a bar's fill: proportional, clamped, empty while the maximum is unknown or zero. */
 export function barFill(value: number | null, max: number | null, width: number): number
 {
     if(value === null || max === null || max <= 0) return 0;
@@ -73,7 +22,6 @@ export function cooldownLabel(slot: IActionSlot, now: number): string | null
 }
 
 /** The server's action bar (M1b §9: `Vortex:Skills:ActionBarSize`), keys 1 to 6. */
-export const SKILL_SLOTS = 6;
 /** The mock-up's item side (consumables, later): keys 7, 8, 9 and 0. */
 const ITEM_SLOTS = 4;
 

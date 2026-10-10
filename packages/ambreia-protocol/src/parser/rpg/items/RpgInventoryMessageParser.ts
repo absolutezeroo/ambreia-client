@@ -2,6 +2,7 @@ import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrappe
 import type {IIncomingParser} from '@ambreia/net/style/MessageMap';
 import type {IRpgItemEntry} from '../../../incoming/rpg/items/IRpgItemEntry';
 import {RpgInventoryMessage} from '../../../incoming/rpg/items/RpgInventoryMessage';
+import {readCount} from '../../readCount';
 
 /** Reads RpgInventoryMessage in the order of the server's RpgInventoryMessageComposerSerializer. */
 export class RpgInventoryMessageParser implements IIncomingParser<RpgInventoryMessage>
@@ -10,7 +11,7 @@ export class RpgInventoryMessageParser implements IIncomingParser<RpgInventoryMe
     {
         const bagSize = wrapper.readInt();
         const maxParcels = wrapper.readInt();
-        const count = wrapper.readInt();
+        const count = readCount(wrapper);
         const items: IRpgItemEntry[] = [];
 
         for(let i = 0; i < count; i++)

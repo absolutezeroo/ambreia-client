@@ -50,8 +50,8 @@ export const RoomObjectVariableEnum = {
     AVATAR_VERTICAL_OFFSET: 'figure_vertical_offset',
     AVATAR_IS_MUTED: 'figure_is_muted',
     AVATAR_GUIDE_STATUS: 'figure_guide_status',
-    /** TS-only (RPG F3b §7.3): 1 while this avatar is the player's target. */
-    AVATAR_RPG_TARGET: 'figure_rpg_target',
+    /** TS-only: 1 while the host points this avatar out (a ring at its feet). */
+    AVATAR_SELECTION_RING: 'figure_selection_ring',
     HEAD_DIRECTION: 'head_direction',
 
     // Pet variables

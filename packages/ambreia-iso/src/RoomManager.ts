@@ -39,13 +39,19 @@ export const RoomManagerState = {
     INITIALIZED: 3,
 } as const;
 
-/** What the host tells the room manager: the external-content URLs a visualization may need. */
+/**
+ * What the host tells the room manager: the external content a visualization may show, read when
+ * an object is made (so the host may resolve them late). The engine knows no property key: the
+ * host maps its own (`stories.image_url_base`, `extra_data_service_url`, `extra_data_batches_enabled`
+ * in the client) onto these.
+ */
 export interface IRoomManagerOptions
 {
-    /** A configuration property (`stories.image_url_base`, `extra_data_service_url`). */
-    property(key: string): string;
-    /** A boolean configuration flag (`extra_data_batches_enabled`). */
-    flag(key: string): boolean;
+    /** Where the pictures a furni shows are served from (an empty string: none). */
+    externalImageUrl(): string;
+    /** The service that answers a furni's extra data by id, and whether it takes several ids at once. */
+    extraDataServiceUrl(): string;
+    extraDataBatches(): boolean;
 }
 
 // DEVIATION: AS3's RoomManager is a Component; here a plain class built from its options, which
@@ -567,9 +573,9 @@ export class RoomManager implements IRoomManager, IRoomInstanceContainer
                 spriteViz.assetCollection = assetCollection;
                 // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/room/RoomManager.as::createRoomObject() (line 343)
                 spriteViz.setExternalBaseUrls(
-                    this._options.property('stories.image_url_base'),
-                    this._options.property('extra_data_service_url'),
-                    this._options.flag('extra_data_batches_enabled')
+                    this._options.externalImageUrl(),
+                    this._options.extraDataServiceUrl(),
+                    this._options.extraDataBatches()
                 );
 
                 // Get or create cached visualization data
@@ -897,9 +903,9 @@ export class RoomManager implements IRoomManager, IRoomInstanceContainer
                             spriteViz.assetCollection = this._contentLoader.getGraphicAssetCollection(contentType);
                             // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/room/RoomManager.as (line 560)
                             spriteViz.setExternalBaseUrls(
-                                this._options.property('stories.image_url_base'),
-                                this._options.property('extra_data_service_url'),
-                                this._options.flag('extra_data_batches_enabled')
+                                this._options.externalImageUrl(),
+                                this._options.extraDataServiceUrl(),
+                                this._options.extraDataBatches()
                             );
                             const vizData = this._visualizationFactory.getRoomObjectVisualizationData(
                                 contentType, visualizationType, visualizationConfig

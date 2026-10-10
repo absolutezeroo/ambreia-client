@@ -12,7 +12,7 @@ import type {RpgEmoteMessage} from '@ambreia/protocol/incoming/rpg/emote/RpgEmot
 import {RpgEmoteMessageParser} from '@ambreia/protocol/parser/rpg/emote/RpgEmoteMessageParser';
 import {RpgEmoteSendMessage} from '@ambreia/protocol/outgoing/rpg/emote/RpgEmoteSendMessage';
 import {RpgEmoteSendMessageSerializer} from '@ambreia/protocol/serializer/rpg/emote/RpgEmoteSendMessageSerializer';
-import type {IChatSend} from '../hud/chatModel';
+import type {IChatSend} from '../../ui/kit/chatModel';
 
 export interface IRpgChatSessionEvents
 {

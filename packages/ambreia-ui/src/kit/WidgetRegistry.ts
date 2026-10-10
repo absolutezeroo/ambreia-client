@@ -34,8 +34,15 @@ export class WidgetRegistry implements IWidgetFactory
     private readonly _builders = new Map<string, (window: IWidgetWindow) => unknown>();
     private readonly _unknown = new Set<string>();
 
-    public register(type: string, create: (window: IWidgetWindow) => unknown): void
+    /**
+     * A type registered twice is an error naming it: the second registration silently replaced
+     * the first, so a game widget could shadow a kit one (or Glaze's placeholder a real widget)
+     * without a word. A host that means to replace a widget says so with `{replace: true}`.
+     */
+    public register(type: string, create: (window: IWidgetWindow) => unknown, options: {replace?: boolean} = {}): void
     {
+        if(this._builders.has(type) && !options.replace) throw new Error(`Widget type "${type}" is already registered; pass {replace: true} to replace it`);
+
         this._builders.set(type, create);
     }
 

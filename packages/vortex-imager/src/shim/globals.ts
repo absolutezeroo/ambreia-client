@@ -13,7 +13,7 @@
 import {createCanvas, loadImage} from '@napi-rs/canvas';
 import {DOMParser} from 'linkedom';
 import {readFile} from 'node:fs/promises';
-import {join, normalize} from 'node:path';
+import {isAbsolute, join, normalize, relative as relativeTo} from 'node:path';
 
 export interface IGlobalsOptions
 {
@@ -40,7 +40,6 @@ export function installGlobals(options: IGlobalsOptions): void
     installCanvas();
     installXml();
     installDocument();
-    installStorage();
 
     if(options.assetsRoot !== null) installFileBackedFetch(options.assetsRoot, options.assetsBaseUrl);
 }
@@ -114,36 +113,6 @@ function installDocument(): void
 }
 
 /**
- * An in-memory `localStorage`.
- *
- * `HabboConfigurationManager.initEmbeddedConfigurations()` reads the browser's stored hotel
- * choice (`vortex_environment`) before falling back to the first entry of
- * `live.environment.list`. There is no stored choice on a server, and the imager sets its
- * environment explicitly anyway, so an empty store is exactly the right answer — it just has
- * to exist, because the read is unguarded.
- */
-function installStorage(): void
-{
-    const globals = globalThis as Record<string, unknown>;
-
-    if(typeof globals.localStorage !== 'undefined') return;
-
-    const store = new Map<string, string>();
-
-    globals.localStorage = {
-        get length(): number
-        {
-            return store.size;
-        },
-        getItem: (key: string): string | null => store.get(key) ?? null,
-        setItem: (key: string, value: string): void => void store.set(key, String(value)),
-        removeItem: (key: string): void => void store.delete(key),
-        clear: (): void => store.clear(),
-        key: (index: number): string | null => [...store.keys()][index] ?? null
-    };
-}
-
-/**
  * `Document` and `Element` are installed from a probe parse rather than from linkedom's
  * exports: `AvatarXmlUtils.isXmlDocument()` narrows with `instanceof`, so the globals have to
  * be the exact constructors linkedom produces, whatever it happens to name them.
@@ -185,7 +154,10 @@ function installFileBackedFetch(root: string, baseUrl: string): void
         const relative = decodeURIComponent(url.slice(prefix.length).split('?')[0]).replace(/^\/+/, '');
         const target = normalize(join(normalisedRoot, relative));
 
-        if(!target.startsWith(normalisedRoot))
+        // `relative()` rather than a string prefix: `/assets-private/x` starts with `/assets`.
+        const escape = relativeTo(normalisedRoot, target);
+
+        if(escape.startsWith('..') || isAbsolute(escape))
         {
             return new Response(null, {status: 403, statusText: 'Forbidden'});
         }

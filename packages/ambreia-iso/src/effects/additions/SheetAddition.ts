@@ -4,12 +4,12 @@ import type {IRoomObjectSprite} from '../../object/visualization/IRoomObjectSpri
 import type {IAvatarAddition} from '../../avatar/visualization/additions/IAvatarAddition';
 
 /**
- * A sprite sheet played on the ground under an avatar (RPG: a sigil, an incantation circle): one
+ * A sprite sheet played on the ground under an avatar (a sigil, a circle of light): one
  * frame after another, `ms` each, once or in a loop, drawn behind the avatar like its shadow
- * (relativeDepth 1, as TargetCircle) with the sheet's anchor on the avatar's location. Done once a
- * single play ends; whoever added it removes it (AvatarVisualization.removeRpgAddition()).
+ * (relativeDepth 1, as SelectionRing) with the sheet's anchor on the avatar's location. Done once a
+ * single play ends; whoever added it removes it (AvatarVisualization.removeExternalAddition()).
  */
-// TS-only: the RPG's effects; Habbo has none.
+// TS-only: Habbo has no ground effect.
 export class SheetAddition implements IAvatarAddition
 {
     private readonly _born = performance.now();

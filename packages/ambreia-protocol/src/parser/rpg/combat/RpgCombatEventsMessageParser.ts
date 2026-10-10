@@ -2,13 +2,14 @@ import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrappe
 import type {IIncomingParser} from '@ambreia/net/style/MessageMap';
 import type {IRpgCombatHit} from '../../../incoming/rpg/combat/RpgCombatEventsMessage';
 import {RpgCombatEventsMessage} from '../../../incoming/rpg/combat/RpgCombatEventsMessage';
+import {readCount} from '../../readCount';
 
 /** Reads RpgCombatEventsMessage in the order of the server's RpgCombatEventsMessageComposerSerializer. */
 export class RpgCombatEventsMessageParser implements IIncomingParser<RpgCombatEventsMessage>
 {
     parse(wrapper: IMessageDataWrapper): RpgCombatEventsMessage
     {
-        const count = wrapper.readInt();
+        const count = readCount(wrapper);
         const hits: IRpgCombatHit[] = [];
 
         for(let i = 0; i < count; i++)

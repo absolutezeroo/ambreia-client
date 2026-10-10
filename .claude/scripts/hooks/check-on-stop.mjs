@@ -7,7 +7,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { changedTypeScript, fingerprint } from './lib.mjs';
+import { changedSources, fingerprint } from './lib.mjs';
 
 const input = JSON.parse(readFileSync(0, 'utf8'));
 const repo = process.env.CLAUDE_PROJECT_DIR ?? input.cwd;
@@ -28,7 +28,7 @@ if(status.status !== 0)
 const since = input.transcript_path && existsSync(input.transcript_path)
     ? statSync(input.transcript_path).birthtimeMs
     : 0;
-const touched = changedTypeScript(status.stdout)
+const touched = changedSources(status.stdout)
     .map(path => [path, existsSync(join(repo, path)) ? statSync(join(repo, path)).mtimeMs : 0])
     .filter(([, mtime]) => mtime > since);
 

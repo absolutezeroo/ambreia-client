@@ -1,6 +1,9 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {sheetEntry, render} from './build-vfx-sheets.mjs';
+import {mkdtempSync, rmSync, writeFileSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {sheetEntry, render, isUpToDate} from './build-vfx-sheets.mjs';
 
 const pixellab = (w, h, count, imageW, anchor, ms = 83) => ({
     frames: Array.from({length: count}, (_, i) => ({frame: {x: (i % 3) * w, y: Math.floor(i / 3) * h, w, h}, duration: ms})),
@@ -23,4 +26,21 @@ test('the generated module is sorted and typed as const', () =>
 
     assert.ok(out.indexOf("'mage/a'") < out.indexOf("'mage/z'"));
     assert.match(out, /export const VFX_SHEETS = \{[\s\S]*\} as const;/);
+});
+
+test('--check compares the committed module with what the sheets render to', () =>
+{
+    const sheets = new Map([['mage/a', sheetEntry('mage/a', pixellab(8, 8, 1, 8, {x: 4, y: 4}))]]);
+    const dir = mkdtempSync(join(tmpdir(), 'vfx-check-'));
+    const out = join(dir, 'vfxSheets.generated.ts');
+
+    assert.equal(isUpToDate(sheets, out), false, 'a missing file is stale');
+
+    writeFileSync(out, render(sheets));
+    assert.equal(isUpToDate(sheets, out), true);
+
+    writeFileSync(out, render(sheets) + '\n// edited by hand');
+    assert.equal(isUpToDate(sheets, out), false, 'a hand edit is stale');
+
+    rmSync(dir, {recursive: true, force: true});
 });

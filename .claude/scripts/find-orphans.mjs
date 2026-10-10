@@ -137,17 +137,96 @@ export function findOrphans({ root, entries, scan, aliases })
     return all.filter(f => !reached.has(f)).sort();
 }
 
+/** Every file under `packages/<pkg>/<sub>` that exists, as a root: a file only a test or a tool reaches is not an orphan. */
+function filesUnder(root, dir)
+{
+    const out = [];
+    const walk = d =>
+    {
+        if(!fs.existsSync(d)) return;
+
+        for(const entry of fs.readdirSync(d, { withFileTypes: true }))
+        {
+            const p = path.join(d, entry.name);
+
+            if(entry.isDirectory())
+            {
+                if(!['node_modules', 'dist', 'assets', '.vortex-dev'].includes(entry.name)) walk(p);
+            }
+            else if(/\.(ts|mts|mjs)$/.test(entry.name) && !entry.name.endsWith('.d.ts')) out.push(posix(path.relative(root, p)));
+        }
+    };
+
+    walk(path.join(root, dir));
+
+    return out;
+}
+
+/**
+ * The workspace as the scan sees it: the src folder of every package is scanned, `@ambreia/<name>` resolves
+ * to its package (the names come from each package.json), and the entry points are the apps' plus
+ * every test, tool, sandbox and app file (what only they reach is alive) plus the `<script src>`
+ * of every html page.
+ */
+export function workspaceScan(root)
+{
+    const packagesDir = path.join(root, 'packages');
+    const aliases = { '@ui': 'packages/vortex-client/src', '@': 'packages/vortex-client/src', '@client': 'packages/vortex-client/src' };
+    const scan = [];
+    const entries = [];
+
+    for(const dir of fs.readdirSync(packagesDir))
+    {
+        const manifest = path.join(packagesDir, dir, 'package.json');
+
+        if(!fs.existsSync(manifest)) continue;
+
+        const name = JSON.parse(fs.readFileSync(manifest, 'utf8')).name;
+        const src = `packages/${dir}/src`;
+
+        if(fs.existsSync(path.join(root, src))) scan.push(src);
+        if(name.startsWith('@ambreia/')) aliases[name] = src;
+
+        for(const sub of ['test', 'tools', 'sandbox', 'app']) entries.push(...filesUnder(root, `packages/${dir}/${sub}`));
+
+    }
+
+    for(const entry of ['packages/vortex-client/src/index.ts', 'packages/vortex-engine/src/index.ts', 'packages/vortex-glaze/src/main.ts', 'packages/vortex-imager/src/index.ts', 'packages/ambreia-map-editor/src/main.ts'])
+    {
+        if(fs.existsSync(path.join(root, entry))) entries.push(entry);
+    }
+
+    // `<script src="./main.ts">` of the sandboxes and the editor pages.
+    const walkHtml = d =>
+    {
+        for(const entry of fs.readdirSync(d, { withFileTypes: true }))
+        {
+            const p = path.join(d, entry.name);
+
+            if(entry.isDirectory())
+            {
+                if(!['node_modules', 'dist', 'assets', '.vortex-dev', 'public'].includes(entry.name)) walkHtml(p);
+            }
+            else if(entry.name.endsWith('.html'))
+            {
+                for(const m of fs.readFileSync(p, 'utf8').matchAll(/src="([^"]+\.ts)"/g))
+                {
+                    const target = path.resolve(path.dirname(p), m[1]);
+
+                    if(fs.existsSync(target)) entries.push(posix(path.relative(root, target)));
+                }
+            }
+        }
+    };
+
+    walkHtml(packagesDir);
+
+    return { root, entries: [...new Set(entries)], scan, aliases };
+}
+
 if(process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url))
 {
-    const root = process.cwd();
-    const E = 'packages/vortex-engine/src';
-    const C = 'packages/vortex-client/src';
-    const orphans = findOrphans({
-        root,
-        entries: [`${E}/index.ts`, `${C}/index.ts`, 'packages/vortex-glaze/src/main.ts', 'packages/vortex-imager/src/index.ts'],
-        scan: [E, C],
-        aliases: { '@core': `${E}/core`, '@habbo': `${E}/habbo`, '@room': `${E}/room`, '@iid': `${E}/iid`, '@ui': C, '@': C, '@client': C }
-    });
+    const orphans = findOrphans(workspaceScan(process.cwd()));
 
     for(const f of orphans) console.log(f);
     console.error(`${orphans.length} orphan file(s)`);

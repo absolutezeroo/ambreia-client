@@ -17,14 +17,19 @@ export class RoomObjectVisualizationRegistry
     private _defaultData: (() => IRoomObjectVisualizationData) | null = null;
     private readonly _unknown = new Set<string>();
 
-    public register(type: string, create: () => IRoomObjectVisualization): void
+    /** A type registered twice is an error naming it, unless `{override: true}` says it is meant (see RoomObjectLogicRegistry). */
+    public register(type: string, create: () => IRoomObjectVisualization, options: {override?: boolean} = {}): void
     {
+        if(this._builders.has(type) && !options.override) throw new Error(`Room object visualization "${type}" is already registered; pass {override: true} to replace it`);
+
         this._builders.set(type, create);
     }
 
     /** The data class of a type's content; types without one get the default data. */
-    public registerData(type: string, create: () => IRoomObjectVisualizationData): void
+    public registerData(type: string, create: () => IRoomObjectVisualizationData, options: {override?: boolean} = {}): void
     {
+        if(this._dataBuilders.has(type) && !options.override) throw new Error(`Room object visualization data "${type}" is already registered; pass {override: true} to replace it`);
+
         this._dataBuilders.set(type, create);
     }
 

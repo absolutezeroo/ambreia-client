@@ -14,8 +14,15 @@ export class RoomObjectLogicRegistry
     private readonly _builders = new Map<string, () => IRoomObjectEventHandler>();
     private readonly _unknown = new Set<string>();
 
-    public register(type: string, create: () => IRoomObjectEventHandler): void
+    /**
+     * A type registered twice is an error naming it: module order was silently load-bearing (the
+     * last registration won), and a feature could replace `furniture_basic` by mistake without a
+     * word. A module that means to replace a type says so with `{override: true}`.
+     */
+    public register(type: string, create: () => IRoomObjectEventHandler, options: {override?: boolean} = {}): void
     {
+        if(this._builders.has(type) && !options.override) throw new Error(`Room object logic "${type}" is already registered; pass {override: true} to replace it`);
+
         this._builders.set(type, create);
     }
 
