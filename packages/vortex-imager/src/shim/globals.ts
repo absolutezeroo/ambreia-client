@@ -13,7 +13,7 @@
 import {createCanvas, loadImage} from '@napi-rs/canvas';
 import {DOMParser} from 'linkedom';
 import {readFile} from 'node:fs/promises';
-import {join, normalize} from 'node:path';
+import {isAbsolute, join, normalize, relative as relativeTo} from 'node:path';
 
 export interface IGlobalsOptions
 {
@@ -185,7 +185,10 @@ function installFileBackedFetch(root: string, baseUrl: string): void
         const relative = decodeURIComponent(url.slice(prefix.length).split('?')[0]).replace(/^\/+/, '');
         const target = normalize(join(normalisedRoot, relative));
 
-        if(!target.startsWith(normalisedRoot))
+        // `relative()` rather than a string prefix: `/assets-private/x` starts with `/assets`.
+        const escape = relativeTo(normalisedRoot, target);
+
+        if(escape.startsWith('..') || isAbsolute(escape))
         {
             return new Response(null, {status: 403, statusText: 'Forbidden'});
         }

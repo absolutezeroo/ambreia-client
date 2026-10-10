@@ -18,6 +18,7 @@ import {Core} from '@ambreia/kernel/Core';
 import type {CoreComponentContext} from '@ambreia/kernel/runtime/CoreComponentContext';
 import {AssetLibrary} from '@ambreia/game/core/assets/index';
 import {Logger} from '@ambreia/common/utils/Logger';
+import {ContentUnavailableError} from '../room/FurnitureRequest';
 import {openAssetDirectories} from '@ambreia/common/assets/pack/AssetDirectories';
 import type {IAssetDirectories} from '@ambreia/common/assets/pack/AssetDirectories';
 import {IID_Core} from '@ambreia/kernel/iid/IIDCore';
@@ -142,9 +143,12 @@ export class AvatarRenderService
             // re-resolves the action set once the library is in.
             if(request.effectId > 0 && !this.isEffectSettled(request.effectId))
             {
+                // Not rendered without it: the image would be cached, in memory and on disk, under
+                // the key of the image *with* the effect, and served as it for the rest of time.
+                // A 503 with Retry-After says "not yet" and nothing is stored.
                 await withTimeout(effectReady, EFFECT_TIMEOUT_MS).catch(() =>
                 {
-                    log.warn(`Effect ${request.effectId} did not load in time; rendering without it`);
+                    throw new ContentUnavailableError(`Effect ${request.effectId} did not load within ${EFFECT_TIMEOUT_MS} ms`);
                 });
 
                 this._settledEffects.add(request.effectId);
@@ -376,7 +380,11 @@ export class AvatarRenderService
             };
 
             renderManager.downloadFigure(container, listener);
-        }), FIGURE_TIMEOUT_MS);
+        }), FIGURE_TIMEOUT_MS).catch(() =>
+        {
+            // Transient like a furniture library that is not in yet: 503 + Retry-After, not a 500.
+            throw new ContentUnavailableError(`The figure's libraries did not load within ${FIGURE_TIMEOUT_MS} ms`);
+        });
     }
 
     private requireRenderManager(): AvatarRenderManager
@@ -423,7 +431,7 @@ export class AvatarRenderService
 
         context.attachInstance(IID_AvatarRenderManager, renderManager);
 
-        await withTimeout(new Promise<void>((resolve) =>
+        const ready = new Promise<void>((resolve) =>
         {
             if(renderManager.isReady)
             {
@@ -433,7 +441,21 @@ export class AvatarRenderService
             }
 
             renderManager.events.once(AvatarRenderEvent.AVATAR_RENDER_READY, () => resolve());
-        }), READY_TIMEOUT_MS);
+        });
+
+        // An unreachable asset host (DNS, connection refused) used to be a 120 s wait: the directory
+        // reader forgets a failed fetch so the next read tries again, and nothing in the ready wait
+        // ever learns of it. Reading a piece that cannot exist settles the question at once: null
+        // (the directory is fine, the piece is not there) or the network error, with the URL.
+        const probe = directories.clothing.read('__ambreia_probe__').then(
+            () => new Promise<never>(() => undefined),
+            (error: unknown) =>
+            {
+                throw new Error(`${directories.clothing.url} cannot be read: ${String((error as Error | null)?.message ?? error)}`);
+            }
+        );
+
+        await withTimeout(Promise.race([ready, probe]), READY_TIMEOUT_MS);
 
         this._renderManager = renderManager;
 

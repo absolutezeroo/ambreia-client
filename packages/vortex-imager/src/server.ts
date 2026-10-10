@@ -45,9 +45,25 @@ const log = Logger.getLogger('imager.server');
 /** Rendered images are immutable for a given query, so they cache hard downstream. */
 const CACHE_CONTROL = 'public, max-age=21600';
 
+/**
+ * Where the boot stands. The server listens before the avatar and room pipelines are up, so an
+ * orchestrator's probe can tell "warming up" (503 + the step) and "broken" (503 + the reason) from
+ * "dead" (no answer at all), and a transient asset-host outage no longer crash-loops the process.
+ */
+export interface IBootState
+{
+    state: 'starting' | 'ready' | 'failed';
+    /** What failed, or what is being waited for; null once ready. */
+    reason: string | null;
+    /** When the current state began (ms since epoch). */
+    since: number;
+}
+
 export interface IServerDependencies
 {
     config: IImagerConfig;
+    boot: IBootState;
+    /** Set once the avatar pipeline is up; until then every render route answers 503 (the gate below). */
     avatars: AvatarRenderService;
     badges: BadgeRenderService | null;
 
@@ -124,10 +140,22 @@ export function createServer(deps: IServerDependencies): FastifyInstance
         if(deps.config.corsOrigin !== '*') reply.header('Vary', 'Origin');
     });
 
-    app.get('/health', async () =>
+    // Until the pipelines are up, every route but /health answers 503 with the step the boot is
+    // at: a handler never sees a service that is not there yet.
+    app.addHook('onRequest', async (request, reply) =>
     {
+        if(deps.boot.state === 'ready' || request.url === '/health' || request.url.startsWith('/health?')) return;
+
+        await reply.code(503).header('Retry-After', '5').send({error: `imager ${deps.boot.state}: ${deps.boot.reason ?? 'booting'}`});
+    });
+
+    app.get('/health', async (_request, reply) =>
+    {
+        if(deps.boot.state !== 'ready') reply.code(503);
+
         return {
-            status: 'ok',
+            status: deps.boot.state === 'ready' ? 'ok' : deps.boot.state,
+            boot: {state: deps.boot.state, reason: deps.boot.reason, sinceMs: Date.now() - deps.boot.since},
             cachedImages: deps.cache.size,
             cachedRooms: deps.roomCache.size,
             diskCache: deps.diskCache === null ? 'disabled' : deps.diskCache.root,
