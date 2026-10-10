@@ -1,5 +1,6 @@
 import type {IItemListWindow} from '@ambreia/ui/components/IItemListWindow';
 import type {IWindow} from '@ambreia/ui/IWindow';
+import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 import {buildField} from './buildField';
 import type {IFieldSpec} from './IFieldSpec';
 
@@ -39,6 +40,7 @@ export class FormList
 
                 if(!built) continue;
 
+                fit(built.window, list.width);
                 rows.push(built.window);
                 this._bindings.push(built.binding);
             }
@@ -47,5 +49,33 @@ export class FormList
         }
 
         for(const binding of this._bindings) binding.render();
+    }
+}
+
+/**
+ * Narrows a row built for the inspector (316) to a narrower list (the left panel's 292): what
+ * overflows shrinks, what sits in its right half (a number field's arrows) moves left instead.
+ */
+function fit(window: IWindow, width: number): void
+{
+    const delta = window.width - width;
+
+    if(delta > 0) shrink(window, delta);
+}
+
+function shrink(window: IWindow, delta: number): void
+{
+    window.width -= delta;
+
+    const container = window as IWindowContainer;
+
+    for(let i = 0; i < (container.numChildren ?? 0); i++)
+    {
+        const child = container.getChildAt(i);
+
+        if(!child || child.x + child.width <= window.width) continue;
+
+        if(child.x > window.width / 2) child.x -= delta;
+        else shrink(child, delta);
     }
 }

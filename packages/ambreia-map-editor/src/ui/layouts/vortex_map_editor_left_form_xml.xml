@@ -22,6 +22,8 @@
                 <var key="text_style" value="u_regular" type="String"/>
                 <var key="font_size" value="10" type="uint"/>
                 <var key="text_color" value="0x6b7682" type="hex"/>
+                <var key="word_wrap" value="true" type="Boolean"/>
+                <var key="multiline" value="true" type="Boolean"/>
                 <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
               </variables>
             </text>
