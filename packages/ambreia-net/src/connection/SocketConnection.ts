@@ -179,6 +179,11 @@ export class SocketConnection extends EventEmitter<IConnectionEvents> implements
             log.warn('Insecure WebSocket connection (ws://). Use wss:// in production.');
         }
 
+        // A retry (next port, second attempt) must not leave the previous socket's handlers alive:
+        // its late `onclose` flipped `_connected` and announced a disconnect over a connection that
+        // was still being opened.
+        this.detachSocket();
+
         try
         {
             this._socket = new WebSocket(url);
@@ -502,6 +507,23 @@ export class SocketConnection extends EventEmitter<IConnectionEvents> implements
         this.removeAllListeners();
 
         this._disposed = true;
+    }
+
+    /** Forgets the current socket: handlers off, closed if still open or opening. */
+    private detachSocket(): void
+    {
+        const socket = this._socket;
+
+        if(!socket) return;
+
+        socket.onopen = null;
+        socket.onclose = null;
+        socket.onerror = null;
+        socket.onmessage = null;
+
+        if(socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING) socket.close();
+
+        this._socket = null;
     }
 
     private setupEventListeners(): void

@@ -242,10 +242,16 @@ export class RSA
         padded[0] = 0x00;
         padded[1] = 0x02;
 
-        // Fill with random non-zero bytes
-        for(let i = 2; i < 2 + paddingLength; i++)
+        // Fill with random non-zero bytes. From WebCrypto, not Math.random: V8's PRNG is
+        // recoverable from a few outputs, and the padding is what hides the DH public key from a
+        // passive observer on a plain-text socket.
+        const random = new Uint8Array(paddingLength);
+
+        crypto.getRandomValues(random);
+
+        for(let i = 0; i < paddingLength; i++)
         {
-            padded[i] = Math.floor(Math.random() * 255) + 1;
+            padded[2 + i] = (random[i] % 255) + 1;
         }
 
         padded[2 + paddingLength] = 0x00;
