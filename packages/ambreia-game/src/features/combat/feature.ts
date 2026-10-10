@@ -1,3 +1,4 @@
+import {devHook} from '@ambreia/common/utils/BuildEnv';
 import {Logger} from '@ambreia/common/utils/Logger';
 import {RoomSessionEvent} from '../../session/events/RoomSessionEvent';
 import {RoomSessionUserDataUpdateEvent} from '../../session/events/RoomSessionUserDataUpdateEvent';
@@ -313,9 +314,7 @@ export const CombatFeature: IGameFeature = {
         // `simulate(objectId, 'cast', 'skill.mage.flame_burst')` loops that skill's cast visual on
         // the object for two seconds; `simulate(objectId, 'skill', 'skill.mage.flame_burst')` lands
         // that skill on it.
-        const root = globalThis as unknown as {__ambreia?: Record<string, unknown>};
-
-        root.__ambreia = {...(root.__ambreia ?? {}), combat: {
+        devHook('combat', {
             session,
             simulate: (objectId: number, what = 'blows', skillId = 'skill.mage.flame_burst') =>
             {
@@ -343,7 +342,7 @@ export const CombatFeature: IGameFeature = {
                     {attackerId: self, targetId: objectId, amount: 7 * (i + 1), outcome, health: 28 - 7 * i, maxHealth: 40, killed: false}
                 ])), i * 700));
             }
-        }};
+        });
 
         return null;
     },

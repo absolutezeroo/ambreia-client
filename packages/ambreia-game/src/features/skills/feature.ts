@@ -1,3 +1,4 @@
+import {devHook} from '@ambreia/common/utils/BuildEnv';
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {IRpgCastStart} from '@ambreia/protocol/incoming/rpg/skills/RpgCastStartMessage';
 import type {IRpgStatus} from '@ambreia/protocol/incoming/rpg/skills/RpgStatusesMessage';
@@ -359,9 +360,7 @@ export const SkillsFeature: IGameFeature = {
         });
 
         // Dev hook: `__ambreia.skills.session`, `.open()`.
-        const root = globalThis as unknown as {__ambreia?: Record<string, unknown>};
-
-        root.__ambreia = {...(root.__ambreia ?? {}), skills: {session, use, open: openWindow}};
+        devHook('skills', {session, use, open: openWindow});
 
         return null;
     },

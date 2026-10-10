@@ -1,3 +1,4 @@
+import {devHook} from '@ambreia/common/utils/BuildEnv';
 import {RoomSessionEvent} from '../../session/events/RoomSessionEvent';
 import {RoomSessionUserDataUpdateEvent} from '../../session/events/RoomSessionUserDataUpdateEvent';
 import {UserDataType} from '../../session/UserData';
@@ -165,9 +166,7 @@ export const HudFeature: IGameFeature = {
                 });
             }
         };
-        const root = globalThis as unknown as {__ambreia?: Record<string, unknown>};
-
-        root.__ambreia = {...(root.__ambreia ?? {}), hud: hook};
+        devHook('hud', hook);
 
         return null;
     }

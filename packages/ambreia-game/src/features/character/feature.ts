@@ -1,3 +1,4 @@
+import {devHook} from '@ambreia/common/utils/BuildEnv';
 import {Logger} from '@ambreia/common/utils/Logger';
 import {RoomSessionEvent} from '../../session/events/RoomSessionEvent';
 import type {IGameFeature} from '../GameFeature';
@@ -35,9 +36,7 @@ export const CharacterFeature: IGameFeature = {
         });
 
         // Dev hook: the screen as it is (`__ambreia.characters.screen()`).
-        const root = globalThis as unknown as {__ambreia?: Record<string, unknown>};
-
-        root.__ambreia = {...(root.__ambreia ?? {}), characters: {session, screen: () => screen}};
+        devHook('characters', {session, screen: () => screen});
 
         host.made.roomSession?.sessionEvents.on(RoomSessionEvent.RSE_STARTED, () =>
         {

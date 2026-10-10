@@ -1,3 +1,4 @@
+import {devHook} from '@ambreia/common/utils/BuildEnv';
 import {Logger} from '@ambreia/common/utils/Logger';
 import {browserLanguage} from '@ambreia/common/localization/Texts';
 import type {IRpgStatBlock} from '@ambreia/protocol/incoming/rpg/characters/IRpgStatBlock';
@@ -150,9 +151,7 @@ export const InventoryFeature: IGameFeature = {
         });
 
         // Dev hook: `__ambreia.inventory.open()`.
-        const root = globalThis as unknown as {__ambreia?: Record<string, unknown>};
-
-        root.__ambreia = {...(root.__ambreia ?? {}), inventory: {session, open: () => open('inventory'), character: () => open('character')}};
+        devHook('inventory', {session, open: () => open('inventory'), character: () => open('character')});
 
         return null;
     },

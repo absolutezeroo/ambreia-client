@@ -1,4 +1,5 @@
 import {Logger, LogLevel} from '@ambreia/common/utils/Logger';
+import {isProductionBuild} from '@ambreia/common/utils/BuildEnv';
 
 const NAMESPACE = 'core.communication.PacketLogger';
 
@@ -19,10 +20,14 @@ const log = Logger.getLogger(NAMESPACE);
  *     __packets.off()
  *     __packets.dump()                // the last 200 entries as a table
  *     __packets.unhandled()           // incoming ids that reached no handler
+ *
+ * Dev tooling: a production build installs no console API and keeps no history (a player's
+ * console would otherwise hold the last 200 message names of the session).
  */
 export class PacketLogger
 {
     private static readonly HISTORY_LIMIT = 200;
+    private static readonly ACTIVE = !isProductionBuild();
 
     private static _enabled = false;
     private static _filter: string | null = null;
@@ -44,6 +49,8 @@ export class PacketLogger
 	 */
     static incoming(id: number, name: string, handlerCount: number): void
     {
+        if(!PacketLogger.ACTIVE) return;
+
         if(handlerCount === 0)
         {
             const entry = PacketLogger._unhandled.get(id) ?? {name, count: 0};
@@ -63,6 +70,8 @@ export class PacketLogger
 
     static outgoing(id: number, name: string): void
     {
+        if(!PacketLogger.ACTIVE) return;
+
         PacketLogger.record({
             at: PacketLogger.now(),
             direction: 'out',
@@ -77,7 +86,7 @@ export class PacketLogger
 	 */
     static install(): void
     {
-        if(PacketLogger._installed || typeof globalThis === 'undefined') return;
+        if(!PacketLogger.ACTIVE || PacketLogger._installed || typeof globalThis === 'undefined') return;
 
         PacketLogger._installed = true;
 

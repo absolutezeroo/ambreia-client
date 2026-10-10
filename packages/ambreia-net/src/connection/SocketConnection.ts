@@ -16,12 +16,7 @@ import type {IPacketTap} from './IPacketTap';
 import {MessageDataWrapper} from '../messages/MessageDataWrapper';
 import {PreEncryptionMessageComposer} from '../messages/PreEncryptionMessageComposer';
 import {PacketLogger} from '../PacketLogger';
-
-/** Vite inlines `import.meta.env.PROD` in a build; under Node (tests, tools) there is no `env`. */
-function isProductionBuild(): boolean
-{
-    return (import.meta as unknown as {env?: {PROD?: boolean}}).env?.PROD === true;
-}
+import {isProductionBuild} from '@ambreia/common/utils/BuildEnv';
 
 const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]', '::1']);
 
