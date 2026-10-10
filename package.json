@@ -20,6 +20,7 @@
     "typecheck": "pnpm --filter vortex-client exec tsc --noEmit && pnpm --filter vortex-glaze exec tsc --noEmit && pnpm --filter vortex-imager exec tsc --noEmit && pnpm --filter @ambreia/common exec tsc --noEmit && pnpm --filter @ambreia/net exec tsc --noEmit && pnpm --filter @ambreia/avatar exec tsc --noEmit && pnpm --filter @ambreia/ui exec tsc --noEmit && pnpm --filter @ambreia/iso exec tsc --noEmit && pnpm --filter @ambreia/kernel exec tsc --noEmit && pnpm --filter @ambreia/protocol exec tsc --noEmit && pnpm --filter @ambreia/game exec tsc --noEmit && pnpm --filter @ambreia/map-editor-core exec tsc --noEmit && pnpm --filter @ambreia/map-editor exec tsc --noEmit",
     "check": "pnpm typecheck && pnpm test",
     "gen:headers": "node packages/vortex-engine/tools/gen-headers.mjs",
+    "gen:vfx": "node packages/vortex-client/tools/build-vfx-sheets.mjs",
     "sync:agents": "node .claude/scripts/sync-agent-docs.mjs --write",
     "prepare": "husky"
   },

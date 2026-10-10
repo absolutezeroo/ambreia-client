@@ -111,8 +111,11 @@ export class CombatOverlay
         this.run();
     }
 
-    /** `hit`, `crit`, `miss` (M1a), `dodge`, `heal` (M1b), `immune` (M1c); `absorbed`: what a shield took. */
-    hit(objectId: number, amount: number, outcome: string, absorbed = 0): void
+    /**
+     * `hit`, `crit`, `miss` (M1a), `dodge`, `heal` (M1b), `immune` (M1c); `absorbed`: what a shield
+     * took; `delayMs`: the number waits this long (a projectile's flight) before rising.
+     */
+    hit(objectId: number, amount: number, outcome: string, absorbed = 0, delayMs = 0): void
     {
         const window = this._spare.pop() ?? this.build('vortex_combat_number_xml') as ITextWindow | null;
 
@@ -128,7 +131,7 @@ export class CombatOverlay
         window.fontSize = crit ? 16 : 12;
         window.blend = 1;
         window.visible = false;
-        this._numbers.push({window, objectId, born: performance.now()});
+        this._numbers.push({window, objectId, born: performance.now() + delayMs});
         this.run();
     }
 
@@ -313,6 +316,13 @@ export class CombatOverlay
                 // Swap-remove: splice() would allocate the removed slice, every frame.
                 this._numbers[i] = this._numbers[this._numbers.length - 1];
                 this._numbers.pop();
+                continue;
+            }
+
+            // Not born yet: its blow is still flying.
+            if(age < 0)
+            {
+                number.window.visible = false;
                 continue;
             }
 

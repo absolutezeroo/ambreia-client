@@ -1,0 +1,235 @@
+{
+ "frames": [
+  {
+   "filename": "power-aura 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 66,
+    "h": 107
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 66,
+    "h": 107
+   },
+   "sourceSize": {
+    "w": 66,
+    "h": 107
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8317757009345794
+   },
+   "duration": 83
+  },
+  {
+   "filename": "power-aura 1.png",
+   "frame": {
+    "x": 66,
+    "y": 0,
+    "w": 66,
+    "h": 107
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 66,
+    "h": 107
+   },
+   "sourceSize": {
+    "w": 66,
+    "h": 107
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8317757009345794
+   },
+   "duration": 83
+  },
+  {
+   "filename": "power-aura 2.png",
+   "frame": {
+    "x": 132,
+    "y": 0,
+    "w": 66,
+    "h": 107
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 66,
+    "h": 107
+   },
+   "sourceSize": {
+    "w": 66,
+    "h": 107
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8317757009345794
+   },
+   "duration": 83
+  },
+  {
+   "filename": "power-aura 3.png",
+   "frame": {
+    "x": 0,
+    "y": 107,
+    "w": 66,
+    "h": 107
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 66,
+    "h": 107
+   },
+   "sourceSize": {
+    "w": 66,
+    "h": 107
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8317757009345794
+   },
+   "duration": 83
+  },
+  {
+   "filename": "power-aura 4.png",
+   "frame": {
+    "x": 66,
+    "y": 107,
+    "w": 66,
+    "h": 107
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 66,
+    "h": 107
+   },
+   "sourceSize": {
+    "w": 66,
+    "h": 107
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8317757009345794
+   },
+   "duration": 83
+  },
+  {
+   "filename": "power-aura 5.png",
+   "frame": {
+    "x": 132,
+    "y": 107,
+    "w": 66,
+    "h": 107
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 66,
+    "h": 107
+   },
+   "sourceSize": {
+    "w": 66,
+    "h": 107
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8317757009345794
+   },
+   "duration": 83
+  },
+  {
+   "filename": "power-aura 6.png",
+   "frame": {
+    "x": 0,
+    "y": 214,
+    "w": 66,
+    "h": 107
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 66,
+    "h": 107
+   },
+   "sourceSize": {
+    "w": 66,
+    "h": 107
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8317757009345794
+   },
+   "duration": 83
+  },
+  {
+   "filename": "power-aura 7.png",
+   "frame": {
+    "x": 66,
+    "y": 214,
+    "w": 66,
+    "h": 107
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 66,
+    "h": 107
+   },
+   "sourceSize": {
+    "w": 66,
+    "h": 107
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8317757009345794
+   },
+   "duration": 83
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "power-aura.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 198,
+   "h": 321
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 33,
+   "y": 89
+  },
+  "frameTags": [
+   {
+    "name": "power-aura",
+    "from": 0,
+    "to": 7,
+    "direction": "forward"
+   }
+  ]
+ }
+}

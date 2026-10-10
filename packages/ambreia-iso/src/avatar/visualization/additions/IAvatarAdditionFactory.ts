@@ -1,3 +1,4 @@
+import type {Texture} from 'pixi.js';
 import type {AvatarVisualization} from '../AvatarVisualization';
 import type {IAvatarAddition} from './IAvatarAddition';
 import type {IExpressionAddition} from './IExpressionAddition';
@@ -21,5 +22,10 @@ export interface IAvatarAdditionFactory
     number(id: number, visualization: AvatarVisualization, value: number): IAvatarAddition;
     /** TS-only (RPG F3b §7.3): the ring under the player's target. */
     target(id: number): IAvatarAddition;
+    /**
+     * TS-only (RPG): a sprite sheet played on the ground under the avatar, `ms` a frame, once or in
+     * a loop, its anchor (in frame pixels) on the avatar's location.
+     */
+    sheet(id: number, frames: readonly Texture[], ms: number, loop: boolean, anchorX: number, anchorY: number): IAvatarAddition;
     expression(id: number, type: number, visualization: AvatarVisualization): IExpressionAddition | null;
 }

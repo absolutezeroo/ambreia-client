@@ -31,21 +31,28 @@ export function rpgInteractionMap(announce: <E extends keyof IRpgInteractionSess
 export class RpgInteractionSession
 {
     readonly events = new EventEmitter<IRpgInteractionSessionEvents>();
-    /** The target's object id as the server last set it; 0 for none. */
-    private _targetId = 0;
+    /** The target as the server last set it; null for none. */
+    private _target: RpgTargetMessage | null = null;
     private _connection: IConnection | null = null;
     private _uninstall: (() => void) | null = null;
     private readonly _map: MessageMap = rpgInteractionMap((event, ...args) =>
     {
-        if(event === 'target') this._targetId = (args[0] as RpgTargetMessage).objectId;
+        if(event === 'target') this._target = (args[0] as RpgTargetMessage).objectId === 0 ? null : args[0] as RpgTargetMessage;
 
         // Typed at the map's side; eventemitter3 cannot tie a generic event to its payload here.
         (this.events as unknown as EventEmitter).emit(event, ...args);
     });
 
+    /** The target's object id; 0 for none. */
     get targetId(): number
     {
-        return this._targetId;
+        return this._target?.objectId ?? 0;
+    }
+
+    /** The target as the server described it (its class, rank…); null for none. */
+    get target(): RpgTargetMessage | null
+    {
+        return this._target;
     }
 
     /** Serves the interaction's headers on this connection (once: the client has one game socket). */
@@ -61,14 +68,14 @@ export class RpgInteractionSession
     /** Asks to target the avatar with this room object id, or to clear the target (0) — once there is one. */
     select(objectId: number): void
     {
-        if(objectId === 0 && this._targetId === 0) return;
+        if(objectId === 0 && this._target === null) return;
         if(this._connection !== null) this._map.send(this._connection, new RpgTargetSelectMessage(objectId));
     }
 
     /** The room was left: the server forgets the target with it (F3b §8). */
     forget(): void
     {
-        this._targetId = 0;
+        this._target = null;
     }
 
     dispose(): void

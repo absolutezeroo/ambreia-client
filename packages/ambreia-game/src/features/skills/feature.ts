@@ -8,7 +8,7 @@ import type {IGameFeature} from '../GameFeature';
 import {WindowBits} from '../character/WindowBits';
 import {chatClock} from '../hud/chatModel';
 import {SKILL_SLOTS} from '../hud/PlayerHudState';
-import {barSkill, holdBack, RpgSkillSession, statusTime, type ISkillDefinition, type IStatusDefinition} from './RpgSkillSession';
+import {barSkill, holdBack, RpgSkillSession, statusTime, type IClassDefinition, type ISkillDefinition, type IStatusDefinition} from './RpgSkillSession';
 import {SKILL_IMAGES, skillIcon, statusIcon} from './skillArt';
 import {SKILL_WINDOW_IMAGES, SkillsWindow} from './SkillsWindow';
 
@@ -115,13 +115,14 @@ export const SkillsFeature: IGameFeature = {
             if(windows) (window ??= new SkillsWindow(windows, bits(), session, () => host.made.character?.state?.classId ?? host.made.character?.played?.classId ?? '')).toggle();
         };
 
-        // What each skill aims at and whether the global cooldown holds it (M1b §5.1): the server's
-        // public definitions, once per session; without them a ground skill is refused (invalid_target).
+        // What each skill aims at and whether the global cooldown holds it (M1b §5.1), and what the
+        // skills, statuses and classes draw (their vfx): the server's public definitions, once per
+        // session; without them a ground skill is refused (invalid_target).
         const loadDefinitions = (): Promise<void> => definitions ??= (async () =>
         {
             try
             {
-                const [skills, statuses] = await Promise.all(['skill', 'status'].map(async kind =>
+                const [skills, statuses, classes] = await Promise.all(['skill', 'status', 'class'].map(async kind =>
                 {
                     const response = await fetch(`/webapi/api/public/content/definitions/${kind}`);
 
@@ -130,7 +131,7 @@ export const SkillsFeature: IGameFeature = {
                     return response.json() as Promise<unknown[]>;
                 }));
 
-                session.define(skills as ISkillDefinition[], statuses as IStatusDefinition[]);
+                session.define(skills as ISkillDefinition[], statuses as IStatusDefinition[], classes as IClassDefinition[]);
                 renderBar();
                 window?.refresh();
             }
@@ -180,7 +181,7 @@ export const SkillsFeature: IGameFeature = {
             for(const cast of message.casts as readonly IRpgCastStart[])
             {
                 casts.set(cast.casterObjectId, {skillId: cast.skillId, start: Date.now(), durationMs: cast.durationMs});
-                host.made.combat?.cast(cast.casterObjectId, {durationMs: cast.durationMs, channel: cast.channel});
+                host.made.combat?.cast(cast.casterObjectId, {durationMs: cast.durationMs, channel: cast.channel, skillId: cast.skillId});
             }
 
             renderTarget();
@@ -259,7 +260,7 @@ export const SkillsFeature: IGameFeature = {
             renderTarget();
         });
 
-        session.events.on('events', message => host.made.combat?.report(message.outcomes));
+        session.events.on('events', message => host.made.combat?.report(message.outcomes, message.impacts));
 
         // A new target: the interaction feature drew its frame, this adds its effects and cast.
         host.made.interaction?.events.on('target', renderTarget);

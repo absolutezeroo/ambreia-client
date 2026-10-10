@@ -1,3 +1,4 @@
+import type {Texture} from 'pixi.js';
 import type {AvatarVisualization} from '../../avatar/visualization/AvatarVisualization';
 import type {IAvatarAddition} from '../../avatar/visualization/additions/IAvatarAddition';
 import type {IExpressionAddition} from '../../avatar/visualization/additions/IExpressionAddition';
@@ -7,6 +8,7 @@ import {MutedBubble} from './MutedBubble';
 import {TypingBubble} from './TypingBubble';
 import {GuideStatusBubble} from './GuideStatusBubble';
 import {NumberBubble} from './NumberBubble';
+import {SheetAddition} from './SheetAddition';
 import {TargetCircle} from './TargetCircle';
 import {ExpressionAdditionFactory} from './ExpressionAdditionFactory';
 
@@ -41,6 +43,11 @@ export class AvatarAdditionFactory implements IAvatarAdditionFactory
     public target(id: number): IAvatarAddition
     {
         return new TargetCircle(id);
+    }
+
+    public sheet(id: number, frames: readonly Texture[], ms: number, loop: boolean, anchorX: number, anchorY: number): IAvatarAddition
+    {
+        return new SheetAddition(id, frames, ms, loop, anchorX, anchorY);
     }
 
     public expression(id: number, type: number, visualization: AvatarVisualization): IExpressionAddition | null

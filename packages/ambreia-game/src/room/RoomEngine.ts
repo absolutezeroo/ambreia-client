@@ -49,6 +49,7 @@ import {RoomObjectVisibilityUpdateMessage} from '@ambreia/iso/scene/messages/Roo
 import {LookToMessageComposer} from '@ambreia/protocol/outgoing/room/avatar/LookToMessageComposer';
 import {getUserTypeName, RoomObjectUserTypes} from '@ambreia/iso/scene/object/RoomObjectUserTypes';
 import {RoomObjectVariableEnum} from '@ambreia/iso/scene/object/RoomObjectVariableEnum';
+import {AvatarVisualization} from '@ambreia/iso/avatar/visualization/AvatarVisualization';
 import {StuffDataFactory} from '@ambreia/iso/scene/object/data/StuffDataFactory';
 import {RoomEngineEvent} from '@ambreia/iso/scene/events/RoomEngineEvent';
 import {RoomEngineObjectEvent} from '@ambreia/iso/scene/events/RoomEngineObjectEvent';
@@ -561,6 +562,8 @@ export class RoomEngine extends Component implements IRoomEngine,
     private readonly _rpgStepTimes = new Map<number, number>();
     /** TS-only (RPG M1c §9): the telegraphed casts' cells on the floor, by caster. */
     private readonly _rpgTelegraphs = new Map<number, Container>();
+    /** TS-only (RPG): the next ground sheet's addition id, past the avatar's own additions (1–8). */
+    private _rpgSheetNextId = 1000;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_1821.as::getSelectedAvatarId()
     private _selectedAvatarId: number = -1;
@@ -6148,6 +6151,90 @@ export class RoomEngine extends Component implements IRoomEngine,
 
         out.x = (bounds.x + bounds.width / 2 + screenPoint.x) * scale + canvas.width / 2 + canvas.screenOffsetX;
         out.y = (bounds.y + screenPoint.y) * scale + canvas.height / 2 + canvas.screenOffsetY;
+
+        return true;
+    }
+
+    /**
+     * TS-only (RPG): the layer drawn over the active room's objects, in their own screen space
+     * (RoomRenderingCanvas.overlay: it scrolls and scales with them); null without a room. The
+     * combat's effects go on it (features/combat/CombatVfx).
+     */
+    get rpgOverlay(): Container | null
+    {
+        return this._renderingCanvases.get(this._activeRoomId * 1000 + 1)?.overlay ?? null;
+    }
+
+    /**
+     * TS-only (RPG): the centre of an avatar's drawn box in rpgOverlay's space, or with `feet` the
+     * point of its location on the floor; false when it is not there.
+     */
+    getRpgOverlayAnchor(objectId: number, out: {x: number; y: number}, feet = false): boolean
+    {
+        const canvas = this._renderingCanvases.get(this._activeRoomId * 1000 + 1);
+        const geometry = canvas?.geometry ?? null;
+        const object = this.getRoomObject(this._activeRoomId, objectId, RoomObjectCategoryEnum.OBJECT_CATEGORY_USER);
+        const visualization = object?.getVisualization() ?? null;
+
+        if(canvas === undefined || geometry === null || object === null || visualization === null) return false;
+
+        const screenPoint = geometry.getScreenPoint(object.getLocation());
+
+        if(screenPoint === null) return false;
+
+        if(feet)
+        {
+            out.x = screenPoint.x;
+            out.y = screenPoint.y;
+
+            return true;
+        }
+
+        const bounds = visualization.boundingRectangle;
+
+        out.x = screenPoint.x + bounds.x + bounds.width / 2;
+        out.y = screenPoint.y + bounds.y + bounds.height / 2;
+
+        return true;
+    }
+
+    /**
+     * TS-only (RPG): a sprite sheet played on the ground under an avatar, behind it like its shadow
+     * (an avatar addition, sorted with it), `ms` a frame, once (then taken away by itself) or in a
+     * loop until the returned function is called; null when the object is not an avatar here.
+     */
+    playRpgGroundSheet(objectId: number, frames: readonly Texture[], ms: number, anchorX: number, anchorY: number, loop: boolean): (() => void) | null
+    {
+        const object = this.getRoomObject(this._activeRoomId, objectId, RoomObjectCategoryEnum.OBJECT_CATEGORY_USER);
+        const visualization = object?.getVisualization() ?? null;
+        const factory = AvatarVisualization.additions;
+
+        if(!(visualization instanceof AvatarVisualization) || !factory || frames.length === 0) return null;
+
+        const id = this._rpgSheetNextId++;
+        const addition = factory.sheet(id, frames, ms, loop, anchorX, anchorY);
+        const stop = (): void =>
+        {
+            // The room may have gone with its visualization.
+            if(!visualization.disposed) visualization.removeRpgAddition(id);
+        };
+
+        visualization.addRpgAddition(addition);
+        if(!loop) setTimeout(stop, frames.length * ms);
+
+        return stop;
+    }
+
+    /** TS-only (RPG): the floor at this tile of the active room in rpgOverlay's space; false without a room. */
+    getRpgOverlayCell(x: number, y: number, out: {x: number; y: number}): boolean
+    {
+        const geometry = this._renderingCanvases.get(this._activeRoomId * 1000 + 1)?.geometry ?? null;
+        const point = geometry?.getScreenPoint(new Vector3d(x, y, this.getLegacyGeometry(this._activeRoomId)?.getTileHeight(x, y) ?? 0)) ?? null;
+
+        if(point === null) return false;
+
+        out.x = point.x;
+        out.y = point.y;
 
         return true;
     }

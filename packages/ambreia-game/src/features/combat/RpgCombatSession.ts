@@ -14,7 +14,15 @@ import {RpgDeathMessageParser} from '@ambreia/protocol/parser/rpg/combat/RpgDeat
 import {RpgCombatResultMessageParser} from '@ambreia/protocol/parser/rpg/combat/RpgCombatResultMessageParser';
 import type {RpgMonsterYellMessage} from '@ambreia/protocol/incoming/rpg/combat/RpgMonsterYellMessage';
 import {RpgMonsterYellMessageParser} from '@ambreia/protocol/parser/rpg/combat/RpgMonsterYellMessageParser';
-import type {IRpgSkillOutcome} from '@ambreia/protocol/incoming/rpg/skills/RpgSkillEventsMessage';
+import type {IRpgSkillImpact, IRpgSkillOutcome} from '@ambreia/protocol/incoming/rpg/skills/RpgSkillEventsMessage';
+
+/** A cast running over a combatant: its bar, and the skill whose `cast` visual loops meanwhile. */
+export interface IRpgCast
+{
+    readonly durationMs: number;
+    readonly channel: boolean;
+    readonly skillId: string;
+}
 
 export interface IRpgCombatSessionEvents
 {
@@ -27,10 +35,12 @@ export interface IRpgCombatSessionEvents
     yell: [RpgMonsterYellMessage];
     /** A combatant's health as last known changed (a blow or a vitals line). */
     health: [objectId: number, health: number, maxHealth: number];
+    /** Where skills landed (M1b RpgSkillEvents, reported by features/skills): announced before their outcomes. */
+    impacts: [readonly IRpgSkillImpact[]];
     /** What skills and statuses did (M1b RpgSkillEvents, reported by features/skills). */
     outcomes: [readonly IRpgSkillOutcome[]];
     /** A cast began over this combatant (M1b RpgCastStart); null: it ended. */
-    cast: [objectId: number, cast: {durationMs: number; channel: boolean} | null];
+    cast: [objectId: number, cast: IRpgCast | null];
     /** What holds this combatant back (a slow, a stun: its status icon), reported by features/skills; null: nothing. */
     mark: [objectId: number, icon: string | null];
 }
@@ -73,15 +83,16 @@ export class RpgCombatSession
         return this._health.get(objectId) ?? null;
     }
 
-    /** Skills and statuses hurt and healed too (M1b): their outcomes count as blows here. */
-    report(outcomes: readonly IRpgSkillOutcome[]): void
+    /** Skills and statuses hurt and healed too (M1b): their outcomes count as blows here, after where they landed. */
+    report(outcomes: readonly IRpgSkillOutcome[], impacts: readonly IRpgSkillImpact[] = []): void
     {
+        if(impacts.length > 0) this.events.emit('impacts', impacts);
         this.events.emit('outcomes', outcomes);
         for(const outcome of outcomes) this.setHealth(outcome.targetObjectId, outcome.health, outcome.maxHealth);
     }
 
     /** A cast began (durationMs) or ended (null) over this combatant: the overlay shows its bar. */
-    cast(objectId: number, cast: {durationMs: number; channel: boolean} | null): void
+    cast(objectId: number, cast: IRpgCast | null): void
     {
         this.events.emit('cast', objectId, cast);
     }

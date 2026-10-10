@@ -35,6 +35,8 @@ configurations/
 mockup/
 tools/flash2html/output/
 *.png
+# The RPG effects' sheets are our own art (packages/vortex-client/spells/, bundled as rpg/vfx/<name>).
+!packages/vortex-client/spells/**/*.png
 
 # Window layouts/skins extracted from a Habbo dump by tools/build-window-assets.mjs, and
 # the sound effects extracted by tools/import-crypted-sounds.mjs. Derived dump content,

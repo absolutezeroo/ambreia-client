@@ -315,6 +315,12 @@ _Applies to: `packages/vortex-client/tools/**`, `packages/vortex-client/src/asse
   `monster.json` → `build:monsters` → `pets/<id>.nitro` → `build:ambreia:all --only=pets`. The pet
   type is the id's index in `pet.configuration`. `monster-art:preview <id>` shows the 8 directions
   live. A hand-drawn `.aseprite` (the slime) goes through `build:monsters` the same way.
+- **Combat effects** are PixelLab VFX exports committed under `packages/vortex-client/spells/<folder>/<name>.{json,png}`
+  (the PNGs are un-ignored there). `bundle-assets.mjs` ships each as `rpg/vfx/<folder>/<name>` and
+  `tools/build-vfx-sheets.mjs` (`pnpm gen:vfx`, on `predev`) writes their grid and anchor into
+  `@ambreia/game` `features/combat/vfxSheets.generated.ts`. Which sheet plays when is the emulator's
+  content (`vfx` phases of a skill, `basicAttack` of a class, `aura` of a status), never a table or
+  a class/skill id in the client.
 
 ## Rule: Wire protocol / communication rules
 

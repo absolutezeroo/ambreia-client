@@ -1,0 +1,339 @@
+{
+ "frames": [
+  {
+   "filename": "ground-sigil 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 122,
+    "h": 102
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 122,
+    "h": 102
+   },
+   "sourceSize": {
+    "w": 122,
+    "h": 102
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.6764705882352942
+   },
+   "duration": 83
+  },
+  {
+   "filename": "ground-sigil 1.png",
+   "frame": {
+    "x": 122,
+    "y": 0,
+    "w": 122,
+    "h": 102
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 122,
+    "h": 102
+   },
+   "sourceSize": {
+    "w": 122,
+    "h": 102
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.6764705882352942
+   },
+   "duration": 83
+  },
+  {
+   "filename": "ground-sigil 2.png",
+   "frame": {
+    "x": 244,
+    "y": 0,
+    "w": 122,
+    "h": 102
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 122,
+    "h": 102
+   },
+   "sourceSize": {
+    "w": 122,
+    "h": 102
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.6764705882352942
+   },
+   "duration": 83
+  },
+  {
+   "filename": "ground-sigil 3.png",
+   "frame": {
+    "x": 366,
+    "y": 0,
+    "w": 122,
+    "h": 102
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 122,
+    "h": 102
+   },
+   "sourceSize": {
+    "w": 122,
+    "h": 102
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.6764705882352942
+   },
+   "duration": 83
+  },
+  {
+   "filename": "ground-sigil 4.png",
+   "frame": {
+    "x": 0,
+    "y": 102,
+    "w": 122,
+    "h": 102
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 122,
+    "h": 102
+   },
+   "sourceSize": {
+    "w": 122,
+    "h": 102
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.6764705882352942
+   },
+   "duration": 83
+  },
+  {
+   "filename": "ground-sigil 5.png",
+   "frame": {
+    "x": 122,
+    "y": 102,
+    "w": 122,
+    "h": 102
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 122,
+    "h": 102
+   },
+   "sourceSize": {
+    "w": 122,
+    "h": 102
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.6764705882352942
+   },
+   "duration": 83
+  },
+  {
+   "filename": "ground-sigil 6.png",
+   "frame": {
+    "x": 244,
+    "y": 102,
+    "w": 122,
+    "h": 102
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 122,
+    "h": 102
+   },
+   "sourceSize": {
+    "w": 122,
+    "h": 102
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.6764705882352942
+   },
+   "duration": 83
+  },
+  {
+   "filename": "ground-sigil 7.png",
+   "frame": {
+    "x": 366,
+    "y": 102,
+    "w": 122,
+    "h": 102
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 122,
+    "h": 102
+   },
+   "sourceSize": {
+    "w": 122,
+    "h": 102
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.6764705882352942
+   },
+   "duration": 83
+  },
+  {
+   "filename": "ground-sigil 8.png",
+   "frame": {
+    "x": 0,
+    "y": 204,
+    "w": 122,
+    "h": 102
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 122,
+    "h": 102
+   },
+   "sourceSize": {
+    "w": 122,
+    "h": 102
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.6764705882352942
+   },
+   "duration": 83
+  },
+  {
+   "filename": "ground-sigil 9.png",
+   "frame": {
+    "x": 122,
+    "y": 204,
+    "w": 122,
+    "h": 102
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 122,
+    "h": 102
+   },
+   "sourceSize": {
+    "w": 122,
+    "h": 102
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.6764705882352942
+   },
+   "duration": 83
+  },
+  {
+   "filename": "ground-sigil 10.png",
+   "frame": {
+    "x": 244,
+    "y": 204,
+    "w": 122,
+    "h": 102
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 122,
+    "h": 102
+   },
+   "sourceSize": {
+    "w": 122,
+    "h": 102
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.6764705882352942
+   },
+   "duration": 83
+  },
+  {
+   "filename": "ground-sigil 11.png",
+   "frame": {
+    "x": 366,
+    "y": 204,
+    "w": 122,
+    "h": 102
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 122,
+    "h": 102
+   },
+   "sourceSize": {
+    "w": 122,
+    "h": 102
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.6764705882352942
+   },
+   "duration": 83
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "ground-sigil.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 488,
+   "h": 306
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 61,
+   "y": 69
+  },
+  "frameTags": [
+   {
+    "name": "ground-sigil",
+    "from": 0,
+    "to": 11,
+    "direction": "forward"
+   }
+  ]
+ }
+}

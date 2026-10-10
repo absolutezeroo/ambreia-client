@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "prebuild": "node ./tools/bundle-assets.mjs",
-    "predev": "node ./tools/bundle-assets.mjs",
+    "prebuild": "node ./tools/build-vfx-sheets.mjs && node ./tools/bundle-assets.mjs",
+    "predev": "node ./tools/build-vfx-sheets.mjs && node ./tools/bundle-assets.mjs",
     "dev": "vite",
     "build": "tsc && vite build && node ./tools/check-release-bundle.mjs",
     "preview": "vite preview",
@@ -12,6 +12,7 @@
     "build:bundle": "node ./tools/bundle-assets.mjs",
     "build:ambreia": "tsx ./tools/build-ambreia.ts",
     "build:ambreia:all": "node ./tools/build-ambreia-all.mjs",
+    "build:vfx": "node ./tools/build-vfx-sheets.mjs",
     "build:monsters": "node ./tools/build-monsters.mjs",
     "build:monster-art": "node ./tools/monster-art/build.mjs",
     "monster-art:preview": "node ./tools/monster-art/preview.mjs",

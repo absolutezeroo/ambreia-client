@@ -178,6 +178,9 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
     private _partSpriteCount: number = 0;
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/room/object/visualization/avatar/AvatarVisualization.as::_additions
     private _additions: Map<number, IAvatarAddition> | null = null;
+    /** An addition came or went outside a model change: the next update lays the sprites out again. */
+    // TS-only: see addRpgAddition().
+    private _additionsDirty: boolean = false;
 
     /**
      * Addition artwork, wrapped once and shared by every avatar in the room.
@@ -467,9 +470,15 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
             this._forceUpdate = false;
         }
 
-        if(modelChanged || scale !== this._scale || this._activeAvatarImage == null) 
+        // An RPG addition came or went: the sprites are laid out again below, and the avatar's own
+        // are filled again with the rest (needsSpriteUpdate), as after a model change.
+        const additionsChanged = this._additionsDirty;
+
+        this._additionsDirty = false;
+
+        if(modelChanged || scale !== this._scale || this._activeAvatarImage == null || additionsChanged)
         {
-            if(scale !== this._scale) 
+            if(scale !== this._scale)
             {
                 scaleChanged = true;
                 this.validateActions(scale);
@@ -555,7 +564,7 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
             }
         }
 
-        const needsSpriteUpdate = objectUpdated || modelChanged || scaleChanged;
+        const needsSpriteUpdate = objectUpdated || modelChanged || scaleChanged || additionsChanged;
         const shouldAnimate = (this._isAnimating || this._pendingFrameUpdates > 0) && update && animationFrameDue;
 
         if(needsSpriteUpdate || needsNewImage) 
@@ -573,7 +582,9 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
                 this._updatesUntilFrameUpdate--;
             }
 
-            if(!(this._updatesUntilFrameUpdate <= 0 || scaleChanged || modelChanged || needsNewImage)) 
+            // An additions change laid the sprites out again this frame: they are filled again now,
+            // or the avatar is gone until the frame counter lets the next update through.
+            if(!(this._updatesUntilFrameUpdate <= 0 || scaleChanged || modelChanged || needsNewImage || additionsChanged))
             {
                 return;
             }
@@ -666,6 +677,27 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
 
         this._additions!.delete(id);
         addition.dispose();
+    }
+
+    /**
+     * Adds an addition from outside the model (RPG: a sheet played on the ground, RoomEngine): the
+     * next update gives it its sprite, where a model-driven addition gets one with the model change.
+     */
+    // TS-only: AS3's additions all follow the model.
+    addRpgAddition(addition: IAvatarAddition): void
+    {
+        this.addAddition(addition);
+        this._additionsDirty = true;
+    }
+
+    /** Takes an RPG addition away; its sprite goes at the next update. */
+    // TS-only: see addRpgAddition().
+    removeRpgAddition(id: number): void
+    {
+        if(!this.getAddition(id)) return;
+
+        this.removeAddition(id);
+        this._additionsDirty = true;
     }
 
     /**

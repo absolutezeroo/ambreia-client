@@ -1,0 +1,339 @@
+{
+ "frames": [
+  {
+   "filename": "magic-circle 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 146,
+    "h": 76
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 146,
+    "h": 76
+   },
+   "sourceSize": {
+    "w": 146,
+    "h": 76
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 125
+  },
+  {
+   "filename": "magic-circle 1.png",
+   "frame": {
+    "x": 146,
+    "y": 0,
+    "w": 146,
+    "h": 76
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 146,
+    "h": 76
+   },
+   "sourceSize": {
+    "w": 146,
+    "h": 76
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 125
+  },
+  {
+   "filename": "magic-circle 2.png",
+   "frame": {
+    "x": 292,
+    "y": 0,
+    "w": 146,
+    "h": 76
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 146,
+    "h": 76
+   },
+   "sourceSize": {
+    "w": 146,
+    "h": 76
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 125
+  },
+  {
+   "filename": "magic-circle 3.png",
+   "frame": {
+    "x": 438,
+    "y": 0,
+    "w": 146,
+    "h": 76
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 146,
+    "h": 76
+   },
+   "sourceSize": {
+    "w": 146,
+    "h": 76
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 125
+  },
+  {
+   "filename": "magic-circle 4.png",
+   "frame": {
+    "x": 0,
+    "y": 76,
+    "w": 146,
+    "h": 76
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 146,
+    "h": 76
+   },
+   "sourceSize": {
+    "w": 146,
+    "h": 76
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 125
+  },
+  {
+   "filename": "magic-circle 5.png",
+   "frame": {
+    "x": 146,
+    "y": 76,
+    "w": 146,
+    "h": 76
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 146,
+    "h": 76
+   },
+   "sourceSize": {
+    "w": 146,
+    "h": 76
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 125
+  },
+  {
+   "filename": "magic-circle 6.png",
+   "frame": {
+    "x": 292,
+    "y": 76,
+    "w": 146,
+    "h": 76
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 146,
+    "h": 76
+   },
+   "sourceSize": {
+    "w": 146,
+    "h": 76
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 125
+  },
+  {
+   "filename": "magic-circle 7.png",
+   "frame": {
+    "x": 438,
+    "y": 76,
+    "w": 146,
+    "h": 76
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 146,
+    "h": 76
+   },
+   "sourceSize": {
+    "w": 146,
+    "h": 76
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 125
+  },
+  {
+   "filename": "magic-circle 8.png",
+   "frame": {
+    "x": 0,
+    "y": 152,
+    "w": 146,
+    "h": 76
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 146,
+    "h": 76
+   },
+   "sourceSize": {
+    "w": 146,
+    "h": 76
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 125
+  },
+  {
+   "filename": "magic-circle 9.png",
+   "frame": {
+    "x": 146,
+    "y": 152,
+    "w": 146,
+    "h": 76
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 146,
+    "h": 76
+   },
+   "sourceSize": {
+    "w": 146,
+    "h": 76
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 125
+  },
+  {
+   "filename": "magic-circle 10.png",
+   "frame": {
+    "x": 292,
+    "y": 152,
+    "w": 146,
+    "h": 76
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 146,
+    "h": 76
+   },
+   "sourceSize": {
+    "w": 146,
+    "h": 76
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 125
+  },
+  {
+   "filename": "magic-circle 11.png",
+   "frame": {
+    "x": 438,
+    "y": 152,
+    "w": 146,
+    "h": 76
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 146,
+    "h": 76
+   },
+   "sourceSize": {
+    "w": 146,
+    "h": 76
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 125
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "magic-circle.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 584,
+   "h": 228
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 73,
+   "y": 38
+  },
+  "frameTags": [
+   {
+    "name": "magic-circle",
+    "from": 0,
+    "to": 11,
+    "direction": "forward"
+   }
+  ]
+ }
+}

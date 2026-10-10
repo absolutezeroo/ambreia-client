@@ -11,6 +11,7 @@ import type {IRpgStatus, RpgStatusesMessage} from '@ambreia/protocol/incoming/rp
 import type {RpgSkillEventsMessage} from '@ambreia/protocol/incoming/rpg/skills/RpgSkillEventsMessage';
 import {RpgSkillsMessageParser} from '@ambreia/protocol/parser/rpg/skills/RpgSkillsMessageParser';
 import {RpgSkillResultMessageParser} from '@ambreia/protocol/parser/rpg/skills/RpgSkillResultMessageParser';
+import type {IStatusVfx, IVfxSet} from '../combat/vfxSheets';
 import {RpgCastStartMessageParser} from '@ambreia/protocol/parser/rpg/skills/RpgCastStartMessageParser';
 import {RpgCastEndMessageParser} from '@ambreia/protocol/parser/rpg/skills/RpgCastEndMessageParser';
 import {RpgCooldownsMessageParser} from '@ambreia/protocol/parser/rpg/skills/RpgCooldownsMessageParser';
@@ -86,6 +87,16 @@ export interface ISkillDefinition
     readonly cooldownMs: number;
     /** The area a monster's skill warns of before it lands (M1c); null for the others. */
     readonly telegraph?: ISkillTelegraph | null;
+    /** What the client draws for it, by moment; null for nothing. */
+    readonly vfx: IVfxSet | null;
+}
+
+/** What the client reads of a class's definition (GET /api/public/content/definitions/class). */
+export interface IClassDefinition
+{
+    readonly id: string;
+    /** What the client draws for its basic attack; null for nothing. */
+    readonly basicAttack: IVfxSet | null;
 }
 
 /** A telegraphed skill's area (M1c): the server sends the cells, this only describes them. */
@@ -107,6 +118,8 @@ export interface IStatusDefinition
     readonly durationMs: number;
     /** A slow's grip on the walk and the attacks, 1–90 (M1c); absent for the others. */
     readonly slowPercent?: number;
+    /** What the client draws while it lasts; null for nothing. */
+    readonly vfx: IStatusVfx | null;
 }
 
 /** Habbo's step, and so the server's walk tick when nothing slows it (AvatarTickMs). */
@@ -169,6 +182,7 @@ export class RpgSkillSession
     private readonly _statuses = new Map<number, readonly IRpgStatus[]>();
     private readonly _definitions = new Map<string, ISkillDefinition>();
     private readonly _statusDefinitions = new Map<string, IStatusDefinition>();
+    private readonly _classDefinitions = new Map<string, IClassDefinition>();
     private _connection: IConnection | null = null;
     private _uninstall: (() => void) | null = null;
     private readonly _map: MessageMap = rpgSkillMap((event, ...args) =>
@@ -213,10 +227,16 @@ export class RpgSkillSession
         return this._statusDefinitions.get(statusId) ?? null;
     }
 
-    define(skills: readonly ISkillDefinition[], statuses: readonly IStatusDefinition[] = []): void
+    classDefinition(classId: string): IClassDefinition | null
+    {
+        return this._classDefinitions.get(classId) ?? null;
+    }
+
+    define(skills: readonly ISkillDefinition[], statuses: readonly IStatusDefinition[] = [], classes: readonly IClassDefinition[] = []): void
     {
         for(const definition of skills) this._definitions.set(definition.id, definition);
         for(const definition of statuses) this._statusDefinitions.set(definition.id, definition);
+        for(const definition of classes) this._classDefinitions.set(definition.id, definition);
     }
 
     statusesOf(objectId: number): readonly IRpgStatus[]
