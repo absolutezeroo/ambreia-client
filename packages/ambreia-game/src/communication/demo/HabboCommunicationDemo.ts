@@ -76,6 +76,21 @@ export class HabboCommunicationDemo extends Component implements IHabboCommunica
             ComponentEvents.ERROR, event.message, event.fatal, event.code, event.error ?? null
         );
 
+        // DEVIATION: before a session exists there is nothing to disconnect from. AS3 still ran the
+        //   maintenance branch, and a furnidata that failed to download (an asset host down, a
+        //   wrong asset-packs URL) showed "Maintenance break! / Logged out" over the login form
+        //   with an empty reason — the wrong message for players and for support. The player is
+        //   told that game data could not be downloaded, and keeps the login form.
+        if(!this._isLoggedIn && !this._authenticationStarted)
+        {
+            if(errorEvent.critical && !this.isExcludeFromCrashing(errorEvent.category))
+            {
+                this.alert('${vortex.boot.data.title}', '${vortex.boot.data.text}');
+            }
+
+            return;
+        }
+
         switch(errorEvent.category)
         {
             case 30:

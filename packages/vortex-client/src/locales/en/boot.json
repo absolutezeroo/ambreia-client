@@ -1,0 +1,5 @@
+{
+  "disconnected.reason.maintenance": "The server is down for maintenance. Please try again later.",
+  "vortex.boot.data.text": "Required game data could not be downloaded. Check your connection, or try again in a few minutes.",
+  "vortex.boot.data.title": "Game data unavailable"
+}
