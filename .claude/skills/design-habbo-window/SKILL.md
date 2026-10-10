@@ -112,3 +112,20 @@ with no visual reference, find the shipped window that does the closest *job* an
 Glaze itself (`pnpm --filter vortex-glaze dev`) is the visual editor for the same files — hierarchy,
 property inspector, drag-resize, align, undo, Set Theme. Use it when nudging geometry by hand beats
 another edit-and-render cycle; `render.mjs` drives the same instance.
+
+## Composed previews — `compose.mjs`
+
+`render.mjs` draws one layout as authored. A window whose tab content, rows and popups are
+separate layouts is composed instead: `compose.mjs` registers every `vortex_character_*` layout
+from disk, turns Glaze's Localise on, opens a root layout and runs a page-side fill script
+(`place`, `add`, `text`, `show`, `tint`, `bar`, `icon` helpers) before the shot.
+
+```bash
+node .claude/skills/design-habbo-window/compose.mjs --root=vortex_character_xml --fill=.claude/skills/design-habbo-window/previews/character/fill_titles.js --out=mockup/glaze/character_titles.png
+node .claude/skills/design-habbo-window/previews/character/gen_board.mjs   # writes states_character.xml next to it
+node .claude/skills/design-habbo-window/compose.mjs --root=.claude/skills/design-habbo-window/previews/character/states_character.xml --fill=.claude/skills/design-habbo-window/previews/character/fill_board.js --out=mockup/glaze/states_character.png
+```
+
+`previews/character/` holds the fill scripts of the character window (four tabs, the states
+board, the popups). Copy the folder for another window. Edit a layout, then re-run: Glaze
+reloads the page on a layout change, so wait a few seconds first.

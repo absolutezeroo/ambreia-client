@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_character_menu_xml" width="200" height="40" version="0.1">
+  <window>
+    <container x="0" y="0" width="200" height="40" params="1073741840" style="3" name="character_menu">
+      <children>
+        <border x="0" y="0" width="200" height="40" params="16" style="2" name="menu_frame" color="0xffffff">
+          <filters>
+            <DropShadowFilter distance="3" alpha="0.4" blurX="4" blurY="4"/>
+          </filters>
+          <children>
+            <itemlist_vertical x="6" y="6" width="188" height="28" params="16" style="3" name="menu_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="1" type="int"/>
+              </variables>
+            </itemlist_vertical>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

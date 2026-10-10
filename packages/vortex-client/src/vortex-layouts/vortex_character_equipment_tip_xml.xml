@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_character_equipment_tip_xml" width="220" height="130" version="0.1">
+  <window>
+    <container x="0" y="0" width="220" height="130" params="1073741840" style="3" name="equipment_tip">
+      <children>
+        <border x="0" y="0" width="220" height="130" params="16" style="9" name="tip_frame" color="0x686661">
+          <children>
+            <itemlist_vertical x="8" y="7" width="204" height="118" params="16" style="3" name="tip_list">
+              <children>
+                <text x="0" y="0" width="204" height="16" params="16" style="3" name="item_name" caption="">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0xffffff" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="0" y="0" width="204" height="14" params="16" style="3" name="item_slot" caption="">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0xc8c8c0" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <container x="0" y="0" width="204" height="1" params="16" style="8" color="0xff8a8880" background="true"/>
+                <text x="0" y="0" width="204" height="24" params="16" style="3" name="item_desc" caption="">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0xe8e8e0" type="hex"/>
+                    <var key="multiline" value="true" type="Boolean"/>
+                    <var key="word_wrap" value="true" type="Boolean"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <itemlist_vertical x="0" y="0" width="204" height="28" params="16" style="3" name="bonus_list">
+                  <children/>
+                  <variables>
+                    <var key="spacing" value="0" type="int"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </itemlist_vertical>
+                <text x="0" y="0" width="204" height="14" params="16" style="3" name="item_rarity" caption="">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x6ab8f0" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+              <variables>
+                <var key="spacing" value="4" type="int"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </itemlist_vertical>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

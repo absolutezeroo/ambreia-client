@@ -112,6 +112,17 @@
                 <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
               </variables>
             </link>
+            <region x="262" y="106" width="20" height="20" params="17" style="3" dynamic_style="button" name="guild_search" treshold="0">
+              <children>
+                <static_bitmap x="2" y="2" width="16" height="16" params="16" style="3" tags="%23icon" color="0x2a8fd6">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_magnifier_zoom_looking_magnifying_glass_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </region>
           </children>
         </border>
         <text x="296" y="162" width="260" height="16" params="16" style="3" caption="${vortex.character.title_section}">
@@ -122,7 +133,7 @@
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
-        <border x="296" y="182" width="290" height="76" params="16" style="2" name="active_title" color="0xf5ebc4">
+        <border x="296" y="182" width="290" height="94" params="16" style="2" name="active_title" color="0xf5ebc4">
           <children>
             <border x="8" y="10" width="40" height="40" params="16" style="2" name="active_title_emblem" color="0xe4e4dc">
               <children>
@@ -165,19 +176,10 @@
                 <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
               </variables>
             </text>
-            <link x="140" y="56" width="142" height="16" params="1" style="3" name="all_titles_link" caption="${vortex.character.titles.see_all}" treshold="0">
-              <variables>
-                <var key="text_style" value="u_regular" type="String"/>
-                <var key="font_size" value="11" type="uint"/>
-                <var key="text_color" value="0x1077ac" type="hex"/>
-                <var key="auto_size" value="right" type="String"/>
-                <var key="underline" value="true" type="Boolean"/>
-                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
-              </variables>
-            </link>
+            <button_thick x="8" y="58" width="274" height="28" params="131089" style="3" name="all_titles_button" caption="${vortex.character.titles.see_all}" width_min="274" width_max="274"/>
           </children>
         </border>
-        <text x="296" y="266" width="260" height="16" params="16" style="3" caption="${vortex.reputation.title}">
+        <text x="296" y="284" width="260" height="16" params="16" style="3" caption="${vortex.reputation.title}">
           <variables>
             <var key="text_style" value="u_bold" type="String"/>
             <var key="font_size" value="12" type="uint"/>
@@ -185,9 +187,9 @@
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
-        <border x="296" y="286" width="290" height="214" params="16" style="2" name="reputation">
+        <border x="296" y="304" width="290" height="196" params="16" style="2" name="reputation">
           <children>
-            <itemlist_vertical x="8" y="8" width="274" height="200" params="16" style="3" name="faction_list">
+            <itemlist_vertical x="8" y="8" width="274" height="182" params="16" style="3" name="faction_list">
               <children/>
               <variables>
                 <var key="spacing" value="6" type="int"/>

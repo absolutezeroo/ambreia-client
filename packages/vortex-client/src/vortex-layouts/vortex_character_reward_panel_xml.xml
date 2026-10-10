@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_character_reward_panel_xml" width="300" height="300" version="0.1">
+  <window>
+    <frame x="0" y="0" width="300" height="300" params="32769" style="3" name="reward_panel" caption="${vortex.reputation.next_reward}" color="0x418db0">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <border x="8" y="8" width="44" height="44" params="16" style="2" name="reward_frame" color="0xe4e4dc">
+          <children>
+            <static_bitmap x="6" y="6" width="32" height="32" params="16" style="3" name="reward_icon" tags="%23icon">
+              <variables>
+                <var key="asset_uri" value="rpg/dungeon-objects/icon_37" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <text x="60" y="8" width="226" height="16" params="16" style="3" name="reward_name" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="60" y="26" width="226" height="30" params="16" style="3" name="reward_desc" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x666666" type="hex"/>
+            <var key="multiline" value="true" type="Boolean"/>
+            <var key="word_wrap" value="true" type="Boolean"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="8" y="62" width="278" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+        <text x="8" y="68" width="200" height="16" params="16" style="3" caption="${vortex.reputation.reward.included}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0x24607f" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <itemlist_vertical x="8" y="88" width="278" height="168" params="16" style="3" name="reward_list">
+          <children/>
+          <variables>
+            <var key="spacing" value="4" type="int"/>
+          </variables>
+        </itemlist_vertical>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

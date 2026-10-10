@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_character_status_row_xml" width="214" height="24" version="0.1">
+  <window>
+    <container x="0" y="0" width="214" height="24" params="144" style="3" name="status_row">
+      <children>
+        <border x="0" y="0" width="24" height="24" params="16" style="2" name="status_frame" color="0xe4e4dc">
+          <children>
+            <static_bitmap x="4" y="4" width="16" height="16" params="16" style="3" name="icon" tags="%23icon" color="0x40b030">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/rpg_trade_handshake_deal_exchange_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <text x="32" y="4" width="140" height="16" params="16" style="3" name="label" caption="${vortex.character.reputation.friendly}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="174" y="4" width="40" height="16" params="80" style="3" name="count" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0x2b9a00" type="hex"/>
+            <var key="auto_size" value="right" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </container>
+  </window>
+</layout>

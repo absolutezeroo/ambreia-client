@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_hud_party_member_xml" width="214" height="70" version="0.1">
   <window>
-    <border x="0" y="0" width="214" height="70" params="17" style="9" name="party_member" color="0x686661">
+    <border x="0" y="0" width="214" height="70" params="17" style="9" name="party_member" dynamic_style="lifted_hover" color="0x686661">
       <children>
         <border x="4" y="4" width="46" height="46" params="16" style="3" color="0x201e19" blend="0.8">
           <children>
@@ -76,6 +76,32 @@
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
+        <text visible="false" x="58" y="46" width="150" height="16" params="16" style="3" name="role_txt" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0xc8c6c0" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <!-- Selected member, toggled by the view. -->
+        <container visible="false" x="0" y="0" width="214" height="70" params="16" style="3" name="selected">
+          <children>
+            <container x="0" y="0" width="214" height="2" params="16" style="8" color="0xff2a8fd6" background="true"/>
+            <container x="0" y="68" width="214" height="2" params="16" style="8" color="0xff2a8fd6" background="true"/>
+            <container x="0" y="0" width="2" height="70" params="16" style="8" color="0xff2a8fd6" background="true"/>
+            <container x="212" y="0" width="2" height="70" params="16" style="8" color="0xff2a8fd6" background="true"/>
+          </children>
+        </container>
+        <!-- Low HP warning, toggled by the view. -->
+        <container visible="false" x="0" y="0" width="214" height="70" params="16" style="3" name="low_hp">
+          <children>
+            <container x="0" y="0" width="214" height="2" params="16" style="8" color="0xffe03a3a" background="true"/>
+            <container x="0" y="68" width="214" height="2" params="16" style="8" color="0xffe03a3a" background="true"/>
+            <container x="0" y="0" width="2" height="70" params="16" style="8" color="0xffe03a3a" background="true"/>
+            <container x="212" y="0" width="2" height="70" params="16" style="8" color="0xffe03a3a" background="true"/>
+          </children>
+        </container>
       </children>
     </border>
   </window>

@@ -111,6 +111,15 @@
             </static_bitmap>
           </children>
         </border>
+        <!-- Selected (focus) outline: four strips in a transparent container, toggled by the view. -->
+        <container visible="false" x="0" y="0" width="548" height="50" params="16" style="3" name="selected">
+          <children>
+            <container x="0" y="0" width="548" height="2" params="16" style="8" color="0xff2a8fd6" background="true"/>
+            <container x="0" y="48" width="548" height="2" params="16" style="8" color="0xff2a8fd6" background="true"/>
+            <container x="0" y="0" width="2" height="50" params="16" style="8" color="0xff2a8fd6" background="true"/>
+            <container x="546" y="0" width="2" height="50" params="16" style="8" color="0xff2a8fd6" background="true"/>
+          </children>
+        </container>
       </children>
     </border>
   </window>

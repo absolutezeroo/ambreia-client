@@ -42,7 +42,7 @@
             </static_bitmap>
             <container x="98" y="25" width="224" height="16" params="0" style="3" name="hp_bar">
               <children>
-                <shape x="0" y="0" width="224" height="16" params="144" style="3" name="bg" color="0x2a2824">
+                <shape x="0" y="0" width="224" height="16" params="145" style="3" name="bg" color="0x2a2824">
                   <variables>
                     <var key="shape" value="round_rectangle" type="String"/>
                     <var key="radius" value="4" type="Number"/>
@@ -78,7 +78,7 @@
             </static_bitmap>
             <container x="98" y="45" width="224" height="16" params="0" style="3" name="mana_bar">
               <children>
-                <shape x="0" y="0" width="224" height="16" params="144" style="3" name="bg" color="0x2a2824">
+                <shape x="0" y="0" width="224" height="16" params="145" style="3" name="bg" color="0x2a2824">
                   <variables>
                     <var key="shape" value="round_rectangle" type="String"/>
                     <var key="radius" value="4" type="Number"/>
@@ -115,7 +115,7 @@
             </text>
             <container x="98" y="67" width="224" height="12" params="0" style="3" name="xp_bar">
               <children>
-                <shape x="0" y="0" width="224" height="12" params="144" style="3" name="bg" color="0x2a2824">
+                <shape x="0" y="0" width="224" height="12" params="145" style="3" name="bg" color="0x2a2824">
                   <variables>
                     <var key="shape" value="round_rectangle" type="String"/>
                     <var key="radius" value="4" type="Number"/>

@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="states_combat" width="1276" height="820" version="0.1">
+  <window>
+    <frame x="0" y="0" width="1276" height="820" params="32769" style="3" name="states_combat" caption="États – Combat" color="0x418db0">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <text x="10" y="4" width="900" height="16" params="16" style="3" caption="4. Portraits du groupe">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0x24607f" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="22" width="1250" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+        <text x="10" y="28" width="300" height="16" params="16" style="3" caption="Normal">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0x888888" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="42" width="214" height="70" params="16" style="3" name="party_normal"><children/></container>
+        <text x="234" y="28" width="300" height="16" params="16" style="3" caption="Survol (soulevé)">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0x888888" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="234" y="42" width="214" height="70" params="16" style="3" name="party_hover"><children/></container>
+        <text x="458" y="28" width="300" height="16" params="16" style="3" caption="Sélectionné">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0x888888" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="458" y="42" width="214" height="70" params="16" style="3" name="party_selected"><children/></container>
+        <text x="682" y="28" width="300" height="16" params="16" style="3" caption="Vie faible">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0x888888" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="682" y="42" width="214" height="70" params="16" style="3" name="party_low"><children/></container>
+        <text x="906" y="28" width="300" height="16" params="16" style="3" caption="KO / mort">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0x888888" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="906" y="42" width="214" height="70" params="16" style="3" name="party_dead"><children/></container>
+        <text x="1130" y="28" width="300" height="16" params="16" style="3" caption="Cible compacte">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0x888888" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="1130" y="42" width="104" height="128" params="16" style="3" name="target_compact"><children/></container>
+        <text x="10" y="120" width="300" height="16" params="16" style="3" caption="Avec rôle">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0x888888" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="134" width="214" height="70" params="16" style="3" name="party_role"><children/></container>
+        <text x="234" y="120" width="300" height="16" params="16" style="3" caption="Menu contextuel (clic droit)">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0x888888" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="234" y="134" width="180" height="136" params="16" style="3" name="party_menu"><children/></container>
+        <text x="430" y="120" width="300" height="16" params="16" style="3" caption="Survol d’un joueur (chat)">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0x888888" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="430" y="134" width="200" height="60" params="16" style="3" name="tip_player"><children/></container>
+        <text x="650" y="120" width="300" height="16" params="16" style="3" caption="Textes flottants">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0x888888" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="650" y="134" width="460" height="40" params="16" style="3" name="floating"><children/></container>
+        <text x="10" y="282" width="900" height="16" params="16" style="3" caption="5. Barre du boss et panneau de cible">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0x24607f" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="300" width="1250" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+        <text x="10" y="306" width="300" height="16" params="16" style="3" caption="Boss (normal)">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0x888888" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="320" width="470" height="104" params="16" style="3" name="boss_normal"><children/></container>
+        <text x="490" y="306" width="300" height="16" params="16" style="3" caption="Boss – lancement de compétence">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0x888888" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="490" y="320" width="470" height="104" params="16" style="3" name="boss_cast"><children/></container>
+        <text x="970" y="306" width="300" height="16" params="16" style="3" caption="Survol d’un debuff">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0x888888" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="970" y="320" width="240" height="86" params="16" style="3" name="tip_debuff"><children/></container>
+        <text x="10" y="434" width="300" height="16" params="16" style="3" caption="Cible étendue (détails complets)">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0x888888" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="448" width="360" height="214" params="16" style="3" name="target"><children/></container>
+        <text x="390" y="434" width="300" height="16" params="16" style="3" caption="Effets : normal, durée, cumulé, expiration, désactivé">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0x888888" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="390" y="448" width="28" height="28" params="16" style="3" name="buff_a"><children/></container>
+        <container x="426" y="448" width="28" height="28" params="16" style="3" name="buff_b"><children/></container>
+        <container x="462" y="448" width="28" height="28" params="16" style="3" name="buff_c"><children/></container>
+        <container x="498" y="448" width="28" height="28" params="16" style="3" name="buff_d"><children/></container>
+        <container x="534" y="448" width="28" height="28" params="16" style="3" name="buff_e"><children/></container>
+        <text x="390" y="484" width="300" height="16" params="16" style="3" caption="Avertissement">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0x888888" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="390" y="498" width="460" height="40" params="16" style="3" name="alert"><children/></container>
+        <text x="390" y="548" width="300" height="16" params="16" style="3" caption="Chat et menu des canaux">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0x888888" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="390" y="562" width="500" height="150" params="16" style="3" name="chat"><children/></container>
+        <container x="900" y="562" width="180" height="136" params="16" style="3" name="chat_menu"><children/></container>
+        <text x="1000" y="434" width="300" height="16" params="16" style="3" caption="Cible compacte sélectionnée">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0x888888" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="1000" y="448" width="104" height="128" params="16" style="3" name="target_compact_selected"><children/></container>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

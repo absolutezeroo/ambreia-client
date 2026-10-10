@@ -1,9 +1,105 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<layout name="vortex_hud_action_bar_xml" width="548" height="78" version="0.1">
+<layout name="vortex_hud_action_bar_xml" width="1134" height="78" version="0.1">
   <window>
-    <container x="0" y="0" width="548" height="78" params="1073741840" style="3" name="hud_action_bar">
+    <container x="0" y="0" width="1134" height="78" params="1073741840" style="3" name="hud_action_bar">
       <children>
-        <border x="0" y="0" width="322" height="78" params="16" style="9" name="skill_bar" color="0x686661">
+        <!-- The main menu segment (mock-up: H, bag, shop, house, furniture, builder): the RPG's nav set, Social lives with the utilities. -->
+        <border x="0" y="0" width="268" height="78" params="16" style="9" name="menu_bar" color="0x686661">
+          <children>
+            <container x="8" y="21" width="252" height="36" params="16" style="3" name="menu_buttons">
+              <children>
+            <border x="0" y="0" width="36" height="36" params="17" style="6" name="nav_menu" color="0x55534e" dynamic_style="button">
+              <children>
+                <text x="0" y="8" width="36" height="20" params="16" style="3" tags="%23icon" caption="H">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="18" type="uint"/>
+                    <var key="text_color" value="0xf8c820" type="hex"/>
+                    <var key="auto_size" value="center" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <container visible="false" x="4" y="33" width="28" height="3" params="16" style="8" name="active_bar" color="0xff2a8fd6" background="true"/>
+              </children>
+            </border>
+            <border x="42" y="0" width="36" height="36" params="17" style="6" name="nav_inventory" color="0x55534e" dynamic_style="button">
+              <children>
+                <static_bitmap x="10" y="10" width="16" height="16" params="16" style="3" tags="%23icon" color="0xd8a060">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/rpg_loot_bag_money_coins_purse_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <container visible="false" x="4" y="33" width="28" height="3" params="16" style="8" name="active_bar" color="0xff2a8fd6" background="true"/>
+              </children>
+            </border>
+            <border x="84" y="0" width="36" height="36" params="17" style="6" name="nav_shop" color="0x55534e" dynamic_style="button">
+              <children>
+                <static_bitmap x="10" y="10" width="16" height="16" params="16" style="3" tags="%23icon" color="0xe0e0e0">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_shopping_cart_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <container visible="false" x="4" y="33" width="28" height="3" params="16" style="8" name="active_bar" color="0xff2a8fd6" background="true"/>
+              </children>
+            </border>
+            <border x="126" y="0" width="36" height="36" params="17" style="6" name="nav_quests" color="0x55534e" dynamic_style="button">
+              <children>
+                <static_bitmap x="10" y="10" width="16" height="16" params="16" style="3" tags="%23icon" color="0xe8d8a8">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/tools_crafting_writing_parchment_scroll_document_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <container visible="false" x="4" y="33" width="28" height="3" params="16" style="8" name="active_bar" color="0xff2a8fd6" background="true"/>
+                <border visible="false" x="24" y="-4" width="16" height="16" params="16" style="6" name="quest_badge" color="0xd83030">
+                  <children>
+                    <text x="0" y="0" width="16" height="16" params="16" style="3" caption="!">
+                      <variables>
+                        <var key="text_style" value="u_bold" type="String"/>
+                        <var key="font_size" value="11" type="uint"/>
+                        <var key="text_color" value="0xffffff" type="hex"/>
+                        <var key="auto_size" value="center" type="String"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </border>
+              </children>
+            </border>
+            <border x="168" y="0" width="36" height="36" params="17" style="6" name="nav_map" color="0x55534e" dynamic_style="button">
+              <children>
+                <static_bitmap x="10" y="10" width="16" height="16" params="16" style="3" tags="%23icon" color="0xe8c878">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/map_markers_treasure_map_paper_parchment_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <container visible="false" x="4" y="33" width="28" height="3" params="16" style="8" name="active_bar" color="0xff2a8fd6" background="true"/>
+              </children>
+            </border>
+            <border x="210" y="0" width="36" height="36" params="17" style="6" name="nav_guild" color="0x55534e" dynamic_style="button">
+              <children>
+                <static_bitmap x="10" y="10" width="16" height="16" params="16" style="3" tags="%23icon" color="0x6a9fd8">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/map_markers_banner_heraldry_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <container visible="false" x="4" y="33" width="28" height="3" params="16" style="8" name="active_bar" color="0xff2a8fd6" background="true"/>
+              </children>
+            </border>
+              </children>
+            </container>
+          </children>
+        </border>
+        <border x="276" y="0" width="322" height="78" params="16" style="9" name="skill_bar" color="0x686661">
           <children>
             <itemlist_horizontal x="8" y="6" width="306" height="66" params="16" style="3" name="skill_slots">
               <children/>
@@ -14,7 +110,7 @@
             </itemlist_horizontal>
           </children>
         </border>
-        <border x="330" y="0" width="218" height="78" params="16" style="9" name="item_bar" color="0x686661">
+        <border x="606" y="0" width="218" height="78" params="16" style="9" name="item_bar" color="0x686661">
           <children>
             <itemlist_horizontal x="8" y="6" width="202" height="66" params="16" style="3" name="item_slots">
               <children/>
@@ -23,6 +119,50 @@
                 <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
               </variables>
             </itemlist_horizontal>
+          </children>
+        </border>
+        <border x="832" y="0" width="170" height="78" params="16" style="9" name="shortcut_bar" color="0x686661">
+          <children>
+            <itemlist_horizontal x="8" y="6" width="154" height="66" params="16" style="3" name="shortcut_slots">
+              <children/>
+              <variables>
+                <var key="spacing" value="6" type="int"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </itemlist_horizontal>
+          </children>
+        </border>
+        <border x="1010" y="21" width="36" height="36" params="17" style="6" name="social_button" color="0x55534e" dynamic_style="button">
+          <children>
+            <static_bitmap x="10" y="10" width="16" height="16" params="16" style="3" tags="%23icon" color="0x6aa0e0">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/travel_person_people_three_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <border x="1054" y="21" width="36" height="36" params="17" style="6" name="screenshot_button" color="0x55534e" dynamic_style="button">
+          <children>
+            <static_bitmap x="10" y="10" width="16" height="16" params="16" style="3" tags="%23icon" color="0xffffff">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/media_camera_photo_shoot_1_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <border x="1098" y="21" width="36" height="36" params="17" style="6" name="more_button" color="0x55534e" dynamic_style="button">
+          <children>
+            <static_bitmap x="10" y="10" width="16" height="16" params="16" style="3" tags="%23icon" color="0xffffff">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_speech_bubble_three_dots_dialogue_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+              </variables>
+            </static_bitmap>
           </children>
         </border>
       </children>

@@ -3,7 +3,7 @@
   <window>
     <container x="0" y="0" width="28" height="28" params="16" style="3" name="buff">
       <children>
-        <border x="0" y="0" width="28" height="28" params="16" style="3" name="buff_box" color="0x201e19" blend="0.8">
+        <border x="0" y="0" width="28" height="28" params="17" style="3" name="buff_box" color="0x201e19" blend="0.8">
           <children>
             <static_bitmap x="6" y="3" width="16" height="16" params="16" style="3" name="buff_icon" tags="%23icon" color="0xffffff">
               <variables>
@@ -24,6 +24,15 @@
                 <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
               </variables>
             </text>
+            <!-- Expiring soon, toggled (blinked) by the view. -->
+            <container visible="false" x="0" y="0" width="28" height="28" params="16" style="3" name="expiring">
+              <children>
+                <container x="0" y="0" width="28" height="2" params="16" style="8" color="0xffe03a3a" background="true"/>
+                <container x="0" y="26" width="28" height="2" params="16" style="8" color="0xffe03a3a" background="true"/>
+                <container x="0" y="0" width="2" height="28" params="16" style="8" color="0xffe03a3a" background="true"/>
+                <container x="26" y="0" width="2" height="28" params="16" style="8" color="0xffe03a3a" background="true"/>
+              </children>
+            </container>
           </children>
         </border>
       </children>

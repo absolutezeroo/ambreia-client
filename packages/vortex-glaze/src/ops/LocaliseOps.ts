@@ -2,6 +2,7 @@ import {WindowParser} from '@ambreia/ui/utils/WindowParser';
 import {browserLanguage, readTexts, type OwnTexts} from '@ambreia/common/localization/Texts';
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {EditorState} from '../state/EditorState';
+import {GlazeLocalizationStub} from '../boot/GlazeLocalizationStub';
 
 const log = Logger.getLogger('glaze.ops.LocaliseOps');
 
@@ -24,6 +25,7 @@ export async function toggleLocalisation(state: EditorState): Promise<boolean>
     if(active)
     {
         WindowParser.localizationResolver = (key: string): string => key;
+        GlazeLocalizationStub.setTexts(null);
         active = false;
     }
     else
@@ -36,6 +38,7 @@ export async function toggleLocalisation(state: EditorState): Promise<boolean>
         }
 
         WindowParser.localizationResolver = (key: string): string => map.get(key) ?? key;
+        GlazeLocalizationStub.setTexts(map);
         active = true;
     }
 
