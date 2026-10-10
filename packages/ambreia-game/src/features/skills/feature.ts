@@ -32,13 +32,6 @@ interface IRunningCast
 }
 
 /** True when the key goes to a text field (the window system's fields are DOM inputs). */
-const typing = (event: KeyboardEvent): boolean =>
-{
-    const target = event.target as {tagName?: string} | null;
-
-    return target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA';
-};
-
 /**
  * The skills (M1b §10.3): the HUD's six skill slots and their cooldowns from RpgSkills and
  * RpgCooldowns; keys 1–6 (or a click on a slot) cast on the current target; a ground skill waits for
@@ -52,7 +45,7 @@ const typing = (event: KeyboardEvent): boolean =>
 export const SkillsFeature: IGameFeature = {
     id: 'skills',
     images: [...SKILL_IMAGES, ...SKILL_WINDOW_IMAGES],
-    requires: ['roomEngine', 'interaction', 'hud', 'hudPlayer', 'roomSession'],
+    requires: ['roomEngine', 'interaction', 'hud', 'hudPlayer', 'roomSession', 'input'],
     create: ({host, scope}) =>
     {
         const session = new RpgSkillSession();
@@ -67,6 +60,8 @@ export const SkillsFeature: IGameFeature = {
         /** The combatants a slow or a stun holds back: marked over their head, slowed steps. */
         const heldBack = new Set<number>();
         let definitions: Promise<void> | null = null;
+        /** A ground skill waits for a floor click: Escape gives it up. */
+        let picking = false;
 
         host.made.skills = session;
 
@@ -193,8 +188,10 @@ export const SkillsFeature: IGameFeature = {
             if(session.definition(skillId)?.target === 'ground')
             {
                 host.made.hud?.update({alert: bits().text('vortex.skill.ground.pick', 'skill', skillName(skillId))});
+                picking = true;
                 host.made.roomEngine?.pickRpgTile((x, y) =>
                 {
+                    picking = false;
                     host.made.hud?.update({alert: null});
                     session.cast(skillId, 0, x, y);
                 });
@@ -321,22 +318,30 @@ export const SkillsFeature: IGameFeature = {
             if(name === 'nav_skills') openWindow();
         });
 
-        scope.listen(globalThis, 'keydown', (event: KeyboardEvent) =>
+        // 1–6 cast the bar's slots, K opens the window, in the world only; Escape gives up a tile
+        // pick or the player's own cast, and otherwise leaves the key to the target (interaction).
+        const input = host.made.input!;
+        const inWorld = (): boolean => room !== null;
+
+        for(let slot = 0; slot < SKILL_SLOTS; slot++) scope.add(input.bind('skills', String(slot + 1), () => use(slot), {when: inWorld}));
+        scope.add(input.bind('skills', 'k', openWindow, {when: inWorld}));
+        scope.add(input.onEscape('skills', () =>
         {
-            if(room === null || typing(event) || event.ctrlKey || event.altKey || event.metaKey) return;
+            const casting = casts.has(self());
 
-            // `code` first: the digits are shifted on an AZERTY keyboard; `key` for the numeric pad.
-            const digit = Number(/^Digit([1-9])$/.exec(event.code)?.[1] ?? /^[1-9]$/.exec(event.key)?.[0] ?? 0);
+            if(!picking && !casting) return false;
 
-            if(digit > 0 && digit <= SKILL_SLOTS) use(digit - 1);
-            else if(event.key.toLowerCase() === 'k') openWindow();
-            else if(event.key === 'Escape')
+            if(picking)
             {
+                picking = false;
                 host.made.roomEngine?.pickRpgTile(null);
                 host.made.hud?.update({alert: null});
-                if(casts.has(self())) session.cancel();
             }
-        });
+
+            if(casting) session.cancel();
+
+            return true;
+        }));
 
         const sessionOn = scope.bind(host.made.roomSession?.sessionEvents);
 
@@ -357,6 +362,7 @@ export const SkillsFeature: IGameFeature = {
             statusTicker?.clear();
             statusTicker = null;
             window?.hide();
+            picking = false;
             host.made.roomEngine?.pickRpgTile(null);
             host.made.hud?.update({buffs: [], buffTimes: [], buffExpiring: [], buffTips: []});
         });

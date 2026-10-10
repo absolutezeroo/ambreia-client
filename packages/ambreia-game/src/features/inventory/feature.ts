@@ -21,7 +21,7 @@ const log = Logger.getLogger('habbo.features.inventory');
 export const InventoryFeature: IGameFeature = {
     id: 'inventory',
     images: [...ITEM_ICONS, ...STAT_ICONS],
-    requires: ['character', 'hud', 'roomSession'],
+    requires: ['character', 'hud', 'roomSession', 'input'],
     create: ({app, host, scope}) =>
     {
         const session = new RpgInventorySession();
@@ -122,20 +122,11 @@ export const InventoryFeature: IGameFeature = {
             else if(name === 'nav_character') open('character');
         });
 
-        // I and C, unless a text field has the keyboard (the window system's fields are DOM inputs).
-        const onKey = (event: KeyboardEvent): void =>
-        {
-            const target = event.target as {tagName?: string} | null;
+        // I and C (`requires` has the keyboard made before this).
+        const input = host.made.input!;
 
-            if(event.ctrlKey || event.altKey || event.metaKey || target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA') return;
-
-            const key = event.key.toLowerCase();
-
-            if(key === 'i') open('inventory');
-            else if(key === 'c') open('character');
-        };
-
-        scope.listen(globalThis, 'keydown', onKey);
+        scope.add(input.bind('inventory', 'i', () => open('inventory')));
+        scope.add(input.bind('inventory', 'c', () => open('character')));
 
         const sessionOn = scope.bind(host.made.roomSession?.sessionEvents);
 

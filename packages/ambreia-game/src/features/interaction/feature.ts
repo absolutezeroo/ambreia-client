@@ -45,7 +45,7 @@ export function targetUnit(target: RpgTargetMessage, bits: WindowBits, figure: s
  */
 export const InteractionFeature: IGameFeature = {
     id: 'interaction',
-    requires: ['roomEngine', 'hud', 'roomSession'],
+    requires: ['roomEngine', 'hud', 'roomSession', 'input'],
     create: ({host, scope}) =>
     {
         const session = new RpgInteractionSession();
@@ -86,13 +86,16 @@ export const InteractionFeature: IGameFeature = {
         });
         engineOn(RoomEngineObjectEvent.REOE_DESELECTED, () => session.select(0));
 
-        // Escape, unless a text field has the keyboard (the window system's fields are DOM inputs).
-        scope.listen(globalThis, 'keydown', (event: KeyboardEvent) =>
+        // Escape clears the target, when there is one; what the features after this push (a tile
+        // pick, a cast) goes first.
+        scope.add(host.made.input!.onEscape('interaction', () =>
         {
-            const target = event.target as {tagName?: string} | null;
+            if(session.targetId === 0) return false;
 
-            if(event.key === 'Escape' && target?.tagName !== 'INPUT' && target?.tagName !== 'TEXTAREA') session.select(0);
-        });
+            session.select(0);
+
+            return true;
+        }));
 
         const sessionOn = scope.bind(host.made.roomSession?.sessionEvents);
 
