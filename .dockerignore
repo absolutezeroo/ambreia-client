@@ -27,6 +27,11 @@ packages/vortex-imager/cache/
 .idea/
 .vscode/
 
+# --- a developer's local configuration -------------------------------------------------------------
+# gitignored, and the deployment serves its own: a local copy baked into the image would point the
+# client at a developer's server.
+packages/vortex-client/public/config.json
+
 # --- not needed to build ---------------------------------------------------------------------------
 docs/
 perf/
