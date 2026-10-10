@@ -9,7 +9,7 @@ import type {ITextFieldWindow} from '@ambreia/ui/components/ITextFieldWindow';
 import type {IRpgClassEntry} from '@ambreia/protocol/incoming/rpg/characters/IRpgClassEntry';
 import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
 import {nameRules, partColor, withPartColor, withPartSet} from './CharacterLook';
-import {WindowBits} from './WindowBits';
+import {WindowBits} from '../../ui/kit/WindowBits';
 
 const log = Logger.getLogger('habbo.features.character.CharacterCreateView');
 

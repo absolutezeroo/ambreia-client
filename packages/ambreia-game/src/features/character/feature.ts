@@ -3,7 +3,7 @@ import {RoomSessionEvent} from '../../session/events/RoomSessionEvent';
 import type {IGameFeature} from '../GameFeature';
 import {CharacterScreen} from './CharacterScreen';
 import {RpgCharacterSession} from './RpgCharacterSession';
-import {WindowBits} from './WindowBits';
+import {WindowBits} from '../../ui/kit/WindowBits';
 
 const log = Logger.getLogger('habbo.features.character');
 

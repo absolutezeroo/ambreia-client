@@ -7,11 +7,11 @@ import type {IStaticBitmapWrapperWindow} from '@ambreia/ui/components/IStaticBit
 import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
 import type {IAvatarImageWidget} from '@ambreia/ui/kit/widgets/IAvatarImageWidget';
 import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
-import type {WindowBits} from '../character/WindowBits';
+import type {WindowBits} from '../../ui/kit/WindowBits';
 import {barFill, cooldownLabel} from './PlayerHudState';
 import type {IActionSlot, IPlayerHud, PlayerHudState} from './PlayerHudState';
-import {unavailable} from './hudRules';
-import {HudTooltips, type ITooltip} from './HudTooltips';
+import {unavailable} from '../../ui/kit/hudRules';
+import {HudTooltips, type ITooltip} from '../../ui/kit/HudTooltips';
 import {LAYER, MARGIN} from './HudPanelsView';
 
 const log = Logger.getLogger('habbo.features.hud.HudView');

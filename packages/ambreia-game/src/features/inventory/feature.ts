@@ -4,7 +4,7 @@ import type {IRpgStatBlock} from '@ambreia/protocol/incoming/rpg/characters/IRpg
 import type {RpgItemResultMessage} from '@ambreia/protocol/incoming/rpg/items/RpgItemResultMessage';
 import {RoomSessionEvent} from '../../session/events/RoomSessionEvent';
 import type {IGameFeature} from '../GameFeature';
-import {WindowBits} from '../character/WindowBits';
+import {WindowBits} from '../../ui/kit/WindowBits';
 import {CharacterWindow} from './CharacterWindow';
 import {InventoryView} from './InventoryView';
 import {ITEM_ICONS, parseTexts, STAT_ICONS} from './items';

@@ -295,6 +295,24 @@ export default tseslint.config(
             )
         }
     },
+    {
+        // A feature imports another feature only through its contract: an `I*.ts` file or its
+        // `events.ts` (spec §3 rule 4). What two features share is kit, under game/src/ui/kit.
+        files: ['packages/ambreia-game/src/features/*/**/*.ts'],
+        rules:
+        {
+            'no-restricted-imports': wall(
+                {
+                    regex: '(^|/)vortex-(engine|client|glaze|imager)(/|$)|(^|/)ambreia-[a-z]+/src(/|$)',
+                    message: `@ambreia/game never imports the host packages (${WALLS_SPEC}).`
+                },
+                {
+                    regex: '^\\.\\./(?!\\.\\.(/|$))[^/]+/(?!(I[A-Z][^/]*|events)$).+',
+                    message: `A feature imports another feature only through its I*.ts or events.ts; shared code goes to game/src/ui/kit (${WALLS_SPEC} rule 4).`
+                }
+            )
+        }
+    },
     // game/src/core is the game's bottom layer: it never reaches out of core/. Its folders share
     // names with the game's (communication, localization), so the wall counts the climb per depth.
     ...[1, 2, 3].map(depth => ({

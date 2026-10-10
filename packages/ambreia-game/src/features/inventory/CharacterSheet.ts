@@ -5,7 +5,7 @@ import type {IStaticBitmapWrapperWindow} from '@ambreia/ui/components/IStaticBit
 import type {IRpgStatBlock} from '@ambreia/protocol/incoming/rpg/characters/IRpgStatBlock';
 import type {IRpgItemEntry} from '@ambreia/protocol/incoming/rpg/items/IRpgItemEntry';
 import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
-import type {WindowBits} from '../character/WindowBits';
+import type {WindowBits} from '../../ui/kit/WindowBits';
 import {EQUIPMENT_SLOTS, itemIcon, STATS, type IStatLine} from './items';
 
 const SLOT_BY_NAME = new Map<string, number>(EQUIPMENT_SLOTS.map((key, slot) => [`slot_${key}`, slot]));

@@ -5,8 +5,8 @@ import {RoomSessionUserDataUpdateEvent} from '../../session/events/RoomSessionUs
 import type {IRoomSession} from '../../session/IRoomSession';
 import {UserDataType} from '../../session/UserData';
 import type {IGameFeature} from '../GameFeature';
-import {WindowBits} from '../character/WindowBits';
-import {chatClock} from '../hud/chatModel';
+import {WindowBits} from '../../ui/kit/WindowBits';
+import {chatClock} from '../../ui/kit/chatModel';
 import {RpgCombatEventsMessage} from '@ambreia/protocol/incoming/rpg/combat/RpgCombatEventsMessage';
 import {CombatOverlay} from './CombatOverlay';
 import {CombatVfx} from './CombatVfx';

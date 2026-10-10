@@ -5,8 +5,8 @@ import type {RpgTargetMessage} from '@ambreia/protocol/incoming/rpg/interaction/
 import {RoomSessionEvent} from '../../session/events/RoomSessionEvent';
 import type {IRoomSession} from '../../session/IRoomSession';
 import type {IGameFeature} from '../GameFeature';
-import {WindowBits} from '../character/WindowBits';
-import type {IHudPanels} from '../hud/HudPanelsState';
+import {WindowBits} from '../../ui/kit/WindowBits';
+import type {IHudPanels} from '../hud/IHud';
 import {RpgInteractionSession} from './RpgInteractionSession';
 
 const log = Logger.getLogger('habbo.features.interaction');

@@ -6,11 +6,11 @@ import type {ITabContextWindow} from '@ambreia/ui/components/ITabContextWindow';
 import type {IRpgStatBlock} from '@ambreia/protocol/incoming/rpg/characters/IRpgStatBlock';
 import {RpgItemUnequipMessage} from '@ambreia/protocol/outgoing/rpg/items/RpgItemUnequipMessage';
 import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
-import {WindowBits} from '../character/WindowBits';
+import {WindowBits} from '../../ui/kit/WindowBits';
 import {CharacterSheet, fillStatRow} from './CharacterSheet';
-import {buildFrame, LAYER} from './InventoryView';
+import {buildFrame, LAYER} from '../../ui/kit/buildFrame';
 import {itemKind, STATS, type IStatLine} from './items';
-import {HudTooltips} from '../hud/HudTooltips';
+import {HudTooltips} from '../../ui/kit/HudTooltips';
 import type {IRpgInventorySession} from './IRpgInventorySession';
 
 /**

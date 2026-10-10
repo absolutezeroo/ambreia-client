@@ -12,7 +12,7 @@ import {RpgEnterWorldMessage} from '@ambreia/protocol/outgoing/rpg/characters/Rp
 import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
 import type {IRpgCharacterSession} from './IRpgCharacterSession';
 import {CharacterCreateView, type ICharacterDraft} from './CharacterCreateView';
-import {WindowBits} from './WindowBits';
+import {WindowBits} from '../../ui/kit/WindowBits';
 
 const log = Logger.getLogger('habbo.features.character.CharacterScreen');
 

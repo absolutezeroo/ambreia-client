@@ -1,7 +1,7 @@
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {IGameFeature} from '../GameFeature';
-import {WindowBits} from '../character/WindowBits';
-import {chatClock, chatSend, type ChatChannel} from '../hud/chatModel';
+import {WindowBits} from '../../ui/kit/WindowBits';
+import {chatClock, chatSend, type ChatChannel} from '../../ui/kit/chatModel';
 import {RpgChatSession} from './RpgChatSession';
 
 const log = Logger.getLogger('habbo.features.chat');

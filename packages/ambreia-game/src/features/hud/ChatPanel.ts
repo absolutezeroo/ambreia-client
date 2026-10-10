@@ -11,12 +11,12 @@ import type {ITextWindow} from '@ambreia/ui/components/ITextWindow';
 import type {ISelectableWindow} from '@ambreia/ui/components/ISelectableWindow';
 import type {IDropMenuWindow} from '@ambreia/ui/components/IDropMenuWindow';
 import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
-import {WindowBits} from '../character/WindowBits';
+import {WindowBits} from '../../ui/kit/WindowBits';
 import type {HudPanelsState, IHudPanels} from './HudPanelsState';
 import {
     ALL_TAB, CHAT_CHANNELS, chatLinesOf, channelTab, EMOTICONS, IDLE_MINUTES, PLAIN_COLOR, RP_ACTIONS, saveChatSettings, splitEmoticons, TEXT_SIZES, whisperTab,
     type ChatChannel, type ChatTextSize, type IChatLine, type IChatSettings, type IChatTab
-} from './chatModel';
+} from '../../ui/kit/chatModel';
 
 const ENTER = 13;
 /** The HUD's layer (HudPanelsView.LAYER). */

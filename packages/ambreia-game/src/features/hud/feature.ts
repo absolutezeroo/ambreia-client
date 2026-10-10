@@ -8,8 +8,8 @@ import {PlayerHudState} from './PlayerHudState';
 import {HudPanelsState, type IChatLine} from './HudPanelsState';
 import {bindCharacterToHud} from './CharacterHudBridge';
 import {ChatPanel} from './ChatPanel';
-import {CHAT_ICONS, loadChatSettings} from './chatModel';
-import {WindowBits} from '../character/WindowBits';
+import {CHAT_ICONS, loadChatSettings} from '../../ui/kit/chatModel';
+import {WindowBits} from '../../ui/kit/WindowBits';
 
 // The demo's icons: read by name (static_bitmap asset_uri set at run time), so declared to be
 // decoded at load (IGameFeature.images). The server's skills, quests and effects will come with
