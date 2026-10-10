@@ -5531,9 +5531,18 @@ export class RoomEngine extends Component implements IRoomEngine,
 
         // The canvas sorts an object resting on furniture differently from one on the ground, and
         // the ground is not z=0: a raised floor tile carries its own altitude. Resolved per call
-        // rather than captured, because the geometry only arrives with the floor height map.
+        // rather than captured, because the geometry only arrives with the floor height map. Off the
+        // map is null, not getTileHeight()'s 0: no tile there (RoomRenderingCanvas.lowestFloorAt()).
         canvas.floorHeightAt = (x: number, y: number): number | null =>
-            this.getLegacyGeometry(roomId)?.getTileHeight(x, y) ?? null;
+        {
+            const geometry = this.getLegacyGeometry(roomId);
+
+            if(!geometry) return null;
+
+            const height = geometry.getTileHeight(x, y);
+
+            return height < 0 || geometry.isRoomTile(x, y) ? height : null;
+        };
         // A raised tile's floor is a solid piece sorted among the objects (@ambreia/iso sortTile).
         canvas.raisedFloorAt = (x: number, y: number): boolean =>
             this.getLegacyGeometry(roomId)?.isRaisedFloor(x, y) ?? false;

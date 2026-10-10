@@ -283,7 +283,16 @@ export class RoomLogic extends ObjectLogicBase
         const tileY = planeLoc.y + (planeLeftSide.y * planePoint.x / leftLength) + (planeRightSide.y * planePoint.y / rightLength);
         const tileZ = planeLoc.z + (planeLeftSide.z * planePoint.x / leftLength) + (planeRightSide.z * planePoint.y / rightLength);
 
-        if(planePoint.x < 0 || planePoint.x >= leftLength || planePoint.y < 0 || planePoint.y >= rightLength)
+        // DEVIATION: the room's lowest floor runs under every raised tile (RoomPlaneParser
+        // extractFloor()); a block faded out shows it and lets the pointer through to it. There it
+        // is no tile, the block's top is: it picks none, as a side does. Read off the drawn floor (a
+        // quarter tile, ramps included), not getTileHeight(): the door tile is raised there.
+        const surface = planeType === RoomPlaneData.PLANE_FLOOR && planeParser.getPlaneSortTile(planeIndex) === null
+            ? planeParser.getTileSurface(Math.round(tileX), Math.round(tileY)) : null;
+        const quarter = (v: number): number => Math.min(3, Math.max(0, Math.floor((v - Math.round(v) + 0.5) * 4)));
+        const underBlock = surface !== null && surface[quarter(tileY) * 4 + quarter(tileX)] > tileZ + 0.01;
+
+        if(underBlock || planePoint.x < 0 || planePoint.x >= leftLength || planePoint.y < 0 || planePoint.y >= rightLength)
         {
             const model = this.object.getModelController();
 

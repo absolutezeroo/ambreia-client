@@ -99,8 +99,9 @@ export class ExtendedSprite extends Sprite
     }
 
     /**
-     * A raised floor piece faded out because it hides the player or the tile under the pointer
-     * (RoomRenderingCanvas.updateOcclusion()). A faded side lets the mouse through.
+     * A raised floor piece or furni seen through, in a disc, because it hides the player or a tile
+     * under the pointer (RoomRenderingCanvas.updateOcclusion()). A faded side lets the mouse through
+     * inside the disc.
      */
     // TS-only: no AS3 counterpart.
     faded: boolean = false;

@@ -1147,7 +1147,8 @@ export class RoomVisualization extends RoomObjectSpriteVisualization
         sprite.piece = sortTile === undefined ? null : {
             tile: sortTile.x * 65536 + sortTile.y,
             group: this._planeSortGroups.get(plane) ?? -1,
-            side: plane.normal.z === 0
+            side: plane.normal.z === 0,
+            rise: Math.abs(plane.leftSide.z) + Math.abs(plane.rightSide.z)
         };
 
         // AS3: sprite.asset = getPlaneBitmap(plane, name)

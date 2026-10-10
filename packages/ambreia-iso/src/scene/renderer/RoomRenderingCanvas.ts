@@ -47,6 +47,7 @@ import {RoomObjectSpriteData} from '@ambreia/common/graphics/RoomObjectSpriteDat
 import type {IRoomObjectSprite} from '../../object/visualization/IRoomObjectSprite';
 import {StringUtil} from '@ambreia/common/utils/StringUtil';
 import {Canvas} from '@ambreia/common/utils/Canvas';
+import {platform} from '@ambreia/common/platform/Platform';
 
 export type {IRoomRenderingCanvasMouseListener};
 
@@ -107,6 +108,19 @@ interface IXraySlot
     stamps: Sprite[];
     body: Container;
     copies: Sprite[];
+    eraser: Container;
+}
+
+/** One round window through what hides the player, reused from frame to frame (updateHoles()). */
+interface IHoleSlot
+{
+    /** The room without what is seen through, cut to a disc, shown over the room. */
+    view: Sprite;
+    picture: RenderTexture;
+    body: Container;
+    copies: Sprite[];
+    /** Opaque outside the disc, erasing: what is left of the picture is the disc. */
+    edge: Sprite;
     eraser: Container;
 }
 
@@ -268,6 +282,8 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
         this._display.sortableChildren = false;
         this._master.addChild(this._display);
 
+        this._holes.label = 'holes';
+        this._master.addChild(this._holes);
         this._xray.label = 'xray';
         this._master.addChild(this._xray);
 
@@ -440,10 +456,33 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
     // TS-only: see updateXray().
     public pixiRenderer: (() => Renderer | null) | null = null;
     // TS-only: the see-through copy's tint and alpha.
-    private static readonly XRAY_TINT: number = 0x7088ff;
-    private static readonly XRAY_ALPHA: number = 0.55;
+    private static readonly XRAY_TINT: number = 0x3a50b8;
+    private static readonly XRAY_ALPHA: number = 0.7;
+
     /**
-     * Fade the raised floor that hides the player's avatar or the tile under the pointer
+     * Round windows through what hides the player (updateHoles()): the room drawn again without it,
+     * cut to a disc, over the room and under the light, the see-through avatars and the overlays.
+     */
+    // TS-only: see updateHoles().
+    private readonly _holes: Container = new Container();
+    private readonly _holeSlots: IHoleSlot[] = [];
+    // TS-only: this frame's discs, x, y, radius in turn, in _display's space; and one disc's sprites.
+    private readonly _holeDiscs: number[] = [];
+    private readonly _holeIndices: number[] = [];
+    // TS-only: erases the discs from an x-ray (updateXray()): a hidden avatar shows itself there.
+    private readonly _discEraser: Container = new Container();
+    private readonly _discs: Sprite[] = [];
+    // TS-only: the disc's edge and the disc itself, soft at the rim; made on first use, shared.
+    private static _edgeTexture: Texture | null = null;
+    private static _discTexture: Texture | null = null;
+    // TS-only: a disc's radius, in pixels, around the player and under the pointer alike: fixed, so its
+    // render texture is never resized (holeSlot()).
+    private static readonly HOLE_RADIUS: number = 72;
+    // TS-only: where the rim softens, as a share of the radius; the textures' size.
+    private static readonly HOLE_SOFT_FROM: number = 0.75;
+    private static readonly HOLE_TEXTURE_SIZE: number = 256;
+    /**
+     * See through, in a disc, the raised floor that hides the player's avatar or a tile under the pointer
      * (updateOcclusion()). The game turns it on; an editor showing the room as built leaves it off.
      */
     // TS-only: see updateOcclusion().
@@ -453,10 +492,10 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
     private readonly _fadedFurni: Set<string> = new Set();
     // TS-only: the sorted indices of the player's own avatar sprites this frame.
     private readonly _ownIndices: number[] = [];
-    // TS-only: a see-through sprite's alpha (updateOcclusion()).
-    private static readonly FADE_ALPHA: number = 0.4;
     // TS-only: hidesOwn() probes a HIDE_PROBES × HIDE_PROBES grid where two sprites overlap.
     private static readonly HIDE_PROBES: number = 5;
+    // TS-only: the floor levels lowestFloorAt() tries (a heightmap goes 0-9 then a-z).
+    private static readonly LOWEST_FLOOR_LEVELS: number = 35;
 
     // The depth z AS3 passes to setDepthVector() while rotating. Literal in both call sites there.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/room/renderer/_SafeCls_3074.as::doMagic()
@@ -1286,6 +1325,7 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
             slot.cut.destroy(true);
             slot.picture.destroy(true);
         }
+        for(const slot of this._holeSlots) slot.picture.destroy(true);
         this._master.destroy({children: true});
 
         // Children (incl. the fps overlay) are destroyed by the cascade above.
@@ -2116,14 +2156,16 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
     /**
      * Sees through what hides the player, as an RPG does with a building the player walks behind:
      *
-     * - a raised floor building (RoomPlaneData.sortGroup: the raised tiles joined edge to edge) or a
-     *   furni turns see-through, all of it, while it hides the player's own avatar, and only then.
-     *   It hides it when, drawn after it, it is opaque somewhere the avatar is (hidesOwn()).
-     * - the building whose side (a wall) is under the pointer turns see-through too, and that side
-     *   lets the mouse through, so a tile behind a wall can be clicked. A top stays clickable: it is
-     *   floor; so does a see-through furni.
-     * - any other avatar a raised piece still hides is drawn again over everything, tinted and
-     *   see-through, cut to the shape of the pieces in front of it (updateXray()).
+     * - while a raised floor building (RoomPlaneData.sortGroup: the raised tiles joined edge to edge)
+     *   or a furni hides the player's own avatar, a disc around the avatar is seen through it
+     *   (updateHoles()). It hides it when, drawn after it, it is opaque somewhere the avatar is
+     *   (hidesOwn()).
+     * - the building whose side (a wall) is under the pointer and hides something to point at
+     *   (pointedBuilding()) is seen through in a disc under the pointer, where its sides let the
+     *   mouse through, so a tile behind a wall can be clicked. A top stays clickable: it is floor;
+     *   so does a see-through furni.
+     * - any avatar a raised piece or a furni still hides, outside the discs, is drawn again over
+     *   everything, tinted and see-through, cut to the shape of the pieces in front of it (updateXray()).
      */
     // TS-only: no AS3 counterpart; Habbo had no floor anything could stand behind.
     private updateOcclusion(count: number): void
@@ -2146,9 +2188,6 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
                 if(sprite?.texture && sprite.spriteType === RoomObjectSpriteType.AVATAR_OWN) own.push(i);
             }
 
-            const mouseX = this._mouseLocationX;
-            const mouseY = this._mouseLocationY;
-
             for(let j = 0; j < count; j++)
             {
                 const entry = list[j];
@@ -2164,11 +2203,25 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
                     if(piece !== null) groups.add(piece.group);
                     else furni.add(entry.name);
                 }
-                else if(piece !== null && piece.side && this.spriteHit(j, mouseX, mouseY))
-                {
-                    groups.add(piece.group);
-                }
             }
+
+            const discs = this._holeDiscs;
+
+            discs.length = 0;
+
+            if(groups.size > 0 || furni.size > 0) this.addOwnDisc(own);
+
+            const pointed = this.pointedBuilding(count, this._mouseLocationX, this._mouseLocationY);
+
+            if(pointed !== -1)
+            {
+                groups.add(pointed);
+                discs.push(this._mouseLocationX, this._mouseLocationY, RoomRenderingCanvas.HOLE_RADIUS);
+            }
+        }
+        else
+        {
+            this._holeDiscs.length = 0;
         }
 
         for(let j = 0; j < count; j++)
@@ -2180,23 +2233,265 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
             if(extSprite === null || !sprite) continue;
 
             const piece = sprite.piece;
-            const seeThrough = piece !== null ? groups.has(piece.group) : entry.fadable && furni.has(entry.name);
 
-            if(seeThrough)
-            {
-                if(extSprite.alpha !== RoomRenderingCanvas.FADE_ALPHA) extSprite.alpha = RoomRenderingCanvas.FADE_ALPHA;
-                extSprite.faded = true;
-                extSprite.fadedSide = piece !== null && piece.side;
-            }
-            else if(extSprite.faded)
-            {
-                extSprite.faded = false;
-                extSprite.fadedSide = false;
-                extSprite.alpha = sprite.alpha / 255;
-            }
+            extSprite.faded = piece !== null ? groups.has(piece.group) : entry.fadable && furni.has(entry.name);
+            extSprite.fadedSide = extSprite.faded && piece !== null && piece.side;
         }
 
+        this.updateHoles(count);
         this.updateXray(count);
+    }
+
+    /** A disc around the player's own avatar, centred on it, in _holeDiscs. */
+    // TS-only: see updateHoles().
+    private addOwnDisc(own: number[]): void
+    {
+        let left = Infinity;
+        let top = Infinity;
+        let right = -Infinity;
+        let bottom = -Infinity;
+
+        for(const i of own)
+        {
+            const sprite = this.getSprite(i);
+
+            if(sprite === null) continue;
+
+            const [l, t, r, b] = RoomRenderingCanvas.bounds(sprite);
+
+            left = Math.min(left, l);
+            top = Math.min(top, t);
+            right = Math.max(right, r);
+            bottom = Math.max(bottom, b);
+        }
+
+        if(left === Infinity) return;
+
+        this._holeDiscs.push((left + right) / 2, (top + bottom) / 2, RoomRenderingCanvas.HOLE_RADIUS);
+    }
+
+    /** True when canvas point (x, y) is inside one of this frame's discs (updateHoles()). */
+    // TS-only: a see-through side lets the mouse through only where it is seen through.
+    private inHole(x: number, y: number): boolean
+    {
+        const discs = this._holeDiscs;
+
+        for(let i = 0; i < discs.length; i += 3)
+        {
+            const dx = x - discs[i];
+            const dy = y - discs[i + 1];
+
+            if(dx * dx + dy * dy <= discs[i + 2] * discs[i + 2]) return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Opens each of this frame's discs through what is seen through (updateOcclusion()): the room is
+     * drawn again over it without those buildings and furni, from copies of the sprites the disc
+     * touches, in their order, and cut to the disc with a soft rim. Composed by hand like the x-ray.
+     */
+    // TS-only: see updateOcclusion().
+    // ponytail: one more render per disc (two at most), of the sprites inside it only.
+    private updateHoles(count: number): void
+    {
+        const renderer = this.pixiRenderer?.() ?? null;
+        const discs = this._holeDiscs;
+        const indices = this._holeIndices;
+        let used = 0;
+
+        for(let d = 0; d < discs.length && renderer !== null; d += 3)
+        {
+            const size = RoomRenderingCanvas.HOLE_RADIUS * 2;
+            const left = Math.floor(discs[d] - RoomRenderingCanvas.HOLE_RADIUS);
+            const top = Math.floor(discs[d + 1] - RoomRenderingCanvas.HOLE_RADIUS);
+
+            indices.length = 0;
+
+            for(let j = 0; j < count; j++)
+            {
+                const sprite = this.getSprite(j);
+
+                if(sprite === null || !sprite.visible || sprite.faded || sprite.texture === Texture.EMPTY) continue;
+
+                const [l, t, r, b] = RoomRenderingCanvas.bounds(sprite);
+
+                if(r > left && l < left + size && b > top && t < top + size) indices.push(j);
+            }
+
+            const slot = this.holeSlot(used++);
+            let n = 0;
+
+            for(const j of indices)
+            {
+                const source = this.getSprite(j)!;
+                let copy = slot.copies[n++];
+
+                if(copy === undefined)
+                {
+                    copy = new Sprite();
+                    slot.copies.push(copy);
+                    slot.body.addChild(copy);
+                }
+
+                copy.texture = source.texture;
+                copy.position.set(source.x - left, source.y - top);
+                copy.scale.set(source.scale.x, source.scale.y);
+                copy.alpha = source.alpha;
+                copy.tint = source.tint;
+                copy.blendMode = source.blendMode;
+                copy.filters = source.filters as Filter[];
+                copy.visible = true;
+            }
+
+            for(let i = n; i < slot.copies.length; i++) slot.copies[i].visible = false;
+
+            renderer.render({container: slot.body, target: slot.picture, clear: true});
+            renderer.render({container: slot.eraser, target: slot.picture, clear: false});
+            slot.view.position.set(left, top);
+            slot.view.visible = true;
+        }
+
+        for(let i = used; i < this._holeSlots.length; i++) this._holeSlots[i].view.visible = false;
+    }
+
+    /** The `n`th hole slot, made on first use (see updateHoles()). */
+    // TS-only: see updateHoles().
+    private holeSlot(n: number): IHoleSlot
+    {
+        let slot = this._holeSlots[n];
+
+        if(slot === undefined)
+        {
+            // Made at its size once: a render texture resized from frame to frame, its sprite over the
+            // room drew it at the wrong scale (the player grew and shrank walking through a disc).
+            const size = RoomRenderingCanvas.HOLE_RADIUS * 2;
+            const picture = RenderTexture.create({width: size, height: size});
+            const view = new Sprite(picture);
+            const edge = new Sprite(RoomRenderingCanvas.holeTextures()[0]);
+            const eraser = new Container();
+
+            // Set on a child: a render() root's own blend mode is not applied, the root's children's is.
+            edge.blendMode = 'erase';
+            edge.width = size;
+            edge.height = size;
+            eraser.addChild(edge);
+            this._holes.addChild(view);
+            slot = {view, picture, body: new Container(), copies: [], edge, eraser};
+            this._holeSlots.push(slot);
+        }
+
+        return slot;
+    }
+
+    /** The disc's edge (opaque outside the disc) and the disc, soft at the rim, made once. */
+    // TS-only: see updateHoles().
+    private static holeTextures(): [Texture, Texture]
+    {
+        if(RoomRenderingCanvas._edgeTexture === null || RoomRenderingCanvas._discTexture === null)
+        {
+            const size = RoomRenderingCanvas.HOLE_TEXTURE_SIZE;
+            const draw = (inside: number, outside: number): Texture =>
+            {
+                const canvas = platform().createCanvas(size, size);
+                const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+                const gradient = context.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+
+                gradient.addColorStop(0, `rgba(255, 255, 255, ${inside})`);
+                gradient.addColorStop(RoomRenderingCanvas.HOLE_SOFT_FROM, `rgba(255, 255, 255, ${inside})`);
+                gradient.addColorStop(1, `rgba(255, 255, 255, ${outside})`);
+                context.fillStyle = gradient;
+                context.fillRect(0, 0, size, size);
+
+                return Texture.from({resource: canvas as unknown as HTMLCanvasElement, scaleMode: 'linear'});
+            };
+
+            RoomRenderingCanvas._edgeTexture = draw(0, 1);
+            RoomRenderingCanvas._discTexture = draw(1, 0);
+        }
+
+        return [RoomRenderingCanvas._edgeTexture, RoomRenderingCanvas._discTexture];
+    }
+
+    /**
+     * The building whose side the pointer is on, when that side hides something to point at: another
+     * building's top, a furni, an avatar or a tile of the room's lowest floor. -1 when the pointer
+     * is on anything else, or when the side hides only the lowest floor under a building
+     * (RoomPlaneParser.extractFloor() runs it under every tile) or a wall.
+     */
+    // TS-only: see updateOcclusion().
+    private pointedBuilding(count: number, x: number, y: number): number
+    {
+        const list = this._sortableSpriteList;
+        let group = -1;
+
+        for(let j = count - 1; j >= 0; j--)
+        {
+            const entry = list[j];
+            const sprite = entry?.sprite;
+            const piece = sprite?.piece ?? null;
+
+            if(!sprite?.texture || !this.getSprite(j)?.visible || entry.objectType === 'tile_cursor') continue;
+            // A faded side lets the pointer through (checkMouseHits()). Under the pointed side, the
+            // sides behind it are walls too, and the building's own tops (a lower step of a stair)
+            // are no reason to see through it.
+            if(piece !== null && piece.side && this._fadedGroups.has(piece.group) && this.inHole(x, y)) continue;
+            if(group !== -1 && piece !== null && (piece.side || piece.group === group)) continue;
+            if(!this.spriteHit(j, x, y)) continue;
+
+            if(group === -1)
+            {
+                // A step of a stair is floor to point at, as a top is, not a wall.
+                if(piece === null || !piece.side || piece.rise < 1) return -1;
+
+                group = piece.group;
+                continue;
+            }
+
+            if(piece !== null || sprite.spriteType !== RoomObjectSpriteType.ROOM_PLANE) return group;
+
+            return this.lowestFloorAt(x, y) ? group : -1;
+        }
+
+        return -1;
+    }
+
+    /** True when canvas point (x, y) lies on a tile of the room's lowest floor, a raised one excluded. */
+    // TS-only: see pointedBuilding().
+    // ponytail: four geometry points allocated, only while the pointer is on a side.
+    private lowestFloorAt(x: number, y: number): boolean
+    {
+        if(this.floorHeightAt === null) return false;
+
+        const origin = this._geometry.getScreenPoint(new Vector3d(0, 0, 0));
+        const alongX = this._geometry.getScreenPoint(new Vector3d(1, 0, 0));
+        const alongY = this._geometry.getScreenPoint(new Vector3d(0, 1, 0));
+        const up = this._geometry.getScreenPoint(new Vector3d(0, 0, 1));
+
+        if(origin === null || alongX === null || alongY === null || up === null) return false;
+
+        const ax = alongX.x - origin.x;
+        const ay = alongX.y - origin.y;
+        const bx = alongY.x - origin.x;
+        const by = alongY.y - origin.y;
+        const determinant = ax * by - ay * bx;
+
+        if(determinant === 0) return false;
+
+        // The lowest floor's height is not known here: each level is tried, and the tile found at a
+        // level counts when it is not raised and stands at that level.
+        for(let level = 0; level <= RoomRenderingCanvas.LOWEST_FLOOR_LEVELS; level++)
+        {
+            const dx = x - Math.floor(this._width / 2) - origin.x - level * (up.x - origin.x);
+            const dy = y - Math.floor(this._height / 2) - origin.y - level * (up.y - origin.y);
+            const tileX = Math.round((dx * by - dy * bx) / determinant);
+            const tileY = Math.round((ax * dy - ay * dx) / determinant);
+
+            if(this.floorHeightAt(tileX, tileY) === level) return !(this.raisedFloorAt?.(tileX, tileY) ?? false);
+        }
+
+        return false;
     }
 
     /** True when the sprite drawn at `index` hides one of the player's own avatar sprites (hides()). */
@@ -2422,9 +2717,8 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
 
                 if(!entry?.sprite?.texture || entry.name === name) continue;
 
-                const hiding = piece !== null ? !this._fadedGroups.has(piece.group) : entry.fadable && !this._fadedFurni.has(entry.name);
-
-                if(!hiding) continue;
+                // A building or furni seen through still hides, outside the discs (erased below).
+                if(piece === null && !entry.fadable) continue;
 
                 for(const i of indices)
                 {
@@ -2482,11 +2776,45 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
             RoomRenderingCanvas.copyInto(slot.copies, slot.body, indices, i => this.getSprite(i), -left, -top, RoomRenderingCanvas.XRAY_TINT);
             renderer.render({container: slot.body, target: slot.picture, clear: true});
             renderer.render({container: slot.eraser, target: slot.picture, clear: false});
+
+            // Inside a disc the avatar is seen as it is (updateHoles()): no veil there.
+            if(this._holeDiscs.length > 0) renderer.render({container: this.discEraser(-left, -top), target: slot.picture, clear: false});
+
             slot.view.position.set(left, top);
             slot.view.visible = true;
         }
 
         for(let i = used; i < this._xraySlots.length; i++) this._xraySlots[i].view.visible = false;
+    }
+
+    /** This frame's discs, shifted by (dx, dy), as erasing sprites (see updateXray()). */
+    // TS-only: see updateHoles().
+    private discEraser(dx: number, dy: number): Container
+    {
+        const discs = this._holeDiscs;
+        let n = 0;
+
+        for(let d = 0; d < discs.length; d += 3)
+        {
+            let disc = this._discs[n++];
+
+            if(disc === undefined)
+            {
+                disc = new Sprite(RoomRenderingCanvas.holeTextures()[1]);
+                disc.blendMode = 'erase';
+                this._discs.push(disc);
+                this._discEraser.addChild(disc);
+            }
+
+            disc.position.set(discs[d] - discs[d + 2] + dx, discs[d + 1] - discs[d + 2] + dy);
+            disc.width = discs[d + 2] * 2;
+            disc.height = discs[d + 2] * 2;
+            disc.visible = true;
+        }
+
+        for(let i = n; i < this._discs.length; i++) this._discs[i].visible = false;
+
+        return this._discEraser;
     }
 
     /** The `n`th x-ray slot, made on first use (see updateXray()). */
@@ -2559,9 +2887,11 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
 
     private updateDisplayTransform(): void 
     {
-        // The see-through avatars and their masks are drawn in _display's space.
+        // The see-through avatars and their masks, and the discs, are drawn in _display's space.
         this._xray.position.set(this._screenOffsetX, this._screenOffsetY);
         this._xray.scale.set(this._scale);
+        this._holes.position.set(this._screenOffsetX, this._screenOffsetY);
+        this._holes.scale.set(this._scale);
 
         if(this._display.x !== this._screenOffsetX) 
         {
@@ -2837,8 +3167,8 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
         {
             const extSprite = this.getSprite(i);
 
-            // A faded side (updateOcclusion()) lets the mouse through to what it was hiding.
-            if(extSprite === null || !extSprite.visible || extSprite.fadedSide) 
+            // A side seen through (updateOcclusion()) lets the mouse through where it is seen through.
+            if(extSprite === null || !extSprite.visible || (extSprite.fadedSide && this.inHole(x, y))) 
             {
                 continue;
             }
@@ -2995,7 +3325,7 @@ export class RoomRenderingCanvas implements IRoomRenderingCanvasInterface
         {
             const extSprite = this.getSprite(i);
 
-            if(extSprite === null || !extSprite.clickHandling || extSprite.fadedSide) 
+            if(extSprite === null || !extSprite.clickHandling || (extSprite.fadedSide && this.inHole(x, y))) 
             {
                 continue;
             }

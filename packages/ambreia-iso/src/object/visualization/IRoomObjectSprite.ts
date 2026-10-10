@@ -83,4 +83,6 @@ export interface IRaisedFloorPiece
     readonly group: number;
     /** True for a side (a wall of the block), false for its top. */
     readonly side: boolean;
+    /** How tall a side is, in levels: under one, it is a stair's step. 0 for a top. */
+    readonly rise: number;
 }
