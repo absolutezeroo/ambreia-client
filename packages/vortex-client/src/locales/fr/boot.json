@@ -1,5 +1,6 @@
 {
   "disconnected.reason.maintenance": "Le serveur est en maintenance. Réessayez plus tard.",
   "vortex.boot.data.text": "Les données nécessaires au jeu n'ont pas pu être téléchargées. Vérifiez votre connexion ou réessayez dans quelques minutes.",
-  "vortex.boot.data.title": "Données du jeu indisponibles"
+  "vortex.boot.data.title": "Données du jeu indisponibles",
+  "vortex.connection.reconnecting": "Connexion perdue. Reconnexion… (tentative %attempt%)"
 }

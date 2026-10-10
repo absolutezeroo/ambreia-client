@@ -206,6 +206,21 @@ After authentication, `ISessionGateway.AddSessionToPlayerAsync` binds the sessio
 
 ---
 
+### Phase 6: Reconnect (client, 2026-10-10)
+
+The client keeps one connection state (`@ambreia/net` `ConnectionLifecycle`: `idle`, `connecting`,
+`handshaking`, `ready`, `reconnecting`, `closed`, `failed`), driven by `HabboCommunicationManager`.
+A session the server knew (`ready`) that goes without a close frame (code 1006: a sleeping machine,
+a dropped route) is brought back by itself: a new socket on the same connection after 1 s, 2 s, 4 s…
+up to 30 s (±50 %), six attempts, the same handshake and the same SSO ticket (the server refreshes
+its expiry on every use, §5). While it does, the HUD's alert line says so and every room session
+ends (`lifecycle` `reset` → `RoomSessionManager.disposeAllSessions()`), so the RPG features start
+clean when the server puts the player back (characters screen, then the zone). A close the peer
+meant (1000, 1001, a `DisconnectReason`) or the client's own `disconnect()` is final: the disconnect
+dialog shows, and at top level its OK starts the page over at the login. Six failed attempts show the
+same dialog. The emulator was not reachable when this was written: the state machine and the verdict
+on a closed socket are unit-tested; the round trip itself is not.
+
 ## 3. Wire Protocol
 
 The frame format is **the same classic shape** you'd expect from any Habbo-derived protocol — this part of the old draft was actually correct in spirit, just wrongly attributed to Netty.

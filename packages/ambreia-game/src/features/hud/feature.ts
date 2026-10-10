@@ -46,7 +46,7 @@ const clock = (date: Date): string => `${String(date.getHours()).padStart(2, '0'
 export const HudFeature: IGameFeature = {
     id: 'hud',
     images: [...CHAT_ICONS, ...DEMO_SKILLS, ...DEMO_ITEMS, ...DEMO_QUESTS, ...DEMO_BUFFS, ...DEMO_DEBUFFS, DEMO_BOSS],
-    requires: ['character', 'roomSession'],
+    requires: ['character', 'roomSession', 'communication'],
     create: ({host, scope}) =>
     {
         const state = new PlayerHudState();
@@ -110,6 +110,25 @@ export const HudFeature: IGameFeature = {
         if(host.made.character) scope.add(bindCharacterToHud(host.made.character, state));
         // The bottom bar marks the button whose window is open, and the quests one with its « ! ».
         scope.bind(panels.events)('changed', value => view?.setNav(value.navOpen, value.questAlert));
+
+        // A lost session being brought back is said in the alert line, attempt by attempt; the
+        // line clears when the session is back, and the disconnect dialog takes over when it is not.
+        const lifecycle = host.made.communication?.lifecycle ?? null;
+        let reconnectNotice = false;
+
+        scope.bind(lifecycle)('change', (_from, to) =>
+        {
+            if(to === 'reconnecting')
+            {
+                reconnectNotice = true;
+                panels.update({alert: new WindowBits(host.made.localization).text('vortex.connection.reconnecting', 'attempt', String(lifecycle?.attempt ?? 0))});
+            }
+            else if(reconnectNotice)
+            {
+                reconnectNotice = false;
+                panels.update({alert: null});
+            }
+        });
 
         const sessionOn = scope.bind(host.made.roomSession?.sessionEvents);
 

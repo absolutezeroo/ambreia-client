@@ -16,7 +16,7 @@ const log = Logger.getLogger('habbo.features.character');
  */
 export const CharacterFeature: IGameFeature = {
     id: 'character',
-    requires: ['roomSession'],
+    requires: ['roomSession', 'communication'],
     create: ({host, scope}) =>
     {
         const session = new RpgCharacterSession();
@@ -45,6 +45,9 @@ export const CharacterFeature: IGameFeature = {
             screen?.dispose();
             screen = null;
         });
+
+        // The server forgot the player with the connection: the characters screen is the way back in.
+        scope.bind(host.made.communication?.lifecycle)('reset', () => { inWorld = false; });
 
         scope.own(session).add(() =>
         {

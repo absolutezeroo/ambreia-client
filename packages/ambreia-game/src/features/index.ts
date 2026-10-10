@@ -143,11 +143,12 @@ const Communication = feature({
     id: 'communication',
     essential: 'the client has no server without it',
     provides: [IID_HabboCommunicationManager],
-    create: ({context, host}) =>
+    create: ({context, host, scope}) =>
     {
         const manager = new HabboCommunicationManager(context);
 
         host.made.communication = manager;
+        scope.hook('connection', {state: () => manager.lifecycle.describe()});
 
         return manager;
     },
@@ -219,7 +220,17 @@ const RoomRenderers = feature({
 const RoomSessions = feature({
     id: 'room-session',
     provides: [IID_RoomSessionManager],
-    create: ({context, host}) => (host.made.roomSession = new RoomSessionManager(context))
+    create: ({context, host, scope}) =>
+    {
+        const manager = new RoomSessionManager(context);
+
+        host.made.roomSession = manager;
+        // The session the server knew is gone (a drop, a kick): every room session ends with it, so
+        // the HUD, the widgets and the features start clean when the server puts the player back.
+        scope.bind(host.made.communication?.lifecycle)('reset', () => manager.disposeAllSessions());
+
+        return manager;
+    }
 });
 
 /** The user's data once authenticated (AS3: HabboSessionDataManagerLib). */

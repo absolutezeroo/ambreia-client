@@ -1012,7 +1012,14 @@ export class VortexApp
     //   lives in `vortex-web` — so the handover is a message to the embedder instead.
     private readonly _onDisconnectAcknowledged = (): void =>
     {
-        if(window.parent === window) return;
+        // At top level the client is its own login: the page starts over at it, as the HUD's
+        // logout does, instead of staying up with a dead socket.
+        if(window.parent === window)
+        {
+            window.location.assign(window.location.pathname);
+
+            return;
+        }
 
         window.parent.postMessage({type: SiteChannel.DISCONNECTED}, window.location.origin);
     };

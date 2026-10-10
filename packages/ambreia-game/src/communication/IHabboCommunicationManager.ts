@@ -1,5 +1,6 @@
 import type {EventEmitter} from 'eventemitter3';
 import type {IConnection} from '@ambreia/net/connection/IConnection';
+import type {ConnectionLifecycle} from '@ambreia/net/connection/ConnectionLifecycle';
 import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
 import type {IEncryption} from '@ambreia/net/encryption/IEncryption';
 import type {IKeyExchange} from '@ambreia/net/handshake/IKeyExchange';
@@ -40,6 +41,8 @@ export interface IHabboCommunicationManager
 	 */
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/communication/IHabboCommunicationManager.as::get connection()
     readonly connection: IConnection | null;
+    /** TS-only: the one connection state, and `reset` when a session the server knew is lost. */
+    readonly lifecycle: ConnectionLifecycle;
 
     /**
 	 * AS3: get mode()

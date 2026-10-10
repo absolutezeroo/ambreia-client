@@ -275,6 +275,13 @@ export class RoomSessionManager extends Component implements IRoomSessionManager
     /**
 	 * Start a game session
 	 */
+    /** Every session ended (RSE_ENDED each): the connection the server knew them on is gone. */
+    // TS-only: see the room-session feature's `reset` listener.
+    disposeAllSessions(): void
+    {
+        for(const session of [...this._sessions.values()]) this.disposeSession(session.roomId);
+    }
+
     // AS3: .../src/com/sulake/habbo/session/RoomSessionManager.as::startGameSession()
     startGameSession(): void
     {

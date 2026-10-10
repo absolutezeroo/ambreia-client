@@ -86,6 +86,11 @@ export class IncomingMessages
 
     private _boundOnConnected: () => void;
     private _boundOnDisconnected: () => void;
+    /** A reconnect that ran out of attempts is the one disconnect the player is told about. */
+    private readonly _onLifecycle = (from: string, to: string): void =>
+    {
+        if(from === 'reconnecting' && to === 'failed') this._demo.disconnected(-3, '');
+    };
 
     constructor(demo: HabboCommunicationDemo, communication: IHabboCommunicationManager)
     {
@@ -106,6 +111,7 @@ export class IncomingMessages
 
         connection.on('connected', this._boundOnConnected);
         connection.on('disconnected', this._boundOnDisconnected);
+        this._communication.lifecycle.on('change', this._onLifecycle);
 
         // Register message handlers - matches AS3 order
         this.addHabboConnectionMessageEvent(new LoginFailedHotelClosedMessageEvent(this.onLoginFailedHotelClosed.bind(this)));
@@ -131,6 +137,8 @@ export class IncomingMessages
             connection.off('connected', this._boundOnConnected);
             connection.off('disconnected', this._boundOnDisconnected);
         }
+
+        this._communication.lifecycle.off('change', this._onLifecycle);
 
         for(const event of this._messageEvents)
         {
@@ -496,6 +504,12 @@ export class IncomingMessages
         {
             this._demo.dispatchLoginStepEvent(HabboCommunicationEvent.HANDSHAKE_FAIL);
         }
+
+        this._isHandshaking = false;
+
+        // The communication manager decided first (its callback runs before this event): a session
+        // being brought back is not a disconnect to tell the player about.
+        if(this._communication.lifecycle.state === 'reconnecting') return;
 
         if(!this._wasDisconnected)
         {
