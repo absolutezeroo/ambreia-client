@@ -98,6 +98,7 @@ export interface ZoneFloor {
     tiles: ZoneTile[];
     door: ZoneCell;
     doorDirection?: number;
+    thickness?: number;
 }
 /**
  * This interface was referenced by `ZoneDocument`'s JSON-Schema
