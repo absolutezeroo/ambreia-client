@@ -1,4 +1,3 @@
-import {devHook} from '@ambreia/common/utils/BuildEnv';
 import {RoomSessionEvent} from '../../session/events/RoomSessionEvent';
 import {RoomSessionUserDataUpdateEvent} from '../../session/events/RoomSessionUserDataUpdateEvent';
 import {UserDataType} from '../../session/UserData';
@@ -47,7 +46,8 @@ const clock = (date: Date): string => `${String(date.getHours()).padStart(2, '0'
 export const HudFeature: IGameFeature = {
     id: 'hud',
     images: [...CHAT_ICONS, ...DEMO_SKILLS, ...DEMO_ITEMS, ...DEMO_QUESTS, ...DEMO_BUFFS, ...DEMO_DEBUFFS, DEMO_BOSS],
-    create: ({host}) =>
+    requires: ['character', 'roomSession'],
+    create: ({host, scope}) =>
     {
         const state = new PlayerHudState();
         const panels = new HudPanelsState();
@@ -107,15 +107,24 @@ export const HudFeature: IGameFeature = {
             panels.update({zonePlayers: event.session.userDataManager.getUserCount(UserDataType.USER)});
 
         // The played character fills the HUD (F3a): level, XP, and the bars' maxima.
-        if(host.made.character) bindCharacterToHud(host.made.character, state);
+        if(host.made.character) scope.add(bindCharacterToHud(host.made.character, state));
         // The bottom bar marks the button whose window is open, and the quests one with its « ! ».
-        panels.events.on('changed', value => view?.setNav(value.navOpen, value.questAlert));
+        scope.bind(panels.events)('changed', value => view?.setNav(value.navOpen, value.questAlert));
 
-        const sessionEvents = host.made.roomSession?.sessionEvents;
+        const sessionOn = scope.bind(host.made.roomSession?.sessionEvents);
 
-        sessionEvents?.on(RoomSessionEvent.RSE_STARTED, show);
-        sessionEvents?.on(RoomSessionEvent.RSE_ENDED, hide);
-        sessionEvents?.on(RoomSessionUserDataUpdateEvent.RSUDUE_USER_DATA_UPDATE, countPlayers);
+        sessionOn(RoomSessionEvent.RSE_STARTED, show);
+        sessionOn(RoomSessionEvent.RSE_ENDED, hide);
+        sessionOn(RoomSessionUserDataUpdateEvent.RSUDUE_USER_DATA_UPDATE, countPlayers);
+        scope.add(() =>
+        {
+            view?.dispose();
+            panelsView?.dispose();
+            view = null;
+            panelsView = null;
+            panels.events.removeAllListeners();
+            state.events.removeAllListeners();
+        });
 
         const hook: IHudDevHook = {
             state,
@@ -166,7 +175,7 @@ export const HudFeature: IGameFeature = {
                 });
             }
         };
-        devHook('hud', hook);
+        scope.hook('hud', hook);
 
         return null;
     }

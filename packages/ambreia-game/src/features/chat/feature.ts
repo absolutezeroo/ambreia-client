@@ -15,21 +15,27 @@ const CHANNELS = new Set<string>(['world', 'general', 'group', 'guild', 'trade',
  */
 export const ChatFeature: IGameFeature = {
     id: 'chat',
-    create: ({host}) =>
+    requires: ['hud'],
+    create: ({host, scope}) =>
     {
         const session = new RpgChatSession();
         const hud = host.made.hud;
+        const on = scope.bind(session.events);
+        const hudOn = scope.bind(hud?.events);
+
+        scope.own(session);
 
         host.made.chat = session;
 
-        hud?.events.on('say', typed =>
+        hudOn('say', typed =>
         {
-            const line = chatSend(typed, hud.openTab, hud.value.sayChannel);
+            // `hud` is the emitter of this very event: present when it fires.
+            const line = chatSend(typed, hud!.openTab, hud!.value.sayChannel);
 
             if(line && !session.send(line)) log.warn('no game connection — the chat line was not sent');
         });
 
-        session.events.on('message', message =>
+        on('message', message =>
         {
             // A channel this client does not know yet still shows, as a system line.
             const channel = (CHANNELS.has(message.channel) ? message.channel : 'system') as ChatChannel;
@@ -39,11 +45,11 @@ export const ChatFeature: IGameFeature = {
             hud?.addChatLine({time: chatClock(message.sentAt), channel, author: message.senderName, message: text, target: message.target});
         });
 
-        hud?.events.on('emote', key => session.emote(key));
+        hudOn('emote', key => session.emote(key));
         // The room sends every RP action, the player's own too (F3c §16): played on the avatar.
-        session.events.on('emote', emote => host.made.roomEngine?.playRpgEmote(emote.objectId, emote.key));
+        on('emote', emote => host.made.roomEngine?.playRpgEmote(emote.objectId, emote.key));
 
-        session.events.on('result', result =>
+        on('result', result =>
         {
             const bits = new WindowBits(host.made.localization);
 

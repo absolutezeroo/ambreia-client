@@ -1,4 +1,3 @@
-import {devHook} from '@ambreia/common/utils/BuildEnv';
 import {Logger} from '@ambreia/common/utils/Logger';
 import {RoomEngineObjectEvent} from '@ambreia/iso/scene/events/RoomEngineObjectEvent';
 import {RoomObjectCategoryEnum} from '@ambreia/iso/scene/object/RoomObjectCategoryEnum';
@@ -46,9 +45,11 @@ export function targetUnit(target: RpgTargetMessage, bits: WindowBits, figure: s
  */
 export const InteractionFeature: IGameFeature = {
     id: 'interaction',
-    create: ({host}) =>
+    requires: ['roomEngine', 'hud', 'roomSession'],
+    create: ({host, scope}) =>
     {
         const session = new RpgInteractionSession();
+        const on = scope.bind(session.events);
 
         host.made.interaction = session;
 
@@ -57,13 +58,13 @@ export const InteractionFeature: IGameFeature = {
         /** The room the player is in: its Users give the target's figure. */
         let room: IRoomSession | null = null;
 
-        session.events.on('interactives', message =>
+        on('interactives', message =>
         {
             log.debug(`${message.objects.length} usable object(s) in this zone`);
             engine?.setRpgInteractives(new Map(message.objects.map(object => [object.objectId, object.interaction])));
         });
 
-        session.events.on('target', target =>
+        on('target', target =>
         {
             engine?.setRpgTarget(target.objectId);
             const figure = room?.userDataManager.getUserDataByIndex(target.objectId)?.figure ?? null;
@@ -72,27 +73,31 @@ export const InteractionFeature: IGameFeature = {
         });
 
         // The HUD frame's close button clears the frame alone: ask the server to clear the target too.
-        hud?.events.on('changed', value =>
+        scope.bind(hud?.events)('changed', value =>
         {
             if(value.target === null) session.select(0);
         });
 
-        engine?.events.on(RoomEngineObjectEvent.REOE_SELECTED, (event: RoomEngineObjectEvent) =>
+        const engineOn = scope.bind(engine?.events);
+
+        engineOn(RoomEngineObjectEvent.REOE_SELECTED, (event: RoomEngineObjectEvent) =>
         {
             if(event.category === RoomObjectCategoryEnum.OBJECT_CATEGORY_USER) session.select(event.objectId);
         });
-        engine?.events.on(RoomEngineObjectEvent.REOE_DESELECTED, () => session.select(0));
+        engineOn(RoomEngineObjectEvent.REOE_DESELECTED, () => session.select(0));
 
         // Escape, unless a text field has the keyboard (the window system's fields are DOM inputs).
-        globalThis.addEventListener?.('keydown', (event: KeyboardEvent) =>
+        scope.listen(globalThis, 'keydown', (event: KeyboardEvent) =>
         {
             const target = event.target as {tagName?: string} | null;
 
             if(event.key === 'Escape' && target?.tagName !== 'INPUT' && target?.tagName !== 'TEXTAREA') session.select(0);
         });
 
-        host.made.roomSession?.sessionEvents.on(RoomSessionEvent.RSE_STARTED, (event: RoomSessionEvent) => room = event.session);
-        host.made.roomSession?.sessionEvents.on(RoomSessionEvent.RSE_ENDED, () =>
+        const sessionOn = scope.bind(host.made.roomSession?.sessionEvents);
+
+        sessionOn(RoomSessionEvent.RSE_STARTED, (event: RoomSessionEvent) => room = event.session);
+        sessionOn(RoomSessionEvent.RSE_ENDED, () =>
         {
             room = null;
             engine?.setRpgInteractives(null);
@@ -101,7 +106,7 @@ export const InteractionFeature: IGameFeature = {
             hud?.update({target: null});
         });
 
-        devHook('interaction', {session});
+        scope.own(session).hook('interaction', {session});
 
         return null;
     },

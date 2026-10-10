@@ -237,7 +237,7 @@ const RoomEngines = feature({
 const AvatarRenderer = feature({
     id: 'avatar-renderer',
     provides: [IID_AvatarRenderManager],
-    create: ({context, host}) =>
+    create: ({context, host, scope}) =>
     {
         const made = host.made;
         const configuration = made.configuration;
@@ -265,7 +265,7 @@ const AvatarRenderer = feature({
         };
 
         if(configuration?.isInitialized()) start();
-        else configuration?.events.once('complete', start);
+        else scope.bindOnce(configuration?.events)('complete', start);
 
         return null;
     }

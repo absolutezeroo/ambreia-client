@@ -32,7 +32,8 @@ export const AssetPacksFeature: IGameFeature = {
          */
         key: z.string().regex(/^[A-Za-z0-9_-]{43}$/, 'a 32-byte key in base64url (43 characters)').optional()
     }),
-    create: ({config, host}) =>
+    requires: ['configuration'],
+    create: ({config, host, scope}) =>
     {
         const settings = config as IAssetPacksSettings;
         const configuration = host.made.configuration;
@@ -61,7 +62,7 @@ export const AssetPacksFeature: IGameFeature = {
         };
 
         if(configuration.isInitialized()) open();
-        else configuration.events.once('complete', open);
+        else scope.bindOnce(configuration.events)('complete', open);
 
         return null;
     }

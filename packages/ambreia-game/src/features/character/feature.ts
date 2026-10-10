@@ -1,4 +1,3 @@
-import {devHook} from '@ambreia/common/utils/BuildEnv';
 import {Logger} from '@ambreia/common/utils/Logger';
 import {RoomSessionEvent} from '../../session/events/RoomSessionEvent';
 import type {IGameFeature} from '../GameFeature';
@@ -17,15 +16,17 @@ const log = Logger.getLogger('habbo.features.character');
  */
 export const CharacterFeature: IGameFeature = {
     id: 'character',
-    create: ({host}) =>
+    requires: ['roomSession'],
+    create: ({host, scope}) =>
     {
         const session = new RpgCharacterSession();
+        const on = scope.bind(session.events);
         let screen: CharacterScreen | null = null;
         let inWorld = false;
 
         host.made.character = session;
 
-        session.events.on('characters', () =>
+        on('characters', () =>
         {
             const windows = host.made.windowManager;
 
@@ -36,11 +37,17 @@ export const CharacterFeature: IGameFeature = {
         });
 
         // Dev hook: the screen as it is (`__ambreia.characters.screen()`).
-        devHook('characters', {session, screen: () => screen});
+        scope.hook('characters', {session, screen: () => screen});
 
-        host.made.roomSession?.sessionEvents.on(RoomSessionEvent.RSE_STARTED, () =>
+        scope.bind(host.made.roomSession?.sessionEvents)(RoomSessionEvent.RSE_STARTED, () =>
         {
             inWorld = true;
+            screen?.dispose();
+            screen = null;
+        });
+
+        scope.own(session).add(() =>
+        {
             screen?.dispose();
             screen = null;
         });

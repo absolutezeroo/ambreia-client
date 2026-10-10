@@ -31,7 +31,7 @@ import {Vortex} from './Vortex';
 import {bootFeatures} from '@ambreia/kernel/feature/bootFeatures';
 import type {IKernelReport} from '@ambreia/kernel/feature/bootFeatures';
 import {GAME_FEATURES, emptyManagers} from '@ambreia/game/features/index';
-import {roomWidgetRegistry} from '@ambreia/game/features/GameFeature';
+import {roomWidgetRegistry, guardedFeatures} from '@ambreia/game/features/GameFeature';
 import type {IEngineHost} from '@ambreia/game/features/index';
 
 import {PacketLogger} from '@ambreia/net/PacketLogger';
@@ -438,6 +438,10 @@ export class VortexMain implements IVortexMain
         this._roomMessageHandler?.dispose();
         this._roomMessageHandler = null;
 
+        // The features first, last booted first: their listeners on the managers go before the managers.
+        this._kernelReport?.dispose();
+        this._kernelReport = null;
+
         // Nullify Habbo manager refs (inverse init order)
         this._avatarEditor = null;
         this._roomUI = null;
@@ -537,7 +541,7 @@ export class VortexMain implements IVortexMain
             made
         };
 
-        this._kernelReport = await bootFeatures(ctx, GAME_FEATURES, config.kernel, host);
+        this._kernelReport = await bootFeatures(ctx, guardedFeatures(GAME_FEATURES), config.kernel, host);
 
         this._configurationManager = made.configuration;
         this._habboCommunicationManager = made.communication;

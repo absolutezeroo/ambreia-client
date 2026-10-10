@@ -1,6 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {z} from 'zod';
+import {EventEmitter} from 'eventemitter3';
 import {CoreComponentContext} from '../src/runtime/CoreComponentContext';
 import {Component} from '../src/runtime/Component';
 import {ComponentDependency} from '../src/runtime/ComponentDependency';
@@ -172,4 +173,110 @@ test('an essential feature switched off stops the boot before anything is made, 
         return true;
     });
     assert.equal(made, false);
+});
+
+test('dispose() runs each feature\'s dispose then releases its scope, last booted first', async () =>
+{
+    const context = new CoreComponentContext();
+    const emitter = new EventEmitter<{tick: []}>();
+    const order: string[] = [];
+    const features: IFeature[] = [
+        defineFeature({id: 'a', provides: [IID_A], create: ({context: ctx, scope}) => { scope.bind(emitter)('tick', () => undefined); scope.add(() => order.push('scope a')); return new A(ctx); }, dispose: () => order.push('dispose a')}),
+        defineFeature({id: 'b', create: ({scope}) => { scope.bind(emitter)('tick', () => undefined); scope.add(() => order.push('scope b')); return null; }, dispose: () => order.push('dispose b')})
+    ];
+    const report = await bootFeatures(context, features, config(features));
+
+    assert.equal(emitter.listenerCount('tick'), 2);
+
+    report.dispose();
+
+    assert.deepEqual(order, ['dispose b', 'scope b', 'dispose a', 'scope a']);
+    assert.equal(emitter.listenerCount('tick'), 0);
+
+    // A second boot starts clean: the listeners are the new boot's only.
+    await bootFeatures(new CoreComponentContext(), features, config(features));
+    assert.equal(emitter.listenerCount('tick'), 2);
+});
+
+test('a boot that fails releases what was already made', async () =>
+{
+    let released = false;
+    const features: IFeature[] = [
+        defineFeature({id: 'a', create: ({scope}) => { scope.add(() => { released = true; }); return null; }}),
+        featureB()
+    ];
+
+    await assert.rejects(bootFeatures(new CoreComponentContext(), features, config(features)), FeatureDependencyError);
+    assert.equal(released, true);
+});
+
+test('a plain instance is disposed with its carrier when the context is', async () =>
+{
+    const IID_P = createIID<{disposed: boolean}>('IID_P');
+    const instance = {disposed: false, dispose(): void { this.disposed = true; }};
+    const features: IFeature[] = [defineFeature({id: 'p', provides: [IID_P], create: () => ({instance})})];
+    const context = new CoreComponentContext();
+
+    await bootFeatures(context, features, config(features));
+    context.dispose();
+
+    assert.equal(instance.disposed, true);
+});
+
+test('two features with one id, or two providers of one interface, stop the boot before anything is made', async () =>
+{
+    let made = 0;
+    const twice: IFeature[] = [
+        defineFeature({id: 'a', provides: [IID_A], create: ({context}) => { made++; return new A(context); }}),
+        defineFeature({id: 'a', create: () => { made++; return null; }})
+    ];
+
+    await assert.rejects(bootFeatures(new CoreComponentContext(), twice, config([twice[0]])), (error: unknown) =>
+    {
+        assert.ok(error instanceof FeatureDependencyError);
+        assert.equal(error.message, 'Feature "a" is declared twice');
+
+        return true;
+    });
+
+    const both: IFeature[] = [
+        defineFeature({id: 'a', provides: [IID_A], create: ({context}) => { made++; return new A(context); }}),
+        defineFeature({id: 'a2', provides: [IID_A], create: ({context}) => { made++; return new A(context); }})
+    ];
+
+    await assert.rejects(bootFeatures(new CoreComponentContext(), both, config(both)), (error: unknown) =>
+    {
+        assert.ok(error instanceof FeatureDependencyError);
+        assert.equal(error.message, 'IID_A is provided by both "a" and "a2"');
+
+        return true;
+    });
+    assert.equal(made, 0);
+
+    // A disabled provider does not collide.
+    await bootFeatures(new CoreComponentContext(), both, config(both, {a2: {enabled: false}}));
+});
+
+test('features that wait on each other are a boot error naming the cycle', async () =>
+{
+    class ARequiresB extends Component
+    {
+        protected override get dependencies(): Array<ComponentDependency<unknown>>
+        {
+            return super.dependencies.concat([new ComponentDependency(IID_B, () => {}, true)]);
+        }
+    }
+
+    const features: IFeature[] = [
+        defineFeature({id: 'a', provides: [IID_A], create: ({context}) => new ARequiresB(context)}),
+        featureB()
+    ];
+
+    await assert.rejects(bootFeatures(new CoreComponentContext(), features, config(features)), (error: unknown) =>
+    {
+        assert.ok(error instanceof FeatureDependencyError);
+        assert.equal(error.message, 'Features wait on each other: "a" → "b" → "a"');
+
+        return true;
+    });
 });

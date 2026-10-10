@@ -1,4 +1,4 @@
-import {devHook} from '@ambreia/common/utils/BuildEnv';
+import type {IScopedTimer} from '@ambreia/kernel/feature/FeatureScope';
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {IRpgCastStart} from '@ambreia/protocol/incoming/rpg/skills/RpgCastStartMessage';
 import type {IRpgStatus} from '@ambreia/protocol/incoming/rpg/skills/RpgStatusesMessage';
@@ -52,16 +52,18 @@ const typing = (event: KeyboardEvent): boolean =>
 export const SkillsFeature: IGameFeature = {
     id: 'skills',
     images: [...SKILL_IMAGES, ...SKILL_WINDOW_IMAGES],
-    create: ({host}) =>
+    requires: ['roomEngine', 'interaction', 'hud', 'hudPlayer', 'roomSession'],
+    create: ({host, scope}) =>
     {
         const session = new RpgSkillSession();
+        const on = scope.bind(session.events);
         const casts = new Map<number, IRunningCast>();
         let room: IRoomSession | null = null;
         let window: SkillsWindow | null = null;
-        let castTicker: ReturnType<typeof setInterval> | null = null;
+        let castTicker: IScopedTimer | null = null;
         /** The player's own statuses with their end (Date.now() clock; null: none), and the HUD's second hand. */
         let ownStatuses: {statusId: string; end: number | null}[] = [];
-        let statusTicker: ReturnType<typeof setInterval> | null = null;
+        let statusTicker: IScopedTimer | null = null;
         /** The combatants a slow or a stun holds back: marked over their head, slowed steps. */
         const heldBack = new Set<number>();
         let definitions: Promise<void> | null = null;
@@ -134,10 +136,10 @@ export const SkillsFeature: IGameFeature = {
                 casting ||= own.casting;
             }
 
-            if(casting && castTicker === null) castTicker = setInterval(renderTarget, CAST_TICK_MS);
+            if(casting && castTicker === null) castTicker = scope.interval(renderTarget, CAST_TICK_MS);
             else if(!casting && castTicker !== null)
             {
-                clearInterval(castTicker);
+                castTicker.clear();
                 castTicker = null;
             }
         };
@@ -204,10 +206,10 @@ export const SkillsFeature: IGameFeature = {
             session.cast(skillId, targetId());
         };
 
-        session.events.on('skills', renderBar);
-        session.events.on('cooldowns', renderBar);
+        on('skills', renderBar);
+        on('cooldowns', renderBar);
 
-        session.events.on('result', result =>
+        on('result', result =>
         {
             const text = bits();
 
@@ -216,7 +218,7 @@ export const SkillsFeature: IGameFeature = {
                 text.textOr(`vortex.skill.error.${result.code}`, text.text('vortex.skill.error.refused'))));
         });
 
-        session.events.on('castStart', message =>
+        on('castStart', message =>
         {
             for(const cast of message.casts as readonly IRpgCastStart[])
             {
@@ -228,7 +230,7 @@ export const SkillsFeature: IGameFeature = {
         });
 
         // A telegraphed cast (M1c): its cells on the floor until its RpgCastEnd, also in a room's entry burst.
-        session.events.on('telegraphs', message =>
+        on('telegraphs', message =>
         {
             for(const telegraph of message.telegraphs)
             {
@@ -238,7 +240,7 @@ export const SkillsFeature: IGameFeature = {
             }
         });
 
-        session.events.on('castEnd', message =>
+        on('castEnd', message =>
         {
             for(const end of message.ends)
             {
@@ -273,15 +275,15 @@ export const SkillsFeature: IGameFeature = {
 
             const ticking = ownStatuses.some(status => status.end !== null);
 
-            if(ticking && statusTicker === null) statusTicker = setInterval(renderOwn, 1000);
+            if(ticking && statusTicker === null) statusTicker = scope.interval(renderOwn, 1000);
             else if(!ticking && statusTicker !== null)
             {
-                clearInterval(statusTicker);
+                statusTicker.clear();
                 statusTicker = null;
             }
         };
 
-        session.events.on('statuses', message =>
+        on('statuses', message =>
         {
             const now = Date.now();
 
@@ -305,21 +307,21 @@ export const SkillsFeature: IGameFeature = {
             renderTarget();
         });
 
-        session.events.on('events', message => host.made.combat?.report(message.outcomes, message.impacts));
+        on('events', message => host.made.combat?.report(message.outcomes, message.impacts));
 
         // A new target: the interaction feature drew its frame, this adds its effects and cast.
-        host.made.interaction?.events.on('target', renderTarget);
-        host.made.hudPlayer?.events.on('use', (bar, slot) =>
+        scope.bind(host.made.interaction?.events)('target', renderTarget);
+        scope.bind(host.made.hudPlayer?.events)('use', (bar, slot) =>
         {
             if(bar === 'skills') use(slot);
         });
         // The + menu's « Compétences ».
-        host.made.hud?.events.on('nav', name =>
+        scope.bind(host.made.hud?.events)('nav', name =>
         {
             if(name === 'nav_skills') openWindow();
         });
 
-        globalThis.addEventListener?.('keydown', (event: KeyboardEvent) =>
+        scope.listen(globalThis, 'keydown', (event: KeyboardEvent) =>
         {
             if(room === null || typing(event) || event.ctrlKey || event.altKey || event.metaKey) return;
 
@@ -336,14 +338,14 @@ export const SkillsFeature: IGameFeature = {
             }
         });
 
-        const sessionEvents = host.made.roomSession?.sessionEvents;
+        const sessionOn = scope.bind(host.made.roomSession?.sessionEvents);
 
-        sessionEvents?.on(RoomSessionEvent.RSE_STARTED, (event: RoomSessionEvent) =>
+        sessionOn(RoomSessionEvent.RSE_STARTED, (event: RoomSessionEvent) =>
         {
             room = event.session;
             void loadDefinitions();
         });
-        sessionEvents?.on(RoomSessionEvent.RSE_ENDED, () =>
+        sessionOn(RoomSessionEvent.RSE_ENDED, () =>
         {
             room = null;
             casts.clear();
@@ -352,7 +354,7 @@ export const SkillsFeature: IGameFeature = {
             for(const objectId of heldBack) host.made.roomEngine?.setRpgStepTime(objectId, null);
             heldBack.clear();
             ownStatuses = [];
-            if(statusTicker !== null) clearInterval(statusTicker);
+            statusTicker?.clear();
             statusTicker = null;
             window?.hide();
             host.made.roomEngine?.pickRpgTile(null);
@@ -360,7 +362,12 @@ export const SkillsFeature: IGameFeature = {
         });
 
         // Dev hook: `__ambreia.skills.session`, `.open()`.
-        devHook('skills', {session, use, open: openWindow});
+        scope.own(session).add(() =>
+        {
+            window?.dispose();
+            window = null;
+        });
+        scope.hook('skills', {session, use, open: openWindow});
 
         return null;
     },
