@@ -74,3 +74,10 @@ paths:
   tool refuses to mix them). Build state (`<kind>.sources.json`, the digest of each `.nitro` — "up
   to date" means same digest, not newer mtime) and `<kind>.report.json` go to `--state-dir`
   (`.ambreia-build/`, gitignored), never into the served output.
+- **Monsters** are pets drawn by `tools/monster-art/` (spec
+  `docs/superpowers/specs/2026-10-10-monster-art-pipeline-design.md`): `monsters/<id>/rig.json`
+  (volumes on bones, materials, decals, poses) → `build:monster-art` → `<id>.aseprite` (layers
+  forme/peinture/détails/finition, plus `retouche` for hand edits, never overwritten) and
+  `monster.json` → `build:monsters` → `pets/<id>.nitro` → `build:ambreia:all --only=pets`. The pet
+  type is the id's index in `pet.configuration`. `monster-art:preview <id>` shows the 8 directions
+  live. A hand-drawn `.aseprite` (the slime) goes through `build:monsters` the same way.

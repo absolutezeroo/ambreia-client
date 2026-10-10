@@ -13,6 +13,8 @@
     "build:ambreia": "tsx ./tools/build-ambreia.ts",
     "build:ambreia:all": "node ./tools/build-ambreia-all.mjs",
     "build:monsters": "node ./tools/build-monsters.mjs",
+    "build:monster-art": "node ./tools/monster-art/build.mjs",
+    "monster-art:preview": "node ./tools/monster-art/preview.mjs",
     "gather:ambreia": "node ./tools/gather-ambreia-sources.mjs",
     "import:avatar-configurations": "node ./tools/import-avatar-configurations.mjs --write",
     "import:crypted-images": "node ./tools/import-crypted-images.mjs --write",
