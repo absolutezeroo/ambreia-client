@@ -17,6 +17,27 @@ import {MessageDataWrapper} from '../messages/MessageDataWrapper';
 import {PreEncryptionMessageComposer} from '../messages/PreEncryptionMessageComposer';
 import {PacketLogger} from '../PacketLogger';
 
+/** Vite inlines `import.meta.env.PROD` in a build; under Node (tests, tools) there is no `env`. */
+function isProductionBuild(): boolean
+{
+    return (import.meta as unknown as {env?: {PROD?: boolean}}).env?.PROD === true;
+}
+
+const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]', '::1']);
+
+/** True for a socket URL that stays on this machine. */
+function isLoopback(url: string): boolean
+{
+    try
+    {
+        return LOOPBACK_HOSTS.has(new URL(url).hostname);
+    }
+    catch
+    {
+        return false;
+    }
+}
+
 const log = Logger.getLogger('core.communication.connection.SocketConnection');
 
 export interface IConnectionEvents
@@ -131,16 +152,31 @@ export class SocketConnection extends EventEmitter<IConnectionEvents> implements
         let url: string;
         if(host.startsWith('ws://') || host.startsWith('wss://'))
         {
-            if(host.startsWith('ws://'))
-            {
-                log.warn('Insecure WebSocket connection (ws://). Use wss:// in production.');
-            }
             url = host;
         }
         else
         {
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             url = port > 0 ? `${protocol}//${host}:${port}` : `${protocol}//${host}`;
+        }
+
+        if(url.startsWith('ws://'))
+        {
+            // Plain-text WebSockets stay a development convenience (a local emulator). A production
+            // build refuses them anywhere but on this machine (spec §7 rule 4): the RC4 handshake does
+            // not protect against a third party on the network, and a wrong `app.server.host` must
+            // fail here, named, rather than send the SSO ticket in clear.
+            if(isProductionBuild() && !isLoopback(url))
+            {
+                const error = new Error(`Refusing an insecure WebSocket (${url}) in production: use wss://`);
+
+                log.error(error.message);
+                this._callback?.connectionError?.(error);
+
+                return false;
+            }
+
+            log.warn('Insecure WebSocket connection (ws://). Use wss:// in production.');
         }
 
         try

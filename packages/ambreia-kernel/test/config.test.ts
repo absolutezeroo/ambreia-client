@@ -92,6 +92,9 @@ test('browser sources: the dev host on localhost, the page origin elsewhere, ?ss
 
     assert.deepEqual(local.map(source => source.name), ['defaults', 'url']);
     assert.equal((local[0].values as {app: {server: {host: string}}}).app.server.host, DEV_SERVER_HOST);
+    // A library never compiles a remote host in: the local default stays on this machine, in clear
+    // text only because it never leaves it (spec §7 rule 4).
+    assert.match(new URL(DEV_SERVER_HOST).hostname, /^(localhost|127\.0\.0\.1)$/);
     assert.deepEqual(local[1].values, {app: {sso: 'abc', startLink: 'navigator/goto/1'}});
 
     const deployed = browserSources({hostname: 'jeu.exemple.fr', protocol: 'https:', host: 'jeu.exemple.fr', search: ''}, {app: {}});

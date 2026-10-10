@@ -2,12 +2,15 @@ import type {IConfigSource} from './loadConfig';
 import {ConfigError} from './ConfigError';
 
 /**
- * The socket a page served from this machine dials: the hotel's dev server. Served from anywhere
- * else (a phone on the LAN, a tunnel, the deployment), the page dials back through its own origin,
- * which the website proxies at /ws. Moved from index.html (J5); a deployment overrides it in
- * config.json (`app.server.host`).
+ * The socket a page served from this machine dials: a local emulator, on its default port. Served
+ * from anywhere else (a phone on the LAN, a tunnel, the deployment), the page dials back through its
+ * own origin, which the website proxies at /ws. Moved from index.html (J5). A shared development
+ * server is not a default a library compiles in: it goes in the client's `public/config.json`
+ * (`app.server.host`, gitignored), like a deployment's. The previous value here was a public
+ * `ws://…sslip.io` tunnel, dialled in clear text by every developer without a config.json and
+ * shipped in the production bundle.
  */
-export const DEV_SERVER_HOST = 'ws://ourvjasausgxlxmrunm7ys1w.72.60.91.223.sslip.io';
+export const DEV_SERVER_HOST = 'ws://127.0.0.1:40001';
 
 /** The parts of `window.location` the defaults are computed from. */
 export interface IPageLocation
