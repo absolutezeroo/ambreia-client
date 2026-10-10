@@ -1,11 +1,16 @@
 import {updateWalls} from '@ambreia/map-editor-core/commands/updateWalls';
 import {updateAmbience} from '@ambreia/map-editor-core/commands/updateAmbience';
+import {setFloorThickness} from '@ambreia/map-editor-core/commands/setFloorThickness';
 import type {EditorApp} from '../../app/EditorApp';
 import type {IFieldSpec} from './IFieldSpec';
 
 type Form = {readonly title: string; readonly hint: string; readonly fields: IFieldSpec[]};
 
-/** "Murs": shown or not, their height and thickness (S§9). */
+/** Habbo's thickness scale for walls and floor; the server reads an old 2 or 3 as thick. */
+const THICKNESS: readonly (readonly [string, string])[] = [['-2', 'Très fin'], ['-1', 'Fin'], ['0', 'Normal'], ['1', 'Épais']];
+const thickness = (value = 0): string => String(Math.max(-2, Math.min(1, value)));
+
+/** "Murs": shown or not, their height and thickness, and the floor's thickness (S§9). */
 export function wallsForm(app: EditorApp): Form
 {
     const walls = () => app.doc.walls ?? {};
@@ -16,7 +21,8 @@ export function wallsForm(app: EditorApp): Form
         fields: [
             {kind: 'check', label: 'Murs visibles', get: () => walls().visible !== false, set: v => app.execute(updateWalls({visible: !!v}))},
             {kind: 'number', label: 'Hauteur', get: () => walls().height ?? 0, set: v => app.execute(updateWalls({height: Number(v)})), min: 0, max: 16},
-            {kind: 'number', label: 'Épaisseur', get: () => walls().thickness ?? 0, set: v => app.execute(updateWalls({thickness: Number(v)})), min: 0, max: 3}
+            {kind: 'select', label: 'Épaisseur', get: () => thickness(walls().thickness), set: v => app.execute(updateWalls({thickness: Number(v)})), options: THICKNESS},
+            {kind: 'select', label: 'Épaisseur du sol', get: () => thickness(app.doc.floor.thickness), set: v => app.execute(setFloorThickness(Number(v))), options: THICKNESS}
         ]
     };
 }

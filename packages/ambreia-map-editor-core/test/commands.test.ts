@@ -8,6 +8,7 @@ import {removeDecor} from '../src/commands/removeDecor';
 import {editTiles} from '../src/commands/editTiles';
 import {resizeFloor} from '../src/commands/resizeFloor';
 import {moveDoor} from '../src/commands/moveDoor';
+import {setFloorThickness} from '../src/commands/setFloorThickness';
 import {blankZone} from '../src/zone/blankZone';
 import {tileAt} from '../src/zone/zoneGeometry';
 
@@ -86,4 +87,15 @@ test('the door stays on the floor', () =>
 
     assert.equal(moveDoor(7, 0).apply(doc), doc);
     assert.deepEqual(moveDoor(3, 0).apply(doc).floor.door, {x: 3, y: 0});
+});
+
+test('the floor thickness changes the floor alone, and the same value is no history', () =>
+{
+    const doc = blankZone('v', 'V');
+    const thin = setFloorThickness(-2).apply(doc);
+
+    assert.equal(thin.floor.thickness, -2);
+    assert.equal(thin.floor.tiles, doc.floor.tiles);
+    assert.equal(setFloorThickness(0).apply(doc), doc);
+    assert.equal(setFloorThickness(-2).apply(thin), thin);
 });
