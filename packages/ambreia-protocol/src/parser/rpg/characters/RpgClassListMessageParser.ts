@@ -2,6 +2,7 @@ import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrappe
 import type {IIncomingParser} from '@ambreia/net/style/MessageMap';
 import {RpgClassListMessage} from '../../../incoming/rpg/characters/RpgClassListMessage';
 import type {IRpgClassEntry} from '../../../incoming/rpg/characters/IRpgClassEntry';
+import {readCount} from '../../readCount';
 
 /** Reads RpgClassListMessage in the order of the server's RpgClassListMessageComposerSerializer. */
 export class RpgClassListMessageParser implements IIncomingParser<RpgClassListMessage>
@@ -10,7 +11,7 @@ export class RpgClassListMessageParser implements IIncomingParser<RpgClassListMe
     {
         const classes: IRpgClassEntry[] = [];
 
-        for(let count = wrapper.readInt(); count > 0; count--)
+        for(let count = readCount(wrapper); count > 0; count--)
         {
             const id = wrapper.readString();
             const role = wrapper.readString();
@@ -19,7 +20,7 @@ export class RpgClassListMessageParser implements IIncomingParser<RpgClassListMe
             const starter = wrapper.readBoolean();
             const specializations: string[] = [];
 
-            for(let specs = wrapper.readInt(); specs > 0; specs--) specializations.push(wrapper.readString());
+            for(let specs = readCount(wrapper); specs > 0; specs--) specializations.push(wrapper.readString());
 
             classes.push({id, role, range, primaryStat, starter, specializations});
         }

@@ -2,6 +2,7 @@ import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrappe
 import type {IIncomingParser} from '@ambreia/net/style/MessageMap';
 import type {IRpgSkillImpact, IRpgSkillOutcome} from '../../../incoming/rpg/skills/RpgSkillEventsMessage';
 import {RpgSkillEventsMessage} from '../../../incoming/rpg/skills/RpgSkillEventsMessage';
+import {readCount} from '../../readCount';
 
 /** Reads RpgSkillEventsMessage in the order of the server's RpgSkillEventsMessageComposerSerializer. */
 export class RpgSkillEventsMessageParser implements IIncomingParser<RpgSkillEventsMessage>
@@ -11,12 +12,12 @@ export class RpgSkillEventsMessageParser implements IIncomingParser<RpgSkillEven
         const impacts: IRpgSkillImpact[] = [];
         const outcomes: IRpgSkillOutcome[] = [];
 
-        for(let i = wrapper.readInt(); i > 0; i--)
+        for(let i = readCount(wrapper); i > 0; i--)
         {
             impacts.push({casterObjectId: wrapper.readInt(), skillId: wrapper.readString(), targetObjectId: wrapper.readInt(), x: wrapper.readInt(), y: wrapper.readInt()});
         }
 
-        for(let i = wrapper.readInt(); i > 0; i--)
+        for(let i = readCount(wrapper); i > 0; i--)
         {
             outcomes.push({
                 sourceObjectId: wrapper.readInt(),

@@ -24,6 +24,10 @@ authority on every message; `sources/HABBO-ARCTURUS-DAYBREAK/` is not this proje
    - **Composer**: `extends MessageComposer<TupleType>` with `_data` and `getMessageArray()`
    - **Parser**: `implements IMessageParser` with `flush()` + `parse(wrapper)`
    - **Event**: `extends MessageEvent implements IMessageEvent` with `callback` parameter in constructor
+   - A list's count is read with `readCount(wrapper)` (`@ambreia/protocol/parser/readCount`), never a bare
+     `readInt()`: it refuses a count the frame cannot hold before any item is read.
+   - On the wire a bare `number` is an **int** (a fraction is truncated with a warning); a float is
+     written through `@ambreia/net/util/Float`; `null`/`undefined` throw instead of shifting the fields.
 5. **Message ids come from `Headers.generated.ts`**, written by `pnpm gen:headers` from the emulator's `Headers.cs` and checked by the pre-commit hook. New registrations use `Incoming.X` / `Outgoing.X`; never type an id by hand, never take one from the AS3 registry.
 6. **A new message uses the new style** (spec §6, `@ambreia/net/style/MessageMap`): a plain class, an
    `IIncomingParser` or `IOutgoingSerializer`, an `IMessageHandler`, and a `MessageMap` per domain

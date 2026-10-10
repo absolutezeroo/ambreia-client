@@ -8,6 +8,7 @@
 import type {IMessageParser} from '@ambreia/net/messages/IMessageParser';
 import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
 import {RoomUserData} from '../../../incoming/room/engine/RoomUserData';
+import {readCount} from '../../readCount';
 
 export class UsersMessageParser implements IMessageParser
 {
@@ -93,7 +94,7 @@ export class UsersMessageParser implements IMessageParser
     // pools, leaderboard or breeding), so the player block ends at isModerator.
     parse(wrapper: IMessageDataWrapper): boolean
     {
-        const count = wrapper.readInt();
+        const count = readCount(wrapper);
 
         this._users = Array.from({length: count}, () =>
         {
@@ -161,7 +162,7 @@ export class UsersMessageParser implements IMessageParser
                     userData.ownerId = wrapper.readInt();
                     userData.ownerName = wrapper.readString();
 
-                    const skillCount = wrapper.readInt();
+                    const skillCount = readCount(wrapper);
                     if(skillCount > 0)
                     {
                         userData.botSkills = Array.from({length: skillCount}, () => wrapper.readShort());

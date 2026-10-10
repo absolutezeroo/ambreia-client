@@ -1,6 +1,7 @@
 import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
 import type {IIncomingParser} from '@ambreia/net/style/MessageMap';
 import {RpgCooldownsMessage} from '../../../incoming/rpg/skills/RpgCooldownsMessage';
+import {readCount} from '../../readCount';
 
 /** Reads RpgCooldownsMessage in the order of the server's RpgCooldownsMessageComposerSerializer. */
 export class RpgCooldownsMessageParser implements IIncomingParser<RpgCooldownsMessage>
@@ -10,7 +11,7 @@ export class RpgCooldownsMessageParser implements IIncomingParser<RpgCooldownsMe
         const globalRemainingMs = wrapper.readInt();
         const skills: {skillId: string; remainingMs: number}[] = [];
 
-        for(let i = wrapper.readInt(); i > 0; i--) skills.push({skillId: wrapper.readString(), remainingMs: wrapper.readInt()});
+        for(let i = readCount(wrapper); i > 0; i--) skills.push({skillId: wrapper.readString(), remainingMs: wrapper.readInt()});
 
         return new RpgCooldownsMessage(globalRemainingMs, skills);
     }

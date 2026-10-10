@@ -2,6 +2,7 @@ import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrappe
 import type {IIncomingParser} from '@ambreia/net/style/MessageMap';
 import {RpgCharacterListMessage} from '../../../incoming/rpg/characters/RpgCharacterListMessage';
 import type {IRpgCharacterListEntry} from '../../../incoming/rpg/characters/IRpgCharacterListEntry';
+import {readCount} from '../../readCount';
 
 /** Reads RpgCharacterListMessage in the order of the server's RpgCharacterListMessageComposerSerializer. */
 export class RpgCharacterListMessageParser implements IIncomingParser<RpgCharacterListMessage>
@@ -11,7 +12,7 @@ export class RpgCharacterListMessageParser implements IIncomingParser<RpgCharact
         const maxCharacters = wrapper.readInt();
         const characters: IRpgCharacterListEntry[] = [];
 
-        for(let count = wrapper.readInt(); count > 0; count--)
+        for(let count = readCount(wrapper); count > 0; count--)
         {
             characters.push({
                 playerId: wrapper.readInt(),
