@@ -207,6 +207,10 @@ export interface IWindowManager extends IDisposable {
     // AS3: sources/win63_version/habbo/window/class_38.as::buildModalDialogFromXML()
     buildModalDialogFromXML(layout: string): IModalDialog;
 
+    // Frees the render buffers of hidden and detached windows; called when a room ends.
+    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/HabboWindowManagerComponent.as::purge()
+    purge(): void;
+
     // TS-only: the modal twin of `buildWidgetLayout()`. AS3 components do the asset lookup
     // themselves inside their own `getModalXmlWindow()`; this port keeps the layout map private,
     // so the pair is exposed here instead.

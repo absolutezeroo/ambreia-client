@@ -10,7 +10,8 @@ import type {IIterator} from '../utils/IIterator';
 import {ContainerController} from './ContainerController';
 import {ContainerIterator} from '../iterators/ContainerIterator';
 import {WindowController} from '../WindowController';
-import type {WindowEvent} from '../events/WindowEvent';
+import {WindowEvent} from '../events/WindowEvent';
+import {WindowMouseEvent} from '../events/WindowMouseEvent';
 import {PropertyStruct} from '../utils/PropertyStruct';
 import {TextMargins} from '../utils/TextMargins';
 
@@ -72,6 +73,13 @@ export class FrameController extends ContainerController implements IFrameWindow
         {
             helpButton.procedure = this.helpButtonProcedure.bind(this);
         }
+
+        const closeButton = this.findChildByName('header_button_close');
+
+        if(closeButton !== null) this.hookCloseButton(closeButton);
+
+        // The skin's header is built above; a layout that brings its own close button adds it later.
+        this.addEventListener(WindowEvent.WE_CHILD_ADDED, this._childAddedListener);
 
         this.helpPage = this._helpPage;
         this.menuButtonVisible = false;
@@ -400,6 +408,61 @@ export class FrameController extends ContainerController implements IFrameWindow
         {
             this._helpButtonAction(this._helpPage);
         }
+    }
+
+    // TS-only: AS3 frames do nothing on their close button; each component handled the click (hide,
+    // dispose, confirm first…). Here the frame raises one event so a feature listens for WE_CLOSE
+    // instead of a button name, and hides itself when nobody objects. A feature that destroys or
+    // confirms instead prevents the default in its WE_CLOSE listener.
+    private readonly _closeButtonListener = (): void =>
+    {
+        this.close();
+    };
+
+    private readonly _childAddedListener = (event: WindowEvent): void =>
+    {
+        if(event.related?.name === 'header_button_close') this.hookCloseButton(event.related);
+    };
+
+    /** A listener, not the button's procedure: a feature that sets the latter keeps it and the frame still closes. */
+    private hookCloseButton(button: IWindow): void
+    {
+        button.removeEventListener(WindowMouseEvent.CLICK, this._closeButtonListener);
+        button.addEventListener(WindowMouseEvent.CLICK, this._closeButtonListener);
+    }
+
+    /**
+     * Closes the frame: dispatches a cancelable WE_CLOSE, hides the frame unless it was prevented,
+     * then WE_CLOSED. The shape is DropBaseController.close()'s.
+     *
+     * @returns True when the frame closed (or was already gone)
+     */
+    // TS-only: see _closeButtonListener.
+    public close(): boolean
+    {
+        if(this._disposed || !this.visible) return true;
+
+        const closeEvent = WindowEvent.allocate(WindowEvent.WE_CLOSE, this, null, true);
+        this.update(this as unknown as WindowController, closeEvent);
+
+        if(closeEvent.isDefaultPrevented())
+        {
+            closeEvent.recycle();
+
+            return false;
+        }
+
+        closeEvent.recycle();
+
+        if(this._disposed) return true;
+
+        this.visible = false;
+
+        const closedEvent = WindowEvent.allocate(WindowEvent.WE_CLOSED, this, null);
+        this.update(this as unknown as WindowController, closedEvent);
+        closedEvent.recycle();
+
+        return true;
     }
 
     /**

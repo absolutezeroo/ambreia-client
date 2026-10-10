@@ -149,6 +149,22 @@ export class ModalDialog implements IModalDialog
     }
 
     /**
+     * Forgets the statics a disposed manager owned, so the next manager (HMR, a test, a second
+     * host) gets its own modal container instead of one in a dead context. A manager that is not
+     * the owner changes nothing.
+     */
+    // TS-only: AS3 had one window manager per process and never disposed it.
+    public static reset(windowManager: IWindowManager): void
+    {
+        if(ModalDialog._windowManager !== windowManager) return;
+
+        ModalDialog._windowManager = null;
+        ModalDialog._container = null;
+        ModalDialog._refreshPending = 0;
+        ModalDialog._initialized = false;
+    }
+
+    /**
 	 * Rebuilds the stacked background/content pairs in the shared modal
 	 * container: captures the real desktop (layers below the modal layer) as
 	 * a snapshot, darkens it, and layers in each stacked dialog's own frozen

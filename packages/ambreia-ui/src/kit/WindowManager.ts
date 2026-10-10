@@ -1433,6 +1433,7 @@ export class WindowManager implements IWindowManager
         this.removeMouseEventTracker(this);
         this._disposed = true;
         this._updateReceivers.length = 0;
+        ModalDialog.reset(this);
 
         for(const context of this._windowContextArray)
         {

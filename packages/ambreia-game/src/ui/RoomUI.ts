@@ -830,6 +830,10 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
 
                 this.disposeDesktop(identifier);
 
+                // The room's widgets are gone and the HUD windows that hide between rooms keep
+                // their buffers otherwise: this is the one moment to drop them.
+                this._windowManager?.purge();
+
                 this._isInRoom = false;
 
                 break;

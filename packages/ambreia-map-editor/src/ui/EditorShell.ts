@@ -37,6 +37,12 @@ export class EditorShell
         if(!window) throw new Error('vortex_map_editor_xml is not registered');
 
         this.window = window;
+
+        // A frame hides on its header X (FrameController.close()); on a screen that is the only way
+        // forward the X is taken out instead of left dead.
+        const headerClose = (window as IWindowContainer).findChildByName('header_button_close');
+
+        if(headerClose) headerClose.visible = false;
         (manager.getDesktop(1) as IWindowContainer).addChild(window);
         // The page's size once; then the layout's scale params follow the desktop as it resizes.
         window.rectangle = {x: 0, y: 0, width: host.canvas.width, height: host.canvas.height};
