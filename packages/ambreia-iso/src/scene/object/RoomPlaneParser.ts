@@ -27,6 +27,8 @@ export class RoomPlaneParser
     private _tileMatrix: number[][] = [];
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/room/object/RoomPlaneParser.as::_tileMatrixOriginal
     private _tileMatrixOriginal: number[][] = [];
+    // TS-only: the door initializeFromTileData() was given, for regeneratePlanes().
+    private _doorTile: {x: number; y: number} | null = null;
     // AS3: .../src/com/sulake/habbo/room/object/RoomPlaneParser.as::_width
     private _width: number = 0;
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/room/object/RoomPlaneParser.as::_height
@@ -660,6 +662,7 @@ export class RoomPlaneParser
     initializeFromTileData(fixedWallsHeight: number = -1, doorTile?: { x: number; y: number }): boolean
     {
         this._fixedWallHeight = fixedWallsHeight;
+        this._doorTile = doorTile ?? null;
 
         // Copy tile matrix to original
         for(let y = 0; y < this._height; y++)
@@ -686,6 +689,29 @@ export class RoomPlaneParser
         }
 
         return this.initialize(entranceTile);
+    }
+
+    /**
+     * Builds the planes again from the tiles as they were before the first build, for new
+     * thickness multipliers: those size the wall sides and floor edges, and the room's settings
+     * (2986) arrive after the floor map built them. AS3 got this by re-parsing its plane XML in the
+     * visualization; here the visualization shares this parser. The tiles set since the build (the
+     * door raised by the message handler) are kept; highlight planes are not rebuilt.
+     */
+    // TS-only: see RoomVisualization.initializeRoomPlanes().
+    regeneratePlanes(): boolean
+    {
+        const tiles = this._tileMatrix.map(row => [...row]);
+
+        this._tileMatrix = this._tileMatrixOriginal.map(row => [...row]);
+        this._planes = [];
+        this._highlightPlanes = [];
+
+        const built = this.initializeFromTileData(this._fixedWallHeight, this._doorTile ?? undefined);
+
+        this._tileMatrix = tiles;
+
+        return built;
     }
 
     getPlane(index: number): RoomPlaneData | null

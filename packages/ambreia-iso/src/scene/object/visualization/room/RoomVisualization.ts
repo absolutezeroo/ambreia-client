@@ -347,12 +347,21 @@ export class RoomVisualization extends RoomObjectSpriteVisualization
             return;
         }
 
-        // Before parsing, not after: the multipliers size the wall's side and top faces, and those
-        // are planes the parser generates. Handing them over afterwards would change nothing.
-        // This handoff was missing, which is why the room settings' thickness controls did nothing.
+        // Before reading the planes: the multipliers size the wall's side and top faces and the
+        // floor's edges, planes the parser generates.
         // AS3: .../src/com/sulake/habbo/room/object/visualization/room/RoomVisualization.as::initializeRoomPlanes()
-        if(!isNaN(this._floorThickness)) planeParser.floorThicknessMultiplier = this._floorThickness;
-        if(!isNaN(this._wallThickness)) planeParser.wallThicknessMultiplier = this._wallThickness;
+        // DEVIATION: AS3 re-parsed its plane XML with the multipliers set. This parser is the
+        //   message handler's, its planes already built at the floor map: setting the multipliers
+        //   alone changed nothing (2986 comes after the floor map), so new ones rebuild the planes.
+        const floor = isNaN(this._floorThickness) ? planeParser.floorThicknessMultiplier : this._floorThickness;
+        const wall = isNaN(this._wallThickness) ? planeParser.wallThicknessMultiplier : this._wallThickness;
+
+        if(floor !== planeParser.floorThicknessMultiplier || wall !== planeParser.wallThicknessMultiplier)
+        {
+            planeParser.floorThicknessMultiplier = floor;
+            planeParser.wallThicknessMultiplier = wall;
+            planeParser.regeneratePlanes();
+        }
 
         this._planeParser = planeParser;
         this.createPlanesAndSprites(planeParser);

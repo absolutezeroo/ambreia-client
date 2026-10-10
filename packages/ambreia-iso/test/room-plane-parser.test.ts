@@ -141,3 +141,26 @@ test('the lowest floor runs under the raised tiles, so a faded block shows groun
     assert.deepEqual(tops.filter(t => t.z === 0), [{x: 2.5, y: 0.5, z: 0}]);
     assert.ok(tops.some(t => t.z === 3));
 });
+
+// The room's visualization settings (2986) arrive after the floor map built the planes: the
+// thickness multipliers must rebuild them, as AS3 re-parsed its plane XML (regeneratePlanes()).
+test('new thickness multipliers rebuild the planes, and the tiles stay as they were', () =>
+{
+    const parser = parse([[0, 0], [0, 0]]);
+    const edges = (): number[] => Array.from({length: parser.planeCount}, (_, i) => i)
+        .filter(i => parser.getPlaneType(i) === RoomPlaneData.PLANE_FLOOR && parser.getPlaneRightSide(i)!.z !== 0)
+        .map(i => parser.getPlaneRightSide(i)!.z);
+
+    // A tile set after the build (the message handler raises the door's) survives the rebuild.
+    parser.setTileHeight(1, 1, 5);
+    const count = parser.planeCount;
+
+    parser.floorThicknessMultiplier = 0.25;
+    parser.wallThicknessMultiplier = 0.25;
+    parser.regeneratePlanes();
+
+    assert.equal(parser.planeCount, count);
+    assert.ok(edges().length > 0);
+    for(const edge of edges()) assert.equal(edge, 0.0625);
+    assert.equal(parser.getTileHeight(1, 1), 5);
+});
