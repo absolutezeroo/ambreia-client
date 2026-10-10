@@ -392,6 +392,7 @@ The client app (`/Dockerfile`):
 ```
 packages/vortex-client/**
 packages/vortex-engine/**
+packages/ambreia-*/**
 Dockerfile
 Caddyfile
 install.mjs
@@ -406,6 +407,7 @@ The imager app (`/Dockerfile.imager`):
 ```
 packages/vortex-imager/**
 packages/vortex-engine/**
+packages/ambreia-*/**
 Dockerfile.imager
 install.mjs
 vortex-client-assets.zip
@@ -421,8 +423,12 @@ line in the imager pointing at the client is `src/config.ts`'s `avatarConfigDir`
 into the unpacked assets, never into the client's source. So client source is genuinely not an
 input here — which is the case the list exists for.
 
-`vortex-engine` is in both lists on purpose: the client and the imager both depend on it through
-`workspace:*`.
+`vortex-engine` and `packages/ambreia-*/**` are in both lists on purpose: since the J1–J6 split the
+engines, the kernel, the protocol and the game live under `packages/ambreia-*` and both apps depend on
+them through `workspace:*`. A push touching only those packages (a parser fix, a room change) must
+redeploy both, or the client runs an older protocol than the emulator it talks to. The glob also
+matches the two map-editor packages, which neither image uses: a spare rebuild on an editor-only push
+is the cheaper error, and Coolify globs cannot express the exclusion.
 
 ---
 
