@@ -210,3 +210,18 @@ test('the effects module gives avatars their additions and fireworks their parti
     assert.equal(AvatarVisualization.additions?.constructor.name, 'AvatarAdditionFactory');
     assert.equal(typeof FurnitureFireworksVisualization.particleSystems, 'function');
 });
+
+test('a logic or visualization type registered twice is an error naming it, unless override is asked for', () =>
+{
+    const {logics, visualizations} = createRoomRegistries(DEFAULT_ROOM_MODULES);
+
+    assert.throws(() => logics.register('furniture_basic', () => ({}) as never), /Room object logic "furniture_basic" is already registered/);
+    assert.throws(() => visualizations.register('furniture_static', () => ({}) as never), /Room object visualization "furniture_static" is already registered/);
+    visualizations.registerData('probe_data', () => ({}) as never);
+    assert.throws(() => visualizations.registerData('probe_data', () => ({}) as never), /visualization data "probe_data" is already registered/);
+
+    const replaced = {} as never;
+
+    logics.register('furniture_basic', () => replaced, {override: true});
+    assert.equal(logics.create('furniture_basic'), replaced);
+});

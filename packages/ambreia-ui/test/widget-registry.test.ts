@@ -29,3 +29,15 @@ test('types() is sorted', () =>
 
     assert.deepEqual(registry.types(), ['a', 'b', 'c']);
 });
+
+test('registering a type twice is an error naming it, unless replace is asked for', () =>
+{
+    const registry = new WidgetRegistry();
+
+    registry.register('probe', () => 'first' as never);
+    assert.throws(() => registry.register('probe', () => 'second' as never), /Widget type "probe" is already registered/);
+    assert.equal(registry.createWidget('probe', window), 'first');
+
+    registry.register('probe', () => 'second' as never, {replace: true});
+    assert.equal(registry.createWidget('probe', window), 'second');
+});
