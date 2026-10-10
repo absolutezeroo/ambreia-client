@@ -83,3 +83,6 @@ __pycache__/
 
 # A deployment's own client configuration (server, keys); config.example.json is the template
 packages/vortex-client/public/config.json
+
+# Agent scratch (briefs, reports, diffs)
+.superpowers/
