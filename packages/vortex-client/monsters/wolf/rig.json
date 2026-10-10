@@ -1,0 +1,88 @@
+{
+  "id": "wolf",
+  "ramps": {
+    "grey": ["#3a3b47", "#5d5f6b", "#82848e", "#a9aab0", "#d3d1ca"],
+    "saddle": ["#2a2a34", "#41424e", "#595a66", "#75767f", "#9b9ba0"],
+    "cream": ["#6a6157", "#958a79", "#bdb29c", "#ddd4be", "#f3ecd9"],
+    "ear": ["#3a2c33", "#6e4f55", "#a2787a", "#c99c97", "#e6c4ba"],
+    "dark": ["#16161c", "#24252e", "#33343f", "#454652", "#5b5c68"]
+  },
+  "materials": {
+    "fur": {"ramp": "grey", "when": [{"normalUp": [0.5, 1], "ramp": "saddle"}, {"normalUp": [-1, -0.55], "forward": [-2, 99], "ramp": "cream"}], "texture": "fur", "specular": 0.15},
+    "head": {"ramp": "grey", "when": [{"normalUp": [0.5, 1], "ramp": "saddle"}], "specular": 0.15},
+    "ruff": {"ramp": "grey", "when": [{"normalUp": [-1, 0.1], "ramp": "cream"}], "texture": "fur"},
+    "muzzle": {"ramp": "grey", "when": [{"normalUp": [-1, 0.1], "ramp": "cream"}], "specular": 0.3},
+    "ear": {"ramp": "saddle", "when": [{"normalForward": [0.35, 1], "ramp": "ear"}]},
+    "leg": {"ramp": "grey", "when": [{"height": [-1, 1.4], "ramp": "cream"}]},
+    "tailtip": {"ramp": "grey", "when": [{"along": [0.35, 1], "ramp": "dark"}, {"normalUp": [0.2, 1], "ramp": "saddle"}], "texture": "fur"}
+  },
+  "bones": {
+    "body": {"at": [0, 0, 22.5]},
+    "neck": {"parent": "body", "at": [9, 0, 24.5]},
+    "head": {"parent": "neck", "at": [14, 0, 29.5]},
+    "jaw": {"parent": "head", "at": [18, 0, 28.8]},
+    "tail": {"parent": "body", "at": [-14.5, 0, 26.5]},
+    "tail2": {"parent": "tail", "at": [-19, 0, 24]},
+    "fleg.l": {"parent": "body", "at": [8.5, 2.6, 22]},
+    "hleg.l": {"parent": "body", "at": [-10.5, 2.6, 23]}
+  },
+  "shapes": [
+    {"name": "ribs", "bone": "body", "ellipsoid": {"center": [5, 0, 21.5], "radii": [7, 5, 6.6]}, "material": "fur", "blend": 0},
+    {"name": "withers", "bone": "body", "mirror": true, "ellipsoid": {"center": [7.5, 2.2, 25.5], "radii": [3.2, 2.2, 3]}, "material": "fur", "blend": 2.5},
+    {"name": "waist", "bone": "body", "cone": {"from": [0, 0, 23.3], "to": [-6, 0, 23.7], "radius": [4.7, 3.9]}, "material": "fur", "blend": 3},
+    {"name": "hips", "bone": "body", "ellipsoid": {"center": [-10, 0, 23.1], "radii": [5, 4.2, 4.8]}, "material": "fur", "blend": 3},
+    {"name": "ruff", "bone": "neck", "ellipsoid": {"center": [10, 0, 26], "radii": [4.6, 5.4, 5.6]}, "material": "ruff", "blend": 3},
+    {"name": "neck", "bone": "neck", "cone": {"from": [9, 0, 24.5], "to": [13.5, 0, 30], "radius": [4.2, 3.4]}, "material": "fur", "blend": 3},
+    {"name": "skull", "bone": "head", "ellipsoid": {"center": [15.8, 0, 31.1], "radii": [4.2, 3.6, 3.6]}, "material": "head", "blend": 2.5},
+    {"name": "cheek", "bone": "head", "ellipsoid": {"center": [16.4, 0, 29.5], "radii": [3, 4.1, 2.4]}, "material": "ruff", "blend": 2},
+    {"name": "snout", "bone": "head", "cone": {"from": [18.5, 0, 30.7], "to": [25.5, 0, 29.2], "radius": [2.4, 1.1]}, "material": "muzzle", "blend": 1.5},
+    {"name": "jaw", "bone": "jaw", "cone": {"from": [18, 0, 28.8], "to": [24, 0, 27.7], "radius": [1.7, 0.9]}, "material": "muzzle", "blend": 0.8},
+    {"name": "ear", "bone": "head", "mirror": true, "cone": {"from": [14.4, 2.1, 33.5], "to": [13.2, 2.52, 40], "radius": [2.1, 0.35]}, "material": "ear", "blend": 1},
+    {"name": "upper arm", "bone": "fleg.l", "ellipsoid": {"center": [8.5, 2.6, 18], "radii": [2.4, 1.8, 4.4]}, "material": "leg", "blend": 3},
+    {"name": "forearm", "bone": "fleg.l", "cone": {"from": [8.9, 2.6, 12.5], "to": [9.3, 2.6, 2.2], "radius": [1.45, 1.05]}, "material": "leg", "blend": 2.2},
+    {"name": "front paw", "bone": "fleg.l", "ellipsoid": {"center": [10, 2.6, 1], "radii": [1.6, 1.15, 1]}, "material": "leg", "blend": 1.2},
+    {"name": "thigh", "bone": "hleg.l", "ellipsoid": {"center": [-10.5, 2.6, 19.5], "radii": [3.4, 2.1, 4.6]}, "material": "leg", "blend": 3},
+    {"name": "shin", "bone": "hleg.l", "cone": {"from": [-11.2, 2.6, 13.5], "to": [-14.2, 2.6, 6], "radius": [2, 1.15]}, "material": "leg", "blend": 2.2},
+    {"name": "hock", "bone": "hleg.l", "cone": {"from": [-14.2, 2.6, 6], "to": [-12.6, 2.6, 1.6], "radius": [1.15, 1]}, "material": "leg", "blend": 1.6},
+    {"name": "hind paw", "bone": "hleg.l", "ellipsoid": {"center": [-11.8, 2.6, 1], "radii": [1.6, 1.15, 1]}, "material": "leg", "blend": 1.2},
+    {"name": "tail", "bone": "tail", "cone": {"from": [-14.5, 0, 26.5], "to": [-19, 0, 24], "radius": [1.8, 2.8]}, "material": "fur", "blend": 1.2},
+    {"name": "tail2", "bone": "tail2", "cone": {"from": [-19, 0, 24], "to": [-23, 0, 18], "radius": [2.8, 2.6]}, "material": "fur", "blend": 1},
+    {"name": "tail tip", "bone": "tail2", "cone": {"from": [-23, 0, 18], "to": [-24, 0, 13.5], "radius": [2.6, 0.6]}, "material": "tailtip", "blend": 1}
+  ],
+  "decals": [
+    {"kind": "eye", "bone": "head", "at": [18.9, 2, 32.1], "mirror": true, "colours": ["#e8b545", "#141418"]},
+    {"kind": "pixel", "bone": "head", "at": [26.4, 0, 29.9], "colours": ["#101014"], "size": [1, 2]},
+    {"kind": "pixel", "bone": "fleg.l", "at": [11.5, 2.6, 0.6], "colours": ["#2a2a30"]},
+    {"kind": "pixel", "bone": "hleg.l", "at": [-10.3, 2.6, 0.6], "colours": ["#2a2a30"]}
+  ],
+  "animations": {
+    "idle": [
+      {"ms": 240},
+      {"ms": 220, "pose": {"neck": {"rotate": [0, 2, 0]}, "tail": {"rotate": [0, 0, 6]}}},
+      {"ms": 240},
+      {"ms": 220, "pose": {"tail": {"rotate": [0, 0, -4]}}}
+    ],
+    "walk": [
+      {"ms": 110, "pose": {"fleg.l": {"rotate": [0, 18, 0]}, "fleg.r": {"rotate": [0, -18, 0]}, "hleg.l": {"rotate": [0, -18, 0]}, "hleg.r": {"rotate": [0, 18, 0]}, "tail": {"rotate": [0, 0, 5]}}},
+      {"ms": 110, "pose": {"body": {"move": [0, 0, 0.8]}}},
+      {"ms": 110, "pose": {"fleg.l": {"rotate": [0, -18, 0]}, "fleg.r": {"rotate": [0, 18, 0]}, "hleg.l": {"rotate": [0, 18, 0]}, "hleg.r": {"rotate": [0, -18, 0]}, "tail": {"rotate": [0, 0, -5]}}},
+      {"ms": 110, "pose": {"body": {"move": [0, 0, 0.8]}}}
+    ],
+    "attack": [
+      {"ms": 170, "pose": {"body": {"move": [-2, 0, -1.5]}, "neck": {"rotate": [0, -12, 0]}, "fleg.l": {"rotate": [0, -10, 0]}, "hleg.l": {"rotate": [0, 10, 0]}}},
+      {"ms": 90, "pose": {"body": {"move": [4, 0, 1]}, "neck": {"rotate": [0, 6, 0]}, "jaw": {"rotate": [0, -28, 0]}, "fleg.l": {"rotate": [0, 30, 0]}, "hleg.l": {"rotate": [0, -25, 0]}}},
+      {"ms": 170, "pose": {"body": {"move": [5, 0, 0]}, "neck": {"rotate": [0, -6, 0]}, "fleg.l": {"rotate": [0, 10, 0]}, "hleg.l": {"rotate": [0, -10, 0]}}},
+      {"ms": 130, "pose": {"body": {"move": [2, 0, 0]}}}
+    ],
+    "hit": [
+      {"ms": 90, "flash": true, "pose": {"body": {"move": [-2, 0, 0]}, "neck": {"rotate": [0, 10, 0]}}},
+      {"ms": 150, "pose": {"body": {"move": [-2, 0, -1]}, "neck": {"rotate": [0, 10, 0]}}}
+    ],
+    "death": [
+      {"ms": 170, "pose": {"body": {"move": [-1, 0, -2]}, "neck": {"rotate": [0, -20, 0]}}},
+      {"ms": 170, "pose": {"body": {"rotate": [35, 0, 0], "move": [0, 0, -6]}, "neck": {"rotate": [0, -25, 0]}}},
+      {"ms": 220, "pose": {"body": {"rotate": [82, 0, 0], "move": [0, 0, -15]}, "neck": {"rotate": [0, -15, 0]}, "fleg.l": {"rotate": [0, 15, 0]}, "hleg.l": {"rotate": [0, -15, 0]}}},
+      {"ms": 600, "pose": {"body": {"rotate": [82, 0, 0], "move": [0, 0, -15]}, "neck": {"rotate": [0, -15, 0]}, "fleg.l": {"rotate": [0, 15, 0]}, "hleg.l": {"rotate": [0, -15, 0]}, "tail": {"rotate": [0, 0, 10]}}}
+    ]
+  }
+}

@@ -1,7 +1,19 @@
 {
   "id": "wolf",
   "aseprite": "wolf.aseprite",
-  "anchor": [38, 54],
-  "directions": [2, 0],
+  "anchor": [
+    45,
+    58
+  ],
+  "directions": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
   "scale": 1
 }
