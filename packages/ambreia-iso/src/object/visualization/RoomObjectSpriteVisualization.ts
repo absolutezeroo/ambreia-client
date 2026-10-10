@@ -53,7 +53,15 @@ export class RoomObjectSpriteVisualization implements IRoomObjectSpriteVisualiza
     // AS3: .../src/com/sulake/room/object/visualization/RoomObjectSpriteVisualization.as::set assetCollection()
     set assetCollection(value: IGraphicAssetCollection | null)
     {
+        if(value === this._assetCollection) return;
+
+        // The collection is retained by what draws from it, and RoomContentLoader.purge() drops a
+        // collection only once nothing has for CONTENT_DROP_DELAY. The port had lost both calls:
+        // every purge (each session end) disposed every furniture and pet collection at once, and
+        // re-entering a room downloaded and decoded all of it again.
+        this._assetCollection?.removeReference();
         this._assetCollection = value;
+        value?.addReference();
     }
 
     /**
@@ -394,6 +402,7 @@ export class RoomObjectSpriteVisualization implements IRoomObjectSpriteVisualiza
             this._sprites = [];
         }
 
+        this.assetCollection = null;
         this._object = null;
     }
 
