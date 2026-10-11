@@ -1,6 +1,6 @@
 import type {IWindow} from '@ambreia/ui/IWindow';
 import type {WindowController} from '@ambreia/ui/WindowController';
-import type {AlignEdge, EditorState} from '../state/EditorState';
+import type {AlignEdge, ISelectionOpsState} from '../state/EditorStateContracts';
 
 interface IRect { x: number; y: number; width: number; height: number; }
 
@@ -37,13 +37,13 @@ function moveTo(window: IWindow, current: IRect, globalX: number, globalY: numbe
 }
 
 /** The live, non-root nodes of the selection — the ones an align may move. */
-function movableSelection(state: EditorState): IWindow[]
+function movableSelection(state: ISelectionOpsState): IWindow[]
 {
     return state.selection.filter((win) => !win.disposed && win !== state.rootWindow);
 }
 
 /** The union of the selection's global rectangles. */
-export function selectionBounds(state: EditorState): IRect | null
+export function selectionBounds(state: ISelectionOpsState): IRect | null
 {
     const rects = state.selection.filter((win) => !win.disposed).map(globalRect);
 
@@ -67,7 +67,7 @@ export function selectionBounds(state: EditorState): IRect | null
  * aligns against its parent's edges/centre, which is what Glaze's align buttons
  * did before multi-selection existed.
  */
-export function alignSelection(state: EditorState, edge: AlignEdge): void
+export function alignSelection(state: ISelectionOpsState, edge: AlignEdge): void
 {
     const nodes = movableSelection(state);
 
@@ -114,7 +114,7 @@ export function alignSelection(state: EditorState, edge: AlignEdge): void
     state.notifyGeometryChanged();
 }
 
-function alignToParent(state: EditorState, win: WindowController, edge: AlignEdge): void
+function alignToParent(state: ISelectionOpsState, win: WindowController, edge: AlignEdge): void
 {
     const parent = win.parent;
 
@@ -147,7 +147,7 @@ function alignToParent(state: EditorState, win: WindowController, edge: AlignEdg
  * the two extremes where they are. Returns false when fewer than three nodes are
  * selected, letting the caller fall back to distributing a container's children.
  */
-export function distributeSelection(state: EditorState, axis: 'h' | 'v'): boolean
+export function distributeSelection(state: ISelectionOpsState, axis: 'h' | 'v'): boolean
 {
     const nodes = movableSelection(state);
 

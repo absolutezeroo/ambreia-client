@@ -38,9 +38,9 @@ import {RoomSessionUserDataUpdateEvent} from '../events/RoomSessionUserDataUpdat
 import {RoomSessionDoorbellEvent} from '../events/RoomSessionDoorbellEvent';
 import {RoomSessionUserBadgesEvent} from '../events/RoomSessionUserBadgesEvent';
 import {RoomSessionUserFigureUpdateEvent} from '../events/RoomSessionUserFigureUpdateEvent';
-import type {IUserData} from '../index';
-import { UserData} from '../index';
-import type {RoomUserData} from '../../communication/index';
+import type {IUserData} from '../IUserData';
+import {UserData} from '../UserData';
+import type {RoomUserData} from '@ambreia/protocol/incoming/room/engine/RoomUserData';
 import {
     UserNameChangedMessageEvent
 } from '@ambreia/protocol/incoming/help/UserNameChangedMessageEvent';

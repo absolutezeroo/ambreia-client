@@ -1,8 +1,12 @@
 // AS3 types this field as the concrete HabboWindowManagerComponent, not IWindowManager —
 // which is what lets it read `getProperty()` off the Component base. The port had narrowed it to
 // the interface, where that accessor is not declared, and the shop link could not be resolved.
-import type {HabboWindowManager} from '../HabboWindowManager';
 import {HabboWebTools} from '../../utils/HabboWebTools';
+
+interface IHabbletWindowManagerHost
+{
+    getProperty(key: string, params?: Record<string, string>): string;
+}
 
 /**
  * Link event handler for "habblet/" prefixed URLs.
@@ -14,10 +18,10 @@ import {HabboWebTools} from '../../utils/HabboWebTools';
 export class HabbletLinkHandler
 {
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/handlers/HabbletLinkHandler.as::_windowManager
-    private _windowManager: HabboWindowManager;
+    private _windowManager: IHabbletWindowManagerHost;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/handlers/HabbletLinkHandler.as::HabbletLinkHandler()
-    constructor(windowManager: HabboWindowManager)
+    constructor(windowManager: IHabbletWindowManagerHost)
     {
         this._windowManager = windowManager;
     }

@@ -5,7 +5,7 @@ import type {IHabboConfigurationManager} from "@ambreia/game/configuration/index
 import type {IRoomManager} from "@ambreia/iso/IRoomManager";
 import type {IRoomSessionManager, ISessionDataManager} from "@ambreia/game/session/index";
 import type {IRoomEngine} from "@ambreia/game/room/index";
-import type {IVortexConfig} from "./Vortex";
+import type {IVortexConfig} from './VortexConfig';
 import type {IRoomMessageHandler} from "@ambreia/game/room/IRoomMessageHandler";
 import type {IHabboWindowManager} from "@ambreia/game/window/IHabboWindowManager";
 import type {IAssetLibrary} from "@ambreia/common/assets/IAssetLibrary";

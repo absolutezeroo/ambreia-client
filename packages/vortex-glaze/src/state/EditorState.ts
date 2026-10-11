@@ -5,8 +5,8 @@ import type {IGlazeRuntime} from '../boot/GlazeBoot';
 import {VariablesModel} from './VariablesModel';
 import {EditorHistory} from './EditorHistory';
 import {alignSelection, distributeSelection} from '../ops/SelectionOps';
-
-export type AlignEdge = 'left' | 'hcenter' | 'right' | 'top' | 'vmiddle' | 'bottom';
+import type {AlignEdge} from './EditorStateContracts';
+export type {AlignEdge} from './EditorStateContracts';
 
 /**
  * Editor interaction mode.

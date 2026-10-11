@@ -1,8 +1,14 @@
 import {Logger} from '@ambreia/common/utils/Logger';
-import type {BCFloorPlanEditor} from './BCFloorPlanEditor';
 import type {FloorPlanCache, IPlanPoint} from './FloorPlanCache';
 
 const log = Logger.getLogger('habbo.window.utils.floorplaneditor.FloorPlanPreviewer');
+
+interface IFloorPlanPreviewHost
+{
+    readonly floorPlanCache: FloorPlanCache;
+    requestEmbeddedAsset(name: string, onReady: (bitmap: ImageBitmap) => void): void;
+    updatePreviewBitmap(bitmap: ImageBitmap): void;
+}
 
 /**
  * FloorPlanPreviewer — the small isometric render of the plan being edited.
@@ -35,7 +41,7 @@ export class FloorPlanPreviewer
     private static readonly MAX_DIMENSION: number = 4095;
 
     // AS3: FloorPlanPreviewer.as::_bcFloorPlanEditor
-    private _bcFloorPlanEditor: BCFloorPlanEditor;
+    private _bcFloorPlanEditor: IFloorPlanPreviewHost;
 
     // AS3: FloorPlanPreviewer.as::_tileImages
     private _tileImages: (ImageBitmap | null)[] = [];
@@ -44,7 +50,7 @@ export class FloorPlanPreviewer
     private _floorPlan: FloorPlanCache;
 
     // AS3: FloorPlanPreviewer.as::FloorPlanPreviewer()
-    constructor(bcFloorPlanEditor: BCFloorPlanEditor)
+    constructor(bcFloorPlanEditor: IFloorPlanPreviewHost)
     {
         this._bcFloorPlanEditor = bcFloorPlanEditor;
         this._floorPlan = bcFloorPlanEditor.floorPlanCache;

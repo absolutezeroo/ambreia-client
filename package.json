@@ -37,6 +37,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@stylistic/eslint-plugin": "^5.10.0",
+    "dependency-cruiser": "^18.5.0",
     "eslint": "^10.6.0",
     "globals": "^17.7.0",
     "husky": "^9.1.7",

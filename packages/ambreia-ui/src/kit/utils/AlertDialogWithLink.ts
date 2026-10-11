@@ -2,24 +2,9 @@ import type {IWindow} from '../../IWindow';
 import type {WindowEvent} from '../../events/WindowEvent';
 import {WindowMouseEvent} from '../../events/WindowMouseEvent';
 import type {IWindowManager} from '../IWindowManager';
-import type {AlertDialogCallback} from './AlertDialog';
+import type {AlertDialogCallback, IAlertDialogWithLink} from './DialogContracts';
+export type {IAlertDialogWithLink} from './DialogContracts';
 import {AlertDialog} from './AlertDialog';
-
-/**
- * Interface for alert dialogs that include a clickable link.
- *
- * In AS3 this was the obfuscated `class_3401` which extended `class_3348`
- * (IAlertDialog) with linkTitle and linkUrl properties.
- *
- * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/utils/AlertDialogWithLink.as
- * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/utils/AlertDialogWithLink.as
- */
-export interface IAlertDialogWithLink {
-    // AS3: .../src/com/sulake/habbo/window/utils/AlertDialogWithLink.as::get linkTitle()
-    linkTitle: string;
-    // AS3: .../src/com/sulake/habbo/window/utils/AlertDialogWithLink.as::get linkUrl()
-    linkUrl: string;
-}
 
 /**
  * Alert dialog with a clickable link button.

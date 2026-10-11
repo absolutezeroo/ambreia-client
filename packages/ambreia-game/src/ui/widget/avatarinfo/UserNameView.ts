@@ -6,7 +6,7 @@
  * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/avatarinfo/UserNameView.as
  */
 import {AvatarContextInfoView} from './AvatarContextInfoView';
-import type {AvatarInfoWidget} from './AvatarInfoWidget';
+import type {IContextMenuParentWidget} from '../contextmenu/IContextMenuParentWidget';
 
 export class UserNameView extends AvatarContextInfoView
 {
@@ -24,7 +24,7 @@ export class UserNameView extends AvatarContextInfoView
     private _isGameRoomMode: boolean;
 
     // AS3: .../src/com/sulake/habbo/ui/widget/avatarinfo/UserNameView.as::UserNameView()
-    constructor(widget: AvatarInfoWidget, isGameRoomMode: boolean = false)
+    constructor(widget: IContextMenuParentWidget, isGameRoomMode: boolean = false)
     {
         super(widget);
 

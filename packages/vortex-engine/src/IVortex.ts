@@ -9,7 +9,7 @@ import type {IRoomSessionManager, ISessionDataManager} from '@ambreia/game/sessi
 import type {IHabboLocalizationManager} from '@ambreia/game/localization/index';
 import type {IHabboWindowManager} from '@ambreia/game/window/IHabboWindowManager';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
-import type {IVortexConfig} from './Vortex';
+import type {IVortexConfig} from './VortexConfig';
 import type {IVortexLoadingScreen} from './IVortexLoadingScreen';
 
 export interface IVortex extends IDisposable

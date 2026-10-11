@@ -2,21 +2,9 @@ import type {IWindow} from '../../IWindow';
 import {WindowEvent} from '../../events/WindowEvent';
 import {WindowMouseEvent} from '../../events/WindowMouseEvent';
 import type {IWindowManager} from '../IWindowManager';
-import type {AlertDialogCallback, IAlertDialog} from './AlertDialog';
+import type {AlertDialogCallback} from './DialogContracts';
+export type {IConfirmDialog} from './DialogContracts';
 import {AlertDialog} from './AlertDialog';
-
-/**
- * Interface for confirm dialogs.
- *
- * In AS3 this was the obfuscated `class_3441` / `IConfirmDialog` which
- * extended `class_3348` (IAlertDialog) with no additional members.
- * The behavioral difference is that ConfirmDialog never self-disposes
- * on button click -- it always delegates to the callback.
- *
- * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/utils/ConfirmDialog.as
- * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/utils/ConfirmDialog.as
- */
-export type IConfirmDialog = IAlertDialog;
 
 /**
  * Confirm dialog with OK and Cancel buttons.

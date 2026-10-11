@@ -24,7 +24,7 @@ import {RoomObjectCategoryEnum} from '@ambreia/iso/scene/object/RoomObjectCatego
 import {RoomEngineObjectEvent} from '@ambreia/iso/scene/events/RoomEngineObjectEvent';
 import {RoomWidgetRoomObjectUpdateEvent} from '../events/RoomWidgetRoomObjectUpdateEvent';
 import type {IContextMenuParentWidget} from '../contextmenu/IContextMenuParentWidget';
-import type {ContextInfoView} from '../contextmenu/ContextInfoView';
+import type {IContextInfoView} from '../contextmenu/IContextMenuParentWidget';
 import {RoomWidgetGetObjectLocationMessage} from '../messages/RoomWidgetGetObjectLocationMessage';
 import type {RoomWidgetUserLocationUpdateEvent} from '../events/RoomWidgetUserLocationUpdateEvent';
 import type {EventEmitter} from 'eventemitter3';
@@ -168,7 +168,7 @@ export class AvatarInfoWidget extends RoomWidgetBase implements IContextMenuPare
     }
 
     // AS3: AvatarInfoWidget.as::removeView()
-    public removeView(view: ContextInfoView, animate: boolean): void
+    public removeView(view: IContextInfoView, animate: boolean): void
     {
         view.hide(animate);
 

@@ -1,13 +1,13 @@
 // Typed against the concrete manager rather than `IWindowManager`, as AS3 is
 // (`HabboWindowManagerComponent`): the viewer needs `context`, `assets` and `getProperty()`, and
 // the interface declares none of the three. Type-only, so the import cycle is erased at build.
-import type {HabboWindowManager} from '../../HabboWindowManager';
 import type {IWindow} from '@ambreia/ui/IWindow';
 import type {IFrameWindow} from '@ambreia/ui/components/IFrameWindow';
 import type {ITextWindow} from '@ambreia/ui/components/ITextWindow';
 import type {IScrollbarWindow} from '@ambreia/ui/components/IScrollbarWindow';
 import type {ILinkEventTracker} from '@ambreia/kernel/runtime/events/ILinkEventTracker';
 import type {AssetLoaderStruct} from '@ambreia/common/assets/AssetLoaderStruct';
+import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import {AssetLoaderEvent} from '@ambreia/common/assets/loaders/AssetLoaderEvent';
 import {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
@@ -15,6 +15,20 @@ import {HabboWebTools} from '../../../utils/HabboWebTools';
 import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('habbo.window.utils.habbopedia.HabboPagesViewer');
+
+interface IHabboPagesContextHost
+{
+    addLinkEventTracker(tracker: ILinkEventTracker): void;
+    removeLinkEventTracker(tracker: ILinkEventTracker): void;
+}
+
+interface IHabboPagesWindowManagerHost
+{
+    readonly context: IHabboPagesContextHost;
+    readonly assets: IAssetLibrary | null;
+    getProperty(key: string, params?: Record<string, string>): string;
+    buildWidgetLayout(name: string, layer?: number): IWindow | null;
+}
 
 /**
  * The in-client help pages — "habbopedia".
@@ -52,13 +66,13 @@ export class HabboPagesViewer implements ILinkEventTracker
     public static readonly EDIT_LAYOUT: string = 'habbopedia_edit_xml';
 
     // AS3: .../habbo/window/utils/habbopedia/HabboPagesViewer.as::_windowManager
-    private _windowManager: HabboWindowManager | null;
+    private _windowManager: IHabboPagesWindowManagerHost | null;
 
     // AS3: .../habbo/window/utils/habbopedia/HabboPagesViewer.as::_window
     private _window: IFrameWindow | null = null;
 
     // AS3: .../habbo/window/utils/habbopedia/HabboPagesViewer.as::HabboPagesViewer()
-    constructor(windowManager: HabboWindowManager)
+    constructor(windowManager: IHabboPagesWindowManagerHost)
     {
         this._windowManager = windowManager;
         this._windowManager.context?.addLinkEventTracker(this);

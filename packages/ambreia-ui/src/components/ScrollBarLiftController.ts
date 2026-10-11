@@ -3,9 +3,14 @@ import type {IWindowContext} from '../IWindowContext';
 import type {IDragBarWindow} from './IDragBarWindow';
 import type {IScrollbarWindow} from './IScrollbarWindow';
 import {InteractiveController} from './InteractiveController';
-import type {ScrollBarController} from './ScrollBarController';
 import type {WindowController} from '../WindowController';
 import {WindowEvent} from '../events/WindowEvent';
+
+interface IScrollBarControllerHost
+{
+    readonly horizontal: boolean;
+    update(source: WindowController, event: WindowEvent): boolean;
+}
 
 /**
  * Controller for scrollbar lift (thumb) windows.
@@ -18,7 +23,7 @@ import {WindowEvent} from '../events/WindowEvent';
 export class ScrollBarLiftController extends InteractiveController implements IDragBarWindow
 {
     // AS3: .../src/com/sulake/core/window/components/ScrollBarLiftController.as::_scrollBar
-    protected _scrollBar: ScrollBarController | null = null;
+    protected _scrollBar: IScrollBarControllerHost | null = null;
 
     constructor(
         name: string,
@@ -48,7 +53,7 @@ export class ScrollBarLiftController extends InteractiveController implements ID
         {
             if((current as unknown as IScrollbarWindow).horizontal !== undefined)
             {
-                this._scrollBar = current as unknown as ScrollBarController;
+                this._scrollBar = current as unknown as IScrollBarControllerHost;
                 current = null;
             }
             else

@@ -26,7 +26,7 @@ import type {CoreComponentContext} from '@ambreia/kernel/runtime/CoreComponentCo
 import {CoreComponentContextEvents, CoreSetup} from '@ambreia/kernel/runtime/CoreComponentContext';
 import {Logger} from '@ambreia/common/utils/Logger';
 import {FrameTimings} from '@ambreia/common/utils/FrameTimings';
-import type {IVortexConfig, IVortexWindowAssets} from './Vortex';
+import type {IVortexConfig, IVortexWindowAssets} from './VortexConfig';
 import {Vortex} from './Vortex';
 import {bootFeatures} from '@ambreia/kernel/feature/bootFeatures';
 import type {IKernelReport} from '@ambreia/kernel/feature/bootFeatures';

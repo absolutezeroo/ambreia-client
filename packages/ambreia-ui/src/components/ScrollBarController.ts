@@ -6,12 +6,17 @@ import type {IScrollableWindow} from './IScrollableWindow';
 import type {IDesktopWindow} from './IDesktopWindow';
 import {InteractiveController} from './InteractiveController';
 import {SubstituteParentController} from './SubstituteParentController';
-import type {ScrollBarLiftController} from './ScrollBarLiftController';
 import type {WindowController} from '../WindowController';
 import {WindowEvent} from '../events/WindowEvent';
 import type {WindowMouseEvent} from '../events/WindowMouseEvent';
 import type {PropertyStruct} from '../utils/PropertyStruct';
 import {SmoothScroller} from '../utils/SmoothScroller';
+
+interface IScrollBarLiftState
+{
+    readonly scrollbarOffsetX: number;
+    readonly scrollbarOffsetY: number;
+}
 
 /**
  * Controller for scrollbar windows.
@@ -374,7 +379,7 @@ export class ScrollBarController extends InteractiveController implements IScrol
             {
                 if(!this._isUpdatingLift)
                 {
-                    const liftCtrl = source as unknown as ScrollBarLiftController;
+                    const liftCtrl = source as unknown as IScrollBarLiftState;
 
                     if(this.horizontal)
                     {

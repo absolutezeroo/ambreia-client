@@ -14,6 +14,7 @@ import type {ITableObject} from './ITableObject';
 import type {TableColumn} from './TableColumn';
 import {TableRowModel} from './TableRowModel';
 import {TableRowView} from './TableRowView';
+import type {ITableRowViewState} from './TableViewContracts';
 import {WindowEvent} from '../../../events/WindowEvent';
 
 type Rectangle = {x: number; y: number; width: number; height: number};
@@ -58,7 +59,7 @@ export class TableView implements IDisposable
     private static readonly SCROLLBAR_OFFSET: number = 21;
 
     // AS3: TableView.as::_SafeStr_8288 (name derived: recycled row-view pool)
-    private _rowViewPool: TableRowView[] = [];
+    private _rowViewPool: ITableRowViewState[] = [];
 
     // AS3: TableView.as::_disposed
     private _disposed: boolean = false;
@@ -626,16 +627,16 @@ export class TableView implements IDisposable
     }
 
     // AS3: TableView.as::recycleRowView()
-    private recycleRowView(rowView: TableRowView): void
+    private recycleRowView(rowView: ITableRowViewState): void
     {
         rowView.recycle();
         this._rowViewPool.push(rowView);
     }
 
     // AS3: TableView.as::createOrReuseTableRowView()
-    private createOrReuseTableRowView(model: TableRowModel): TableRowView
+    private createOrReuseTableRowView(model: TableRowModel): ITableRowViewState
     {
-        let rowView: TableRowView;
+        let rowView: ITableRowViewState;
 
         if(this._rowViewPool.length > 0)
         {

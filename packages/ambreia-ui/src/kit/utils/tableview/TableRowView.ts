@@ -6,7 +6,7 @@ import {WindowMouseEvent} from '../../../events/WindowMouseEvent';
 import type {ITableObject} from './ITableObject';
 import {TableCellView} from './TableCellView';
 import type {TableRowModel} from './TableRowModel';
-import type {TableView} from './TableView';
+import type {ITableViewHost} from './TableViewContracts';
 
 /**
  * TableRowView — the window view for one table row: an item-list container holding one TableCellView
@@ -34,7 +34,7 @@ export class TableRowView implements IDisposable
     private _disposed: boolean = false;
 
     // AS3: TableRowView.as::_SafeStr_5262 (name derived: parent table view)
-    private _tableView: TableView;
+    private _tableView: ITableViewHost;
 
     // AS3: TableRowView.as::_container
     private _container: IItemListWindow;
@@ -46,7 +46,7 @@ export class TableRowView implements IDisposable
     private _rowModel: TableRowModel | null;
 
     // AS3: TableRowView.as::TableRowView()
-    constructor(tableView: TableView, rowModel: TableRowModel)
+    constructor(tableView: ITableViewHost, rowModel: TableRowModel)
     {
         this._tableView = tableView;
         this._rowModel = rowModel;

@@ -3,7 +3,7 @@ import type {IWindow} from '@ambreia/ui/IWindow';
 import {EditorSelection} from '@ambreia/map-editor-core/selection/EditorSelection';
 import type {EditorApp} from '../../app/EditorApp';
 import {child, onClick, setEnabled} from '../bind';
-import type {EditorShell} from '../EditorShell';
+import type {EditorTexts} from '../EditorTexts';
 import type {IPanelUi} from '../IPanelUi';
 
 type Item = readonly [label: string, action: (app: EditorApp) => void];
@@ -21,13 +21,11 @@ export class MenuBarUi implements IPanelUi
     private readonly _caption: string;
     private readonly _zoneCaption: string;
 
-    constructor(private readonly _window: IWindow, shell: EditorShell)
+    constructor(private readonly _window: IWindow, app: EditorApp, texts: EditorTexts)
     {
-        const app = shell.app;
-
         this._app = app;
-        this._caption = shell.texts.get('vortex.mapeditor.title');
-        this._zoneCaption = shell.texts.get('vortex.mapeditor.zone_menu', {zone: app.zone.key});
+        this._caption = texts.get('vortex.mapeditor.title');
+        this._zoneCaption = texts.get('vortex.mapeditor.zone_menu', {zone: app.zone.key});
 
         this.menu('menu_file', [
             ['Zones…', a => void a.leave()],

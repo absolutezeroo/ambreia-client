@@ -1,7 +1,8 @@
 import type {IMessageParser} from '@ambreia/net/messages/IMessageParser';
 import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
 import type {IDisposable} from '@ambreia/common/IDisposable';
-import {GuestRoomData, RoomModerationSettings} from '../../incoming/navigator';
+import {GuestRoomData} from '../../incoming/navigator/GuestRoomData';
+import {RoomModerationSettings} from '../../incoming/navigator/RoomModerationSettings';
 import {RoomChatSettings} from '../roomsettings/RoomChatSettings';
 
 /**

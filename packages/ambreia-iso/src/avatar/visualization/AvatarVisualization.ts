@@ -30,6 +30,7 @@ import type {IRoomObjectSprite} from '../../object/visualization/IRoomObjectSpri
 import {RoomObjectSpriteData} from '@ambreia/common/graphics/RoomObjectSpriteData';
 import {AvatarRenderMode} from '@ambreia/avatar/AvatarRenderMode';
 import type {IAvatarAddition} from './additions/IAvatarAddition';
+import type {IExpressionAddition} from './additions/IExpressionAddition';
 import {RoomObjectSpriteVisualization} from '../../object/visualization/RoomObjectSpriteVisualization';
 import {RoomObjectVariableEnum} from '../../scene/object/RoomObjectVariableEnum';
 import {RoomObjectSpriteType} from '../../object/enum/RoomObjectSpriteType';
@@ -38,7 +39,24 @@ import {AvatarSetType} from '@ambreia/avatar/enum/AvatarSetType';
 import {AvatarAction} from '@ambreia/avatar/enum/AvatarAction';
 import {AvatarGuideStatus} from '@ambreia/avatar/enum/AvatarGuideStatus';
 import type {AvatarVisualizationData} from './AvatarVisualizationData';
-import type {IAvatarAdditionFactory, ITypingAddition} from './additions/IAvatarAdditionFactory';
+
+export interface ITypingAddition extends IAvatarAddition
+{
+    relativeDepth: number;
+}
+
+/** The effect-module factory contract lives with the visualization it receives, avoiding a type cycle. */
+export interface IAvatarAdditionFactory
+{
+    idle(id: number, visualization: AvatarVisualization): IAvatarAddition;
+    muted(id: number, visualization: AvatarVisualization): IAvatarAddition;
+    typing(id: number, visualization: AvatarVisualization): ITypingAddition;
+    guide(id: number, visualization: AvatarVisualization, status: number): IAvatarAddition;
+    number(id: number, visualization: AvatarVisualization, value: number): IAvatarAddition;
+    selectionRing(id: number): IAvatarAddition;
+    sheet(id: number, frames: readonly Texture[], ms: number, loop: boolean, anchorX: number, anchorY: number): IAvatarAddition;
+    expression(id: number, type: number, visualization: AvatarVisualization): IExpressionAddition | null;
+}
 
 export class AvatarVisualization extends RoomObjectSpriteVisualization implements IAvatarImageListener, IAvatarEffectListener 
 {

@@ -1,6 +1,6 @@
 import type {IDisposable} from '@ambreia/common/IDisposable';
 import type {ITableObject} from './ITableObject';
-import type {TableRowView} from './TableRowView';
+import type {ITableRowViewState} from './TableViewContracts';
 
 /**
  * TableRowModel — the per-row state in a TableView: the row's data object, its index, and the
@@ -30,7 +30,7 @@ export class TableRowModel implements IDisposable
     private _hasFocus: boolean = false;
 
     // AS3: TableRowModel.as::_SafeStr_4550 (name derived: the row view)
-    private _view: TableRowView | null = null;
+    private _view: ITableRowViewState | null = null;
 
     // AS3: TableRowModel.as::TableRowModel()
     constructor(object: ITableObject, index: number)
@@ -97,7 +97,7 @@ export class TableRowModel implements IDisposable
     }
 
     // AS3: TableRowModel.as::set view()
-    set view(value: TableRowView | null)
+    set view(value: ITableRowViewState | null)
     {
         this._view = value;
     }
@@ -133,7 +133,7 @@ export class TableRowModel implements IDisposable
     }
 
     // AS3: TableRowModel.as::get view()
-    get view(): TableRowView | null
+    get view(): ITableRowViewState | null
     {
         return this._view;
     }

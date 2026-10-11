@@ -12,8 +12,7 @@ import {WindowMouseEvent} from '../../../events/WindowMouseEvent';
 import type {CellTemplate} from './CellTemplate';
 import {TableCell} from './TableCell';
 import type {TableColumn} from './TableColumn';
-import type {TableRowView} from './TableRowView';
-import type {TableView} from './TableView';
+import type {ITableRowInteractionHost, ITableViewHost} from './TableViewContracts';
 import {WindowEvent} from '../../../events/WindowEvent';
 
 const log = Logger.getLogger('habbo.window.utils.tableview.TableCellView');
@@ -36,10 +35,10 @@ export class TableCellView implements IDisposable
     private _disposed: boolean = false;
 
     // AS3: TableCellView.as::_SafeStr_5262 (name derived: parent table view)
-    private _tableView: TableView;
+    private _tableView: ITableViewHost;
 
     // AS3: TableCellView.as::_SafeStr_5675 (name derived: parent row view)
-    private _rowView: TableRowView;
+    private _rowView: ITableRowInteractionHost;
 
     // AS3: TableCellView.as::_SafeStr_6870 (name derived: column id)
     private _columnId: string;
@@ -56,7 +55,7 @@ export class TableCellView implements IDisposable
     private _transitionRunning: boolean = false;
 
     // AS3: TableCellView.as::TableCellView()
-    constructor(tableView: TableView, rowView: TableRowView, columnId: string, cell: TableCell | null)
+    constructor(tableView: ITableViewHost, rowView: ITableRowInteractionHost, columnId: string, cell: TableCell | null)
     {
         this._tableView = tableView;
         this._rowView = rowView;
@@ -308,7 +307,7 @@ export class TableCellView implements IDisposable
 
         this._container.dispose();
         this._columnId = null as unknown as string;
-        this._tableView = null as unknown as TableView;
+        this._tableView = null as unknown as ITableViewHost;
         this._container = null as unknown as IRegionWindow;
         this._cell = null;
         this._disposed = true;

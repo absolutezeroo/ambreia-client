@@ -53,6 +53,7 @@ import {FloorPlanPreviewer} from './FloorPlanPreviewer';
 import {HeightMapEditor} from './HeightMapEditor';
 import {ImportExportDialog} from './ImportExportDialog';
 import {PerkType} from '../../../communication/enum/PerkType';
+import {getThicknessSettingBySelectionIndex} from './FloorPlanEditorUtils';
 
 const log = Logger.getLogger('habbo.window.utils.floorplaneditor.BCFloorPlanEditor');
 
@@ -204,13 +205,7 @@ export class BCFloorPlanEditor implements IUpdateReceiver, IDisposable
     // AS3: BCFloorPlanEditor.as::getThicknessSettingBySelectionIndex()
     public static getThicknessSettingBySelectionIndex(index: number): number
     {
-        switch(index)
-        {
-            case 0: return -2;
-            case 1: return -1;
-            case 3: return 1;
-            default: return 0;
-        }
+        return getThicknessSettingBySelectionIndex(index);
     }
 
     /** True while the player may save — staff only. */

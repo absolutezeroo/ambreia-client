@@ -1,11 +1,7 @@
-import type {Renderer} from 'pixi.js';
-import type {AssetLibrary} from '@ambreia/common/assets/AssetLibrary';
-import type {IAssetDirectories} from '@ambreia/common/assets/pack/AssetDirectories';
 import {Logger} from '@ambreia/common/utils/Logger';
 import {RoomManager} from '@ambreia/iso/RoomManager';
 import {HabboRoomRendererFactory} from '@ambreia/iso/scene/renderer/HabboRoomRendererFactory';
 import {AvatarRenderManager} from '@ambreia/avatar/AvatarRenderManager';
-import type {IAvatarData} from '@ambreia/avatar/AvatarData';
 import {Core} from '@ambreia/kernel/Core';
 import {HabboConfigurationManager} from '../configuration/HabboConfigurationManager';
 import {LEGACY_DEFAULTS} from '../configuration/legacyDefaults';
@@ -17,7 +13,6 @@ import {SessionDataManager} from '../session/SessionDataManager';
 import {RoomEngine} from '../room/RoomEngine';
 import {HabboWindowManager} from '../window/HabboWindowManager';
 import {RoomUI} from '../ui/RoomUI';
-import type {RoomWidgetRegistry} from '../ui/RoomWidgetRegistry';
 import {ObjectLocationRequestHandler} from '../ui/handler/ObjectLocationRequestHandler';
 import type {IGameFeature} from './GameFeature';
 import {AvatarInfoFeature} from './avatar-info/feature';
@@ -25,21 +20,12 @@ import {LoadingBarFeature} from './loading-bar/feature';
 import {AssetPacksFeature} from './asset-packs/feature';
 import {HudFeature} from './hud/feature';
 import {CharacterFeature} from './character/feature';
-import type {RpgCharacterSession} from './character/RpgCharacterSession';
 import {InventoryFeature} from './inventory/feature';
-import type {RpgInventorySession} from './inventory/RpgInventorySession';
-import type {HudPanelsState} from './hud/HudPanelsState';
 import {InteractionFeature} from './interaction/feature';
-import type {RpgInteractionSession} from './interaction/RpgInteractionSession';
 import {ChatFeature} from './chat/feature';
-import type {RpgChatSession} from './chat/RpgChatSession';
 import {CombatFeature} from './combat/feature';
-import type {RpgCombatSession} from './combat/RpgCombatSession';
 import {SkillsFeature} from './skills/feature';
 import {InputFeature} from './input/feature';
-import type {IInputBindings} from './input/IInputBindings';
-import type {RpgSkillSession} from './skills/RpgSkillSession';
-import type {PlayerHudState} from './hud/PlayerHudState';
 import {IID_HabboConfigurationManager} from '../iid/IIDHabboConfigurationManager';
 import {IID_HabboCommunicationManager} from '../iid/IIDHabboCommunicationManager';
 import {IID_HabboLocalizationManager} from '../iid/IIDHabboLocalizationManager';
@@ -54,58 +40,8 @@ import {IID_RoomUI} from '../iid/IIDRoomUI';
 
 const log = Logger.getLogger('habbo.features.GameFeatures');
 
-/** What the features made, read back by VortexMain for its own wiring after the boot. */
-export interface IEngineManagers
-{
-    configuration: HabboConfigurationManager | null;
-    /** One .ambreia directory per asset family (features/asset-packs); null until the configuration completes. */
-    assetDirectories: IAssetDirectories | null;
-    communication: HabboCommunicationManager | null;
-    demo: HabboCommunicationDemo | null;
-    localization: HabboLocalizationManager | null;
-    roomManager: RoomManager | null;
-    roomSession: RoomSessionManager | null;
-    sessionData: SessionDataManager | null;
-    roomEngine: RoomEngine | null;
-    avatarRenderer: AvatarRenderManager | null;
-    windowManager: HabboWindowManager | null;
-    roomUI: RoomUI | null;
-    /** The account's characters and the played one (features/character, F3a). */
-    character: RpgCharacterSession | null;
-    /** The HUD's panels (features/hud): its top bar announces `nav` clicks. */
-    hud: HudPanelsState | null;
-    /** The played character's bag and equipment (features/inventory, Objets §17). */
-    inventory: RpgInventorySession | null;
-    /** The zone's usable objects and the player's target (features/interaction, F3b). */
-    interaction: RpgInteractionSession | null;
-    /** The RPG chat (features/chat, F3c). */
-    chat: RpgChatSession | null;
-    /** The player frame's state (features/hud): combat writes the current HP and mana. */
-    hudPlayer: PlayerHudState | null;
-    /** The zone's fight: blows, health, death (features/combat, M1a). */
-    combat: RpgCombatSession | null;
-    /** The player's skills, the bar, cooldowns and statuses (features/skills, M1b). */
-    skills: RpgSkillSession | null;
-    /** The keyboard: the bindings of the features (features/input). */
-    input: IInputBindings | null;
-}
-
-/** The engine's own objects the features are made with: none of them is configuration. */
-export interface IEngineHost
-{
-    readonly assets: AssetLibrary;
-    /** The avatar's shipped data, for the renderer. */
-    readonly avatarData: IAvatarData;
-    /** The `legacy` section (spec §5): old `key=value` properties, over legacy.defaults.json. */
-    readonly legacy: Readonly<Record<string, string>>;
-    /** Called with the window manager before it is attached: its skins and layouts go in first. */
-    onWindowManager(windowManager: HabboWindowManager): void;
-    /** The application's renderer once it exists (screenshots); the game does not own it. */
-    renderer(): Renderer | null;
-    /** The room widgets the enabled features declare (roomWidgetRegistry()), for RoomUI. */
-    readonly roomWidgets: RoomWidgetRegistry;
-    readonly made: IEngineManagers;
-}
+import type {IEngineManagers} from './EngineHost';
+export type {IEngineHost, IEngineManagers} from './EngineHost';
 
 /** Declares a game feature: its host is the engine shell's (IEngineHost). */
 const feature = (declaration: IGameFeature): IGameFeature => declaration;

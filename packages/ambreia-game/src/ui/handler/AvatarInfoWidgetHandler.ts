@@ -11,7 +11,7 @@
  */
 import type {IRoomWidgetHandler} from '../IRoomWidgetHandler';
 import type {IRoomWidgetHandlerContainer} from '../IRoomWidgetHandlerContainer';
-import type {AvatarInfoWidget} from '../widget/avatarinfo/AvatarInfoWidget';
+import type {IRoomWidget} from '../widget/IRoomWidget';
 
 export class AvatarInfoWidgetHandler implements IRoomWidgetHandler
 {
@@ -19,10 +19,10 @@ export class AvatarInfoWidgetHandler implements IRoomWidgetHandler
     private _disposed: boolean = false;
     // AS3: .../src/com/sulake/habbo/ui/handler/AvatarInfoWidgetHandler.as::_container
     private _container: IRoomWidgetHandlerContainer | null = null;
-    private _widget: AvatarInfoWidget | null = null;
+    private _widget: IRoomWidget | null = null;
 
     // AS3: AvatarInfoWidgetHandler.as::set widget()
-    public set widget(value: AvatarInfoWidget | null)
+    public set widget(value: IRoomWidget | null)
     {
         this._widget = value;
     }

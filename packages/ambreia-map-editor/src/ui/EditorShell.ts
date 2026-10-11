@@ -51,7 +51,7 @@ export class EditorShell
 
         const switcher = new SlotSwitcher(manager, window, app, slots, panels);
         const parts: IPanelUi[] = [
-            new MenuBarUi(window, this),
+            new MenuBarUi(window, app, texts),
             new RailUi(window, app),
             new ViewToolsUi(window, app),
             new ViewInfoUi(window, app, texts),

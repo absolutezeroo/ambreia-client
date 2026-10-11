@@ -1,6 +1,6 @@
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {IRoomWidgetHandler} from './IRoomWidgetHandler';
-import type {RoomUI} from './RoomUI';
+import type {IRoomWidgetUIHost} from './RoomWidgetContracts';
 
 const log = Logger.getLogger('habbo.ui.RoomWidgetRegistry');
 
@@ -11,7 +11,7 @@ const log = Logger.getLogger('habbo.ui.RoomWidgetRegistry');
 export interface IRoomWidgetDefinition
 {
     handler(): IRoomWidgetHandler;
-    widget?(handler: IRoomWidgetHandler, ui: RoomUI): unknown;
+    widget?(handler: IRoomWidgetHandler, ui: IRoomWidgetUIHost): unknown;
 }
 
 /**

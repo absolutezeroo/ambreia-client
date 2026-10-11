@@ -1,5 +1,8 @@
-import type {IDisposable, IMessageEvent} from "../core/index";
-import type {FurnitureFloorData, FurnitureWallData, RoomUserData} from "../communication/index";
+import type {IDisposable} from '@ambreia/common/IDisposable';
+import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
+import type {FurnitureFloorData} from '@ambreia/protocol/incoming/room/engine/FurnitureFloorData';
+import type {FurnitureWallData} from '@ambreia/protocol/incoming/room/engine/FurnitureWallData';
+import type {RoomUserData} from '@ambreia/protocol/incoming/room/engine/RoomUserData';
 
 export interface IRoomMessageHandler extends IDisposable
 {

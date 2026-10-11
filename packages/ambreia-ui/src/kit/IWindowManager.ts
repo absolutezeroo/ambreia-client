@@ -17,9 +17,7 @@ import type {ISkinData} from '../graphics/renderer/BitmapSkinParser';
 import type {WindowEvent} from '../events/WindowEvent';
 import type {IModalDialog} from './utils/IModalDialog';
 import type {IInternalWindowServices} from "../index";
-import type {AlertDialogCallback, IAlertDialog} from './utils/AlertDialog';
-import type {IAlertDialogWithLink} from './utils/AlertDialogWithLink';
-import type {IConfirmDialog} from './utils/ConfirmDialog';
+import type {AlertDialogCallback, IAlertDialog, IAlertDialogWithLink, IConfirmDialog} from './utils/DialogContracts';
 
 /**
  * The window manager: contexts, XML layouts, dialogs, rendering, assets, hints, widgets. Holds no game

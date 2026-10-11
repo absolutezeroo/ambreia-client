@@ -3,10 +3,22 @@ import type {IWindow} from '@ambreia/ui/IWindow';
 import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
 import {LineInterpolation} from '@ambreia/iso/utils/LineInterpolation';
-import type {BCFloorPlanEditor} from './BCFloorPlanEditor';
+import type {IBitmapWrapperWindow} from '@ambreia/ui/components/IBitmapWrapperWindow';
+import type {IRegionWindow} from '@ambreia/ui/components/IRegionWindow';
 import type {FloorPlanCache, IPlanPoint} from './FloorPlanCache';
 
 const log = Logger.getLogger('habbo.window.utils.floorplaneditor.HeightMapEditor');
+
+interface IHeightMapEditorHost
+{
+    readonly floorPlanCache: FloorPlanCache;
+    readonly heightMapBitmapElement: IBitmapWrapperWindow | null;
+    readonly heightMapMouseCapturer: IRegionWindow | null;
+    readonly drawModes: string[];
+    readonly drawMode: string;
+    requestEmbeddedAsset(name: string, onReady: (bitmap: ImageBitmap) => void): void;
+    updateColorSliderTrack(height: number): void;
+}
 
 /** An RGB triple in 0..1, as AS3's `hslToRgb()` returns it. */
 // TS-only: AS3 uses a bare `Array` of three Numbers.
@@ -41,7 +53,7 @@ export class HeightMapEditor
     private static readonly TILE_ENTRY_LARGE: string = 'floor_editor_tile_entry_large';
 
     // AS3: HeightMapEditor.as::_bcFloorPlanEditor
-    private _bcFloorPlanEditor: BCFloorPlanEditor;
+    private _bcFloorPlanEditor: IHeightMapEditorHost;
 
     // AS3: HeightMapEditor.as::_drawing
     private _drawing: boolean = false;
@@ -98,7 +110,7 @@ export class HeightMapEditor
     private _isRectSelect: boolean = false;
 
     // AS3: HeightMapEditor.as::HeightMapEditor()
-    constructor(bcFloorPlanEditor: BCFloorPlanEditor)
+    constructor(bcFloorPlanEditor: IHeightMapEditorHost)
     {
         this._bcFloorPlanEditor = bcFloorPlanEditor;
         this._floorPlan = bcFloorPlanEditor.floorPlanCache;

@@ -4,7 +4,19 @@ import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import {
     UpdateFloorPropertiesMessageComposer
 } from '@ambreia/protocol/outgoing/room/layout/UpdateFloorPropertiesMessageComposer';
-import {BCFloorPlanEditor} from './BCFloorPlanEditor';
+import type {IHabboWindowManager} from '../../IHabboWindowManager';
+import type {FloorPlanCache} from './FloorPlanCache';
+import {getThicknessSettingBySelectionIndex} from './FloorPlanEditorUtils';
+
+interface IImportExportHost
+{
+    readonly windowManager: IHabboWindowManager | null;
+    readonly floorPlanCache: FloorPlanCache;
+    readonly canSave: boolean;
+    readonly lastReceivedFloorPlan: string;
+    readonly wallThickness: number;
+    readonly floorThickness: number;
+}
 
 /**
  * ImportExportDialog — the plan as editable text, for pasting one in or copying one out.
@@ -19,7 +31,7 @@ import {BCFloorPlanEditor} from './BCFloorPlanEditor';
 export class ImportExportDialog
 {
     // AS3: ImportExportDialog.as::_bcFloorPlanEditor
-    private _bcFloorPlanEditor: BCFloorPlanEditor;
+    private _bcFloorPlanEditor: IImportExportHost;
 
     /**
      * AS3 is handed the parsed layout XML; this port is handed the name the layout registry knows
@@ -33,7 +45,7 @@ export class ImportExportDialog
     private _window: IFrameWindow | null = null;
 
     // AS3: ImportExportDialog.as::ImportExportDialog()
-    constructor(bcFloorPlanEditor: BCFloorPlanEditor, layoutName: string)
+    constructor(bcFloorPlanEditor: IImportExportHost, layoutName: string)
     {
         this._bcFloorPlanEditor = bcFloorPlanEditor;
         this._layoutName = layoutName;
@@ -114,10 +126,10 @@ export class ImportExportDialog
                         entryPoint.x,
                         entryPoint.y,
                         cache.entryPointDir,
-                        BCFloorPlanEditor.getThicknessSettingBySelectionIndex(
+                        getThicknessSettingBySelectionIndex(
                             this._bcFloorPlanEditor.wallThickness
                         ),
-                        BCFloorPlanEditor.getThicknessSettingBySelectionIndex(
+                        getThicknessSettingBySelectionIndex(
                             this._bcFloorPlanEditor.floorThickness
                         )
                     )

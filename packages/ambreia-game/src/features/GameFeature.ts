@@ -3,7 +3,7 @@ import type {IKernelConfig} from '@ambreia/kernel/config/loadConfig';
 import {FeatureDependencyError} from '@ambreia/kernel/feature/bootFeatures';
 import {RoomWidgetRegistry} from '../ui/RoomWidgetRegistry';
 import type {IRoomWidgetDefinition} from '../ui/RoomWidgetRegistry';
-import type {IEngineHost, IEngineManagers} from './index';
+import type {IEngineHost, IEngineManagers} from './EngineHost';
 
 /** A slot of `host.made`: what an earlier feature made, read by the ones after it. */
 export type MadeSlot = keyof IEngineManagers;

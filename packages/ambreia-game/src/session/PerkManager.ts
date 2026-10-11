@@ -1,8 +1,15 @@
 import type {IPerkManager, IPerkAllowance} from './IPerkManager';
 import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
-import type {SessionDataManager} from './SessionDataManager';
+import type {IHabboCommunicationManager} from '../communication/IHabboCommunicationManager';
+import type {EventEmitter} from 'eventemitter3';
 import {PerkAllowancesMessageEvent} from '@ambreia/protocol/incoming/perk/index';
 import {PerksUpdatedEvent} from './events/PerksUpdatedEvent';
+
+interface IPerkManagerHost
+{
+    readonly communication: IHabboCommunicationManager | null;
+    readonly events: EventEmitter;
+}
 
 /**
  * Perk manager
@@ -13,13 +20,13 @@ export class PerkManager implements IPerkManager
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/session/PerkManager.as::_ready
     private _ready: boolean = false;
     // AS3: .../src/com/sulake/habbo/session/PerkManager.as::_sessionDataManager
-    private _sessionDataManager: SessionDataManager | null = null;
+    private _sessionDataManager: IPerkManagerHost | null = null;
     // AS3: .../src/com/sulake/habbo/session/PerkManager.as::_perkAllowancesMessageEvent
     private _perkAllowancesMessageEvent: IMessageEvent | null = null;
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/session/PerkManager.as::_perks
     private _perks: Map<string, IPerkAllowance> | null = new Map();
 
-    constructor(sessionDataManager: SessionDataManager)
+    constructor(sessionDataManager: IPerkManagerHost)
     {
         this._sessionDataManager = sessionDataManager;
 

@@ -1,5 +1,5 @@
 import {WindowParser} from '@ambreia/ui/utils/WindowParser';
-import type {EditorState} from '../state/EditorState';
+import type {ILayoutSerializerState} from '../state/EditorStateContracts';
 
 /**
  * Layout persistence for the editor.
@@ -18,7 +18,7 @@ import type {EditorState} from '../state/EditorState';
  * place (`furni_view`: 68 source elements, one live window); those save as the
  * stub they actually are.
  */
-export function serializeLayout(state: EditorState): string
+export function serializeLayout(state: ILayoutSerializerState): string
 {
     const root = state.rootWindow;
 
@@ -47,7 +47,7 @@ export function serializeLayout(state: EditorState): string
  * any non-`<window>` blocks it carries (`<sharedvariables>`) survive the
  * round-trip; only the declared size follows the edited root.
  */
-function wrapInLayoutDocument(state: EditorState, windowXml: string): string
+function wrapInLayoutDocument(state: ILayoutSerializerState, windowXml: string): string
 {
     const root = state.rootWindow;
 
@@ -115,7 +115,7 @@ function wrapInLayoutDocument(state: EditorState, windowXml: string): string
     return `<?xml version="1.0" encoding="UTF-8"?>\n${new XMLSerializer().serializeToString(layoutRoot)}`;
 }
 
-function injectVariables(xml: string, state: EditorState): string
+function injectVariables(xml: string, state: ILayoutSerializerState): string
 {
     const model = state.variables;
 
@@ -184,7 +184,7 @@ function directChild(element: Element, name: string): Element | null
 }
 
 /** Downloads the current layout as an `.xml` file. */
-export function downloadLayout(state: EditorState): void
+export function downloadLayout(state: ILayoutSerializerState): void
 {
     const xml = serializeLayout(state);
 
@@ -205,7 +205,7 @@ export function downloadLayout(state: EditorState): void
 }
 
 /** Saves the current layout back to disk via the dev-server middleware. */
-export async function saveLayout(state: EditorState): Promise<{ ok: boolean; message: string }>
+export async function saveLayout(state: ILayoutSerializerState): Promise<{ ok: boolean; message: string }>
 {
     const xml = serializeLayout(state);
     const name = state.currentLayoutName;
@@ -233,7 +233,7 @@ export async function saveLayout(state: EditorState): Promise<{ ok: boolean; mes
 }
 
 /** Registers raw layout XML under a name and opens it in the editor. */
-export function importLayoutXml(state: EditorState, xml: string, name: string): boolean
+export function importLayoutXml(state: ILayoutSerializerState, xml: string, name: string): boolean
 {
     try
     {

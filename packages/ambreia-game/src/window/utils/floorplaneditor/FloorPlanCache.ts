@@ -5,7 +5,14 @@ import type {
 import type {
     RoomOccupiedTilesMessageParser
 } from '@ambreia/protocol/parser/room/layout/RoomOccupiedTilesMessageParser';
-import type {BCFloorPlanEditor} from './BCFloorPlanEditor';
+import type {IHabboWindowManager} from '../../IHabboWindowManager';
+
+interface IFloorPlanCacheHost
+{
+    readonly windowManager: IHabboWindowManager | null;
+    readonly heightMapEditor: {drawing: boolean} | null;
+    readonly largeFloorPlansAllowed: boolean;
+}
 
 /** A tile address in plan space. AS3 uses `flash.geom.Point`, which this port has no equivalent of. */
 // TS-only: stands in for `flash.geom.Point`.
@@ -48,7 +55,7 @@ export class FloorPlanCache
     private static readonly HEIGHT_RADIX: number = 33;
 
     // AS3: FloorPlanCache.as::_bcFloorPlanEditor
-    private _bcFloorPlanEditor: BCFloorPlanEditor;
+    private _bcFloorPlanEditor: IFloorPlanCacheHost;
 
     // AS3: FloorPlanCache.as::_floorWidth
     private _floorWidth: number = -1;
@@ -77,7 +84,7 @@ export class FloorPlanCache
     private _showedPopup: boolean = false;
 
     // AS3: FloorPlanCache.as::FloorPlanCache()
-    constructor(bcFloorPlanEditor: BCFloorPlanEditor)
+    constructor(bcFloorPlanEditor: IFloorPlanCacheHost)
     {
         this._bcFloorPlanEditor = bcFloorPlanEditor;
     }

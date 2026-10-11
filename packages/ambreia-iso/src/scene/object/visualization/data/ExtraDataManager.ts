@@ -14,7 +14,6 @@
  * used for the individual (non-batched) request in `FurnitureExternalImageVisualization`.
  */
 import {Logger} from '@ambreia/common/utils/Logger';
-import type {FurnitureExternalImageVisualization} from '../../../../furniture/visualization/FurnitureExternalImageVisualization';
 
 const log = Logger.getLogger('habbo.room.object.visualization.data.ExtraDataManager');
 
@@ -23,6 +22,13 @@ interface IExtraDataResult
     id: string;
     url: string;
     status?: string;
+}
+
+export interface IExtraDataVisualization
+{
+    getExternalImageUUID(): string | null;
+    getExtraDataUrl(): string | null;
+    onUrlFromExtraDataService(url: string): void;
 }
 
 export class ExtraDataManager
@@ -37,9 +43,9 @@ export class ExtraDataManager
     private static _instance: ExtraDataManager | null = null;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/data/ExtraDataManager.as::inputVisualizationQueue
-    private _inputQueue: FurnitureExternalImageVisualization[] = [];
+    private _inputQueue: IExtraDataVisualization[] = [];
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/data/ExtraDataManager.as::outputVisualizationQueue
-    private _outputQueue: FurnitureExternalImageVisualization[] = [];
+    private _outputQueue: IExtraDataVisualization[] = [];
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/data/ExtraDataManager.as::ExtraDataManager()
     private constructor()
@@ -59,13 +65,13 @@ export class ExtraDataManager
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/data/ExtraDataManager.as::requestExtraDataUrl()
-    static requestExtraDataUrl(visualization: FurnitureExternalImageVisualization): void
+    static requestExtraDataUrl(visualization: IExtraDataVisualization): void
     {
         ExtraDataManager.getInstance()._inputQueue.push(visualization);
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/data/ExtraDataManager.as::furnitureDisposed()
-    static furnitureDisposed(visualization: FurnitureExternalImageVisualization): void
+    static furnitureDisposed(visualization: IExtraDataVisualization): void
     {
         ExtraDataManager.getInstance().removeFurniFromManager(visualization);
     }
@@ -77,7 +83,7 @@ export class ExtraDataManager
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/object/visualization/data/ExtraDataManager.as::removeFurniFromManager()
-    private removeFurniFromManager(visualization: FurnitureExternalImageVisualization): void
+    private removeFurniFromManager(visualization: IExtraDataVisualization): void
     {
         let index = this._inputQueue.indexOf(visualization);
 

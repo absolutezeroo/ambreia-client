@@ -9,17 +9,17 @@
  */
 import type {IRoomWidgetFactory} from './IRoomWidgetFactory';
 import type {IRoomWidgetHandler} from './IRoomWidgetHandler';
-import type {RoomUI} from './RoomUI';
+import type {IRoomWidgetUIHost} from './RoomWidgetContracts';
 import type {RoomWidgetRegistry} from './RoomWidgetRegistry';
 
 export class RoomWidgetFactory implements IRoomWidgetFactory
 {
     // AS3: .../src/com/sulake/habbo/ui/widget/RoomWidgetFactory.as::_roomUI
-    private _roomUI: RoomUI;
+    private _roomUI: IRoomWidgetUIHost;
     private readonly _registry: RoomWidgetRegistry;
     private _disposed: boolean = false;
 
-    constructor(roomUI: RoomUI, registry: RoomWidgetRegistry)
+    constructor(roomUI: IRoomWidgetUIHost, registry: RoomWidgetRegistry)
     {
         this._roomUI = roomUI;
         this._registry = registry;

@@ -1,4 +1,3 @@
-import type {IDisposable} from '@ambreia/common/IDisposable';
 import type {IWindow} from '../../IWindow';
 import type {IWindowContainer} from '../../IWindowContainer';
 import {WindowEvent} from '../../events/WindowEvent';
@@ -9,40 +8,8 @@ import type {ICaption} from './AlertDialogCaption';
 import {AlertDialogCaption} from './AlertDialogCaption';
 import type {IModalDialog} from './IModalDialog';
 
-/**
- * Callback type for alert dialog events.
- *
- * The callback receives the dialog instance and a WindowEvent
- * indicating the action (WE_OK or WE_CANCEL).
- */
-export type AlertDialogCallback = (dialog: IDisposable, event: WindowEvent) => void;
-
-/**
- * Interface for alert dialogs.
- *
- * In AS3 this was the obfuscated `class_3348` / `IAlertDialog` interface.
- * Combines the INotify base (title, summary, callback) with button
- * caption management (getButtonCaption, setButtonCaption).
- *
- * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/utils/AlertDialog.as
- * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/utils/AlertDialog.as
- */
-export interface IAlertDialog extends IDisposable {
-    // AS3: .../src/com/sulake/habbo/window/utils/AlertDialog.as::get title()
-    title: string;
-    // AS3: .../src/com/sulake/habbo/window/utils/AlertDialog.as::get summary()
-    summary: string;
-    // AS3: .../src/com/sulake/habbo/window/utils/AlertDialog.as::get callback()
-    callback: AlertDialogCallback | null;
-    // AS3: .../src/com/sulake/habbo/window/utils/AlertDialog.as::get titleBarColor()
-    titleBarColor: number;
-
-    // AS3: .../src/com/sulake/habbo/window/utils/AlertDialog.as::getButtonCaption()
-    getButtonCaption(buttonFlag: number): ICaption | null;
-
-    // AS3: .../src/com/sulake/habbo/window/utils/AlertDialog.as::setButtonCaption()
-    setButtonCaption(buttonFlag: number, caption: ICaption): void;
-}
+export type {AlertDialogCallback, IAlertDialog} from './DialogContracts';
+import type {AlertDialogCallback, IAlertDialog} from './DialogContracts';
 
 /**
  * Alert dialog with configurable buttons.

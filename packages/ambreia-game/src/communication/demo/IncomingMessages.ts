@@ -5,9 +5,9 @@ import {CryptoTools} from '@ambreia/net/encryption/CryptoTools';
 import {RSA} from '@ambreia/net/encryption/RSA';
 import type {SocketConnection} from '@ambreia/net/connection/SocketConnection';
 import {Logger} from '@ambreia/common/utils/Logger';
-import type {HabboCommunicationDemo} from './HabboCommunicationDemo';
+import type {IConnection} from '@ambreia/net/connection/IConnection';
 import type {IHabboCommunicationManager} from '../IHabboCommunicationManager';
-import {HabboCommunicationEvent} from '../enum/HabboCommunicationEvent';
+import {HabboCommunicationEvent, type HabboCommunicationEventType} from '../enum/HabboCommunicationEvent';
 
 // Events
 import {
@@ -54,12 +54,24 @@ import {GetFurnitureAliasesMessageComposer} from '@ambreia/protocol/outgoing/roo
 
 const log = Logger.getLogger('habbo.communication.demo.IncomingMessages');
 
+/** Minimal host surface the handshake message set calls back into. */
+export interface IIncomingMessagesHost
+{
+    readonly rsaModulus: string | null;
+    dispatchLoginStepEvent(step: HabboCommunicationEventType): void;
+    sendConnectionParameters(connection: IConnection): void;
+    loginOk(): void;
+    disconnected(reason: number, reasonText: string): void;
+    handleLoginFailedHotelClosedMessage(openHour: number, openMinute: number): void;
+    handleErrorMessage(errorCode: number, messageId: number): void;
+}
+
 /**
  * Handles incoming messages during connection/handshake
  *
  * Faithfully mirrors AS3: com.sulake.habbo.communication.demo.IncomingMessages
  *
- * Takes a reference to HabboCommunicationDemo and calls back to its methods
+ * Takes a minimal host contract and calls back to the demo methods
  * (loginOk, disconnected, handleErrorMessage, etc.) rather than emitting events.
  *
  * @see source_as_win63/habbo/communication/demo/IncomingMessages.as
@@ -69,7 +81,7 @@ export class IncomingMessages
     /** How long the server has to complete the Diffie-Hellman exchange once the socket is open. */
     private static readonly HANDSHAKE_TIMEOUT_MS = 15000;
 
-    private _demo: HabboCommunicationDemo;
+    private _demo: IIncomingMessagesHost;
     // AS3: sources/win63_version/habbo/communication/demo/class_1762.as::_communication
     private _communication: IHabboCommunicationManager;
     // AS3: sources/win63_version/habbo/communication/demo/class_1762.as::_messageEvents
@@ -92,7 +104,7 @@ export class IncomingMessages
         if(from === 'reconnecting' && to === 'failed') this._demo.disconnected(-3, '');
     };
 
-    constructor(demo: HabboCommunicationDemo, communication: IHabboCommunicationManager)
+    constructor(demo: IIncomingMessagesHost, communication: IHabboCommunicationManager)
     {
         this._demo = demo;
         this._communication = communication;

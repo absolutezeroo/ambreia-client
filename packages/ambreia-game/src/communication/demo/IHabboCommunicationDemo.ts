@@ -1,5 +1,6 @@
-import type {HabboCommunicationEventType, IHabboCommunicationManager} from "../index";
-import type {IConnection} from "../../core/index";
+import type {HabboCommunicationEventType} from '../enum/HabboCommunicationEvent';
+import type {IHabboCommunicationManager} from '../IHabboCommunicationManager';
+import type {IConnection} from '@ambreia/net/connection/IConnection';
 
 export interface IHabboCommunicationDemo
 {

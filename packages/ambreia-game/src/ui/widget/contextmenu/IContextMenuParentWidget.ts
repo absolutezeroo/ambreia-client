@@ -11,7 +11,11 @@ import type {IHabboWindowManager} from '../../../window/IHabboWindowManager';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import type {IHabboLocalizationManager} from '../../../localization/IHabboLocalizationManager';
 import type {IRoomWidgetMessageListener} from '../../IRoomWidgetMessageListener';
-import type {ContextInfoView} from './ContextInfoView';
+
+export interface IContextInfoView
+{
+    hide(animate: boolean): void;
+}
 
 export interface IContextMenuParentWidget
 {
@@ -24,5 +28,5 @@ export interface IContextMenuParentWidget
     readonly messageListener: IRoomWidgetMessageListener | null;
 
     // AS3: _SafeCls_1870.as::removeView()
-    removeView(view: ContextInfoView, animate: boolean): void;
+    removeView(view: IContextInfoView, animate: boolean): void;
 }

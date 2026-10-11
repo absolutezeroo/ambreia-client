@@ -12,11 +12,23 @@ import {withShape} from '@ambreia/map-editor-core/zone/withShape';
 import type {ZoneCell} from '@ambreia/map-editor-core/zone/Zone.generated';
 import type {IPick} from '../view/IPick';
 import {CATEGORY_LAYER} from './CATEGORY_LAYER';
-import type {EditorApp} from './EditorApp';
+import type {IEditorCommand} from '@ambreia/map-editor-core/commands/IEditorCommand';
+import type {ZoneDocument} from '@ambreia/map-editor-core/zone/Zone.generated';
+import type {Category} from './Category';
 import type {IElementRef} from './IElementRef';
 import type {WorldTool} from './WorldTool';
 
 type Cell = {readonly x: number; readonly y: number};
+
+export interface IWorldEditingHost
+{
+    category: Category;
+    readonly doc: ZoneDocument;
+    selection: EditorSelection;
+    hover: Cell | null;
+    execute(command: IEditorCommand): void;
+    refresh(): void;
+}
 
 /**
  * Editing the world layers (entries, passages, areas, NPCs, spawns, triggers…): which element is
@@ -36,7 +48,7 @@ export class WorldEditing
     private _dragTo: Cell | null = null;
     private _rectFrom: Cell | null = null;
 
-    constructor(private readonly _app: EditorApp)
+    constructor(private readonly _app: IWorldEditingHost)
     {
     }
 

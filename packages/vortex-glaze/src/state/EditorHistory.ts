@@ -1,6 +1,6 @@
 import type {IWindow} from '@ambreia/ui/IWindow';
 import {serializeLayout, importLayoutXml} from '../ops/LayoutSerializer';
-import type {EditorState} from './EditorState';
+import type {IEditorHistoryState} from './EditorStateContracts';
 
 interface ISnapshot
 {
@@ -37,14 +37,14 @@ const COALESCE_MS = 600;
  */
 export class EditorHistory
 {
-    private readonly _state: EditorState;
+    private readonly _state: IEditorHistoryState;
     private _undo: ISnapshot[] = [];
     private _redo: ISnapshot[] = [];
     private _lastKey: string | null = null;
     private _lastTime = 0;
     private _restoring = false;
 
-    public constructor(state: EditorState)
+    public constructor(state: IEditorHistoryState)
     {
         this._state = state;
     }

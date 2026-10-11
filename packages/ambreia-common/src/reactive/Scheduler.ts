@@ -1,4 +1,3 @@
-import type {EffectComputation} from './Effect';
 import {Logger} from '../utils/Logger';
 
 const log = Logger.getLogger('core.reactive.Scheduler');
@@ -15,6 +14,14 @@ const log = Logger.getLogger('core.reactive.Scheduler');
 export interface IFlushEmitter
 {
     on(type: string, listener: () => void): unknown;
+}
+
+/** Minimal surface the scheduler needs from an executable effect. */
+export interface IScheduledEffect
+{
+    readonly disposed: boolean;
+
+    run(): void;
 }
 
 /**
@@ -40,20 +47,20 @@ export class ReactiveScheduler
     // TS-only: convergence cap for effects that keep writing signals.
     private static readonly MAX_FLUSH_ITERATIONS: number = 100;
 
-    private readonly _queue: Set<EffectComputation> = new Set();
+    private readonly _queue: Set<IScheduledEffect> = new Set();
     private _flushing: boolean = false;
     private _attached: boolean = false;
 
     /** Queues an effect for the next flush. Idempotent per flush. */
     // TS-only: called by signal writes and by effect creation.
-    public enqueue(effect: EffectComputation): void
+    public enqueue(effect: IScheduledEffect): void
     {
         this._queue.add(effect);
     }
 
     /** Drops a disposed effect from the queue. */
     // TS-only: called by EffectComputation.dispose().
-    public dequeue(effect: EffectComputation): void
+    public dequeue(effect: IScheduledEffect): void
     {
         this._queue.delete(effect);
     }
