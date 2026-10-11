@@ -1,7 +1,9 @@
 import {EventEmitter} from 'eventemitter3';
 import {getIIDName, type IID} from './IID';
 import type {IDisposable} from '@ambreia/common/IDisposable';
-import type {IContext, InterfaceCallback, IUpdateReceiver} from './IContext';
+import type {IContext, IUpdateReceiver} from './IContext';
+import type {IComponent} from './IComponent';
+import type {InterfaceCallback} from './InterfaceCallback';
 import type {ComponentDependency} from './ComponentDependency';
 import {LockEvent} from './events/LockEvent';
 import type {AssetLoaderStruct} from '@ambreia/common/assets/AssetLoaderStruct';
@@ -131,7 +133,7 @@ interface IInterfaceStruct<T = unknown>
  * }
  * ```
  */
-export class Component implements IDisposable
+export class Component implements IDisposable, IComponent
 {
     // AS3: .../src/com/sulake/core/runtime/_SafeCls_50.as::_lastError
     protected _lastError: string = '';

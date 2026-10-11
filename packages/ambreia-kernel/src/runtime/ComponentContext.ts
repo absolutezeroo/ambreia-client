@@ -4,6 +4,7 @@ import type {ComponentDependency} from './ComponentDependency';
 import type {ICoreConfiguration} from './ICoreConfiguration';
 import type {ILinkEventTracker} from './events/ILinkEventTracker';
 import {Component, ComponentEvents, ComponentFlags} from './Component';
+import type {IComponent} from './IComponent';
 import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('core.runtime.ComponentContext');
@@ -52,13 +53,13 @@ interface IUpdateReceiverEntry
  */
 export class ComponentContext extends Component implements IContext
 {
-    private readonly _attachedComponents: Component[] = [];
+    private readonly _attachedComponents: IComponent[] = [];
     private readonly _interfaceQueues: Map<symbol, IInterfaceQueue> = new Map();
     private readonly _updateReceivers: IUpdateReceiverEntry[] = [];
     private _updateReceiversDirty: boolean = false;
     // AS3: .../src/com/sulake/core/runtime/_SafeCls_56.as::_linkEventTrackers
     private readonly _linkEventTrackers: ILinkEventTracker[] = [];
-    private readonly _unlockHandlers: Map<Component, () => void> = new Map();
+    private readonly _unlockHandlers: Map<IComponent, () => void> = new Map();
 
     constructor(parentContext?: IContext)
     {
@@ -176,7 +177,7 @@ export class ComponentContext extends Component implements IContext
         return provided;
     }
 
-    attachComponent(component: Component, interfaces: IID[], instance?: unknown): void
+    attachComponent(component: IComponent, interfaces: IID[], instance?: unknown): void
     {
         if(this.disposed) return;
 
@@ -233,7 +234,7 @@ export class ComponentContext extends Component implements IContext
 	 * Detach a component from this context
 	 */
     // AS3: .../src/com/sulake/core/runtime/_SafeCls_56.as::detachComponent()
-    detachComponent(component: Component): void
+    detachComponent(component: IComponent): void
     {
         const index = this._attachedComponents.indexOf(component);
 
@@ -559,7 +560,7 @@ export class ComponentContext extends Component implements IContext
 
         for(const component of this._attachedComponents)
         {
-            if(component !== (this as unknown as Component)) xml += component.toXMLString(indent + 1);
+            if(component !== this) xml += component.toXMLString(indent + 1);
         }
 
         return `${xml}${pad}</context>\n`;
@@ -574,7 +575,7 @@ export class ComponentContext extends Component implements IContext
     /**
 	 * Get all attached components
 	 */
-    getAttachedComponents(): readonly Component[]
+    getAttachedComponents(): readonly IComponent[]
     {
         return this._attachedComponents;
     }
@@ -601,7 +602,7 @@ export class ComponentContext extends Component implements IContext
     /**
 	 * Called when a component unlocks (all its dependencies resolved)
 	 */
-    private onComponentUnlocked(component: Component, interfaces: IID[]): void
+    private onComponentUnlocked(component: IComponent, interfaces: IID[]): void
     {
         if(this.disposed || component.disposed) return;
 

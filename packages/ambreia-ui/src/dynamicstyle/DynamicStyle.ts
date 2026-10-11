@@ -1,4 +1,4 @@
-import type {WindowController} from '../WindowController';
+import type {IWindow} from '../IWindow';
 
 /**
  * Represents a dynamic style with state-based visual properties.
@@ -78,7 +78,7 @@ export class DynamicStyle
 	 * @returns The matching child style, or null
 	 */
     // AS3: .../src/com/sulake/core/window/dynamicstyle/DynamicStyle.as::getChildStyle()
-    public getChildStyle(window: WindowController): DynamicStyle | null
+    public getChildStyle(window: IWindow): DynamicStyle | null
     {
         for(const tag of window.tags)
         {

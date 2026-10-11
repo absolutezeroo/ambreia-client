@@ -20,7 +20,7 @@ import type {ISelectedRoomObjectData} from '@ambreia/iso/scene/ISelectedRoomObje
 import type {SelectedRoomObjectData} from '@ambreia/iso/scene/utils/SelectedRoomObjectData';
 import type {IRoomAreaSelectionManager} from '@ambreia/iso/scene/IRoomAreaSelectionManager';
 import type {RoomPlaneParser} from '@ambreia/iso/scene/object/RoomPlaneParser';
-import type {IRoomEngineRectangle} from './RoomEngine';
+import type {IRoomEngineRectangle} from './IRoomEngineRectangle';
 
 export interface IRoomEngine extends IDisposable {
     // Event emitter

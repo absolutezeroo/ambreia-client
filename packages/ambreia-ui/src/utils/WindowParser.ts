@@ -3,7 +3,7 @@ import type {IWindowParser} from './IWindowParser';
 import type {IWindow} from '../IWindow';
 import type {IWindowContext} from '../IWindowContext';
 import type {IStaticBitmapWrapperWindow} from '../components/IStaticBitmapWrapperWindow';
-import type {BoxSizerController} from '../components/BoxSizerController';
+import type {IBoxSizerWindow} from '../components/IBoxSizerWindow';
 import {PropertyStruct} from './PropertyStruct';
 import {TYPE_CODE_TO_NAME, TYPE_NAME_TO_CODE, WindowType} from '../enum/WindowType';
 import {PARAM_NAME_TO_FLAG, WindowParam} from '../enum/WindowParam';
@@ -662,7 +662,7 @@ export class WindowParser implements IWindowParser
         // setAutoRearrange(false) is only useful while children are being added, but the final
         // setAutoRearrange(true) is unconditional in AS3 - it runs on every BoxSizer, not just ones
         // with a <children> node.
-        const boxSizer = window as unknown as BoxSizerController;
+        const boxSizer = window as unknown as IBoxSizerWindow;
         const isBoxSizer = typeof boxSizer.setAutoRearrange === 'function';
 
         if(childrenNode)

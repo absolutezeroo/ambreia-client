@@ -6,7 +6,7 @@ import type {ICoreErrorLogger} from './ICoreErrorLogger';
 import type {IFileProxy} from './IFileProxy';
 import {ComponentContext} from './ComponentContext';
 import {ComponentEvents} from './Component';
-import type {Component} from './Component';
+import type {IComponent} from './IComponent';
 import {DefaultErrorReporter} from './DefaultErrorReporter';
 import {Exception} from './exceptions/Exception';
 import {LibraryProgressEvent} from './events/LibraryProgressEvent';
@@ -329,9 +329,9 @@ export class CoreComponentContext extends ComponentContext implements ICore
 	 * wrapper the boot warning uses.
 	 */
     // AS3: .../src/com/sulake/core/runtime/_SafeCls_58.as::getLockedComponents()
-    getLockedComponents(): Component[]
+    getLockedComponents(): IComponent[]
     {
-        const locked: Component[] = [];
+        const locked: IComponent[] = [];
 
         for(const component of this.getAttachedComponents())
         {

@@ -18,6 +18,7 @@ import {DEFAULT_ROOM_MODULES} from '@ambreia/iso/defaultRoomModules';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import type {IConnection} from '@ambreia/net/connection/IConnection';
 import type {IRoomEngine} from './IRoomEngine';
+import type {IRoomEngineRectangle} from './IRoomEngineRectangle';
 import {RoomAreaSelectionManager} from './utils/RoomAreaSelectionManager';
 import type {IRoomCreator} from './IRoomCreator';
 import type {IRoomEngineServices} from './IRoomEngineServices';
@@ -341,15 +342,6 @@ export interface IPendingWallItemData {
     ownerName: string;
     // AS3: .../src/com/sulake/habbo/room/utils/_SafeCls_2114.as::get expiryTime()
     secondsToExpiration: number;
-}
-
-export interface IRoomEngineRectangle {
-    left: number;
-    top: number;
-    right: number;
-    bottom: number;
-    width: number;
-    height: number;
 }
 
 export class RoomEngine extends Component implements IRoomEngine,

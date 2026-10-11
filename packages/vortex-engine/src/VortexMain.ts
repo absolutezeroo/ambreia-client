@@ -27,7 +27,7 @@ import {CoreComponentContextEvents, CoreSetup} from '@ambreia/kernel/runtime/Cor
 import {Logger} from '@ambreia/common/utils/Logger';
 import {FrameTimings} from '@ambreia/common/utils/FrameTimings';
 import type {IVortexConfig, IVortexWindowAssets} from './VortexConfig';
-import {Vortex} from './Vortex';
+import type {IVortexMainHost} from './IVortexMainHost';
 import {bootFeatures} from '@ambreia/kernel/feature/bootFeatures';
 import type {IKernelReport} from '@ambreia/kernel/feature/bootFeatures';
 import {GAME_FEATURES, emptyManagers} from '@ambreia/game/features/index';
@@ -158,11 +158,12 @@ export class VortexMain implements IVortexMain
     /**
      * AS3: HabboAirMain(_arg_1:IHabboLoadingScreen, _arg_2:Dictionary)
      *
+     * @param host - Services owned by the outer application shell
      * @param loadingScreen - Loading screen to update during initialization
      *
      * @see sources/WIN63-202607011411-782849652/src/binaryData/HabboAir.as constructor
      */
-    constructor(loadingScreen?: IVortexLoadingScreen | null) 
+    constructor(private readonly _host: IVortexMainHost, loadingScreen?: IVortexLoadingScreen | null)
     {
         this._loadingScreen = loadingScreen ?? null;
     }
@@ -536,7 +537,7 @@ export class VortexMain implements IVortexMain
             avatarData: config.avatarData,
             legacy: config.kernel.legacy,
             onWindowManager: windowManager => this.applyWindowAssets(config.windowAssets ?? null, windowManager),
-            renderer: () => Vortex.instance?.application?.renderer ?? null,
+            renderer: () => this._host.getRenderer(),
             roomWidgets: roomWidgetRegistry(GAME_FEATURES, config.kernel),
             made
         };
@@ -886,7 +887,7 @@ export class VortexMain implements IVortexMain
     // AS3: .../src/binaryData/HabboAir.as::onConfigurationComplete()
     private onConfigurationComplete(): void 
     {
-        Vortex.trackLoginStep('client.init.config.loaded');
+        this._host.trackLoginStep('client.init.config.loaded');
         this._completedInitSteps++;
         this.updateProgressBar();
     }
@@ -899,7 +900,7 @@ export class VortexMain implements IVortexMain
     // AS3: .../src/binaryData/HabboAir.as::onLocalizationComplete()
     private onLocalizationComplete(): void 
     {
-        Vortex.trackLoginStep('client.init.localization.loaded');
+        this._host.trackLoginStep('client.init.localization.loaded');
 
         // Wire localization resolver for WindowParser.
         if(this._localizationManager) 
@@ -927,7 +928,7 @@ export class VortexMain implements IVortexMain
     private onRoomEngineReady(): void 
     {
         this._roomEngineReady = true;
-        Vortex.trackLoginStep('client.init.room.ready');
+        this._host.trackLoginStep('client.init.room.ready');
 
         this.startSendingHeartBeat();
     }
@@ -944,7 +945,7 @@ export class VortexMain implements IVortexMain
     private onCoreRunning(): void 
     {
         this._coreRunning = true;
-        Vortex.trackLoginStep('client.init.core.running');
+        this._host.trackLoginStep('client.init.core.running');
         this._completedInitSteps++;
         this.updateProgressBar();
     }
@@ -992,7 +993,7 @@ export class VortexMain implements IVortexMain
     // AS3: .../src/binaryData/HabboAir.as::sendHeartBeat()
     private sendHeartBeat(): void 
     {
-        Vortex.instance.vortexEvents.emit('heartbeat');
+        this._host.emitLifecycle('heartbeat');
     }
 
     /**
@@ -1005,7 +1006,7 @@ export class VortexMain implements IVortexMain
     {
         log.error(`Core error: ${message}`);
 
-        Vortex.reportCrash(message, 'core', false);
+        this._host.reportCrash(message, 'core', false);
     }
 
     /**
@@ -1035,7 +1036,7 @@ export class VortexMain implements IVortexMain
 
         // Kept ahead of the reload for anything embedding the engine that wants to know; nothing
         // in this client listens, and the reload wins either way.
-        Vortex.instance.vortexEvents.emit('reboot');
+        this._host.emitLifecycle('reboot');
 
         window.location.reload();
     };

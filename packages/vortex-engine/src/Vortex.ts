@@ -497,7 +497,12 @@ export class Vortex implements IVortex
             target.appendChild(this._application.canvas);
 
             // 2. Create and init engine orchestrator (= HabboAirMain)
-            this._habboMain = new VortexMain(this._loadingScreen);
+            this._habboMain = new VortexMain({
+                getRenderer: () => this._application?.renderer ?? null,
+                trackLoginStep: (step, extra) => Vortex.trackLoginStep(step, extra),
+                reportCrash: (message, category, isFatal, error) => Vortex.reportCrash(message, category, isFatal, error),
+                emitLifecycle: event => this._events.emit(event),
+            }, this._loadingScreen);
 
             await this._habboMain.init(this._application, config);
 

@@ -2,15 +2,13 @@ import type {EventEmitter} from 'eventemitter3';
 import type {IID} from './IID';
 import type {IDisposable} from '@ambreia/common/IDisposable';
 import type {ICoreConfiguration} from './ICoreConfiguration';
-import type {Component} from './Component';
+import type {IComponent} from './IComponent';
 import type {ComponentDependency} from './ComponentDependency';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import type {ILinkEventTracker} from './events/ILinkEventTracker';
+import type {InterfaceCallback} from './InterfaceCallback';
 
-/**
- * Queue callback for interface resolution
- */
-export type InterfaceCallback<T = unknown> = (iid: IID<T>, instance: T) => void;
+export type {InterfaceCallback} from './InterfaceCallback';
 
 /**
  * The central container that manages components and their dependencies: registration and
@@ -82,7 +80,7 @@ export interface IContext extends IDisposable
 	 * @param interfaces Array of interface IDs this component provides
 	 */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/core/runtime/_SafeCls_54.as::attachComponent()
-    attachComponent(component: Component, interfaces: IID[], instance?: unknown): void;
+    attachComponent(component: IComponent, interfaces: IID[], instance?: unknown): void;
 
     // TS-only: registers a plain object (an engine package's class) under `iid`.
     attachInstance<T>(iid: IID<T>, instance: T, options?: IAttachInstanceOptions): void;
@@ -93,7 +91,7 @@ export interface IContext extends IDisposable
 	 * @param component The component to detach
 	 */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/core/runtime/_SafeCls_54.as::detachComponent()
-    detachComponent(component: Component): void;
+    detachComponent(component: IComponent): void;
 
     /**
 	 * Register an update receiver to be called each frame
