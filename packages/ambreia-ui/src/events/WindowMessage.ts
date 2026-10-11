@@ -71,7 +71,7 @@ export class WindowMessage extends WindowEvent
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/core/window/events/WindowMessage.as::clone()
     public override clone(): WindowEvent
     {
-        return WindowMessage.allocateMessage(this.message, this._window, this._related, this._cancelable);
+        return WindowMessage.allocateMessage(this.message, this._window as IWindow | null, this._related as IWindow | null, this._cancelable);
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/core/window/events/WindowMessage.as::toString()

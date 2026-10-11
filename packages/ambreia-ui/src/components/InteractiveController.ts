@@ -125,7 +125,8 @@ export class InteractiveController extends WindowController implements IInteract
         // Wired 2026-08-27. These five branches were empty comments, so `WindowToolTipAgent` — 262
         // lines, constructed by every `ServiceManager` — was never called once and no tooltip in
         // this client had ever appeared.
-        const toolTips = window.context?.getWindowServices()?.getToolTipAgentService() ?? null;
+        const context = window.context as IWindowContext;
+        const toolTips = context.getWindowServices().getToolTipAgentService();
 
         if(toolTips === null) return;
 

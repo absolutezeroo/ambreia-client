@@ -1,4 +1,4 @@
-import type {IWindow} from '../IWindow';
+import type {IWindowEventTarget} from './IWindowEventTarget';
 
 /**
  * Base window event with object pooling (allocate/recycle pattern).
@@ -84,21 +84,21 @@ export class WindowEvent
     }
 
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/core/window/events/WindowEvent.as::_window
-    protected _window: IWindow | null = null;
+    protected _window: IWindowEventTarget | null = null;
 
     /** The target window that dispatched this event. */
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/core/window/events/WindowEvent.as::get window()
-    public get window(): IWindow | null
+    public get window(): IWindowEventTarget | null
     {
         return this._window;
     }
 
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/core/window/events/WindowEvent.as::_related
-    protected _related: IWindow | null = null;
+    protected _related: IWindowEventTarget | null = null;
 
     /** The related window (parent, child, etc.). */
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/core/window/events/WindowEvent.as::get related()
-    public get related(): IWindow | null
+    public get related(): IWindowEventTarget | null
     {
         return this._related;
     }
@@ -115,7 +115,7 @@ export class WindowEvent
 
     /** The target window that dispatched this event. */
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/core/window/events/WindowEvent.as::get target()
-    public get target(): IWindow | null
+    public get target(): IWindowEventTarget | null
     {
         return this._window;
     }
@@ -130,7 +130,7 @@ export class WindowEvent
 	 * @returns A pooled or new WindowEvent instance
 	 */
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/core/window/events/WindowEvent.as::allocate()
-    public static allocate(type: string, window: IWindow | null, related: IWindow | null, cancelable: boolean = false): WindowEvent
+    public static allocate(type: string, window: IWindowEventTarget | null, related: IWindowEventTarget | null, cancelable: boolean = false): WindowEvent
     {
         const event: WindowEvent = (WindowEvent._pool.length > 0)
             ? WindowEvent._pool.pop()!

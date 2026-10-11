@@ -133,6 +133,6 @@ export class HotLooksView implements ICategoryView
 
         if(parent === null) return;
 
-        this._model?.selectHotLook(this._grid?.getGridItemIndex(parent) ?? -1);
+        this._model?.selectHotLook(this._grid?.getGridItemIndex(parent as IWindow) ?? -1);
     };
 }

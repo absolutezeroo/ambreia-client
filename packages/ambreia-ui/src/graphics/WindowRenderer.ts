@@ -789,7 +789,7 @@ export class WindowRenderer implements IWindowRenderer
     {
         if(event.window)
         {
-            this.removeRenderable(event.window);
+            this.removeRenderable(event.window as IWindow);
         }
     }
 

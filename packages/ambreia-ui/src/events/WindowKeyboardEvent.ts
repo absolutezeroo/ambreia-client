@@ -125,7 +125,7 @@ export class WindowKeyboardEvent extends WindowEvent
     {
         return WindowKeyboardEvent.allocateKeyboard(
             this._type, this._keyCode, this._charCode,
-            this._window, this._related,
+            this._window as IWindow | null, this._related as IWindow | null,
             this._altKey, this._ctrlKey, this._shiftKey,
             this._keyLocation, this._cancelable
         );

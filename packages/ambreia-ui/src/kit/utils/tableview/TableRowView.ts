@@ -242,7 +242,7 @@ export class TableRowView implements IDisposable
             return;
         }
 
-        this._rowModel.hasFocus = TableRowView.windowIsChild(this._container as unknown as IWindow, event.related);
+        this._rowModel.hasFocus = TableRowView.windowIsChild(this._container as unknown as IWindow, event.related as IWindow | null);
         this.updateColor();
     };
 

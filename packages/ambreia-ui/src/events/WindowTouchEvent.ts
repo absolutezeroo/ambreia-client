@@ -121,7 +121,7 @@ export class WindowTouchEvent extends WindowEvent
     public override clone(): WindowEvent 
     {
         return WindowTouchEvent.allocateTouch(
-            this._type, this._window, this._related,
+            this._type, this._window as IWindow | null, this._related as IWindow | null,
             this.localX, this.localY, this.sizeX, this.sizeY,
             this.stageX, this.stageY, this.pressure,
             this.altKey, this.ctrlKey, this.shiftKey

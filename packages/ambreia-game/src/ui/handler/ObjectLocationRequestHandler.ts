@@ -2,7 +2,7 @@ import type {IRoomWidgetHandler} from '../IRoomWidgetHandler';
 import type {IRoomWidgetHandlerContainer} from '../IRoomWidgetHandlerContainer';
 import type {RoomWidgetMessage} from '../widget/messages/RoomWidgetMessage';
 import type {RoomWidgetUpdateEvent} from '../widget/events/RoomWidgetUpdateEvent';
-import type {IRoomEngineRectangle} from '../../room/RoomEngine';
+import type {IRoomEngineRectangle} from '../../room/IRoomEngineRectangle';
 import {RoomObjectCategoryEnum} from '@ambreia/iso/scene/object/RoomObjectCategoryEnum';
 import {RoomWidgetGetObjectLocationMessage} from '../widget/messages/RoomWidgetGetObjectLocationMessage';
 import {RoomWidgetUserLocationUpdateEvent} from '../widget/events/RoomWidgetUserLocationUpdateEvent';

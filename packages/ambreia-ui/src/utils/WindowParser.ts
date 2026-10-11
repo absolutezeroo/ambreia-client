@@ -1,7 +1,7 @@
 import {platform} from '@ambreia/common/platform/Platform';
 import type {IWindowParser} from './IWindowParser';
 import type {IWindow} from '../IWindow';
-import type {IWindowContext} from '../IWindowContext';
+import type {IWindowContextAccess} from '../IWindowContextAccess';
 import type {IStaticBitmapWrapperWindow} from '../components/IStaticBitmapWrapperWindow';
 import type {IBoxSizerWindow} from '../components/IBoxSizerWindow';
 import {PropertyStruct} from './PropertyStruct';
@@ -51,7 +51,7 @@ export class WindowParser implements IWindowParser
     // (see HabboWindowManagerComponent.as::buildFromXML()), and this is how the top-level
     // constructed window still resolves a context/theme to build under despite having no parent
     // to read `.context` off of.
-    private readonly _context: IWindowContext;
+    private readonly _context: IWindowContextAccess<IWindow>;
 
     // DEVIATION: AS3 declares a `_parsedLayoutCache`, allocates it in the constructor and disposes
     //   it in dispose(), and never reads or writes it in between — `parseAndConstruct()`'s
@@ -59,7 +59,7 @@ export class WindowParser implements IWindowParser
     //   allocation and a disposal around nothing, so the port omits it rather than carrying a
     //   field whose only behaviour is to exist. The name suggests a cache; there is no cache.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/core/window/utils/WindowParser.as::_parsedLayoutCache
-    public constructor(context: IWindowContext)
+    public constructor(context: IWindowContextAccess<IWindow>)
     {
         this._context = context;
     }

@@ -209,6 +209,6 @@ export class AvatarEditorGridViewEffects implements IAvatarEditorGridView
 
         if(window === null) return;
 
-        this._model?.selectPart(this._partType, this._thumbs?.getGridItemIndex(window) ?? -1);
+        this._model?.selectPart(this._partType, this._thumbs?.getGridItemIndex(window as IWindow) ?? -1);
     };
 }

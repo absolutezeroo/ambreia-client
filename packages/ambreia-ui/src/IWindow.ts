@@ -1,6 +1,6 @@
 import type {IRectLimiter} from './utils/IRectLimiter';
 import type {PropertyStruct} from './utils/PropertyStruct';
-import type {IWindowContext} from './IWindowContext';
+import type {IWindowContextAccess} from './IWindowContextAccess';
 import type {WindowEvent} from './events/WindowEvent';
 import type {WindowEventListener} from './events/WindowEventDispatcher';
 import type {IDisposable} from "@ambreia/common/IDisposable";
@@ -112,7 +112,7 @@ export interface IWindow extends IDisposable
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/core/window/IWindow.as::get parent()
     parent: IWindow | null;
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/core/window/IWindow.as::get context()
-    readonly context: IWindowContext;
+    readonly context: IWindowContextAccess<IWindow>;
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/core/window/IWindow.as::get desktop()
     readonly desktop: IWindow | null;
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/core/window/IWindow.as::get host()

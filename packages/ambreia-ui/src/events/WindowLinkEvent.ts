@@ -60,7 +60,7 @@ export class WindowLinkEvent extends WindowEvent
 	 */
     public override clone(): WindowEvent
     {
-        return WindowLinkEvent.allocateLink(this._link, this._window, this._related);
+        return WindowLinkEvent.allocateLink(this._link, this._window as IWindow | null, this._related as IWindow | null);
     }
 
     /**

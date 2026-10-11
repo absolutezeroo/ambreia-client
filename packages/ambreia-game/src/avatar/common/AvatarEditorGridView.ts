@@ -282,7 +282,7 @@ export class AvatarEditorGridView implements IAvatarEditorGridView
 
                 if(window === null) return;
 
-                this._model?.selectPart(this._partType, this._thumbs?.getGridItemIndex(window) ?? -1);
+                this._model?.selectPart(this._partType, this._thumbs?.getGridItemIndex(window as IWindow) ?? -1);
 
                 return;
             }
@@ -308,7 +308,7 @@ export class AvatarEditorGridView implements IAvatarEditorGridView
             if((this._palettes?.length ?? 0) <= layer) continue;
 
             const grid = this._palettes?.[layer] ?? null;
-            const index = grid?.getGridItemIndex(window) ?? -1;
+            const index = grid?.getGridItemIndex(window as IWindow) ?? -1;
 
             if(index > -1)
             {

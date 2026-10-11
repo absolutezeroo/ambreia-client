@@ -1,4 +1,5 @@
 import type {IWindow} from './IWindow';
+import type {IWindowContextAccess} from './IWindowContextAccess';
 import type {IWindowParser} from './utils/IWindowParser';
 import type {IResourceManager} from './IResourceManager';
 import type {IDisposable} from "@ambreia/common/IDisposable";
@@ -17,7 +18,7 @@ import type {IWindowLocalization} from './IWindowLocalization';
  *
  * @see sources/PRODUCTION-201601012205-226667486/src/com/sulake/core/window/IWindowContext.as
  */
-export interface IWindowContext extends IDisposable
+export interface IWindowContext extends IDisposable, IWindowContextAccess<IWindow>
 {
     inputEventTrackers: IInputEventTracker[];
 

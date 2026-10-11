@@ -139,7 +139,7 @@ export class WindowMouseEvent extends WindowEvent
     public override clone(): WindowEvent
     {
         return WindowMouseEvent.allocateMouse(
-            this._type, this._window, this._related,
+            this._type, this._window as IWindow | null, this._related as IWindow | null,
             this.localX, this.localY, this.stageX, this.stageY,
             this.altKey, this.ctrlKey, this.shiftKey, this.buttonDown,
             this.delta

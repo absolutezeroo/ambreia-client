@@ -4,7 +4,7 @@ import type {IWindow} from '@ambreia/ui/IWindow';
 import type {IMessageComposer} from '@ambreia/net/messages/IMessageComposer';
 import type {IHabboCommunicationManager} from '../communication/IHabboCommunicationManager';
 import type {IHabboLocalizationManager} from '../localization/IHabboLocalizationManager';
-import type {IHabboWindowManager} from '../window/IHabboWindowManager';
+import type {IWindowManager} from '@ambreia/ui/kit/IWindowManager';
 import type {IAvatarEffect} from '@ambreia/protocol/parser/inventory/AvatarEffectsMessageParser';
 import type {IUserDataManager} from './IUserDataManager';
 import type {IPerkManager} from './IPerkManager';
@@ -30,7 +30,7 @@ export interface ISessionDataManager extends IDisposable
     readonly ignoredUsersManager: IIgnoredUsersManager;
     readonly groupInfoManager: IHabboGroupInfoManager;
     readonly roomSessionManager: IRoomSessionManager | null;
-    readonly windowManager: IHabboWindowManager | null;
+    readonly windowManager: IWindowManager | null;
     readonly localization: IHabboLocalizationManager | null;
 
     // System status

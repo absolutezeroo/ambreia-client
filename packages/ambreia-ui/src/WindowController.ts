@@ -1795,7 +1795,7 @@ export class WindowController extends WindowModel implements IWindow, IGraphicCo
                     }
                     else if(this.testParamFlag(0x20000)) 
                     {
-                        WindowController.expandToAccommodateChild(this, event.related!);
+                        WindowController.expandToAccommodateChild(this, event.related as IWindow);
                     }
 
                     this.renderDynamicStyle();
@@ -1819,7 +1819,7 @@ export class WindowController extends WindowModel implements IWindow, IGraphicCo
                     }
                     else if(this.testParamFlag(0x20000)) 
                     {
-                        WindowController.expandToAccommodateChild(this, event.related!);
+                        WindowController.expandToAccommodateChild(this, event.related as IWindow);
                     }
                     break;
 
@@ -1830,7 +1830,7 @@ export class WindowController extends WindowModel implements IWindow, IGraphicCo
                     }
                     else if(this.testParamFlag(0x20000)) 
                     {
-                        WindowController.expandToAccommodateChild(this, event.related!);
+                        WindowController.expandToAccommodateChild(this, event.related as IWindow);
                     }
                     break;
 

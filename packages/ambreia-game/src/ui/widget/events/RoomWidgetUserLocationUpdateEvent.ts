@@ -1,4 +1,4 @@
-import type {IRoomEngineRectangle} from '../../../room/RoomEngine';
+import type {IRoomEngineRectangle} from '../../../room/IRoomEngineRectangle';
 import {RoomWidgetUpdateEvent} from './RoomWidgetUpdateEvent';
 
 /**

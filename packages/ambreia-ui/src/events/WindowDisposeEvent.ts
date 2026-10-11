@@ -45,7 +45,7 @@ export class WindowDisposeEvent extends WindowEvent
      */
     public override clone(): WindowEvent 
     {
-        return WindowDisposeEvent.allocateDispose(this._window);
+        return WindowDisposeEvent.allocateDispose(this._window as IWindow | null);
     }
 
     /**

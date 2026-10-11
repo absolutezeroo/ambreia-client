@@ -421,7 +421,7 @@ export class FrameController extends ContainerController implements IFrameWindow
 
     private readonly _childAddedListener = (event: WindowEvent): void =>
     {
-        if(event.related?.name === 'header_button_close') this.hookCloseButton(event.related);
+        if(event.related?.name === 'header_button_close') this.hookCloseButton(event.related as IWindow);
     };
 
     /** A listener, not the button's procedure: a feature that sets the latter keeps it and the frame still closes. */

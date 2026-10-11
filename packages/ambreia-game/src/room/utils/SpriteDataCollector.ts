@@ -1,7 +1,8 @@
 // The concrete engine, not `IRoomEngine`, because that is what AS3 takes here
 // (`getFurniData(..., param3:_SafeCls_90, ...)`): `getRoomObjects()` is declared on the class and
 // not on the interface, in AS3 as here.
-import {RoomEngine, type IRoomEngineRectangle} from '../RoomEngine';
+import {RoomEngine} from '../RoomEngine';
+import type {IRoomEngineRectangle} from '../IRoomEngineRectangle';
 import type {RoomRenderingCanvas} from '@ambreia/iso/scene/renderer/RoomRenderingCanvas';
 import {PlaneDrawingData} from '@ambreia/iso/scene/object/visualization/room/PlaneDrawingData';
 import type {IPlaneDrawingData} from '@ambreia/iso/object/visualization/IPlaneDrawingData';
