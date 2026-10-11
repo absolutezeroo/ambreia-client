@@ -7,7 +7,6 @@ import {RoomShakingEffect} from '@ambreia/iso/utils/RoomShakingEffect';
 // Message events
 import {UsersMessageEvent} from '@ambreia/protocol/incoming/room/engine/UsersMessageEvent';
 import {UserRemoveMessageEvent} from '@ambreia/protocol/incoming/room/engine/UserRemoveMessageEvent';
-import {DoorbellMessageEvent} from '@ambreia/protocol/incoming/navigator/DoorbellMessageEvent';
 import {BlockUserUpdateMessageEvent} from '@ambreia/protocol/incoming/users/BlockUserUpdateMessageEvent';
 import {HabboUserBadgesMessageEvent} from '@ambreia/protocol/incoming/users/HabboUserBadgesMessageEvent';
 import {UserChangeMessageEvent} from '@ambreia/protocol/incoming/room/action/UserChangeMessageEvent';
@@ -27,7 +26,6 @@ import {RoomSessionFriendRequestEvent} from '../events/RoomSessionFriendRequestE
 // Parsers
 import type {UsersMessageParser} from '@ambreia/protocol/parser/room/engine/UsersMessageParser';
 import type {UserRemoveMessageParser} from '@ambreia/protocol/parser/room/engine/UserRemoveMessageParser';
-import type {DoorbellMessageParser} from '@ambreia/protocol/parser/navigator/DoorbellMessageParser';
 import type {HabboUserBadgesMessageParser} from '@ambreia/protocol/parser/users/HabboUserBadgesMessageParser';
 import type {
     UserChangeMessageEventParser
@@ -35,7 +33,6 @@ import type {
 
 // Events
 import {RoomSessionUserDataUpdateEvent} from '../events/RoomSessionUserDataUpdateEvent';
-import {RoomSessionDoorbellEvent} from '../events/RoomSessionDoorbellEvent';
 import {RoomSessionUserBadgesEvent} from '../events/RoomSessionUserBadgesEvent';
 import {RoomSessionUserFigureUpdateEvent} from '../events/RoomSessionUserFigureUpdateEvent';
 import type {IUserData} from '../IUserData';
@@ -73,7 +70,6 @@ export class RoomUsersHandler extends BaseHandler
         this.addMessageEvent(connection, new UsersMessageEvent(this.onUsers.bind(this)));
         this.addMessageEvent(connection, new UserRemoveMessageEvent(this.onUserRemove.bind(this)));
         this.addMessageEvent(connection, new HabboUserBadgesMessageEvent(this.onUserBadges.bind(this)));
-        this.addMessageEvent(connection, new DoorbellMessageEvent(this.onDoorbell.bind(this)));
         this.addMessageEvent(connection, new BlockUserUpdateMessageEvent(this.onBlockUserUpdate.bind(this)));
         // DEVIATION: AS3 also subscribes the pet messages (info, commands, placing error, figure,
         //   status, level, breeding), the favourite-group update and the bot error. The RPG server
@@ -343,42 +339,6 @@ export class RoomUsersHandler extends BaseHandler
             session.userDataManager.markAsBlocked(
                 userData.roomObjectId,
                 blockEvent.result === BlockUserUpdateMessageEvent.BLOCKED
-            );
-        }
-    }
-
-    /**
-	 * Handle doorbell ring
-	 */
-    // AS3: .../src/com/sulake/habbo/session/handler/RoomUsersHandler.as::onDoorbell()
-    private onDoorbell(event: IMessageEvent): void
-    {
-        const doorbellEvent = event as DoorbellMessageEvent;
-
-        if(doorbellEvent === null)
-        {
-            return;
-        }
-
-        const userName = (doorbellEvent.parser as DoorbellMessageParser)?.userName;
-
-        if(!userName || userName === '')
-        {
-            return;
-        }
-
-        const session = this.listener.getSession(this.roomId);
-
-        if(session === null)
-        {
-            return;
-        }
-
-        if(this.listener.sessionEvents)
-        {
-            this.listener.sessionEvents.emit(
-                RoomSessionDoorbellEvent.RSDE_DOORBELL,
-                new RoomSessionDoorbellEvent(RoomSessionDoorbellEvent.RSDE_DOORBELL, session, userName)
             );
         }
     }

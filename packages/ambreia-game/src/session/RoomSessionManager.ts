@@ -11,13 +11,9 @@ import type {IRoomSession} from './IRoomSession';
 import {RoomSessionState} from './IRoomSession';
 import {RoomSession} from './RoomSession';
 import {RoomSessionEvent} from './events/RoomSessionEvent';
-import {
-    RoomNetworkOpenConnectionMessageComposer
-} from '@ambreia/protocol/outgoing/room/session/RoomNetworkOpenConnectionMessageComposer';
 import type {BaseHandler} from './handler/BaseHandler';
 import {RoomSessionHandler, RoomSessionHandlerState} from './handler/RoomSessionHandler';
 import {RoomPermissionsHandler} from './handler/RoomPermissionsHandler';
-import {RoomDataHandler} from './handler/RoomDataHandler';
 import {RoomChatHandler} from './handler/RoomChatHandler';
 import {RoomUsersHandler} from './handler/RoomUsersHandler';
 import {GenericErrorHandler} from './handler/GenericErrorHandler';
@@ -174,23 +170,6 @@ export class RoomSessionManager extends Component implements IRoomSessionManager
         session.roomPassword = password;
         session.roomResources = roomResources;
         session.skipOpc = skipOpc;
-
-        return this.createSession(session);
-    }
-
-    /**
-	 * Go to a room via network (for room forwarding)
-	 *
-	 * @see sources/win63_version/habbo/session/RoomSessionManager.as gotoRoomNetwork()
-	 */
-    // AS3: .../src/com/sulake/habbo/session/RoomSessionManager.as::gotoRoomNetwork()
-    gotoRoomNetwork(roomId: number, homeRoomId: number): boolean
-    {
-        const session = new RoomSession();
-
-        session.roomId = 1;
-        session.roomPassword = '';
-        session.openConnectionComposer = new RoomNetworkOpenConnectionMessageComposer(roomId, homeRoomId);
 
         return this.createSession(session);
     }
@@ -457,7 +436,6 @@ export class RoomSessionManager extends Component implements IRoomSessionManager
         this._handlers.push(new RoomChatHandler(connection, this));
         this._handlers.push(new RoomUsersHandler(connection, this));
         this._handlers.push(new RoomPermissionsHandler(connection, this));
-        this._handlers.push(new RoomDataHandler(connection, this));
         this._handlers.push(new PresentHandler(connection, this));
         this._handlers.push(new GenericErrorHandler(connection, this));
         this._handlers.push(new RoomDimmerPresetsHandler(connection, this));

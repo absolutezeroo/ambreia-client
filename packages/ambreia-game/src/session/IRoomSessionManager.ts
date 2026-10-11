@@ -36,16 +36,6 @@ export interface IRoomSessionManager
     gotoRoom(roomId: number, password?: string, roomResources?: string, skipOpc?: boolean): boolean;
 
     /**
-	 * Go to a room via network (for room forwarding)
-	 *
-	 * @param roomId Room ID
-	 * @param homeRoomId Home room ID
-	 * @returns True if session was created
-	 */
-    // AS3: .../src/com/sulake/habbo/session/IRoomSessionManager.as::gotoRoomNetwork()
-    gotoRoomNetwork(roomId: number, homeRoomId: number): boolean;
-
-    /**
 	 * Start an existing session
 	 *
 	 * @param session The room session to start

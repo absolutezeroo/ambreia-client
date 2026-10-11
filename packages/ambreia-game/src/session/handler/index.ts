@@ -6,7 +6,6 @@ export {GenericErrorHandler} from './GenericErrorHandler';
 export {PetPackageHandler} from './PetPackageHandler';
 export {PresentHandler} from './PresentHandler';
 export {RoomChatHandler} from './RoomChatHandler';
-export {RoomDataHandler} from './RoomDataHandler';
 export {RoomDimmerPresetsHandler} from './RoomDimmerPresetsHandler';
 export {RoomPermissionsHandler} from './RoomPermissionsHandler';
 export {RoomSessionHandlerState, RoomSessionHandler,} from './RoomSessionHandler';

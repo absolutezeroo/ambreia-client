@@ -1,9 +1,7 @@
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {IConnection} from '@ambreia/net/connection/IConnection';
-import type {IMessageComposer} from '@ambreia/net/messages/IMessageComposer';
 import type {IRoomSession, RoomSessionStateType} from './IRoomSession';
 import {RoomSessionState} from './IRoomSession';
-import type {RoomModerationSettings} from '@ambreia/protocol/incoming/navigator/index';
 import {
     AmbassadorAlertMessageComposer,
     AssignRightsMessageComposer,
@@ -12,7 +10,6 @@ import {
     CancelTypingMessageComposer,
     ChangeMottoMessageComposer,
     ChangePostureMessageComposer,
-    ChangeQueueMessageComposer,
     ChatMessageComposer,
     CreditFurniRedeemMessageComposer,
     DanceMessageComposer,
@@ -83,21 +80,6 @@ export class RoomSession implements IRoomSession
     get userDataManager(): IUserDataManager
     {
         return this._userDataManager;
-    }
-
-    // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/session/RoomSession.as::_openConnectionComposer
-    private _openConnectionComposer: IMessageComposer<unknown[]> | null = null;
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::get openConnectionComposer()
-    get openConnectionComposer(): IMessageComposer<unknown[]> | null
-    {
-        return this._openConnectionComposer;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::set openConnectionComposer()
-    set openConnectionComposer(value: IMessageComposer<unknown[]> | null)
-    {
-        this._openConnectionComposer = value;
     }
 
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/session/RoomSession.as::_connection
@@ -248,63 +230,6 @@ export class RoomSession implements IRoomSession
         }
     }
 
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::_isGuildRoom
-    private _isGuildRoom: boolean = false;
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::get isGuildRoom()
-    get isGuildRoom(): boolean
-    {
-        return this._isGuildRoom;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::set isGuildRoom()
-    set isGuildRoom(value: boolean)
-    {
-        this._isGuildRoom = value;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::get isPrivateRoom()
-    get isPrivateRoom(): boolean
-    {
-        return true;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::_tradeMode
-    private _tradeMode: number = 0;
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::get tradeMode()
-    get tradeMode(): number
-    {
-        return this._tradeMode;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::set tradeMode()
-    set tradeMode(value: number)
-    {
-        this._tradeMode = value;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::_doorMode
-    private _doorMode: number = 0;
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::get doorMode()
-    get doorMode(): number
-    {
-        return this._doorMode;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::set doorMode()
-    set doorMode(value: number)
-    {
-        this._doorMode = value;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::get isNoobRoom()
-    get isNoobRoom(): boolean
-    {
-        return this._doorMode === 4;
-    }
-
     // AS3: .../src/com/sulake/habbo/session/RoomSession.as::_isSpectatorMode
     private _isSpectatorMode: boolean = false;
 
@@ -318,42 +243,6 @@ export class RoomSession implements IRoomSession
     set isSpectatorMode(value: boolean)
     {
         this._isSpectatorMode = value;
-    }
-
-    // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/session/RoomSession.as::_arePetsAllowed
-    private _arePetsAllowed: boolean = false;
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::get arePetsAllowed()
-    get arePetsAllowed(): boolean
-    {
-        return this._arePetsAllowed;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::set arePetsAllowed()
-    set arePetsAllowed(value: boolean)
-    {
-        this._arePetsAllowed = value;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::get areBotsAllowed()
-    get areBotsAllowed(): boolean
-    {
-        return this._isRoomOwner;
-    }
-
-    // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/session/RoomSession.as::_roomModerationSettings
-    private _roomModerationSettings: RoomModerationSettings | null = null;
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::get roomModerationSettings()
-    get roomModerationSettings(): RoomModerationSettings | null
-    {
-        return this._roomModerationSettings;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::set roomModerationSettings()
-    set roomModerationSettings(value: RoomModerationSettings | null)
-    {
-        this._roomModerationSettings = value;
     }
 
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/session/RoomSession.as::_isUserDecorating
@@ -403,8 +292,7 @@ export class RoomSession implements IRoomSession
     /**
 	 * Start the room session.
 	 *
-	 * Sends either a predefined openConnectionComposer or the default
-	 * OpenFlatConnectionMessageComposer to enter the room.
+	 * Sends OpenFlatConnectionMessageComposer to enter the room.
 	 *
 	 * @see sources/win63_version/habbo/session/RoomSession.as start()
 	 */
@@ -420,18 +308,7 @@ export class RoomSession implements IRoomSession
 
         if(!this._skipOpc)
         {
-            if(this._openConnectionComposer !== null)
-            {
-                // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/RoomSession.as::sendPredefinedOpenConnection()
-                // Consumed once - a later start() on the same instance must fall through to the
-                // default OpenFlatConnectionMessageComposer, not resend the predefined one.
-                this._connection.send(this._openConnectionComposer);
-                this._openConnectionComposer = null;
-            }
-            else
-            {
-                this._connection.send(new OpenFlatConnectionMessageComposer(this._roomId, this._roomPassword));
-            }
+            this._connection.send(new OpenFlatConnectionMessageComposer(this._roomId, this._roomPassword));
         }
 
         return true;
@@ -449,7 +326,6 @@ export class RoomSession implements IRoomSession
             this._roomId = newRoomId;
             this._isRoomOwner = false;
             this._roomControllerLevel = 0;
-            this._tradeMode = 0;
             this._isSpectatorMode = false;
         }
     }
@@ -475,12 +351,6 @@ export class RoomSession implements IRoomSession
     dispose(): void
     {
         this._connection = null;
-
-        if(this._openConnectionComposer !== null)
-        {
-            this._openConnectionComposer.dispose();
-            this._openConnectionComposer = null;
-        }
 
         this._state = RoomSessionState.ENDED;
         this._chatTrackingMap.clear();
@@ -821,14 +691,6 @@ export class RoomSession implements IRoomSession
         if(this._connection === null) return;
 
         this._connection.send(new UseProductForPetComposer(petId, productId));
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::changeQueue()
-    changeQueue(targetQueue: number): void
-    {
-        if(this._connection === null) return;
-
-        this._connection.send(new ChangeQueueMessageComposer(targetQueue));
     }
 
     // AS3: .../src/com/sulake/habbo/session/RoomSession.as::sendScriptProceed()

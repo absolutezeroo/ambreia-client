@@ -10,8 +10,6 @@ export class RoomSessionEvent
     public static readonly RSE_CREATED = 'RSE_CREATED';
     public static readonly RSE_STARTED = 'RSE_STARTED';
     public static readonly RSE_ENDED = 'RSE_ENDED';
-    // AS3: .../src/com/sulake/habbo/session/events/RoomSessionEvent.as::SESSION_ROOM_DATA
-    public static readonly SESSION_ROOM_DATA = 'RSE_ROOM_DATA';
 
     constructor(type: string, session: IRoomSession, openLandingPage: boolean = true)
     {

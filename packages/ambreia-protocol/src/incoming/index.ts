@@ -6,7 +6,6 @@ export * from './availability';
 export * from './avatar';
 export * from './error';
 export * from './handshake';
-export * from './navigator';
 export * from './notifications';
 export * from './room';
 export * from './users';

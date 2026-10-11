@@ -40,12 +40,6 @@ import {
 // Events - Avatar
 import {FigureUpdateMessageEvent} from '@ambreia/protocol/incoming/avatar/FigureUpdateMessageEvent';
 
-// Events - Navigator
-import {
-    NavigatorSettingsMessageEvent
-} from '@ambreia/protocol/incoming/navigator/NavigatorSettingsMessageEvent';
-import {FavouritesMessageEvent} from '@ambreia/protocol/incoming/navigator/FavouritesMessageEvent';
-
 // Events - Notifications
 import {ActivityPointsMessageEvent} from '@ambreia/protocol/incoming/notifications/ActivityPointsMessageEvent';
 import {InfoFeedEnableMessageEvent} from '@ambreia/protocol/incoming/notifications/InfoFeedEnableMessageEvent';
@@ -90,10 +84,6 @@ import type {
     AvailabilityStatusMessageParser
 } from '@ambreia/protocol/parser/availability/AvailabilityStatusMessageParser';
 import type {FigureUpdateMessageParser} from '@ambreia/protocol/parser/avatar/FigureUpdateMessageParser';
-import type {
-    NavigatorSettingsMessageParser
-} from '@ambreia/protocol/parser/navigator/NavigatorSettingsMessageParser';
-import type {FavouritesMessageParser} from '@ambreia/protocol/parser/navigator/FavouritesMessageParser';
 import type {
     ActivityPointsMessageParser
 } from '@ambreia/protocol/parser/notifications/ActivityPointsMessageParser';
@@ -401,35 +391,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
     get isFirstLoginOfDay(): boolean
     {
         return this._isFirstLoginOfDay;
-    }
-
-    // Navigator settings
-    private _homeRoomId: number = 0;
-
-    get homeRoomId(): number
-    {
-        return this._homeRoomId;
-    }
-
-    private _roomIdToEnter: number = 0;
-
-    get roomIdToEnter(): number
-    {
-        return this._roomIdToEnter;
-    }
-
-    private _favouriteRooms: number[] = [];
-
-    get favouriteRooms(): number[]
-    {
-        return this._favouriteRooms;
-    }
-
-    private _favouriteRoomsLimit: number = 30;
-
-    get favouriteRoomsLimit(): number
-    {
-        return this._favouriteRoomsLimit;
     }
 
     // Currency & Achievements
@@ -1344,10 +1305,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
         // Avatar events
         this.addMessageEvent(new FigureUpdateMessageEvent(this.onFigureUpdate.bind(this)));
 
-        // Navigator events
-        this.addMessageEvent(new NavigatorSettingsMessageEvent(this.onNavigatorSettings.bind(this)));
-        this.addMessageEvent(new FavouritesMessageEvent(this.onFavourites.bind(this)));
-
         // Notification events
         this.addMessageEvent(new ActivityPointsMessageEvent(this.onActivityPoints.bind(this)));
         this.addMessageEvent(new InfoFeedEnableMessageEvent(this.onInfoFeedEnable.bind(this)));
@@ -1491,34 +1448,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
         this._isFirstLoginOfDay = parser.isFirstLoginOfDay;
 
         log.debug(`First login of day: ${this._isFirstLoginOfDay}`);
-    }
-
-    private onNavigatorSettings(event: IMessageEvent): void
-    {
-        if(!event) return;
-
-        const parser = event.parser as NavigatorSettingsMessageParser;
-
-        if(!parser) return;
-
-        this._homeRoomId = parser.homeRoomId;
-        this._roomIdToEnter = parser.roomIdToEnter;
-
-        log.debug(`Navigator: HomeRoom=${this._homeRoomId}, RoomToEnter=${this._roomIdToEnter}`);
-    }
-
-    private onFavourites(event: IMessageEvent): void
-    {
-        if(!event) return;
-
-        const parser = event.parser as FavouritesMessageParser;
-
-        if(!parser) return;
-
-        this._favouriteRoomsLimit = parser.limit;
-        this._favouriteRooms = [...parser.favouriteRoomIds];
-
-        log.debug(`Favourites: ${this._favouriteRooms.length}/${this._favouriteRoomsLimit}`);
     }
 
     private onActivityPoints(event: IMessageEvent): void

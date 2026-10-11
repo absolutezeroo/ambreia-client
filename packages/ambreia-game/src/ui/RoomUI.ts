@@ -43,8 +43,6 @@ import type {IRoomSession} from '../session/IRoomSession';
 // Events
 import {RoomSessionEvent} from '../session/events/RoomSessionEvent';
 import {RoomSessionErrorMessageEvent} from '../session/events/RoomSessionErrorMessageEvent';
-import {RoomSessionDoorbellEvent} from '../session/events/RoomSessionDoorbellEvent';
-import {RoomSessionQueueEvent} from '../session/events/RoomSessionQueueEvent';
 import {RoomEngineEvent} from '@ambreia/iso/scene/events/RoomEngineEvent';
 import {RoomEngineObjectEvent} from '@ambreia/iso/scene/events/RoomEngineObjectEvent';
 import {RoomEngineToWidgetEvent} from '@ambreia/iso/scene/events/RoomEngineToWidgetEvent';
@@ -99,13 +97,9 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
         'RSCE_CHAT_EVENT',
         'RSCE_FLOOD_EVENT',
         'RSUBE_BADGES',
-        RoomSessionDoorbellEvent.RSDE_DOORBELL,
-        RoomSessionDoorbellEvent.RSDE_REJECTED,
-        RoomSessionDoorbellEvent.RSDE_ACCEPTED,
         'RSPE_PRESENT_OPENED',
         'RSOPPE_OPEN_PET_PACKAGE_REQUESTED',
         'RSOPPE_OPEN_PET_PACKAGE_RESULT',
-        RoomSessionQueueEvent.QUEUE_STATUS,
         'RSDPE_PRESETS',
         'RSFRE_FRIEND_REQUEST',
         'RSDE_DANCE',
@@ -252,8 +246,7 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
     /**
      * The communication manager, used to construct widgets that need it (e.g. room tools).
      */
-    // TS-only: the navigator and the notifications component answered these two with an alert; both
-    //   left with the core cut (2026-10-07), and RoomUI is the kept component with a window manager.
+    // Room-entry errors and generic server dialogs are shown by the kept RoomUI shell.
     private readonly _alertMessageEvents: IMessageEvent[] = [
         new CantConnectMessageEvent(this.onCantConnect.bind(this)),
         new NotificationDialogMessageEvent(this.onNotificationDialog.bind(this)),

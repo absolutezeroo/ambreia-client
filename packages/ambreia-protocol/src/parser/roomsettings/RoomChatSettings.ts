@@ -6,8 +6,7 @@
  * This revision no longer sends mode, bubble width or scroll speed with the room settings —
  * only flood sensitivity travels, and the other three are filled in from AS3's own defaults
  * by `fromFloodSensitivity()`. It is therefore built from plain values, never straight off
- * the wire, which is why there is no wrapper constructor here. The identically-named class
- * under `incoming/navigator/` is a different message and still reads all five fields.
+ * the wire, which is why there is no wrapper constructor here.
  *
  * AS3: sources/WIN63-202607011411-782849652/src/unknowns/_SafePkg_1710/_SafeCls_1709.as
  */

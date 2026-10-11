@@ -1,5 +1,4 @@
 import type {IConnection} from '@ambreia/net/connection/IConnection';
-import type {RoomModerationSettings} from '@ambreia/protocol/incoming/navigator/index';
 import type {IUserDataManager} from "./IUserDataManager";
 
 /**
@@ -47,24 +46,8 @@ export interface IRoomSession
     isRoomOwner: boolean;
     // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::get roomControllerLevel()
     roomControllerLevel: number;
-    // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::get isGuildRoom()
-    isGuildRoom: boolean;
-    // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::get isPrivateRoom()
-    readonly isPrivateRoom: boolean;
-    // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::get isNoobRoom()
-    readonly isNoobRoom: boolean;
-    // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::get tradeMode()
-    tradeMode: number;
-    // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::get doorMode()
-    doorMode: number;
     // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::get isSpectatorMode()
     isSpectatorMode: boolean;
-    // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::get arePetsAllowed()
-    arePetsAllowed: boolean;
-    // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::get areBotsAllowed()
-    readonly areBotsAllowed: boolean;
-    // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::get roomModerationSettings()
-    roomModerationSettings: RoomModerationSettings | null;
     // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::get isUserDecorating()
     isUserDecorating: boolean;
     // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::get isGameSession()
@@ -221,9 +204,6 @@ export interface IRoomSession
     useProductForPet(petId: number, productId: number): void;
 
     // Queue methods
-    // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::changeQueue()
-    changeQueue(targetQueue: number): void;
-
     // Chat tracking
     // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::receivedChatWithTrackingId()
     receivedChatWithTrackingId(trackingId: number): void;

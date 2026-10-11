@@ -73,12 +73,6 @@ export interface ISessionDataManager extends IDisposable
     readonly lastAccessDate: string;
     readonly isFirstLoginOfDay: boolean;
 
-    // Navigator
-    readonly homeRoomId: number;
-    readonly roomIdToEnter: number;
-    readonly favouriteRooms: number[];
-    readonly favouriteRoomsLimit: number;
-
     // Currency & achievements
     readonly activityPoints: Map<number, number>;
     readonly achievementScore: number;
