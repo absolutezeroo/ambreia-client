@@ -18,14 +18,8 @@ export class RoomWidgetChatUpdateEvent extends RoomWidgetUpdateEvent
     public static readonly CHAT_TYPE_WHISPER: number = 1;
     // AS3: sources/win63_version/habbo/ui/widget/events/RoomWidgetChatUpdateEvent.as::CHAT_TYPE_SHOUT
     public static readonly CHAT_TYPE_SHOUT: number = 2;
-    // AS3: sources/win63_version/habbo/ui/widget/events/RoomWidgetChatUpdateEvent.as::CHAT_TYPE_RESPECT
-    public static readonly CHAT_TYPE_RESPECT: number = 3;
-    // AS3: sources/win63_version/habbo/ui/widget/events/RoomWidgetChatUpdateEvent.as::CHAT_TYPE_PETRESPECT
-    public static readonly CHAT_TYPE_PETRESPECT: number = 4;
     // AS3: sources/win63_version/habbo/ui/widget/events/RoomWidgetChatUpdateEvent.as::CHAT_TYPE_NOTIFY
     public static readonly CHAT_TYPE_NOTIFY: number = 5;
-    // AS3: sources/win63_version/habbo/ui/widget/events/RoomWidgetChatUpdateEvent.as::CHAT_TYPE_PETTREAT
-    public static readonly CHAT_TYPE_PETTREAT: number = 6;
     // 7, 8 and 9 were the monsterplant supplement bubbles (revive, rebreed, speed); the RPG fork
     // removed monsterplants. Not renumbered: these are AS3's values.
     // AS3: sources/win63_version/habbo/ui/widget/events/RoomWidgetChatUpdateEvent.as::CHAT_TYPE_BOT_SPEAK
@@ -81,30 +75,43 @@ export class RoomWidgetChatUpdateEvent extends RoomWidgetUpdateEvent
 
     // AS3: sources/win63_version/habbo/ui/widget/events/RoomWidgetChatUpdateEvent.as::get userId()
     public get userId(): number { return this._userId; }
+
     // AS3: sources/win63_version/habbo/ui/widget/events/RoomWidgetChatUpdateEvent.as::get text()
     public get text(): string { return this._text; }
+
     // AS3: sources/win63_version/habbo/ui/widget/events/RoomWidgetChatUpdateEvent.as::get chatType()
     public get chatType(): number { return this._chatType; }
+
     // AS3: sources/win63_version/habbo/ui/widget/events/RoomWidgetChatUpdateEvent.as::get userName()
     public get userName(): string { return this._userName; }
+
     // AS3: sources/win63_version/habbo/ui/widget/events/RoomWidgetChatUpdateEvent.as::get userCategory()
     public get userCategory(): number { return this._userCategory; }
+
     // AS3: sources/win63_version/habbo/ui/widget/events/RoomWidgetChatUpdateEvent.as::get userType()
     public get userType(): number { return this._userType; }
+
     // AS3: sources/win63_version/habbo/ui/widget/events/RoomWidgetChatUpdateEvent.as::get petType()
     public get petType(): number { return this._petType; }
+
     // AS3: sources/win63_version/habbo/ui/widget/events/RoomWidgetChatUpdateEvent.as::get links()
     public get links(): IChatLink[] | null { return this._links; }
+
     // AS3: sources/win63_version/habbo/ui/widget/events/RoomWidgetChatUpdateEvent.as::get userX()
     public get userX(): number { return this._userX; }
+
     // AS3: sources/win63_version/habbo/ui/widget/events/RoomWidgetChatUpdateEvent.as::get userY()
     public get userY(): number { return this._userY; }
+
     // AS3: sources/win63_version/habbo/ui/widget/events/RoomWidgetChatUpdateEvent.as::get userImage()
     public get userImage(): ImageBitmap | null { return this._userImage; }
+
     // AS3: sources/win63_version/habbo/ui/widget/events/RoomWidgetChatUpdateEvent.as::get userColor()
     public get userColor(): number { return this._userColor; }
+
     // AS3: sources/win63_version/habbo/ui/widget/events/RoomWidgetChatUpdateEvent.as::get roomId()
     public get roomId(): number { return this._roomId; }
+
     // AS3: sources/win63_version/habbo/ui/widget/events/RoomWidgetChatUpdateEvent.as::get styleId()
     public get styleId(): number { return this._styleId; }
 }

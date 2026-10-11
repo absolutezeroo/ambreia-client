@@ -424,13 +424,6 @@ export class HabboMessages implements IMessageConfiguration
         //   3013 -> _SafeCls_2397 (PetRemovedFromInventory, onPetRemoved)
         //   3653 -> _SafeCls_3510 (PetAddedToInventory, onPetAdded)
 
-        // PetRespectFailedEvent (header 31, AS3 incoming/room/pets/) is deliberately absent here:
-        // it was already ported and registered under incoming/notifications/ (see the NOTIFICATIONS
-        // block below), and its parser already reads AS3's requiredDays/avatarAgeInDays exactly.
-        // Its directory does not match the AS3 package, but re-homing it would be churn for no
-        // behaviour change — and registering a second copy at 31 would have silently overwritten
-        // the first, since _events is a Map. The server sends this one with an empty body too.
-
         // === VAULT / EARNINGS ===
         // The three server->client halves of the vault. Their client->server siblings (809, 3417)
         // have been registered all along; nothing read the answers, because `EarningsController` was
@@ -536,10 +529,6 @@ export class HabboMessages implements IMessageConfiguration
         // handled by HabboNuxDialogs; 752 carries no payload.
 
         // === ROOM WIDGETS ===
-        // The furniture-refusal / failed-respect notice, `_events[169] = _SafeCls_3982`,
-        // corroborated by the emulator as CustomUserNotificationMessageComposer. Two handlers read
-        // it: CustomUserNotificationWidgetHandler opens the dialog, AvatarInfoWidgetHandler refunds
-        // the respect on codes 4-5.
         // The rentable-space answers, `_events[2800]/[2158]/[3117]`, all three corroborated by the
         // emulator (RentableSpaceStatus/RentOk/RentFailed MessageComposer).
 
@@ -778,8 +767,6 @@ export class HabboMessages implements IMessageConfiguration
 
         // === ROOM ACTION ===
 
-        // === ROOM RESPECT ===
-
         // === ROOM FURNITURE ===
         // AS3: _SafeCls_1821.as::useObject() — the six ROFCAE_* furniture actions. Headers from
         // WIN63's registry; all but 350 and 3422 are corroborated by vortex-emulator, whose
@@ -795,9 +782,6 @@ export class HabboMessages implements IMessageConfiguration
         this._composers.set(Outgoing.UseFurnitureMessageEvent, UseFurnitureMessageComposer);
         this._composers.set(Outgoing.UseWallItemMessageEvent, UseWallItemMessageComposer);
         // AS3: _SafeCls_1821.as::modifyRoomObjectData() "OBJECT_SAVE_STUFF_DATA"
-
-        // The floor plan editor's three. The two GETs have a real handler waiting on the emulator;
-        // UpdateFloorProperties is accepted and dropped there today, so saving is a no-op server-side.
 
         // The special-items display's pair: ask, then claim. Its result is 431, already registered.
 

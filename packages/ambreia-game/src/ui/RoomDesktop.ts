@@ -52,10 +52,6 @@ import {RoomEngineObjectEvent} from '@ambreia/iso/scene/events/RoomEngineObjectE
 import {RoomWidgetRoomObjectUpdateEvent} from './widget/events/RoomWidgetRoomObjectUpdateEvent';
 import type {RoomEngineObjectPlacedEvent} from '@ambreia/iso/scene/events/RoomEngineObjectPlacedEvent';
 import {RoomWidgetRoomObjectPlaceEvent} from './widget/events/RoomWidgetRoomObjectPlaceEvent';
-import {RoomDesktopMouseZoomEnableEvent} from './widget/events/RoomDesktopMouseZoomEnableEvent';
-import {PerkAllowancesMessageEvent} from '@ambreia/protocol/incoming/perk/PerkAllowancesMessageEvent';
-import type {PerkAllowancesMessageEventParser} from '@ambreia/protocol/parser/perk/PerkAllowancesMessageEventParser';
-import {PerkType} from '../communication/enum/PerkType';
 import type {AvatarInfoWidget} from './widget/avatarinfo/AvatarInfoWidget';
 // Vortex-only: the fishing handler lives under src/vortex/, not in the ported tree.
 import type {IHabboAvatarEditor} from '../avatar/IHabboAvatarEditor';
@@ -156,51 +152,13 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
 
             connection.addMessageEvent(this._botSkillListEvent);
             connection.addMessageEvent(this._botForceOpenContextMenuEvent);
-
-            // TS deviation: AS3 subscribes this on `RoomUI` and forwards the event to whichever
-            // desktop is current, guarded on its `_isInRoom`. This port's RoomUI has no connection
-            // of its own, and a RoomDesktop only exists for a session that is in a room — so the
-            // guard is structural here and the two are equivalent.
-            this._perkAllowancesEvent = new PerkAllowancesMessageEvent(this.onPerkAllowances);
-
-            connection.addMessageEvent(this._perkAllowancesEvent);
         }
     }
-
-    /**
-     * AS3: RoomUI.as::onPerkAllowances()
-     *
-     * Wheel zoom is a *perk*: the server decides per account, and the client only binds the wheel
-     * once told it may. AS3's other half of that method — the 250ms timer that re-attaches
-     * free-flow chat to the stage — is not ported; this port parents the chat display once.
-     */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomUI.as::onPerkAllowances()
-    private onPerkAllowances = (event: IMessageEvent): void =>
-    {
-        const parser = event.parser as PerkAllowancesMessageEventParser | null;
-
-        if(parser == null) return;
-
-        this.processEvent(new RoomDesktopMouseZoomEnableEvent(parser.isPerkAllowed(PerkType.MOUSE_ZOOM)));
-    };
 
     // AS3: RoomDesktop.as::_SafeStr_6316
     private _botSkillListEvent: IMessageEvent | null = null;
     // AS3: RoomDesktop.as::_SafeStr_6270
     private _botForceOpenContextMenuEvent: IMessageEvent | null = null;
-
-    // TS-only: AS3 keeps this subscription on RoomUI — see onPerkAllowances() above.
-    private _perkAllowancesEvent: IMessageEvent | null = null;
-
-    /**
-     * Whether the account may zoom with the wheel. AS3 has no such field: it re-binds the wheel
-     * listener on any RDMZEE_ENABLED and never reads the flag the event carries, which means the
-     * wheel is armed by the packet arriving rather than by what it says. A flag is the same thing
-     * in this port, where the binding lives in the client and cannot be attached and detached from
-     * here — and it does read the flag, so a `false` answer really does refuse.
-     */
-    // AS3: RoomDesktop.as::checkAndEnableMouseZoomEvent() — the state that call implies
-    private _mouseZoomEnabled: boolean = false;
 
     /** Derived name — `_lastZoomScrollMillis` is AS3's own, unobfuscated. */
     // AS3: RoomDesktop.as::_lastZoomScrollMillis
@@ -584,13 +542,6 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
         if(eventType === 'RWZTM_ZOOM_TOGGLE')
         {
             this.toggleZoom();
-        }
-
-        // AS3: RoomDesktop.as::processEvent() — the RDMZEE_ENABLED arm, which calls
-        // checkAndEnableMouseZoomEvent() to (re)bind the wheel listener.
-        if(eventType === RoomDesktopMouseZoomEnableEvent.ENABLED)
-        {
-            this._mouseZoomEnabled = (event as RoomDesktopMouseZoomEnableEvent).enabled;
         }
 
         const handlers = this._widgetEventHandlers.get(eventType);
@@ -984,9 +935,8 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
     /**
      * AS3: RoomDesktop.as::mouseWheelHandler() — the ctrl-wheel zoom arm.
      *
-     * Two guards AS3 has and this port did not. It is gated on the **MOUSE_ZOOM perk** — the wheel
-     * listener is only bound after the server says so, which is what `_mouseZoomEnabled` stands in
-     * for here. And it is **throttled**: a wheel with `|delta| >= 2` always passes, a smaller one
+     * The inherited client gated this behind a hotel perk. Ambreia treats camera zoom as a normal
+     * engine capability. It remains **throttled**: a wheel with `|delta| >= 2` always passes, a smaller one
      * only once every 400ms, so a trackpad's stream of tiny deltas steps the zoom once instead of
      * running it to the end of the table.
      *
@@ -997,7 +947,7 @@ export class RoomDesktop implements IRoomDesktop, IRoomWidgetMessageListener, IR
     public handleMouseWheel(deltaY: number, x: number, y: number): void 
     {
         if(this._roomEngine === null || this._canvasIds.length === 0) return;
-        if(!this._mouseZoomEnabled || deltaY === 0) return;
+        if(deltaY === 0) return;
 
         const now = Date.now();
 

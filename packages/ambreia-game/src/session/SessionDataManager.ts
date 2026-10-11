@@ -49,7 +49,6 @@ import {FavouritesMessageEvent} from '@ambreia/protocol/incoming/navigator/Favou
 // Events - Notifications
 import {ActivityPointsMessageEvent} from '@ambreia/protocol/incoming/notifications/ActivityPointsMessageEvent';
 import {InfoFeedEnableMessageEvent} from '@ambreia/protocol/incoming/notifications/InfoFeedEnableMessageEvent';
-import {PetRespectFailedEvent} from '@ambreia/protocol/incoming/notifications/PetRespectFailedEvent';
 
 // Events - Inventory
 import {
@@ -126,8 +125,6 @@ import type {
 } from '@ambreia/protocol/parser/users/UserPurchasableChatStylesMessageParser';
 
 // Composers
-import {RespectUserMessageComposer} from '@ambreia/protocol/outgoing/room/RespectUserMessageComposer';
-import {RespectPetMessageComposer} from '@ambreia/protocol/outgoing/room/RespectPetMessageComposer';
 import {ChatMessageComposer} from '@ambreia/protocol/outgoing/room/chat/ChatMessageComposer';
 import {SetUIFlagsMessageComposer} from '@ambreia/protocol/outgoing/preferences/SetUIFlagsMessageComposer';
 import {
@@ -148,9 +145,6 @@ import {
 import {
     GetDailyTasksComposer
 } from '@ambreia/protocol/outgoing/users/GetDailyTasksComposer';
-import {
-    ReplenishRespectMessageComposer
-} from '@ambreia/protocol/outgoing/users/ReplenishRespectMessageComposer';
 
 // Session events
 import {UserNameUpdateEvent} from './events/UserNameUpdateEvent';
@@ -158,15 +152,12 @@ import {SessionDataToWidgetEvent} from './events/SessionDataToWidgetEvent';
 
 // Sub-managers
 import type {IUserDataManager} from './IUserDataManager';
-import type {IPerkManager} from './IPerkManager';
 import type {IIgnoredUsersManager} from './IIgnoredUsersManager';
 import type {IHabboGroupInfoManager} from './IHabboGroupInfoManager';
 import {UserDataManager} from './UserDataManager';
-import {PerkManager} from './PerkManager';
 import {IgnoredUsersManager} from './IgnoredUsersManager';
 import {BlockedUsersManager} from './BlockedUsersManager';
 import {HabboGroupInfoManager} from './HabboGroupInfoManager';
-import {PerkType} from '../communication/enum/PerkType';
 import {HabboWebTools} from '../utils/HabboWebTools';
 import {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import type {IDisposable} from '@ambreia/common/IDisposable';
@@ -256,14 +247,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
     get userDataManager(): IUserDataManager
     {
         return this._userDataManager!;
-    }
-
-    // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/session/SessionDataManager.as::_perkManager
-    private _perkManager: PerkManager | null = null;
-
-    get perkManager(): IPerkManager
-    {
-        return this._perkManager!;
     }
 
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/session/SessionDataManager.as::_ignoredUsersManager
@@ -395,40 +378,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
     get noobnessLevel(): number
     {
         return this._noobnessLevel;
-    }
-
-    // Respect
-    private _respectTotal: number = 0;
-
-    get respectTotal(): number
-    {
-        return this._respectTotal;
-    }
-
-    private _respectLeft: number = 0;
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::get respectLeft()
-    get respectLeft(): number
-    {
-        return this._respectLeft;
-    }
-
-    private _respectReplenishesLeft: number = 0;
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::get respectReplenishesLeft()
-    get respectReplenishesLeft(): number
-    {
-        return this._respectReplenishesLeft;
-    }
-
-    private _maxRespectPerDay: number = 3;
-
-    private _petRespectLeft: number = 0;
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::get petRespectLeft()
-    get petRespectLeft(): number
-    {
-        return this._petRespectLeft;
     }
 
     private _nameChangeAllowed: boolean = false;
@@ -601,36 +550,7 @@ export class SessionDataManager extends Component implements ISessionDataManager
         return this._nameChangeAllowed;
     }
 
-    get respectsReceived(): number
-    {
-        return this._respectTotal;
-    }
-
-    get respectsRemaining(): number
-    {
-        return this._respectLeft;
-    }
-
-    get respectsPetRemaining(): number
-    {
-        return this._petRespectLeft;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::get perksReady()
-    get perksReady(): boolean
-    {
-        return this._perkManager?.isReady ?? false;
-    }
-
     private _configurationManager: IHabboConfigurationManager | null = null;
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/SessionDataManager.as::get currentTalentTrack()
-    get currentTalentTrack(): string
-    {
-        const citizenshipEnabled = this._configurationManager?.getBoolean('talent.track.citizenship.enabled') ?? false;
-
-        return citizenshipEnabled && !this.isPerkAllowed(PerkType.CITIZEN) ? 'citizenship' : 'helper';
-    }
 
     protected override get dependencies(): Array<ComponentDependency<any>>
     {
@@ -721,49 +641,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
     }
 
     /**
-	 * Give respect to a user
-	 */
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::giveRespect()
-    giveRespect(userId: number): void
-    {
-        if(userId >= 0 && this._respectLeft > 0)
-        {
-            this.send(new RespectUserMessageComposer(userId));
-            this._respectLeft--;
-        }
-    }
-
-    /**
-	 * Give respect to a pet
-	 */
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::givePetRespect()
-    givePetRespect(petId: number): void
-    {
-        if(petId >= 0 && this._petRespectLeft > 0)
-        {
-            this.send(new RespectPetMessageComposer(petId));
-            this._petRespectLeft--;
-        }
-    }
-
-    /**
-	 * Called when giving respect fails - restore the counter
-	 */
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::giveRespectFailed()
-    giveRespectFailed(): void
-    {
-        this._respectLeft++;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::replenishRespect()
-    replenishRespect(): void
-    {
-        this.send(new ReplenishRespectMessageComposer());
-        this._respectReplenishesLeft--;
-        this._respectLeft = this._maxRespectPerDay;
-    }
-
-    /**
 	 * Set room camera follow disabled preference.
 	 *
 	 * Only updates the local flag. The SetUIFlagsMessageComposer is
@@ -793,18 +670,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
     setRoomToolsState(open: boolean): void
     {
         this.setUIFlag(UIFlagsEnum.ROOM_TOOLS_OPEN, open);
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::isPerkAllowed()
-    isPerkAllowed(perk: string): boolean
-    {
-        return this._perkManager?.isPerkAllowed(perk) ?? false;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::getPerkErrorMessage()
-    getPerkErrorMessage(perk: string): string
-    {
-        return this._perkManager?.getPerkErrorMessage(perk) ?? '';
     }
 
     // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::isIgnored()
@@ -1272,14 +1137,12 @@ export class SessionDataManager extends Component implements ISessionDataManager
 
         // Dispose sub-managers
         this._userDataManager?.dispose();
-        this._perkManager?.dispose();
         this._ignoredUsersManager?.dispose();
         this._blockedUsersManager?.dispose();
         this._groupInfoManager?.dispose();
         this._badgeImageManager?.dispose();
 
         this._userDataManager = null;
-        this._perkManager = null;
         this._ignoredUsersManager = null;
         this._blockedUsersManager = null;
         this._groupInfoManager = null;
@@ -1363,7 +1226,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
 
         this._userDataManager = new UserDataManager();
         this._userDataManager.connection = this._communicationManager?.connection ?? null;
-        this._perkManager = new PerkManager(this);
         this._ignoredUsersManager = new IgnoredUsersManager(this._communicationManager, sendCallback);
         this._blockedUsersManager = new BlockedUsersManager(this._communicationManager, sendCallback);
         this._groupInfoManager = new HabboGroupInfoManager(this._communicationManager, sendCallback);
@@ -1541,9 +1403,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
         this.addMessageEvent(new RoomReadyMessageEvent(this.onRoomReady.bind(this)));
         this.addMessageEvent(new UserChangeMessageEvent(this.onUserChange.bind(this)));
 
-        // Notification events
-        this.addMessageEvent(new PetRespectFailedEvent(this.onPetRespectFailed.bind(this)));
-
         // Chat-style events
         this.addMessageEvent(new UserNftChatStylesMessageEvent(this.onNftChatStyles.bind(this)));
         this.addMessageEvent(new UserPurchasableChatStylesMessageEvent(this.onPurchasableChatStyles.bind(this)));
@@ -1575,11 +1434,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
         this._gender = parser.sex;
         this._customData = parser.customData;
         this._directMail = parser.directMail;
-        this._respectTotal = parser.respectTotal;
-        this._respectLeft = parser.respectLeft;
-        this._respectReplenishesLeft = parser.respectReplenishesLeft;
-        this._maxRespectPerDay = parser.maxRespectPerDay;
-        this._petRespectLeft = parser.petRespectLeft;
         this._streamPublishingAllowed = parser.streamPublishingAllowed;
         this._lastAccessDate = parser.lastAccessDate;
         this._nameChangeAllowed = parser.nameChangeAllowed;
@@ -1945,17 +1799,5 @@ export class SessionDataManager extends Component implements ISessionDataManager
 
             log.debug(`User figure changed: ${this._figure}`);
         }
-    }
-
-    /**
-	 * Handle pet respect failed - restore counter
-	 * @see source_as_win63/habbo/session/SessionDataManager.as line 525
-	 */
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::onPetRespectFailed()
-    private onPetRespectFailed(_event: IMessageEvent): void
-    {
-        this._petRespectLeft++;
-
-        log.debug('Pet respect failed, counter restored');
     }
 }

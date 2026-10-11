@@ -22,12 +22,11 @@ import {SimpleAlertDialog} from './utils/SimpleAlertDialog';
 import {HabbletLinkHandler} from './handlers/HabbletLinkHandler';
 import {HabboPagesViewer} from './utils/habbopedia/HabboPagesViewer';
 import {ElementPointerHandler} from './utils/ElementPointerHandler';
-import {BCFloorPlanEditor} from './utils/floorplaneditor/BCFloorPlanEditor';
 
 /**
  * The window manager with the game services: WindowManager (@ambreia/ui) plus the avatar renderer,
  * communication, session, room engine, localisation and configuration, and the game-only windows
- * (help pages, floor plan editor, element pointer). Not a Component since J3: the engine attaches it
+ * (help pages and element pointer). Not a Component since J3: the engine attaches it
  * with `context.attachInstance(IID_HabboWindowManager, manager, {dependencies: manager.createDependencies(), …})`.
  *
  * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/HabboWindowManagerComponent.as
@@ -70,9 +69,6 @@ export class HabboWindowManager extends WindowManager implements IHabboWindowMan
     private _habboPagesViewer: HabboPagesViewer | null = null;
 
     private _elementPointerHandler: ElementPointerHandler | null = null;
-
-    // AS3: .../src/com/sulake/habbo/window/HabboWindowManagerComponent.as::_bcfloorPlanEditor
-    private _bcFloorPlanEditor: BCFloorPlanEditor | null = null;
 
     private _configuration: IHabboConfigurationManager | null = null;
     // AS3: .../src/com/sulake/habbo/window/HabboWindowManagerComponent.as::_localization
@@ -239,21 +235,6 @@ export class HabboWindowManager extends WindowManager implements IHabboWindowMan
     }
 
     /**
-     * Opens the floor plan editor (`BCFloorPlanEditor`, AS3's name), building it if the
-     * configuration arrived too late for `onConfigurationComplete()` to have done so.
-     *
-     * Reached from the room-info window's button and from the `:floorplan` chat command, both of
-     * which already called this while it was an empty stub.
-     */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/HabboWindowManagerComponent.as::displayFloorPlanEditor()
-    public displayFloorPlanEditor(): void
-    {
-        if(this._bcFloorPlanEditor === null) this._bcFloorPlanEditor = new BCFloorPlanEditor(this);
-
-        this._bcFloorPlanEditor.visible = true;
-    }
-
-    /**
      * DEVIATION: AS3 only assigns the field here, because in Flash this dependency callback always
      *   ran before the configuration's `complete` event, so `onConfigurationComplete()` could count
      *   on `_communication`. This port's DI resolves the two the other way round often enough that
@@ -276,23 +257,9 @@ export class HabboWindowManager extends WindowManager implements IHabboWindowMan
     }
 
     /**
-     * The two helpers AS3 builds in `onConfigurationComplete()`, built the moment the communication
+     * Communication-bound helpers are built the moment the communication
      * manager is in — which is the only thing either of them actually reads.
      *
-     * Both subscribe message events in their own constructors, and for `BCFloorPlanEditor` that
-     * timing is the whole point: `FloorHeightMap` is a room-entry message, so an editor built when
-     * its window is first opened has already missed the only copy it will get. That is what it did
-     * — `displayFloorPlanEditor()` was constructing it lazily, and it opened on an empty plan with
-     * both panels blank. `ElementPointerHandler` sat behind the same guard and was lost the same
-     * way, silently.
-     *
-     * AS3 can build them from the configuration's `complete` event alone because in Flash the
-     * dependency callbacks have all run by then. Here three orderings are possible and one of them
-     * loses both helpers outright: `applyDependency()` calls the setter *before* it attaches the
-     * event listeners, so a configuration that finished loading early has already emitted
-     * `complete` by the time this component subscribes, and `initComponent()`'s `isInitialized()`
-     * fallback runs while the optional communication dependency is still null. Hanging the build on
-     * `communication` instead of on the configuration removes the ordering from the question.
      */
     // TS-only: AS3 needs no such method — its two callers cannot run in the losing order.
     private buildCommunicationBoundHelpers(): void
@@ -302,11 +269,6 @@ export class HabboWindowManager extends WindowManager implements IHabboWindowMan
         if(!this._elementPointerHandler)
         {
             this._elementPointerHandler = new ElementPointerHandler(this);
-        }
-
-        if(this._bcFloorPlanEditor === null)
-        {
-            this._bcFloorPlanEditor = new BCFloorPlanEditor(this);
         }
     }
 

@@ -69,17 +69,6 @@ const log = Logger.getLogger('habbo.ui.RoomUI');
 
 export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
 {
-    // sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomUI.as::onPerkAllowances() —
-    // deliberately not subscribed, and this note is here so the next unwired-code sweep stops
-    // re-flagging it as a missing registration.
-    //
-    // AS3 subscribes `PerkAllowancesMessageEvent` (1535) here only to start a 250 ms timer whose
-    // completion adds the free-flow chat to the stage — it builds that chat lazily, on the first
-    // perk packet. This port builds it eagerly in `HabboFreeFlowChat.initComponent()`, and the
-    // reasoning (with the AS3 check that makes it a deviation rather than a gap) is written at that
-    // method. The end state is identical; the message itself is ported and read by `PerkManager`
-    // and `GuideSessionController`.
-
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/RoomUI.as — the entries of the
     // listener table whose callback is roomSessionDialogEventHandler, in the source's own order.
     private static readonly ROOM_SESSION_DIALOG_EVENTS: readonly string[] = [

@@ -10,7 +10,6 @@ export {HabboCommunicationManagerEvent} from './HabboCommunicationManagerEvent';
 export {HabboConnectionType} from './HabboConnectionType';
 export {HabboHotelViewEvent} from './HabboHotelViewEvent';
 export {NoobnessLevelEnum} from './NoobnessLevelEnum';
-export {PerkType} from './PerkType';
 export {PlatformType} from './PlatformType';
 export {TradeOfferState} from './TradeOfferState';
 
@@ -23,6 +22,5 @@ export type {HabboCommunicationManagerEventType} from './HabboCommunicationManag
 export type {HabboConnectionModeType} from './HabboConnectionType';
 export type {HabboHotelViewEventType} from './HabboHotelViewEvent';
 export type {NoobnessLevelType} from './NoobnessLevelEnum';
-export type {PerkTypeValue} from './PerkType';
 export type {PlatformTypeValue} from './PlatformType';
 export type {TradeOfferStateType} from './TradeOfferState';

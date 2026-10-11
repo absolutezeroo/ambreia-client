@@ -13,7 +13,7 @@ import {TabUtils} from './TabUtils';
  * tab inside it and swap its bitmap.
  *
  * Note that it does **not** implement `ICategoryView`: `switchCategory()` is left to the
- * subclasses, which is why `HotLooksView` can implement the interface without extending this at all.
+ * subclasses.
  *
  * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/common/CategoryBaseView.as
  */

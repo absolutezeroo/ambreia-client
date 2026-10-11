@@ -7,12 +7,8 @@ import {BaseHandler} from './BaseHandler';
 import {ChatMessageEvent} from '@ambreia/protocol/incoming/room/chat/ChatMessageEvent';
 import {ShoutMessageEvent} from '@ambreia/protocol/incoming/room/chat/ShoutMessageEvent';
 import {WhisperMessageEvent} from '@ambreia/protocol/incoming/room/chat/WhisperMessageEvent';
-import {PetRespectNotificationEvent} from '@ambreia/protocol/incoming/notifications/PetRespectNotificationEvent';
 
 // Parsers
-import type {
-    PetRespectNotificationEventParser
-} from '@ambreia/protocol/parser/notifications/PetRespectNotificationEventParser';
 import type {ChatMessageEventParser, IChatLink} from '@ambreia/protocol/parser/room/chat/ChatMessageEventParser';
 
 import {RemainingMutePeriodMessageEvent} from '@ambreia/protocol/incoming/room/session/RemainingMutePeriodMessageEvent';
@@ -21,12 +17,6 @@ import {FloodControlMessageEvent} from '@ambreia/protocol/incoming/room/chat/Flo
 import type {
     FloodControlMessageParser
 } from '@ambreia/protocol/parser/room/chat/FloodControlMessageParser';
-import {
-    RespectNotificationMessageEvent
-} from '@ambreia/protocol/incoming/notifications/RespectNotificationMessageEvent';
-import type {
-    RespectNotificationMessageEventParser
-} from '@ambreia/protocol/parser/notifications/RespectNotificationMessageEventParser';
 import {
     HandItemReceivedMessageEvent
 } from '@ambreia/protocol/incoming/users/HandItemReceivedMessageEvent';
@@ -72,21 +62,11 @@ export class RoomChatHandler extends BaseHandler
         this.addMessageEvent(connection, new ChatMessageEvent(this.onRoomChat.bind(this)));
         this.addMessageEvent(connection, new WhisperMessageEvent(this.onRoomWhisper.bind(this)));
         this.addMessageEvent(connection, new ShoutMessageEvent(this.onRoomShout.bind(this)));
-        // DEVIATION: AS3 also subscribes PetSupplementedNotification; the RPG fork removed the
-        //   monsterplant supplements.
-        // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/handler/RoomChatHandler.as::RoomChatHandler()
-        this.addMessageEvent(connection, new PetRespectNotificationEvent(this.onPetRespectNotification.bind(this)));
-
         // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/handler/RoomChatHandler.as::RoomChatHandler()
         this.addMessageEvent(connection, new FloodControlMessageEvent(this.onFloodControl.bind(this)));
         this.addMessageEvent(connection, new RemainingMutePeriodMessageEvent(this.onRemainingMutePeriod.bind(this)));
 
-        // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/handler/RoomChatHandler.as::RoomChatHandler()
-        // The last three of AS3's ten. They were the difference between this handler and its
-        // source: `RespectNotification` sat behind "register when implemented" while its event and
-        // parser had both been ported, `HandItemReceived` was in the registry and constructed
-        // nowhere, and `SpecialSystemChat` had no message at all.
-        this.addMessageEvent(connection, new RespectNotificationMessageEvent(this.onRespectNotification.bind(this)));
+        // Inherited hand-item/system chat messages remain until their RPG replacements land.
         this.addMessageEvent(connection, new HandItemReceivedMessageEvent(this.onHandItemNotification.bind(this)));
         this.addMessageEvent(connection, new SpecialSystemChatMessageEvent(this.onSpecialSystemChat.bind(this)));
     }
@@ -148,61 +128,6 @@ export class RoomChatHandler extends BaseHandler
                 )
             );
         }
-    }
-
-    /**
-     * Scratching a pet, or feeding it a treat, surfaces as a bubble over the pet. Which of the
-     * two it was is not a field on the message: AS3 infers it from the pet's own figure type, so
-     * `isTreat()` is a look at the payload rather than a flag.
-     *
-     * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/handler/RoomChatHandler.as::onPetRespectNotification()
-     */
-    // AS3: .../src/com/sulake/habbo/session/handler/RoomChatHandler.as::onPetRespectNotification()
-    private onPetRespectNotification(event: IMessageEvent): void
-    {
-        const parser = event.parser as PetRespectNotificationEventParser | null;
-
-        if(parser === null || parser.petData === null) return;
-
-        const session = this.listener.getSession(this.roomId);
-
-        if(session === null) return;
-
-        const petData = session.userDataManager.getPetUserData(parser.petData.id);
-
-        if(petData === null) return;
-
-        const chatType = parser.isTreat()
-            ? RoomSessionChatEvent.CHAT_TYPE_PET_TREAT
-            : RoomSessionChatEvent.CHAT_TYPE_PET_RESPECT;
-
-        // AS3 passes no giver here.
-        this.dispatchChatEvent(petData.roomObjectId, '', chatType, 1);
-    }
-
-    /**
-	 * Somebody was respected. The bubble goes over the *respected* user, so the payload's `userId`
-	 * is resolved to a room object through the session rather than dispatched as-is.
-	 *
-	 * AS3 reads `respectTotal` off the same parser and ignores it here — the running total is the
-	 * notifications module's business, and it subscribes this message separately.
-	 */
-    // AS3: .../src/com/sulake/habbo/session/handler/RoomChatHandler.as::onRespectNotification()
-    private onRespectNotification(event: IMessageEvent): void
-    {
-        const parser = event.parser as RespectNotificationMessageEventParser | null;
-
-        if(parser === null) return;
-
-        const session = this.listener.getSession(this.roomId);
-
-        if(session === null) return;
-
-        const userData = session.userDataManager.getUserData(parser.userId);
-
-        if(userData === null) return;
-
-        this.dispatchChatEvent(userData.roomObjectId, '', RoomSessionChatEvent.CHAT_TYPE_RESPECT, 1);
     }
 
     /**

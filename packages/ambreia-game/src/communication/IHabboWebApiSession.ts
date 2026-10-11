@@ -48,7 +48,6 @@ export const WEB_API_ROUTES: Record<string, IWebApiRouteDefinition> = {
     register: {uri: '/api/public/registration/new', method: 'POST', requiresSession: false},
     popularRooms: {uri: '/api/public/rooms/popular', method: 'GET', requiresSession: false},
     room: {uri: '/api/public/rooms/:roomId', method: 'GET', requiresSession: false},
-    hotlooks: {uri: '/api/public/lists/hotlooks', method: 'GET', requiresSession: false},
     logCrash: {uri: '/api/log/crash', method: 'POST'},
     logError: {uri: '/api/log/error', method: 'POST'},
     logLoginStep: {uri: '/api/log/loginstep', method: 'POST'},
@@ -143,8 +142,6 @@ export interface IHabboWebApiSession {
     popularRooms(): void;
 
     room(id: number): void;
-
-    hotlooks(): void;
 
     logCrash(message: string): void;
 

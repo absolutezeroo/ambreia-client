@@ -126,7 +126,7 @@ export class AvatarEditorView implements IAvatarEditorView
     // DEVIATION: AS3 also lists `nfts`; the RPG fork removed NFT, so `createWindow()` drops the
     //   layout's `nfts` tab like any other unavailable one.
     // AS3: .../avatar/AvatarEditorView.as::_allCategories
-    private _allCategories: string[] = ['generic', 'head', 'torso', 'legs', 'hotlooks', 'wardrobe'];
+    private _allCategories: string[] = ['generic', 'head', 'torso', 'legs', 'wardrobe'];
 
     // AS3: .../avatar/AvatarEditorView.as::_categoryContainers
     // Page id → the `<id>_content` container detached from `contentArea` at build time.

@@ -66,30 +66,6 @@ export class UserObjectMessageParser implements IMessageParser
         return this._directMail;
     }
 
-    private _respectTotal: number = 0;
-
-    // AS3: sources/win63_version/habbo/communication/messages/parser/handshake/UserObjectEventParser.as::get respectTotal()
-    get respectTotal(): number
-    {
-        return this._respectTotal;
-    }
-
-    private _respectLeft: number = 0;
-
-    // AS3: sources/win63_version/habbo/communication/messages/parser/handshake/UserObjectEventParser.as::get respectLeft()
-    get respectLeft(): number
-    {
-        return this._respectLeft;
-    }
-
-    private _petRespectLeft: number = 0;
-
-    // AS3: sources/win63_version/habbo/communication/messages/parser/handshake/UserObjectEventParser.as::get petRespectLeft()
-    get petRespectLeft(): number
-    {
-        return this._petRespectLeft;
-    }
-
     private _streamPublishingAllowed: boolean = false;
 
     // AS3: sources/win63_version/habbo/communication/messages/parser/handshake/UserObjectEventParser.as::get streamPublishingAllowed()
@@ -130,22 +106,6 @@ export class UserObjectMessageParser implements IMessageParser
         return this._nameColor;
     }
 
-    private _respectReplenishesLeft: number = 0;
-
-    // AS3: sources/win63_version/habbo/communication/messages/parser/handshake/UserObjectEventParser.as::get respectReplenishesLeft()
-    get respectReplenishesLeft(): number
-    {
-        return this._respectReplenishesLeft;
-    }
-
-    private _maxRespectPerDay: number = 3;
-
-    // AS3: sources/win63_version/habbo/communication/messages/parser/handshake/UserObjectEventParser.as::get maxRespectPerDay()
-    get maxRespectPerDay(): number
-    {
-        return this._maxRespectPerDay;
-    }
-
     // AS3: sources/win63_version/habbo/communication/messages/parser/handshake/UserObjectEventParser.as::flush()
     flush(): boolean
     {
@@ -156,16 +116,11 @@ export class UserObjectMessageParser implements IMessageParser
         this._customData = '';
         this._realName = '';
         this._directMail = false;
-        this._respectTotal = 0;
-        this._respectLeft = 0;
-        this._petRespectLeft = 0;
         this._streamPublishingAllowed = false;
         this._lastAccessDate = '';
         this._nameChangeAllowed = false;
         this._accountTradeLocked = false;
         this._nameColor = '';
-        this._respectReplenishesLeft = 0;
-        this._maxRespectPerDay = 3;
         return true;
     }
 
@@ -181,9 +136,11 @@ export class UserObjectMessageParser implements IMessageParser
         this._customData = wrapper.readString();
         this._realName = wrapper.readString();
         this._directMail = wrapper.readBoolean();
-        this._respectTotal = wrapper.readInt();
-        this._respectLeft = wrapper.readInt();
-        this._petRespectLeft = wrapper.readInt();
+        // Legacy Habbo respect counters are still present on the wire for compatibility.
+        // Ambreia has no Respect product system, so consume them without retaining state.
+        wrapper.readInt();
+        wrapper.readInt();
+        wrapper.readInt();
         this._streamPublishingAllowed = wrapper.readBoolean();
         this._lastAccessDate = wrapper.readString();
         this._nameChangeAllowed = wrapper.readBoolean();
@@ -196,8 +153,9 @@ export class UserObjectMessageParser implements IMessageParser
 
         if(wrapper.bytesAvailable > 0)
         {
-            this._respectReplenishesLeft = wrapper.readInt();
-            this._maxRespectPerDay = wrapper.readInt();
+            // Same compatibility tail: consume the two retired Respect allowance fields.
+            wrapper.readInt();
+            wrapper.readInt();
         }
 
         return true;

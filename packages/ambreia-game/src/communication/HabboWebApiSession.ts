@@ -344,12 +344,6 @@ export class HabboWebApiSession implements IHabboWebApiSession, IApiListener
         this.executeRequest('room', null, [id]);
     }
 
-    // AS3: .../src/com/sulake/habbo/communication/HabboWebApiSession.as::hotlooks()
-    public hotlooks(): void 
-    {
-        this.executeRequest('hotlooks');
-    }
-
     // AS3: .../src/com/sulake/habbo/communication/HabboWebApiSession.as::logCrash()
     public logCrash(message: string): void 
     {

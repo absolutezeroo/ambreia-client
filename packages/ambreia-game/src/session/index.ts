@@ -6,7 +6,6 @@ export {IgnoreResult} from './IIgnoredUsersManager';
 export {RoomSessionState} from './IRoomSession';
 export {BlockedUsersManager} from './BlockedUsersManager';
 export {IgnoredUsersManager} from './IgnoredUsersManager';
-export {PerkManager} from './PerkManager';
 export {BanDuration, RoomSession,} from './RoomSession';
 export {RoomSessionManager} from './RoomSessionManager';
 export {SessionDataManager} from './SessionDataManager';
@@ -19,7 +18,6 @@ export * from './handler';
 // Types
 export type {IHabboGroupInfoManager} from './IHabboGroupInfoManager';
 export type {IIgnoredUsersManager} from './IIgnoredUsersManager';
-export type {IPerkAllowance, IPerkManager,} from './IPerkManager';
 export type {IRoomHandlerListener} from './IRoomHandlerListener';
 export type {RoomSessionStateType, IRoomSession,} from './IRoomSession';
 export type {IRoomSessionManager} from './IRoomSessionManager';

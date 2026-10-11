@@ -3,7 +3,6 @@
 
 export {BadgeImageReadyEvent} from './BadgeImageReadyEvent';
 export {FurniIconImageReadyEvent} from './FurniIconImageReadyEvent';
-export {PerksUpdatedEvent} from './PerksUpdatedEvent';
 export {RoomSessionChatEvent} from './RoomSessionChatEvent';
 export {RoomSessionDanceEvent} from './RoomSessionDanceEvent';
 export {RoomSessionDimmerPresetsEvent} from './RoomSessionDimmerPresetsEvent';

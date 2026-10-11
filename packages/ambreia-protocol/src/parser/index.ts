@@ -10,6 +10,5 @@ export * from './handshake';
 export * from './help';
 export * from './inventory';
 export * from './moderation';
-export * from './perk';
 export * from './room';
 export * from './users';

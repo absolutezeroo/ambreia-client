@@ -433,10 +433,6 @@ export class WebApiLoginProvider extends EventEmitter implements ILoginProvider,
                 this._viewer.showSelectAvatar(data);
                 break;
 
-            case '/api/public/lists/hotlooks':
-                this._viewer.showPromoHabbos(data);
-                break;
-
             case '/api/newuser/name/select':
             case '/api/newuser/name/check':
                 this._viewer.nameCheckResponse(data, uri === '/api/newuser/name/check');

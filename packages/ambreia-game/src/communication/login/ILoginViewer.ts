@@ -9,7 +9,7 @@
  *
  * Several of these are empty in `LoginFlow`, which is what the 701 source says: the provider calls
  * them, the desktop flow has nowhere to put them (`showLoginScreen`, `showLoadingScreen`,
- * `showSelectAvatar`, `showPromoHabbos`, `showSelectRoom`).
+ * `showSelectAvatar`, `showSelectRoom`).
  */
 import type {AvatarData} from './AvatarData';
 import type {ICaptchaView} from './ICaptchaView';
@@ -57,9 +57,6 @@ export interface ILoginViewer
 
     // AS3: function showSelectAvatar(_arg_1:Object):void
     showSelectAvatar(response: unknown): void;
-
-    // AS3: function showPromoHabbos(_arg_1:XML):void
-    showPromoHabbos(looks: unknown): void;
 
     // AS3: function showSelectRoom():void
     showSelectRoom(): void;

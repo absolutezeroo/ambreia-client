@@ -46,7 +46,6 @@ export class HabboWebApiMethod
     public static readonly POPULAR_ROOMS = '/api/public/rooms/popular';
     // AS3: .../src/com/sulake/habbo/communication/HabboWebApiMethod.as::ROOM
     public static readonly ROOM = '/api/public/rooms/:roomId';
-    public static readonly HOTLOOKS = '/api/public/lists/hotlooks';
 
     public static readonly SELF = '/api/user/self';
     // AS3: .../src/com/sulake/habbo/communication/HabboWebApiMethod.as::PROFILE

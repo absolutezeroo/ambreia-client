@@ -7,7 +7,6 @@ import type {IHabboLocalizationManager} from '../localization/IHabboLocalization
 import type {IWindowManager} from '@ambreia/ui/kit/IWindowManager';
 import type {IAvatarEffect} from '@ambreia/protocol/parser/inventory/AvatarEffectsMessageParser';
 import type {IUserDataManager} from './IUserDataManager';
-import type {IPerkManager} from './IPerkManager';
 import type {IIgnoredUsersManager} from './IIgnoredUsersManager';
 import type {IHabboGroupInfoManager} from './IHabboGroupInfoManager';
 import type {IRoomSessionManager} from './IRoomSessionManager';
@@ -26,7 +25,6 @@ export interface ISessionDataManager extends IDisposable
     readonly events: EventEmitter;
     readonly communication: IHabboCommunicationManager | null;
     readonly userDataManager: IUserDataManager;
-    readonly perkManager: IPerkManager;
     readonly ignoredUsersManager: IIgnoredUsersManager;
     readonly groupInfoManager: IHabboGroupInfoManager;
     readonly roomSessionManager: IRoomSessionManager | null;
@@ -77,18 +75,6 @@ export interface ISessionDataManager extends IDisposable
     // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::get isEmailVerified()
     readonly isEmailVerified: boolean;
 
-    // Respect
-    readonly respectTotal: number;
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::get respectLeft()
-    readonly respectLeft: number;
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::get respectReplenishesLeft()
-    readonly respectReplenishesLeft: number;
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::get petRespectLeft()
-    readonly petRespectLeft: number;
-    readonly respectsReceived: number;
-    readonly respectsRemaining: number;
-    readonly respectsPetRemaining: number;
-
     // Stream & access
     readonly streamPublishingAllowed: boolean;
     readonly lastAccessDate: string;
@@ -116,32 +102,12 @@ export interface ISessionDataManager extends IDisposable
     readonly boundFurnitureNames: string[];
     readonly avatarEffects: IAvatarEffect[];
 
-    // Perks
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::get perksReady()
-    readonly perksReady: boolean;
-
-    // Talent
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::get currentTalentTrack()
-    readonly currentTalentTrack: string;
     newFurniDataHash: string;
 
     // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::hasSecurity()
     hasSecurity(level: number): boolean;
 
     send(composer: IMessageComposer<unknown[]>): void;
-
-    // Respect
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::giveRespect()
-    giveRespect(userId: number): void;
-
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::givePetRespect()
-    givePetRespect(petId: number): void;
-
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::giveRespectFailed()
-    giveRespectFailed(): void;
-
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::replenishRespect()
-    replenishRespect(): void;
 
     // UI preferences
     // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::setRoomCameraFollowDisabled()
@@ -152,13 +118,6 @@ export interface ISessionDataManager extends IDisposable
 
     // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::setRoomToolsState()
     setRoomToolsState(open: boolean): void;
-
-    // Perks
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::isPerkAllowed()
-    isPerkAllowed(perk: string): boolean;
-
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::getPerkErrorMessage()
-    getPerkErrorMessage(perk: string): string;
 
     // Ignored users
     // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::isIgnored()

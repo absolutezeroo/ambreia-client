@@ -5,9 +5,9 @@ import type {IAvatarEditorGridModel} from './IAvatarEditorGridModel';
  * The window side of one editor page.
  *
  * Interface name DERIVED: the AS3 file is `_SafeCls_4089.as`. Named for its seven implementors —
- * `BodyView`, `HeadView`, `TorsoView`, `LegsView`, `MiscView`, `EffectsView` and `HotLooksView`
+ * `BodyView`, `HeadView`, `TorsoView`, `LegsView`, `MiscView` and `EffectsView`
  * (AS3 has an eighth, the NFT page, which the RPG fork removed). The first six extend
- * `CategoryBaseView`; `HotLooksView` implements it directly, which is why the shared behaviour lives in a base class and not here.
+ * `CategoryBaseView`.
  *
  * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/common/_SafeCls_4089.as
  */

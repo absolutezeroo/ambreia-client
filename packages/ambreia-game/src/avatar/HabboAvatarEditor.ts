@@ -23,7 +23,6 @@ import {AvatarEditorView} from './AvatarEditorView';
 import {AvatarUpdateEvent} from './events/AvatarUpdateEvent';
 import {CategoryData} from './common/CategoryData';
 import {EffectsModel} from './effects/EffectsModel';
-import {HotLooksModel} from './hotlooks/HotLooksModel';
 import {FigureData} from './figuredata/FigureData';
 import {BodyModel} from './generic/BodyModel';
 import {HeadModel} from './head/HeadModel';
@@ -781,13 +780,6 @@ export class HabboAvatarEditor implements ICategoryModelOwner, IFigureDataOwner,
         this._categories.add('torso', new TorsoModel(this));
         this._categories.add('legs', new LegsModel(this));
         this._categories.add('misc', new MiscModel(this));
-
-        // The one page built conditionally, because its constructor fires a request at the server
-        // — an editor restricted to other pages should not ask for hot looks it will never show.
-        if(categories === null || categories.indexOf('hotlooks') > -1)
-        {
-            this._categories.add('hotlooks', new HotLooksModel(this));
-        }
 
         // Added unconditionally, as in AS3 — the *tab* is what `AvatarEditorView` prunes when the
         // configuration is off, not the model.
