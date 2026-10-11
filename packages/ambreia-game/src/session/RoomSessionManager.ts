@@ -24,7 +24,6 @@ import {GenericErrorHandler} from './handler/GenericErrorHandler';
 import {RoomDimmerPresetsHandler} from './handler/RoomDimmerPresetsHandler';
 import {PresentHandler} from './handler/PresentHandler';
 import {PetPackageHandler} from './handler/PetPackageHandler';
-import {AvatarEffectsHandler} from './handler/AvatarEffectsHandler';
 import {RoomEngineEvent} from '@ambreia/iso/scene/events/RoomEngineEvent';
 import {Logger} from '@ambreia/common/utils/Logger';
 import type {IRoomEngine} from '../room/index';
@@ -458,7 +457,6 @@ export class RoomSessionManager extends Component implements IRoomSessionManager
         this._handlers.push(new RoomChatHandler(connection, this));
         this._handlers.push(new RoomUsersHandler(connection, this));
         this._handlers.push(new RoomPermissionsHandler(connection, this));
-        this._handlers.push(new AvatarEffectsHandler(connection, this));
         this._handlers.push(new RoomDataHandler(connection, this));
         this._handlers.push(new PresentHandler(connection, this));
         this._handlers.push(new GenericErrorHandler(connection, this));

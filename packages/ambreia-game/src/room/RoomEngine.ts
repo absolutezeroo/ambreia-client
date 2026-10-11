@@ -3270,7 +3270,6 @@ export class RoomEngine extends Component implements IRoomEngine,
         objectId: number,
         figure: string,
         gender: string | null,
-        clubLevel: string | null,
         isRiding: boolean
     ): boolean 
     {
@@ -5025,7 +5024,7 @@ export class RoomEngine extends Component implements IRoomEngine,
         isRiding?: boolean
     ): boolean 
     {
-        return this.updateRoomObjectUserFigure(roomId, roomIndex, figure, sex, subType ?? null, isRiding ?? false);
+        return this.updateRoomObjectUserFigure(roomId, roomIndex, figure, sex, isRiding ?? false);
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::updateObjectUserPosture()

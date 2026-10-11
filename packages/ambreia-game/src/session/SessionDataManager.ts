@@ -6,7 +6,7 @@ import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
 import type {IMessageComposer} from '@ambreia/net/messages/IMessageComposer';
 import type {IHabboCommunicationManager} from '../communication/IHabboCommunicationManager';
 import type {ISessionDataManager} from './ISessionDataManager';
-import {HabboClubLevelEnum, hasClub as clubLevelHasClub, hasVip as clubLevelHasVip, UIFlagsEnum} from './enum';
+import {UIFlagsEnum} from './enum';
 import {IID_HabboCommunicationManager} from '../iid/IIDHabboCommunicationManager';
 import {IID_HabboConfigurationManager} from '../iid/IIDHabboConfigurationManager';
 import {IID_HabboLocalizationManager} from '../iid/IIDHabboLocalizationManager';
@@ -55,7 +55,6 @@ import {
     AchievementsScoreMessageEvent
 } from '@ambreia/protocol/incoming/inventory/AchievementsScoreMessageEvent';
 import {FigureSetIdsMessageEvent} from '@ambreia/protocol/incoming/inventory/FigureSetIdsMessageEvent';
-import {AvatarEffectsMessageEvent} from '@ambreia/protocol/incoming/inventory/AvatarEffectsMessageEvent';
 
 // Events - Users
 import {InClientLinkMessageEvent} from '@ambreia/protocol/incoming/users/InClientLinkMessageEvent';
@@ -105,10 +104,6 @@ import type {
     AchievementsScoreMessageParser
 } from '@ambreia/protocol/parser/inventory/AchievementsScoreMessageParser';
 import type {FigureSetIdsMessageParser} from '@ambreia/protocol/parser/inventory/FigureSetIdsMessageParser';
-import type {
-    AvatarEffectsMessageParser,
-    IAvatarEffect
-} from '@ambreia/protocol/parser/inventory/AvatarEffectsMessageParser';
 import type {InClientLinkMessageParser} from '@ambreia/protocol/parser/users/InClientLinkMessageParser';
 import type {EmailStatusResultParser} from '@ambreia/protocol/parser/users/EmailStatusResultParser';
 import type {
@@ -343,16 +338,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
     }
 
     // User status
-    // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/session/SessionDataManager.as::_clubLevel
-    // DEVIATION: AS3 takes it from UserRights; the RPG server sends no membership, so it stays "no club".
-    private readonly _clubLevel: number = HabboClubLevelEnum.NO_CLUB;
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::get clubLevel()
-    get clubLevel(): number
-    {
-        return this._clubLevel;
-    }
-
     private _securityLevel: number = 0;
 
     get securityLevel(): number
@@ -501,28 +486,9 @@ export class SessionDataManager extends Component implements ISessionDataManager
         return this._boundFurnitureNames;
     }
 
-    private _avatarEffects: IAvatarEffect[] = [];
-
-    get avatarEffects(): IAvatarEffect[]
-    {
-        return this._avatarEffects;
-    }
-
     get motto(): string
     {
         return this._customData;
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/SessionDataManager.as::get hasVip()
-    get hasVip(): boolean
-    {
-        return clubLevelHasVip(this._clubLevel);
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/SessionDataManager.as::get hasClub()
-    get hasClub(): boolean
-    {
-        return clubLevelHasClub(this._clubLevel);
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/SessionDataManager.as::get isNoob()
@@ -1389,7 +1355,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
         // Inventory events
         this.addMessageEvent(new AchievementsScoreMessageEvent(this.onAchievementsScore.bind(this)));
         this.addMessageEvent(new FigureSetIdsMessageEvent(this.onFigureSetIds.bind(this)));
-        this.addMessageEvent(new AvatarEffectsMessageEvent(this.onAvatarEffects.bind(this)));
 
         // Users events
         this.addMessageEvent(new InClientLinkMessageEvent(this.onInClientLink.bind(this)));
@@ -1607,19 +1572,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
         this._boundFurnitureNames = [...parser.boundFurnitureNames];
 
         log.debug(`Figure sets: ${this._figureSetIds.length}, Bound furniture: ${this._boundFurnitureNames.length}`);
-    }
-
-    private onAvatarEffects(event: IMessageEvent): void
-    {
-        if(!event) return;
-
-        const parser = event.parser as AvatarEffectsMessageParser;
-
-        if(!parser) return;
-
-        this._avatarEffects = [...parser.effects];
-
-        log.debug(`Avatar effects: ${this._avatarEffects.length}`);
     }
 
     // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::onInClientLink()

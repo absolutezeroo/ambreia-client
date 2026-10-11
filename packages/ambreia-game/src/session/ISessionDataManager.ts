@@ -5,7 +5,6 @@ import type {IMessageComposer} from '@ambreia/net/messages/IMessageComposer';
 import type {IHabboCommunicationManager} from '../communication/IHabboCommunicationManager';
 import type {IHabboLocalizationManager} from '../localization/IHabboLocalizationManager';
 import type {IWindowManager} from '@ambreia/ui/kit/IWindowManager';
-import type {IAvatarEffect} from '@ambreia/protocol/parser/inventory/AvatarEffectsMessageParser';
 import type {IUserDataManager} from './IUserDataManager';
 import type {IIgnoredUsersManager} from './IIgnoredUsersManager';
 import type {IHabboGroupInfoManager} from './IHabboGroupInfoManager';
@@ -52,17 +51,11 @@ export interface ISessionDataManager extends IDisposable
     readonly motto: string;
 
     // Security & status
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::get clubLevel()
-    readonly clubLevel: number;
     readonly securityLevel: number;
     // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::get topSecurityLevel()
     readonly topSecurityLevel: number;
     readonly noobnessLevel: number;
 
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::get hasVip()
-    readonly hasVip: boolean;
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::get hasClub()
-    readonly hasClub: boolean;
     // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::get isNoob()
     readonly isNoob: boolean;
     // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::get isRealNoob()
@@ -100,7 +93,6 @@ export interface ISessionDataManager extends IDisposable
     // Figure & effects
     readonly figureSetIds: number[];
     readonly boundFurnitureNames: string[];
-    readonly avatarEffects: IAvatarEffect[];
 
     newFurniDataHash: string;
 

@@ -2,7 +2,6 @@ import type {EventEmitter} from 'eventemitter3';
 import type {IConnection} from '@ambreia/net/connection/IConnection';
 import type {ISessionDataManager} from '../session/ISessionDataManager';
 import type {IHabboWindowManager} from '../window/IHabboWindowManager';
-import type {IAvatarEffect} from './IAvatarEffect';
 import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
 import type {IFigurePartSet} from '@ambreia/avatar/structure/figure/IFigurePartSet';
 import type {IAvatarEditorGridModel} from './common/IAvatarEditorGridModel';
@@ -65,7 +64,7 @@ export interface IHabboAvatarEditorHost
     readonly desktopWidth: number;
 
     // AS3: .../src/com/sulake/habbo/catalog/IHabboCatalog.as::openCatalogPage()
-    // Flattened from `manager.catalog.openCatalogPage(...)`, like `openClubCenter()` above.
+    // Flattened from `manager.catalog.openCatalogPage(...)`.
     openCatalogPage(pageName: string): void;
 
     // AS3: .../avatar/HabboAvatarEditorManager.as::close()
@@ -83,36 +82,11 @@ export interface IHabboAvatarEditorHost
     // Narrowed — the editor asks the inventory exactly one question. See `IFigureSetOwnership`.
     readonly inventory: IFigureSetOwnership | null;
 
-    /**
-     * AS3: .../avatar/HabboAvatarEditorManager.as::get inventory()
-     *
-     * The same inventory, for the two effect calls `saveCurrentSelection()` makes. Separate from
-     * `inventory` because the two surfaces are unrelated and this one may be absent independently.
-     */
-    // AS3: .../avatar/HabboAvatarEditorManager.as::get inventory()
-    readonly effectInventory: {
-        setEffectSelected(effectType: number): void;
-        deselectAllEffects(force: boolean): void;
-        // AS3: .../src/com/sulake/habbo/inventory/HabboInventory.as::getAvatarEffects()
-        // What the effects page's whole grid comes from — unfiltered and unsorted.
-        getAvatarEffects(): IAvatarEffect[];
-    } | null;
-
     // AS3: .../src/com/sulake/core/runtime/_SafeCls_50.as::getBoolean()
     getBoolean(key: string): boolean;
 
-    // AS3: .../src/com/sulake/core/runtime/_SafeCls_50.as::getInteger()
-    // One key: `avatareditor.wardrobe.slots`, defaulted to 10.
-    getInteger(key: string, defaultValue: number): number;
-
-    // AS3: .../src/com/sulake/habbo/catalog/IHabboCatalog.as::verifyClubLevel()
-    verifyClubLevel(): boolean;
-
-    // AS3: .../src/com/sulake/habbo/catalog/IHabboCatalog.as::openClubCenter()
-    openClubCenter(): void;
-
     // AS3: .../src/com/sulake/habbo/avatar/_SafeCls_581.as::getMandatoryAvatarPartSetIds()
-    getMandatoryAvatarPartSetIds(gender: string, clubLevel: number): string[];
+    getMandatoryAvatarPartSetIds(gender: string, figureAccessLevel: number): string[];
 
     /**
      * TS-only: AS3 reads these straight off `windowManager.assets`. Flattened because the editor

@@ -380,7 +380,6 @@ export interface IRoomEngine extends IDisposable {
         objectId: number,
         figure: string,
         gender: string | null,
-        clubLevel: string | null,
         isRiding: boolean
     ): boolean;
 

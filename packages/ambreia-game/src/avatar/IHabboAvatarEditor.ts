@@ -45,7 +45,7 @@ export interface IHabboAvatarEditor
     ): boolean;
 
     // AS3: .../avatar/_SafeCls_68.as::loadAvatarInEditor()
-    loadAvatarInEditor(editorId: number, figure: string, gender: string, clubLevel?: number): void;
+    loadAvatarInEditor(editorId: number, figure: string, gender: string): void;
 
     // AS3: .../avatar/_SafeCls_68.as::loadOwnAvatarInEditor()
     loadOwnAvatarInEditor(editorId: number): void;

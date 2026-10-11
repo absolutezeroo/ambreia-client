@@ -13,8 +13,8 @@ import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
 export interface IFigureDataOwner
 {
     /**
-     * The first selectable colour in the part's palette that the user's club level allows, or −1
-     * when the part has no set type, no palette, or nothing affordable in it.
+     * The first selectable colour in the part's palette, or −1 when the part has no set type,
+     * no palette, or no selectable colour.
      */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/HabboAvatarEditor.as::getDefaultColour()
     getDefaultColour(partType: string): number;

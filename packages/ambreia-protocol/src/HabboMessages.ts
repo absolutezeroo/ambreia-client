@@ -240,17 +240,6 @@ export class HabboMessages implements IMessageConfiguration
         // corroborated by the emulator's Revision20260701 Headers.cs. The 2016-era 1016 that
         // win63_version and Nitro carry is a different build's number.
 
-        // === INVENTORY ===
-        // AS3: header corrected 2475 -> 2405 (_SafeCls_2835, onAvatarEffects in
-        // com/sulake/habbo/inventory/_SafeCls_1951.as). Header 2475 there is really
-        // onPostMessageMessage (_SafeCls_3133, GroupForumController.as), an unrelated,
-        // unported message.
-        // Discrete avatar-effect push updates (owned by inventory/_SafeCls_1951.as).
-        // IDs from com/sulake/habbo/communication/_SafeCls_2046.as.
-        // The avatar editor's two remaining incoming messages. 3629 is *not* the room-effect push
-        // (that is 2624, AvatarEffectMessageEvent) — both ids are real and carry different payloads.
-        // The avatar editor's hot-looks page.
-
         // === INVENTORY - FURNI ===
         // AS3: header corrected 3790 -> 1856 (_SafeCls_2440, onFurniListInvalidate,
         // confirmed also at com/sulake/habbo/ui/handler/CraftingWidgetHandler.as:223).
@@ -371,12 +360,9 @@ export class HabboMessages implements IMessageConfiguration
         // com/sulake/habbo/room/_SafeCls_1984.as:270, parser _SafeCls_3947 - userId,
         // expressionType - matches this TS parser exactly). Header 1783 there is really
         // onRoomSettingsSaved (_SafeCls_2385), which has moved here - see ROOM SETTINGS below.
-        // AS3: header corrected 3629 -> 2624. The registry maps _SafeStr_4546[2624] = _SafeCls_2589,
-        // the event RoomMessageHandler.onAvatarEffect subscribes to, whose parser _SafeCls_3361
-        // reads (userId, effectId, delayMilliSeconds) — exactly this TS parser. 3629 is a different
-        // message entirely (_SafeCls_3136 -> parser _SafeCls_4142, a single `type` int), consumed by
-        // AvatarEditorMessageHandler.onAvatarEffectSelected. The wrong header is why in-room avatar
-        // effects never arrived even though the whole render pipeline was ported.
+        // The room avatar-effect channel remains intentionally: the RPG server uses it as a
+        // generic avatar visual-effect/cosmetic primitive. It is distinct from the removed
+        // Habbo owned-effect inventory/editor flow.
         this._events.set(Incoming.AvatarEffectMessageComposer, AvatarEffectMessageEvent);
         this._events.set(Incoming.CarryObjectMessageComposer, CarryObjectMessageEvent);
         // AS3: header corrected 2833 -> 1953 (_SafeCls_3578, onUseObject,
@@ -476,12 +462,6 @@ export class HabboMessages implements IMessageConfiguration
         // (GuildMembersMessageComposer = 403, GuildMembershipUpdatedMessageComposer = 3477,
         // GuildMemberMgmtFailedMessageComposer = 1735, GuildMembershipRejectedMessageComposer = 595,
         // GroupMembershipRequestedMessageComposer = 2087).
-        // AS3: header corrected 1948 -> 1097 (_SafeCls_2180, onClubStatus,
-        // com/sulake/habbo/inventory/_SafeCls_1951.as:462, parser _SafeCls_1956 - exact
-        // field-for-field match with this TS parser). Header 1948 there is really
-        // onGroupDeactivated (_SafeCls_2104, com/sulake/habbo/groups/HabboGroupsManager.as:199),
-        // an unrelated, unported message.
-
         // === HELP (name change) ===
 
         // === ONBOARDING (new user flow) ===

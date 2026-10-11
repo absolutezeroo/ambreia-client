@@ -9,5 +9,4 @@ export * from './ICategoryModel';
 export * from './ICategoryModelOwner';
 export * from './ICategoryView';
 export * from './IFigureSetOwnership';
-export * from './ISideContent';
 export * from './TabUtils';

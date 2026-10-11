@@ -630,11 +630,11 @@ export class RoomPreviewer
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/preview/RoomPreviewer.as::updateObjectUserFigure()
-    updateObjectUserFigure(figure: string, gender: string | null = null, clubLevel: string | null = null, isRiding: boolean = false): boolean
+    updateObjectUserFigure(figure: string, gender: string | null = null, isRiding: boolean = false): boolean
     {
         if(this.isRoomEngineReady)
         {
-            return this._roomEngine!.updateRoomObjectUserFigure(this._previewRoomId, RoomPreviewer.PREVIEW_OBJECT_ID, figure, gender, clubLevel, isRiding);
+            return this._roomEngine!.updateRoomObjectUserFigure(this._previewRoomId, RoomPreviewer.PREVIEW_OBJECT_ID, figure, gender, isRiding);
         }
 
         return false;

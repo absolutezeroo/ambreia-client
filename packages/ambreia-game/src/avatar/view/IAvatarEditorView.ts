@@ -19,21 +19,11 @@ export interface IAvatarEditorView
     // AS3: .../avatar/AvatarEditorView.as::get currentViewId()
     readonly currentViewId: string;
 
-    // AS3: .../avatar/AvatarEditorView.as::get gridView()
-    // The one grid shared by every tabbed page — see `CategoryBaseView.updateGridView()`.
+    // The one grid shared by every appearance category.
     readonly gridView: IAvatarEditorGridView | null;
 
-    // AS3: .../avatar/AvatarEditorView.as::get effectsGridView()
-    // The same container wrapped by the effects page's own grid class.
-    readonly effectsGridView: IAvatarEditorGridView | null;
-
-    // AS3: .../avatar/AvatarEditorView.as::get avatarEditorNameChangeView()
-    // Null until the rename button is clicked once — the dialog is built lazily, which is why
-    // `AvatarEditorMessageHandler.onCheckUserNameResult()` drops a result that arrives before then.
+    // Null until the rename dialog is opened once.
     readonly avatarEditorNameChangeView: IAvatarEditorNameChangeView | null;
-
-    // AS3: .../avatar/AvatarEditorView.as::get effectsParamViewContainer()
-    readonly effectsParamViewContainer: IWindowContainer | null;
 
     // AS3: .../avatar/AvatarEditorView.as::getFrame()
     // Wraps the body in the standalone frame and hands it back — what `openEditor()` returns.

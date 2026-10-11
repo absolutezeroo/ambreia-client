@@ -23,7 +23,7 @@ export interface IAvatarEditorGridPartItem
 
     // AS3: .../avatar/common/AvatarEditorGridPartItem.as::get partSet()
     // Null for the two synthetic thumbnails, "REMOVE_ITEM" and "GET_MORE" — which is why every
-    // caller in `CategoryData` null-checks it before reading `clubLevel` or `isSellable`.
+    // caller in `CategoryData` null-checks it before reading part metadata.
     readonly partSet: IFigurePartSet | null;
 
     // AS3: .../avatar/common/AvatarEditorGridPartItem.as::get colorLayerCount()
@@ -35,9 +35,8 @@ export interface IAvatarEditorGridPartItem
     isSelected: boolean;
 
     // AS3: .../avatar/common/AvatarEditorGridPartItem.as::get isDisabledForWearing()
-    // True for a club item the user cannot afford, shown dimmed rather than hidden when
-    // `avatareditor.show.clubitems.dimmed` is on. Clicking one reverts the selection and opens the
-    // club advert instead.
+    // Generic disabled state for an appearance entry. The current RPG editor creates normal
+    // appearance choices enabled, but the state remains useful for future unlock requirements.
     readonly isDisabledForWearing: boolean;
 
     // AS3: .../avatar/common/AvatarEditorGridPartItem.as::set iconImage()
@@ -75,7 +74,7 @@ export interface IAvatarEditorGridColorItem
     isSelected: boolean;
 
     // AS3: .../avatar/common/AvatarEditorGridColorItem.as::get isDisabledForWearing()
-    // The colour equivalent of the part flag above — same dimmed-club-item treatment.
+    // The colour equivalent of the part disabled state above.
     readonly isDisabledForWearing: boolean;
 
     // AS3: .../avatar/common/AvatarEditorGridColorItem.as::dispose()

@@ -158,13 +158,6 @@ export class HabboAvatarEditorManager extends Component
         return null;
     }
 
-    // AS3: .../avatar/HabboAvatarEditorManager.as::get inventory()
-    // The effect half of the same manager; separate because the two surfaces are unrelated.
-    public get effectInventory(): IHabboAvatarEditorHost['effectInventory']
-    {
-        return null;
-    }
-
     // AS3: .../avatar/HabboAvatarEditorManager.as::get linkPattern()
     public get linkPattern(): string
     {
@@ -223,9 +216,9 @@ export class HabboAvatarEditorManager extends Component
     }
 
     // AS3: .../avatar/HabboAvatarEditorManager.as::loadAvatarInEditor()
-    public loadAvatarInEditor(editorId: number, figure: string, gender: string, clubLevel: number = 0): void
+    public loadAvatarInEditor(editorId: number, figure: string, gender: string): void
     {
-        this._editors?.getValue(editorId)?.loadAvatarInEditor(figure, gender, clubLevel);
+        this._editors?.getValue(editorId)?.loadAvatarInEditor(figure, gender);
     }
 
     // DEVIATION: AS3 loads the NFT fallback figure instead when an NFT outfit is worn; the RPG fork
@@ -239,8 +232,7 @@ export class HabboAvatarEditorManager extends Component
 
         editor.loadAvatarInEditor(
             this._sessionData?.figure ?? '',
-            this._sessionData?.gender ?? 'M',
-            this._sessionData?.clubLevel ?? 0
+            this._sessionData?.gender ?? 'M'
         );
     }
 
@@ -265,16 +257,6 @@ export class HabboAvatarEditorManager extends Component
         const editor = this._editors.getValue(editorId);
 
         if(editor === null) return;
-
-        // Closing the editor drops whatever effect was being *previewed* and puts back the one
-        // the player actually has on. The development editors are exempt because they preview
-        // effects on purpose.
-        if(!AvatarEditorIdEnum.isDevelopmentEditor(editorId))
-        {
-            const figureData = editor.figureData;
-
-            if(figureData !== null) figureData.avatarEffectType = -1;
-        }
 
         switch(editorId)
         {
@@ -319,23 +301,10 @@ export class HabboAvatarEditorManager extends Component
         this.loadOwnAvatarInEditor(AvatarEditorIdEnum.MAIN_EDITOR);
     }
 
-    // DEVIATION: AS3 asks the catalog; with no catalog since the core cut (2026-10-07) nobody has club.
-    // AS3: .../src/com/sulake/habbo/catalog/IHabboCatalog.as::verifyClubLevel()
-    public verifyClubLevel(): boolean
-    {
-        return false;
-    }
-
-    // DEVIATION: AS3 opens the club center, which left with the catalog in the core cut (2026-10-07).
-    // AS3: .../src/com/sulake/habbo/catalog/IHabboCatalog.as::openClubCenter()
-    public openClubCenter(): void
-    {
-    }
-
     // AS3: .../src/com/sulake/habbo/avatar/_SafeCls_581.as::getMandatoryAvatarPartSetIds()
-    public getMandatoryAvatarPartSetIds(gender: string, clubLevel: number): string[]
+    public getMandatoryAvatarPartSetIds(gender: string, figureAccessLevel: number): string[]
     {
-        return this._avatarRenderManager?.getMandatoryAvatarPartSetIds(gender, clubLevel) ?? [];
+        return this._avatarRenderManager?.getMandatoryAvatarPartSetIds(gender, figureAccessLevel) ?? [];
     }
 
     // TS-only: AS3 reads `windowManager.assets.getAssetByName(name).content` inline — see

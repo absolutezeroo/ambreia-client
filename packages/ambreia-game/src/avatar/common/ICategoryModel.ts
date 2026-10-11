@@ -4,7 +4,7 @@ import type {IFigureSetOwnership} from './IFigureSetOwnership';
 import type {IAvatarEditorGridModel} from './IAvatarEditorGridModel';
 
 /**
- * One page of the avatar editor — body, head, torso, legs, misc, hot looks or effects.
+ * One page of the avatar appearance editor — body, head, torso, legs or misc.
  *
  * Interface name DERIVED: the AS3 file is `_SafeCls_2660.as` and the identifier exists in no tree.
  * Named for its sole implementor, `CategoryBaseModel`, and for `HabboAvatarEditor`'s `_categories`
@@ -34,14 +34,8 @@ export interface ICategoryModel extends IAvatarEditorGridModel
     // AS3: .../avatar/common/_SafeCls_2660.as::switchCategory()
     switchCategory(partType?: string): void;
 
-    // AS3: .../avatar/common/_SafeCls_2660.as::hasClubItemsOverLevel()
-    hasClubItemsOverLevel(clubLevel: number): boolean;
-
     // AS3: .../avatar/common/_SafeCls_2660.as::hasInvalidSellableItems()
     hasInvalidSellableItems(inventory: IFigureSetOwnership | null): boolean;
-
-    // AS3: .../avatar/common/_SafeCls_2660.as::stripClubItemsOverLevel()
-    stripClubItemsOverLevel(clubLevel: number): boolean;
 
     // AS3: .../avatar/common/_SafeCls_2660.as::stripInvalidSellableItems()
     stripInvalidSellableItems(): boolean;

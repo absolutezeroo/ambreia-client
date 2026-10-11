@@ -17,7 +17,6 @@ export class AvatarData
     private _gender: string;
     private _headFigure: string;
     private _lastAccess: number;
-    private _habboClubMember: boolean;
     // AS3: .../src/com/sulake/habbo/communication/login/AvatarData.as::_creationTime
     private _creationTime: string;
 
@@ -31,7 +30,6 @@ export class AvatarData
         this._gender = (data.gender as string) ?? '';
         this._headFigure = '';
         this._lastAccess = (data.lastWebAccess as number) ?? 0;
-        this._habboClubMember = data.habboClubMember === 'true' || data.habboClubMember === true;
         this._creationTime = (data.creationTime as string) ?? '';
     }
 

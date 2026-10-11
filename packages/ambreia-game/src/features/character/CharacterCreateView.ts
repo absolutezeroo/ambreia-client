@@ -529,7 +529,7 @@ export class CharacterCreateView
         if(!setType) return [];
 
         return [...setType.partSets.values()]
-            .filter(set => set.isSelectable && set.clubLevel === 0 && !set.isSellable && (set.gender === gender || set.gender === 'U'))
+            .filter(set => set.isSelectable && !set.isSellable && (set.gender === gender || set.gender === 'U'))
             .map(set => set.id)
             .slice(0, TILES.count);
     }
@@ -545,7 +545,7 @@ export class CharacterCreateView
     {
         const palette = this.palette(type);
 
-        return palette ? [...palette.colors.values()].filter(color => color.isSelectable && color.clubLevel === 0).map(color => color.id) : [];
+        return palette ? [...palette.colors.values()].filter(color => color.isSelectable).map(color => color.id) : [];
     }
 
     dispose(): void

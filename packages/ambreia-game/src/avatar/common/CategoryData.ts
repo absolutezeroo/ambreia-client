@@ -288,24 +288,6 @@ export class CategoryData
         return ids.slice(0, Math.max(part.colorLayerCount, 1));
     }
 
-    // AS3: .../avatar/common/CategoryData.as::hasClubSelectionsOverLevel()
-    // True if *either* a selected colour or the selected part is above the level — both branches
-    // run, and AS3 does not short-circuit.
-    public hasClubSelectionsOverLevel(clubLevel: number): boolean
-    {
-        let colourOverLevel = false;
-
-        for(const colour of this.getSelectedColors())
-        {
-            if(colour !== null && colour.clubLevel > clubLevel) colourOverLevel = true;
-        }
-
-        const partSet = this.getCurrentPart()?.partSet ?? null;
-        const partOverLevel = partSet !== null && partSet.clubLevel > clubLevel;
-
-        return colourOverLevel || partOverLevel;
-    }
-
     // AS3: .../avatar/common/CategoryData.as::hasInvalidSellableItems()
     // Only the *selected* part is checked, not the whole grid.
     public hasInvalidSellableItems(inventory: IFigureSetOwnership | null): boolean
@@ -317,27 +299,8 @@ export class CategoryData
         return partSet.isSellable && !(inventory?.hasFigureSetIdInInventory(partSet.id) ?? false);
     }
 
-    /**
-     * Falls back to the first thumbnail when the selected part is above the club level — and to
-     * the **second** when the first turns out to be the synthetic "remove item" entry, which has
-     * no part set.
-     */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/common/CategoryData.as::stripClubItemsOverLevel()
-    public stripClubItemsOverLevel(clubLevel: number): boolean
-    {
-        const partSet = this.getCurrentPart()?.partSet ?? null;
-
-        if(partSet === null || partSet.clubLevel <= clubLevel) return false;
-
-        const fallback = this.selectPartIndex(0);
-
-        if(fallback !== null && fallback.partSet === null) this.selectPartIndex(1);
-
-        return true;
-    }
-
     // AS3: .../avatar/common/CategoryData.as::stripInvalidSellableItems()
-    // The same fallback as stripClubItemsOverLevel(), for an unowned sellable part.
+    // Unowned sellable appearance parts fall back to the first available entry.
     public stripInvalidSellableItems(inventory: IFigureSetOwnership | null): boolean
     {
         const partSet = this.getCurrentPart()?.partSet ?? null;
@@ -351,41 +314,6 @@ export class CategoryData
         if(fallback !== null && fallback.partSet === null) this.selectPartIndex(1);
 
         return true;
-    }
-
-    /**
-     * Replaces every colour above the club level — and every *missing* one — with the palette's
-     * first affordable colour, then re-applies the whole set.
-     *
-     * A palette with nothing affordable returns false and changes nothing, so a user whose club
-     * lapsed keeps an unaffordable colour rather than losing it to −1.
-     */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/common/CategoryData.as::stripClubColorsOverLevel()
-    public stripClubColorsOverLevel(clubLevel: number): boolean
-    {
-        const replacementId = CategoryData.defaultColorId(this.getPalette(0), clubLevel);
-
-        if(replacementId === -1) return false;
-
-        const ids: number[] = [];
-        let stripped = false;
-
-        for(const colour of this.getSelectedColors())
-        {
-            if(colour === null || colour.clubLevel > clubLevel)
-            {
-                ids.push(replacementId);
-                stripped = true;
-            }
-            else
-            {
-                ids.push(colour.id);
-            }
-        }
-
-        if(stripped) this.selectColorIds(ids);
-
-        return stripped;
     }
 
     // AS3: .../avatar/common/CategoryData.as::dispose()
@@ -415,23 +343,6 @@ export class CategoryData
         this._paletteIndexes = null;
 
         void CategoryData.MAX_PALETTES;
-    }
-
-    // AS3: .../avatar/common/CategoryData.as::defaultColorId()
-    // The first *selectable-by-level* colour in a palette. Static in AS3 too.
-    private static defaultColorId(palette: IAvatarEditorGridColorItem[] | null, clubLevel: number): number
-    {
-        if(palette === null || palette.length === 0) return -1;
-
-        for(const swatch of palette)
-        {
-            if(swatch.partColor !== null && swatch.partColor.clubLevel <= clubLevel)
-            {
-                return swatch.partColor.id;
-            }
-        }
-
-        return -1;
     }
 
     // AS3: .../avatar/common/CategoryData.as::getSelectedColors()

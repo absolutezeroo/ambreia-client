@@ -94,8 +94,6 @@ export class BodyModel extends CategoryBaseModel implements ICategoryModel, IAva
 
         if(colour?.isDisabledForWearing === true)
         {
-            this._controller?.openHabboClubAdWindow();
-
             return;
         }
 

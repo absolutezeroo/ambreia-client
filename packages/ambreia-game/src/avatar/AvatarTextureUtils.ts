@@ -73,8 +73,8 @@ export class AvatarTextureUtils
     /**
      * The drawable behind a texture, plus the sub-rectangle of it the texture actually covers.
      *
-     * Separate from `toImageBitmap()` because the wardrobe composes *into* a fixed-size slot rather
-     * than taking the avatar as-is, and doing that through an intermediate bitmap would blit twice.
+     * Separate from `toImageBitmap()` so callers that compose into a fixed-size destination can
+     * avoid an unnecessary intermediate bitmap blit.
      */
     // TS-only: see the class note.
     public static toCanvasSource(

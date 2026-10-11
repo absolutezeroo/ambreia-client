@@ -10,14 +10,12 @@ import type {IAvatarEditorGridView} from './common/ICategoryView';
 import type {IAvatarEditorView} from './view/IAvatarEditorView';
 import {Logger} from '@ambreia/common/utils/Logger';
 import {AvatarEditorGridView} from './common/AvatarEditorGridView';
-import {AvatarEditorGridViewEffects} from './effects/AvatarEditorGridViewEffects';
 import {AvatarEditorNameChangeView} from './view/AvatarEditorNameChangeView';
 
 const log = Logger.getLogger('habbo.avatar.AvatarEditorView');
 
 /**
- * The editor's window: the tab strip, the page area, the shared grid, the side panel and the save
- * bar.
+ * The editor's window: the tab strip, the page area, the shared grid and the save bar.
  *
  * It comes in two shapes from one layout. `AvatarEditorContent` is the whole editor body and is
  * built in the constructor; `getFrame()` additionally wraps it in `AvatarEditorFrame` for the
@@ -65,13 +63,6 @@ export class AvatarEditorView implements IAvatarEditorView
     // Name DERIVED: the 7 the rotate button wraps at.
     private static readonly MAX_DIRECTION: number = 7;
 
-    // AS3: .../avatar/AvatarEditorView.as::SIDE_CONTENT_NONE
-    // Name DERIVED: the "nothing" AS3 uses as the empty side-panel id.
-    private static readonly SIDE_CONTENT_NONE: string = 'nothing';
-
-    // AS3: .../avatar/AvatarEditorView.as::SIDE_CONTENT_WARDROBE
-    private static readonly SIDE_CONTENT_WARDROBE: string = 'wardrobe';
-
     // AS3: .../avatar/AvatarEditorView.as::_editor
     // Name DERIVED (`_SafeStr_4578`): the field behind `get editor()`.
     private _editor: IAvatarEditorViewHost | null;
@@ -105,28 +96,16 @@ export class AvatarEditorView implements IAvatarEditorView
     // Name DERIVED (`_SafeStr_6772`): the preview's facing, stepped by the rotate button.
     private _direction: number = 4;
 
-    // AS3: .../avatar/AvatarEditorView.as::_sideContentId
-    // Name DERIVED (`_SafeStr_7931`): `wardrobe` or `nothing`; starts undefined so the first
-    // `setSideContent()` always runs.
-    private _sideContentId: string = '';
-
-    // AS3: .../avatar/AvatarEditorView.as::_showWardrobeOnUpdate
-    // Cleared for good the first time the user closes the wardrobe.
-    private _showWardrobeOnUpdate: boolean = true;
-
     // AS3: .../avatar/AvatarEditorView.as::_availableCategories
     private _availableCategories: string[] = [];
 
     /**
-     * Every page the editor can show, in tab order.
-     *
-     * `wardrobe` is in this list even though it is a side panel rather than a page — the layout has
-     * no `wardrobe` tab, so it only ever affects `validateAvailableCategories()`. AS3's; kept.
+     * Every appearance page the RPG editor can show, in tab order.
      */
     // DEVIATION: AS3 also lists `nfts`; the RPG fork removed NFT, so `createWindow()` drops the
     //   layout's `nfts` tab like any other unavailable one.
     // AS3: .../avatar/AvatarEditorView.as::_allCategories
-    private _allCategories: string[] = ['generic', 'head', 'torso', 'legs', 'wardrobe'];
+    private _allCategories: string[] = ['generic', 'head', 'torso', 'legs'];
 
     // AS3: .../avatar/AvatarEditorView.as::_categoryContainers
     // Page id → the `<id>_content` container detached from `contentArea` at build time.
@@ -136,10 +115,6 @@ export class AvatarEditorView implements IAvatarEditorView
     // Name DERIVED (`_SafeStr_4604`).
     private _gridView: IAvatarEditorGridView | null = null;
 
-    // AS3: .../avatar/AvatarEditorView.as::_effectsGridView
-    // Name DERIVED (`_SafeStr_9017`): wraps the **same** `grid_container` as `_gridView`.
-    private _effectsGridView: IAvatarEditorGridView | null = null;
-
     // AS3: .../avatar/AvatarEditorView.as::_avatarEditorNameChangeView
     // Name DERIVED (`_SafeStr_8336`): built on the first rename click and never disposed.
     private _avatarEditorNameChangeView: AvatarEditorNameChangeView | null = null;
@@ -147,15 +122,12 @@ export class AvatarEditorView implements IAvatarEditorView
     /**
      * AS3: .../avatar/AvatarEditorView.as::AvatarEditorView()
      *
-     * The two optional pages are appended to `_allCategories` from configuration *before* the
-     * requested list is validated against it, so an editor asking for `effects` on a hotel that
-     * disables them fails validation rather than silently dropping the tab.
+     * Optional appearance pages are appended from configuration before the requested list is validated.
      */
     constructor(editor: IAvatarEditorViewHost, categories: string[] | null)
     {
         this._editor = editor;
 
-        if(editor.manager?.getBoolean('effects.in.avatar.editor') === true) this._allCategories.push('effects');
         if(editor.manager?.getBoolean('clothing.misc.tab.enabled') === true) this._allCategories.push('misc');
 
         for(const category of categories ?? this._allCategories) this._availableCategories.push(category);
@@ -181,23 +153,11 @@ export class AvatarEditorView implements IAvatarEditorView
         return this._gridView;
     }
 
-    // AS3: .../avatar/AvatarEditorView.as::get effectsGridView()
-    public get effectsGridView(): IAvatarEditorGridView | null
-    {
-        return this._effectsGridView;
-    }
-
     // AS3: .../avatar/AvatarEditorView.as::get avatarEditorNameChangeView()
     // Null until the rename button is clicked once; `AvatarEditorMessageHandler` null-checks it.
     public get avatarEditorNameChangeView(): AvatarEditorNameChangeView | null
     {
         return this._avatarEditorNameChangeView;
-    }
-
-    // AS3: .../avatar/AvatarEditorView.as::get effectsParamViewContainer()
-    public get effectsParamViewContainer(): IWindowContainer | null
-    {
-        return (this._window?.findChildByName('effectParamsContainer') as IWindowContainer | null) ?? null;
     }
 
     /**
@@ -343,47 +303,17 @@ export class AvatarEditorView implements IAvatarEditorView
     }
 
     /**
-     * Re-reads everything the editor's state decides: whether the wardrobe button shows, which side
-     * panel is up, and whether the current outfit still contains items the user may not wear.
-     *
-     * The wardrobe button's visibility is assigned **twice** — first including the club test, then
-     * again without it. The second assignment wins, so a non-subscriber sees the button. AS3's;
-     * kept, because removing the dead line would also remove the evidence that the club rule was
-     * meant to apply.
+     * Revalidates owned appearance items and redraws the active category.
      */
-    // AS3: .../avatar/AvatarEditorView.as::update()
+    // RPG editor update: only validate item ownership and redraw the active category.
     public update(): void
     {
         const editor = this._editor;
 
         if(editor === null || this._window === null) return;
 
-        const wardrobeButton = this._window.findChildByName('wardrobeButtonContainer');
-
-        if(wardrobeButton !== null && editor.manager?.sessionData != null)
-        {
-            wardrobeButton.visible = (editor.manager.sessionData.hasClub ?? false) && editor.isSideContentEnabled();
-            wardrobeButton.visible = editor.isSideContentEnabled();
-        }
-
-        let sideContent = AvatarEditorView.SIDE_CONTENT_NONE;
-
-        if(this._sideContentId === AvatarEditorView.SIDE_CONTENT_WARDROBE || this._showWardrobeOnUpdate)
-        {
-            sideContent = AvatarEditorView.SIDE_CONTENT_WARDROBE;
-        }
-
-        if(!editor.isSideContentEnabled()) sideContent = AvatarEditorView.SIDE_CONTENT_NONE;
-
-        if(editor.hasInvalidClubItems())
-        {
-            editor.stripClubItems();
-            editor.disableClubClothing();
-        }
-
         if(editor.hasInvalidSellableItems()) editor.stripInvalidSellableItems();
 
-        this.setSideContent(sideContent);
         this.setViewToCategory(this._currentViewId);
     }
 
@@ -440,12 +370,6 @@ export class AvatarEditorView implements IAvatarEditorView
 
             case 'cancel':
             case 'header_button_close':
-                if(editor.hasInvalidClubItems())
-                {
-                    editor.stripClubItems();
-                    editor.disableClubClothing();
-                }
-
                 editor.manager?.close(editor.instanceId);
                 break;
 
@@ -455,10 +379,6 @@ export class AvatarEditorView implements IAvatarEditorView
                 if(this._direction > AvatarEditorView.MAX_DIRECTION) this._direction = 0;
 
                 if(editor.figureData !== null) editor.figureData.direction = this._direction;
-                break;
-
-            case 'wardrobe':
-                this.toggleWardrobe();
                 break;
 
             case 'avatar_name_change':
@@ -640,10 +560,6 @@ export class AvatarEditorView implements IAvatarEditorView
 
         this._gridView = new AvatarEditorGridView(gridContainer);
 
-        // The **same** `grid_container`, wrapped a second time. The two grids coexist over one
-        // window and neither knows about the other; whichever page is showing refills it.
-        this._effectsGridView = new AvatarEditorGridViewEffects(gridContainer);
-
         if(this._tabs !== null)
         {
             const first = this._tabs.getTabItemAt(0);
@@ -671,11 +587,8 @@ export class AvatarEditorView implements IAvatarEditorView
     }
 
     /**
-     * The save button, which does not always save.
-     *
-     * An outfit containing unowned sellable parts opens the catalogue instead; one containing
-     * unaffordable club parts opens the club advert instead. Both still disable the button for the
-     * timeout, so the user cannot hammer it. A development editor skips both checks.
+     * Saves the current selection. Unowned catalogue-backed appearance pieces still route to their
+     * purchase flow; otherwise the RPG appearance is submitted immediately.
      */
     // AS3: .../avatar/AvatarEditorView.as::windowEventProc() — the "save" case
     private onSaveClicked(editor: IAvatarEditorViewHost): void
@@ -683,15 +596,6 @@ export class AvatarEditorView implements IAvatarEditorView
         if(!editor.isDevelopmentEditor() && editor.hasInvalidSellableItems())
         {
             this.startSellablePurchase();
-            this.startSaveTimeout();
-            this._window?.findChildByName('save')?.disable();
-
-            return;
-        }
-
-        if(!editor.isDevelopmentEditor() && editor.hasInvalidClubItems())
-        {
-            editor.openHabboClubAdWindow();
             this.startSaveTimeout();
             this._window?.findChildByName('save')?.disable();
 
@@ -716,65 +620,6 @@ export class AvatarEditorView implements IAvatarEditorView
         editor.toggleAvatarEditorPage(categoryId);
     }
 
-    // AS3: .../avatar/AvatarEditorView.as::toggleWardrobe()
-    // Closing the wardrobe also clears `_showWardrobeOnUpdate`, so it stays closed across updates;
-    // opening it does not set the flag back, so the choice is one-way for the session.
-    private toggleWardrobe(): void
-    {
-        if(this._sideContentId === AvatarEditorView.SIDE_CONTENT_WARDROBE)
-        {
-            this._showWardrobeOnUpdate = false;
-            this.setSideContent(AvatarEditorView.SIDE_CONTENT_NONE);
-
-            return;
-        }
-
-        this.setSideContent(AvatarEditorView.SIDE_CONTENT_WARDROBE);
-    }
-
-    /**
-     * Swaps the side panel and resizes the editor around it.
-     *
-     * The body shrinks by whatever was removed but is **not** grown back by what is added — only
-     * the side container's own width follows the new panel. The frame's content is then resized to
-     * the body, so the standalone window tracks the change and an embedded one does not.
-     */
-    // AS3: .../avatar/AvatarEditorView.as::setSideContent()
-    private setSideContent(sideContentId: string): void
-    {
-        if(this._sideContentId === sideContentId) return;
-
-        const container = this._window?.findChildByName('sideContainer') as IWindowContainer | null;
-
-        if(container == null) return;
-
-        let panel: IWindow | null = null;
-
-        if(sideContentId === AvatarEditorView.SIDE_CONTENT_WARDROBE)
-        {
-            panel = (this._editor?.getSideContentWindowContainer('wardrobe') as IWindow | null) ?? null;
-        }
-
-        const removed = container.removeChildAt(0);
-
-        if(removed !== null && this._window !== null) this._window.width -= removed.width;
-
-        if(panel !== null)
-        {
-            container.addChild(panel);
-            panel.visible = true;
-            container.width = panel.width;
-        }
-        else
-        {
-            container.width = 1;
-        }
-
-        this._sideContentId = sideContentId;
-
-        if(this._frame !== null && this._window !== null) this._frame.content.width = this._window.width;
-    }
-
     /**
      * Shows one page in `contentArea`.
      *
@@ -782,9 +627,8 @@ export class AvatarEditorView implements IAvatarEditorView
      * not built leaves the area empty rather than unchanged. That is the visible symptom of an
      * unported category: the tab lights up and the panel goes blank.
      */
-    // DEVIATION: AS3 also disables the wardrobe button and closes the side panel on the `nfts`
-    //   page; the RPG fork removed NFT. The layout's `collectible_avatar_info` panel, which only that
-    //   page showed, is still hidden here until Task 10 removes it from the XML.
+    // The legacy layout still contains `collectible_avatar_info`; keep it hidden until the
+    // appearance layout itself is replaced by the RPG UI.
     // AS3: .../avatar/AvatarEditorView.as::setViewToCategory()
     private setViewToCategory(categoryId: string): void
     {
@@ -794,15 +638,9 @@ export class AvatarEditorView implements IAvatarEditorView
 
         if(contentArea === null) return;
 
-        const effectsParams = this.effectsParamViewContainer;
-
-        if(effectsParams !== null) effectsParams.visible = categoryId === 'effects';
-
         const collectibleInfo = this._window.findChildByName('collectible_avatar_info');
 
         if(collectibleInfo !== null) collectibleInfo.visible = false;
-
-        this._window.findChildByName('wardrobe')?.enable();
 
         const outgoing = contentArea.getChildAt(0);
 

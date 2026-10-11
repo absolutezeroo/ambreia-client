@@ -105,8 +105,8 @@ export class BodyView extends CategoryBaseView implements ICategoryView
 
     /**
      * Clicking a gender tab stops propagation — the page container is a child of the editor body,
-     * whose own procedure would otherwise see the click and try to match it against `save`,
-     * `wardrobe` and the rest.
+     * whose own procedure would otherwise see the click and try to match it against unrelated
+     * editor actions.
      *
      * Hovering out does not un-light the tab: it re-runs `updateGenderTab()`, so the tab for the
      * *current* gender stays lit whichever one the cursor left.

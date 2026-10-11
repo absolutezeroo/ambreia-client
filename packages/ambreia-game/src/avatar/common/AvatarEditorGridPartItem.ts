@@ -96,7 +96,7 @@ export class AvatarEditorGridPartItem implements IAvatarEditorGridPartItem, IAva
     private static readonly DOWNLOAD_ICON_ASSET: string = 'avatar_editor_avatar_editor_download_icon';
 
     // AS3: .../avatar/common/AvatarEditorGridPartItem.as::DISABLED_ALPHA
-    // Name DERIVED: the 0.2 a dimmed club item is drawn at.
+    // Name DERIVED: the alpha used for a disabled appearance item.
     private static readonly DISABLED_ALPHA: number = 0.2;
 
     // AS3: .../avatar/common/AvatarEditorGridPartItem.as::HOVER_BLEND
@@ -348,8 +348,7 @@ export class AvatarEditorGridPartItem implements IAvatarEditorGridPartItem, IAva
     };
 
     /**
-     * Paints the thumbnail centred in its window, then the club and sellable badges, then the
-     * selection background.
+     * Paints the thumbnail centred in its window, then the sellable badge and selection state.
      *
      * `iconImage` wins over the composite **only when `useColors` is false** — which is how the
      * synthetic tiles and the rendered face thumbnails (`BodyModel`) get through, since both are
@@ -373,10 +372,10 @@ export class AvatarEditorGridPartItem implements IAvatarEditorGridPartItem, IAva
             target.bitmap = this.centre(source, target.width, target.height);
         }
 
-        const clubIcon = this._window.findChildByTag('CLUB_ICON');
+        const legacyAccessIcon = this._window.findChildByTag('CLUB_ICON');
         const sellableIcon = this._window.findChildByTag('SELLABLE_ICON') as IStaticBitmapWrapperWindow | null;
 
-        if(clubIcon !== null) clubIcon.visible = (this._partSet?.clubLevel ?? 0) > 0;
+        if(legacyAccessIcon !== null) legacyAccessIcon.visible = false;
         if(sellableIcon !== null && sellableIcon !== undefined) sellableIcon.visible = this._partSet?.isSellable ?? false;
 
         if(this._selectionBackground === null) return;

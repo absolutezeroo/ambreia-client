@@ -8,8 +8,8 @@ import {OrderedMap} from '@ambreia/common/utils/OrderedMap';
 
 /**
  * What every editor page has in common: a lazily-built `CategoryData` per part type it owns, the
- * plumbing that keeps those selections in step with the figure, and the two "strip what you may
- * not wear" sweeps.
+ * plumbing that keeps those selections in step with the figure, and validation for inventory-backed
+ * appearance pieces.
  *
  * Subclasses supply only `init()` — which part types this page owns and which view draws it. The
  * five simple pages are nothing but that; `BodyModel` is the one that overrides behaviour.
@@ -83,8 +83,7 @@ export class CategoryBaseModel implements ICategoryModel
 
     /**
      * Throws the grids away and clears the initialised flag, so the next `switchCategory()` or
-     * `getWindowContainer()` rebuilds them — that is how a gender change or a club-level change
-     * re-filters every page.
+     * `getWindowContainer()` rebuilds them after appearance context changes.
      *
      * The **view is not disposed**, only reset: the windows survive and are re-populated.
      */
@@ -133,20 +132,6 @@ export class CategoryBaseModel implements ICategoryModel
         return this._categories.getValue(partType);
     }
 
-    // AS3: .../avatar/common/CategoryBaseModel.as::hasClubItemsOverLevel()
-    // Any part type of this page having an over-level selection is enough.
-    public hasClubItemsOverLevel(clubLevel: number): boolean
-    {
-        if(this._categories === null) return false;
-
-        for(const category of this._categories.getValues())
-        {
-            if(category !== null && category.hasClubSelectionsOverLevel(clubLevel)) return true;
-        }
-
-        return false;
-    }
-
     // AS3: .../avatar/common/CategoryBaseModel.as::hasInvalidSellableItems()
     public hasInvalidSellableItems(inventory: IFigureSetOwnership | null): boolean
     {
@@ -158,44 +143,6 @@ export class CategoryBaseModel implements ICategoryModel
         }
 
         return false;
-    }
-
-    /**
-     * Strips the part *and* the colours of every part type on the page, and writes the result back
-     * into the figure. Both strips run — the second is not skipped when the first already
-     * succeeded, so a part that was over-level and dyed over-level is fixed in one pass.
-     */
-    // AS3: .../avatar/common/CategoryBaseModel.as::stripClubItemsOverLevel()
-    public stripClubItemsOverLevel(clubLevel: number): boolean
-    {
-        if(this._categories === null) return false;
-
-        let strippedAny = false;
-
-        for(const partType of this._categories.getKeys())
-        {
-            const category = this._categories.getValue(partType);
-
-            if(category === null) continue;
-
-            let stripped = false;
-
-            if(category.stripClubItemsOverLevel(clubLevel)) stripped = true;
-            if(category.stripClubColorsOverLevel(clubLevel)) stripped = true;
-
-            if(!stripped) continue;
-
-            const part = category.getCurrentPart();
-
-            if(part !== null && this._controller?.figureData != null)
-            {
-                this._controller.figureData.savePartData(partType, part.id, category.getSelectedColorIds() ?? [], true);
-            }
-
-            strippedAny = true;
-        }
-
-        return strippedAny;
     }
 
     // AS3: .../avatar/common/CategoryBaseModel.as::stripInvalidSellableItems()
@@ -229,8 +176,7 @@ export class CategoryBaseModel implements ICategoryModel
     }
 
     /**
-     * Clicking a dimmed club item **reverts** to the previous selection and opens the club advert
-     * instead of applying — which is why the old index is captured before the new one is set.
+     * Disabled appearance entries revert to the previous selection instead of being applied.
      */
     // AS3: .../avatar/common/CategoryBaseModel.as::selectPart()
     public selectPart(partType: string, index: number): void
@@ -250,8 +196,6 @@ export class CategoryBaseModel implements ICategoryModel
         if(part.isDisabledForWearing)
         {
             category.selectPartIndex(previousIndex);
-            this._controller?.openHabboClubAdWindow();
-
             return;
         }
 
@@ -266,9 +210,7 @@ export class CategoryBaseModel implements ICategoryModel
     }
 
     /**
-     * The club revert is the same idea as `selectPart()`, but the whole check sits **inside** the
-     * `figureData` guard — so with no figure loaded a dimmed colour is silently applied to the
-     * grid and neither reverted nor advertised. AS3's; kept.
+     * Disabled colours revert to the previous selection before the figure is updated.
      */
     // AS3: .../avatar/common/CategoryBaseModel.as::selectColor()
     public selectColor(partType: string, index: number, layer: number): void
@@ -290,8 +232,6 @@ export class CategoryBaseModel implements ICategoryModel
         if(colour.isDisabledForWearing)
         {
             category.selectColorIndex(previousIndex, layer);
-            this._controller.openHabboClubAdWindow();
-
             return;
         }
 

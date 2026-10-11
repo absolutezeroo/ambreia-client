@@ -8,8 +8,7 @@ import type {IAvatarEditorGridModel} from './IAvatarEditorGridModel';
 import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
 
 /**
- * One colour swatch: a tinted 13×21 chip, a border that shows selection and hover, and a club
- * badge for a subscriber-only colour.
+ * One colour swatch: a tinted 13×21 chip with selection, hover and optional disabled state.
  *
  * The chip is **not** a coloured rectangle — it is a shared greyscale bitmap
  * (`..._clr_13x21_2`) tinted per swatch by the part colour's own multipliers, so every colour in
@@ -196,11 +195,11 @@ export class AvatarEditorGridColorItem implements IAvatarEditorGridColorItem
 
         if(this._border !== null) this._border.assetUri = AvatarEditorGridColorItem.SELECTED_ASSET;
 
-        const clubIcon: IWindow | null = this._window.findChildByTag('CLUB_ICON');
+        const legacyAccessIcon: IWindow | null = this._window.findChildByTag('CLUB_ICON');
 
-        if(clubIcon === null) return;
+        if(legacyAccessIcon === null) return;
 
-        clubIcon.visible = this._partColor !== null && this._partColor.clubLevel > 0;
+        legacyAccessIcon.visible = false;
     }
 
     // TS-only: the grid model exposes the asset lookup directly instead of walking the editor owner chain.
