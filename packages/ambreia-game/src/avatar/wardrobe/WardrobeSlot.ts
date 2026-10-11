@@ -2,7 +2,7 @@ import type {IWindow} from '@ambreia/ui/IWindow';
 import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 import type {IBitmapWrapperWindow} from '@ambreia/ui/components/IBitmapWrapperWindow';
 import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
-import type {HabboAvatarEditor} from '../HabboAvatarEditor';
+import type {IWardrobeController} from './IWardrobeController';
 import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
 import type {IOutfit} from '../IOutfit';
 import {Logger} from '@ambreia/common/utils/Logger';
@@ -53,7 +53,7 @@ export class WardrobeSlot implements IOutfit, IAvatarImageListener
 
     // AS3: .../avatar/wardrobe/WardrobeSlot.as::_controller
     // Name DERIVED (`_SafeStr_4593`).
-    private _controller: HabboAvatarEditor | null;
+    private _controller: IWardrobeController | null;
 
     // AS3: .../avatar/wardrobe/WardrobeSlot.as::_figure
     // Name DERIVED (`_SafeStr_5551`): null for a slot that has never been filled.
@@ -86,7 +86,7 @@ export class WardrobeSlot implements IOutfit, IAvatarImageListener
     // AS3: .../avatar/wardrobe/WardrobeSlot.as::WardrobeSlot()
     constructor(
         template: IWindow | null,
-        controller: HabboAvatarEditor | null,
+        controller: IWardrobeController | null,
         id: number,
         enabled: boolean,
         figure: string | null = null,
@@ -164,7 +164,7 @@ export class WardrobeSlot implements IOutfit, IAvatarImageListener
     // AS3: .../avatar/wardrobe/WardrobeSlot.as::updateView()
     public updateView(): void
     {
-        const zoom = this._controller?.manager?.getBoolean('zoom.enabled') ?? false;
+        const zoom = this._controller?.getBoolean('zoom.enabled') ?? false;
 
         let source: {resource: CanvasImageSource; frame: {x: number; y: number; width: number; height: number}} | null = null;
 

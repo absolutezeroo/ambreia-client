@@ -1,6 +1,6 @@
 import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 import type {WardrobeOutfit} from '@ambreia/protocol/parser/wardrobe/WardrobeOutfit';
-import type {HabboAvatarEditor} from '../HabboAvatarEditor';
+import type {IWardrobeController} from './IWardrobeController';
 import type {ISideContentModel} from '../common/ISideContent';
 import {ErrorReportStorage} from '@ambreia/common/utils/ErrorReportStorage';
 import {OrderedMap} from '@ambreia/common/utils/OrderedMap';
@@ -33,7 +33,7 @@ export class WardrobeModel implements ISideContentModel
 
     // AS3: .../avatar/wardrobe/WardrobeModel.as::_controller
     // Name DERIVED (`_SafeStr_4593`).
-    private _controller: HabboAvatarEditor | null;
+    private _controller: IWardrobeController | null;
 
     // AS3: .../avatar/wardrobe/WardrobeModel.as::_view
     // Name DERIVED (`_SafeStr_4550`).
@@ -48,7 +48,7 @@ export class WardrobeModel implements ISideContentModel
     private _initialised: boolean = false;
 
     // AS3: .../avatar/wardrobe/WardrobeModel.as::WardrobeModel()
-    constructor(controller: HabboAvatarEditor | null)
+    constructor(controller: IWardrobeController | null)
     {
         this._controller = controller;
     }
@@ -56,12 +56,12 @@ export class WardrobeModel implements ISideContentModel
     // AS3: .../avatar/wardrobe/WardrobeModel.as::get availableSlots()
     public get availableSlots(): number
     {
-        return this._controller?.manager?.getInteger(WardrobeModel.SLOTS_KEY, WardrobeModel.DEFAULT_SLOTS)
+        return this._controller?.getInteger(WardrobeModel.SLOTS_KEY, WardrobeModel.DEFAULT_SLOTS)
             ?? WardrobeModel.DEFAULT_SLOTS;
     }
 
     // AS3: .../avatar/wardrobe/WardrobeModel.as::get controller()
-    public get controller(): HabboAvatarEditor | null
+    public get controller(): IWardrobeController | null
     {
         return this._controller;
     }
@@ -182,7 +182,7 @@ export class WardrobeModel implements ISideContentModel
     // usable slots and five dead ones.
     private isSlotEnabled(id: number): boolean
     {
-        const sessionData = this._controller?.manager?.sessionData ?? null;
+        const sessionData = this._controller?.sessionData ?? null;
 
         if(id <= WardrobeModel.CLUB_SLOTS) return sessionData?.hasClub ?? false;
 

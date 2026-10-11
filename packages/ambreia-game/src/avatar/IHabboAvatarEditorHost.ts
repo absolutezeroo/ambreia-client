@@ -5,7 +5,7 @@ import type {IHabboWindowManager} from '../window/IHabboWindowManager';
 import type {IAvatarEffect} from './IAvatarEffect';
 import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
 import type {IFigurePartSet} from '@ambreia/avatar/structure/figure/IFigurePartSet';
-import type {ICategoryModel} from './common/ICategoryModel';
+import type {IAvatarEditorGridModel} from './common/IAvatarEditorGridModel';
 import type {
     IAvatarEditorGridColorItem,
     IAvatarEditorGridPartItem
@@ -130,7 +130,7 @@ export interface IHabboAvatarEditorHost
      */
     // TS-only: stands in for AS3's inline `new AvatarEditorGridPartItem(...)`.
     createGridPartItem(
-        model: ICategoryModel,
+        model: IAvatarEditorGridModel,
         partSet: IFigurePartSet | null,
         colours: unknown[] | null,
         colourable: boolean,
@@ -140,7 +140,7 @@ export interface IHabboAvatarEditorHost
     // TS-only: the colour equivalent, standing in for
     // `new AvatarEditorGridColorItem(AvatarEditorView.COLOUR_WINDOW.clone(), …)`.
     createGridColorItem(
-        model: ICategoryModel,
+        model: IAvatarEditorGridModel,
         colour: unknown,
         disabled: boolean
     ): IAvatarEditorGridColorItem | null;

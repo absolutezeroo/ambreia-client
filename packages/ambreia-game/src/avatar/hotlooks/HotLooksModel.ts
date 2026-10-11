@@ -116,7 +116,7 @@ export class HotLooksModel extends CategoryBaseModel implements ICategoryModel
      * AS3: .../avatar/hotlooks/HotLooksModel.as::dispose()
      *
      * 🐛 Calls `super.dispose()` **first**, which nulls `_controller` — then guards the
-     * unregistration on `controller && controller.manager && …`, which is now false. The message
+     * unregistration through the controller chain, which is now false. The message
      * event is therefore **never removed**, and a disposed model keeps receiving hot-look pushes
      * and keeps building `Outfit`s into a map it has already dropped. Kept as written.
      */
@@ -126,9 +126,9 @@ export class HotLooksModel extends CategoryBaseModel implements ICategoryModel
 
         if(this._hotLooksEvent !== null)
         {
-            if(this._controller?.manager?.connection != null)
+            if(this._controller?.connection != null)
             {
-                this._controller.manager.connection.removeMessageEvent(this._hotLooksEvent);
+                this._controller.connection.removeMessageEvent(this._hotLooksEvent);
             }
 
             this._hotLooksEvent = null;
@@ -160,7 +160,7 @@ export class HotLooksModel extends CategoryBaseModel implements ICategoryModel
     // AS3: .../avatar/hotlooks/HotLooksModel.as::requestHotLooks()
     private requestHotLooks(controller: ICategoryModelOwner | null): void
     {
-        const connection = controller?.manager?.connection ?? null;
+        const connection = controller?.connection ?? null;
 
         if(connection === null) return;
 

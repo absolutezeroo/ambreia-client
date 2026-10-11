@@ -11,7 +11,7 @@ import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
 import type {IAvatarEditorSaveListener} from './IAvatarEditorSaveListener';
 import type {IFigurePartSet} from '@ambreia/avatar/structure/figure/IFigurePartSet';
 import type {IPartColor} from '@ambreia/avatar/structure/figure/IPartColor';
-import type {ICategoryModel} from './common/ICategoryModel';
+import type {IAvatarEditorGridModel} from './common/IAvatarEditorGridModel';
 import type {IFigureSetOwnership} from './common/IFigureSetOwnership';
 import type {IHabboAvatarEditor} from './IHabboAvatarEditor';
 import type {IHabboAvatarEditorHost} from './IHabboAvatarEditorHost';
@@ -368,7 +368,7 @@ export class HabboAvatarEditorManager extends Component
      * nothing.
      */
     public createGridPartItem(
-        model: ICategoryModel,
+        model: IAvatarEditorGridModel,
         partSet: IFigurePartSet | null,
         colours: unknown[] | null,
         colourable: boolean,
@@ -388,7 +388,7 @@ export class HabboAvatarEditorManager extends Component
     // TS-only: the colour equivalent, standing in for
     // `new AvatarEditorGridColorItem(AvatarEditorView.COLOUR_WINDOW.clone(), ...)`.
     public createGridColorItem(
-        model: ICategoryModel,
+        model: IAvatarEditorGridModel,
         colour: unknown,
         disabled: boolean
     ): AvatarEditorGridColorItem | null

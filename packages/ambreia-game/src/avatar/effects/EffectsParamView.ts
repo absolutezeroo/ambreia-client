@@ -4,7 +4,7 @@ import type {IBitmapWrapperWindow} from '@ambreia/ui/components/IBitmapWrapperWi
 import type {ITextWindow} from '@ambreia/ui/components/ITextWindow';
 import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
 import type {IAvatarEffect} from '../IAvatarEffect';
-import type {EffectsModel} from './EffectsModel';
+import type {ICategoryModelOwner} from '../common/ICategoryModelOwner';
 import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
 
 /**
@@ -37,7 +37,7 @@ export class EffectsParamView implements IDisposable
 
     // AS3: .../avatar/effects/EffectsParamView.as::_model
     // Name DERIVED (`_SafeStr_4570`).
-    private _model: EffectsModel | null;
+    private _model: {readonly controller: ICategoryModelOwner | null} | null;
 
     // AS3: .../avatar/effects/EffectsParamView.as::_container
     private _container: IWindowContainer | null;
@@ -64,12 +64,12 @@ export class EffectsParamView implements IDisposable
 
     // AS3: .../avatar/effects/EffectsParamView.as::EffectsParamView()
     // AS3's third parameter is the asset library; unused there and not carried here.
-    constructor(model: EffectsModel | null, windowManager: IHabboWindowManager | null)
+    constructor(model: {readonly controller: ICategoryModelOwner | null} | null, windowManager: IHabboWindowManager | null)
     {
         this._model = model;
         this._windowManager = windowManager;
         this._container = model?.controller?.view?.effectsParamViewContainer ?? null;
-        this._catalogPageName = model?.controller?.manager?.getProperty(EffectsParamView.CATALOG_PAGE_KEY) ?? '';
+        this._catalogPageName = model?.controller?.getProperty(EffectsParamView.CATALOG_PAGE_KEY) ?? '';
 
         this._container?.findChildByName('get_more_button')?.addEventListener(WindowMouseEvent.CLICK, this.onBuyButtonClick);
 
@@ -229,7 +229,7 @@ export class EffectsParamView implements IDisposable
     // AS3: .../avatar/effects/EffectsParamView.as::onBuyButtonClick()
     private onBuyButtonClick = (): void =>
     {
-        this._model?.controller?.manager?.openCatalogPage(this._catalogPageName);
+        this._model?.controller?.openCatalogPage(this._catalogPageName);
     };
 
     /**

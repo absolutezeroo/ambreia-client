@@ -9,7 +9,7 @@ import {AvatarTextureUtils} from '../AvatarTextureUtils';
 import type {IFigurePartSet} from '@ambreia/avatar/structure/figure/IFigurePartSet';
 import type {IPartColor} from '@ambreia/avatar/structure/figure/IPartColor';
 import type {IAvatarEditorGridPartItem} from './IAvatarEditorGridItem';
-import type {ICategoryModel} from './ICategoryModel';
+import type {IAvatarEditorGridModel} from './IAvatarEditorGridModel';
 import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
 
 /** TS-only: the rectangle union `analyzePartLayers()` accumulates. */
@@ -23,8 +23,10 @@ interface IThumbSprite
 {
     // TS-only: AS3 reads `BitmapDataAsset.content`, a BitmapData.
     content: ImageBitmap;
+
     // TS-only: AS3 reads `BitmapDataAsset.offset`, the negated draw origin.
     offset: {x: number; y: number};
+
     // TS-only: AS3 reads `BitmapDataAsset.rectangle`.
     rectangle: {width: number; height: number};
 }
@@ -33,10 +35,13 @@ interface IThumbRect
 {
     // TS-only: `flash.geom.Rectangle.x`.
     x: number;
+
     // TS-only: `flash.geom.Rectangle.y`.
     y: number;
+
     // TS-only: `flash.geom.Rectangle.width`.
     width: number;
+
     // TS-only: `flash.geom.Rectangle.height`.
     height: number;
 }
@@ -107,7 +112,7 @@ export class AvatarEditorGridPartItem implements IAvatarEditorGridPartItem, IAva
 
     // AS3: .../avatar/common/AvatarEditorGridPartItem.as::_model
     // Name DERIVED (`_SafeStr_4570`).
-    private _model: ICategoryModel | null;
+    private _model: IAvatarEditorGridModel | null;
 
     // AS3: .../avatar/common/AvatarEditorGridPartItem.as::_window
     private _window: IWindowContainer | null;
@@ -157,7 +162,7 @@ export class AvatarEditorGridPartItem implements IAvatarEditorGridPartItem, IAva
     // AS3: .../avatar/common/AvatarEditorGridPartItem.as::AvatarEditorGridPartItem()
     constructor(
         window: IWindowContainer | null,
-        model: ICategoryModel | null,
+        model: IAvatarEditorGridModel | null,
         partSet: IFigurePartSet | null,
         colors: (IPartColor | null)[] | null,
         useColors: boolean = true,
@@ -641,20 +646,15 @@ export class AvatarEditorGridPartItem implements IAvatarEditorGridPartItem, IAva
     {
         if(AvatarEditorGridPartItem._downloadIcon !== null) return AvatarEditorGridPartItem._downloadIcon;
 
-        const controller = this._model?.controller as {getAssetBitmap?(n: string): ImageBitmap | null} | null;
-
         AvatarEditorGridPartItem._downloadIcon =
-            controller?.getAssetBitmap?.(AvatarEditorGridPartItem.DOWNLOAD_ICON_ASSET) ?? null;
+            this._model?.getAssetBitmap(AvatarEditorGridPartItem.DOWNLOAD_ICON_ASSET) ?? null;
 
         return AvatarEditorGridPartItem._downloadIcon;
     }
 
-    // TS-only: AS3 reaches it as `model.controller.manager.avatarRenderManager`.
+    // TS-only: the grid model exposes the avatar renderer directly instead of walking the editor owner chain.
     private resolveRenderManager(): IAvatarRenderManager | null
     {
-        const controller = this._model?.controller as
-            {avatarRenderManager?: IAvatarRenderManager | null} | null;
-
-        return controller?.avatarRenderManager ?? null;
+        return this._model?.avatarRenderManager ?? null;
     }
 }

@@ -48,7 +48,7 @@ export class EffectsModel extends CategoryBaseModel implements ICategoryModel
     // AS3: .../avatar/effects/EffectsModel.as::get effects()
     public get effects(): IAvatarEffect[]
     {
-        const inventory = this._controller?.manager?.effectInventory ?? null;
+        const inventory = this._controller?.effectInventory ?? null;
 
         if(inventory === null) return [];
 
@@ -134,7 +134,7 @@ export class EffectsModel extends CategoryBaseModel implements ICategoryModel
         if(this._view !== null) return;
 
         this._view = new EffectsView(this);
-        this._paramView = new EffectsParamView(this, this._controller?.manager?.windowManager ?? null);
+        this._paramView = new EffectsParamView(this, this._controller?.windowManager ?? null);
         this._view.init();
     }
 

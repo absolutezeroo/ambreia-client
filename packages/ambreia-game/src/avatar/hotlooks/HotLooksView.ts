@@ -3,7 +3,17 @@ import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 import type {IItemGridWindow} from '@ambreia/ui/components/IItemGridWindow';
 import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import type {ICategoryView} from '../common/ICategoryView';
-import type {HotLooksModel} from './HotLooksModel';
+import type {ICategoryModelOwner} from '../common/ICategoryModelOwner';
+import type {Outfit} from '../wardrobe/Outfit';
+
+interface IHotLooksViewModel
+{
+    readonly controller: ICategoryModelOwner | null;
+
+    readonly hotLooks: Outfit[];
+
+    selectHotLook(index: number): void;
+}
 
 /**
  * The hot-looks page: a grid of outfits the hotel is currently showing off.
@@ -21,14 +31,14 @@ export class HotLooksView implements ICategoryView
 
     // AS3: .../avatar/hotlooks/HotLooksView.as::_model
     // Name DERIVED (`_SafeStr_4570`).
-    private _model: HotLooksModel | null;
+    private _model: IHotLooksViewModel | null;
 
     // AS3: .../avatar/hotlooks/HotLooksView.as::_grid
     // Name DERIVED (`_SafeStr_6333`).
     private _grid: IItemGridWindow | null = null;
 
     // AS3: .../avatar/hotlooks/HotLooksView.as::HotLooksView()
-    constructor(model: HotLooksModel | null)
+    constructor(model: IHotLooksViewModel | null)
     {
         this._model = model;
     }

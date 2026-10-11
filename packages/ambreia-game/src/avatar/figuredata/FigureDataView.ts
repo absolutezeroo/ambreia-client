@@ -2,7 +2,7 @@ import type {IRoomPreviewerWidget} from '../../window/widgets/IRoomPreviewerWidg
 import type {RoomPreviewer} from '../../room/preview/RoomPreviewer';
 import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
 import type {IFigureDataView} from './IFigureDataView';
-import type {FigureData} from './FigureData';
+import type {IFigureDataOwner} from './IFigureDataOwner';
 import {Logger} from '@ambreia/common/utils/Logger';
 import {AvatarTextureUtils} from '../AvatarTextureUtils';
 
@@ -44,7 +44,7 @@ export class FigureDataView implements IFigureDataView, IAvatarImageListener
 
     // AS3: .../avatar/figuredata/FigureDataView.as::_figureData
     // Name DERIVED (`_SafeStr_4570`).
-    private _figureData: FigureData | null;
+    private _owner: IFigureDataOwner | null;
 
     // AS3: .../avatar/figuredata/FigureDataView.as::_figureString
     // The figure the last `update()` asked for; `avatarImageReady()` only repaints for a match.
@@ -61,11 +61,11 @@ export class FigureDataView implements IFigureDataView, IAvatarImageListener
      * previewer at all, and a throw in this constructor would abort `HabboAvatarEditor.init()`
      * rather than merely leave the preview blank.
      */
-    constructor(figureData: FigureData | null)
+    constructor(owner: IFigureDataOwner | null)
     {
-        this._figureData = figureData;
+        this._owner = owner;
 
-        const container = figureData?.avatarEditor?.view?.getFigureContainer() ?? null;
+        const container = owner?.getFigureContainer() ?? null;
 
         this._widget = (container?.widget as IRoomPreviewerWidget | null) ?? null;
 
@@ -147,7 +147,7 @@ export class FigureDataView implements IFigureDataView, IAvatarImageListener
     // AS3: .../avatar/figuredata/FigureDataView.as::update()
     private showRenderedFigure(figureString: string): void
     {
-        const image = this._figureData?.avatarEditor?.avatarRenderManager?.createAvatarImage(
+        const image = this._owner?.avatarRenderManager?.createAvatarImage(
             figureString, FigureDataView.RENDER_SCALE, null, this, null
         ) ?? null;
 

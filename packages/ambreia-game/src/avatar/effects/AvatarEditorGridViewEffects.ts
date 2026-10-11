@@ -3,8 +3,8 @@ import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 import type {IItemGridWindow} from '@ambreia/ui/components/IItemGridWindow';
 import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import type {IAvatarEditorGridView} from '../common/ICategoryView';
-import type {ICategoryModel} from '../common/ICategoryModel';
-import type {EffectsModel} from './EffectsModel';
+import type {IAvatarEditorGridModel} from '../common/IAvatarEditorGridModel';
+import type {IEffectsGridModel} from './IEffectsGridModel';
 import {AvatarEditorGridItemEffect} from './AvatarEditorGridItemEffect';
 
 /**
@@ -38,7 +38,7 @@ export class AvatarEditorGridViewEffects implements IAvatarEditorGridView
 
     // AS3: .../avatar/effects/AvatarEditorGridViewEffects.as::_model
     // Name DERIVED (`_SafeStr_4570`).
-    private _model: ICategoryModel | null = null;
+    private _model: IEffectsGridModel | null = null;
 
     // AS3: .../avatar/effects/AvatarEditorGridViewEffects.as::_partType
     // Name DERIVED (`_SafeStr_7619`): always `effects`, but stored the same way as the clothing grid.
@@ -93,14 +93,16 @@ export class AvatarEditorGridViewEffects implements IAvatarEditorGridView
      * member.
      */
     // AS3: .../avatar/effects/AvatarEditorGridViewEffects.as::initFromList()
-    public initFromList(model: ICategoryModel, partType: string): void
+    public initFromList(model: IAvatarEditorGridModel, partType: string): void
     {
-        this._model = model;
+        const effectsModel = model as IEffectsGridModel;
+
+        this._model = effectsModel;
         this._partType = partType;
 
         if(this._window !== null) this._window.visible = true;
 
-        const effects = (model as EffectsModel).effects ?? [];
+        const effects = effectsModel.effects ?? [];
 
         this._thumbs?.removeGridItems();
         this._effectItems = [];
@@ -115,8 +117,8 @@ export class AvatarEditorGridViewEffects implements IAvatarEditorGridView
             if(this._notification !== null) this._notification.visible = false;
             if(this._title !== null) this._title.visible = false;
 
-            const windowManager = model.controller?.manager?.windowManager ?? null;
-            const assets = model.controller?.manager ?? null;
+            const windowManager = effectsModel.windowManager;
+            const assets = effectsModel;
 
             this.addGridItem(new AvatarEditorGridItemEffect(null, windowManager, assets));
 

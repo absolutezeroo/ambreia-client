@@ -53,7 +53,7 @@ export class Outfit implements IOutfit, IAvatarImageListener
     constructor(controller: ICategoryModelOwner | null, figure: string, gender: string)
     {
         this._controller = controller;
-        this._view = new OutfitView(controller?.manager?.windowManager ?? null, figure !== '');
+        this._view = new OutfitView(controller?.windowManager ?? null, figure !== '');
         this._figure = figure;
         this._gender = Outfit.normaliseGender(gender);
 
@@ -94,7 +94,7 @@ export class Outfit implements IOutfit, IAvatarImageListener
     // AS3: .../avatar/wardrobe/Outfit.as::update()
     public update(): void
     {
-        const zoom = this._controller?.manager?.getBoolean('zoom.enabled') ?? false;
+        const zoom = this._controller?.getBoolean('zoom.enabled') ?? false;
 
         const image = this._controller?.createAvatarImage(
             this.figure, zoom ? FigureData.SCALE : Outfit.SMALL_SCALE, this._gender, this

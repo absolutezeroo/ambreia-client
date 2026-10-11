@@ -2,7 +2,7 @@ import type {IWindow} from '@ambreia/ui/IWindow';
 import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import type {ICategoryView} from '../common/ICategoryView';
-import type {TorsoModel} from './TorsoModel';
+import type {ICategoryModel} from '../common/ICategoryModel';
 import {CategoryBaseView} from '../common/CategoryBaseView';
 
 /**
@@ -39,8 +39,8 @@ export class TorsoView extends CategoryBaseView implements ICategoryView
     ]);
 
     // AS3: .../avatar/torso/TorsoView.as::TorsoView()
-    // Typed to the concrete model in AS3 where every sibling view takes the interface. Kept.
-    constructor(model: TorsoModel | null)
+    // AS3 types this to the concrete model; the view only uses the category-model surface.
+    constructor(model: ICategoryModel | null)
     {
         super(model);
     }

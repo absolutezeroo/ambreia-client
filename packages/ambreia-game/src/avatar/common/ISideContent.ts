@@ -1,5 +1,4 @@
 import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
-import type {HabboAvatarEditor} from '../HabboAvatarEditor';
 
 /**
  * A panel beside the editor's pages rather than one of them — the wardrobe is the only one.
@@ -16,11 +15,6 @@ export interface ISideContentModel
 
     // AS3: .../avatar/common/ISideContentModel.as::reset()
     reset(): void;
-
-    // AS3: .../avatar/common/ISideContentModel.as::get controller()
-    // Typed to the concrete editor, as in AS3 — `WardrobeSlot` reaches nine members through it,
-    // which is well past what a narrow interface would be worth.
-    readonly controller: HabboAvatarEditor | null;
 
     // AS3: .../avatar/common/ISideContentModel.as::getWindowContainer()
     getWindowContainer(): IWindowContainer | null;

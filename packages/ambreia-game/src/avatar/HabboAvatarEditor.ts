@@ -8,7 +8,10 @@ import type {IPalette} from '@ambreia/avatar/structure/figure/IPalette';
 import type {ISetType} from '@ambreia/avatar/structure/figure/ISetType';
 import type {IAvatarEditorSaveListener} from './IAvatarEditorSaveListener';
 import type {IAvatarEditorView} from './view/IAvatarEditorView';
+import type {IAvatarEditorViewHost} from './view/IAvatarEditorViewHost';
+import type {IFigureDataOwner} from './figuredata/IFigureDataOwner';
 import type {ICategoryModel} from './common/ICategoryModel';
+import type {IAvatarEditorGridModel} from './common/IAvatarEditorGridModel';
 import type {ICategoryModelOwner} from './common/ICategoryModelOwner';
 import type {IAvatarEditorGridColorItem, IAvatarEditorGridPartItem} from './common/IAvatarEditorGridItem';
 import type {IFigureSetOwnership} from './common/IFigureSetOwnership';
@@ -28,6 +31,7 @@ import {LegsModel} from './legs/LegsModel';
 import {MiscModel} from './misc/MiscModel';
 import {TorsoModel} from './torso/TorsoModel';
 import {WardrobeModel} from './wardrobe/WardrobeModel';
+import type {IWardrobeController} from './wardrobe/IWardrobeController';
 import {
     UpdateFigureDataMessageComposer
 } from '@ambreia/protocol/outgoing/avatar/UpdateFigureDataMessageComposer';
@@ -41,7 +45,7 @@ import {
  *
  * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/HabboAvatarEditor.as
  */
-export class HabboAvatarEditor implements ICategoryModelOwner
+export class HabboAvatarEditor implements ICategoryModelOwner, IFigureDataOwner, IAvatarEditorViewHost, IWardrobeController
 {
     // AS3: .../avatar/HabboAvatarEditor.as::DEFAULT_MALE_FIGURE
     public static readonly DEFAULT_MALE_FIGURE: string =
@@ -153,10 +157,55 @@ export class HabboAvatarEditor implements ICategoryModelOwner
         return this._manager;
     }
 
+    public get windowManager(): IHabboAvatarEditorHost['windowManager']
+    {
+        return this._manager?.windowManager ?? null;
+    }
+
+    public get connection(): IHabboAvatarEditorHost['connection']
+    {
+        return this._manager?.connection ?? null;
+    }
+
+    public get effectInventory(): IHabboAvatarEditorHost['effectInventory']
+    {
+        return this._manager?.effectInventory ?? null;
+    }
+
+    public get sessionData(): IHabboAvatarEditorHost['sessionData']
+    {
+        return this._manager?.sessionData ?? null;
+    }
+
+    public getProperty(key: string): string
+    {
+        return this._manager?.getProperty(key) ?? '';
+    }
+
+    public getBoolean(key: string): boolean
+    {
+        return this._manager?.getBoolean(key) ?? false;
+    }
+
+    public getInteger(key: string, defaultValue: number): number
+    {
+        return this._manager?.getInteger(key, defaultValue) ?? defaultValue;
+    }
+
+    public openCatalogPage(pageName: string): void
+    {
+        this._manager?.openCatalogPage(pageName);
+    }
+
     // AS3: .../avatar/HabboAvatarEditor.as::get view()
     public get view(): IAvatarEditorView | null
     {
         return this._view;
+    }
+
+    public getFigureContainer()
+    {
+        return this._view?.getFigureContainer() ?? null;
     }
 
     // AS3: .../avatar/HabboAvatarEditor.as::get figureData()
@@ -471,7 +520,7 @@ export class HabboAvatarEditor implements ICategoryModelOwner
      * the second palette treatment.
      */
     // AS3: .../avatar/HabboAvatarEditor.as::generateDataContent()
-    public generateDataContent(model: ICategoryModel, partType: string): CategoryData | null
+    public generateDataContent(model: IAvatarEditorGridModel, partType: string): CategoryData | null
     {
         if(model === null || partType === '') return null;
 
@@ -790,7 +839,7 @@ export class HabboAvatarEditor implements ICategoryModelOwner
      * of one `clone()`; the manager builds the real, window-backed item.
      */
     private createPartItem(
-        model: ICategoryModel,
+        model: IAvatarEditorGridModel,
         partSet: IFigurePartSet | null,
         colours: unknown[] | null,
         colourable: boolean,
@@ -802,7 +851,7 @@ export class HabboAvatarEditor implements ICategoryModelOwner
 
     // TS-only: the colour half of `createPartItem()` — same reasoning.
     private createColorItem(
-        model: ICategoryModel,
+        model: IAvatarEditorGridModel,
         colour: unknown,
         disabled: boolean
     ): IAvatarEditorGridColorItem | null

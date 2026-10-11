@@ -5,7 +5,7 @@ import type {ITabButtonWindow} from '@ambreia/ui/components/ITabButtonWindow';
 import type {ITabContextWindow} from '@ambreia/ui/components/ITabContextWindow';
 import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
 import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
-import type {HabboAvatarEditor} from './HabboAvatarEditor';
+import type {IAvatarEditorViewHost} from './view/IAvatarEditorViewHost';
 import type {IAvatarEditorGridView} from './common/ICategoryView';
 import type {IAvatarEditorView} from './view/IAvatarEditorView';
 import {Logger} from '@ambreia/common/utils/Logger';
@@ -74,7 +74,7 @@ export class AvatarEditorView implements IAvatarEditorView
 
     // AS3: .../avatar/AvatarEditorView.as::_editor
     // Name DERIVED (`_SafeStr_4578`): the field behind `get editor()`.
-    private _editor: HabboAvatarEditor | null;
+    private _editor: IAvatarEditorViewHost | null;
 
     // AS3: .../avatar/AvatarEditorView.as::_window
     // Name DERIVED (`_SafeStr_4585`): the `AvatarEditorContent` body, with or without a frame.
@@ -151,7 +151,7 @@ export class AvatarEditorView implements IAvatarEditorView
      * requested list is validated against it, so an editor asking for `effects` on a hotel that
      * disables them fails validation rather than silently dropping the tab.
      */
-    constructor(editor: HabboAvatarEditor, categories: string[] | null)
+    constructor(editor: IAvatarEditorViewHost, categories: string[] | null)
     {
         this._editor = editor;
 
@@ -170,7 +170,7 @@ export class AvatarEditorView implements IAvatarEditorView
     }
 
     // AS3: .../avatar/AvatarEditorView.as::get editor()
-    public get editor(): HabboAvatarEditor | null
+    public get editor(): IAvatarEditorViewHost | null
     {
         return this._editor;
     }
@@ -472,7 +472,9 @@ export class AvatarEditorView implements IAvatarEditorView
                 }
 
                 this._avatarEditorNameChangeView = new AvatarEditorNameChangeView(
-                    this, (this._window?.x ?? 0) + (this._window?.width ?? 0), this._window?.y ?? 0
+                    this._editor?.manager ?? null,
+                    (this._window?.x ?? 0) + (this._window?.width ?? 0),
+                    this._window?.y ?? 0
                 );
                 break;
         }
@@ -676,7 +678,7 @@ export class AvatarEditorView implements IAvatarEditorView
      * timeout, so the user cannot hammer it. A development editor skips both checks.
      */
     // AS3: .../avatar/AvatarEditorView.as::windowEventProc() — the "save" case
-    private onSaveClicked(editor: HabboAvatarEditor): void
+    private onSaveClicked(editor: IAvatarEditorViewHost): void
     {
         if(!editor.isDevelopmentEditor() && editor.hasInvalidSellableItems())
         {

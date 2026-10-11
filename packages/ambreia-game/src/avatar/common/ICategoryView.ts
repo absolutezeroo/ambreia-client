@@ -1,5 +1,5 @@
 import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
-import type {ICategoryModel} from './ICategoryModel';
+import type {IAvatarEditorGridModel} from './IAvatarEditorGridModel';
 
 /**
  * The window side of one editor page.
@@ -50,7 +50,7 @@ export interface IAvatarEditorGridView
     readonly window: IWindowContainer | null;
 
     // AS3: .../avatar/common/_SafeCls_3071.as::initFromList()
-    initFromList(model: ICategoryModel, partType: string): void;
+    initFromList(model: IAvatarEditorGridModel, partType: string): void;
 
     // AS3: .../avatar/common/_SafeCls_3071.as::showPalettes()
     showPalettes(count: number): void;

@@ -5,7 +5,7 @@ import type {IScrollableGridWindow} from '@ambreia/ui/components/IScrollableGrid
 import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
 import type {IAvatarEditorGridView} from './ICategoryView';
-import type {ICategoryModel} from './ICategoryModel';
+import type {IAvatarEditorGridModel} from './IAvatarEditorGridModel';
 
 /**
  * The one grid every tabbed page shares — thumbnails on top, up to two colour palettes below.
@@ -39,7 +39,7 @@ export class AvatarEditorGridView implements IAvatarEditorGridView
 
     // AS3: .../avatar/common/AvatarEditorGridView.as::_model
     // Name DERIVED (`_SafeStr_4570`): the page whose parts are currently in the grid.
-    private _model: ICategoryModel | null = null;
+    private _model: IAvatarEditorGridModel | null = null;
 
     // AS3: .../avatar/common/AvatarEditorGridView.as::_thumbs
     // Name DERIVED (`_SafeStr_5336`).
@@ -98,7 +98,7 @@ export class AvatarEditorGridView implements IAvatarEditorGridView
      * be searched for across both palettes.
      */
     // AS3: .../avatar/common/AvatarEditorGridView.as::initFromList()
-    public initFromList(model: ICategoryModel, partType: string): void
+    public initFromList(model: IAvatarEditorGridModel, partType: string): void
     {
         const data = model.getCategoryData(partType);
 
@@ -268,9 +268,9 @@ export class AvatarEditorGridView implements IAvatarEditorGridView
         {
             case AvatarEditorGridView.GET_MORE:
             {
-                const manager = this._model?.controller?.manager ?? null;
+                const model = this._model;
 
-                manager?.openCatalogPage(manager.getProperty('catalog.clothes.page'));
+                if(model !== null) model.openCatalogPage(model.getProperty('catalog.clothes.page'));
 
                 return;
             }

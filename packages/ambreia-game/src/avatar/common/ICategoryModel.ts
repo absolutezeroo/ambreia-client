@@ -1,7 +1,7 @@
 import type {IWindow} from '@ambreia/ui/IWindow';
-import type {CategoryData} from './CategoryData';
 import type {ICategoryModelOwner} from './ICategoryModelOwner';
 import type {IFigureSetOwnership} from './IFigureSetOwnership';
+import type {IAvatarEditorGridModel} from './IAvatarEditorGridModel';
 
 /**
  * One page of the avatar editor — body, head, torso, legs, misc, hot looks or effects.
@@ -16,7 +16,7 @@ import type {IFigureSetOwnership} from './IFigureSetOwnership';
  *
  * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/common/_SafeCls_2660.as
  */
-export interface ICategoryModel
+export interface ICategoryModel extends IAvatarEditorGridModel
 {
     // AS3: .../avatar/common/_SafeCls_2660.as::dispose()
     dispose(): void;
@@ -33,15 +33,6 @@ export interface ICategoryModel
 
     // AS3: .../avatar/common/_SafeCls_2660.as::switchCategory()
     switchCategory(partType?: string): void;
-
-    // AS3: .../avatar/common/_SafeCls_2660.as::getCategoryData()
-    getCategoryData(partType: string): CategoryData | null;
-
-    // AS3: .../avatar/common/_SafeCls_2660.as::selectPart()
-    selectPart(partType: string, index: number): void;
-
-    // AS3: .../avatar/common/_SafeCls_2660.as::selectColor()
-    selectColor(partType: string, index: number, layer: number): void;
 
     // AS3: .../avatar/common/_SafeCls_2660.as::hasClubItemsOverLevel()
     hasClubItemsOverLevel(clubLevel: number): boolean;

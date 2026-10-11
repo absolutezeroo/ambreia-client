@@ -56,6 +56,31 @@ export class CategoryBaseModel implements ICategoryModel
         return this._controller;
     }
 
+    public get avatarRenderManager()
+    {
+        return this._controller?.avatarRenderManager ?? null;
+    }
+
+    public get windowManager()
+    {
+        return this._controller?.windowManager ?? null;
+    }
+
+    public getAssetBitmap(name: string): ImageBitmap | null
+    {
+        return this._controller?.getAssetBitmap(name) ?? null;
+    }
+
+    public getProperty(key: string): string
+    {
+        return this._controller?.getProperty(key) ?? '';
+    }
+
+    public openCatalogPage(pageName: string): void
+    {
+        this._controller?.openCatalogPage(pageName);
+    }
+
     /**
      * Throws the grids away and clears the initialised flag, so the next `switchCategory()` or
      * `getWindowContainer()` rebuilds them — that is how a gender change or a club-level change

@@ -1,6 +1,7 @@
 import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
 import type {IFigureDataOwner} from './IFigureDataOwner';
 import type {IFigureDataView} from './IFigureDataView';
+import type {IFigureData} from './IFigureData';
 import {FigureDataView} from './FigureDataView';
 
 /**
@@ -15,7 +16,7 @@ import {FigureDataView} from './FigureDataView';
  *
  * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/figuredata/FigureData.as
  */
-export class FigureData implements IAvatarImageListener
+export class FigureData implements IFigureData, IAvatarImageListener
 {
     // AS3: .../avatar/figuredata/FigureData.as::MALE
     public static readonly MALE: string = 'M';
@@ -104,7 +105,7 @@ export class FigureData implements IAvatarImageListener
         // port's addition, kept so a caller can inject one; left null it now behaves as AS3 does.
         // The editor's window already exists by this point — `HabboAvatarEditor.init()` builds the
         // view before the figures, precisely so this lookup finds the preview slot.
-        this._view = view ?? new FigureDataView(this);
+        this._view = view ?? new FigureDataView(avatarEditor);
     }
 
     // AS3: .../avatar/figuredata/FigureData.as::get disposed()

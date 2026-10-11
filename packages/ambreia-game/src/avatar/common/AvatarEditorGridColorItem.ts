@@ -4,7 +4,7 @@ import type {IBitmapWrapperWindow} from '@ambreia/ui/components/IBitmapWrapperWi
 import type {IStaticBitmapWrapperWindow} from '@ambreia/ui/components/IStaticBitmapWrapperWindow';
 import type {IPartColor} from '@ambreia/avatar/structure/figure/IPartColor';
 import type {IAvatarEditorGridColorItem} from './IAvatarEditorGridItem';
-import type {ICategoryModel} from './ICategoryModel';
+import type {IAvatarEditorGridModel} from './IAvatarEditorGridModel';
 import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
 
 /**
@@ -37,7 +37,7 @@ export class AvatarEditorGridColorItem implements IAvatarEditorGridColorItem
     // AS3: .../avatar/common/AvatarEditorGridColorItem.as::_model
     // Name DERIVED (`_SafeStr_4570`): the page this swatch belongs to; used only to reach the
     // asset library.
-    private _model: ICategoryModel | null;
+    private _model: IAvatarEditorGridModel | null;
 
     // AS3: .../avatar/common/AvatarEditorGridColorItem.as::_window
     private _window: IWindowContainer | null;
@@ -59,7 +59,7 @@ export class AvatarEditorGridColorItem implements IAvatarEditorGridColorItem
     // AS3: .../avatar/common/AvatarEditorGridColorItem.as::AvatarEditorGridColorItem()
     constructor(
         window: IWindowContainer | null,
-        model: ICategoryModel | null,
+        model: IAvatarEditorGridModel | null,
         partColor: IPartColor | null,
         isDisabledForWearing: boolean = false
     )
@@ -203,11 +203,9 @@ export class AvatarEditorGridColorItem implements IAvatarEditorGridColorItem
         clubIcon.visible = this._partColor !== null && this._partColor.clubLevel > 0;
     }
 
-    // TS-only: AS3 reaches the library as `model.controller.manager.windowManager.assets`.
+    // TS-only: the grid model exposes the asset lookup directly instead of walking the editor owner chain.
     private getAsset(name: string): ImageBitmap | null
     {
-        const controller = this._model?.controller as {getAssetBitmap?(n: string): ImageBitmap | null} | null;
-
-        return controller?.getAssetBitmap?.(name) ?? null;
+        return this._model?.getAssetBitmap(name) ?? null;
     }
 }

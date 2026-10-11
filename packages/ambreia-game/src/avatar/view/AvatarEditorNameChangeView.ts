@@ -4,8 +4,8 @@ import type {IFrameWindow} from '@ambreia/ui/components/IFrameWindow';
 import type {ITextFieldWindow} from '@ambreia/ui/components/ITextFieldWindow';
 import type {ITextWindow} from '@ambreia/ui/components/ITextWindow';
 import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
-import type {AvatarEditorView} from '../AvatarEditorView';
 import type {IHabboAvatarEditorHost} from '../IHabboAvatarEditorHost';
+import type {IAvatarEditorNameChangeView} from './IAvatarEditorNameChangeView';
 import {AvatarEditorNameSuggestionListRenderer} from './AvatarEditorNameSuggestionListRenderer';
 import {CheckUserNameResultMessageEvent} from '@ambreia/protocol/incoming/help/CheckUserNameResultMessageEvent';
 import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
@@ -24,7 +24,7 @@ import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
  *
  * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/view/AvatarEditorNameChangeView.as
  */
-export class AvatarEditorNameChangeView
+export class AvatarEditorNameChangeView implements IAvatarEditorNameChangeView
 {
     // AS3: .../avatar/view/AvatarEditorNameChangeView.as::NAME_SUGGESTION_BG_COLOR
     // 0xC9EFF4. AS3 declares this a `private static var` rather than a const; nothing writes it,
@@ -46,10 +46,6 @@ export class AvatarEditorNameChangeView
 
     // AS3: .../avatar/view/AvatarEditorNameChangeView.as::_window
     private _window: IFrameWindow | null;
-
-    // AS3: .../avatar/view/AvatarEditorNameChangeView.as::_editorView
-    // Name DERIVED (`_SafeStr_4684`): held only to reach the manager, in the constructor.
-    private _editorView: AvatarEditorView | null;
 
     // AS3: .../avatar/view/AvatarEditorNameChangeView.as::_manager
     // Name DERIVED (`_SafeStr_4571`).
@@ -77,10 +73,9 @@ export class AvatarEditorNameChangeView
      * Opens at `(x, y)` — the editor's right-hand edge — and slides left if that would put it past
      * the desktop's right edge. There is no matching correction for the bottom.
      */
-    constructor(editorView: AvatarEditorView | null, x: number, y: number)
+    constructor(manager: IHabboAvatarEditorHost | null, x: number, y: number)
     {
-        this._editorView = editorView;
-        this._manager = editorView?.editor?.manager ?? null;
+        this._manager = manager;
         this._window = (this._manager?.windowManager?.buildWidgetLayout(
             AvatarEditorNameChangeView.LAYOUT_ASSET
         ) as IFrameWindow | null) ?? null;
@@ -340,7 +335,6 @@ export class AvatarEditorNameChangeView
         this._suggestionRenderer = null;
         this._window?.dispose();
         this._window = null;
-        this._editorView = null;
         this._manager = null;
     }
 
@@ -429,10 +423,4 @@ export class AvatarEditorNameChangeView
 
         if(chip !== null) chip.color = AvatarEditorNameChangeView.NAME_SUGGESTION_BG_COLOR;
     };
-
-    // TS-only: keeps the held-but-otherwise-unread AS3 field referenced.
-    private get unused(): unknown
-    {
-        return this._editorView;
-    }
 }

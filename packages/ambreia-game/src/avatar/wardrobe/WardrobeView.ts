@@ -2,10 +2,20 @@ import type {IWindow} from '@ambreia/ui/IWindow';
 import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 import type {IItemListWindow} from '@ambreia/ui/components/IItemListWindow';
 import type {ISideContentView} from '../common/ISideContent';
-import type {WardrobeModel} from './WardrobeModel';
+import type {WardrobeSlot} from './WardrobeSlot';
+import type {IWardrobeController} from './IWardrobeController';
 import {Logger} from '@ambreia/common/utils/Logger';
 
 const log = Logger.getLogger('habbo.avatar.wardrobe.WardrobeView');
+
+interface IWardrobeViewModel
+{
+    readonly controller: IWardrobeController | null;
+
+    readonly availableSlots: number;
+
+    readonly slots: WardrobeSlot[];
+}
 
 /**
  * The wardrobe panel: a horizontal list of columns, each a vertical list of seven slots.
@@ -31,7 +41,7 @@ export class WardrobeView implements ISideContentView
 
     // AS3: .../avatar/wardrobe/WardrobeView.as::_model
     // Name DERIVED (`_SafeStr_4570`).
-    private _model: WardrobeModel | null;
+    private _model: IWardrobeViewModel | null;
 
     // AS3: .../avatar/wardrobe/WardrobeView.as::_columnsList
     // Name DERIVED (`_SafeStr_5799`): the horizontal list the cloned columns go into.
@@ -54,11 +64,11 @@ export class WardrobeView implements ISideContentView
      *
      * The panel is built **hidden**; `AvatarEditorView.setSideContent()` is what shows it.
      */
-    constructor(model: WardrobeModel | null)
+    constructor(model: IWardrobeViewModel | null)
     {
         this._model = model;
 
-        const windowManager = model?.controller?.manager?.windowManager ?? null;
+        const windowManager = model?.controller?.windowManager ?? null;
 
         this._window = (windowManager?.buildWidgetLayout(WardrobeView.LAYOUT_ASSET) as IWindowContainer | null) ?? null;
 

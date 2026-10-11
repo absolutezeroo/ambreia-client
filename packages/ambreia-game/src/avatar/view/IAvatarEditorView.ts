@@ -3,7 +3,7 @@ import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 import type {IFrameWindow} from '@ambreia/ui/components/IFrameWindow';
 import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
 import type {IAvatarEditorGridView} from '../common/ICategoryView';
-import type {AvatarEditorNameChangeView} from './AvatarEditorNameChangeView';
+import type {IAvatarEditorNameChangeView} from './IAvatarEditorNameChangeView';
 
 /**
  * The window side of the avatar editor.
@@ -30,7 +30,7 @@ export interface IAvatarEditorView
     // AS3: .../avatar/AvatarEditorView.as::get avatarEditorNameChangeView()
     // Null until the rename button is clicked once — the dialog is built lazily, which is why
     // `AvatarEditorMessageHandler.onCheckUserNameResult()` drops a result that arrives before then.
-    readonly avatarEditorNameChangeView: AvatarEditorNameChangeView | null;
+    readonly avatarEditorNameChangeView: IAvatarEditorNameChangeView | null;
 
     // AS3: .../avatar/AvatarEditorView.as::get effectsParamViewContainer()
     readonly effectsParamViewContainer: IWindowContainer | null;

@@ -1,0 +1,2230 @@
+diff --git a/packages/ambreia-avatar/src/enum/AvatarBodyPartType.ts b/packages/ambreia-avatar/src/enum/AvatarBodyPartType.ts
+deleted file mode 100644
+index 626267a..0000000
+--- a/packages/ambreia-avatar/src/enum/AvatarBodyPartType.ts
++++ /dev/null
+@@ -1,33 +0,0 @@
+-/**
+- * The six body parts the avatar's geometry addresses by name.
+- *
+- * Four of the six constants are `_SafeStr_N` in the primary tree and appear in no other tree, so
+- * their **names are derived from their values** — `leftitem`, `rightitem`, `leftarm`, `rightarm`
+- * spell themselves. `TORSO` and `HEAD` survive the obfuscator intact.
+- *
+- * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/enum/AvatarBodyPartType.as
+- */
+-export class AvatarBodyPartType
+-{
+-    // AS3: .../src/com/sulake/habbo/avatar/enum/AvatarBodyPartType.as::TORSO
+-    public static readonly TORSO: string = 'torso';
+-
+-    // Name DERIVED from the value (`_SafeStr_11353`).
+-    // AS3: .../src/com/sulake/habbo/avatar/enum/AvatarBodyPartType.as::_SafeStr_11353
+-    public static readonly LEFT_ITEM: string = 'leftitem';
+-
+-    // Name DERIVED from the value (`_SafeStr_11261`).
+-    // AS3: .../src/com/sulake/habbo/avatar/enum/AvatarBodyPartType.as::_SafeStr_11261
+-    public static readonly RIGHT_ITEM: string = 'rightitem';
+-
+-    // AS3: .../src/com/sulake/habbo/avatar/enum/AvatarBodyPartType.as::HEAD
+-    public static readonly HEAD: string = 'head';
+-
+-    // Name DERIVED from the value (`_SafeStr_11160`).
+-    // AS3: .../src/com/sulake/habbo/avatar/enum/AvatarBodyPartType.as::_SafeStr_11160
+-    public static readonly LEFT_ARM: string = 'leftarm';
+-
+-    // Name DERIVED from the value (`_SafeStr_11111`).
+-    // AS3: .../src/com/sulake/habbo/avatar/enum/AvatarBodyPartType.as::_SafeStr_11111
+-    public static readonly RIGHT_ARM: string = 'rightarm';
+-}
+diff --git a/packages/ambreia-avatar/src/enum/AvatarFigurePartType.ts b/packages/ambreia-avatar/src/enum/AvatarFigurePartType.ts
+deleted file mode 100644
+index 60124b9..0000000
+--- a/packages/ambreia-avatar/src/enum/AvatarFigurePartType.ts
++++ /dev/null
+@@ -1,80 +0,0 @@
+-/**
+- * Avatar figure part type identifiers.
+- *
+- * @see sources/win63_version/habbo/avatar/enum/AvatarFigurePartType.as
+- */
+-export class AvatarFigurePartType
+-{
+-    // AS3: .../src/com/sulake/habbo/avatar/enum/AvatarFigurePartType.as::BODY
+-    public static readonly BODY: string = 'bd';
+-    // AS3: .../src/com/sulake/habbo/avatar/enum/AvatarFigurePartType.as::SHOES
+-    public static readonly SHOES: string = 'sh';
+-    public static readonly LEGS: string = 'lg';
+-    // AS3: .../src/com/sulake/habbo/avatar/enum/AvatarFigurePartType.as::CHEST
+-    public static readonly CHEST: string = 'ch';
+-    public static readonly WAIST_ACCESSORY: string = 'wa';
+-    // AS3: .../src/com/sulake/habbo/avatar/enum/AvatarFigurePartType.as::CHEST_ACCESSORY
+-    public static readonly CHEST_ACCESSORY: string = 'ca';
+-    // AS3: .../src/com/sulake/habbo/avatar/enum/AvatarFigurePartType.as::HEAD
+-    public static readonly HEAD: string = 'hd';
+-    // AS3: .../src/com/sulake/habbo/avatar/enum/AvatarFigurePartType.as::HAIR
+-    public static readonly HAIR: string = 'hr';
+-    public static readonly FACE_ACCESSORY: string = 'fa';
+-    public static readonly EYE_ACCESSORY: string = 'ea';
+-    public static readonly HEAD_ACCESSORY: string = 'ha';
+-    public static readonly HEAD_ACCESSORY_EXTRA: string = 'he';
+-    // AS3: .../src/com/sulake/habbo/avatar/enum/AvatarFigurePartType.as::COAT_CHEST
+-    public static readonly COAT_CHEST: string = 'cc';
+-    // AS3: .../src/com/sulake/habbo/avatar/enum/AvatarFigurePartType.as::CHEST_PRINT
+-    public static readonly CHEST_PRINT: string = 'cp';
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/enum/AvatarFigurePartType.as::MISC
+-    public static readonly MISC: string = 'mc';
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/enum/AvatarFigurePartType.as::MISC_RIGHT
+-    public static readonly MISC_RIGHT: string = 'mcr';
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/enum/AvatarFigurePartType.as::_SafeStr_11626
+-    // AS3 name unrecoverable (obfuscated in every tree) - derived from pairing with MISC_RIGHT
+-    // ("mcr"), matching the LEFT_HAND/RIGHT_HAND, LEFT_SLEEVE/RIGHT_SLEEVE naming pattern used
+-    // throughout this enum.
+-    public static readonly MISC_LEFT: string = 'mcl';
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/enum/AvatarFigurePartType.as::PET
+-    public static readonly PET: string = 'pt';
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/enum/AvatarFigurePartType.as::PET_RIGHT
+-    public static readonly PET_RIGHT: string = 'ptr';
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/enum/AvatarFigurePartType.as::PET_LEFT
+-    public static readonly PET_LEFT: string = 'ptl';
+-    public static readonly LEFT_HAND_ITEM: string = 'li';
+-    public static readonly LEFT_HAND: string = 'lh';
+-    // AS3: .../src/com/sulake/habbo/avatar/enum/AvatarFigurePartType.as::LEFT_SLEEVE
+-    public static readonly LEFT_SLEEVE: string = 'ls';
+-    public static readonly RIGHT_HAND: string = 'rh';
+-    // AS3: .../src/com/sulake/habbo/avatar/enum/AvatarFigurePartType.as::RIGHT_SLEEVE
+-    public static readonly RIGHT_SLEEVE: string = 'rs';
+-    public static readonly FACE: string = 'fc';
+-    // AS3: .../src/com/sulake/habbo/avatar/enum/AvatarFigurePartType.as::EYES
+-    public static readonly EYES: string = 'ey';
+-    public static readonly HAIR_BIG: string = 'hrb';
+-    public static readonly RIGHT_HAND_ITEM: string = 'ri';
+-    // AS3: .../src/com/sulake/habbo/avatar/enum/AvatarFigurePartType.as::LEFT_COAT_SLEEVE
+-    public static readonly LEFT_COAT_SLEEVE: string = 'lc';
+-    // AS3: .../src/com/sulake/habbo/avatar/enum/AvatarFigurePartType.as::RIGHT_COAT_SLEEVE
+-    public static readonly RIGHT_COAT_SLEEVE: string = 'rc';
+-
+-    // AS3: .../src/com/sulake/habbo/avatar/enum/AvatarFigurePartType.as::FIGURE_SETS
+-    public static readonly FIGURE_SETS: string[] = [
+-        AvatarFigurePartType.SHOES,
+-        AvatarFigurePartType.LEGS,
+-        AvatarFigurePartType.CHEST,
+-        AvatarFigurePartType.WAIST_ACCESSORY,
+-        AvatarFigurePartType.CHEST_ACCESSORY,
+-        AvatarFigurePartType.HEAD,
+-        AvatarFigurePartType.HAIR,
+-        AvatarFigurePartType.FACE_ACCESSORY,
+-        AvatarFigurePartType.EYE_ACCESSORY,
+-        AvatarFigurePartType.HEAD_ACCESSORY,
+-        AvatarFigurePartType.HEAD_ACCESSORY_EXTRA,
+-        AvatarFigurePartType.COAT_CHEST,
+-        AvatarFigurePartType.CHEST_PRINT,
+-        AvatarFigurePartType.PET,
+-        AvatarFigurePartType.MISC
+-    ];
+-}
+diff --git a/packages/ambreia-avatar/src/enum/GeometryType.ts b/packages/ambreia-avatar/src/enum/GeometryType.ts
+deleted file mode 100644
+index a5592f4..0000000
+--- a/packages/ambreia-avatar/src/enum/GeometryType.ts
++++ /dev/null
+@@ -1,18 +0,0 @@
+-/**
+- * Avatar geometry type identifiers for body orientation.
+- *
+- * @see sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/enum/GeometryType.as (GeometryType)
+- */
+-export class GeometryType
+-{
+-    // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/enum/GeometryType.as::VERTICAL
+-    public static readonly VERTICAL: string = 'vertical';
+-    // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/enum/GeometryType.as::SITTING
+-    public static readonly SITTING: string = 'sitting';
+-    // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/enum/GeometryType.as::HORIZONTAL
+-    public static readonly HORIZONTAL: string = 'horizontal';
+-    // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/enum/GeometryType.as::SWIM
+-    public static readonly SWIM: string = 'swim';
+-    // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/enum/GeometryType.as::SNOWWARS_HORIZONTAL
+-    public static readonly SNOWWARS_HORIZONTAL: string = 'swhorizontal';
+-}
+diff --git a/packages/ambreia-common/src/utils/BitmapSlot.ts b/packages/ambreia-common/src/utils/BitmapSlot.ts
+deleted file mode 100644
+index 407eae2..0000000
+--- a/packages/ambreia-common/src/utils/BitmapSlot.ts
++++ /dev/null
+@@ -1,89 +0,0 @@
+-/**
+- * The port of a three-line idiom AS3 repeats at every bitmap-wrapper slot in the client:
+- *
+- *     var slot:BitmapData = new BitmapData(wrapper.width, wrapper.height);
+- *     slot.fillRect(slot.rect, 0);
+- *     slot.copyPixels(image, image.rect, new Point((slot.width - image.width) / 2,
+- *                                                 (slot.height - image.height) / 2));
+- *     wrapper.bitmap = slot;
+- *
+- * Two things it does that assigning the raw image does NOT:
+- * - the result is always exactly the slot's size, so the wrapper never scales it. A wrapper whose
+- *   layout does not switch stretching off will otherwise stretch whatever it is given to fill the
+- *   slot, which is how a 64x110 avatar came out as a distorted 100x150 one;
+- * - the image is centred, and cropped rather than shrunk when it is bigger than the slot.
+- *
+- * `PurchaseConfirmationDialog.setImage()` already carried this by hand; the inventory grids and
+- * previews (bots, pets) assumed the wrapper would centre for them, and it does not.
+- *
+- * `offsetX`/`offsetY` nudge the centred image, which is the shape AS3 writes at the call sites that
+- * take one: the offsets are added to the centring term.
+- *
+- * TS-only in the sense that AS3 has no such shared function — it inlines these lines per call site.
+- */
+-export function drawIntoBitmapSlot(
+-    image: ImageBitmap | null,
+-    slotWidth: number,
+-    slotHeight: number,
+-    closeSource: boolean = true,
+-    offsetX: number = 0,
+-    offsetY: number = 0
+-): ImageBitmap | null
+-{
+-    if(image === null) return null;
+-
+-    const width = Math.max(1, Math.floor(slotWidth));
+-    const height = Math.max(1, Math.floor(slotHeight));
+-    const canvas = new OffscreenCanvas(width, height);
+-    const context = canvas.getContext('2d');
+-
+-    if(context === null) return null;
+-
+-    context.drawImage(
+-        image,
+-        Math.floor((width - image.width) * 0.5) + offsetX,
+-        Math.floor((height - image.height) * 0.5) + offsetY
+-    );
+-
+-    const result = canvas.transferToImageBitmap();
+-
+-    // AS3 hands the source BitmapData's lifetime to the caller; here the source is a throwaway
+-    // render in every current call site, so it is released unless the caller says otherwise.
+-    if(closeSource) image.close();
+-
+-    return result;
+-}
+-
+-/**
+- * Turns a *loaded* `HTMLImageElement` into an `ImageBitmap`, synchronously.
+- *
+- * BadgeImageManager caches `HTMLImageElement`s — it loads them through the hotel's image library,
+- * which has no ImageBitmap path — while every window's `bitmap` takes an `ImageBitmap`. The
+- * obvious bridge, `createImageBitmap()`, is async, and AS3's badge getters are not: in Flash
+- * `getGroupBadgeImage()` hands back a BitmapData that is either already decoded or null, and
+- * callers just return it inline. Drawing into an OffscreenCanvas and calling
+- * `transferToImageBitmap()` gives that same synchronous shape.
+- *
+- * Returns null for an image that has not finished loading, which is the null AS3 would have
+- * returned at that moment anyway — the caller gets the badge on a later repaint.
+- *
+- * TS-only: no AS3 counterpart; Flash has one bitmap type where this port has two.
+- */
+-export function imageElementToBitmap(image: HTMLImageElement | null): ImageBitmap | null
+-{
+-    if(image === null || !image.complete) return null;
+-
+-    const width = image.naturalWidth;
+-    const height = image.naturalHeight;
+-
+-    if(width === 0 || height === 0) return null;
+-
+-    const canvas = new OffscreenCanvas(width, height);
+-    const context = canvas.getContext('2d');
+-
+-    if(context === null) return null;
+-
+-    context.drawImage(image, 0, 0);
+-
+-    return canvas.transferToImageBitmap();
+-}
+diff --git a/packages/ambreia-common/src/utils/DateTimeFormatter.ts b/packages/ambreia-common/src/utils/DateTimeFormatter.ts
+deleted file mode 100644
+index 1ef574c..0000000
+--- a/packages/ambreia-common/src/utils/DateTimeFormatter.ts
++++ /dev/null
+@@ -1,42 +0,0 @@
+-/**
+- * DateTimeFormatter — minimal port of flash.globalization.DateTimeFormatter covering the pattern-based
+- * formatting the wired system needs. The Flash class is locale-aware; this shim ignores the locale (the
+- * only caller uses "en-US" with a fixed numeric pattern) and formats from the pattern's tokens in local
+- * time (matching Flash's default and the round-trip against Date.parse the caller relies on).
+- *
+- * Supported tokens: yyyy (4-digit year), MM (2-digit month), dd (2-digit day), HH (2-digit 24h hour),
+- * mm (2-digit minute), ss (2-digit second). Any other characters are emitted literally. Tokens are
+- * case-sensitive (MM = month, mm = minute), so a single left-to-right pass has no collisions.
+- *
+- * AS3 (Flash SDK): flash.globalization.DateTimeFormatter — used by the wired DATE_RANGE_ACTIVE condition.
+- */
+-export class DateTimeFormatter
+-{
+-    // AS3: the active dateTimePattern (Flash defaults to a locale pattern; the wired caller always sets it).
+-    private _pattern: string = 'yyyy/MM/dd HH:mm';
+-
+-    // AS3: new DateTimeFormatter(requestedLocaleIDName) — locale is accepted but unused (numeric pattern only).
+-    constructor(_locale: string)
+-    {
+-    }
+-
+-    // AS3: DateTimeFormatter.setDateTimePattern()
+-    setDateTimePattern(pattern: string): void
+-    {
+-        this._pattern = pattern;
+-    }
+-
+-    // AS3: DateTimeFormatter.format()
+-    format(date: Date): string
+-    {
+-        const pad = (value: number, length: number): string => value.toString().padStart(length, '0');
+-
+-        return this._pattern
+-            .replace(/yyyy/g, pad(date.getFullYear(), 4))
+-            .replace(/MM/g, pad(date.getMonth() + 1, 2))
+-            .replace(/dd/g, pad(date.getDate(), 2))
+-            .replace(/HH/g, pad(date.getHours(), 2))
+-            .replace(/mm/g, pad(date.getMinutes(), 2))
+-            .replace(/ss/g, pad(date.getSeconds(), 2));
+-    }
+-}
+diff --git a/packages/ambreia-game/src/avatar/AvatarEditorView.ts b/packages/ambreia-game/src/avatar/AvatarEditorView.ts
+index f62c4d0..8eef007 100644
+--- a/packages/ambreia-game/src/avatar/AvatarEditorView.ts
++++ b/packages/ambreia-game/src/avatar/AvatarEditorView.ts
+@@ -5,7 +5,7 @@ import type {ITabButtonWindow} from '@ambreia/ui/components/ITabButtonWindow';
+ import type {ITabContextWindow} from '@ambreia/ui/components/ITabContextWindow';
+ import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
+ import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
+-import type {HabboAvatarEditor} from './HabboAvatarEditor';
++import type {IAvatarEditorViewHost} from './view/IAvatarEditorViewHost';
+ import type {IAvatarEditorGridView} from './common/ICategoryView';
+ import type {IAvatarEditorView} from './view/IAvatarEditorView';
+ import {Logger} from '@ambreia/common/utils/Logger';
+@@ -74,7 +74,7 @@ export class AvatarEditorView implements IAvatarEditorView
+ 
+     // AS3: .../avatar/AvatarEditorView.as::_editor
+     // Name DERIVED (`_SafeStr_4578`): the field behind `get editor()`.
+-    private _editor: HabboAvatarEditor | null;
++    private _editor: IAvatarEditorViewHost | null;
+ 
+     // AS3: .../avatar/AvatarEditorView.as::_window
+     // Name DERIVED (`_SafeStr_4585`): the `AvatarEditorContent` body, with or without a frame.
+@@ -151,7 +151,7 @@ export class AvatarEditorView implements IAvatarEditorView
+      * requested list is validated against it, so an editor asking for `effects` on a hotel that
+      * disables them fails validation rather than silently dropping the tab.
+      */
+-    constructor(editor: HabboAvatarEditor, categories: string[] | null)
++    constructor(editor: IAvatarEditorViewHost, categories: string[] | null)
+     {
+         this._editor = editor;
+ 
+@@ -170,7 +170,7 @@ export class AvatarEditorView implements IAvatarEditorView
+     }
+ 
+     // AS3: .../avatar/AvatarEditorView.as::get editor()
+-    public get editor(): HabboAvatarEditor | null
++    public get editor(): IAvatarEditorViewHost | null
+     {
+         return this._editor;
+     }
+@@ -472,7 +472,9 @@ export class AvatarEditorView implements IAvatarEditorView
+                 }
+ 
+                 this._avatarEditorNameChangeView = new AvatarEditorNameChangeView(
+-                    this, (this._window?.x ?? 0) + (this._window?.width ?? 0), this._window?.y ?? 0
++                    this._editor?.manager ?? null,
++                    (this._window?.x ?? 0) + (this._window?.width ?? 0),
++                    this._window?.y ?? 0
+                 );
+                 break;
+         }
+@@ -676,7 +678,7 @@ export class AvatarEditorView implements IAvatarEditorView
+      * timeout, so the user cannot hammer it. A development editor skips both checks.
+      */
+     // AS3: .../avatar/AvatarEditorView.as::windowEventProc() — the "save" case
+-    private onSaveClicked(editor: HabboAvatarEditor): void
++    private onSaveClicked(editor: IAvatarEditorViewHost): void
+     {
+         if(!editor.isDevelopmentEditor() && editor.hasInvalidSellableItems())
+         {
+diff --git a/packages/ambreia-game/src/avatar/HabboAvatarEditor.ts b/packages/ambreia-game/src/avatar/HabboAvatarEditor.ts
+index 31ef783..6614136 100644
+--- a/packages/ambreia-game/src/avatar/HabboAvatarEditor.ts
++++ b/packages/ambreia-game/src/avatar/HabboAvatarEditor.ts
+@@ -8,7 +8,10 @@ import type {IPalette} from '@ambreia/avatar/structure/figure/IPalette';
+ import type {ISetType} from '@ambreia/avatar/structure/figure/ISetType';
+ import type {IAvatarEditorSaveListener} from './IAvatarEditorSaveListener';
+ import type {IAvatarEditorView} from './view/IAvatarEditorView';
++import type {IAvatarEditorViewHost} from './view/IAvatarEditorViewHost';
++import type {IFigureDataOwner} from './figuredata/IFigureDataOwner';
+ import type {ICategoryModel} from './common/ICategoryModel';
++import type {IAvatarEditorGridModel} from './common/IAvatarEditorGridModel';
+ import type {ICategoryModelOwner} from './common/ICategoryModelOwner';
+ import type {IAvatarEditorGridColorItem, IAvatarEditorGridPartItem} from './common/IAvatarEditorGridItem';
+ import type {IFigureSetOwnership} from './common/IFigureSetOwnership';
+@@ -28,6 +31,7 @@ import {LegsModel} from './legs/LegsModel';
+ import {MiscModel} from './misc/MiscModel';
+ import {TorsoModel} from './torso/TorsoModel';
+ import {WardrobeModel} from './wardrobe/WardrobeModel';
++import type {IWardrobeController} from './wardrobe/IWardrobeController';
+ import {
+     UpdateFigureDataMessageComposer
+ } from '@ambreia/protocol/outgoing/avatar/UpdateFigureDataMessageComposer';
+@@ -41,7 +45,7 @@ import {
+  *
+  * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/HabboAvatarEditor.as
+  */
+-export class HabboAvatarEditor implements ICategoryModelOwner
++export class HabboAvatarEditor implements ICategoryModelOwner, IFigureDataOwner, IAvatarEditorViewHost, IWardrobeController
+ {
+     // AS3: .../avatar/HabboAvatarEditor.as::DEFAULT_MALE_FIGURE
+     public static readonly DEFAULT_MALE_FIGURE: string =
+@@ -153,12 +157,57 @@ export class HabboAvatarEditor implements ICategoryModelOwner
+         return this._manager;
+     }
+ 
++    public get windowManager(): IHabboAvatarEditorHost['windowManager']
++    {
++        return this._manager?.windowManager ?? null;
++    }
++
++    public get connection(): IHabboAvatarEditorHost['connection']
++    {
++        return this._manager?.connection ?? null;
++    }
++
++    public get effectInventory(): IHabboAvatarEditorHost['effectInventory']
++    {
++        return this._manager?.effectInventory ?? null;
++    }
++
++    public get sessionData(): IHabboAvatarEditorHost['sessionData']
++    {
++        return this._manager?.sessionData ?? null;
++    }
++
++    public getProperty(key: string): string
++    {
++        return this._manager?.getProperty(key) ?? '';
++    }
++
++    public getBoolean(key: string): boolean
++    {
++        return this._manager?.getBoolean(key) ?? false;
++    }
++
++    public getInteger(key: string, defaultValue: number): number
++    {
++        return this._manager?.getInteger(key, defaultValue) ?? defaultValue;
++    }
++
++    public openCatalogPage(pageName: string): void
++    {
++        this._manager?.openCatalogPage(pageName);
++    }
++
+     // AS3: .../avatar/HabboAvatarEditor.as::get view()
+     public get view(): IAvatarEditorView | null
+     {
+         return this._view;
+     }
+ 
++    public getFigureContainer()
++    {
++        return this._view?.getFigureContainer() ?? null;
++    }
++
+     // AS3: .../avatar/HabboAvatarEditor.as::get figureData()
+     // Which of the two figures this returns follows `_gender`, so the whole editor swaps model
+     // when the user switches sex.
+@@ -471,7 +520,7 @@ export class HabboAvatarEditor implements ICategoryModelOwner
+      * the second palette treatment.
+      */
+     // AS3: .../avatar/HabboAvatarEditor.as::generateDataContent()
+-    public generateDataContent(model: ICategoryModel, partType: string): CategoryData | null
++    public generateDataContent(model: IAvatarEditorGridModel, partType: string): CategoryData | null
+     {
+         if(model === null || partType === '') return null;
+ 
+@@ -790,7 +839,7 @@ export class HabboAvatarEditor implements ICategoryModelOwner
+      * of one `clone()`; the manager builds the real, window-backed item.
+      */
+     private createPartItem(
+-        model: ICategoryModel,
++        model: IAvatarEditorGridModel,
+         partSet: IFigurePartSet | null,
+         colours: unknown[] | null,
+         colourable: boolean,
+@@ -802,7 +851,7 @@ export class HabboAvatarEditor implements ICategoryModelOwner
+ 
+     // TS-only: the colour half of `createPartItem()` — same reasoning.
+     private createColorItem(
+-        model: ICategoryModel,
++        model: IAvatarEditorGridModel,
+         colour: unknown,
+         disabled: boolean
+     ): IAvatarEditorGridColorItem | null
+diff --git a/packages/ambreia-game/src/avatar/HabboAvatarEditorManager.ts b/packages/ambreia-game/src/avatar/HabboAvatarEditorManager.ts
+index 5d0804f..edb82db 100644
+--- a/packages/ambreia-game/src/avatar/HabboAvatarEditorManager.ts
++++ b/packages/ambreia-game/src/avatar/HabboAvatarEditorManager.ts
+@@ -11,7 +11,7 @@ import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
+ import type {IAvatarEditorSaveListener} from './IAvatarEditorSaveListener';
+ import type {IFigurePartSet} from '@ambreia/avatar/structure/figure/IFigurePartSet';
+ import type {IPartColor} from '@ambreia/avatar/structure/figure/IPartColor';
+-import type {ICategoryModel} from './common/ICategoryModel';
++import type {IAvatarEditorGridModel} from './common/IAvatarEditorGridModel';
+ import type {IFigureSetOwnership} from './common/IFigureSetOwnership';
+ import type {IHabboAvatarEditor} from './IHabboAvatarEditor';
+ import type {IHabboAvatarEditorHost} from './IHabboAvatarEditorHost';
+@@ -368,7 +368,7 @@ export class HabboAvatarEditorManager extends Component
+      * nothing.
+      */
+     public createGridPartItem(
+-        model: ICategoryModel,
++        model: IAvatarEditorGridModel,
+         partSet: IFigurePartSet | null,
+         colours: unknown[] | null,
+         colourable: boolean,
+@@ -388,7 +388,7 @@ export class HabboAvatarEditorManager extends Component
+     // TS-only: the colour equivalent, standing in for
+     // `new AvatarEditorGridColorItem(AvatarEditorView.COLOUR_WINDOW.clone(), ...)`.
+     public createGridColorItem(
+-        model: ICategoryModel,
++        model: IAvatarEditorGridModel,
+         colour: unknown,
+         disabled: boolean
+     ): AvatarEditorGridColorItem | null
+diff --git a/packages/ambreia-game/src/avatar/IHabboAvatarEditorHost.ts b/packages/ambreia-game/src/avatar/IHabboAvatarEditorHost.ts
+index 38155d7..4fb710a 100644
+--- a/packages/ambreia-game/src/avatar/IHabboAvatarEditorHost.ts
++++ b/packages/ambreia-game/src/avatar/IHabboAvatarEditorHost.ts
+@@ -5,7 +5,7 @@ import type {IHabboWindowManager} from '../window/IHabboWindowManager';
+ import type {IAvatarEffect} from './IAvatarEffect';
+ import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
+ import type {IFigurePartSet} from '@ambreia/avatar/structure/figure/IFigurePartSet';
+-import type {ICategoryModel} from './common/ICategoryModel';
++import type {IAvatarEditorGridModel} from './common/IAvatarEditorGridModel';
+ import type {
+     IAvatarEditorGridColorItem,
+     IAvatarEditorGridPartItem
+@@ -130,7 +130,7 @@ export interface IHabboAvatarEditorHost
+      */
+     // TS-only: stands in for AS3's inline `new AvatarEditorGridPartItem(...)`.
+     createGridPartItem(
+-        model: ICategoryModel,
++        model: IAvatarEditorGridModel,
+         partSet: IFigurePartSet | null,
+         colours: unknown[] | null,
+         colourable: boolean,
+@@ -140,7 +140,7 @@ export interface IHabboAvatarEditorHost
+     // TS-only: the colour equivalent, standing in for
+     // `new AvatarEditorGridColorItem(AvatarEditorView.COLOUR_WINDOW.clone(), …)`.
+     createGridColorItem(
+-        model: ICategoryModel,
++        model: IAvatarEditorGridModel,
+         colour: unknown,
+         disabled: boolean
+     ): IAvatarEditorGridColorItem | null;
+diff --git a/packages/ambreia-game/src/avatar/common/AvatarEditorGridColorItem.ts b/packages/ambreia-game/src/avatar/common/AvatarEditorGridColorItem.ts
+index 38bb041..37d6aa5 100644
+--- a/packages/ambreia-game/src/avatar/common/AvatarEditorGridColorItem.ts
++++ b/packages/ambreia-game/src/avatar/common/AvatarEditorGridColorItem.ts
+@@ -4,7 +4,7 @@ import type {IBitmapWrapperWindow} from '@ambreia/ui/components/IBitmapWrapperWi
+ import type {IStaticBitmapWrapperWindow} from '@ambreia/ui/components/IStaticBitmapWrapperWindow';
+ import type {IPartColor} from '@ambreia/avatar/structure/figure/IPartColor';
+ import type {IAvatarEditorGridColorItem} from './IAvatarEditorGridItem';
+-import type {ICategoryModel} from './ICategoryModel';
++import type {IAvatarEditorGridModel} from './IAvatarEditorGridModel';
+ import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
+ 
+ /**
+@@ -37,7 +37,7 @@ export class AvatarEditorGridColorItem implements IAvatarEditorGridColorItem
+     // AS3: .../avatar/common/AvatarEditorGridColorItem.as::_model
+     // Name DERIVED (`_SafeStr_4570`): the page this swatch belongs to; used only to reach the
+     // asset library.
+-    private _model: ICategoryModel | null;
++    private _model: IAvatarEditorGridModel | null;
+ 
+     // AS3: .../avatar/common/AvatarEditorGridColorItem.as::_window
+     private _window: IWindowContainer | null;
+@@ -59,7 +59,7 @@ export class AvatarEditorGridColorItem implements IAvatarEditorGridColorItem
+     // AS3: .../avatar/common/AvatarEditorGridColorItem.as::AvatarEditorGridColorItem()
+     constructor(
+         window: IWindowContainer | null,
+-        model: ICategoryModel | null,
++        model: IAvatarEditorGridModel | null,
+         partColor: IPartColor | null,
+         isDisabledForWearing: boolean = false
+     )
+@@ -203,11 +203,9 @@ export class AvatarEditorGridColorItem implements IAvatarEditorGridColorItem
+         clubIcon.visible = this._partColor !== null && this._partColor.clubLevel > 0;
+     }
+ 
+-    // TS-only: AS3 reaches the library as `model.controller.manager.windowManager.assets`.
++    // TS-only: the grid model exposes the asset lookup directly instead of walking the editor owner chain.
+     private getAsset(name: string): ImageBitmap | null
+     {
+-        const controller = this._model?.controller as {getAssetBitmap?(n: string): ImageBitmap | null} | null;
+-
+-        return controller?.getAssetBitmap?.(name) ?? null;
++        return this._model?.getAssetBitmap(name) ?? null;
+     }
+ }
+diff --git a/packages/ambreia-game/src/avatar/common/AvatarEditorGridPartItem.ts b/packages/ambreia-game/src/avatar/common/AvatarEditorGridPartItem.ts
+index 1bec4af..48c3be9 100644
+--- a/packages/ambreia-game/src/avatar/common/AvatarEditorGridPartItem.ts
++++ b/packages/ambreia-game/src/avatar/common/AvatarEditorGridPartItem.ts
+@@ -9,7 +9,7 @@ import {AvatarTextureUtils} from '../AvatarTextureUtils';
+ import type {IFigurePartSet} from '@ambreia/avatar/structure/figure/IFigurePartSet';
+ import type {IPartColor} from '@ambreia/avatar/structure/figure/IPartColor';
+ import type {IAvatarEditorGridPartItem} from './IAvatarEditorGridItem';
+-import type {ICategoryModel} from './ICategoryModel';
++import type {IAvatarEditorGridModel} from './IAvatarEditorGridModel';
+ import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
+ 
+ /** TS-only: the rectangle union `analyzePartLayers()` accumulates. */
+@@ -107,7 +107,7 @@ export class AvatarEditorGridPartItem implements IAvatarEditorGridPartItem, IAva
+ 
+     // AS3: .../avatar/common/AvatarEditorGridPartItem.as::_model
+     // Name DERIVED (`_SafeStr_4570`).
+-    private _model: ICategoryModel | null;
++    private _model: IAvatarEditorGridModel | null;
+ 
+     // AS3: .../avatar/common/AvatarEditorGridPartItem.as::_window
+     private _window: IWindowContainer | null;
+@@ -157,7 +157,7 @@ export class AvatarEditorGridPartItem implements IAvatarEditorGridPartItem, IAva
+     // AS3: .../avatar/common/AvatarEditorGridPartItem.as::AvatarEditorGridPartItem()
+     constructor(
+         window: IWindowContainer | null,
+-        model: ICategoryModel | null,
++        model: IAvatarEditorGridModel | null,
+         partSet: IFigurePartSet | null,
+         colors: (IPartColor | null)[] | null,
+         useColors: boolean = true,
+@@ -641,20 +641,15 @@ export class AvatarEditorGridPartItem implements IAvatarEditorGridPartItem, IAva
+     {
+         if(AvatarEditorGridPartItem._downloadIcon !== null) return AvatarEditorGridPartItem._downloadIcon;
+ 
+-        const controller = this._model?.controller as {getAssetBitmap?(n: string): ImageBitmap | null} | null;
+-
+         AvatarEditorGridPartItem._downloadIcon =
+-            controller?.getAssetBitmap?.(AvatarEditorGridPartItem.DOWNLOAD_ICON_ASSET) ?? null;
++            this._model?.getAssetBitmap(AvatarEditorGridPartItem.DOWNLOAD_ICON_ASSET) ?? null;
+ 
+         return AvatarEditorGridPartItem._downloadIcon;
+     }
+ 
+-    // TS-only: AS3 reaches it as `model.controller.manager.avatarRenderManager`.
++    // TS-only: the grid model exposes the avatar renderer directly instead of walking the editor owner chain.
+     private resolveRenderManager(): IAvatarRenderManager | null
+     {
+-        const controller = this._model?.controller as
+-            {avatarRenderManager?: IAvatarRenderManager | null} | null;
+-
+-        return controller?.avatarRenderManager ?? null;
++        return this._model?.avatarRenderManager ?? null;
+     }
+ }
+diff --git a/packages/ambreia-game/src/avatar/common/AvatarEditorGridView.ts b/packages/ambreia-game/src/avatar/common/AvatarEditorGridView.ts
+index 9040c76..15b171c 100644
+--- a/packages/ambreia-game/src/avatar/common/AvatarEditorGridView.ts
++++ b/packages/ambreia-game/src/avatar/common/AvatarEditorGridView.ts
+@@ -5,7 +5,7 @@ import type {IScrollableGridWindow} from '@ambreia/ui/components/IScrollableGrid
+ import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
+ import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
+ import type {IAvatarEditorGridView} from './ICategoryView';
+-import type {ICategoryModel} from './ICategoryModel';
++import type {IAvatarEditorGridModel} from './IAvatarEditorGridModel';
+ 
+ /**
+  * The one grid every tabbed page shares — thumbnails on top, up to two colour palettes below.
+@@ -39,7 +39,7 @@ export class AvatarEditorGridView implements IAvatarEditorGridView
+ 
+     // AS3: .../avatar/common/AvatarEditorGridView.as::_model
+     // Name DERIVED (`_SafeStr_4570`): the page whose parts are currently in the grid.
+-    private _model: ICategoryModel | null = null;
++    private _model: IAvatarEditorGridModel | null = null;
+ 
+     // AS3: .../avatar/common/AvatarEditorGridView.as::_thumbs
+     // Name DERIVED (`_SafeStr_5336`).
+@@ -98,7 +98,7 @@ export class AvatarEditorGridView implements IAvatarEditorGridView
+      * be searched for across both palettes.
+      */
+     // AS3: .../avatar/common/AvatarEditorGridView.as::initFromList()
+-    public initFromList(model: ICategoryModel, partType: string): void
++    public initFromList(model: IAvatarEditorGridModel, partType: string): void
+     {
+         const data = model.getCategoryData(partType);
+ 
+@@ -268,9 +268,9 @@ export class AvatarEditorGridView implements IAvatarEditorGridView
+         {
+             case AvatarEditorGridView.GET_MORE:
+             {
+-                const manager = this._model?.controller?.manager ?? null;
++                const model = this._model;
+ 
+-                manager?.openCatalogPage(manager.getProperty('catalog.clothes.page'));
++                if(model !== null) model.openCatalogPage(model.getProperty('catalog.clothes.page'));
+ 
+                 return;
+             }
+diff --git a/packages/ambreia-game/src/avatar/common/CategoryBaseModel.ts b/packages/ambreia-game/src/avatar/common/CategoryBaseModel.ts
+index d35bd9a..347c8f9 100644
+--- a/packages/ambreia-game/src/avatar/common/CategoryBaseModel.ts
++++ b/packages/ambreia-game/src/avatar/common/CategoryBaseModel.ts
+@@ -56,6 +56,31 @@ export class CategoryBaseModel implements ICategoryModel
+         return this._controller;
+     }
+ 
++    public get avatarRenderManager()
++    {
++        return this._controller?.avatarRenderManager ?? null;
++    }
++
++    public get windowManager()
++    {
++        return this._controller?.windowManager ?? null;
++    }
++
++    public getAssetBitmap(name: string): ImageBitmap | null
++    {
++        return this._controller?.getAssetBitmap(name) ?? null;
++    }
++
++    public getProperty(key: string): string
++    {
++        return this._controller?.getProperty(key) ?? '';
++    }
++
++    public openCatalogPage(pageName: string): void
++    {
++        this._controller?.openCatalogPage(pageName);
++    }
++
+     /**
+      * Throws the grids away and clears the initialised flag, so the next `switchCategory()` or
+      * `getWindowContainer()` rebuilds them — that is how a gender change or a club-level change
+diff --git a/packages/ambreia-game/src/avatar/common/IAvatarEditorGridModel.ts b/packages/ambreia-game/src/avatar/common/IAvatarEditorGridModel.ts
+new file mode 100644
+index 0000000..4e5b88c
+--- /dev/null
++++ b/packages/ambreia-game/src/avatar/common/IAvatarEditorGridModel.ts
+@@ -0,0 +1,23 @@
++import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
++import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
++import type {CategoryData} from './CategoryData';
++
++/**
++ * Model surface consumed by the editor's shared thumbnail grids.
++ *
++ * It deliberately contains no `controller` back-reference. The grids only need selection commands
++ * plus the rendering/window services used to paint their cells, so depending on this role keeps the
++ * model/view boundary one-way.
++ */
++export interface IAvatarEditorGridModel
++{
++    readonly avatarRenderManager: IAvatarRenderManager | null;
++    readonly windowManager: IHabboWindowManager | null;
++
++    getAssetBitmap(name: string): ImageBitmap | null;
++    getProperty(key: string): string;
++    openCatalogPage(pageName: string): void;
++    getCategoryData(partType: string): CategoryData | null;
++    selectPart(partType: string, index: number): void;
++    selectColor(partType: string, index: number, layer: number): void;
++}
+diff --git a/packages/ambreia-game/src/avatar/common/ICategoryModel.ts b/packages/ambreia-game/src/avatar/common/ICategoryModel.ts
+index 742edda..28d7f45 100644
+--- a/packages/ambreia-game/src/avatar/common/ICategoryModel.ts
++++ b/packages/ambreia-game/src/avatar/common/ICategoryModel.ts
+@@ -1,7 +1,7 @@
+ import type {IWindow} from '@ambreia/ui/IWindow';
+-import type {CategoryData} from './CategoryData';
+ import type {ICategoryModelOwner} from './ICategoryModelOwner';
+ import type {IFigureSetOwnership} from './IFigureSetOwnership';
++import type {IAvatarEditorGridModel} from './IAvatarEditorGridModel';
+ 
+ /**
+  * One page of the avatar editor — body, head, torso, legs, misc, hot looks or effects.
+@@ -16,7 +16,7 @@ import type {IFigureSetOwnership} from './IFigureSetOwnership';
+  *
+  * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/common/_SafeCls_2660.as
+  */
+-export interface ICategoryModel
++export interface ICategoryModel extends IAvatarEditorGridModel
+ {
+     // AS3: .../avatar/common/_SafeCls_2660.as::dispose()
+     dispose(): void;
+@@ -34,14 +34,8 @@ export interface ICategoryModel
+     // AS3: .../avatar/common/_SafeCls_2660.as::switchCategory()
+     switchCategory(partType?: string): void;
+ 
+-    // AS3: .../avatar/common/_SafeCls_2660.as::getCategoryData()
+-    getCategoryData(partType: string): CategoryData | null;
+ 
+-    // AS3: .../avatar/common/_SafeCls_2660.as::selectPart()
+-    selectPart(partType: string, index: number): void;
+ 
+-    // AS3: .../avatar/common/_SafeCls_2660.as::selectColor()
+-    selectColor(partType: string, index: number, layer: number): void;
+ 
+     // AS3: .../avatar/common/_SafeCls_2660.as::hasClubItemsOverLevel()
+     hasClubItemsOverLevel(clubLevel: number): boolean;
+diff --git a/packages/ambreia-game/src/avatar/common/ICategoryModelOwner.ts b/packages/ambreia-game/src/avatar/common/ICategoryModelOwner.ts
+index f9e2420..7fd2cbb 100644
+--- a/packages/ambreia-game/src/avatar/common/ICategoryModelOwner.ts
++++ b/packages/ambreia-game/src/avatar/common/ICategoryModelOwner.ts
+@@ -1,122 +1,48 @@
+ import type {IAvatarImage} from '@ambreia/avatar/IAvatarImage';
+-import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
+ import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
+-import type {FigureData} from '../figuredata/FigureData';
++import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
++import type {IConnection} from '@ambreia/net/connection/IConnection';
++import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
++import type {IAvatarEffect} from '../IAvatarEffect';
++import type {IFigureData} from '../figuredata/IFigureData';
+ import type {IAvatarEditorView} from '../view/IAvatarEditorView';
+-import type {IHabboAvatarEditorHost} from '../IHabboAvatarEditorHost';
+ import type {CategoryData} from './CategoryData';
+-import type {ICategoryModel} from './ICategoryModel';
++import type {IAvatarEditorGridModel} from './IAvatarEditorGridModel';
+ import type {IFigureSetOwnership} from './IFigureSetOwnership';
+ 
+ /**
+- * The editor surface a category page uses.
+- *
+- * TS-only: AS3's `CategoryBaseModel` holds a whole `HabboAvatarEditor` and reaches through it for
+- * six things — the figure being edited, the grid content for a part type, the club advert, the
+- * inventory and (from `BodyModel` alone) the avatar renderer. Narrowed to exactly those, the same
+- * technique slices 2 and 3 used, so the eight category models port and verify before
+- * `HabboAvatarEditor` exists. It will satisfy this interface as written, apart from the two
+- * members reached via `manager` — see `inventory` and `createAvatarImage` below.
++ * Editor-core surface consumed by category models and their views.
+  *
+- * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/HabboAvatarEditor.as
++ * The old port exposed the whole avatar-editor manager here. That made every page depend back on
++ * the editor host and closed one large model/view cycle. The members below are the exact services
++ * pages already used through that manager, flattened at the owner boundary.
+  */
+ export interface ICategoryModelOwner
+ {
+-    /**
+-     * The figure currently being edited. Read for the part/colour selection a category restores
+-     * itself from, and written when the user picks something.
+-     */
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/HabboAvatarEditor.as::get figureData()
+-    readonly figureData: FigureData | null;
+-
+-    /**
+-     * The editor's window. Every `CategoryBaseView` reaches through it twice — for its own page
+-     * container (`getCategoryContainer()`) and for the one shared grid (`gridView`).
+-     */
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/HabboAvatarEditor.as::get view()
++    readonly figureData: IFigureData | null;
+     readonly view: IAvatarEditorView | null;
++    readonly inventory: IFigureSetOwnership | null;
++    readonly avatarRenderManager: IAvatarRenderManager | null;
++    readonly windowManager: IHabboWindowManager | null;
++    readonly connection: IConnection | null;
++    readonly effectInventory: {
++        setEffectSelected(effectType: number): void;
++        deselectAllEffects(force: boolean): void;
++        getAvatarEffects(): IAvatarEffect[];
++    } | null;
+ 
+-    /**
+-     * The manager, for the two things a page's view asks of it: the clothes catalogue page id and
+-     * the call that opens it. Reached as `controller.manager.…` in AS3.
+-     */
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/HabboAvatarEditor.as::get manager()
+-    readonly manager: IHabboAvatarEditorHost | null;
+-
+-    /**
+-     * Read *and written* — `BodyView`'s two gender tabs assign it, which resets every page and
+-     * swaps the figure model underneath the whole editor.
+-     */
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/HabboAvatarEditor.as::get gender()
+     gender: string;
++    readonly clubMemberLevel: number;
+ 
+-    /**
+-     * Builds a part type's whole grid — every wearable thumbnail and both colour palettes,
+-     * filtered by gender, club level and ownership, and sorted.
+-     */
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/HabboAvatarEditor.as::generateDataContent()
+-    generateDataContent(model: ICategoryModel, partType: string): CategoryData | null;
+-
+-    /**
+-     * Opens the club advert. A category calls this instead of applying the choice when the user
+-     * clicks a dimmed club item.
+-     */
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/HabboAvatarEditor.as::openHabboClubAdWindow()
++    generateDataContent(model: IAvatarEditorGridModel, partType: string): CategoryData | null;
+     openHabboClubAdWindow(): void;
+-
+-    /**
+-     * Applies an effect to the edited figure and flags it so the save pushes it into the
+-     * inventory. `EffectsModel` is the only caller; −1 means "wear nothing".
+-     */
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/HabboAvatarEditor.as::setAvatarEffectType()
+     setAvatarEffectType(effectType: number): void;
+-
+-    /**
+-     * The club level the *editor* is working with, which is not always the session's — see
+-     * `HabboAvatarEditor.get clubMemberLevel()`. The two outfit pages pass it straight back into
+-     * `loadAvatarInEditor()`.
+-     */
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/HabboAvatarEditor.as::get clubMemberLevel()
+-    readonly clubMemberLevel: number;
+-
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/HabboAvatarEditor.as::loadAvatarInEditor()
+-    // How the hot-looks page actually wears what you clicked.
+     loadAvatarInEditor(figure: string, gender: string, clubLevel?: number): void;
+-
+-    /**
+-     * Whether the user owns a given sellable figure set.
+-     *
+-     * AS3 reaches this as `controller.manager.inventory`; flattened here because the manager is
+-     * not otherwise needed. See `IFigureSetOwnership` for why it may be null in this port.
+-     */
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/HabboAvatarEditorManager.as::get inventory()
+-    readonly inventory: IFigureSetOwnership | null;
+-
+-    /**
+-     * Renders a figure so a thumbnail can show it. Only `BodyModel` uses this, to draw each
+-     * candidate face on the user's own colours.
+-     *
+-     * AS3 reaches it as `controller.manager.avatarRenderManager.createAvatarImage(...)`; flattened
+-     * for the same reason as `inventory`.
+-     */
+-    /**
+-     * The renderer, for the grid items — `AvatarEditorGridPartItem` composites a thumbnail out of
+-     * its sprites. AS3 reaches it as `controller.manager.avatarRenderManager`.
+-     */
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/HabboAvatarEditorManager.as::get avatarRenderManager()
+-    readonly avatarRenderManager: IAvatarRenderManager | null;
+-
+-    /**
+-     * A named bitmap from the window manager's library — the colour chip, the download icon.
+-     * AS3 reaches it as `controller.manager.windowManager.assets.getAssetByName(...)`.
+-     */
+-    // TS-only: flattens that two-level reach; see `IHabboAvatarEditorHost.getAssetBitmap()`.
+     getAssetBitmap(name: string): ImageBitmap | null;
++    getProperty(key: string): string;
++    getBoolean(key: string): boolean;
++    openCatalogPage(pageName: string): void;
+ 
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/_SafeCls_581.as::createAvatarImage()
+-    // The port's IAvatarRenderManager takes a fifth `effectListener` argument that AS3's
+-    // four-argument call site leaves off; kept optional here so `HabboAvatarEditorManager` can
+-    // forward straight through.
+     createAvatarImage(
+         figureString: string,
+         scale: string,
+diff --git a/packages/ambreia-game/src/avatar/common/ICategoryView.ts b/packages/ambreia-game/src/avatar/common/ICategoryView.ts
+index efc4dec..8fffd5b 100644
+--- a/packages/ambreia-game/src/avatar/common/ICategoryView.ts
++++ b/packages/ambreia-game/src/avatar/common/ICategoryView.ts
+@@ -1,5 +1,5 @@
+ import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+-import type {ICategoryModel} from './ICategoryModel';
++import type {IAvatarEditorGridModel} from './IAvatarEditorGridModel';
+ 
+ /**
+  * The window side of one editor page.
+@@ -50,7 +50,7 @@ export interface IAvatarEditorGridView
+     readonly window: IWindowContainer | null;
+ 
+     // AS3: .../avatar/common/_SafeCls_3071.as::initFromList()
+-    initFromList(model: ICategoryModel, partType: string): void;
++    initFromList(model: IAvatarEditorGridModel, partType: string): void;
+ 
+     // AS3: .../avatar/common/_SafeCls_3071.as::showPalettes()
+     showPalettes(count: number): void;
+diff --git a/packages/ambreia-game/src/avatar/common/ISideContent.ts b/packages/ambreia-game/src/avatar/common/ISideContent.ts
+index 57ea49c..14843a1 100644
+--- a/packages/ambreia-game/src/avatar/common/ISideContent.ts
++++ b/packages/ambreia-game/src/avatar/common/ISideContent.ts
+@@ -1,5 +1,4 @@
+ import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+-import type {HabboAvatarEditor} from '../HabboAvatarEditor';
+ 
+ /**
+  * A panel beside the editor's pages rather than one of them — the wardrobe is the only one.
+@@ -17,11 +16,6 @@ export interface ISideContentModel
+     // AS3: .../avatar/common/ISideContentModel.as::reset()
+     reset(): void;
+ 
+-    // AS3: .../avatar/common/ISideContentModel.as::get controller()
+-    // Typed to the concrete editor, as in AS3 — `WardrobeSlot` reaches nine members through it,
+-    // which is well past what a narrow interface would be worth.
+-    readonly controller: HabboAvatarEditor | null;
+-
+     // AS3: .../avatar/common/ISideContentModel.as::getWindowContainer()
+     getWindowContainer(): IWindowContainer | null;
+ }
+diff --git a/packages/ambreia-game/src/avatar/effects/AvatarEditorGridViewEffects.ts b/packages/ambreia-game/src/avatar/effects/AvatarEditorGridViewEffects.ts
+index a092a66..1ec2814 100644
+--- a/packages/ambreia-game/src/avatar/effects/AvatarEditorGridViewEffects.ts
++++ b/packages/ambreia-game/src/avatar/effects/AvatarEditorGridViewEffects.ts
+@@ -3,8 +3,8 @@ import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+ import type {IItemGridWindow} from '@ambreia/ui/components/IItemGridWindow';
+ import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
+ import type {IAvatarEditorGridView} from '../common/ICategoryView';
+-import type {ICategoryModel} from '../common/ICategoryModel';
+-import type {EffectsModel} from './EffectsModel';
++import type {IAvatarEditorGridModel} from '../common/IAvatarEditorGridModel';
++import type {IEffectsGridModel} from './IEffectsGridModel';
+ import {AvatarEditorGridItemEffect} from './AvatarEditorGridItemEffect';
+ 
+ /**
+@@ -38,7 +38,7 @@ export class AvatarEditorGridViewEffects implements IAvatarEditorGridView
+ 
+     // AS3: .../avatar/effects/AvatarEditorGridViewEffects.as::_model
+     // Name DERIVED (`_SafeStr_4570`).
+-    private _model: ICategoryModel | null = null;
++    private _model: IEffectsGridModel | null = null;
+ 
+     // AS3: .../avatar/effects/AvatarEditorGridViewEffects.as::_partType
+     // Name DERIVED (`_SafeStr_7619`): always `effects`, but stored the same way as the clothing grid.
+@@ -93,14 +93,16 @@ export class AvatarEditorGridViewEffects implements IAvatarEditorGridView
+      * member.
+      */
+     // AS3: .../avatar/effects/AvatarEditorGridViewEffects.as::initFromList()
+-    public initFromList(model: ICategoryModel, partType: string): void
++    public initFromList(model: IAvatarEditorGridModel, partType: string): void
+     {
+-        this._model = model;
++        const effectsModel = model as IEffectsGridModel;
++
++        this._model = effectsModel;
+         this._partType = partType;
+ 
+         if(this._window !== null) this._window.visible = true;
+ 
+-        const effects = (model as EffectsModel).effects ?? [];
++        const effects = effectsModel.effects ?? [];
+ 
+         this._thumbs?.removeGridItems();
+         this._effectItems = [];
+@@ -115,8 +117,8 @@ export class AvatarEditorGridViewEffects implements IAvatarEditorGridView
+             if(this._notification !== null) this._notification.visible = false;
+             if(this._title !== null) this._title.visible = false;
+ 
+-            const windowManager = model.controller?.manager?.windowManager ?? null;
+-            const assets = model.controller?.manager ?? null;
++            const windowManager = effectsModel.windowManager;
++            const assets = effectsModel;
+ 
+             this.addGridItem(new AvatarEditorGridItemEffect(null, windowManager, assets));
+ 
+diff --git a/packages/ambreia-game/src/avatar/effects/EffectsModel.ts b/packages/ambreia-game/src/avatar/effects/EffectsModel.ts
+index 8a2738a..29a4e7f 100644
+--- a/packages/ambreia-game/src/avatar/effects/EffectsModel.ts
++++ b/packages/ambreia-game/src/avatar/effects/EffectsModel.ts
+@@ -48,7 +48,7 @@ export class EffectsModel extends CategoryBaseModel implements ICategoryModel
+     // AS3: .../avatar/effects/EffectsModel.as::get effects()
+     public get effects(): IAvatarEffect[]
+     {
+-        const inventory = this._controller?.manager?.effectInventory ?? null;
++        const inventory = this._controller?.effectInventory ?? null;
+ 
+         if(inventory === null) return [];
+ 
+@@ -134,7 +134,7 @@ export class EffectsModel extends CategoryBaseModel implements ICategoryModel
+         if(this._view !== null) return;
+ 
+         this._view = new EffectsView(this);
+-        this._paramView = new EffectsParamView(this, this._controller?.manager?.windowManager ?? null);
++        this._paramView = new EffectsParamView(this, this._controller?.windowManager ?? null);
+         this._view.init();
+     }
+ 
+diff --git a/packages/ambreia-game/src/avatar/effects/EffectsParamView.ts b/packages/ambreia-game/src/avatar/effects/EffectsParamView.ts
+index 55d3253..8d73f0a 100644
+--- a/packages/ambreia-game/src/avatar/effects/EffectsParamView.ts
++++ b/packages/ambreia-game/src/avatar/effects/EffectsParamView.ts
+@@ -4,7 +4,7 @@ import type {IBitmapWrapperWindow} from '@ambreia/ui/components/IBitmapWrapperWi
+ import type {ITextWindow} from '@ambreia/ui/components/ITextWindow';
+ import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
+ import type {IAvatarEffect} from '../IAvatarEffect';
+-import type {EffectsModel} from './EffectsModel';
++import type {ICategoryModelOwner} from '../common/ICategoryModelOwner';
+ import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
+ 
+ /**
+@@ -37,7 +37,7 @@ export class EffectsParamView implements IDisposable
+ 
+     // AS3: .../avatar/effects/EffectsParamView.as::_model
+     // Name DERIVED (`_SafeStr_4570`).
+-    private _model: EffectsModel | null;
++    private _model: {readonly controller: ICategoryModelOwner | null} | null;
+ 
+     // AS3: .../avatar/effects/EffectsParamView.as::_container
+     private _container: IWindowContainer | null;
+@@ -64,12 +64,12 @@ export class EffectsParamView implements IDisposable
+ 
+     // AS3: .../avatar/effects/EffectsParamView.as::EffectsParamView()
+     // AS3's third parameter is the asset library; unused there and not carried here.
+-    constructor(model: EffectsModel | null, windowManager: IHabboWindowManager | null)
++    constructor(model: {readonly controller: ICategoryModelOwner | null} | null, windowManager: IHabboWindowManager | null)
+     {
+         this._model = model;
+         this._windowManager = windowManager;
+         this._container = model?.controller?.view?.effectsParamViewContainer ?? null;
+-        this._catalogPageName = model?.controller?.manager?.getProperty(EffectsParamView.CATALOG_PAGE_KEY) ?? '';
++        this._catalogPageName = model?.controller?.getProperty(EffectsParamView.CATALOG_PAGE_KEY) ?? '';
+ 
+         this._container?.findChildByName('get_more_button')?.addEventListener(WindowMouseEvent.CLICK, this.onBuyButtonClick);
+ 
+@@ -229,7 +229,7 @@ export class EffectsParamView implements IDisposable
+     // AS3: .../avatar/effects/EffectsParamView.as::onBuyButtonClick()
+     private onBuyButtonClick = (): void =>
+     {
+-        this._model?.controller?.manager?.openCatalogPage(this._catalogPageName);
++        this._model?.controller?.openCatalogPage(this._catalogPageName);
+     };
+ 
+     /**
+diff --git a/packages/ambreia-game/src/avatar/effects/IEffectsGridModel.ts b/packages/ambreia-game/src/avatar/effects/IEffectsGridModel.ts
+new file mode 100644
+index 0000000..1750406
+--- /dev/null
++++ b/packages/ambreia-game/src/avatar/effects/IEffectsGridModel.ts
+@@ -0,0 +1,8 @@
++import type {IAvatarEffect} from '../IAvatarEffect';
++import type {IAvatarEditorGridModel} from '../common/IAvatarEditorGridModel';
++
++/** Model surface unique to the effects grid. */
++export interface IEffectsGridModel extends IAvatarEditorGridModel
++{
++    readonly effects: IAvatarEffect[];
++}
+diff --git a/packages/ambreia-game/src/avatar/events/LibraryLoadedEvent.ts b/packages/ambreia-game/src/avatar/events/LibraryLoadedEvent.ts
+deleted file mode 100644
+index 2426dd7..0000000
+--- a/packages/ambreia-game/src/avatar/events/LibraryLoadedEvent.ts
++++ /dev/null
+@@ -1,28 +0,0 @@
+-/**
+- * Event dispatched when an avatar asset library has finished loading.
+- *
+- * @see sources/win63_version/habbo/avatar/events/LibraryLoadedEvent.as
+- */
+-export class LibraryLoadedEvent
+-{
+-    constructor(type: string, library: string)
+-    {
+-        this._type = type;
+-        this._library = library;
+-    }
+-
+-    private _type: string;
+-
+-    public get type(): string
+-    {
+-        return this._type;
+-    }
+-
+-    private _library: string;
+-
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/events/LibraryLoadedEvent.as::get library()
+-    public get library(): string
+-    {
+-        return this._library;
+-    }
+-}
+diff --git a/packages/ambreia-game/src/avatar/figuredata/FigureData.ts b/packages/ambreia-game/src/avatar/figuredata/FigureData.ts
+index 14906b1..c61fa12 100644
+--- a/packages/ambreia-game/src/avatar/figuredata/FigureData.ts
++++ b/packages/ambreia-game/src/avatar/figuredata/FigureData.ts
+@@ -1,6 +1,7 @@
+ import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
+ import type {IFigureDataOwner} from './IFigureDataOwner';
+ import type {IFigureDataView} from './IFigureDataView';
++import type {IFigureData} from './IFigureData';
+ import {FigureDataView} from './FigureDataView';
+ 
+ /**
+@@ -15,7 +16,7 @@ import {FigureDataView} from './FigureDataView';
+  *
+  * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/figuredata/FigureData.as
+  */
+-export class FigureData implements IAvatarImageListener
++export class FigureData implements IFigureData, IAvatarImageListener
+ {
+     // AS3: .../avatar/figuredata/FigureData.as::MALE
+     public static readonly MALE: string = 'M';
+@@ -104,7 +105,7 @@ export class FigureData implements IAvatarImageListener
+         // port's addition, kept so a caller can inject one; left null it now behaves as AS3 does.
+         // The editor's window already exists by this point — `HabboAvatarEditor.init()` builds the
+         // view before the figures, precisely so this lookup finds the preview slot.
+-        this._view = view ?? new FigureDataView(this);
++        this._view = view ?? new FigureDataView(avatarEditor);
+     }
+ 
+     // AS3: .../avatar/figuredata/FigureData.as::get disposed()
+diff --git a/packages/ambreia-game/src/avatar/figuredata/FigureDataView.ts b/packages/ambreia-game/src/avatar/figuredata/FigureDataView.ts
+index 80bba51..c0e13f2 100644
+--- a/packages/ambreia-game/src/avatar/figuredata/FigureDataView.ts
++++ b/packages/ambreia-game/src/avatar/figuredata/FigureDataView.ts
+@@ -2,7 +2,7 @@ import type {IRoomPreviewerWidget} from '../../window/widgets/IRoomPreviewerWidg
+ import type {RoomPreviewer} from '../../room/preview/RoomPreviewer';
+ import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
+ import type {IFigureDataView} from './IFigureDataView';
+-import type {FigureData} from './FigureData';
++import type {IFigureDataOwner} from './IFigureDataOwner';
+ import {Logger} from '@ambreia/common/utils/Logger';
+ import {AvatarTextureUtils} from '../AvatarTextureUtils';
+ 
+@@ -44,7 +44,7 @@ export class FigureDataView implements IFigureDataView, IAvatarImageListener
+ 
+     // AS3: .../avatar/figuredata/FigureDataView.as::_figureData
+     // Name DERIVED (`_SafeStr_4570`).
+-    private _figureData: FigureData | null;
++    private _owner: IFigureDataOwner | null;
+ 
+     // AS3: .../avatar/figuredata/FigureDataView.as::_figureString
+     // The figure the last `update()` asked for; `avatarImageReady()` only repaints for a match.
+@@ -61,11 +61,11 @@ export class FigureDataView implements IFigureDataView, IAvatarImageListener
+      * previewer at all, and a throw in this constructor would abort `HabboAvatarEditor.init()`
+      * rather than merely leave the preview blank.
+      */
+-    constructor(figureData: FigureData | null)
++    constructor(owner: IFigureDataOwner | null)
+     {
+-        this._figureData = figureData;
++        this._owner = owner;
+ 
+-        const container = figureData?.avatarEditor?.view?.getFigureContainer() ?? null;
++        const container = owner?.getFigureContainer() ?? null;
+ 
+         this._widget = (container?.widget as IRoomPreviewerWidget | null) ?? null;
+ 
+@@ -147,7 +147,7 @@ export class FigureDataView implements IFigureDataView, IAvatarImageListener
+     // AS3: .../avatar/figuredata/FigureDataView.as::update()
+     private showRenderedFigure(figureString: string): void
+     {
+-        const image = this._figureData?.avatarEditor?.avatarRenderManager?.createAvatarImage(
++        const image = this._owner?.avatarRenderManager?.createAvatarImage(
+             figureString, FigureDataView.RENDER_SCALE, null, this, null
+         ) ?? null;
+ 
+diff --git a/packages/ambreia-game/src/avatar/figuredata/IFigureData.ts b/packages/ambreia-game/src/avatar/figuredata/IFigureData.ts
+new file mode 100644
+index 0000000..be6579e
+--- /dev/null
++++ b/packages/ambreia-game/src/avatar/figuredata/IFigureData.ts
+@@ -0,0 +1,22 @@
++/**
++ * Mutable figure state exposed to the avatar editor's pages.
++ *
++ * TS-only: the concrete `FigureData` owns serialization and preview plumbing too, while category
++ * models only need the state and edit operations below. Keeping that surface here prevents the
++ * page contracts from depending on the concrete figure implementation.
++ */
++export interface IFigureData
++{
++    readonly gender: string;
++    avatarEffectType: number;
++    direction: number;
++
++    loadAvatarData(figureString: string, gender: string): void;
++    getPartSetId(partType: string): number;
++    getColourIds(partType: string): number[];
++    getFigureString(): string;
++    getFigureStringWithFace(setId: number): string;
++    savePartData(partType: string, setId: number, colourIds: number[], update?: boolean): void;
++    savePartSetColourId(partType: string, colourIds: number[], update?: boolean): void;
++    updateView(): void;
++}
+diff --git a/packages/ambreia-game/src/avatar/figuredata/IFigureDataOwner.ts b/packages/ambreia-game/src/avatar/figuredata/IFigureDataOwner.ts
+index cffe3af..5b87d8e 100644
+--- a/packages/ambreia-game/src/avatar/figuredata/IFigureDataOwner.ts
++++ b/packages/ambreia-game/src/avatar/figuredata/IFigureDataOwner.ts
+@@ -1,4 +1,4 @@
+-import type {IAvatarEditorView} from '../view/IAvatarEditorView';
++import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
+ import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
+ /**
+  * The one thing `FigureData` asks of the editor that owns it.
+@@ -19,15 +19,8 @@ export interface IFigureDataOwner
+     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/HabboAvatarEditor.as::getDefaultColour()
+     getDefaultColour(partType: string): number;
+ 
+-    /**
+-     * The editor's window, for the one thing `FigureDataView` needs from it: the preview slot.
+-     *
+-     * AS3's `FigureData` holds the whole `HabboAvatarEditor` and reaches
+-     * `avatarEditor.view.getFigureContainer()`. This interface was narrowed to a single member back
+-     * when no view existed; it has to carry that reach now that one does.
+-     */
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/HabboAvatarEditor.as::get view()
+-    readonly view: IAvatarEditorView | null;
++    /** The preview slot used by `FigureDataView`. */
++    getFigureContainer(): IWidgetWindow | null;
+ 
+     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/HabboAvatarEditorManager.as::get avatarRenderManager()
+     // The fallback path renders a flat image when the room previewer is not up yet.
+diff --git a/packages/ambreia-game/src/avatar/hotlooks/HotLooksModel.ts b/packages/ambreia-game/src/avatar/hotlooks/HotLooksModel.ts
+index eb9f687..01a8071 100644
+--- a/packages/ambreia-game/src/avatar/hotlooks/HotLooksModel.ts
++++ b/packages/ambreia-game/src/avatar/hotlooks/HotLooksModel.ts
+@@ -116,7 +116,7 @@ export class HotLooksModel extends CategoryBaseModel implements ICategoryModel
+      * AS3: .../avatar/hotlooks/HotLooksModel.as::dispose()
+      *
+      * 🐛 Calls `super.dispose()` **first**, which nulls `_controller` — then guards the
+-     * unregistration on `controller && controller.manager && …`, which is now false. The message
++     * unregistration through the controller chain, which is now false. The message
+      * event is therefore **never removed**, and a disposed model keeps receiving hot-look pushes
+      * and keeps building `Outfit`s into a map it has already dropped. Kept as written.
+      */
+@@ -126,9 +126,9 @@ export class HotLooksModel extends CategoryBaseModel implements ICategoryModel
+ 
+         if(this._hotLooksEvent !== null)
+         {
+-            if(this._controller?.manager?.connection != null)
++            if(this._controller?.connection != null)
+             {
+-                this._controller.manager.connection.removeMessageEvent(this._hotLooksEvent);
++                this._controller.connection.removeMessageEvent(this._hotLooksEvent);
+             }
+ 
+             this._hotLooksEvent = null;
+@@ -160,7 +160,7 @@ export class HotLooksModel extends CategoryBaseModel implements ICategoryModel
+     // AS3: .../avatar/hotlooks/HotLooksModel.as::requestHotLooks()
+     private requestHotLooks(controller: ICategoryModelOwner | null): void
+     {
+-        const connection = controller?.manager?.connection ?? null;
++        const connection = controller?.connection ?? null;
+ 
+         if(connection === null) return;
+ 
+diff --git a/packages/ambreia-game/src/avatar/hotlooks/HotLooksView.ts b/packages/ambreia-game/src/avatar/hotlooks/HotLooksView.ts
+index 6c19ae9..cee75da 100644
+--- a/packages/ambreia-game/src/avatar/hotlooks/HotLooksView.ts
++++ b/packages/ambreia-game/src/avatar/hotlooks/HotLooksView.ts
+@@ -3,7 +3,16 @@ import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+ import type {IItemGridWindow} from '@ambreia/ui/components/IItemGridWindow';
+ import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
+ import type {ICategoryView} from '../common/ICategoryView';
+-import type {HotLooksModel} from './HotLooksModel';
++import type {ICategoryModelOwner} from '../common/ICategoryModelOwner';
++import type {Outfit} from '../wardrobe/Outfit';
++
++
++interface IHotLooksViewModel
++{
++    readonly controller: ICategoryModelOwner | null;
++    readonly hotLooks: Outfit[];
++    selectHotLook(index: number): void;
++}
+ 
+ /**
+  * The hot-looks page: a grid of outfits the hotel is currently showing off.
+@@ -21,14 +30,14 @@ export class HotLooksView implements ICategoryView
+ 
+     // AS3: .../avatar/hotlooks/HotLooksView.as::_model
+     // Name DERIVED (`_SafeStr_4570`).
+-    private _model: HotLooksModel | null;
++    private _model: IHotLooksViewModel | null;
+ 
+     // AS3: .../avatar/hotlooks/HotLooksView.as::_grid
+     // Name DERIVED (`_SafeStr_6333`).
+     private _grid: IItemGridWindow | null = null;
+ 
+     // AS3: .../avatar/hotlooks/HotLooksView.as::HotLooksView()
+-    constructor(model: HotLooksModel | null)
++    constructor(model: IHotLooksViewModel | null)
+     {
+         this._model = model;
+     }
+diff --git a/packages/ambreia-game/src/avatar/pets/PetType.ts b/packages/ambreia-game/src/avatar/pets/PetType.ts
+deleted file mode 100644
+index 2995855..0000000
+--- a/packages/ambreia-game/src/avatar/pets/PetType.ts
++++ /dev/null
+@@ -1,44 +0,0 @@
+-/**
+- * Pet type identifiers.
+- *
+- * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/pets/_SafeCls_3584.as (PetType)
+- */
+-export class PetType
+-{
+-    public static readonly DOG: number = 0;
+-    public static readonly CAT: number = 1;
+-    public static readonly CROCODILE: number = 2;
+-    public static readonly TERRIER: number = 3;
+-    public static readonly BEAR: number = 4;
+-    public static readonly PIG: number = 5;
+-    public static readonly LION: number = 6;
+-    public static readonly RHINO: number = 7;
+-    public static readonly SPIDER: number = 8;
+-    public static readonly TURTLE: number = 9;
+-    public static readonly CHICKEN: number = 10;
+-    public static readonly FROG: number = 11;
+-    public static readonly DRAGON: number = 12;
+-    public static readonly MONSTER: number = 13;
+-    public static readonly MONKEY: number = 14;
+-    public static readonly HORSE: number = 15;
+-    public static readonly MONSTERPLANT: number = 16;
+-    public static readonly BUNNY: number = 17;
+-    public static readonly BUNNYEVIL: number = 18;
+-    public static readonly BUNNYDEPRESSED: number = 19;
+-    public static readonly BUNNYLOVE: number = 20;
+-    public static readonly PIGEONBLACK: number = 21;
+-    public static readonly PIGEONEVIL: number = 22;
+-    public static readonly DEMONMONKEY: number = 23;
+-    public static readonly BABYBEAR: number = 24;
+-    public static readonly BABYTERRIER: number = 25;
+-    public static readonly GNOME: number = 26;
+-    public static readonly LEPRECHAUN: number = 27;
+-    public static readonly KITTENBABY: number = 28;
+-    public static readonly PUPPYBABY: number = 29;
+-    public static readonly PIGLETNBABY: number = 30;
+-    public static readonly HALOOMPA: number = 31;
+-    public static readonly FOOLS: number = 32;
+-    public static readonly PTEROSAUR: number = 33;
+-    public static readonly VELOCIRAPTOR: number = 34;
+-    public static readonly COW: number = 35;
+-}
+diff --git a/packages/ambreia-game/src/avatar/torso/TorsoView.ts b/packages/ambreia-game/src/avatar/torso/TorsoView.ts
+index a321905..18148e8 100644
+--- a/packages/ambreia-game/src/avatar/torso/TorsoView.ts
++++ b/packages/ambreia-game/src/avatar/torso/TorsoView.ts
+@@ -2,7 +2,7 @@ import type {IWindow} from '@ambreia/ui/IWindow';
+ import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+ import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
+ import type {ICategoryView} from '../common/ICategoryView';
+-import type {TorsoModel} from './TorsoModel';
++import type {ICategoryModel} from '../common/ICategoryModel';
+ import {CategoryBaseView} from '../common/CategoryBaseView';
+ 
+ /**
+@@ -39,8 +39,8 @@ export class TorsoView extends CategoryBaseView implements ICategoryView
+     ]);
+ 
+     // AS3: .../avatar/torso/TorsoView.as::TorsoView()
+-    // Typed to the concrete model in AS3 where every sibling view takes the interface. Kept.
+-    constructor(model: TorsoModel | null)
++    // AS3 types this to the concrete model; the view only uses the category-model surface.
++    constructor(model: ICategoryModel | null)
+     {
+         super(model);
+     }
+diff --git a/packages/ambreia-game/src/avatar/view/AvatarEditorNameChangeView.ts b/packages/ambreia-game/src/avatar/view/AvatarEditorNameChangeView.ts
+index bc55454..b7ab16b 100644
+--- a/packages/ambreia-game/src/avatar/view/AvatarEditorNameChangeView.ts
++++ b/packages/ambreia-game/src/avatar/view/AvatarEditorNameChangeView.ts
+@@ -4,8 +4,8 @@ import type {IFrameWindow} from '@ambreia/ui/components/IFrameWindow';
+ import type {ITextFieldWindow} from '@ambreia/ui/components/ITextFieldWindow';
+ import type {ITextWindow} from '@ambreia/ui/components/ITextWindow';
+ import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
+-import type {AvatarEditorView} from '../AvatarEditorView';
+ import type {IHabboAvatarEditorHost} from '../IHabboAvatarEditorHost';
++import type {IAvatarEditorNameChangeView} from './IAvatarEditorNameChangeView';
+ import {AvatarEditorNameSuggestionListRenderer} from './AvatarEditorNameSuggestionListRenderer';
+ import {CheckUserNameResultMessageEvent} from '@ambreia/protocol/incoming/help/CheckUserNameResultMessageEvent';
+ import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
+@@ -24,7 +24,7 @@ import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
+  *
+  * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/view/AvatarEditorNameChangeView.as
+  */
+-export class AvatarEditorNameChangeView
++export class AvatarEditorNameChangeView implements IAvatarEditorNameChangeView
+ {
+     // AS3: .../avatar/view/AvatarEditorNameChangeView.as::NAME_SUGGESTION_BG_COLOR
+     // 0xC9EFF4. AS3 declares this a `private static var` rather than a const; nothing writes it,
+@@ -47,10 +47,6 @@ export class AvatarEditorNameChangeView
+     // AS3: .../avatar/view/AvatarEditorNameChangeView.as::_window
+     private _window: IFrameWindow | null;
+ 
+-    // AS3: .../avatar/view/AvatarEditorNameChangeView.as::_editorView
+-    // Name DERIVED (`_SafeStr_4684`): held only to reach the manager, in the constructor.
+-    private _editorView: AvatarEditorView | null;
+-
+     // AS3: .../avatar/view/AvatarEditorNameChangeView.as::_manager
+     // Name DERIVED (`_SafeStr_4571`).
+     private _manager: IHabboAvatarEditorHost | null;
+@@ -77,10 +73,9 @@ export class AvatarEditorNameChangeView
+      * Opens at `(x, y)` — the editor's right-hand edge — and slides left if that would put it past
+      * the desktop's right edge. There is no matching correction for the bottom.
+      */
+-    constructor(editorView: AvatarEditorView | null, x: number, y: number)
++    constructor(manager: IHabboAvatarEditorHost | null, x: number, y: number)
+     {
+-        this._editorView = editorView;
+-        this._manager = editorView?.editor?.manager ?? null;
++        this._manager = manager;
+         this._window = (this._manager?.windowManager?.buildWidgetLayout(
+             AvatarEditorNameChangeView.LAYOUT_ASSET
+         ) as IFrameWindow | null) ?? null;
+@@ -340,7 +335,6 @@ export class AvatarEditorNameChangeView
+         this._suggestionRenderer = null;
+         this._window?.dispose();
+         this._window = null;
+-        this._editorView = null;
+         this._manager = null;
+     }
+ 
+@@ -430,9 +424,4 @@ export class AvatarEditorNameChangeView
+         if(chip !== null) chip.color = AvatarEditorNameChangeView.NAME_SUGGESTION_BG_COLOR;
+     };
+ 
+-    // TS-only: keeps the held-but-otherwise-unread AS3 field referenced.
+-    private get unused(): unknown
+-    {
+-        return this._editorView;
+-    }
+ }
+diff --git a/packages/ambreia-game/src/avatar/view/IAvatarEditorNameChangeView.ts b/packages/ambreia-game/src/avatar/view/IAvatarEditorNameChangeView.ts
+new file mode 100644
+index 0000000..b8f39b4
+--- /dev/null
++++ b/packages/ambreia-game/src/avatar/view/IAvatarEditorNameChangeView.ts
+@@ -0,0 +1,8 @@
++/** Result surface used by the avatar-editor message handler. */
++export interface IAvatarEditorNameChangeView
++{
++    checkedName: string | null;
++    setNameNotAvailableView(resultCode: number, name: string, suggestions: string[]): void;
++    focus(): void;
++    dispose(): void;
++}
+diff --git a/packages/ambreia-game/src/avatar/view/IAvatarEditorView.ts b/packages/ambreia-game/src/avatar/view/IAvatarEditorView.ts
+index f1e5005..8cee106 100644
+--- a/packages/ambreia-game/src/avatar/view/IAvatarEditorView.ts
++++ b/packages/ambreia-game/src/avatar/view/IAvatarEditorView.ts
+@@ -3,7 +3,7 @@ import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+ import type {IFrameWindow} from '@ambreia/ui/components/IFrameWindow';
+ import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
+ import type {IAvatarEditorGridView} from '../common/ICategoryView';
+-import type {AvatarEditorNameChangeView} from './AvatarEditorNameChangeView';
++import type {IAvatarEditorNameChangeView} from './IAvatarEditorNameChangeView';
+ 
+ /**
+  * The window side of the avatar editor.
+@@ -30,7 +30,7 @@ export interface IAvatarEditorView
+     // AS3: .../avatar/AvatarEditorView.as::get avatarEditorNameChangeView()
+     // Null until the rename button is clicked once — the dialog is built lazily, which is why
+     // `AvatarEditorMessageHandler.onCheckUserNameResult()` drops a result that arrives before then.
+-    readonly avatarEditorNameChangeView: AvatarEditorNameChangeView | null;
++    readonly avatarEditorNameChangeView: IAvatarEditorNameChangeView | null;
+ 
+     // AS3: .../avatar/AvatarEditorView.as::get effectsParamViewContainer()
+     readonly effectsParamViewContainer: IWindowContainer | null;
+diff --git a/packages/ambreia-game/src/avatar/view/IAvatarEditorViewHost.ts b/packages/ambreia-game/src/avatar/view/IAvatarEditorViewHost.ts
+new file mode 100644
+index 0000000..641b8d3
+--- /dev/null
++++ b/packages/ambreia-game/src/avatar/view/IAvatarEditorViewHost.ts
+@@ -0,0 +1,26 @@
++import type {IWindow} from '@ambreia/ui/IWindow';
++import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
++import type {IHabboAvatarEditorHost} from '../IHabboAvatarEditorHost';
++import type {IFigureData} from '../figuredata/IFigureData';
++
++/** The editor-core surface required by `AvatarEditorView`. */
++export interface IAvatarEditorViewHost
++{
++    readonly instanceId: number;
++    readonly manager: IHabboAvatarEditorHost | null;
++    readonly figureData: IFigureData | null;
++
++    isSideContentEnabled(): boolean;
++    hasInvalidClubItems(): boolean;
++    stripClubItems(): void;
++    disableClubClothing(): void;
++    hasInvalidSellableItems(): boolean;
++    stripInvalidSellableItems(): void;
++    isDevelopmentEditor(): boolean;
++    openHabboClubAdWindow(): void;
++    saveCurrentSelection(): void;
++    toggleAvatarEditorPage(categoryId: string): void;
++    getSideContentWindowContainer(name: string): IWindowContainer | null;
++    getCategoryWindowContainer(categoryId: string): IWindow | null;
++    activateCategory(categoryId: string): void;
++}
+diff --git a/packages/ambreia-game/src/avatar/wardrobe/IWardrobeController.ts b/packages/ambreia-game/src/avatar/wardrobe/IWardrobeController.ts
+new file mode 100644
+index 0000000..a85f994
+--- /dev/null
++++ b/packages/ambreia-game/src/avatar/wardrobe/IWardrobeController.ts
+@@ -0,0 +1,30 @@
++import type {IAvatarImage} from '@ambreia/avatar/IAvatarImage';
++import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
++import type {ISessionDataManager} from '../../session/ISessionDataManager';
++import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
++import type {IAvatarEditorMessageHandler} from '../IAvatarEditorMessageHandler';
++import type {IFigureData} from '../figuredata/IFigureData';
++
++/** Editor-core surface used by the wardrobe side panel and its slots. */
++export interface IWardrobeController
++{
++    readonly handler: IAvatarEditorMessageHandler | null;
++    readonly figureData: IFigureData | null;
++    readonly clubMemberLevel: number;
++    readonly windowManager: IHabboWindowManager | null;
++    readonly sessionData: ISessionDataManager | null;
++    gender: string;
++
++    getBoolean(key: string): boolean;
++    getInteger(key: string, defaultValue: number): number;
++    verifyClubLevel(): boolean;
++    loadAvatarInEditor(figure: string, gender: string, clubLevel?: number): void;
++    getAssetBitmap(name: string): ImageBitmap | null;
++    createAvatarImage(
++        figureString: string,
++        scale: string,
++        gender: string | null,
++        listener: IAvatarImageListener | null,
++        effectListener?: unknown
++    ): IAvatarImage | null;
++}
+diff --git a/packages/ambreia-game/src/avatar/wardrobe/Outfit.ts b/packages/ambreia-game/src/avatar/wardrobe/Outfit.ts
+index 0caa11c..c84d8c7 100644
+--- a/packages/ambreia-game/src/avatar/wardrobe/Outfit.ts
++++ b/packages/ambreia-game/src/avatar/wardrobe/Outfit.ts
+@@ -53,7 +53,7 @@ export class Outfit implements IOutfit, IAvatarImageListener
+     constructor(controller: ICategoryModelOwner | null, figure: string, gender: string)
+     {
+         this._controller = controller;
+-        this._view = new OutfitView(controller?.manager?.windowManager ?? null, figure !== '');
++        this._view = new OutfitView(controller?.windowManager ?? null, figure !== '');
+         this._figure = figure;
+         this._gender = Outfit.normaliseGender(gender);
+ 
+@@ -94,7 +94,7 @@ export class Outfit implements IOutfit, IAvatarImageListener
+     // AS3: .../avatar/wardrobe/Outfit.as::update()
+     public update(): void
+     {
+-        const zoom = this._controller?.manager?.getBoolean('zoom.enabled') ?? false;
++        const zoom = this._controller?.getBoolean('zoom.enabled') ?? false;
+ 
+         const image = this._controller?.createAvatarImage(
+             this.figure, zoom ? FigureData.SCALE : Outfit.SMALL_SCALE, this._gender, this
+diff --git a/packages/ambreia-game/src/avatar/wardrobe/WardrobeModel.ts b/packages/ambreia-game/src/avatar/wardrobe/WardrobeModel.ts
+index f104a6b..6920337 100644
+--- a/packages/ambreia-game/src/avatar/wardrobe/WardrobeModel.ts
++++ b/packages/ambreia-game/src/avatar/wardrobe/WardrobeModel.ts
+@@ -1,6 +1,6 @@
+ import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+ import type {WardrobeOutfit} from '@ambreia/protocol/parser/wardrobe/WardrobeOutfit';
+-import type {HabboAvatarEditor} from '../HabboAvatarEditor';
++import type {IWardrobeController} from './IWardrobeController';
+ import type {ISideContentModel} from '../common/ISideContent';
+ import {ErrorReportStorage} from '@ambreia/common/utils/ErrorReportStorage';
+ import {OrderedMap} from '@ambreia/common/utils/OrderedMap';
+@@ -33,7 +33,7 @@ export class WardrobeModel implements ISideContentModel
+ 
+     // AS3: .../avatar/wardrobe/WardrobeModel.as::_controller
+     // Name DERIVED (`_SafeStr_4593`).
+-    private _controller: HabboAvatarEditor | null;
++    private _controller: IWardrobeController | null;
+ 
+     // AS3: .../avatar/wardrobe/WardrobeModel.as::_view
+     // Name DERIVED (`_SafeStr_4550`).
+@@ -48,7 +48,7 @@ export class WardrobeModel implements ISideContentModel
+     private _initialised: boolean = false;
+ 
+     // AS3: .../avatar/wardrobe/WardrobeModel.as::WardrobeModel()
+-    constructor(controller: HabboAvatarEditor | null)
++    constructor(controller: IWardrobeController | null)
+     {
+         this._controller = controller;
+     }
+@@ -56,12 +56,12 @@ export class WardrobeModel implements ISideContentModel
+     // AS3: .../avatar/wardrobe/WardrobeModel.as::get availableSlots()
+     public get availableSlots(): number
+     {
+-        return this._controller?.manager?.getInteger(WardrobeModel.SLOTS_KEY, WardrobeModel.DEFAULT_SLOTS)
++        return this._controller?.getInteger(WardrobeModel.SLOTS_KEY, WardrobeModel.DEFAULT_SLOTS)
+             ?? WardrobeModel.DEFAULT_SLOTS;
+     }
+ 
+     // AS3: .../avatar/wardrobe/WardrobeModel.as::get controller()
+-    public get controller(): HabboAvatarEditor | null
++    public get controller(): IWardrobeController | null
+     {
+         return this._controller;
+     }
+@@ -182,7 +182,7 @@ export class WardrobeModel implements ISideContentModel
+     // usable slots and five dead ones.
+     private isSlotEnabled(id: number): boolean
+     {
+-        const sessionData = this._controller?.manager?.sessionData ?? null;
++        const sessionData = this._controller?.sessionData ?? null;
+ 
+         if(id <= WardrobeModel.CLUB_SLOTS) return sessionData?.hasClub ?? false;
+ 
+diff --git a/packages/ambreia-game/src/avatar/wardrobe/WardrobeSlot.ts b/packages/ambreia-game/src/avatar/wardrobe/WardrobeSlot.ts
+index 55a7cd7..7e3d7c1 100644
+--- a/packages/ambreia-game/src/avatar/wardrobe/WardrobeSlot.ts
++++ b/packages/ambreia-game/src/avatar/wardrobe/WardrobeSlot.ts
+@@ -2,7 +2,7 @@ import type {IWindow} from '@ambreia/ui/IWindow';
+ import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+ import type {IBitmapWrapperWindow} from '@ambreia/ui/components/IBitmapWrapperWindow';
+ import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
+-import type {HabboAvatarEditor} from '../HabboAvatarEditor';
++import type {IWardrobeController} from './IWardrobeController';
+ import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
+ import type {IOutfit} from '../IOutfit';
+ import {Logger} from '@ambreia/common/utils/Logger';
+@@ -53,7 +53,7 @@ export class WardrobeSlot implements IOutfit, IAvatarImageListener
+ 
+     // AS3: .../avatar/wardrobe/WardrobeSlot.as::_controller
+     // Name DERIVED (`_SafeStr_4593`).
+-    private _controller: HabboAvatarEditor | null;
++    private _controller: IWardrobeController | null;
+ 
+     // AS3: .../avatar/wardrobe/WardrobeSlot.as::_figure
+     // Name DERIVED (`_SafeStr_5551`): null for a slot that has never been filled.
+@@ -86,7 +86,7 @@ export class WardrobeSlot implements IOutfit, IAvatarImageListener
+     // AS3: .../avatar/wardrobe/WardrobeSlot.as::WardrobeSlot()
+     constructor(
+         template: IWindow | null,
+-        controller: HabboAvatarEditor | null,
++        controller: IWardrobeController | null,
+         id: number,
+         enabled: boolean,
+         figure: string | null = null,
+@@ -164,7 +164,7 @@ export class WardrobeSlot implements IOutfit, IAvatarImageListener
+     // AS3: .../avatar/wardrobe/WardrobeSlot.as::updateView()
+     public updateView(): void
+     {
+-        const zoom = this._controller?.manager?.getBoolean('zoom.enabled') ?? false;
++        const zoom = this._controller?.getBoolean('zoom.enabled') ?? false;
+ 
+         let source: {resource: CanvasImageSource; frame: {x: number; y: number; width: number; height: number}} | null = null;
+ 
+diff --git a/packages/ambreia-game/src/avatar/wardrobe/WardrobeView.ts b/packages/ambreia-game/src/avatar/wardrobe/WardrobeView.ts
+index 6e5db7c..7a6521a 100644
+--- a/packages/ambreia-game/src/avatar/wardrobe/WardrobeView.ts
++++ b/packages/ambreia-game/src/avatar/wardrobe/WardrobeView.ts
+@@ -2,11 +2,19 @@ import type {IWindow} from '@ambreia/ui/IWindow';
+ import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+ import type {IItemListWindow} from '@ambreia/ui/components/IItemListWindow';
+ import type {ISideContentView} from '../common/ISideContent';
+-import type {WardrobeModel} from './WardrobeModel';
++import type {WardrobeSlot} from './WardrobeSlot';
++import type {IWardrobeController} from './IWardrobeController';
+ import {Logger} from '@ambreia/common/utils/Logger';
+ 
+ const log = Logger.getLogger('habbo.avatar.wardrobe.WardrobeView');
+ 
++interface IWardrobeViewModel
++{
++    readonly controller: IWardrobeController | null;
++    readonly availableSlots: number;
++    readonly slots: WardrobeSlot[];
++}
++
+ /**
+  * The wardrobe panel: a horizontal list of columns, each a vertical list of seven slots.
+  *
+@@ -31,7 +39,7 @@ export class WardrobeView implements ISideContentView
+ 
+     // AS3: .../avatar/wardrobe/WardrobeView.as::_model
+     // Name DERIVED (`_SafeStr_4570`).
+-    private _model: WardrobeModel | null;
++    private _model: IWardrobeViewModel | null;
+ 
+     // AS3: .../avatar/wardrobe/WardrobeView.as::_columnsList
+     // Name DERIVED (`_SafeStr_5799`): the horizontal list the cloned columns go into.
+@@ -54,11 +62,11 @@ export class WardrobeView implements ISideContentView
+      *
+      * The panel is built **hidden**; `AvatarEditorView.setSideContent()` is what shows it.
+      */
+-    constructor(model: WardrobeModel | null)
++    constructor(model: IWardrobeViewModel | null)
+     {
+         this._model = model;
+ 
+-        const windowManager = model?.controller?.manager?.windowManager ?? null;
++        const windowManager = model?.controller?.windowManager ?? null;
+ 
+         this._window = (windowManager?.buildWidgetLayout(WardrobeView.LAYOUT_ASSET) as IWindowContainer | null) ?? null;
+ 
+diff --git a/packages/ambreia-game/src/ui/widget/enums/ChatBubbleOwnerTypeEnum.ts b/packages/ambreia-game/src/ui/widget/enums/ChatBubbleOwnerTypeEnum.ts
+deleted file mode 100644
+index 582ffac..0000000
+--- a/packages/ambreia-game/src/ui/widget/enums/ChatBubbleOwnerTypeEnum.ts
++++ /dev/null
+@@ -1,21 +0,0 @@
+-/**
+- * Who a chat bubble belongs to: a player, a generic speaker, or a bot. Class name DERIVED — obfuscated in every tree.
+- *
+- * **Nothing in any source tree reads this class** — its values are written as literals wherever
+- * they are needed, in AS3 and here alike. Transcribed because it is the only place these names are
+- * recorded, not because anything dispatches on it.
+- *
+- * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/enums/_SafeCls_3808.as
+- */
+-export const ChatBubbleOwnerTypeEnum = {
+-    // AS3: _SafeCls_3808.as::NORMAL
+-    NORMAL: 0,
+-
+-    // AS3: _SafeCls_3808.as::GENERIC
+-    GENERIC: 1,
+-
+-    // AS3: _SafeCls_3808.as::BOT
+-    BOT: 2,
+-} as const;
+-
+-export type ChatBubbleOwnerTypeEnum = typeof ChatBubbleOwnerTypeEnum[keyof typeof ChatBubbleOwnerTypeEnum];
+diff --git a/packages/ambreia-game/src/ui/widget/enums/FriendFurniTypeEnum.ts b/packages/ambreia-game/src/ui/widget/enums/FriendFurniTypeEnum.ts
+deleted file mode 100644
+index 75064ac..0000000
+--- a/packages/ambreia-game/src/ui/widget/enums/FriendFurniTypeEnum.ts
++++ /dev/null
+@@ -1,29 +0,0 @@
+-/**
+- * The five friend-furni kinds. Class name DERIVED — obfuscated in every tree, named from LOVE_LOCK/CARVE_A_TREE/FRIENDS_PORTRAIT.
+- *
+- * **Nothing in any source tree reads this class** — its values are written as literals wherever
+- * they are needed, in AS3 and here alike. Transcribed because it is the only place these names are
+- * recorded, not because anything dispatches on it.
+- *
+- * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/enums/_SafeCls_2473.as
+- */
+-export const FriendFurniTypeEnum = {
+-    // AS3: _SafeCls_2473.as::LOVE_LOCK
+-    LOVE_LOCK: 0,
+-
+-    // AS3: _SafeCls_2473.as::CARVE_A_TREE
+-    CARVE_A_TREE: 1,
+-
+-    // AS3: _SafeCls_2473.as::FRIENDS_PORTRAIT
+-    FRIENDS_PORTRAIT: 2,
+-
+-    /** Derived name — `_SafeStr_11427`; named from its own value, which is all it has. */
+-    // AS3: _SafeCls_2473.as::_SafeStr_11427
+-    TYPE_3: 3,
+-
+-    /** Derived name — `_SafeStr_11716`; named from its own value, which is all it has. */
+-    // AS3: _SafeCls_2473.as::_SafeStr_11716
+-    TYPE_4: 4,
+-} as const;
+-
+-export type FriendFurniTypeEnum = typeof FriendFurniTypeEnum[keyof typeof FriendFurniTypeEnum];
+diff --git a/packages/ambreia-game/src/ui/widget/enums/FurniUsableTypeEnum.ts b/packages/ambreia-game/src/ui/widget/enums/FurniUsableTypeEnum.ts
+deleted file mode 100644
+index 8ac6ec8..0000000
+--- a/packages/ambreia-game/src/ui/widget/enums/FurniUsableTypeEnum.ts
++++ /dev/null
+@@ -1,39 +0,0 @@
+-/**
+- * What a usable furni does when you click it. Class name DERIVED — obfuscated in every tree, named from its members.
+- *
+- * **Nothing in any source tree reads this class** — its values are written as literals wherever
+- * they are needed, in AS3 and here alike. Transcribed because it is the only place these names are
+- * recorded, not because anything dispatches on it.
+- *
+- * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/enums/_SafeCls_3141.as
+- */
+-export const FurniUsableTypeEnum = {
+-    // AS3: _SafeCls_3141.as::DUMMY
+-    DUMMY: "DUMMY",
+-
+-    // AS3: _SafeCls_3141.as::FRIEND_FURNITURE
+-    FRIEND_FURNITURE: "FRIEND_FURNITURE",
+-
+-    // AS3: _SafeCls_3141.as::MONSTERPLANT_SEED
+-    MONSTERPLANT_SEED: "MONSTERPLANT_SEED",
+-
+-    // AS3: _SafeCls_3141.as::MYSTERY_BOX
+-    MYSTERY_BOX: "MYSTERY_BOX",
+-
+-    // AS3: _SafeCls_3141.as::EFFECT_BOX
+-    EFFECT_BOX: "EFFECT_BOX",
+-
+-    // AS3: _SafeCls_3141.as::MYSTERY_TROPHY
+-    MYSTERY_TROPHY: "MYSTERY_TROPHY",
+-
+-    // AS3: _SafeCls_3141.as::RANDOM_TELEPORT
+-    RANDOM_TELEPORT: "RANDOM_TELEPORT",
+-
+-    // AS3: _SafeCls_3141.as::PURCHASABLE_CLOTHING
+-    PURCHASABLE_CLOTHING: "PURCHASABLE_CLOTHING",
+-
+-    // AS3: _SafeCls_3141.as::GENERIC_USABLE
+-    GENERIC_USABLE: "GENERIC_USABLE",
+-} as const;
+-
+-export type FurniUsableTypeEnum = typeof FurniUsableTypeEnum[keyof typeof FurniUsableTypeEnum];
+diff --git a/packages/ambreia-game/src/ui/widget/enums/RoomWidgetEnum.ts b/packages/ambreia-game/src/ui/widget/enums/RoomWidgetEnum.ts
+deleted file mode 100644
+index e2d95c2..0000000
+--- a/packages/ambreia-game/src/ui/widget/enums/RoomWidgetEnum.ts
++++ /dev/null
+@@ -1,160 +0,0 @@
+-/**
+- * Every room-widget type code, as one table.
+- *
+- * **Nothing in any source tree reads this class.** AS3's own call sites write the literals its
+- * constants expand to, and so does this port. It is transcribed because it is part of the client
+- * and because it is the only place these names are recorded — not because anything dispatches on
+- * it. Adopting it across the widget switches would be a bulk string-to-constant swap with no
+- * behaviour change and a real chance of a silent typo; the literals are already correct.
+- *
+- * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/enums/RoomWidgetEnum.as
+- */
+-export const RoomWidgetEnum = {
+-    // AS3: RoomWidgetEnum.as::INFOSTAND_WIDGET
+-    INFOSTAND_WIDGET: "RWE_INFOSTAND",
+-
+-    // AS3: RoomWidgetEnum.as::ME_MENU_WIDGET
+-    ME_MENU_WIDGET: "RWE_ME_MENU",
+-
+-    // AS3: RoomWidgetEnum.as::CHAT_INPUT_WIDGET
+-    CHAT_INPUT_WIDGET: "RWE_CHAT_INPUT_WIDGET",
+-
+-    // AS3: RoomWidgetEnum.as::FURNI_PLACEHOLDER_WIDGET
+-    FURNI_PLACEHOLDER_WIDGET: "RWE_FURNI_PLACEHOLDER",
+-
+-    // AS3: RoomWidgetEnum.as::FURNI_CREDIT_WIDGET
+-    FURNI_CREDIT_WIDGET: "RWE_FURNI_CREDIT_WIDGET",
+-
+-    // AS3: RoomWidgetEnum.as::FURNI_STICKIE_WIDGET
+-    FURNI_STICKIE_WIDGET: "RWE_FURNI_STICKIE_WIDGET",
+-
+-    // AS3: RoomWidgetEnum.as::FURNI_TROPHY_WIDGET
+-    FURNI_TROPHY_WIDGET: "RWE_FURNI_TROPHY_WIDGET",
+-
+-    // AS3: RoomWidgetEnum.as::FURNI_PRESENT_WIDGET
+-    FURNI_PRESENT_WIDGET: "RWE_FURNI_PRESENT_WIDGET",
+-
+-    // AS3: RoomWidgetEnum.as::FURNI_ECOTRONBOX_WIDGET
+-    FURNI_ECOTRONBOX_WIDGET: "RWE_FURNI_ECOTRONBOX_WIDGET",
+-
+-    // AS3: RoomWidgetEnum.as::FURNI_PET_PACKAGE_WIDGET
+-    FURNI_PET_PACKAGE_WIDGET: "RWE_FURNI_PET_PACKAGE_WIDGET",
+-
+-    // AS3: RoomWidgetEnum.as::DOORBELL
+-    DOORBELL: "RWE_DOORBELL",
+-
+-    // AS3: RoomWidgetEnum.as::LOADINGBAR
+-    LOADINGBAR: "RWE_LOADINGBAR",
+-
+-    // AS3: RoomWidgetEnum.as::ROOM_QUEUE
+-    ROOM_QUEUE: "RWE_ROOM_QUEUE",
+-
+-    // AS3: RoomWidgetEnum.as::USER_CHOOSER
+-    USER_CHOOSER: "RWE_USER_CHOOSER",
+-
+-    // AS3: RoomWidgetEnum.as::FURNI_CHOOSER
+-    FURNI_CHOOSER: "RWE_FURNI_CHOOSER",
+-
+-    // AS3: RoomWidgetEnum.as::DIMMER
+-    DIMMER: "RWE_ROOM_DIMMER",
+-
+-    // AS3: RoomWidgetEnum.as::FRIEND_REQUEST
+-    FRIEND_REQUEST: "RWE_FRIEND_REQUEST",
+-
+-    // AS3: RoomWidgetEnum.as::CLOTHING_CHANGE
+-    CLOTHING_CHANGE: "RWE_CLOTHING_CHANGE",
+-
+-    // AS3: RoomWidgetEnum.as::CONVERSION_TRACKING
+-    CONVERSION_TRACKING: "RWE_CONVERSION_TRACKING",
+-
+-    // AS3: RoomWidgetEnum.as::USER_NOTIFICATION
+-    USER_NOTIFICATION: "RWE_USER_NOTIFICATION",
+-
+-    // AS3: RoomWidgetEnum.as::FRIENDS_BAR
+-    FRIENDS_BAR: "RWE_FRIENDS_BAR",
+-
+-    /** Derived name — `_SafeStr_11541`; named from its own value, which is all it has. */
+-    // AS3: RoomWidgetEnum.as::_SafeStr_11541
+-    PURSE_WIDGET: "RWE_PURSE_WIDGET",
+-
+-    // AS3: RoomWidgetEnum.as::AVATAR_INFO
+-    AVATAR_INFO: "RWE_AVATAR_INFO",
+-
+-    // AS3: RoomWidgetEnum.as::SPAMWALL_POSTIT_WIDGET
+-    SPAMWALL_POSTIT_WIDGET: "RWE_SPAMWALL_POSTIT_WIDGET",
+-
+-    /** Derived name — `_SafeStr_10234`; named from its own value, which is all it has. */
+-    // AS3: RoomWidgetEnum.as::_SafeStr_10234
+-    EFFECTS: "RWE_EFFECTS",
+-
+-    // AS3: RoomWidgetEnum.as::MANNEQUIN
+-    MANNEQUIN: "RWE_MANNEQUIN",
+-
+-    // AS3: RoomWidgetEnum.as::FURNITURE_CONTEXT_MENU
+-    FURNITURE_CONTEXT_MENU: "RWE_FURNITURE_CONTEXT_MENU",
+-
+-    // AS3: RoomWidgetEnum.as::LOCATION_WIDGET
+-    LOCATION_WIDGET: "RWE_LOCATION_WIDGET",
+-
+-    // AS3: RoomWidgetEnum.as::ROOM_BACKGROUND_COLOR
+-    ROOM_BACKGROUND_COLOR: "RWE_ROOM_BACKGROUND_COLOR",
+-
+-    // AS3: RoomWidgetEnum.as::AREA_HIDE
+-    AREA_HIDE: "RWE_AREA_HIDE",
+-
+-    // AS3: RoomWidgetEnum.as::CUSTOM_USER_NOTIFICATION
+-    CUSTOM_USER_NOTIFICATION: "RWE_CUSTOM_USER_NOTIFICATION",
+-
+-    // AS3: RoomWidgetEnum.as::FURNI_ACHIEVEMENT_RESOLUTION_ENGRAVING
+-    FURNI_ACHIEVEMENT_RESOLUTION_ENGRAVING: "RWE_FURNI_ACHIEVEMENT_RESOLUTION_ENGRAVING",
+-
+-    // AS3: RoomWidgetEnum.as::FRIEND_FURNI_CONFIRM
+-    FRIEND_FURNI_CONFIRM: "RWE_FRIEND_FURNI_CONFIRM",
+-
+-    // AS3: RoomWidgetEnum.as::FRIEND_FURNI_ENGRAVING
+-    FRIEND_FURNI_ENGRAVING: "RWE_FRIEND_FURNI_ENGRAVING",
+-
+-    /** Derived name — `_SafeStr_10404`; named from its own value, which is all it has. */
+-    // AS3: RoomWidgetEnum.as::_SafeStr_10404
+-    HIGH_SCORE_DISPLAY: "RWE_HIGH_SCORE_DISPLAY",
+-
+-    // AS3: RoomWidgetEnum.as::INTERNAL_LINK
+-    INTERNAL_LINK: "RWE_INTERNAL_LINK",
+-
+-    // AS3: RoomWidgetEnum.as::CUSTOM_STACK_HEIGHT
+-    CUSTOM_STACK_HEIGHT: "RWE_CUSTOM_STACK_HEIGHT",
+-
+-    // AS3: RoomWidgetEnum.as::YOUTUBE
+-    YOUTUBE: "RWE_YOUTUBE",
+-
+-    // AS3: RoomWidgetEnum.as::RENTABLESPACE
+-    RENTABLESPACE: "RWE_RENTABLESPACE",
+-
+-    // AS3: RoomWidgetEnum.as::VIMEO
+-    VIMEO: "RWE_VIMEO",
+-
+-    // AS3: RoomWidgetEnum.as::ROOM_TOOLS
+-    ROOM_TOOLS: "RWE_ROOM_TOOLS",
+-
+-    // AS3: RoomWidgetEnum.as::EXTERNAL_IMAGE
+-    EXTERNAL_IMAGE: "RWE_EXTERNAL_IMAGE",
+-
+-    /** Derived name — `_SafeStr_11391`; named from its own value, which is all it has. */
+-    // AS3: RoomWidgetEnum.as::_SafeStr_11391
+-    UI_HELP_BUBBLE: "RWE_UI_HELP_BUBBLE",
+-
+-    // AS3: RoomWidgetEnum.as::ROOM_LINK
+-    ROOM_LINK: "RWE_ROOM_LINK",
+-
+-    // AS3: RoomWidgetEnum.as::CRAFTING
+-    CRAFTING: "RWE_CRAFTING",
+-
+-    // TS-only: Vortex-only fishing system — no AS3 counterpart.
+-    //   See docs/vortex-original/fishing.md §2.3.
+-    FISHING_SPOT: "RWE_FISHING_SPOT",
+-    // TS-only: the wooden sign beside a fishing zone; a click opens the Fish-O-Pedia.
+-    //   See docs/vortex-original/fishing.md §1 and §15.
+-    FISHING_SIGN: "RWE_FISHING_SIGN",
+-} as const;
+-
+-export type RoomWidgetEnum = typeof RoomWidgetEnum[keyof typeof RoomWidgetEnum];
+diff --git a/packages/ambreia-game/src/ui/widget/enums/RoomWidgetFurniInfoUsagePolicyEnum.ts b/packages/ambreia-game/src/ui/widget/enums/RoomWidgetFurniInfoUsagePolicyEnum.ts
+deleted file mode 100644
+index 09b3495..0000000
+--- a/packages/ambreia-game/src/ui/widget/enums/RoomWidgetFurniInfoUsagePolicyEnum.ts
++++ /dev/null
+@@ -1,16 +0,0 @@
+-/**
+- * RoomWidgetFurniInfoUsagePolicyEnum
+- *
+- * @see sources/win63_version/habbo/ui/widget/enums/RoomWidgetFurniInfoUsagePolicyEnum.as
+- */
+-export class RoomWidgetFurniInfoUsagePolicyEnum
+-{
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/enums/RoomWidgetFurniInfoUsagePolicyEnum.as::NOBODY
+-    public static readonly NOBODY: number = 0;
+-
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/ui/widget/enums/RoomWidgetFurniInfoUsagePolicyEnum.as::CONTROLLER
+-    public static readonly CONTROLLER: number = 1;
+-
+-    // AS3: sources/win63_version/habbo/ui/widget/enums/RoomWidgetFurniInfoUsagePolicyEnum.as::const_731
+-    public static readonly EVERYBODY: number = 2;
+-}
+diff --git a/packages/ambreia-game/src/utils/BitmapDataUtils.ts b/packages/ambreia-game/src/utils/BitmapDataUtils.ts
+deleted file mode 100644
+index fa371d6..0000000
+--- a/packages/ambreia-game/src/utils/BitmapDataUtils.ts
++++ /dev/null
+@@ -1,72 +0,0 @@
+-/**
+- * Downscaling that halves repeatedly instead of resizing once.
+- *
+- * A single `drawImage` from 4x to 1x samples four source pixels per destination pixel and throws
+- * the rest away; halving three times averages all sixteen. The difference was visible on habbicon
+- * previews, drawn at 0.5x — its only user until the RPG fork removed Habbicons; kept as the AS3
+- * utility it ports.
+- *
+- * **The class name is unrecoverable from any tree** — `_SafeCls_2871` in the primary, `class_2495`
+- * in `win63_version`, absent from PRODUCTION. The *method* name is real in both obfuscated trees;
+- * only the class wrapping it is not, so this file is named for what it holds.
+- *
+- * `AvatarImage` carries its own private copy of the same algorithm, written before this file
+- * existed. Left alone: it is private, correct, and merging the two is a refactor of the avatar
+- * pipeline.
+- *
+- * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/utils/_SafeCls_2871.as
+- */
+-export class BitmapDataUtils
+-{
+-    /**
+-	 * AS3 fills the new bitmap with opaque white before drawing; on a canvas the equivalent is simply
+-	 * not clearing, and `drawImage` composites over transparent black. The alpha channel survives
+-	 * either way.
+-	 */
+-    // AS3: _SafeCls_2871.as::resizeBitmapData()
+-    private static resizeBitmap(source: ImageBitmap, scale: number): ImageBitmap
+-    {
+-        const width = Math.max(1, Math.round(source.width * scale));
+-        const height = Math.max(1, Math.round(source.height * scale));
+-        const canvas = new OffscreenCanvas(width, height);
+-        const context = canvas.getContext('2d');
+-
+-        if(context === null) return source;
+-
+-        context.imageSmoothingEnabled = true;
+-        context.drawImage(source, 0, 0, source.width, source.height, 0, 0, width, height);
+-
+-        return canvas.transferToImageBitmap();
+-    }
+-
+-    /**
+-	 * The loop condition is `!==`, so a scale that never lands exactly on the target would spin
+-	 * forever. It cannot: each pass either halves `current` or jumps it straight to `scale`, and the
+-	 * halving branch only runs while `scale` is still below half of `current`.
+-	 */
+-    // AS3: _SafeCls_2871.as::resampleBitmapData()
+-    static resampleBitmap(source: ImageBitmap, scale: number): ImageBitmap
+-    {
+-        if(scale >= 1) return BitmapDataUtils.resizeBitmap(source, scale);
+-
+-        let result = source;
+-        let current = 1;
+-
+-        do
+-        {
+-            if(scale < 0.5 * current)
+-            {
+-                result = BitmapDataUtils.resizeBitmap(result, 0.5);
+-                current = 0.5 * current;
+-            }
+-            else
+-            {
+-                result = BitmapDataUtils.resizeBitmap(result, scale / current);
+-                current = scale;
+-            }
+-        }
+-        while(current !== scale);
+-
+-        return result;
+-    }
+-}
+diff --git a/packages/ambreia-iso/src/scene/enum/RoomObjectPlacementSource.ts b/packages/ambreia-iso/src/scene/enum/RoomObjectPlacementSource.ts
+deleted file mode 100644
+index df877ea..0000000
+--- a/packages/ambreia-iso/src/scene/enum/RoomObjectPlacementSource.ts
++++ /dev/null
+@@ -1,17 +0,0 @@
+-/**
+- * Where a furni being placed in the room came from. Carried on the placement event so a widget can
+- * tell "I dragged this out of the catalog preview" from "I dragged it out of my inventory".
+- *
+- * AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/enum/RoomObjectPlacementSource.as
+- */
+-export class RoomObjectPlacementSource
+-{
+-    // AS3: .../src/com/sulake/habbo/room/enum/RoomObjectPlacementSource.as::CATALOG
+-    public static readonly CATALOG: string = 'catalog';
+-
+-    // AS3: .../src/com/sulake/habbo/room/enum/RoomObjectPlacementSource.as::INVENTORY
+-    public static readonly INVENTORY: string = 'inventory';
+-
+-    // AS3: .../src/com/sulake/habbo/room/enum/RoomObjectPlacementSource.as::INFO_STAND
+-    public static readonly INFO_STAND: string = 'info_stand';
+-}
+diff --git a/packages/ambreia-iso/src/utils/NumberBank.ts b/packages/ambreia-iso/src/utils/NumberBank.ts
+deleted file mode 100644
+index edc9580..0000000
+--- a/packages/ambreia-iso/src/utils/NumberBank.ts
++++ /dev/null
+@@ -1,75 +0,0 @@
+-/**
+- * A bounded pool of integer ids that can be handed out and given back.
+- *
+- * Constructed with a size, it holds `0 .. size - 1` and lends them one at a time.
+- * `reserveNumber()` answers -1 once every id is out on loan, which is a real signal and not an
+- * error code to ignore: `RoomEngine.getGenericRoomObjectThumbnail()` gives up and returns no
+- * image on it, so a caller that leaks ids degrades into "no thumbnails" rather than growing a
+- * counter forever.
+- *
+- * Ids come back from the *end* of the free list, so the sequence is descending and a freed id is
+- * the next one lent. That is AS3's `pop()`, kept because a caller comparing ids across a
+- * reserve/free cycle sees the same order it always did.
+- *
+- * @see sources/WIN63-202607011411-782849652/src/com/sulake/room/utils/NumberBank.as
+- */
+-export class NumberBank
+-{
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/room/utils/NumberBank.as::_reservedNumbers
+-    private _reservedNumbers: number[] | null = [];
+-
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/room/utils/NumberBank.as::_freeNumbers
+-    private _freeNumbers: number[] | null = [];
+-
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/room/utils/NumberBank.as::NumberBank()
+-    constructor(size: number)
+-    {
+-        const total = (size < 0) ? 0 : size;
+-
+-        for(let i = 0; i < total; i++)
+-        {
+-            this._freeNumbers!.push(i);
+-        }
+-    }
+-
+-    /**
+-	 * Lends the next free id, or -1 when there is none left.
+-	 */
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/room/utils/NumberBank.as::reserveNumber()
+-    public reserveNumber(): number
+-    {
+-        if(this._freeNumbers === null || this._freeNumbers.length === 0) return -1;
+-
+-        const value = this._freeNumbers.pop()!;
+-
+-        this._reservedNumbers!.push(value);
+-
+-        return value;
+-    }
+-
+-    /**
+-	 * Returns an id to the pool.
+-	 *
+-	 * Silently ignores an id that was not lent out — freeing twice does not grow the pool past
+-	 * its size, which is what keeps the bound meaningful.
+-	 */
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/room/utils/NumberBank.as::freeNumber()
+-    public freeNumber(value: number): void
+-    {
+-        if(this._reservedNumbers === null) return;
+-
+-        const index = this._reservedNumbers.indexOf(value);
+-
+-        if(index < 0) return;
+-
+-        this._reservedNumbers.splice(index, 1);
+-        this._freeNumbers!.push(value);
+-    }
+-
+-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/room/utils/NumberBank.as::dispose()
+-    public dispose(): void
+-    {
+-        this._reservedNumbers = null;
+-        this._freeNumbers = null;
+-    }
+-}
