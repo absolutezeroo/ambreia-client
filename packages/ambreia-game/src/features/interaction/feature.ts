@@ -7,6 +7,7 @@ import type {IRoomSession} from '../../session/IRoomSession';
 import type {IGameFeature} from '../GameFeature';
 import {WindowBits} from '../../ui/kit/WindowBits';
 import type {IHudPanels} from '../hud/IHud';
+import {HudTargetClose} from './HudTargetClose';
 import {RpgInteractionSession} from './RpgInteractionSession';
 
 const log = Logger.getLogger('habbo.features.interaction');
@@ -73,10 +74,9 @@ export const InteractionFeature: IGameFeature = {
         });
 
         // The HUD frame's close button clears the frame alone: ask the server to clear the target too.
-        scope.bind(hud?.events)('changed', value =>
-        {
-            if(value.target === null) session.select(0);
-        });
+        const close = new HudTargetClose(objectId => session.select(objectId));
+
+        scope.bind(hud?.events)('changed', value => close.changed(value.target));
 
         const engineOn = scope.bind(engine?.events);
 
