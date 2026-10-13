@@ -537,6 +537,8 @@ export class AvatarImageWidget implements IAvatarImageWidget, IAvatarImageListen
 
         if(context === null) return null;
 
+        // TS-only: pixel art scaled by whole factors stays sharp; the canvas would blur it.
+        context.imageSmoothingEnabled = false;
         context.drawImage(bitmap, 0, 0, width, height);
 
         return canvas.transferToImageBitmap();

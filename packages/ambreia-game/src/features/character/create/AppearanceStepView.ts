@@ -1,6 +1,8 @@
 import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import type {IWindow} from '@ambreia/ui/IWindow';
 import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
+import type {IWidgetWindow} from '@ambreia/ui/components/IWidgetWindow';
+import type {IAvatarImageWidget} from '@ambreia/ui/kit/widgets/IAvatarImageWidget';
 import type {IHabboWindowManager} from '../../../window/IHabboWindowManager';
 import {WindowBits} from '../../../ui/kit/WindowBits';
 import {partColor, withPartColor, withPartSet} from '../CharacterLook';
@@ -10,6 +12,8 @@ import {ACTIVE, IDLE, SWATCHES, TILES} from './wizardLook';
 
 /** Appearance tabs: 0 whole looks, then one part type each (face, hair, top, bottom). */
 const CATEGORY_PARTS = [null, 'hd', 'hr', 'ch', 'lg'] as const;
+/** The preview is drawn at twice the layout's size: the stage has the room, and the look is what is being chosen. */
+const PREVIEW_ZOOM = 2;
 
 /**
  * The look step: a tab per part, its tiles (whole looks or one part's sets), the hair and skin
@@ -38,6 +42,7 @@ export class AppearanceStepView
         // A Habbo figure has no eye colour to pick.
         this._bits.setVisible(page, false, 'eyes_palette');
         this._bits.avatar(page, 'preview_avatar', draft.figure, this.direction);
+        this.enlarge(page.findChildByName('preview_avatar') as IWidgetWindow | null);
     }
 
     /** A click on a tab, a tile or a swatch changes the tab or the draft; false when it was none of them. */
@@ -95,6 +100,21 @@ export class AppearanceStepView
     {
         this.direction = (this.direction + by + 8) % 8;
         if(page) this._bits.avatar(page, 'preview_avatar', figure, this.direction);
+    }
+
+    /** Once per page: the zoomed preview keeps the centre the layout gave it. */
+    private enlarge(preview: IWidgetWindow | null): void
+    {
+        const widget = (preview?.widget ?? null) as IAvatarImageWidget | null;
+
+        if(!preview || !widget || widget.zoomX === PREVIEW_ZOOM) return;
+
+        const centreX = preview.x + preview.width / 2;
+        const centreY = preview.y + preview.height / 2;
+
+        widget.zoomX = widget.zoomY = PREVIEW_ZOOM;
+        preview.x = Math.round(centreX - preview.width * PREVIEW_ZOOM / 2);
+        preview.y = Math.round(centreY - preview.height * PREVIEW_ZOOM / 2);
     }
 
     private fillTiles(grid: IWindowContainer | null, draft: Readonly<ICharacterDraft>): void
