@@ -59,14 +59,21 @@ test('timers stop on release, a fired timeout is inactive, and listen() needs an
     scope.listen(target, 'keydown', () => undefined);
     scope.listen({}, 'keydown', () => undefined);
 
-    await new Promise(resolve => setTimeout(resolve, 30));
+    // A loaded machine runs timers late: wait for the ticks rather than a fixed time, and release
+    // whatever happens, or a live interval keeps the test process from ever ending.
+    try
+    {
+        for(const deadline = Date.now() + 2000; (ticks < 2 || fired < 1) && Date.now() < deadline;) await new Promise(resolve => setTimeout(resolve, 5));
 
-    assert.ok(ticks >= 2);
-    assert.equal(fired, 1);
-    assert.equal(timeout.active, false);
-    assert.equal(interval.active, true);
-
-    scope.release();
+        assert.ok(ticks >= 2);
+        assert.equal(fired, 1);
+        assert.equal(timeout.active, false);
+        assert.equal(interval.active, true);
+    }
+    finally
+    {
+        scope.release();
+    }
 
     const after = ticks;
 
