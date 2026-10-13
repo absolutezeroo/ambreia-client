@@ -64,7 +64,7 @@ i = int, s = string, b = bool; lists are `count × (...)`.
 | `RpgTargets` | count × (objectId:i, targetObjectId:i; 0 = none) | full in the entry burst, then one entry per combatant whose target changed, each tick. Gives the target of target and every monster's target |
 | `RpgThreat` | monsterObjectId:i, percent:i, hasAggro:b | to the player only, for their current target: on target change, when `percent` moves by `ThreatReportStep` or more, and when `hasAggro` flips. `percent` = floor(playerThreat / topThreat × 100), in 0..100; `hasAggro` = the player is the top of the table (ties: the first in, as the server already resolves them). No value above 100 |
 | `RpgResurrectOffer` | casterObjectId:i, healthPercent:i, expiresMs:i | when a `resurrect` effect lands on a KO player. A newer offer replaces the pending one |
-| `RpgLevelUp` | level:i, statsBefore, statsAfter (the stat block of `RpgStatBlockWriter`), skillsLearned: count × skillId:s | to the player, right after `RpgCharacterProgress`, once per level gained |
+| `RpgLevelUp` | fromLevel:i, toLevel:i, statsBefore, statsAfter (the stat block of `RpgStatBlockWriter`), skillsLearned: count × skillId:s | to the player, once per XP gain that raised the level, after `RpgCharacterProgress`, `RpgCharacterStats` and `RpgSkills` |
 | `RpgAutoAttackState` | active:b | to the player on every change: start, stop, target died, target cleared, refusal |
 
 ### 2.2 New outgoing messages
@@ -114,11 +114,11 @@ None at that tick, not when the corpse is removed. The same for a player who die
 memory like `persistent` statuses, so the GCD and cooldowns survive a zone change. `RpgCooldowns`
 joins the entry burst.
 
-**Level-up.** Order on one XP gain, deterministic whatever the number of levels gained:
-`RpgCharacterProgress` (final level), `RpgCharacterStats` and `RpgSkills` as today, `RpgVitals` and
-`RpgSelfVitals` at the new maxima (health and mana filled), then one `RpgLevelUp` per level in
-ascending order, each with its own `statsBefore`/`statsAfter` and the skills learned at that level.
-The client coalesces consecutive `RpgLevelUp` received in the same tick into one panel (§4).
+**Level-up.** Order on one XP gain, deterministic whatever the number of levels gained: the
+character grain sends `RpgCharacterProgress` (final level), `RpgCharacterStats`, `RpgSkills`, then one
+`RpgLevelUp` with `fromLevel`, `toLevel`, the stats before and after the whole gain and every skill
+learned in between (the grain has no stats for an intermediate level, so one message per gain);
+the zone fills health and mana and sends `RpgVitals` and `RpgSelfVitals` within its next tick.
 
 **Entry burst**, in order: `RpgVitals` (full), `RpgStatuses` (full), `RpgTelegraphs`, `RpgTargets`
 (full), `RpgCooldowns` (full), `RpgThreat` of the current target if any, if the player is KO
@@ -224,10 +224,10 @@ visible behind, greyed by a filter on the scene. The panel closes when the death
 name, level and class resolved from the room's user data by `casterObjectId`, the text with
 `healthPercent`, an expiry bar from `expiresMs`, Accept and Decline.
 
-**Level-up panel** (panel 4). Modal "Niveau N !" with N the last level reached: the avatar in its
-victory pose, the table of stats that rose (last `statsAfter` minus first `statsBefore`, non-zero rows
-only), "Nouveaux éléments débloqués" with every `skillsLearned` (icon and name from content),
-Continue. Several `RpgLevelUp` in one tick make one panel. A gold flash on the player frame. No toast.
+**Level-up panel** (panel 4). Modal "Niveau N !" with N = `toLevel`: the avatar in its victory
+pose, the table of stats that rose (`statsAfter` minus `statsBefore`, non-zero rows only), "Nouveaux
+éléments débloqués" with `skillsLearned` (icon and name from content), Continue. A gold flash on
+the player frame. No toast.
 
 **Combat log.** A `combat` tab of the chat panel: a new channel in `ui/kit/chatModel.ts` next to
 `system`. Typed, coloured lines, each derived from one producer:
@@ -271,10 +271,10 @@ It becomes `AvatarAnimationAssets` in `@ambreia/avatar`; `AmbreiaEffectMap.xml` 
 `dance.*` entries and renamed `AmbreiaAnimationMap.xml`; the 237 other Habbo effects leave the file
 and the asset zip. `vortex-imager` follows; it renders no effect.
 
-**Replacement on the avatar**: status auras. `AuraAddition` in `iso/effects/additions/`, next to
-`SelectionRing` and `SheetAddition`, attached to body or feet per `attach`, created when a status with
-`vfx.aura` appears in the model for an avatar and removed when it expires. It reads the sheets of
-`vfxSheets.generated.ts` like the other phases.
+**Replacement on the avatar**: status auras. `CombatVfx.loop()` already plays a sheet in a loop on
+the body, the feet or the ground (`SheetAddition`) of an avatar: an aura starts when a status with
+`vfx.aura` appears in the model for that avatar and stops when it disappears. No new addition class;
+the sheets come from `vfxSheets.generated.ts` like the other phases.
 
 **Cutover order**: the new domain first, the removal as the last task, after auras play, so no state
 of the client is without visuals.
@@ -283,10 +283,10 @@ of the client is without visuals.
 
 ### 6.1 Definitions
 
-- Skill `priest_resurrect`: class healer, `type: cast`, `castMs` 8000, `range` 8, `target:
-  dead_ally`, effect `{kind: resurrect, healthPercent: 35}`, `cooldownMs` 60000, VFX `release` on the
-  target.
-- Status aura example: `vfx.aura` on an existing mage buff with the `power-aura` sheet, to prove the
+- Skill `skill.cleric.resurrect` (`content/skill/cleric_resurrect.json`, class `class.cleric`, the
+  repository's healer): `type: cast`, `castMs` 8000, `range` 8, `target: dead_ally`, effect
+  `{kind: resurrect, healthPercent: 35}`, `cooldownMs` 60000, VFX `release` on the target.
+- Status aura example: `vfx.aura` on `status.focused` with the `mage/power-aura` sheet, to prove the
   chain.
 - `icon` field on skill and status definitions, served with them. `skillArt.ts` is deleted; the client
   maps nothing. Unknown icon: the generic one, as today.
@@ -295,9 +295,10 @@ of the client is without visuals.
 
 ### 6.2 Texts
 
-`vortex.combat.ko.*`, `vortex.combat.resurrect.*`, `vortex.combat.levelup.*`,
-`vortex.combat.log.*`, `vortex.combat.threat`, `vortex.combat.autoattack`, in fr and en, served by
-`GET /api/public/content/texts/{language}`.
+UI strings (`vortex.combat.ko.*`, `vortex.combat.resurrect.*`, `vortex.combat.levelup.*`,
+`vortex.combat.log.*`, `vortex.combat.threat`, `vortex.combat.autoattack`) live in the client's
+locales (`packages/vortex-client/src/locales/{fr,en}/hud.json`), where every `vortex.combat.*` key
+already is. Content names (`skill.cleric.resurrect.name`) come from the emulator's texts as today.
 
 ## 7. Tests and exit criteria
 
@@ -310,8 +311,7 @@ a buffer produced by the emulator's serializer, not an invented shape. `incoming
 (alive → ko → wait → offer → accept / decline / release / auto-release / offer replaced); health with
 one writer (9013 then 9004 does not lower it); rebuild from the entry burst after `reset(epoch)`
 equals the live model; timers computed from `remainingMs`; log bounded at 200 and typed; auto-attack
-follows `RpgAutoAttackState` only; nothing is logged while `resyncing`; two `RpgLevelUp` in one tick
-make one `levelUp` event.
+follows `RpgAutoAttackState` only; nothing is logged while `resyncing`.
 
 **Server** (emulator tests): `Swings` does nothing without `AutoAttacking`; `RpgTargetSelect` alone
 never swings; `resurrect` on a living target is `invalid_target`; `accept` stands up on the spot with
