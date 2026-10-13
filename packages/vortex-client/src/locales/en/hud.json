@@ -55,6 +55,8 @@
   "vortex.combat.log.heal": "%source% heals %target% for %amount%.",
   "vortex.combat.log.immune": "%target% is immune to %skill%.",
   "vortex.combat.log.levelup": "You reach level %level%!",
+  "vortex.toast.refused": "Can't do that",
+  "vortex.toast.resurrecting": "Being resurrected…",
   "vortex.combat.log.miss": "%source% misses %target%.",
   "vortex.combat.log.resurrect.offered": "%caster% offers to resurrect you.",
   "vortex.combat.log.resurrect.up": "You stand up.",

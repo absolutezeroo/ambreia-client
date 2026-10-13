@@ -55,6 +55,8 @@
   "vortex.combat.log.heal": "%source% rend %amount% points de vie à %target%.",
   "vortex.combat.log.immune": "%target% est insensible à %skill%.",
   "vortex.combat.log.levelup": "Vous passez au niveau %level% !",
+  "vortex.toast.refused": "Action impossible",
+  "vortex.toast.resurrecting": "Résurrection en cours…",
   "vortex.combat.log.miss": "%source% rate %target%.",
   "vortex.combat.log.resurrect.offered": "%caster% propose de vous ressusciter.",
   "vortex.combat.log.resurrect.up": "Vous vous relevez.",

@@ -16,7 +16,8 @@ import {platform} from '@ambreia/common/platform/Platform';
 import {RoomEngineObjectEvent} from '@ambreia/iso/scene/events/RoomEngineObjectEvent';
 import {AttackBinding} from './views/AttackBinding';
 import {CombatLogPanel} from './views/CombatLogPanel';
-import {LOG_IMAGES, logClock} from './views/combatLogLines';
+import {LOG_IMAGES, logClock, logLine} from './views/combatLogLines';
+import type {ILogNames} from './views/ILogNames';
 import {DeathScreens} from './views/DeathScreens';
 import {KoPanel} from './views/KoPanel';
 import {LevelUpPanel} from './views/LevelUpPanel';
@@ -119,9 +120,15 @@ export const CombatFeature: IGameFeature = {
 
         // KO, wait, release, the resurrection offer (M1d §2.3, §4): the owner's two screens.
         const choose = (choice: Parameters<typeof session.deathChoice>[0]): void => deaths.choose(choice);
+        const send = (choice: Parameters<typeof session.deathChoice>[0]): void =>
+        {
+            session.deathChoice(choice);
+
+            if(choice === 'accept') host.made.hud?.toast({kind: 'success', title: bits().text('vortex.toast.resurrecting'), text: '', ms: 4000});
+        };
         const ko = new KoPanel(() => host.made.windowManager, bits(), choose);
         const offer = new ResurrectOfferPanel(() => host.made.windowManager, bits(), choose);
-        const deaths = new DeathScreens(session.model, ko, offer, new OnceChoice(choice => session.deathChoice(choice)),
+        const deaths = new DeathScreens(session.model, ko, offer, new OnceChoice(send),
             () =>
             {
                 const player = host.made.hudPlayer?.value;
@@ -149,13 +156,24 @@ export const CombatFeature: IGameFeature = {
         modelOn('levelUp', up => levelUp.show(up, host.made.hudPlayer?.value.figure ?? ''));
 
         // The combat log (M1d §4): the model's lines, opened with L; the time each line was written.
-        const combatLog = new CombatLogPanel(() => host.made.windowManager, bits(), {
+        const logNames: ILogNames = {
             name: objectId => objectId === session.model.ownObjectId ? bits().text('vortex.combat.log.you') : nameOf(objectId) ?? '',
             content: id => bits().contentName(`${id}.name`, id)
-        }, at => logClock(Date.now() - (platform().now() - at)));
+        };
+        const combatLog = new CombatLogPanel(() => host.made.windowManager, bits(), logNames, at => logClock(Date.now() - (platform().now() - at)));
 
         scope.own(combatLog);
-        modelOn('log', entry => combatLog.add(entry, session.model.log));
+        modelOn('log', entry =>
+        {
+            combatLog.add(entry, session.model.log);
+
+            // A refusal (an attack or a skill the server turned down) is also said at once, as a toast.
+            if(entry.kind !== 'refused') return;
+
+            const text = bits();
+
+            host.made.hud?.toast({kind: 'error', title: text.text('vortex.toast.refused'), text: logLine(entry, (key, ...params) => text.text(key, ...params), logNames).text, ms: 3000});
+        });
         scope.add(host.made.input!.bind('combat', 'l', () => combatLog.toggle(session.model.log), {when: () => room !== null}));
 
         // A monster's own art (tools/build-monsters.mjs) plays these pet gestures; a pet without them

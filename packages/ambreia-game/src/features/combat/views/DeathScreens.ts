@@ -8,12 +8,10 @@ import type {IKoView} from './IKoView';
 import type {IOfferCaster} from './IOfferCaster';
 import type {IOfferView} from './IOfferView';
 import type {OnceChoice} from './OnceChoice';
+import type {Ticker} from '../../../ui/kit/Ticker';
 
 /** How often the countdowns move while the player is KO. */
 const TICK_MS = 250;
-
-/** A ticker the feature's scope owns. */
-export type Ticker = (run: () => void, ms: number) => {clear(): void};
 
 /**
  * The death screens (M1d §4): the KO screen while the model says KO, the offer beside it while one

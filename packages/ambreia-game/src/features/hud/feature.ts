@@ -10,6 +10,8 @@ import {bindCharacterToHud} from './CharacterHudBridge';
 import {ChatPanel} from './ChatPanel';
 import {CHAT_ICONS, loadChatSettings} from '../../ui/kit/chatModel';
 import {WindowBits} from '../../ui/kit/WindowBits';
+import {platform} from '@ambreia/common/platform/Platform';
+import {TOAST_IMAGES, ToastStack} from './ToastStack';
 
 // The demo's icons: read by name (static_bitmap asset_uri set at run time), so declared to be
 // decoded at load (IGameFeature.images). The server's skills, quests and effects will come with
@@ -45,7 +47,7 @@ const clock = (date: Date): string => `${String(date.getHours()).padStart(2, '0'
  */
 export const HudFeature: IGameFeature = {
     id: 'hud',
-    images: [...CHAT_ICONS, ATTACK_ICON, ...DEMO_SKILLS, ...DEMO_ITEMS, ...DEMO_QUESTS, ...DEMO_BUFFS, ...DEMO_DEBUFFS, DEMO_BOSS],
+    images: [...CHAT_ICONS, ATTACK_ICON, ...TOAST_IMAGES, ...DEMO_SKILLS, ...DEMO_ITEMS, ...DEMO_QUESTS, ...DEMO_BUFFS, ...DEMO_DEBUFFS, DEMO_BOSS],
     requires: ['character', 'roomSession', 'communication'],
     create: ({host, scope}) =>
     {
@@ -57,6 +59,12 @@ export const HudFeature: IGameFeature = {
         // The chat settings the player chose on this browser (the cog).
         panels.update({chatSettings: loadChatSettings(ChatPanel.storage())});
         let view: HudView | null = null;
+
+        // The toasts (M1d §4): any feature's notices, stacked at the top of the screen.
+        const toasts = new ToastStack(() => host.made.windowManager, new WindowBits(host.made.localization), (run, ms) => scope.interval(run, ms), () => platform().now());
+
+        scope.own(toasts);
+        scope.bind(panels.events)('toast', toast => toasts.push(toast));
         let panelsView: HudPanelsView | null = null;
 
         // What is typed goes to the chat feature (F3c), which sends it; the server's copy comes back as a line.

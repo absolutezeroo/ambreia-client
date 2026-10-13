@@ -1,5 +1,6 @@
 import {EventEmitter} from 'eventemitter3';
 import type {IHudPanels} from './IHud';
+import type {IToast} from './IToast';
 import {ALL_TAB, DEFAULT_CHAT_SETTINGS, type IChatLine, type IChatTab} from '../../ui/kit/chatModel';
 
 export type {ChatChannel, IChatLine} from '../../ui/kit/chatModel';
@@ -18,9 +19,9 @@ export class HudPanelsState
     /**
      * `nav`: a top bar button was clicked (`nav_inventory`…), the feature that owns the window opens
      * it; `say`: the player typed a chat line (Enter), the chat feature sends it; `emote`: an RP
-     * action of the palette (`wave`…), the chat feature asks for it.
+     * action of the palette (`wave`…), the chat feature asks for it; `toast`: a notice to show (ToastStack).
      */
-    readonly events = new EventEmitter<{changed: [Readonly<IHudPanels>]; nav: [string]; say: [string]; emote: [string]}>();
+    readonly events = new EventEmitter<{changed: [Readonly<IHudPanels>]; nav: [string]; say: [string]; emote: [string]; toast: [IToast]}>();
     private _value: IHudPanels = {
         gold: null, gems: null, tokens: null, questAlert: false, zoneName: '', zonePlayers: null,
         quests: [], party: [], buffs: [], partySelected: null, navOpen: null, target: null, targetOfTarget: null, boss: null, alert: null, chat: [], chatTabs: [ALL_TAB], chatTab: ALL_TAB.id, sayChannel: 'world', chatSettings: DEFAULT_CHAT_SETTINGS
@@ -42,6 +43,12 @@ export class HudPanelsState
     get openTab(): IChatTab
     {
         return this._value.chatTabs.find(tab => tab.id === this._value.chatTab) ?? ALL_TAB;
+    }
+
+    /** A notice at the top of the screen, from any feature. */
+    toast(toast: IToast): void
+    {
+        this.events.emit('toast', toast);
     }
 
     addChatLine(line: IChatLine): void
