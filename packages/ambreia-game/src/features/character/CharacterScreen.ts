@@ -11,7 +11,8 @@ import {RpgCharacterChooseClassMessage} from '@ambreia/protocol/outgoing/rpg/cha
 import {RpgEnterWorldMessage} from '@ambreia/protocol/outgoing/rpg/characters/RpgEnterWorldMessage';
 import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
 import type {IRpgCharacterSession} from './IRpgCharacterSession';
-import {CharacterCreateView, type ICharacterDraft} from './CharacterCreateView';
+import {CharacterCreateView} from './CharacterCreateView';
+import type {ICharacterDraft} from './create/ICharacterDraft';
 import {WindowBits} from '../../ui/kit/WindowBits';
 
 const log = Logger.getLogger('habbo.features.character.CharacterScreen');
