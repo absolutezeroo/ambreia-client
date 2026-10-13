@@ -128,6 +128,8 @@ export interface ITextWindow extends IWindow, IScrollableWindow
     htmlText: string;
     // AS3: .../src/com/sulake/core/window/components/TextController.as::get textColor()
     textColor: number;
+    // TS-only: the caption colour of a selected tab (`selected_text_color`), null when the layout sets none.
+    readonly selectedTextColor: number | null;
     // AS3: .../src/com/sulake/core/window/components/TextController.as::get textBackground()
     textBackground: boolean;
     // AS3: .../src/com/sulake/core/window/components/TextController.as::get textBackgroundColor()

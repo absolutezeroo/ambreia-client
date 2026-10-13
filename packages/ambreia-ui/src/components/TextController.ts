@@ -120,6 +120,8 @@ export class TextController extends WindowController implements ITextWindow
     protected _hasExplicitTextStyle: boolean = false;
 
     protected _textColor: number = 0;
+    // TS-only: the colour a tab's caption takes while its tab is selected (`selected_text_color`); null leaves it alone.
+    protected _selectedTextColor: number | null = null;
     protected _bold: boolean = false;
 
     // TS-only: remembers that `_bold` came from a Flash font NAME rather than from a `bold` var,
@@ -313,6 +315,12 @@ export class TextController extends WindowController implements ITextWindow
         this._textColor = value;
         this.refreshTextImage();
         this._explicitStyle.color = value;
+    }
+
+    // TS-only: see `_selectedTextColor`.
+    public get selectedTextColor(): number | null
+    {
+        return this._selectedTextColor;
     }
 
     // DEVIATION: AS3's TextController declares no `color` getter at all — the opacity below is
@@ -1347,6 +1355,7 @@ export class TextController extends WindowController implements ITextWindow
         props.push(this.createProperty('font_size', this._fontSize));
         props.push(this.createProperty('grid_fit_type', this._gridFitType));
         props.push(this.createProperty('text_color', this._textColor));
+        if(this._selectedTextColor !== null) props.push(this.createProperty('selected_text_color', this._selectedTextColor));
         props.push(this.createProperty('text_style', this._textStyleName));
         props.push(this.createProperty('margin_left', this._marginLeft));
         props.push(this.createProperty('margin_top', this._marginTop));
@@ -2512,6 +2521,10 @@ export class TextController extends WindowController implements ITextWindow
             'text_color': (ctrl, v) =>
             {
                 ctrl.textColor = Number(v);
+            },
+            'selected_text_color': (ctrl, v) =>
+            {
+                ctrl._selectedTextColor = Number(v);
             },
             'text_style': (ctrl, v) =>
             {

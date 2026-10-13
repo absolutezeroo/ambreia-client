@@ -3,6 +3,7 @@ import type {IWindowContext} from '../IWindowContext';
 import type {ITabButtonWindow} from './ITabButtonWindow';
 import {WindowController} from '../WindowController';
 import type {WindowEvent} from '../events/WindowEvent';
+import type {ITextWindow} from './ITextWindow';
 import {SelectableController} from './SelectableController';
 
 /**
@@ -21,6 +22,8 @@ export class TabButtonController extends SelectableController implements ITabBut
     private static readonly LABEL_TAG: string = 'TAB_BUTTON_TITLE';
     // AS3: .../src/com/sulake/core/window/components/TabButtonController.as::ICON_TAG
     private static readonly ICON_TAG: string = 'TAB_BUTTON_ICON';
+    // TS-only: the caption's own colour, kept while the selected colour shows (a light active tab over dark ones).
+    private _labelColor: number | null = null;
 
     constructor(
         name: string,
@@ -62,6 +65,18 @@ export class TabButtonController extends SelectableController implements ITabBut
         if(event.type === 'WE_CHILD_RESIZED')
         {
             WindowController.resizeToAccommodateChildren(this);
+        }
+
+        // A caption with a `selected_text_color` swaps to it while the tab is selected.
+        if(event.type === 'WE_SELECTED' || event.type === 'WE_UNSELECTED')
+        {
+            const label = this.findChildByTag(TabButtonController.LABEL_TAG) as ITextWindow | null;
+
+            if(label && label.selectedTextColor !== null)
+            {
+                this._labelColor ??= label.textColor;
+                label.textColor = event.type === 'WE_SELECTED' ? label.selectedTextColor : this._labelColor;
+            }
         }
 
         return super.update(source, event);
