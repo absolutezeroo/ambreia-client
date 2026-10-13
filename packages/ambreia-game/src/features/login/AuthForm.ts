@@ -1,3 +1,5 @@
+import type {IRegisterForm} from './IRegisterForm';
+
 /** The server's rules (AccountPasswordRules, BCrypt's 72 bytes), checked before asking it. */
 export const PASSWORD_MIN_LENGTH = 8;
 export const PASSWORD_MAX_BYTES = 72;
@@ -16,15 +18,6 @@ export function passwordStrength(password: string): 0 | 1 | 2 | 3
     const score = kinds + (password.length >= 12 ? 1 : 0);
 
     return score >= 4 ? 3 : score >= 3 ? 2 : 1;
-}
-
-export interface IRegisterForm
-{
-    email: string;
-    password: string;
-    confirm: string;
-    acceptTerms: boolean;
-    acceptPrivacy: boolean;
 }
 
 /** The first thing that stops the registration, as the error code shown for it; null when none. */

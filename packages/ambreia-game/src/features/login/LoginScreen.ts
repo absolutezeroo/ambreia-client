@@ -3,38 +3,22 @@ import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import type {WindowKeyboardEvent} from '@ambreia/ui/events/WindowKeyboardEvent';
 import type {IWindow} from '@ambreia/ui/IWindow';
 import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
-import type {ISelectableWindow} from '@ambreia/ui/components/ISelectableWindow';
 import type {ITextFieldWindow} from '@ambreia/ui/components/ITextFieldWindow';
 import type {IHabboLocalizationManager} from '../../localization/IHabboLocalizationManager';
 import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
-import {AuthApi, AuthApiError} from './AuthApi';
-import {isEmail, passwordStrength, registerProblem} from './AuthForm';
+import {AuthApi} from './AuthApi';
+import {isEmail, registerProblem} from './AuthForm';
+import {authErrorKey} from './screen/authErrors';
+import {layOutAuthScreen} from './screen/layOutAuthScreen';
+import {LoginForm} from './screen/LoginForm';
+import {RegisterForm} from './screen/RegisterForm';
+import {RememberedEmail} from './screen/RememberedEmail';
+import {SignInFlow} from './screen/SignInFlow';
 
 const log = Logger.getLogger('habbo.features.login.LoginScreen');
 
 const LAYER = 1;
-/** The size vortex_auth_screen_xml is drawn at. */
-const DESIGN = {width: 1280, height: 720};
 const ENTER = 13;
-const REMEMBER_KEY = 'ambreia:login.email';
-/** The strength bars' colours: unused, weak, medium, strong. */
-const STRENGTH_COLORS = [0xffd0d0c8, 0xffd04030, 0xffe0a020, 0xff4caa30];
-const STRENGTH_KEYS = ['', 'vortex.auth.strength.weak', 'vortex.auth.strength.medium', 'vortex.auth.strength.strong'];
-
-/** The server's codes and the form's own, to the text shown for them. */
-const ERROR_KEYS: Record<string, string> = {
-    'pocket.auth.login_failed': 'vortex.auth.error.credentials',
-    'pocket.auth.invalid_login': 'vortex.auth.error.credentials',
-    'pocket.auth.missing_credentials': 'vortex.auth.error.credentials',
-    'pocket.auth.email_already_taken': 'vortex.auth.error.email_taken',
-    'pocket.auth.password_too_short': 'vortex.auth.error.password_short',
-    'pocket.auth.password_too_long': 'vortex.auth.error.password_long',
-    email_invalid: 'vortex.auth.field.invalid',
-    password_mismatch: 'vortex.auth.field.mismatch',
-    terms_not_accepted: 'vortex.auth.error.terms',
-    rate_limited: 'vortex.auth.error.rate_limited',
-    network: 'vortex.auth.error.network'
-};
 
 type Dialog = 'login' | 'register';
 
@@ -42,15 +26,19 @@ type Dialog = 'login' | 'register';
  * The login screen (F3a §6.4, vortex_auth_screen_xml): the backdrop, and in its dialog slot the
  * login or the registration form. Signing in goes through the web API, which answers with the
  * account ticket the socket logs in with. The screen stays up behind the characters screen and
- * is disposed once the player is in the world.
+ * is disposed once the player is in the world. This one builds the screen and the forms and routes
+ * their events; each form, the layout and the sign-in flow are their own units (screen/).
  */
 export class LoginScreen
 {
     private _screen: IWindowContainer | null = null;
     private _dialog: IWindowContainer | null = null;
     private _shown: Dialog | null = null;
-    private _busy = false;
     private _resolve: ((ticket: string) => void) | null = null;
+    private readonly _login = new LoginForm();
+    private readonly _register: RegisterForm;
+    private readonly _remembered = new RememberedEmail();
+    private readonly _flow: SignInFlow;
     private _disposed = false;
 
     private readonly _onResize = (): void => this.place();
@@ -60,7 +48,15 @@ export class LoginScreen
         private readonly _localization: IHabboLocalizationManager | null,
         private readonly _api = new AuthApi(),
         private readonly _version = ''
-    ) {}
+    )
+    {
+        this._register = new RegisterForm(key => this.text(key));
+        this._flow = new SignInFlow(() => this._api.accountTicket(), ticket => this.signedIn(ticket), code => this.refused(code), busy =>
+        {
+            if(busy) this._dialog?.disable();
+            else this._dialog?.enable();
+        });
+    }
 
     /** Shows the screen until the player signs in or registers; resolves with the account ticket. */
     signIn(): Promise<string>
@@ -93,9 +89,16 @@ export class LoginScreen
         }
 
         // No language switch, options or quit yet: hidden rather than dead.
-        this.hide(this._screen, 'language_menu', 'options_link', 'quit_link');
+        for(const name of ['language_menu', 'options_link', 'quit_link'])
+        {
+            const window = this._screen.findChildByName(name);
 
-        this.setText(this._screen, 'version_txt', this.text('vortex.auth.version', 'version', this._version));
+            if(window) window.visible = false;
+        }
+
+        const version = this._screen.findChildByName('version_txt');
+
+        if(version) version.caption = this.text('vortex.auth.version', 'version', this._version);
         desktop.addChild(this._screen);
         this._screen.addEventListener('WE_PARENT_RESIZED', this._onResize);
         this.place();
@@ -107,51 +110,12 @@ export class LoginScreen
     {
         const desktop = this._windows.getDesktop(LAYER);
 
-        if(!desktop || !this._screen) return;
-
-        const screen = this._screen;
-        const width = desktop.width;
-        const height = desktop.height;
-        const at = (name: string): IWindow | null => screen.findChildByName(name);
-        const set = (name: string, values: Partial<Pick<IWindow, 'x' | 'y' | 'width' | 'height'>>): void =>
-        {
-            const window = at(name);
-
-            if(window) Object.assign(window, values);
-        };
-
-        // The whole desktop: the backdrop covers it at its own proportions, the rest keeps its
-        // place relative to the centre or to the bottom edge of the 1280 × 720 mock-up.
-        Object.assign(screen, {x: 0, y: 0, width, height});
-        set('backdrop_color', {x: 0, y: 0, width, height});
-
-        const backdrop = at('backdrop') as (IWindow & {stretchedX: boolean; stretchedY: boolean}) | null;
-
-        if(backdrop)
-        {
-            const scale = Math.max(width / DESIGN.width, height / DESIGN.height);
-            const cover = {width: Math.ceil(DESIGN.width * scale), height: Math.ceil(DESIGN.height * scale)};
-
-            backdrop.stretchedX = backdrop.stretchedY = true;
-            Object.assign(backdrop, {...cover, x: Math.round((width - cover.width) / 2), y: Math.round((height - cover.height) / 2)});
-        }
-
-        const centreX = (name: string, designY: number): void =>
-        {
-            const window = at(name);
-
-            if(window) Object.assign(window, {x: Math.round((width - window.width) / 2), y: Math.round(height / 2 + designY - DESIGN.height / 2)});
-        };
-
-        centreX('logo', 6);
-        centreX('dialog_slot', 235);
-        set('footer_bg', {x: 0, y: height - 30, width});
-        set('version_txt', {y: height - 23});
+        if(desktop && this._screen) layOutAuthScreen(this._screen, desktop.width, desktop.height);
     }
 
     private showDialog(dialog: Dialog): void
     {
-        const slot = this._screen && this.find(this._screen, 'dialog_slot') as IWindowContainer | null;
+        const slot = this._screen?.findChildByName('dialog_slot') as IWindowContainer | null;
 
         if(!slot) return;
 
@@ -181,59 +145,13 @@ export class LoginScreen
         // The layouts say `password`; the text field's property is `display_as_password`.
         for(const name of ['password_input', 'confirm_input'])
         {
-            const field = this.input(name);
+            const field = this._dialog.findChildByName(name) as ITextFieldWindow | null;
 
             if(field) field.displayAsPassword = true;
         }
 
-        if(dialog === 'login')
-        {
-            // No reset route on the server yet.
-            this.hide(this._dialog, 'forgot_link', 'login_error');
-
-            const remembered = this.remembered();
-
-            if(remembered)
-            {
-                this.input('identifier_input')!.text = remembered;
-                (this.find(this._dialog, 'remember_me') as ISelectableWindow | null)?.select();
-            }
-        }
-        else
-        {
-            // The account has no name of its own (the server keeps an e-mail): characters do.
-            this.hide(this._dialog, 'username_label', 'username_status');
-
-            const username = this.find(this._dialog, 'username_input')?.parent;
-
-            if(username) username.visible = false;
-            this.closeUsernameGap(slot);
-            this.refreshRegisterFields();
-        }
-    }
-
-    /** Moves the registration form up over the hidden username row, and shrinks it to match. */
-    private closeUsernameGap(slot: IWindowContainer): void
-    {
-        const dialog = this._dialog!;
-        const content = this.find(dialog, 'content') as IWindowContainer | null;
-        const from = this.find(dialog, 'username_label');
-        const to = this.find(dialog, 'email_label');
-
-        if(!content || !from || !to) return;
-
-        const gap = to.y - from.y;
-
-        for(let i = 0; i < content.numChildren; i++)
-        {
-            const child = content.getChildAt(i);
-
-            if(child && child.y >= to.y) child.y -= gap;
-        }
-
-        content.height -= gap;
-        dialog.height -= gap;
-        dialog.y = Math.round((slot.height - dialog.height) / 2);
+        if(dialog === 'login') this._login.prepare(this._dialog, this._remembered.get());
+        else this._register.prepare(this._dialog, slot);
     }
 
     private readonly _onEvent = (event: WindowEvent, window: IWindow): void =>
@@ -247,7 +165,7 @@ export class LoginScreen
 
         if(event.type === 'WE_CHANGE' && this._shown === 'register')
         {
-            this.refreshRegisterFields();
+            if(this._dialog) this._register.refresh(this._dialog);
 
             return;
         }
@@ -265,181 +183,60 @@ export class LoginScreen
 
     private async submitLogin(): Promise<void>
     {
-        const email = this.input('identifier_input')?.text.trim() ?? '';
-        const password = this.input('password_input')?.text ?? '';
+        if(!this._dialog) return;
 
-        if(!isEmail(email) || password.length === 0)
+        const form = this._login.read(this._dialog);
+
+        if(!isEmail(form.email) || form.password.length === 0)
         {
-            this.showLoginError('pocket.auth.missing_credentials');
+            this.refused('pocket.auth.missing_credentials');
 
             return;
         }
 
-        const remember = (this.find(this._dialog!, 'remember_me') as ISelectableWindow | null)?.isSelected ?? false;
-
-        await this.run(async () =>
+        await this._flow.run(async () =>
         {
-            await this._api.login(email, password);
-            this.remember(remember ? email : null);
+            await this._api.login(form.email, form.password);
+            this._remembered.set(form.remember ? form.email : null);
         });
     }
 
     private async submitRegister(): Promise<void>
     {
-        const form = {
-            email: this.input('email_input')?.text.trim() ?? '',
-            password: this.input('password_input')?.text ?? '',
-            confirm: this.input('confirm_input')?.text ?? '',
-            acceptTerms: (this.find(this._dialog!, 'accept_terms') as ISelectableWindow | null)?.isSelected ?? false,
-            acceptPrivacy: (this.find(this._dialog!, 'accept_privacy') as ISelectableWindow | null)?.isSelected ?? false
-        };
+        if(!this._dialog) return;
+
+        const form = this._register.read(this._dialog);
         const problem = registerProblem(form);
 
         if(problem)
         {
-            this.alert(problem);
+            this.refused(problem);
 
             return;
         }
 
-        await this.run(() => this._api.register(form.email, form.password, form.confirm));
+        await this._flow.run(() => this._api.register(form.email, form.password, form.confirm));
     }
 
-    /** One request at a time; on success the account ticket ends the screen's part. */
-    private async run(signIn: () => Promise<void>): Promise<void>
+    /** The account ticket ends the screen's part. */
+    private signedIn(ticket: string): void
     {
-        if(this._busy) return;
+        if(this._disposed) return;
 
-        this._busy = true;
-        this._dialog?.disable();
-
-        try
-        {
-            await signIn();
-
-            const ticket = await this._api.accountTicket();
-
-            if(this._disposed) return;
-
-            this._dialog?.destroy();
-            this._dialog = null;
-            this._shown = null;
-            this._resolve?.(ticket);
-            this._resolve = null;
-        }
-        catch (error)
-        {
-            const code = error instanceof AuthApiError ? error.code : 'unknown';
-
-            log.info(`sign in refused: ${code}`);
-            if(this._shown === 'login') this.showLoginError(code);
-            else this.alert(code);
-        }
-        finally
-        {
-            this._busy = false;
-            this._dialog?.enable();
-        }
+        this._dialog?.destroy();
+        this._dialog = null;
+        this._shown = null;
+        this._resolve?.(ticket);
+        this._resolve = null;
     }
 
-    private refreshRegisterFields(): void
+    /** The login form says why on its error line; the registration form in an alert. */
+    private refused(code: string): void
     {
-        const dialog = this._dialog;
+        const text = this.text(authErrorKey(code));
 
-        if(!dialog) return;
-
-        const password = this.input('password_input')?.text ?? '';
-        const confirm = this.input('confirm_input')?.text ?? '';
-        const strength = passwordStrength(password);
-
-        for(let i = 0; i < 3; i++)
-        {
-            const bar = this.find(dialog, `strength_${i}`);
-
-            if(bar) bar.color = STRENGTH_COLORS[i < strength ? strength : 0];
-        }
-
-        this.setText(dialog, 'strength_txt', strength === 0 ? '' : this.text(STRENGTH_KEYS[strength]));
-
-        const status = this.find(dialog, 'confirm_status');
-
-        if(status)
-        {
-            status.visible = confirm.length > 0;
-            this.setText(status as IWindowContainer, 'status_txt', this.text(password === confirm ? 'vortex.auth.field.matching' : 'vortex.auth.field.mismatch'));
-        }
-    }
-
-    private showLoginError(code: string): void
-    {
-        const error = this._dialog && this.find(this._dialog, 'login_error');
-
-        if(!error) return;
-
-        error.caption = this.errorText(code);
-        error.visible = true;
-    }
-
-    private alert(code: string): void
-    {
-        this._windows.alert(this.text('vortex.auth.register'), this.errorText(code), 0, null);
-    }
-
-    private errorText(code: string): string
-    {
-        return this.text(ERROR_KEYS[code] ?? 'vortex.auth.error.unknown');
-    }
-
-    private remembered(): string | null
-    {
-        try
-        {
-            return localStorage.getItem(REMEMBER_KEY);
-        }
-        catch
-        {
-            return null;
-        }
-    }
-
-    private remember(email: string | null): void
-    {
-        try
-        {
-            if(email) localStorage.setItem(REMEMBER_KEY, email);
-            else localStorage.removeItem(REMEMBER_KEY);
-        }
-        catch
-        {
-            // Private window: nothing remembered, nothing lost.
-        }
-    }
-
-    private hide(container: IWindowContainer, ...names: string[]): void
-    {
-        for(const name of names)
-        {
-            const window = container.findChildByName(name);
-
-            if(window) window.visible = false;
-        }
-    }
-
-    private input(name: string): ITextFieldWindow | null
-    {
-        return this._dialog ? this.find(this._dialog, name) as ITextFieldWindow | null : null;
-    }
-
-    private find(container: IWindowContainer, name: string): IWindow | null
-    {
-        return container.findChildByName(name);
-    }
-
-    private setText(container: IWindowContainer, name: string, text: string): void
-    {
-        const window = container.findChildByName(name);
-
-        if(window && window.caption !== text) window.caption = text;
+        if(this._shown === 'login' && this._dialog) this._login.showError(this._dialog, text);
+        else this._windows.alert(this.text('vortex.auth.register'), text, 0, null);
     }
 
     private text(key: string, ...params: string[]): string
