@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="purple_vortex_quest_xml" width="740" height="584" version="0.1">
+  <window>
+    <frame x="0" y="0" width="740" height="584" params="32769" style="103" name="quest_window" caption="${vortex.quest.title}">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <tab_context x="6" y="2" width="720" height="32" params="17" style="3" name="tab_context">
+          <children>
+            <tab_button x="0" y="0" width="160" height="32" params="17" style="3" name="tab_main" caption="${vortex.quest.tab.main}" id="1"/>
+            <tab_button x="160" y="0" width="160" height="32" params="17" style="3" name="tab_side" caption="${vortex.quest.tab.side}" id="2"/>
+            <tab_button x="320" y="0" width="160" height="32" params="17" style="3" name="tab_daily" caption="${vortex.quest.tab.daily}" id="3"/>
+            <tab_button x="480" y="0" width="160" height="32" params="17" style="3" name="tab_done" caption="${vortex.ui.completed}" id="4"/>
+          </children>
+        </tab_context>
+        <container x="0" y="40" width="734" height="500" params="16" style="3" name="tab_content">
+          <children/>
+        </container>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

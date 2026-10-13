@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="states_trade" width="1276" height="1156" version="0.1">
+  <window>
+    <frame x="0" y="0" width="1276" height="1156" params="32769" style="103" name="states_trade" caption="États – Échange">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <text x="10" y="4" width="900" height="16" params="16" style="3" caption="1. Échange : proposition, joueur prêt, verrouillé">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0xffd890" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="22" width="1250" height="1" params="16" style="8" color="0xff8a78a8" background="true"/>
+        <text x="10" y="28" width="300" height="16" params="16" style="3" caption="Proposition en cours">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="42" width="600" height="408" params="16" style="3" name="trade"><children/></container>
+        <text x="650" y="28" width="300" height="16" params="16" style="3" caption="Joueur prêt">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="650" y="42" width="600" height="408" params="16" style="3" name="trade_ready"><children/></container>
+        <text x="10" y="460" width="300" height="16" params="16" style="3" caption="Les deux confirmés, verrouillé">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="474" width="600" height="408" params="16" style="3" name="trade_locked"><children/></container>
+        <text x="650" y="460" width="300" height="16" params="16" style="3" caption="Confirmation finale">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="650" y="474" width="340" height="280" params="16" style="3" name="trade_confirm"><children/></container>
+        <text x="650" y="768" width="300" height="16" params="16" style="3" caption="Avertissement">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="650" y="782" width="460" height="60" params="16" style="3" name="warning"><children/></container>
+        <text x="10" y="892" width="900" height="16" params="16" style="3" caption="2. Séparation de pile, infobulle">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0xffd890" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="910" width="1250" height="1" params="16" style="8" color="0xff8a78a8" background="true"/>
+        <text x="10" y="916" width="300" height="16" params="16" style="3" caption="Séparation de pile">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="930" width="300" height="182" params="16" style="3" name="split"><children/></container>
+        <text x="320" y="916" width="300" height="16" params="16" style="3" caption="Infobulle d’objet">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="320" y="930" width="300" height="124" params="16" style="3" name="tip_item"><children/></container>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

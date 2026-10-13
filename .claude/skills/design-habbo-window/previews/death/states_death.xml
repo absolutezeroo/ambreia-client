@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="states_death" width="1276" height="1250" version="0.1">
+  <window>
+    <frame x="0" y="0" width="1276" height="1250" params="32769" style="103" name="states_death" caption="États – Mort et progression">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <text x="10" y="4" width="900" height="16" params="16" style="3" caption="1. Mort, résurrection, wipe">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0xffd890" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="22" width="1250" height="1" params="16" style="8" color="0xff8a78a8" background="true"/>
+        <text x="10" y="28" width="300" height="16" params="16" style="3" caption="Écran de mort (K.O.)">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="42" width="380" height="330" params="16" style="3" name="death"><children/></container>
+        <text x="400" y="28" width="300" height="16" params="16" style="3" caption="Proposition de résurrection">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="400" y="42" width="320" height="236" params="16" style="3" name="resurrect"><children/></container>
+        <text x="730" y="28" width="300" height="16" params="16" style="3" caption="Échec / wipe de donjon">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="730" y="42" width="380" height="290" params="16" style="3" name="wipe"><children/></container>
+        <text x="10" y="386" width="900" height="16" params="16" style="3" caption="2. Réapparition et progression">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0xffd890" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="404" width="1250" height="1" params="16" style="8" color="0xff8a78a8" background="true"/>
+        <text x="10" y="410" width="300" height="16" params="16" style="3" caption="Montée de niveau">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="424" width="420" height="360" params="16" style="3" name="levelup"><children/></container>
+        <text x="440" y="410" width="300" height="16" params="16" style="3" caption="Récapitulatif de récompenses">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="440" y="424" width="420" height="340" params="16" style="3" name="summary"><children/></container>
+        <text x="870" y="410" width="300" height="16" params="16" style="3" caption="Choix du point de réapparition">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="870" y="424" width="330" height="400" params="16" style="3" name="respawn"><children/></container>
+        <text x="10" y="836" width="900" height="16" params="16" style="3" caption="3. Récompense de quête et confirmation">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0xffd890" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="854" width="1250" height="1" params="16" style="8" color="0xff8a78a8" background="true"/>
+        <text x="10" y="860" width="300" height="16" params="16" style="3" caption="Choix de récompense de quête">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="874" width="580" height="300" params="16" style="3" name="reward_choice"><children/></container>
+        <text x="600" y="860" width="300" height="16" params="16" style="3" caption="Fenêtre de confirmation générique">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="600" y="874" width="320" height="140" params="16" style="3" name="confirm"><children/></container>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="states_parts" width="1276" height="500" version="0.1">
+  <window>
+    <frame x="0" y="0" width="1276" height="500" params="32769" style="103" name="states_parts" caption="États – Housing, permissions et composants">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <text x="10" y="4" width="900" height="16" params="16" style="3" caption="1. Permissions, états, confirmations">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0xffd890" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="22" width="1250" height="1" params="16" style="8" color="0xff8a78a8" background="true"/>
+        <text x="10" y="28" width="400" height="16" params="16" style="3" caption="Permissions d’accès">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="42" width="380" height="360" params="16" style="3" name="permissions"><children/></container>
+        <text x="400" y="28" width="400" height="16" params="16" style="3" caption="Onglets : normal, survol, sélectionné">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="400" y="42" width="280" height="70" params="16" style="3" name="tabs"><children/></container>
+        <text x="400" y="122" width="400" height="16" params="16" style="3" caption="Emplacement d’objet : sélectionné, normal">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="400" y="136" width="140" height="56" params="16" style="3" name="slots"><children/></container>
+        <text x="400" y="202" width="400" height="16" params="16" style="3" caption="Mobilier verrouillé">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="400" y="216" width="56" height="56" params="16" style="3" name="locked"><children/></container>
+        <text x="464" y="226" width="200" height="16" params="16" style="3" caption="Objet verrouillé">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="464" y="244" width="200" height="16" params="16" style="3" caption="Non modifiable">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0xff8a7a" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="700" y="28" width="400" height="16" params="16" style="3" caption="Infobulle">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="700" y="42" width="300" height="124" params="16" style="3" name="tip"><children/></container>
+        <text x="700" y="176" width="400" height="16" params="16" style="3" caption="Confirmation de suppression">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="700" y="190" width="320" height="140" params="16" style="3" name="confirm_delete"><children/></container>
+        <text x="400" y="290" width="400" height="16" params="16" style="3" caption="Confirmation de stockage">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="400" y="304" width="320" height="140" params="16" style="3" name="confirm_store"><children/></container>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="states_npc" width="1276" height="1160" version="0.1">
+  <window>
+    <frame x="0" y="0" width="1276" height="1160" params="32769" style="103" name="states_npc" caption="États – Dialogues PNJ">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <text x="10" y="4" width="900" height="16" params="16" style="3" caption="1. Dialogue principal et états de quête">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0xffd890" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="22" width="1250" height="1" params="16" style="8" color="0xff8a78a8" background="true"/>
+        <text x="10" y="28" width="300" height="16" params="16" style="3" caption="Dialogue PNJ principal (choix, un verrouillé)">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="42" width="440" height="420" params="16" style="3" name="dialog_main"><children/></container>
+        <text x="460" y="28" width="300" height="16" params="16" style="3" caption="Quête disponible">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="460" y="42" width="440" height="260" params="16" style="3" name="dialog_available"><children/></container>
+        <text x="460" y="312" width="300" height="16" params="16" style="3" caption="Quête en cours">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="460" y="326" width="440" height="250" params="16" style="3" name="dialog_progress"><children/></container>
+        <text x="10" y="472" width="300" height="16" params="16" style="3" caption="Quête terminée">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="486" width="440" height="250" params="16" style="3" name="dialog_done"><children/></container>
+        <text x="460" y="586" width="300" height="16" params="16" style="3" caption="Remise de récompense">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="460" y="600" width="440" height="300" params="16" style="3" name="dialog_reward"><children/></container>
+        <text x="910" y="28" width="300" height="16" params="16" style="3" caption="Menu d’interaction PNJ">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="910" y="42" width="230" height="250" params="16" style="3" name="npc_menu"><children/></container>
+        <text x="910" y="302" width="300" height="16" params="16" style="3" caption="Indicateurs en jeu">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="910" y="316" width="24" height="24" params="16" style="3" name="marker_quest"><children/></container>
+        <container x="950" y="316" width="24" height="24" params="16" style="3" name="marker_talk"><children/></container>
+        <container x="990" y="316" width="120" height="28" params="16" style="3" name="prompt"><children/></container>
+        <text x="910" y="356" width="300" height="16" params="16" style="3" caption="Choix : normal, survol, sélectionné, verrouillé">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="910" y="370" width="350" height="40" params="16" style="3" name="choice_normal"><children/></container>
+        <container x="910" y="416" width="350" height="40" params="16" style="3" name="choice_hover"><children/></container>
+        <container x="910" y="462" width="350" height="40" params="16" style="3" name="choice_selected"><children/></container>
+        <container x="910" y="508" width="350" height="40" params="16" style="3" name="choice_locked"><children/></container>
+        <text x="910" y="560" width="300" height="16" params="16" style="3" caption="Infobulle d’objet">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="910" y="574" width="300" height="124" params="16" style="3" name="tip"><children/></container>
+        <text x="10" y="912" width="900" height="16" params="16" style="3" caption="2. Messages">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0xffd890" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="930" width="1250" height="1" params="16" style="8" color="0xff8a78a8" background="true"/>
+        <text x="10" y="936" width="300" height="16" params="16" style="3" caption="Message d’avertissement">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="950" width="520" height="40" params="16" style="3" name="warning"><children/></container>
+        <text x="540" y="936" width="300" height="16" params="16" style="3" caption="Confirmation">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="540" y="950" width="320" height="140" params="16" style="3" name="confirm"><children/></container>
+        <text x="10" y="1000" width="300" height="16" params="16" style="3" caption="Toasts de succès et d’erreur">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="1014" width="320" height="46" params="16" style="3" name="toast_ok"><children/></container>
+        <container x="10" y="1066" width="320" height="46" params="16" style="3" name="toast_err"><children/></container>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="states_combat2" width="1276" height="720" version="0.1">
+  <window>
+    <frame x="0" y="0" width="1276" height="720" params="32769" style="103" name="states_combat2" caption="États – Combat tactique">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <text x="10" y="4" width="900" height="16" params="16" style="3" caption="1. HUD joueur, cible, cible de la cible, barres d’incantation">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0xffd890" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="22" width="1250" height="1" params="16" style="8" color="0xff8a78a8" background="true"/>
+        <text x="10" y="28" width="300" height="16" params="16" style="3" caption="HUD joueur avec buffs">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="42" width="330" height="96" params="16" style="3" name="player"><children/></container>
+        <container x="350" y="42" width="150" height="34" params="16" style="3" name="buffs"><children/></container>
+        <text x="10" y="148" width="300" height="16" params="16" style="3" caption="Cible et sa cible">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="162" width="360" height="214" params="16" style="3" name="target"><children/></container>
+        <container x="380" y="162" width="104" height="128" params="16" style="3" name="target_of_target"><children/></container>
+        <text x="510" y="28" width="300" height="16" params="16" style="3" caption="Barres d’incantation : normale, canalisation, interrompue, hors de portée, pas de mana">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="510" y="42" width="400" height="50" params="16" style="3" name="cast_normal"><children/></container>
+        <container x="510" y="98" width="400" height="50" params="16" style="3" name="cast_channel"><children/></container>
+        <container x="510" y="154" width="400" height="50" params="16" style="3" name="cast_interrupted"><children/></container>
+        <container x="510" y="210" width="400" height="50" params="16" style="3" name="cast_range"><children/></container>
+        <container x="510" y="266" width="400" height="50" params="16" style="3" name="cast_mana"><children/></container>
+        <text x="920" y="28" width="300" height="16" params="16" style="3" caption="Buffs / debuffs : normal, expiration, cumuls, contrôle">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="920" y="42" width="340" height="34" params="16" style="3" name="buff_row"><children/></container>
+        <text x="920" y="86" width="300" height="16" params="16" style="3" caption="Infobulle de buff">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="920" y="100" width="300" height="130" params="16" style="3" name="tip_buff"><children/></container>
+        <text x="920" y="240" width="300" height="16" params="16" style="3" caption="Bannières d’avertissement">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="920" y="254" width="340" height="30" params="16" style="3" name="banner_mana"><children/></container>
+        <container x="920" y="288" width="340" height="30" params="16" style="3" name="banner_range"><children/></container>
+        <container x="920" y="322" width="340" height="30" params="16" style="3" name="banner_cd"><children/></container>
+        <container x="920" y="356" width="340" height="30" params="16" style="3" name="banner_ok"><children/></container>
+        <text x="10" y="392" width="900" height="16" params="16" style="3" caption="2. Journal de combat, textes flottants, boutons">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0xffd890" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="410" width="1250" height="1" params="16" style="8" color="0xff8a78a8" background="true"/>
+        <text x="10" y="416" width="300" height="16" params="16" style="3" caption="Journal de combat (filtres)">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="430" width="560" height="230" params="16" style="3" name="log"><children/></container>
+        <text x="580" y="416" width="300" height="16" params="16" style="3" caption="Textes flottants : dégâts, critique, soin, bloqué, esquivé, résisté">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="580" y="430" width="100" height="30" params="16" style="3" name="ft_dmg"><children/></container>
+        <container x="690" y="430" width="100" height="30" params="16" style="3" name="ft_crit"><children/></container>
+        <container x="800" y="430" width="100" height="30" params="16" style="3" name="ft_heal"><children/></container>
+        <container x="580" y="470" width="100" height="30" params="16" style="3" name="ft_block"><children/></container>
+        <container x="690" y="470" width="100" height="30" params="16" style="3" name="ft_dodge"><children/></container>
+        <container x="800" y="470" width="100" height="30" params="16" style="3" name="ft_resist"><children/></container>
+        <text x="580" y="516" width="300" height="16" params="16" style="3" caption="Infobulle de compétence (boule de feu)">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="580" y="530" width="300" height="130" params="16" style="3" name="tip_skill"><children/></container>
+        <text x="900" y="416" width="300" height="16" params="16" style="3" caption="Cases d’action : normal, survol, pressé, sélectionné, désactivé">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="900" y="430" width="46" height="62" params="16" style="3" name="s_normal"><children/></container>
+        <container x="954" y="430" width="46" height="62" params="16" style="3" name="s_hover"><children/></container>
+        <container x="1008" y="430" width="46" height="62" params="16" style="3" name="s_pressed"><children/></container>
+        <container x="1062" y="430" width="46" height="62" params="16" style="3" name="s_selected"><children/></container>
+        <container x="1116" y="430" width="46" height="62" params="16" style="3" name="s_disabled"><children/></container>
+        <text x="900" y="500" width="300" height="16" params="16" style="3" caption="Filtres : tous, buffs, debuffs, contrôle">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="900" y="514" width="360" height="24" params="16" style="3" name="filters"><children/></container>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

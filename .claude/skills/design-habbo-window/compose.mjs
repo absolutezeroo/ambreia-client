@@ -88,7 +88,7 @@ const show = (w, n, v = true) => { const t = find(w, n); if(t) t.visible = v; };
 const tint = (w, n, c) => { const t = n ? find(w, n) : w; if(t) t.color = c; };
 const bar = (w, n, px) => { const f = find(find(w, n), 'fill'); if(f) f.width = px; };
 const icon = (w, n, uri) => { const t = find(w, n); if(t) t.assetUri = uri; };
-const add = (list, layout, fill) => { if(!list) return null; const row = build(layout); if(fill) fill(row); list.addListItem(row); return row; };
+const add = (list, layout, fill) => { if(!list) return null; const row = build(layout); if(fill) fill(row); (list.addListItem ?? list.addGridItem).call(list, row); return row; };
 const place = (parent, layout, x, y, fill) => { if(!parent) return null; const w = build(layout); w.x = x; w.y = y; if(fill) fill(w); parent.addChild(w); return w; };
 const tab = (frame, name) => { const tabs = find(frame, 'tab_context'); const item = tabs.getTabItemByName(name); if(tabs.selector && item) tabs.selector.setSelected(item); };
 `;
@@ -98,15 +98,34 @@ async function main()
     const page = await connect();
     for(let i = 0; i < 80; i++) { if(await page.eval('typeof window.glaze !== "undefined"')) break; await sleep(250); }
 
+    // --reload: the page again (a new atlas or skin lands in the bundle at boot only).
+    if(flags.reload)
+    {
+        await page.eval('location.reload()');
+        await sleep(3000);
+        for(let i = 0; i < 80; i++) { if(await page.eval('typeof window.glaze !== "undefined"')) break; await sleep(250); }
+    }
+
     if(flags.expr) { console.log(JSON.stringify(await page.eval(flags.expr))); page.ws.close(); return; }
 
     // Every character layout from disk, fresh.
-    const PREFIXES = (flags.prefixes ?? 'vortex_character_,vortex_hud_,vortex_combat_,vortex_bestiary_tip').split(',');
+    const PREFIXES = (flags.prefixes ?? 'vortex_').split(',');
     for(const file of readdirSync(LAYOUTS).filter((f) => PREFIXES.some((p) => f.startsWith(p))))
     {
         const name = file.replace(/\.xml$/, '');
         const xml = readFileSync(join(LAYOUTS, file), 'utf8');
         await page.eval(`(() => { glaze.runtime.windowManager.registerWidgetLayout(${JSON.stringify(name)}, ${JSON.stringify(xml)}); glaze.runtime.layoutXml.set(${JSON.stringify(name)}, ${JSON.stringify(xml)}); return true; })()`);
+    }
+
+    // --extra=<dir>: more layouts to register (a scratch theme, a composite), by file basename.
+    if(flags.extra)
+    {
+        for(const file of readdirSync(resolve(flags.extra)).filter((f) => f.endsWith('.xml')))
+        {
+            const name = file.replace(/.xml$/, '');
+            const xml = readFileSync(join(resolve(flags.extra), file), 'utf8');
+            await page.eval(`(() => { glaze.runtime.windowManager.registerWidgetLayout(${JSON.stringify(name)}, ${JSON.stringify(xml)}); glaze.runtime.layoutXml.set(${JSON.stringify(name)}, ${JSON.stringify(xml)}); return true; })()`);
+        }
     }
 
     // Localise (the toolbar toggle) when a known caption still reads as its key.
@@ -129,9 +148,14 @@ async function main()
 
     if(flags.fill)
     {
-        const body = readFileSync(resolve(flags.fill), 'utf8');
+        // `// @include <file>` pulls a sibling script in (shared sample data of a window's previews).
+        let body = readFileSync(resolve(flags.fill), 'utf8');
+        for(let pass = 0; pass < 4 && /^\/\/ @include /m.test(body); pass++) body = body.replace(/^\/\/ @include (\S+)\s*$/gm, (m, f) => readFileSync(join(dirname(resolve(flags.fill)), f), 'utf8'));
         await page.eval(`(async () => { ${PRELUDE}\n${body}\n return true; })()`);
     }
+
+    // --probe=<js>: evaluated after the fill, printed (a check on the built tree).
+    if(flags.probe) console.log('probe:', JSON.stringify(await page.eval(`(() => { const root = glaze.state.rootWindow; return (${flags.probe}); })()`)));
 
     // A caption resolved at parse time is not rasterised until it is set again (the text field
     // only invalidates on a change): walk the tree and re-set every caption.

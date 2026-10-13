@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="states_help" width="1276" height="1236" version="0.1">
+  <window>
+    <frame x="0" y="0" width="1276" height="1236" params="32769" style="103" name="states_help" caption="États – Outils joueur, aide et sécurité">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <text x="10" y="4" width="900" height="16" params="16" style="3" caption="1. Tutoriel et codex">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0xffd890" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="22" width="1250" height="1" params="16" style="8" color="0xff8a78a8" background="true"/>
+        <text x="10" y="28" width="400" height="16" params="16" style="3" caption="Guide d’Ambreia (étape 1, bulles d’aide)">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="42" width="620" height="400" params="16" style="3" name="guide"><children/></container>
+        <text x="640" y="28" width="400" height="16" params="16" style="3" caption="Codex d’Ambreia (Statistiques)">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="640" y="42" width="620" height="400" params="16" style="3" name="codex"><children/></container>
+        <text x="10" y="452" width="900" height="16" params="16" style="3" caption="2. Signalement, connexion, inactivité, notifications">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0xffd890" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="470" width="1250" height="1" params="16" style="8" color="0xff8a78a8" background="true"/>
+        <text x="10" y="476" width="400" height="16" params="16" style="3" caption="Signaler un joueur">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="490" width="320" height="440" params="16" style="3" name="report"><children/></container>
+        <text x="340" y="476" width="400" height="16" params="16" style="3" caption="Connexion perdue">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="340" y="490" width="460" height="250" params="16" style="3" name="reconnect"><children/></container>
+        <text x="810" y="476" width="400" height="16" params="16" style="3" caption="Inactivité (AFK)">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="810" y="490" width="360" height="250" params="16" style="3" name="afk"><children/></container>
+        <text x="340" y="750" width="400" height="16" params="16" style="3" caption="Centre de notifications">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="340" y="764" width="540" height="330" params="16" style="3" name="notifications"><children/></container>
+        <text x="10" y="940" width="400" height="16" params="16" style="3" caption="Fenêtre de confirmation">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="954" width="320" height="140" params="16" style="3" name="confirm"><children/></container>
+        <text x="890" y="750" width="400" height="16" params="16" style="3" caption="Infobulle">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="890" y="764" width="300" height="124" params="16" style="3" name="tip"><children/></container>
+        <text x="890" y="898" width="400" height="16" params="16" style="3" caption="Ligne de liste">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="890" y="912" width="370" height="40" params="16" style="3" name="list_row"><children/></container>
+        <text x="890" y="962" width="400" height="16" params="16" style="3" caption="États désactivé (avec indice) et survolé">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+<button x="890" y="976" width="180" height="28" params="131089" style="301" color="0x9a9a9a" name="" caption="Bouton désactivé" width_min="180" width_max="180" height_min="28" height_max="28"/>
+        <container x="890" y="1008" width="180" height="24" params="16" style="3" name="hint"><children/></container>
+<button x="1080" y="976" width="180" height="28" params="131089" style="301" color="0x3a8ad0" name="" caption="Bouton survolé" width_min="180" width_max="180" height_min="28" height_max="28"/>
+        <text x="10" y="1104" width="900" height="16" params="16" style="3" caption="3. Bannière et toasts">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0xffd890" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="1122" width="1250" height="1" params="16" style="8" color="0xff8a78a8" background="true"/>
+        <text x="10" y="1128" width="400" height="16" params="16" style="3" caption="Bannière d’avertissement">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="1142" width="460" height="40" params="16" style="3" name="banner"><children/></container>
+        <text x="480" y="1128" width="400" height="16" params="16" style="3" caption="Toast de succès">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="480" y="1142" width="320" height="46" params="16" style="3" name="toast_ok"><children/></container>
+        <text x="810" y="1128" width="400" height="16" params="16" style="3" caption="Toast d’erreur">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="810" y="1142" width="320" height="46" params="16" style="3" name="toast_err"><children/></container>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

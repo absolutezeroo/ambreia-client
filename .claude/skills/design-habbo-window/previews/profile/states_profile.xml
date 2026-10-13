@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="states_profile" width="1276" height="1232" version="0.1">
+  <window>
+    <frame x="0" y="0" width="1276" height="1232" params="32769" style="103" name="states_profile" caption="États – Profil et interactions">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <text x="10" y="4" width="900" height="16" params="16" style="3" caption="1. Fiche profil, inspection, carte sociale">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0xffd890" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="22" width="1250" height="1" params="16" style="8" color="0xff8a78a8" background="true"/>
+        <text x="10" y="28" width="400" height="16" params="16" style="3" caption="Fiche profil joueur (onglet Général)">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="42" width="380" height="500" params="16" style="3" name="profile"><children/></container>
+        <text x="400" y="28" width="400" height="16" params="16" style="3" caption="Inspection d’équipement, objet survolé">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="400" y="42" width="540" height="480" params="16" style="3" name="inspect"><children/></container>
+        <text x="948" y="28" width="400" height="16" params="16" style="3" caption="Carte sociale compacte">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="948" y="42" width="320" height="472" params="16" style="3" name="card"><children/></container>
+        <text x="948" y="524" width="400" height="16" params="16" style="3" caption="Actions verrouillées / indisponibles">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="948" y="538" width="270" height="30" params="16" style="3" name="locked_1"><children/></container>
+        <container x="948" y="574" width="270" height="30" params="16" style="3" name="locked_2"><children/></container>
+        <text x="948" y="614" width="400" height="16" params="16" style="3" caption="Confirmation d’action">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="948" y="628" width="320" height="140" params="16" style="3" name="confirm"><children/></container>
+        <text x="10" y="552" width="400" height="16" params="16" style="3" caption="Menu contextuel, survol">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="566" width="200" height="212" params="16" style="3" name="menu"><children/></container>
+        <text x="220" y="552" width="400" height="16" params="16" style="3" caption="États de bouton">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+<button x="220" y="566" width="170" height="28" params="131089" style="301" color="0x2a6aa0" name="" caption="Bouton par défaut" width_min="170" width_max="170" height_min="28" height_max="28"/>
+<button x="220" y="600" width="170" height="28" params="131089" style="301" color="0x3a8ad0" name="" caption="Survol (Hover)" width_min="170" width_max="170" height_min="28" height_max="28"/>
+<button x="220" y="634" width="170" height="28" params="131089" style="301" color="0x1a4a80" name="" caption="Appuyé (Pressed)" width_min="170" width_max="170" height_min="28" height_max="28"/>
+<button x="220" y="668" width="170" height="28" params="131089" style="301" color="0x9a9a9a" name="" caption="Désactivé" width_min="170" width_max="170" height_min="28" height_max="28"/>
+<button x="220" y="702" width="170" height="28" params="131089" style="301" color="0x8a2a2a" name="" caption="Verrouillé" width_min="170" width_max="170" height_min="28" height_max="28"/>
+<static_bitmap x="228" y="708" width="16" height="16" params="16" style="3" tags="%23icon" color="0xffffff">
+  <variables>
+    <var key="asset_uri" value="rpg/ui-icons/map_markers_doorway_enterance_exit_locked_icon" type="String"/>
+    <var key="stretched_x" value="false" type="Boolean"/>
+    <var key="stretched_y" value="false" type="Boolean"/>
+    <var key="pivot_point" value="center" type="String"/>
+  </variables>
+</static_bitmap>
+        <text x="10" y="792" width="900" height="16" params="16" style="3" caption="2. Recherche, messages privés, infobulle">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0xffd890" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="810" width="1250" height="1" params="16" style="8" color="0xff8a78a8" background="true"/>
+        <text x="10" y="816" width="400" height="16" params="16" style="3" caption="Recherche / ajout d’ami / signalement">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="830" width="560" height="360" params="16" style="3" name="search"><children/></container>
+        <text x="580" y="816" width="400" height="16" params="16" style="3" caption="Messages privés (chuchoter)">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="580" y="830" width="300" height="250" params="16" style="3" name="whisper"><children/></container>
+        <text x="890" y="816" width="400" height="16" params="16" style="3" caption="Infobulle d’objet">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="890" y="830" width="300" height="124" params="16" style="3" name="tip"><children/></container>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

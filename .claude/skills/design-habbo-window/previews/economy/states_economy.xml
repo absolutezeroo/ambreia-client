@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="states_economy" width="1276" height="1060" version="0.1">
+  <window>
+    <frame x="0" y="0" width="1276" height="1060" params="32769" style="103" name="states_economy" caption="États – Économie">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <text x="10" y="4" width="900" height="16" params="16" style="3" caption="1. Lignes : boutique, hôtel des ventes, artisanat (normal / survol / sélectionné)">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0xffd890" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="22" width="1250" height="1" params="16" style="8" color="0xff8a78a8" background="true"/>
+        <text x="10" y="28" width="300" height="16" params="16" style="3" caption="Article de boutique">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="42" width="296" height="40" params="16" style="3" name="shop_normal"><children/></container>
+        <container x="10" y="86" width="296" height="40" params="16" style="3" name="shop_hover"><children/></container>
+        <container x="10" y="130" width="296" height="40" params="16" style="3" name="shop_selected"><children/></container>
+        <text x="316" y="28" width="300" height="16" params="16" style="3" caption="Annonce (avec « votre offre »)">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="316" y="42" width="470" height="38" params="16" style="3" name="listing_normal"><children/></container>
+        <container x="316" y="84" width="470" height="38" params="16" style="3" name="listing_hover"><children/></container>
+        <container x="316" y="126" width="470" height="38" params="16" style="3" name="listing_own"><children/></container>
+        <text x="796" y="28" width="300" height="16" params="16" style="3" caption="Recette : normale, favorite, verrouillée">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="796" y="42" width="220" height="46" params="16" style="3" name="recipe_normal"><children/></container>
+        <container x="796" y="92" width="220" height="46" params="16" style="3" name="recipe_fav"><children/></container>
+        <container x="796" y="142" width="220" height="46" params="16" style="3" name="recipe_locked"><children/></container>
+        <text x="1026" y="28" width="300" height="16" params="16" style="3" caption="Commande : défaut, sélectionnée">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="1026" y="42" width="240" height="62" params="16" style="3" name="order_normal"><children/></container>
+        <container x="1026" y="108" width="240" height="62" params="16" style="3" name="order_selected"><children/></container>
+        <text x="10" y="196" width="900" height="16" params="16" style="3" caption="2. Boutons, badges, étapes">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0xffd890" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="214" width="1250" height="1" params="16" style="8" color="0xff8a78a8" background="true"/>
+        <text x="10" y="220" width="300" height="16" params="16" style="3" caption="Acheter : normal / survol / pressé / désactivé">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <button x="10" y="236" width="130" height="28" params="131089" style="301" color="0x2f9e2f" caption="Acheter" width_min="130" width_max="130" height_min="28" height_max="28"/>
+        <button x="146" y="236" width="130" height="28" params="131089" style="301" color="0x3fbe3f" caption="Acheter" width_min="130" width_max="130" height_min="28" height_max="28"/>
+        <button x="282" y="236" width="130" height="28" params="131089" style="301" color="0x1f7e1f" caption="Acheter" width_min="130" width_max="130" height_min="28" height_max="28"/>
+        <button x="418" y="236" width="130" height="28" params="131089" style="301" color="0x9a9a9a" caption="Acheter" width_min="130" width_max="130" height_min="28" height_max="28"/>
+        <text x="10" y="272" width="300" height="16" params="16" style="3" caption="Mettre en vente / Tout retirer / Tout vider / Fabriquer / Accélérer">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <button x="10" y="288" width="130" height="28" params="131089" style="301" color="0x2f9e2f" caption="Mettre en vente" width_min="130" width_max="130" height_min="28" height_max="28"/>
+        <button x="146" y="288" width="130" height="28" params="131089" style="301" color="0xd23a2a" caption="Tout retirer" width_min="130" width_max="130" height_min="28" height_max="28"/>
+        <button x="282" y="288" width="130" height="28" params="131089" style="301" color="0x8c8c86" caption="Tout vider" width_min="130" width_max="130" height_min="28" height_max="28"/>
+        <button x="418" y="288" width="130" height="28" params="131089" style="301" color="0x2a6aa0" caption="Fabriquer" width_min="130" width_max="130" height_min="28" height_max="28"/>
+        <button x="554" y="288" width="150" height="28" params="131089" style="301" color="0xd89a20" caption="Accélérer (1 gemme)" width_min="150" width_max="150" height_min="28" height_max="28"/>
+        <text x="10" y="324" width="300" height="16" params="16" style="3" caption="Statuts du marché">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="338" width="300" height="150" params="16" style="3" name="status_list"><children/></container>
+        <text x="320" y="324" width="300" height="16" params="16" style="3" caption="Barres de progression : en cours, terminée, en pause, erreur">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="320" y="338" width="300" height="110" params="16" style="3" name="bars"><children/></container>
+        <text x="630" y="324" width="300" height="16" params="16" style="3" caption="Paliers : débloqué / verrouillé / survol">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="630" y="338" width="390" height="92" params="16" style="3" name="milestones"><children/></container>
+        <text x="630" y="440" width="300" height="16" params="16" style="3" caption="Pagination">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="630" y="454" width="300" height="24" params="16" style="3" name="pager"><children/></container>
+        <text x="1030" y="220" width="300" height="16" params="16" style="3" caption="Sélecteur de quantité">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="1030" y="236" width="152" height="26" params="16" style="3" name="quantity"><children/></container>
+        <container x="1030" y="268" width="236" height="26" params="16" style="3" name="quantity_max"><children/></container>
+        <text x="1030" y="304" width="300" height="16" params="16" style="3" caption="Cases de banque : vide, nouveau, pile, verrouillé">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="1030" y="318" width="56" height="56" params="16" style="3" name="slot_empty"><children/></container>
+        <container x="1090" y="318" width="56" height="56" params="16" style="3" name="slot_new"><children/></container>
+        <container x="1150" y="318" width="56" height="56" params="16" style="3" name="slot_stack"><children/></container>
+        <container x="1210" y="318" width="56" height="56" params="16" style="3" name="slot_locked"><children/></container>
+        <text x="1030" y="384" width="300" height="16" params="16" style="3" caption="Survol / sélection">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="1030" y="398" width="56" height="56" params="16" style="3" name="slot_hover"><children/></container>
+        <container x="1090" y="398" width="56" height="56" params="16" style="3" name="slot_selected"><children/></container>
+        <text x="10" y="498" width="900" height="16" params="16" style="3" caption="3. Menus et fenêtres secondaires">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0xffd890" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="516" width="1250" height="1" params="16" style="8" color="0xff8a78a8" background="true"/>
+        <text x="10" y="522" width="300" height="16" params="16" style="3" caption="Menu contextuel (annonce)">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="536" width="200" height="110" params="16" style="3" name="menu_listing"><children/></container>
+        <text x="10" y="660" width="300" height="16" params="16" style="3" caption="Menu de retrait (banque)">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="674" width="200" height="110" params="16" style="3" name="menu_bank"><children/></container>
+        <text x="340" y="522" width="300" height="16" params="16" style="3" caption="Modifier le prix">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="340" y="536" width="300" height="176" params="16" style="3" name="edit_price"><children/></container>
+        <text x="650" y="522" width="300" height="16" params="16" style="3" caption="Retirer une quantité">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="650" y="536" width="300" height="176" params="16" style="3" name="withdraw"><children/></container>
+        <text x="960" y="522" width="300" height="16" params="16" style="3" caption="Spécialisation / bonus">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="960" y="536" width="300" height="150" params="16" style="3" name="bonus"><children/></container>
+        <text x="220" y="660" width="300" height="16" params="16" style="3" caption="Retirer la vente ?">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="220" y="674" width="320" height="140" params="16" style="3" name="confirm_withdraw"><children/></container>
+        <text x="550" y="722" width="300" height="16" params="16" style="3" caption="Infobulles : commission, objet, temps restant">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="550" y="736" width="240" height="86" params="16" style="3" name="tip_commission"><children/></container>
+        <container x="800" y="736" width="300" height="124" params="16" style="3" name="tip_item"><children/></container>
+        <container x="550" y="830" width="240" height="86" params="16" style="3" name="tip_time"><children/></container>
+        <text x="10" y="830" width="300" height="16" params="16" style="3" caption="Bulle du marchand">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="left" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="10" y="844" width="286" height="44" params="16" style="3" name="merchant"><children/></container>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

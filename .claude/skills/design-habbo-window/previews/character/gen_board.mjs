@@ -4,7 +4,7 @@ import fs from 'node:fs';
 
 const W = 1240, H = 1150;
 const parts = [];
-const text = (x, y, w, caption, {size = 10, bold = false, color = '0x666666', align = 'left'} = {}) => parts.push(`
+const text = (x, y, w, caption, {size = 10, bold = false, color = '0xd8d0e8', align = 'left'} = {}) => parts.push(`
         <text x="${x}" y="${y}" width="${w}" height="16" params="16" style="3" caption="${caption}">
           <variables>
             <var key="text_style" value="${bold ? 'u_bold' : 'u_regular'}" type="String"/>
@@ -14,8 +14,8 @@ const text = (x, y, w, caption, {size = 10, bold = false, color = '0x666666', al
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>`);
-const heading = (y, caption) => { text(10, y, 600, caption, {size: 12, bold: true, color: '0x24607f'}); parts.push(`\n        <container x="10" y="${y + 18}" width="${W - 20}" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>`); };
-const label = (x, y, caption) => text(x, y, 250, caption, {size: 9, bold: true, color: '0x888888'});
+const heading = (y, caption) => { text(10, y, 600, caption, {size: 12, bold: true, color: '0xffd890'}); parts.push(`\n        <container x="10" y="${y + 18}" width="${W - 20}" height="1" params="16" style="8" color="0xff8a78a8" background="true"/>`); };
+const label = (x, y, caption) => text(x, y, 250, caption, {size: 9, bold: true, color: '0xb8b0c8'});
 const slot = (name, x, y, w, h) => parts.push(`\n        <container x="${x}" y="${y}" width="${w}" height="${h}" params="16" style="3" name="${name}"><children/></container>`);
 const pill = (x, y, w, caption, bg, fg) => parts.push(`
         <border x="${x}" y="${y}" width="${w}" height="20" params="16" style="2" color="${bg}">
@@ -85,18 +85,18 @@ label(320, 292, 'Choix du titre actif (depuis le crayon de l’aperçu)'); slot(
 label(560, 292, 'Rareté : couleur du texte');
 [['Commun', '0x777777'], ['Rare', '0x1077ac'], ['Épique', '0x8a2be2'], ['Légendaire', '0xd09000']].forEach(([c, col], i) => text(560 + i * 90, 308, 90, c, {size: 11, bold: true, color: col}));
 label(560, 340, 'Indicateurs de relation (réputation)');
-[['Amical', '0xb8e090', '0x2b7000', '\${vortex.reputation.standing.friendly.desc}'], ['Neutre', '0xe4e4dc', '0x444444', '\${vortex.reputation.standing.neutral.desc}'], ['Inconnu', '0xe4e4dc', '0x999999', '\${vortex.reputation.standing.unknown.desc}'], ['Hostile', '0xf0b8b0', '0xa01e10', '\${vortex.reputation.standing.hostile.desc}']].forEach(([c, bg, fg, d], i) => { pill(560, 356 + i * 26, 66, c, bg, fg); text(634, 358 + i * 26, 300, d, {size: 10, color: '0x444444'}); });
+[['Amical', '0xb8e090', '0x2b7000', '\${vortex.reputation.standing.friendly.desc}'], ['Neutre', '0xe4e4dc', '0x444444', '\${vortex.reputation.standing.neutral.desc}'], ['Inconnu', '0xe4e4dc', '0x999999', '\${vortex.reputation.standing.unknown.desc}'], ['Hostile', '0xf0b8b0', '0xa01e10', '\${vortex.reputation.standing.hostile.desc}']].forEach(([c, bg, fg, d], i) => { pill(560, 356 + i * 26, 66, c, bg, fg); text(634, 358 + i * 26, 300, d, {size: 10, color: '0xffffff'}); });
 label(960, 292, 'Indicateur de valeur');
-text(960, 308, 60, '+4', {size: 11, bold: true, color: '0x2b9a00'}); text(1000, 308, 60, '-3', {size: 11, bold: true, color: '0xc30000'}); text(1040, 308, 60, '15%', {size: 11, bold: true, color: '0x222222'});
+text(960, 308, 60, '+4', {size: 11, bold: true, color: '0x2b9a00'}); text(1000, 308, 60, '-3', {size: 11, bold: true, color: '0xc30000'}); text(1040, 308, 60, '15%', {size: 11, bold: true, color: '0xffffff'});
 text(960, 324, 280, 'bonus · malus · valeur neutre', {size: 9});
 label(960, 340, 'Statut global'); slot('status_rows', 960, 356, 214, 80);
-label(960, 440, 'Compteur'); text(960, 456, 120, '\${vortex.character.titles.owned}', {size: 12, bold: true, color: '0x24607f'}); text(1080, 456, 60, '6 / 12', {size: 12, bold: true, color: '0x222222', align: 'right'});
+label(960, 440, 'Compteur'); text(960, 456, 120, '\${vortex.character.titles.owned}', {size: 12, bold: true, color: '0xffd890'}); text(1080, 456, 60, '6 / 12', {size: 12, bold: true, color: '0xffffff', align: 'right'});
 
 // D — tooltips
 heading(588, 'Infobulles (survol, 500 ms)');
 [['Titre verrouillé', 'tip_locked'], ['Statistique', 'tip_stat'], ['Région / faction', 'tip_faction'], ['Crayon : Modifier le pseudonyme', 'tip_edit'], ['Loupe : Rechercher une guilde', 'tip_search']].forEach(([l, n], i) => { label(10 + i * 230, 612, l); slot(n, 10 + i * 230, 626, 220, 60); });
 label(10, 700, 'Équipement (survol d’une case)'); slot('tip_equipment', 10, 714, 220, 130);
-text(240, 714, 600, 'Chaque infobulle est un panneau sombre (border style 9) : titre blanc gras 11 px, corps 10 px. Celle de l’équipement ajoute l’emplacement, les bonus en vert et la rareté colorée.', {size: 10, color: '0x444444'});
+text(240, 714, 600, 'Chaque infobulle est un panneau sombre (border style 9) : titre blanc gras 11 px, corps 10 px. Celle de l’équipement ajoute l’emplacement, les bonus en vert et la rareté colorée.', {size: 10, color: '0xffffff'});
 
 // E — reputation rows
 heading(858, 'Lignes de réputation');

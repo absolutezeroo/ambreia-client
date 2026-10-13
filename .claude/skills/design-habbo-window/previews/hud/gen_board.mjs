@@ -17,10 +17,10 @@ const board = (name, caption, H, draw) =>
           </variables>
         </text>`);
     const h = {
-        heading: (y, caption) => { text(10, y, 900, caption, {size: 12, bold: true, color: '0x24607f'}); parts.push(`\n        <container x="10" y="${y + 18}" width="${W - 20}" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>`); },
-        label: (x, y, caption) => text(x, y, 300, caption, {size: 9, bold: true, color: '0x888888'}),
+        heading: (y, caption) => { text(10, y, 900, caption, {size: 12, bold: true, color: '0xffd890'}); parts.push(`\n        <container x="10" y="${y + 18}" width="${W - 20}" height="1" params="16" style="8" color="0xff8a78a8" background="true"/>`); },
+        label: (x, y, caption) => text(x, y, 300, caption, {size: 9, bold: true, color: '0xd8d0e8'}),
         slot: (name, x, y, w, hh) => parts.push(`\n        <container x="${x}" y="${y}" width="${w}" height="${hh}" params="16" style="3" name="${name}"><children/></container>`),
-        note: (x, y, w, caption) => text(x, y, w, caption, {size: 9, color: '0x666666'}),
+        note: (x, y, w, caption) => text(x, y, w, caption, {size: 9, color: '0xd8d0e8'}),
     };
     draw(h);
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
