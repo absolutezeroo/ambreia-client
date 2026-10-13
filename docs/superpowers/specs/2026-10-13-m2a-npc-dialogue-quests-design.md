@@ -183,7 +183,9 @@ The content loader refuses a dialogue whose `next` names no node, a choice with 
 `accept`/`complete`/`entries` quest that is not in the content. For a quest it refuses an unknown
 `kind` in any of its three lists, a `count` below 1, and whatever the piece's own kind refuses: each
 kind validates its fields against the content (`kill` an unknown monster, `collect` an unknown item,
-a reward an unknown item…). The schema is assembled from each kind's fragment (`oneOf` on `kind`).
+a reward an unknown item…). The committed JSON schema, exported from the records, leaves a piece's
+own fields open (`additionalProperties`): each kind reads them strictly into its own record at load,
+so a typo is a load error naming the quest and the piece, not a schema hint.
 
 ## 3. Server contract
 
@@ -222,9 +224,11 @@ lists are `count × (...)`.
 - **Progress**: see §3.4. A counter never passes `required`. A quest whose objectives are all met
   becomes `ready`; a held objective that drops sends it back to `active`.
 - **Complete**: the quest must be `ready` (held objectives are read again at that moment). Items a
-  `collect` objective consumes are taken first; then each reward kind grants with the grant key
-  `quest:<questId>:<playerId>:<n>`, so a retry or a double click grants nothing more; then the quest
-  is `done`.
+  `collect` objective consumes are taken first, then the quest is written `done`, then each reward
+  kind grants: items with the grant key `quest:<questId>:<playerId>:<n>` (`GrantItemsAsync`, which
+  gives nothing twice), XP through `GainXpAsync(amount, "quest:<questId>")` — not `GrantXpAsync`,
+  whose daily cap is an operator's. The quest is `done` before anything is granted, so a retry or a
+  double click finds it done and grants nothing: at most once, as the XP grants already are.
 - **Rules engine**: a `StartQuestExecutor` (the same path as a dialogue accept) and a
   `QuestStateEvaluator` reading a new `CharacterQuestFacts` part of the zone facts (quest id → state),
   pushed by the character on every change, as `CharacterZoneFacts` is today. Both drop their `rpg`
@@ -237,17 +241,24 @@ lists are `count × (...)`.
 
 The engine (`Vortex.Rpg.Quests`, a new module) knows quests, states and counters, never a kind:
 
-- `IQuestObjectiveKind`: `Key`, `Validate(objective, content)`, and one of
-  - `ICountedObjective<TEvent>`: `Progress(TEvent, objective)`, the players and amounts that event
-    adds;
-  - `IHeldObjective`: `Current(objective, facts)`, the count the player holds now.
-- `IQuestRewardKind`: `Key`, `Validate(reward, content)`, `GrantAsync(player, reward, grantKey)`.
-- Requirements are zone conditions (§2.1): the existing `IZoneConditionEvaluator`s.
-- Kinds are declared by DI by the module that owns their source (`kill` by combat, `collect` by
-  characters…). At start the engine subscribes once to every event type a counted kind names, and
-  on each event asks only the kinds of that type; the character grain applies the amounts to its
-  active quests that have such an objective. A held objective is recomputed when the character
-  pushes new facts.
+- **Signals.** What the game reports to quests is a `QuestSignal`: a name, the zone key, a subject
+  (name → value) and an amount. `monster_killed` {monster, rank} for each participant of a
+  `MonsterKilledEvent`; `area_entered` {area} and `decor_used` {object} from the room's own events
+  (a room listener of the quests module); `npc_talked` {npc} when a dialogue opens (M2a's NPC part).
+  A module that adds a signal (a dungeon completed, an item crafted) sends it to the player's quest
+  log; no quest code changes.
+- `IQuestObjectiveRule` (content): `Kind`, `Problems(objective, check)`. Two runtime families:
+  - `ICountedObjectiveKind`: `Counts(objective, signal)`, how much that signal adds to that
+    objective (0 when it does not match);
+  - `IHeldObjectiveKind`: `Current(objective, holdings)`, the count the player holds now (holdings:
+    items in bag and equipment, level).
+- `IQuestRewardKind`: `Kind`, `Problems(reward, check)`, `GrantAsync(reward, grant)`.
+- Requirements are zone conditions (§2.1), evaluated by the room's rule registry: the dialogue's
+  offer and the `StartQuest` action check them through the rule context.
+- The quest log is its own grain, `IQuestLogGrain` (one per player), in a new module
+  `Vortex.Rpg.Quests`: the character grain keeps the character. It asks only the kinds a signal or a
+  holdings change can concern; held objectives are recomputed on the item events the character
+  already publishes (`ItemGranted`, `ItemRemoved`, `ItemDestroyed`) and on `LevelUp`.
 - A kind is unit-tested alone (an event and an objective in, amounts out); the engine is tested with
   a test kind it has never heard of, to prove a new kind needs no change to it.
 
