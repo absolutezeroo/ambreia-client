@@ -1,21 +1,6 @@
-import type {IStatusEntry} from '../ICombat';
-
-/** One status as RpgStatuses lists it. */
-export interface IStatusLine
-{
-    readonly statusId: string;
-    /** -1 for a status without end. */
-    readonly remainingMs: number;
-    readonly stacks: number;
-}
-
-/** What changed between two full lists of a combatant: the only signals 9023 gives (spec §4). */
-export interface IStatusDiff
-{
-    readonly applied: string[];
-    readonly stacked: {statusId: string; stacks: number}[];
-    readonly expired: string[];
-}
+import type {IStatusDiff} from './IStatusDiff';
+import type {IStatusLine} from './IStatusLine';
+import type {IStatusEntry} from '../IStatusEntry';
 
 /** The statuses of every combatant, each with a deadline on the clock handed in. */
 export class StatusBook

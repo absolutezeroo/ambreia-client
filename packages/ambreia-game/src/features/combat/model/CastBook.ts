@@ -1,4 +1,4 @@
-import type {ICastEntry} from '../ICombat';
+import type {ICastEntry} from '../ICastEntry';
 
 /** The casts under way, by caster (RpgCastStart to RpgCastEnd). */
 export class CastBook

@@ -3,12 +3,24 @@ import {platform} from '@ambreia/common/platform/Platform';
 import type {IRpgCombatHit} from '@ambreia/protocol/incoming/rpg/combat/RpgCombatEventsMessage';
 import type {IRpgSkillOutcome} from '@ambreia/protocol/incoming/rpg/skills/RpgSkillEventsMessage';
 import type {IRpgTargetEntry} from '@ambreia/protocol/incoming/rpg/combat/RpgTargetsMessage';
-import type {ICastEntry, ICombatModel, ICombatModelEvents, ILevelUp, ILogEntry, ISelf, IStatusEntry, ITargetInfo, IThreat, IVitals, LogKind} from './ICombat';
+import type {ICastEntry} from './ICastEntry';
+import type {ICombatModel} from './ICombatModel';
+import type {ICombatModelEvents} from './ICombatModelEvents';
+import type {ILevelUp} from './ILevelUp';
+import type {ILogEntry} from './ILogEntry';
+import type {ILogKind} from './ILogKind';
+import type {ISelf} from './ISelf';
+import type {IStatusEntry} from './IStatusEntry';
+import type {ITargetInfo} from './ITargetInfo';
+import type {IThreat} from './IThreat';
+import type {IVitals} from './IVitals';
 import {CastBook} from './model/CastBook';
-import {CombatLog, type IBlow} from './model/CombatLog';
+import {CombatLog} from './model/CombatLog';
+import type {IBlow} from './model/IBlow';
 import {CooldownBook} from './model/CooldownBook';
 import {DeathMachine} from './model/DeathMachine';
-import {StatusBook, type IStatusLine} from './model/StatusBook';
+import type {IStatusLine} from './model/IStatusLine';
+import {StatusBook} from './model/StatusBook';
 import {TargetBook} from './model/TargetBook';
 import {VitalsBook} from './model/VitalsBook';
 
@@ -281,7 +293,7 @@ export class CombatModel implements ICombatModel
         for(const entry of this._log.blow(blow, platform().now())) this.events.emit('log', entry);
     }
 
-    private logLine(kind: LogKind, key: string, params: Record<string, string>, now: number): void
+    private logLine(kind: ILogKind, key: string, params: Record<string, string>, now: number): void
     {
         const entry = this._log.push(kind, key, params, now);
 

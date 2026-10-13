@@ -1,5 +1,6 @@
 import type {IRpgTargetEntry} from '@ambreia/protocol/incoming/rpg/combat/RpgTargetsMessage';
-import type {ITargetInfo, IThreat} from '../ICombat';
+import type {ITargetInfo} from '../ITargetInfo';
+import type {IThreat} from '../IThreat';
 
 /** The player's target (RpgTarget), who aims at whom (RpgTargets) and the threat on the target (RpgThreat). */
 export class TargetBook

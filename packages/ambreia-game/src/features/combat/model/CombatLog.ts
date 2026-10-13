@@ -1,23 +1,12 @@
-import type {ILogEntry, LogKind} from '../ICombat';
+import type {IBlow} from './IBlow';
+import type {ILogEntry} from '../ILogEntry';
+import type {ILogKind} from '../ILogKind';
 
 /** The combat log keeps this many lines; older ones go for good. */
 const LOG_LINES = 200;
 
 /** Outcomes that touched nothing. */
 const MISSED = new Set(['miss', 'dodge', 'immune']);
-
-/** A blow or a skill outcome, as 9012 and 9024 describe it, source first. */
-export interface IBlow
-{
-    readonly source: number;
-    readonly target: number;
-    readonly amount: number;
-    readonly absorbed: number;
-    readonly outcome: string;
-    readonly killed: boolean;
-    /** The skill or status behind it; null for an auto-attack. */
-    readonly sourceId: string | null;
-}
 
 /**
  * The bounded, typed combat log (spec §4): text keys and their parameters, resolved by whoever
@@ -37,7 +26,7 @@ export class CombatLog
     }
 
     /** Returns the entry written, or null when muted. */
-    push(kind: LogKind, key: string, params: Record<string, string>, now: number): ILogEntry | null
+    push(kind: ILogKind, key: string, params: Record<string, string>, now: number): ILogEntry | null
     {
         if(this.muted) return null;
 

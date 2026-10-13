@@ -1,4 +1,4 @@
-import type {DeathState} from '../ICombat';
+import type {IDeathState} from '../IDeathState';
 
 /**
  * Alive, or KO on the spot (spec §3.1): counting down to the auto-release, or waiting for a
@@ -7,9 +7,9 @@ import type {DeathState} from '../ICombat';
  */
 export class DeathMachine
 {
-    private _state: DeathState = {kind: 'alive'};
+    private _state: IDeathState = {kind: 'alive'};
 
-    get state(): DeathState
+    get state(): IDeathState
     {
         return this._state;
     }

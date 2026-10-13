@@ -1,4 +1,4 @@
-import type {IVitals} from '../ICombat';
+import type {IVitals} from '../IVitals';
 
 /** Every combatant's last known health, and the player's own mana (only his is on the wire). */
 export class VitalsBook
