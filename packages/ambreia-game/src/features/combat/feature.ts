@@ -17,6 +17,8 @@ import {RoomEngineObjectEvent} from '@ambreia/iso/scene/events/RoomEngineObjectE
 import {AttackBinding} from './views/AttackBinding';
 import {DeathScreens} from './views/DeathScreens';
 import {KoPanel} from './views/KoPanel';
+import {LevelUpPanel} from './views/LevelUpPanel';
+import {LEVEL_UP_IMAGES} from './views/levelUpRows';
 import {OnceChoice} from './views/OnceChoice';
 import {ResurrectOfferPanel} from './views/ResurrectOfferPanel';
 import {PlayerFrameBinding} from './views/PlayerFrameBinding';
@@ -41,7 +43,7 @@ const MISSED = new Set(['miss', 'dodge', 'immune']);
  */
 export const CombatFeature: IGameFeature = {
     id: 'combat',
-    images: VFX_IMAGES,
+    images: [...VFX_IMAGES, ...LEVEL_UP_IMAGES],
     requires: ['roomEngine', 'hud', 'hudPlayer', 'roomSession', 'input'],
     create: ({host, scope}) =>
     {
@@ -126,6 +128,15 @@ export const CombatFeature: IGameFeature = {
             (run, ms) => scope.interval(run, ms));
 
         scope.own(ko).own(offer).own(deaths);
+
+        // The level-up (M1d §4): one panel per XP gain, the skills by their content name and icon.
+        const levelUp = new LevelUpPanel(() => host.made.windowManager, bits(), skillId => ({
+            name: bits().contentName(`${skillId}.name`, skillId),
+            icon: host.made.skills?.definition(skillId)?.icon || 'rpg/skills/warrior_skill_icon_10'
+        }));
+
+        scope.own(levelUp);
+        modelOn('levelUp', up => levelUp.show(up, host.made.hudPlayer?.value.figure ?? ''));
 
         // A monster's own art (tools/build-monsters.mjs) plays these pet gestures; a pet without them
         // plays nothing.
