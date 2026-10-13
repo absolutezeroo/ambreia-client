@@ -50,9 +50,9 @@
                 <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
               </variables>
             </text>
-            <border x="12" y="70" width="290" height="26" params="16" style="2" color="0xffffff">
+            <border x="12" y="70" width="194" height="26" params="16" style="2" color="0xffffff">
               <children>
-                <input x="6" y="5" width="278" height="16" params="1" style="0" name="email_input" caption=""/>
+                <input x="6" y="5" width="182" height="16" params="1" style="0" name="email_input" caption=""/>
               </children>
             </border>
             <text x="12" y="102" width="200" height="16" params="16" style="3" name="password_label" caption="${vortex.auth.password}">
@@ -137,7 +137,7 @@
                 <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
               </variables>
             </text>
-            <link x="120" y="204" width="160" height="16" params="1" style="3" name="terms_link" caption="${vortex.auth.terms}" treshold="0">
+            <link x="106" y="204" width="180" height="16" params="1" style="3" name="terms_link" caption="${vortex.auth.terms}" treshold="0">
               <variables>
                 <var key="text_style" value="u_regular" type="String"/>
                 <var key="font_size" value="11" type="uint"/>
@@ -155,7 +155,7 @@
                 <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
               </variables>
             </text>
-            <link x="110" y="228" width="180" height="16" params="1" style="3" name="privacy_link" caption="${vortex.auth.privacy}" treshold="0">
+            <link x="106" y="228" width="180" height="16" params="1" style="3" name="privacy_link" caption="${vortex.auth.privacy}" treshold="0">
               <variables>
                 <var key="text_style" value="u_regular" type="String"/>
                 <var key="font_size" value="11" type="uint"/>
