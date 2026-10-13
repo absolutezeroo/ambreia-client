@@ -3,38 +3,37 @@ import type {IFigureData} from '@ambreia/avatar/structure/IFigureData';
 import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import type {IWindow} from '@ambreia/ui/IWindow';
 import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
-import type {IItemListWindow} from '@ambreia/ui/components/IItemListWindow';
 import type {IRpgCharacterListEntry} from '@ambreia/protocol/incoming/rpg/characters/IRpgCharacterListEntry';
 import {RpgCharacterResultMessage} from '@ambreia/protocol/incoming/rpg/characters/RpgCharacterResultMessage';
-import {RpgCharacterCreateMessage} from '@ambreia/protocol/outgoing/rpg/characters/RpgCharacterCreateMessage';
-import {RpgCharacterChooseClassMessage} from '@ambreia/protocol/outgoing/rpg/characters/RpgCharacterChooseClassMessage';
 import {RpgEnterWorldMessage} from '@ambreia/protocol/outgoing/rpg/characters/RpgEnterWorldMessage';
 import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
 import {pinWindow} from '../../ui/kit/pinWindow';
 import type {IRpgCharacterSession} from './IRpgCharacterSession';
 import {CharacterCreateView} from './CharacterCreateView';
-import type {ICharacterDraft} from './create/ICharacterDraft';
 import {WindowBits} from '../../ui/kit/WindowBits';
+import {CharacterListView} from './select/CharacterListView';
+import {CreationFlow} from './select/CreationFlow';
+import {SelectedCharacterView} from './select/SelectedCharacterView';
 
 const log = Logger.getLogger('habbo.features.character.CharacterScreen');
 
 const LAYER = 1;
-const SELECTED = 0xffcfe3f4;
-const IDLE = 0xfff2f2ec;
 
 /**
  * The characters screen (F3a §6.4, vortex_character_select_xml): the account's characters, the
  * one selected in full, "create" and "enter the world". A character still in the starter class
  * chooses its class first, through the creation wizard. Follows the session's list and results;
- * the feature hides it once the player is in a room.
+ * the feature hides it once the player is in a room. This one builds the screen, keeps the selection
+ * and routes; the list, the selected character and the wizard's requests are their own units (select/).
  */
 export class CharacterScreen
 {
     private _window: IWindowContainer | null = null;
     private _create: CharacterCreateView | null = null;
     private _selected = 0;
-    /** The class to give the character being created, once the server says it exists. */
-    private _pendingClass: string | null = null;
+    private readonly _list: CharacterListView;
+    private readonly _detail: SelectedCharacterView;
+    private readonly _flow: CreationFlow;
     private _disposed = false;
 
     private readonly _onResize = (): void => this.place();
@@ -48,6 +47,11 @@ export class CharacterScreen
         private readonly _figureData: () => IFigureData | null
     )
     {
+        const className = (entry: IRpgCharacterListEntry): string => _bits.contentName(`vortex.${entry.classId}`, entry.classId);
+
+        this._list = new CharacterListView(_windows, _bits, className, this._onEvent);
+        this._detail = new SelectedCharacterView(_bits, className);
+        this._flow = new CreationFlow(message => _session.send(message));
         _session.events.on('characters', this._onCharacters);
         _session.events.on('result', this._onResult);
     }
@@ -126,30 +130,7 @@ export class CharacterScreen
 
         if(!characters.some(entry => entry.playerId === this._selected)) this._selected = characters[0]?.playerId ?? 0;
 
-        const rows = window.findChildByName('character_list') as IItemListWindow | null;
-
-        rows?.destroyListItems();
-
-        for(const entry of characters)
-        {
-            const row = this._windows.buildWidgetLayout('vortex_character_select_row_xml') as IWindowContainer | null;
-
-            if(!row || !rows) break;
-
-            row.id = entry.playerId;
-            row.color = entry.playerId === this._selected ? SELECTED : IDLE;
-            this._bits.avatar(row, 'avatar_image', entry.figure, 2, true);
-            this._bits.setText(row, 'character_name', entry.name);
-            this._bits.setText(row, 'character_level', this._bits.text('vortex.ui.level.long', 'level', String(entry.level)));
-            this._bits.setText(row, 'character_class', ` · ${this.className(entry)}`);
-            this._bits.setText(row, 'character_zone', '');
-            this._bits.setVisible(row, false, 'delete_button');
-            (row.findChildByName('character_line') as IItemListWindow | null)?.arrangeListItems();
-            // A scrollable list answers its items' events itself: the row carries the screen's.
-            row.procedure = this._onEvent;
-            rows.addListItem(row);
-        }
-
+        this._list.render(window, characters, this._selected);
         this._bits.setText(window, 'slot_count', this._bits.text('vortex.charselect.slots', 'count', String(characters.length), 'max', String(list.maxCharacters)));
 
         const create = window.findChildByName('create_character_button');
@@ -165,30 +146,8 @@ export class CharacterScreen
 
     private renderSelected(): void
     {
-        const window = this._window!;
-        const entry = this.selected();
-        const play = window.findChildByName('play_button');
-
-        this._bits.setText(window, 'selected_name', entry?.name ?? this._bits.text('vortex.charselect.empty'));
-        this._bits.setText(window, 'selected_info', entry ? `${this._bits.text('vortex.ui.level.long', 'level', String(entry.level))} · ${this.className(entry)}` : '');
-        this._bits.setVisible(window, entry !== null, 'selected_avatar');
-        if(entry) this._bits.avatar(window, 'selected_avatar', entry.figure, 2);
-
-        if(play)
-        {
-            play.caption = this._bits.text(entry?.starter ? 'vortex.charselect.choose_class' : 'vortex.charselect.play');
-            if(entry) play.enable();
-            else play.disable();
-        }
-
-        const rows = window.findChildByName('character_list') as IItemListWindow | null;
-
-        for(let i = 0; rows && i < rows.numListItems; i++)
-        {
-            const row = rows.getListItemAt(i);
-
-            if(row) row.color = row.id === this._selected ? SELECTED : IDLE;
-        }
+        this._detail.render(this._window!, this.selected());
+        this._list.highlight(this._window!, this._selected);
     }
 
     private readonly _onEvent = (event: WindowEvent, window: IWindow): void =>
@@ -236,7 +195,7 @@ export class CharacterScreen
             this._bits,
             this._figureData(),
             this._session.classes?.classes ?? [],
-            {submit: draft => this.submit(draft), cancel: () => this.closeCreate()},
+            {submit: draft => this._flow.submit(draft), cancel: () => this.closeCreate()},
             existing
         );
 
@@ -256,7 +215,7 @@ export class CharacterScreen
     {
         this._create?.dispose();
         this._create = null;
-        this._pendingClass = null;
+        this._flow.reset();
 
         if(this._window && !this._disposed)
         {
@@ -265,55 +224,32 @@ export class CharacterScreen
         }
     }
 
-    /** A new character is created first, then given its class: two requests, two answers. */
-    private submit(draft: ICharacterDraft): void
-    {
-        if(draft.playerId > 0)
-        {
-            this._session.send(new RpgCharacterChooseClassMessage(draft.playerId, draft.classId));
-
-            return;
-        }
-
-        this._pendingClass = draft.classId;
-        this._session.send(new RpgCharacterCreateMessage(draft.name, draft.figure, draft.gender));
-    }
-
     private onResult(result: RpgCharacterResultMessage): void
     {
-        const ok = result.code === 'ok';
-
-        if(result.action === RpgCharacterResultMessage.ACTION_CREATE && this._create)
+        if(this._create && result.action !== RpgCharacterResultMessage.ACTION_ENTER_WORLD)
         {
-            if(ok && this._pendingClass && result.playerId > 0)
-            {
-                this._selected = result.playerId;
-                this._session.send(new RpgCharacterChooseClassMessage(result.playerId, this._pendingClass));
-                this._pendingClass = null;
+            const outcome = this._flow.result(result);
 
-                return;
+            if(outcome.kind === 'classing')
+            {
+                this._selected = outcome.playerId;
             }
-
-            if(!ok)
+            else if(outcome.kind === 'refused')
             {
-                this._create.refused(result.code);
-                if(result.code !== 'character.name_taken' && result.code !== 'character.name_invalid') this.alert(result.code);
+                this._create.refused(outcome.code);
+                if(outcome.alert) this.alert(outcome.code);
+            }
+            else if(outcome.kind === 'done')
+            {
+                if(outcome.refusal) this.alert(outcome.refusal);
+                if(outcome.playerId > 0) this._selected = outcome.playerId;
+                this.closeCreate();
             }
 
             return;
         }
 
-        if(result.action === RpgCharacterResultMessage.ACTION_CHOOSE_CLASS && this._create)
-        {
-            if(!ok) this.alert(result.code);
-            if(result.playerId > 0) this._selected = result.playerId;
-            // Created but still classless on a refusal: the list offers to choose again.
-            this.closeCreate();
-
-            return;
-        }
-
-        if(result.action === RpgCharacterResultMessage.ACTION_ENTER_WORLD && !ok)
+        if(result.action === RpgCharacterResultMessage.ACTION_ENTER_WORLD && result.code !== 'ok')
         {
             this.alert(result.code);
             this._window?.findChildByName('play_button')?.enable();
@@ -329,11 +265,6 @@ export class CharacterScreen
     private selected(): IRpgCharacterListEntry | null
     {
         return this._session.characters?.characters.find(entry => entry.playerId === this._selected) ?? null;
-    }
-
-    private className(entry: IRpgCharacterListEntry): string
-    {
-        return this._bits.contentName(`vortex.${entry.classId}`, entry.classId);
     }
 
     dispose(): void
