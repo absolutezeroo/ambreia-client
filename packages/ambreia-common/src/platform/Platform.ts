@@ -14,6 +14,8 @@ export interface IPlatform
     createCanvas(width: number, height: number): ICanvas2D;
     decodeImage(bytes: Uint8Array, mimeType: string): Promise<CanvasImageSource>;
     parseXml(text: string): Document;
+    /** A monotonic clock in ms, never the wall clock: a system clock change must not move a timer. */
+    now(): number;
 }
 
 export const BROWSER_PLATFORM: IPlatform = {
@@ -21,7 +23,8 @@ export const BROWSER_PLATFORM: IPlatform = {
         ? new OffscreenCanvas(width, height)
         : Object.assign(document.createElement('canvas'), {width, height}),
     decodeImage: (bytes, mimeType) => createImageBitmap(new Blob([bytes as Uint8Array<ArrayBuffer>], {type: mimeType})),
-    parseXml: text => new DOMParser().parseFromString(text, 'text/xml')
+    parseXml: text => new DOMParser().parseFromString(text, 'text/xml'),
+    now: () => performance.now()
 };
 
 let current: IPlatform = BROWSER_PLATFORM;

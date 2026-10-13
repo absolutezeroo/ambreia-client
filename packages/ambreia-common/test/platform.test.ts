@@ -9,7 +9,8 @@ const calls: string[] = [];
 const FAKE: IPlatform = {
     createCanvas: (width, height) => { calls.push(`canvas ${width}x${height}`); return {width, height, getContext: () => null}; },
     decodeImage: async () => { throw new Error('unused'); },
-    parseXml: text => { calls.push(`xml ${text.length}`); return {documentElement: {nodeName: 'root'}} as unknown as Document; }
+    parseXml: text => { calls.push(`xml ${text.length}`); return {documentElement: {nodeName: 'root'}} as unknown as Document; },
+    now: () => 0
 };
 
 test('setPlatform replaces the browser default', () =>
@@ -38,4 +39,15 @@ test('an XML asset parses through the platform', () =>
 
     assert.deepEqual(calls, ['xml 7']);
     setPlatform(BROWSER_PLATFORM);
+});
+
+test('now() is the monotonic clock, and a test can substitute it', () =>
+{
+    setPlatform({...BROWSER_PLATFORM, now: () => 42});
+    assert.equal(platform().now(), 42);
+    setPlatform(BROWSER_PLATFORM);
+
+    const first = platform().now();
+
+    assert.ok(platform().now() >= first);
 });

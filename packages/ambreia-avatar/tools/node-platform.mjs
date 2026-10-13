@@ -9,6 +9,7 @@ export function nodePlatform()
     return {
         createCanvas: (width, height) => createCanvas(Math.max(1, width), Math.max(1, height)),
         decodeImage: bytes => loadImage(Buffer.from(bytes)),
-        parseXml: text => new DOMParser().parseFromString(text, 'text/xml')
+        parseXml: text => new DOMParser().parseFromString(text, 'text/xml'),
+        now: () => performance.now()
     };
 }
