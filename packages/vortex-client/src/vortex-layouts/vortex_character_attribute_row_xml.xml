@@ -3,11 +3,13 @@
   <window>
     <container x="0" y="0" width="258" height="30" params="145" style="3" dynamic_style="lifted_hover" name="attribute_row">
       <children>
+        <border visible="false" x="0" y="0" width="258" height="30" params="16" style="104" name="selected" color="0xffd890"/>
         <static_bitmap x="3" y="7" width="16" height="16" params="16" style="3" name="icon" tags="%23icon" color="0xe09a60">
           <variables>
             <var key="asset_uri" value="rpg/ui-icons/rpg_stat_strength_fist_melee_attack_icon" type="String"/>
             <var key="stretched_x" value="false" type="Boolean"/>
             <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="pivot_point" value="center" type="String"/>
           </variables>
         </static_bitmap>
         <text x="28" y="0" width="150" height="16" params="16" style="3" name="label" caption="${vortex.stat.strength}">
@@ -42,14 +44,6 @@
           </variables>
         </text>
         <!-- Selected (focus) outline: four strips in a transparent container, toggled by the view. -->
-        <container visible="false" x="0" y="0" width="258" height="30" params="16" style="3" name="selected">
-          <children>
-            <container x="0" y="0" width="258" height="2" params="16" style="8" color="0xff2a8fd6" background="true"/>
-            <container x="0" y="28" width="258" height="2" params="16" style="8" color="0xff2a8fd6" background="true"/>
-            <container x="0" y="0" width="2" height="30" params="16" style="8" color="0xff2a8fd6" background="true"/>
-            <container x="256" y="0" width="2" height="30" params="16" style="8" color="0xff2a8fd6" background="true"/>
-          </children>
-        </container>
       </children>
     </container>
   </window>

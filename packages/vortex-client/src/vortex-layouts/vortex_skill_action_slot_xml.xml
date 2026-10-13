@@ -3,8 +3,9 @@
   <window>
     <container x="0" y="0" width="52" height="68" params="16" style="3" name="action_slot">
       <children>
-        <border x="0" y="0" width="52" height="52" params="17" style="2" name="slot_box" dynamic_style="reward_track_item" color="0xe4e4dc">
+        <border x="0" y="0" width="52" height="52" params="17" style="104" name="slot_box" dynamic_style="reward_track_item">
           <children>
+            <border visible="false" x="0" y="0" width="52" height="52" params="16" style="104" name="selected" color="0xffd890"/>
             <static_bitmap x="10" y="10" width="32" height="32" params="16" style="3" name="slot_icon" tags="%23icon">
               <variables>
                 <var key="asset_uri" value="rpg/skills/warrior_skill_icon_1" type="String"/>
@@ -21,6 +22,15 @@
                 <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
               </variables>
             </text>
+            <text visible="false" x="0" y="18" width="52" height="16" params="16" style="3" name="cooldown_txt" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="12" type="uint"/>
+                <var key="text_color" value="0x1f2a33" type="hex"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
             <text visible="false" x="26" y="35" width="24" height="16" params="16" style="3" name="slot_count" caption="">
               <variables>
                 <var key="text_style" value="u_bold" type="String"/>
@@ -31,6 +41,14 @@
             </text>
           </children>
         </border>
+        <static_bitmap visible="false" x="36" y="36" width="16" height="16" params="16" style="3" name="lock_icon" tags="%23icon" color="0x8a94a0">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/tools_crafting_padlock_locked_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="pivot_point" value="center" type="String"/>
+          </variables>
+        </static_bitmap>
         <text x="0" y="53" width="52" height="16" params="16" style="3" name="slot_key" caption="">
           <variables>
             <var key="text_style" value="u_bold" type="String"/>

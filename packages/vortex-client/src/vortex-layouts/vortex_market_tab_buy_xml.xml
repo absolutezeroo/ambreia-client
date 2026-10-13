@@ -3,9 +3,9 @@
   <window>
     <container x="0" y="0" width="1018" height="556" params="16" style="3" name="tab_root">
       <children>
-        <border x="8" y="0" width="200" height="556" params="16" style="2" name="categories" color="0xdcefe4">
+        <border x="8" y="0" width="200" height="556" params="16" style="103" name="categories" color="0xdcefe4">
           <children>
-            <border x="6" y="8" width="188" height="24" params="16" style="2" color="0xe4e4dc">
+            <border x="6" y="8" width="188" height="24" params="16" style="103">
               <children>
                 <static_bitmap x="4" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0x888880">
                   <variables>
@@ -25,9 +25,9 @@
             </itemlist_vertical>
           </children>
         </border>
-        <border x="216" y="0" width="486" height="556" params="16" style="2" name="listings">
+        <border x="216" y="0" width="486" height="556" params="16" style="103" name="listings">
           <children>
-            <border x="8" y="8" width="470" height="24" params="16" style="2" name="column_header" color="0xe6e6de">
+            <border x="8" y="8" width="470" height="24" params="16" style="103" name="column_header">
               <children>
                 <text x="42" y="4" width="150" height="16" params="16" style="3" caption="${vortex.market.column.item}">
                   <variables>
@@ -78,7 +78,7 @@
             </container>
           </children>
         </border>
-        <border x="710" y="0" width="300" height="556" params="16" style="2" name="item_detail">
+        <border x="710" y="0" width="300" height="556" params="16" style="103" name="item_detail">
           <children>
             <container x="8" y="8" width="284" height="84" params="16" style="3" name="item_header_slot">
               <children/>
@@ -156,7 +156,7 @@
                 <var key="spacing" value="2" type="int"/>
               </variables>
             </itemlist_vertical>
-            <border x="8" y="334" width="284" height="214" params="16" style="2" name="sale_form" color="0xe2f0e7">
+            <border x="8" y="334" width="284" height="214" params="16" style="103" name="sale_form" color="0xe2f0e7">
               <children>
                 <text x="8" y="6" width="200" height="16" params="16" style="3" caption="${vortex.market.sell_this}">
                   <variables>
@@ -174,7 +174,7 @@
                     <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
                   </variables>
                 </text>
-                <border x="8" y="44" width="88" height="24" params="16" style="2" color="0xffffff">
+                <border x="8" y="44" width="88" height="24" params="16" style="103">
                   <children>
                     <static_bitmap x="4" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf0c030">
                       <variables>
@@ -194,7 +194,7 @@
                     <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
                   </variables>
                 </text>
-                <border x="102" y="44" width="48" height="24" params="16" style="2" color="0xffffff">
+                <border x="102" y="44" width="48" height="24" params="16" style="104">
                   <children>
                     <input x="6" y="4" width="36" height="16" params="1" style="0" name="qty_input" caption="1"/>
                   </children>
@@ -234,7 +234,7 @@
                     </text>
                   </children>
                 </container>
-                <button_thick x="114" y="92" width="160" height="28" params="131089" style="6" color="0x0aa00" name="sell_button" caption="${vortex.market.sell}" width_min="160" width_max="160"/>
+                <button x="114" y="92" width="160" height="28" params="131089" style="301" color="0x0aa00" name="sell_button" caption="${vortex.market.sell}" width_min="160" width_max="160" height_min="28" height_max="28"/>
                 <text x="8" y="134" width="268" height="30" params="16" style="3" name="sell_hint" caption="${vortex.market.sell_hint}">
                   <variables>
                     <var key="text_style" value="u_regular" type="String"/>

@@ -1,0 +1,18 @@
+{
+  "vortex.trading.confirm": "Confirmer l’échange",
+  "vortex.trading.confirm_message": "Les deux joueurs ont confirmé. L’échange va être effectué dans :",
+  "vortex.trading.confirm_title": "Confirmer l’échange",
+  "vortex.trading.gold": "Pièces d’Ambre",
+  "vortex.trading.in_progress": "Échange en cours...",
+  "vortex.trading.locked": "Échange verrouillé",
+  "vortex.trading.locked_sub": "En attente de validation finale...",
+  "vortex.trading.notice": "Vérifiez bien les objets et la somme proposée. Une fois les deux joueurs prêts, l’échange sera effectué.",
+  "vortex.trading.offer_quantity": "Quantité à offrir :",
+  "vortex.trading.owned": "Quantité possédée : %count%",
+  "vortex.trading.ready": "Prêt",
+  "vortex.trading.stackable": "Empilable : %count%",
+  "vortex.trading.title": "Échange entre joueurs",
+  "vortex.trading.value": "Valeur :",
+  "vortex.trading.waiting": "En attente de %name%...",
+  "vortex.trading.warning": "Vérifiez bien les objets et la somme proposée. Les deux joueurs doivent confirmer pour valider l’échange. Une fois confirmé, l’échange ne peut pas être annulé."
+}

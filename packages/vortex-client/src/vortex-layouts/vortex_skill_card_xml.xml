@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<layout name="vortex_skill_card_xml" width="200" height="60" version="0.1">
+<layout name="vortex_skill_card_xml" width="192" height="60" version="0.1">
   <window>
-    <border x="0" y="0" width="200" height="60" params="17" style="2" name="skill_card" dynamic_style="lifted_hover" color="0xf2f2ec">
+    <border x="0" y="0" width="192" height="60" params="17" style="104" name="skill_card" dynamic_style="lifted_hover">
       <children>
-        <border x="6" y="6" width="48" height="48" params="16" style="2" color="0xe4e4dc">
+        <border visible="false" x="0" y="0" width="192" height="60" params="16" style="104" name="selected" color="0xffd890"/>
+        <border x="6" y="6" width="48" height="48" params="16" style="104">
           <children>
             <static_bitmap x="14" y="14" width="20" height="20" params="16" style="3" name="skill_icon" tags="%23icon">
               <variables>
@@ -14,7 +15,7 @@
             </static_bitmap>
           </children>
         </border>
-        <text x="62" y="8" width="134" height="30" params="16" style="3" name="skill_name" caption="">
+        <text x="62" y="8" width="126" height="30" params="16" style="3" name="skill_name" caption="">
           <variables>
             <var key="text_style" value="u_bold" type="String"/>
             <var key="font_size" value="11" type="uint"/>
@@ -23,7 +24,7 @@
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
-        <text x="62" y="40" width="134" height="16" params="16" style="3" name="skill_level" caption="">
+        <text x="62" y="40" width="126" height="16" params="16" style="3" name="skill_level" caption="">
           <variables>
             <var key="text_style" value="u_regular" type="String"/>
             <var key="font_size" value="10" type="uint"/>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_inventory_compare_xml" width="412" height="156" version="0.1">
+  <window>
+    <container x="0" y="0" width="412" height="156" params="1073741840" style="3" name="inventory_compare">
+      <children>
+        <container x="0" y="0" width="200" height="156" params="16" style="3" name="current_slot"><children/></container>
+        <container x="212" y="0" width="200" height="156" params="16" style="3" name="new_slot"><children/></container>
+      </children>
+    </container>
+  </window>
+</layout>

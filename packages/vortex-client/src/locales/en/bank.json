@@ -1,0 +1,21 @@
+{
+  "vortex.bank.all_categories": "All categories",
+  "vortex.bank.available": "Available: %count%",
+  "vortex.bank.capacity": "%used% / %max% slots used",
+  "vortex.bank.deposit": "Deposit",
+  "vortex.bank.drop": "Drop the item",
+  "vortex.bank.guild_capacity": "%used% / %max%",
+  "vortex.bank.guild_permission": "You have Deposit-only access.",
+  "vortex.bank.no_selection": "Select an item to see its details.",
+  "vortex.bank.quantity": "Quantity: %count%",
+  "vortex.bank.search": "Search an item...",
+  "vortex.bank.sort_name": "Sort: Name",
+  "vortex.bank.tab.bag": "Bag",
+  "vortex.bank.tab.guild": "Guild chest",
+  "vortex.bank.tab.personal": "Personal chest",
+  "vortex.bank.title": "Bank",
+  "vortex.bank.weight": "Weight: %unit% (%total% total)",
+  "vortex.bank.withdraw": "Withdraw",
+  "vortex.bank.withdraw_some": "Withdraw a quantity",
+  "vortex.bank.withdraw_stack": "Withdraw the stack"
+}

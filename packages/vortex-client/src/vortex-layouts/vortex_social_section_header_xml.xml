@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_social_section_header_xml" width="330" height="24" version="0.1">
   <window>
-    <border x="0" y="0" width="330" height="24" params="17" style="2" name="section_header" dynamic_style="lifted_hover" color="0xe6e6de">
+    <border x="0" y="0" width="330" height="24" params="17" style="104" name="section_header" dynamic_style="lifted_hover">
       <children>
         <shape x="8" y="8" width="9" height="9" params="16" style="3" name="status_dot" color="0x4cc040">
           <variables>

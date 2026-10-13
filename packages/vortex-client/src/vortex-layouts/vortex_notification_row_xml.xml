@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_notification_row_xml" width="500" height="30" version="0.1">
+  <window>
+    <border x="0" y="0" width="500" height="30" params="17" style="104" name="notification_row" dynamic_style="lifted_hover">
+      <children>
+        <static_bitmap x="8" y="7" width="16" height="16" params="16" style="3" name="notification_icon" tags="%23icon" color="0xd8a030">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/rpg_gift_present_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="pivot_point" value="center" type="String"/>
+          </variables>
+        </static_bitmap>
+        <text x="32" y="7" width="360" height="16" params="16" style="3" name="notification_txt" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="396" y="8" width="80" height="14" params="16" style="3" name="notification_time" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0x666666" type="hex"/>
+            <var key="auto_size" value="right" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <shape x="484" y="11" width="8" height="8" params="16" style="3" name="unread_dot" color="0xd23a2a">
+          <variables>
+            <var key="shape" value="round_rectangle" type="String"/>
+            <var key="radius" value="4" type="Number"/>
+          </variables>
+        </shape>
+      </children>
+    </border>
+  </window>
+</layout>

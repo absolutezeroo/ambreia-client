@@ -3,7 +3,7 @@
   <window>
     <container x="0" y="0" width="260" height="284" params="1073741840" style="3" name="hud_chat_emotes">
       <children>
-        <border x="0" y="0" width="260" height="284" params="16" style="9" color="0x686661">
+        <border x="0" y="0" width="260" height="284" params="16" style="9" color="0x4a4068">
           <children>
           <text x="10" y="8" width="210" height="16" params="16" style="3" caption="${vortex.chat.emoticons}">
             <variables>
@@ -20,6 +20,7 @@
               <var key="asset_uri" value="rpg/ui-icons/software_signs_maths_multiplication_x_crossout_checkmark_cancel_icon" type="String"/>
               <var key="stretched_x" value="false" type="Boolean"/>
               <var key="stretched_y" value="false" type="Boolean"/>
+              <var key="pivot_point" value="center" type="String"/>
             </variables>
           </static_bitmap>
             </children>

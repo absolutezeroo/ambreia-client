@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_achievement_category_row_xml" width="208" height="52" version="0.1">
   <window>
-    <border x="0" y="0" width="208" height="52" params="17" style="2" name="category_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+    <border x="0" y="0" width="208" height="52" params="17" style="104" name="category_row" dynamic_style="lifted_hover">
       <children>
-        <border x="5" y="5" width="42" height="42" params="16" style="2" color="0xe4e4dc">
+        <border visible="false" x="0" y="0" width="208" height="52" params="16" style="104" name="selected" color="0xffd890"/>
+        <border x="5" y="5" width="42" height="42" params="16" style="104">
           <children>
             <static_bitmap x="11" y="11" width="20" height="20" params="16" style="3" name="category_icon" tags="%23icon">
               <variables>

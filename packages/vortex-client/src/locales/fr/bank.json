@@ -1,0 +1,21 @@
+{
+  "vortex.bank.all_categories": "Toutes catégories",
+  "vortex.bank.available": "Quantité disponible : %count%",
+  "vortex.bank.capacity": "%used% / %max% emplacements utilisés",
+  "vortex.bank.deposit": "Déposer",
+  "vortex.bank.drop": "Jeter l’objet",
+  "vortex.bank.guild_capacity": "%used% / %max%",
+  "vortex.bank.guild_permission": "Vous avez un accès Dépôt uniquement.",
+  "vortex.bank.no_selection": "Sélectionnez un objet pour voir ses détails.",
+  "vortex.bank.quantity": "Quantité : %count%",
+  "vortex.bank.search": "Rechercher un objet...",
+  "vortex.bank.sort_name": "Trier : Nom",
+  "vortex.bank.tab.bag": "Sac",
+  "vortex.bank.tab.guild": "Coffre de guilde",
+  "vortex.bank.tab.personal": "Coffre personnel",
+  "vortex.bank.title": "Banque",
+  "vortex.bank.weight": "Poids : %unit% (%total% au total)",
+  "vortex.bank.withdraw": "Retirer",
+  "vortex.bank.withdraw_some": "Retirer une quantité",
+  "vortex.bank.withdraw_stack": "Retirer la pile"
+}

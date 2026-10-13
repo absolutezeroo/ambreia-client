@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_skill_tree_xml" width="166" height="372" version="0.1">
   <window>
-    <border x="0" y="0" width="166" height="372" params="17" style="2" name="skill_tree" dynamic_style="lifted_hover" color="0xf8d8c8">
+    <border x="0" y="0" width="166" height="372" params="17" style="104" name="skill_tree" dynamic_style="lifted_hover">
       <children>
         <static_bitmap x="16" y="14" width="16" height="16" params="16" style="3" tags="%23icon">
           <variables>
@@ -16,7 +16,7 @@
           <variables>
             <var key="text_style" value="u_bold" type="String"/>
             <var key="font_size" value="11" type="uint"/>
-            <var key="text_color" value="0xa83a10" type="hex"/>
+            <var key="text_color" value="0x5a4a7a" type="hex"/>
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>

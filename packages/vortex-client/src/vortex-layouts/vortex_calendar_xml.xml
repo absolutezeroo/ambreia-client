@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_calendar_xml" width="706" height="500" version="0.1">
+  <window>
+    <frame x="0" y="0" width="706" height="500" params="32769" style="103" name="vortex_calendar" caption="${vortex.calendar.title}">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <tab_context x="6" y="2" width="690" height="32" params="17" style="3" name="tab_context">
+          <children>
+            <tab_button x="0" y="0" width="160" height="32" params="17" style="3" name="tab_rewards" caption="${vortex.calendar.tab.rewards}" id="1"/>
+            <tab_button x="160" y="0" width="160" height="32" params="17" style="3" name="tab_events" caption="${vortex.calendar.tab.events}" id="2"/>
+            <tab_button x="320" y="0" width="160" height="32" params="17" style="3" name="tab_missions" caption="${vortex.calendar.tab.missions}" id="3"/>
+            <tab_button x="480" y="0" width="160" height="32" params="17" style="3" name="tab_wallet" caption="${vortex.calendar.tab.wallet}" id="4"/>
+          </children>
+        </tab_context>
+        <container x="0" y="40" width="700" height="420" params="16" style="3" name="tab_content">
+          <children>
+            
+          </children>
+        </container>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

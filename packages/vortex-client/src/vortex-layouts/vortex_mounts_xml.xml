@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_mounts_xml" width="880" height="580" version="0.1">
+  <window>
+    <frame x="0" y="0" width="880" height="580" params="32769" style="103" name="vortex_mounts" caption="${vortex.mounts.title}">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <tab_context x="6" y="2" width="860" height="32" params="17" style="3" name="tab_context">
+          <children>
+            <tab_button x="0" y="0" width="130" height="32" params="17" style="3" name="tab_collection" caption="${vortex.companion.tab.collection}" id="1"/>
+            <tab_button x="130" y="0" width="130" height="32" params="17" style="3" name="tab_active" caption="${vortex.companion.tab.active}" id="2"/>
+            <tab_button x="260" y="0" width="130" height="32" params="17" style="3" name="tab_stable" caption="${vortex.mounts.tab.stable}" id="3"/>
+            <tab_button x="390" y="0" width="130" height="32" params="17" style="3" name="tab_appearances" caption="${vortex.companion.tab.appearances}" id="4"/>
+            <tab_button x="520" y="0" width="130" height="32" params="17" style="3" name="tab_equipment" caption="${vortex.ui.equipment}" id="5"/>
+          </children>
+        </tab_context>
+        <border x="838" y="4" width="28" height="26" params="17" style="104" name="settings_button" dynamic_style="button">
+          <children>
+            <static_bitmap x="6" y="5" width="16" height="16" params="16" style="3" name="settings_button_icon" tags="%23icon" color="0x5a4a7a">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_options_settings_cogwheel_gear_mechanics_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <container x="0" y="40" width="874" height="500" params="16" style="3" name="tab_content">
+          <children>
+            
+          </children>
+        </container>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

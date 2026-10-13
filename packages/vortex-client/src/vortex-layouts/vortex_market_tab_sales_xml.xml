@@ -3,9 +3,9 @@
   <window>
     <container x="0" y="0" width="1018" height="556" params="16" style="3" name="tab_root">
       <children>
-        <border x="8" y="0" width="200" height="556" params="16" style="2" name="categories" color="0xdcefe4">
+        <border x="8" y="0" width="200" height="556" params="16" style="103" name="categories" color="0xdcefe4">
           <children>
-            <border x="6" y="8" width="188" height="24" params="16" style="2" color="0xe4e4dc">
+            <border x="6" y="8" width="188" height="24" params="16" style="103">
               <children>
                 <static_bitmap x="4" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0x888880">
                   <variables>
@@ -25,9 +25,9 @@
             </itemlist_vertical>
           </children>
         </border>
-        <border x="216" y="0" width="486" height="556" params="16" style="2" name="sales">
+        <border x="216" y="0" width="486" height="556" params="16" style="103" name="sales">
           <children>
-            <border x="8" y="8" width="470" height="24" params="16" style="2" name="column_header" color="0xe6e6de">
+            <border x="8" y="8" width="470" height="24" params="16" style="103" name="column_header">
               <children>
                 <text x="40" y="4" width="104" height="16" params="16" style="3" caption="${vortex.market.column.item}">
                   <variables>
@@ -96,12 +96,12 @@
             </container>
           </children>
         </border>
-        <border x="710" y="0" width="300" height="556" params="16" style="2" name="sale_detail">
+        <border x="710" y="0" width="300" height="556" params="16" style="103" name="sale_detail">
           <children>
             <container x="8" y="8" width="284" height="84" params="16" style="3" name="item_header_slot">
               <children/>
             </container>
-            <border x="8" y="96" width="284" height="28" params="16" style="2" name="status_box" color="0xf2f2ec">
+            <border x="8" y="96" width="284" height="28" params="16" style="103" name="status_box">
               <children>
                 <shape x="10" y="10" width="9" height="9" params="16" style="3" name="status_dot" color="0x4cc040">
                   <variables>
@@ -134,11 +134,11 @@
             <container x="8" y="300" width="284" height="20" params="16" style="3" name="gain_slot">
               <children/>
             </container>
-            <button_thick x="8" y="330" width="139" height="28" params="131089" style="6" color="0x2a8fd6" name="edit_price_button" caption="${vortex.market.edit_price}" width_min="139" width_max="139"/>
-            <button_thick x="153" y="330" width="139" height="28" params="131089" style="6" color="0xd23a2a" name="withdraw_button" caption="${vortex.market.withdraw}" width_min="139" width_max="139"/>
-            <button_thick visible="false" x="8" y="330" width="284" height="28" params="131089" style="6" color="0x0aa00" name="collect_gold_button" caption="${vortex.market.collect_gold}" width_min="284" width_max="284"/>
-            <button_thick visible="false" x="8" y="330" width="284" height="28" params="131089" style="6" color="0x2a8fd6" name="collect_items_button" caption="${vortex.market.collect_items}" width_min="284" width_max="284"/>
-            <border x="8" y="370" width="284" height="178" params="16" style="2" name="offers_box" color="0xf2f2ec">
+            <button x="8" y="330" width="139" height="28" params="131089" style="301" color="0x2a8fd6" name="edit_price_button" caption="${vortex.market.edit_price}" width_min="139" width_max="139" height_min="28" height_max="28"/>
+            <button x="153" y="330" width="139" height="28" params="131089" style="301" color="0xd23a2a" name="withdraw_button" caption="${vortex.market.withdraw}" width_min="139" width_max="139" height_min="28" height_max="28"/>
+            <button visible="false" x="8" y="330" width="284" height="28" params="131089" style="301" color="0x0aa00" name="collect_gold_button" caption="${vortex.market.collect_gold}" width_min="284" width_max="284" height_min="28" height_max="28"/>
+            <button visible="false" x="8" y="330" width="284" height="28" params="131089" style="301" color="0x2a8fd6" name="collect_items_button" caption="${vortex.market.collect_items}" width_min="284" width_max="284" height_min="28" height_max="28"/>
+            <border x="8" y="370" width="284" height="178" params="16" style="103" name="offers_box">
               <children>
                 <text x="8" y="10" width="268" height="16" params="16" style="3" name="offers_title" caption="${vortex.market.no_offer}">
                   <variables>

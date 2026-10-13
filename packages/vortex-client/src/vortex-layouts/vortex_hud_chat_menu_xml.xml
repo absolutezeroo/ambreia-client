@@ -3,7 +3,7 @@
   <window>
     <container x="0" y="0" width="180" height="40" params="1073741840" style="3" name="hud_chat_menu">
       <children>
-        <border x="0" y="0" width="180" height="40" params="16" style="9" name="menu_frame" color="0x686661">
+        <border x="0" y="0" width="180" height="40" params="16" style="9" name="menu_frame" color="0x4a4068">
           <children>
             <itemlist_vertical x="6" y="6" width="168" height="28" params="16" style="3" name="menu_list">
               <children/>

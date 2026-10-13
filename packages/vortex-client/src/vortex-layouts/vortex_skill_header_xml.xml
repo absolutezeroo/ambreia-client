@@ -3,7 +3,7 @@
   <window>
     <container x="0" y="0" width="440" height="116" params="144" style="3" name="skill_header">
       <children>
-        <border x="0" y="0" width="60" height="60" params="16" style="2" color="0xe4e4dc">
+        <border x="0" y="0" width="60" height="60" params="16" style="104">
           <children>
             <static_bitmap x="14" y="14" width="32" height="32" params="16" style="3" name="skill_icon" tags="%23icon">
               <variables>
@@ -58,7 +58,7 @@
             </text>
           </children>
         </container>
-        <border x="354" y="2" width="86" height="20" params="16" style="2" name="skill_tag" color="0xf6c0b8">
+        <border x="354" y="2" width="86" height="20" params="16" style="103" name="skill_tag" color="0xf6c0b8">
           <children>
             <text x="0" y="2" width="86" height="16" params="16" style="3" name="skill_tag_txt" caption="${vortex.skill.damage}">
               <variables>

@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_character_create_xml" width="900" height="480" version="0.1">
   <window>
-    <frame x="0" y="0" width="900" height="480" params="32769" style="3" name="character_create" caption="${vortex.charselect.create}" color="0x418db0">
+    <frame x="0" y="0" width="900" height="480" params="32769" style="103" name="character_create" caption="${vortex.charselect.create}">
       <filters>
         <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
       </filters>
       <children>
         <container x="0" y="4" width="894" height="437" params="16" style="3" name="content">
           <children>
-            <border x="8" y="4" width="186" height="379" params="16" style="2" name="steps" color="0xe8eef4">
+            <border x="8" y="4" width="186" height="379" params="16" style="103" name="steps" color="0xe8eef4">
               <children>
                 <itemlist_vertical x="6" y="6" width="174" height="144" params="16" style="3" name="step_list">
                   <children>
-                    <border x="0" y="0" width="174" height="32" params="16" style="2" name="step_row" color="0xcfe3f4">
+                    <border x="0" y="0" width="174" height="32" params="16" style="104" name="step_row" color="0xcfe3f4">
                       <children>
-                        <border x="4" y="4" width="24" height="24" params="16" style="2" name="step_badge" color="0x2a8fd6">
+                        <border x="4" y="4" width="24" height="24" params="16" style="104" name="step_badge" color="0x2a8fd6">
                           <children>
                             <text x="0" y="4" width="24" height="16" params="16" style="3" name="step_number" caption="">
                               <variables>
@@ -36,9 +36,9 @@
                         </text>
                       </children>
                     </border>
-                    <border x="0" y="0" width="174" height="32" params="16" style="2" name="step_row" color="0xf2f2ec">
+                    <border x="0" y="0" width="174" height="32" params="16" style="104" name="step_row">
                       <children>
-                        <border x="4" y="4" width="24" height="24" params="16" style="2" name="step_badge" color="0xd0d0c8">
+                        <border x="4" y="4" width="24" height="24" params="16" style="104" name="step_badge" color="0xd0d0c8">
                           <children>
                             <text x="0" y="4" width="24" height="16" params="16" style="3" name="step_number" caption="">
                               <variables>
@@ -61,9 +61,9 @@
                         </text>
                       </children>
                     </border>
-                    <border x="0" y="0" width="174" height="32" params="16" style="2" name="step_row" color="0xf2f2ec">
+                    <border x="0" y="0" width="174" height="32" params="16" style="104" name="step_row">
                       <children>
-                        <border x="4" y="4" width="24" height="24" params="16" style="2" name="step_badge" color="0xd0d0c8">
+                        <border x="4" y="4" width="24" height="24" params="16" style="104" name="step_badge" color="0xd0d0c8">
                           <children>
                             <text x="0" y="4" width="24" height="16" params="16" style="3" name="step_number" caption="">
                               <variables>
@@ -86,9 +86,9 @@
                         </text>
                       </children>
                     </border>
-                    <border x="0" y="0" width="174" height="32" params="16" style="2" name="step_row" color="0xf2f2ec">
+                    <border x="0" y="0" width="174" height="32" params="16" style="104" name="step_row">
                       <children>
-                        <border x="4" y="4" width="24" height="24" params="16" style="2" name="step_badge" color="0xd0d0c8">
+                        <border x="4" y="4" width="24" height="24" params="16" style="104" name="step_badge" color="0xd0d0c8">
                           <children>
                             <text x="0" y="4" width="24" height="16" params="16" style="3" name="step_number" caption="">
                               <variables>
@@ -122,10 +122,10 @@
               <children/>
             </container>
             <container x="8" y="383" width="878" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
-            <button_thick x="8" y="391" width="140" height="28" params="131089" style="3" name="cancel_button" caption="${vortex.ui.cancel}" width_min="140" width_max="140"/>
-            <button_thick x="538" y="391" width="140" height="28" params="131089" style="3" name="previous_button" caption="${vortex.charcreate.previous}" width_min="140" width_max="140"/>
-            <button_thick x="686" y="391" width="200" height="28" params="131089" style="6" color="0x0aa00" name="next_button" caption="${vortex.charcreate.next}" width_min="200" width_max="200"/>
-            <button_thick visible="false" x="686" y="391" width="200" height="28" params="131089" style="6" color="0x0aa00" name="create_button" caption="${vortex.charcreate.create}" width_min="200" width_max="200"/>
+            <button x="8" y="391" width="140" height="28" params="131089" style="300" name="cancel_button" caption="${vortex.ui.cancel}" width_min="140" width_max="140" height_min="28" height_max="28"/>
+            <button x="538" y="391" width="140" height="28" params="131089" style="300" name="previous_button" caption="${vortex.charcreate.previous}" width_min="140" width_max="140" height_min="28" height_max="28"/>
+            <button x="686" y="391" width="200" height="28" params="131089" style="301" color="0x0aa00" name="next_button" caption="${vortex.charcreate.next}" width_min="200" width_max="200" height_min="28" height_max="28"/>
+            <button visible="false" x="686" y="391" width="200" height="28" params="131089" style="301" color="0x0aa00" name="create_button" caption="${vortex.charcreate.create}" width_min="200" width_max="200" height_min="28" height_max="28"/>
           </children>
         </container>
       </children>

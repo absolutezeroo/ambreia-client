@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_achievement_similar_row_xml" width="324" height="52" version="0.1">
   <window>
-    <border x="0" y="0" width="324" height="52" params="17" style="2" name="similar_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+    <border x="0" y="0" width="324" height="52" params="17" style="104" name="similar_row" dynamic_style="lifted_hover">
       <children>
-        <border x="5" y="6" width="38" height="38" params="16" style="2" color="0xe4e4dc">
+        <border x="5" y="6" width="38" height="38" params="16" style="104">
           <children>
             <static_bitmap x="3" y="3" width="32" height="32" params="16" style="3" name="similar_icon" tags="%23icon">
               <variables>
@@ -58,7 +58,7 @@
             </text>
           </children>
         </container>
-        <border x="294" y="14" width="24" height="24" params="16" style="2" name="done_box" color="0xc8e8a8">
+        <border x="294" y="14" width="24" height="24" params="16" style="104" name="done_box" color="0xc8e8a8">
           <children>
             <static_bitmap x="4" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0x40b030">
               <variables>

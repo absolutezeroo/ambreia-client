@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_calendar_tab_missions_xml" width="700" height="420" version="0.1">
+  <window>
+    <container x="0" y="0" width="700" height="420" params="16" style="3" name="tab_root">
+      <children>
+        <container x="8" y="0" width="684" height="24" params="16" style="3" name="filter_bar">
+          <children>
+            
+          </children>
+        </container>
+        <border x="8" y="32" width="684" height="380" params="16" style="102" name="missions">
+          <children>
+            <scrollable_itemlist_vertical x="0" y="6" width="684" height="368" params="16" style="3" name="mission_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="4" type="int"/>
+              </variables>
+            </scrollable_itemlist_vertical>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

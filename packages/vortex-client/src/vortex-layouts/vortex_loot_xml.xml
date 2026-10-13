@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_loot_xml" width="560" height="420" version="0.1">
+  <window>
+    <frame x="0" y="0" width="560" height="420" params="32769" style="103" name="vortex_loot" caption="${vortex.loot.title}">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <text x="8" y="2" width="200" height="16" params="16" style="3" caption="${vortex.loot.found}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="8" y="22" width="268" height="270" params="16" style="102" name="bag">
+          <children>
+            <scrollable_itemgrid_vertical x="6" y="6" width="256" height="258" params="16" style="3" name="loot_grid">
+              <variables>
+                <var key="spacing" value="4" type="int"/>
+              </variables>
+            </scrollable_itemgrid_vertical>
+          </children>
+        </border>
+        <border x="8" y="298" width="268" height="32" params="16" style="103" name="purse">
+          <children>
+            <static_bitmap x="8" y="8" width="16" height="16" params="16" style="3" name="gold_icon" tags="%23icon" color="0xf0c030">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/rpg_coin_gold_currency_money_gp_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+            <text x="30" y="8" width="130" height="16" params="16" style="3" name="gold_txt" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x1f2a33" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <border x="188" y="4" width="72" height="24" params="17" style="104" name="sort_button" dynamic_style="button">
+              <children>
+                <static_bitmap x="6" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0x5a4a7a">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_filter_sort_funnel_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
+                  </variables>
+                </static_bitmap>
+                <text x="24" y="4" width="44" height="16" params="16" style="3" caption="${vortex.loot.sort}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x5a4a7a" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+          </children>
+        </border>
+        <button x="8" y="338" width="268" height="28" params="131089" style="301" color="0x2f9e2f" name="take_all_button" caption="${vortex.loot.take_all}" width_min="268" width_max="268" height_min="28" height_max="28"/>
+        <border x="284" y="2" width="268" height="364" params="16" style="103" name="detail">
+          <children>
+            <border x="8" y="8" width="56" height="56" params="16" style="104" name="item_frame">
+              <children>
+                <static_bitmap x="12" y="12" width="32" height="32" params="16" style="3" name="detail_icon">
+                  <variables>
+                    <var key="asset_uri" value="" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <text x="72" y="10" width="188" height="18" params="16" style="3" name="item_name" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="13" type="uint"/>
+                <var key="text_color" value="0x8a3ad0" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="72" y="30" width="188" height="14" params="16" style="3" name="item_rarity" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x8a3ad0" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="72" y="46" width="188" height="14" params="16" style="3" name="item_level" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container x="8" y="72" width="252" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+            <itemlist_vertical x="8" y="80" width="252" height="100" params="16" style="3" name="stat_list">
+              <children></children>
+              <variables>
+                <var key="spacing" value="4" type="int"/>
+              </variables>
+            </itemlist_vertical>
+            <container x="8" y="186" width="252" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+            <text x="8" y="194" width="252" height="60" params="16" style="3" name="item_desc" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x4a5a6a" type="hex"/>
+                <var key="multiline" value="true" type="Boolean"/>
+                <var key="word_wrap" value="true" type="Boolean"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="8" y="260" width="252" height="14" params="16" style="3" name="item_type" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="8" y="276" width="252" height="14" params="16" style="3" name="item_slot_txt" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container visible="false" x="0" y="0" width="268" height="364" params="16" style="3" name="no_selection">
+              <children>
+                <border x="110" y="110" width="48" height="48" params="16" style="104">
+                  <children>
+                    <static_bitmap x="8" y="8" width="32" height="32" params="16" style="3" name="empty_icon" tags="%23icon" color="0x808078">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/tools_crafting_chest_locked_loot_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                        <var key="pivot_point" value="center" type="String"/>
+                        <var key="zoom_x" value="2" type="Number"/>
+                        <var key="zoom_y" value="2" type="Number"/>
+                      </variables>
+                    </static_bitmap>
+                  </children>
+                </border>
+                <text x="8" y="166" width="252" height="32" params="16" style="3" name="empty_message" caption="${vortex.loot.no_selection}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x888888" type="hex"/>
+                    <var key="auto_size" value="center" type="String"/>
+                    <var key="multiline" value="true" type="Boolean"/>
+                    <var key="word_wrap" value="true" type="Boolean"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </container>
+          </children>
+        </border>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

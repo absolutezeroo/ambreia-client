@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_ui_dropdown_list_xml" width="228" height="120" version="0.1">
+  <window>
+    <border x="0" y="0" width="228" height="120" params="16" style="102" name="dropdown_list">
+      <children>
+        <itemlist_vertical x="4" y="4" width="220" height="112" params="16" style="3" name="option_list">
+          <children/>
+          <variables>
+            <var key="spacing" value="1" type="int"/>
+          </variables>
+        </itemlist_vertical>
+      </children>
+    </border>
+  </window>
+</layout>

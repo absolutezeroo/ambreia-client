@@ -3,7 +3,7 @@
   <window>
     <container x="0" y="0" width="324" height="20" params="144" style="3" name="member_row">
       <children>
-        <border x="0" y="0" width="20" height="20" params="16" style="2" color="0xe4e4dc">
+        <border x="0" y="0" width="20" height="20" params="16" style="104">
           <children>
             <widget x="0" y="-1" width="20" height="20" params="16" style="3" name="head_image">
               <variables>

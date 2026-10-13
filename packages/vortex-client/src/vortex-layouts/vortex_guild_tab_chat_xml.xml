@@ -6,11 +6,11 @@
         <container x="8" y="8" width="598" height="60" params="16" style="3" name="guild_header_slot">
           <children/>
         </container>
-        <button x="8" y="72" width="145" height="24" params="131089" style="6" color="0x8c8c86" name="channel_0" caption="${vortex.guild.channel.general}" width_min="145" width_max="145"/>
-        <button x="159" y="72" width="145" height="24" params="131089" style="6" color="0x8c8c86" name="channel_1" caption="${vortex.guild.channel.announcements}" width_min="145" width_max="145"/>
-        <button x="310" y="72" width="145" height="24" params="131089" style="6" color="0x8c8c86" name="channel_2" caption="${vortex.guild.channel.events}" width_min="145" width_max="145"/>
-        <button x="461" y="72" width="145" height="24" params="131089" style="6" color="0x8c8c86" name="channel_3" caption="${vortex.guild.channel.recruitment}" width_min="145" width_max="145"/>
-        <border x="8" y="104" width="598" height="56" params="16" style="2" name="pinned" color="0xfbf0d0">
+        <button x="8" y="72" width="145" height="24" params="131089" style="301" color="0x8c8c86" name="channel_0" caption="${vortex.guild.channel.general}" width_min="145" width_max="145"/>
+        <button x="159" y="72" width="145" height="24" params="131089" style="301" color="0x8c8c86" name="channel_1" caption="${vortex.guild.channel.announcements}" width_min="145" width_max="145"/>
+        <button x="310" y="72" width="145" height="24" params="131089" style="301" color="0x8c8c86" name="channel_2" caption="${vortex.guild.channel.events}" width_min="145" width_max="145"/>
+        <button x="461" y="72" width="145" height="24" params="131089" style="301" color="0x8c8c86" name="channel_3" caption="${vortex.guild.channel.recruitment}" width_min="145" width_max="145"/>
+        <border x="8" y="104" width="598" height="56" params="16" style="103" name="pinned" color="0xfbf0d0">
           <children>
             <static_bitmap x="10" y="12" width="16" height="16" params="16" style="3" tags="%23icon" color="0xe0a030">
               <variables>
@@ -47,7 +47,7 @@
             </text>
           </children>
         </border>
-        <border x="8" y="166" width="598" height="331" params="16" style="2" name="messages" color="0xe2e6f2">
+        <border x="8" y="166" width="598" height="331" params="16" style="102" name="messages" color="0xe2e6f2">
           <children>
             <scrollable_itemlist_vertical x="8" y="6" width="582" height="319" params="16" style="3" name="message_list">
               <children/>
@@ -57,7 +57,7 @@
             </scrollable_itemlist_vertical>
           </children>
         </border>
-        <border x="8" y="503" width="558" height="30" params="16" style="2" color="0xffffff">
+        <border x="8" y="503" width="558" height="30" params="16" style="103">
           <children>
             <input x="8" y="7" width="518" height="16" params="1" style="0" name="message_input" caption="${vortex.guild.write}"/>
             <static_bitmap x="534" y="7" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf0c040">
@@ -69,7 +69,7 @@
             </static_bitmap>
           </children>
         </border>
-        <border x="572" y="503" width="30" height="30" params="17" style="2" name="send_button" dynamic_style="button" color="0x2a8fd6">
+        <border x="572" y="503" width="30" height="30" params="17" style="104" name="send_button" dynamic_style="button" color="0x2a8fd6">
           <children>
             <static_bitmap x="7" y="8" width="16" height="16" params="16" style="3" tags="%23icon" color="0xffffff">
               <variables>

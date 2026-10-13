@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_skill_slot_xml" width="76" height="76" version="0.1">
   <window>
-    <border x="0" y="0" width="76" height="76" params="17" style="2" name="skill_slot" dynamic_style="reward_track_item" color="0xe4e4dc">
+    <border x="0" y="0" width="76" height="76" params="17" style="104" name="skill_slot" dynamic_style="reward_track_item">
       <children>
+        <border visible="false" x="0" y="0" width="76" height="76" params="16" style="104" name="selected" color="0xffd890"/>
         <static_bitmap x="22" y="13" width="32" height="32" params="16" style="3" name="skill_icon" tags="%23icon">
           <variables>
             <var key="asset_uri" value="rpg/skills/warrior_skill_icon_1" type="String"/>
@@ -16,7 +17,15 @@
             <var key="stretched_x" value="false" type="Boolean"/>
             <var key="stretched_y" value="false" type="Boolean"/>
           </variables>
+        </static_bitmap>        <static_bitmap visible="false" x="56" y="4" width="16" height="16" params="16" style="3" name="upgrade_badge" tags="%23icon" color="0x40b030">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/arrows_up_north_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="pivot_point" value="center" type="String"/>
+          </variables>
         </static_bitmap>
+
         <text x="0" y="57" width="76" height="16" params="16" style="3" name="skill_level" caption="">
           <variables>
             <var key="text_style" value="u_bold" type="String"/>

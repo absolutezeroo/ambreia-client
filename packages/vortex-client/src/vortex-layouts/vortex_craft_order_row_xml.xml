@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_craft_order_row_xml" width="332" height="62" version="0.1">
   <window>
-    <border x="0" y="0" width="332" height="62" params="17" style="2" name="order_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+    <border x="0" y="0" width="332" height="62" params="17" style="104" name="order_row" dynamic_style="lifted_hover">
       <children>
-        <border x="5" y="5" width="44" height="44" params="16" style="2" name="npc" color="0xe4e4dc">
+        <border visible="false" x="0" y="0" width="332" height="62" params="16" style="104" name="selected" color="0xffd890"/>
+        <border x="5" y="5" width="44" height="44" params="16" style="104" name="npc">
           <children>
             <widget x="5" y="4" width="34" height="36" params="16" style="3" name="npc_image">
               <variables>
@@ -21,7 +22,7 @@
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
-        <border visible="false" x="224" y="4" width="80" height="18" params="16" style="2" name="order_state" color="0xcfe0f6">
+        <border visible="false" x="224" y="4" width="80" height="18" params="16" style="103" name="order_state" color="0xcfe0f6">
           <children>
             <text x="0" y="1" width="80" height="16" params="16" style="3" name="order_state_txt" caption="${vortex.ui.in_progress}">
               <variables>
@@ -87,7 +88,7 @@
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
-        <border x="308" y="20" width="18" height="22" params="17" style="2" name="open_button" dynamic_style="button" color="0xe4e4dc">
+        <border x="308" y="20" width="18" height="22" params="17" style="104" name="open_button" dynamic_style="button">
           <children>
             <static_bitmap x="1" y="2" width="16" height="16" params="16" style="3" tags="%23icon">
               <variables>

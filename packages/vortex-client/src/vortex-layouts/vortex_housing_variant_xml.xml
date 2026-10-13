@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_housing_variant_xml" width="60" height="96" version="0.1">
+  <window>
+    <container x="0" y="0" width="60" height="96" params="16" style="3" name="variant">
+      <children>
+        <border x="2" y="0" width="56" height="56" params="17" style="104" name="variant_box" dynamic_style="lifted_hover">
+          <children>
+            <border visible="false" x="0" y="0" width="56" height="56" params="16" style="104" name="selected" color="0xffd890">
+              <children>
+                
+              </children>
+            </border>
+            <static_bitmap x="12" y="12" width="32" height="32" params="16" style="3" name="variant_icon">
+              <variables>
+                <var key="asset_uri" value="" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+                <var key="zoom_x" value="2" type="Number"/>
+                <var key="zoom_y" value="2" type="Number"/>
+              </variables>
+            </static_bitmap>
+            <static_bitmap visible="false" x="36" y="36" width="16" height="16" params="16" style="3" name="variant_lock" tags="%23icon" color="0xd8a030">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/map_markers_doorway_enterance_exit_locked_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <text x="0" y="60" width="60" height="30" params="16" style="3" name="variant_txt" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
+            <var key="auto_size" value="center" type="String"/>
+            <var key="multiline" value="true" type="Boolean"/>
+            <var key="word_wrap" value="true" type="Boolean"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </container>
+  </window>
+</layout>

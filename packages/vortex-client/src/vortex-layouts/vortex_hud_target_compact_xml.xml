@@ -3,7 +3,7 @@
   <window>
     <container x="0" y="0" width="104" height="128" params="1073741840" style="3" name="hud_target_compact">
       <children>
-        <border x="0" y="0" width="104" height="128" params="17" style="9" name="target_frame" dynamic_style="lifted_hover" color="0x686661">
+        <border x="0" y="0" width="104" height="128" params="17" style="9" name="target_frame" dynamic_style="lifted_hover" color="0x4a4068">
           <children>
             <text x="4" y="5" width="96" height="14" params="16" style="3" name="target_title" caption="${vortex.hud.target}">
               <variables>
@@ -23,6 +23,7 @@
                     <var key="stretched_y" value="false" type="Boolean"/>
                     <var key="zoom_x" value="3" type="Number"/>
                     <var key="zoom_y" value="3" type="Number"/>
+                                      <var key="pivot_point" value="center" type="String"/>
                   </variables>
                 </static_bitmap>
               </children>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_reward_choice_xml" width="580" height="300" version="0.1">
+  <window>
+    <frame x="0" y="0" width="580" height="300" params="32769" style="103" name="vortex_reward_choice" caption="${vortex.reward.choice_title}">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <border x="8" y="4" width="56" height="56" params="16" style="104" name="head_image_box">
+          <children>
+            <widget x="4" y="4" width="48" height="48" params="16" style="3" name="head_image">
+              <variables>
+                <var key="widget_type" value="avatar_image" type="String"/>
+              </variables>
+            </widget>
+          </children>
+        </border>
+        <text x="72" y="8" width="480" height="16" params="16" style="3" name="giver_name" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="72" y="26" width="480" height="30" params="16" style="3" name="giver_txt" caption="${vortex.reward.choose}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="multiline" value="true" type="Boolean"/>
+            <var key="word_wrap" value="true" type="Boolean"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <itemlist_horizontal x="8" y="66" width="564" height="150" params="16" style="3" name="choice_list">
+          <children/>
+          <variables>
+            <var key="spacing" value="8" type="int"/>
+          </variables>
+        </itemlist_horizontal>
+        <button x="8" y="226" width="200" height="32" params="131089" style="301" color="0x2f9e2f" name="choose_button" caption="${vortex.reward.choose_button}" width_min="200" width_max="200" height_min="32" height_max="32"/>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

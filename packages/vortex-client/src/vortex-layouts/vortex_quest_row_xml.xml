@@ -1,15 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_quest_row_xml" width="272" height="44" version="0.1">
   <window>
-    <border x="0" y="0" width="272" height="44" params="17" style="2" name="quest_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+    <border x="0" y="0" width="272" height="44" params="17" style="104" name="quest_row" dynamic_style="lifted_hover">
       <children>
-        <border x="4" y="4" width="36" height="36" params="16" style="2" color="0xe4e4dc">
+        <!-- Selected quest: the amber-edged blue card over the row, toggled by the view. -->
+        <border visible="false" x="0" y="0" width="272" height="44" params="16" style="104" name="selected" color="0xffd890"/>
+        <border x="4" y="4" width="36" height="36" params="16" style="102">
           <children>
             <static_bitmap x="8" y="8" width="20" height="20" params="16" style="3" name="quest_icon" tags="%23icon">
               <variables>
                 <var key="asset_uri" value="variablefx_icon_star_power" type="String"/>
                 <var key="stretched_x" value="false" type="Boolean"/>
                 <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+            <static_bitmap visible="false" x="10" y="10" width="16" height="16" params="16" style="3" name="lock_icon" tags="%23icon" color="0xd8a030">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/tools_crafting_padlock_locked_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
               </variables>
             </static_bitmap>
           </children>
@@ -18,7 +29,8 @@
           <variables>
             <var key="text_style" value="u_bold" type="String"/>
             <var key="font_size" value="11" type="uint"/>
-            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>            <var key="text_color" value="0xb07a10" type="hex"/>
+
           </variables>
         </text>
         <text x="48" y="23" width="160" height="16" params="16" style="3" name="quest_subtitle" caption="">
@@ -29,18 +41,19 @@
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
-        <border x="246" y="12" width="20" height="20" params="17" style="2" name="track_button" dynamic_style="button" color="0xe4e4dc">
+        <border x="246" y="12" width="20" height="20" params="17" style="102" name="track_button" dynamic_style="button">
           <children>
-            <static_bitmap x="2" y="2" width="16" height="16" params="16" style="3" tags="%23icon" color="0xe04848">
+            <static_bitmap x="2" y="2" width="16" height="16" params="16" style="3" tags="%23icon" color="0x24607f">
               <variables>
                 <var key="asset_uri" value="rpg/ui-icons/map_markers_location_pin_small_icon" type="String"/>
                 <var key="stretched_x" value="false" type="Boolean"/>
                 <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
               </variables>
             </static_bitmap>
           </children>
         </border>
-        <border visible="false" x="206" y="12" width="60" height="20" params="16" style="2" name="turn_in_badge" color="0xb8e090">
+        <border visible="false" x="206" y="12" width="60" height="20" params="16" style="102" name="turn_in_badge">
           <children>
             <text x="0" y="2" width="60" height="16" params="16" style="3" name="turn_in_badge_txt" caption="${vortex.quest.ready}">
               <variables>

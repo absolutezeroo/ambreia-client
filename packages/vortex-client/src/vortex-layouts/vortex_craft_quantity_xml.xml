@@ -3,13 +3,13 @@
   <window>
     <container x="0" y="0" width="152" height="26" params="16" style="3" name="quantity_stepper">
       <children>
-        <button x="0" y="0" width="32" height="24" params="131089" style="3" name="minus_button" caption="-" width_min="32" width_max="32"/>
-        <border x="36" y="1" width="80" height="24" params="16" style="2" color="0xe4e4dc">
+        <button x="0" y="0" width="32" height="24" params="131089" style="300" name="minus_button" caption="-" width_min="32" width_max="32"/>
+        <border x="36" y="1" width="80" height="24" params="16" style="103">
           <children>
             <input x="4" y="4" width="72" height="16" params="1" style="0" name="quantity_input" caption="1"/>
           </children>
         </border>
-        <button x="120" y="0" width="32" height="24" params="131089" style="3" name="plus_button" caption="+" width_min="32" width_max="32"/>
+        <button x="120" y="0" width="32" height="24" params="131089" style="300" name="plus_button" caption="+" width_min="32" width_max="32"/>
       </children>
     </container>
   </window>

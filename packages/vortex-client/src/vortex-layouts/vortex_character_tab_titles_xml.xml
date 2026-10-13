@@ -7,7 +7,7 @@
           <variables>
             <var key="text_style" value="u_bold" type="String"/>
             <var key="font_size" value="12" type="uint"/>
-            <var key="text_color" value="0x24607f" type="hex"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
@@ -15,17 +15,19 @@
           <variables>
             <var key="text_style" value="u_bold" type="String"/>
             <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
             <var key="auto_size" value="right" type="String"/>
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
-        <border x="8" y="22" width="280" height="26" params="17" style="2" name="category_filter" dynamic_style="lifted_hover" color="0xffffff">
+        <border x="8" y="22" width="280" height="26" params="17" style="104" name="category_filter" dynamic_style="lifted_hover">
           <children>
             <static_bitmap x="7" y="5" width="16" height="16" params="16" style="3" name="category_filter_icon" tags="%23icon" color="0xf0c040">
               <variables>
                 <var key="asset_uri" value="rpg/ui-icons/software_filter_sort_funnel_icon" type="String"/>
                 <var key="stretched_x" value="false" type="Boolean"/>
                 <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
               </variables>
             </static_bitmap>
             <text x="30" y="5" width="220" height="16" params="16" style="3" name="category_filter_txt" caption="${vortex.character.titles.filter.all}">
@@ -40,11 +42,12 @@
                 <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_down_south_icon" type="String"/>
                 <var key="stretched_x" value="false" type="Boolean"/>
                 <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
               </variables>
             </static_bitmap>
           </children>
         </border>
-        <border x="8" y="54" width="280" height="446" params="16" style="2">
+        <border x="8" y="54" width="280" height="446" params="16" style="102">
           <children>
             <scrollable_itemlist_vertical x="6" y="6" width="268" height="434" params="16" style="3" name="title_list">
               <children/>
@@ -58,19 +61,20 @@
           <variables>
             <var key="text_style" value="u_bold" type="String"/>
             <var key="font_size" value="12" type="uint"/>
-            <var key="text_color" value="0x24607f" type="hex"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
-        <border x="296" y="22" width="290" height="444" params="16" style="2" name="title_detail">
+        <border x="296" y="22" width="290" height="444" params="16" style="103" name="title_detail">
           <children>
-            <border x="8" y="8" width="56" height="56" params="16" style="2" name="title_emblem" color="0xe4e4dc">
+            <border x="8" y="8" width="56" height="56" params="16" style="104" name="title_emblem">
               <children>
                 <static_bitmap x="14" y="15" width="28" height="27" params="16" style="3" name="title_emblem_icon" tags="%23icon">
                   <variables>
                     <var key="asset_uri" value="extended_profile_icon_star_gem" type="String"/>
                     <var key="stretched_x" value="false" type="Boolean"/>
                     <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
                   </variables>
                 </static_bitmap>
               </children>
@@ -127,13 +131,14 @@
                 <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
               </variables>
             </text>
-            <border x="8" y="82" width="274" height="50" params="16" style="2" name="state_active" color="0xd8f0c0">
+            <border x="8" y="82" width="274" height="50" params="16" style="103" name="state_active" color="0xd8f0c0">
               <children>
                 <static_bitmap x="10" y="17" width="16" height="16" params="16" style="3" tags="%23icon" color="0x40b030">
                   <variables>
                     <var key="asset_uri" value="rpg/ui-icons/software_signs_checkmark_checkbox_ticked_todo_icon" type="String"/>
                     <var key="stretched_x" value="false" type="Boolean"/>
                     <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
                   </variables>
                 </static_bitmap>
                 <text x="36" y="6" width="230" height="16" params="16" style="3" name="state_title" caption="${vortex.character.titles.active_now}">
@@ -156,13 +161,14 @@
                 </text>
               </children>
             </border>
-            <border visible="false" x="8" y="82" width="274" height="50" params="16" style="2" name="state_owned" color="0xdde8f1">
+            <border visible="false" x="8" y="82" width="274" height="50" params="16" style="103" name="state_owned">
               <children>
                 <static_bitmap x="10" y="17" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf8d030">
                   <variables>
                     <var key="asset_uri" value="rpg/ui-icons/rpg_magic_sparkles_enchantment_icon" type="String"/>
                     <var key="stretched_x" value="false" type="Boolean"/>
                     <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
                   </variables>
                 </static_bitmap>
                 <text x="36" y="6" width="230" height="16" params="16" style="3" name="state_title" caption="${vortex.character.titles.owned_state}">
@@ -185,13 +191,14 @@
                 </text>
               </children>
             </border>
-            <border visible="false" x="8" y="82" width="274" height="50" params="16" style="2" name="state_locked" color="0xe6e6e0">
+            <border visible="false" x="8" y="82" width="274" height="50" params="16" style="103" name="state_locked" color="0xe6e6e0">
               <children>
                 <static_bitmap x="11" y="17" width="16" height="16" params="16" style="3" tags="%23icon" color="0xd8a030">
                   <variables>
                     <var key="asset_uri" value="rpg/ui-icons/tools_crafting_padlock_locked_icon" type="String"/>
                     <var key="stretched_x" value="false" type="Boolean"/>
                     <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
                   </variables>
                 </static_bitmap>
                 <text x="36" y="6" width="230" height="16" params="16" style="3" name="state_title" caption="${vortex.character.titles.locked}">
@@ -246,9 +253,9 @@
             </itemlist_vertical>
           </children>
         </border>
-        <button_thick x="296" y="472" width="290" height="28" params="131089" style="6" color="0xd23a2a" name="remove_title_button" caption="${vortex.character.titles.remove}" width_min="290" width_max="290"/>
-        <button_thick visible="false" x="296" y="472" width="290" height="28" params="131089" style="6" color="0x2f9e2f" name="equip_title_button" caption="${vortex.character.titles.equip}" width_min="290" width_max="290"/>
-        <button_thick visible="false" x="296" y="472" width="290" height="28" params="131089" style="3" name="locked_title_button" caption="${vortex.character.titles.locked}" width_min="290" width_max="290"/>
+        <button x="296" y="472" width="290" height="28" params="131089" style="301" color="0xd23a2a" name="remove_title_button" caption="${vortex.character.titles.remove}" width_min="290" width_max="290" height_min="28" height_max="28"/>
+        <button visible="false" x="296" y="472" width="290" height="28" params="131089" style="301" color="0x2f9e2f" name="equip_title_button" caption="${vortex.character.titles.equip}" width_min="290" width_max="290" height_min="28" height_max="28"/>
+        <button visible="false" x="296" y="472" width="290" height="28" params="131089" style="300" name="locked_title_button" caption="${vortex.character.titles.locked}" width_min="290" width_max="290" height_min="28" height_max="28"/>
       </children>
     </container>
   </window>

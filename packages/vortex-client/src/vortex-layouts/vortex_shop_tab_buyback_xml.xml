@@ -3,7 +3,7 @@
   <window>
     <container x="0" y="0" width="854" height="520" params="16" style="3" name="tab_root">
       <children>
-        <border x="8" y="0" width="512" height="380" params="16" style="2" name="buyback">
+        <border x="8" y="0" width="512" height="380" params="16" style="103" name="buyback">
           <children>
             <text x="8" y="6" width="200" height="16" params="16" style="3" caption="${vortex.shop.recently_sold}">
               <variables>
@@ -21,7 +21,7 @@
             </scrollable_itemlist_vertical>
           </children>
         </border>
-        <border x="528" y="0" width="318" height="380" params="16" style="2" name="buyback_detail" color="0xf6eedd">
+        <border x="528" y="0" width="318" height="380" params="16" style="103" name="buyback_detail" color="0xf6eedd">
           <children>
             <container x="8" y="8" width="302" height="84" params="16" style="3" name="item_header_slot">
               <children/>
@@ -33,7 +33,7 @@
                 <var key="spacing" value="4" type="int"/>
               </variables>
             </itemlist_vertical>
-            <button_thick x="8" y="340" width="302" height="28" params="131089" style="6" color="0x2a8fd6" name="buyback_button" caption="${vortex.shop.buyback}" width_min="302" width_max="302"/>
+            <button x="8" y="340" width="302" height="28" params="131089" style="301" color="0x2a8fd6" name="buyback_button" caption="${vortex.shop.buyback}" width_min="302" width_max="302" height_min="28" height_max="28"/>
             <text visible="false" x="8" y="322" width="302" height="16" params="16" style="3" name="buyback_hint" caption="${vortex.skill.not_enough_gold}">
               <variables>
                 <var key="text_style" value="u_bold" type="String"/>

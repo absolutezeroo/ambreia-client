@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_settings_panel_interface_xml" width="500" height="400" version="0.1">
+  <window>
+    <border x="0" y="0" width="500" height="400" params="16" style="103" name="panel">
+      <children>
+        <static_bitmap x="8" y="8" width="16" height="16" params="16" style="3" tags="%23icon" color="0x5a4a7a">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/software_hardware_monitor_display_pc_computer_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="pivot_point" value="center" type="String"/>
+          </variables>
+        </static_bitmap>
+        <text x="30" y="8" width="300" height="16" params="16" style="3" caption="${vortex.settings.interface_title}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0x5a4a7a" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="8" y="42" width="220" height="16" params="16" style="3" caption="${vortex.settings.ui.player_names}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <checkbox x="240" y="40" width="18" height="18" params="17" style="3" name="player_names"/>
+        <text x="266" y="42" width="120" height="16" params="16" style="3" name="player_names_txt" caption="${vortex.settings.enabled}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x666666" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="8" y="68" width="220" height="16" params="16" style="3" caption="${vortex.settings.ui.npc_names}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <checkbox x="240" y="66" width="18" height="18" params="17" style="3" name="npc_names"/>
+        <text x="266" y="68" width="120" height="16" params="16" style="3" name="npc_names_txt" caption="${vortex.settings.enabled}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x666666" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="8" y="94" width="220" height="16" params="16" style="3" caption="${vortex.settings.ui.combat_text}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <checkbox x="240" y="92" width="18" height="18" params="17" style="3" name="combat_text"/>
+        <text x="266" y="94" width="120" height="16" params="16" style="3" name="combat_text_txt" caption="${vortex.settings.enabled}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x666666" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="8" y="124" width="180" height="16" params="16" style="3" caption="${vortex.settings.ui.hud_scale}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="240" y="124" width="210" height="16" params="16" style="3" name="hud_scale">
+          <children>
+            <shape x="0" y="5" width="160" height="6" params="144" style="3" name="track" color="0xd8d8d0">
+              <variables>
+                <var key="shape" value="round_rectangle" type="String"/>
+                <var key="radius" value="3" type="Number"/>
+                <var key="stroke_color" value="0xffa0a098" type="hex"/>
+                <var key="stroke_thickness" value="1" type="Number"/>
+              </variables>
+            </shape>
+            <shape x="0" y="5" width="80" height="6" params="16" style="3" name="fill" color="0x2a8fd6">
+              <variables>
+                <var key="shape" value="round_rectangle" type="String"/>
+                <var key="radius" value="3" type="Number"/>
+              </variables>
+            </shape>
+            <border x="74" y="1" width="12" height="14" params="17" style="104" name="knob" dynamic_style="button">
+              <children>
+                
+              </children>
+            </border>
+            <text x="166" y="0" width="44" height="16" params="16" style="3" name="value_txt" caption="100 %">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x1f2a33" type="hex"/>
+                <var key="auto_size" value="right" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </container>
+        <text x="8" y="154" width="180" height="16" params="16" style="3" caption="${vortex.settings.ui.bar_size}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="240" y="154" width="210" height="16" params="16" style="3" name="bar_size">
+          <children>
+            <shape x="0" y="5" width="160" height="6" params="144" style="3" name="track" color="0xd8d8d0">
+              <variables>
+                <var key="shape" value="round_rectangle" type="String"/>
+                <var key="radius" value="3" type="Number"/>
+                <var key="stroke_color" value="0xffa0a098" type="hex"/>
+                <var key="stroke_thickness" value="1" type="Number"/>
+              </variables>
+            </shape>
+            <shape x="0" y="5" width="110" height="6" params="16" style="3" name="fill" color="0x2a8fd6">
+              <variables>
+                <var key="shape" value="round_rectangle" type="String"/>
+                <var key="radius" value="3" type="Number"/>
+              </variables>
+            </shape>
+            <border x="104" y="1" width="12" height="14" params="17" style="104" name="knob" dynamic_style="button">
+              <children>
+                
+              </children>
+            </border>
+            <text x="166" y="0" width="44" height="16" params="16" style="3" name="value_txt" caption="120 %">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x1f2a33" type="hex"/>
+                <var key="auto_size" value="right" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </container>
+        <text x="8" y="184" width="180" height="16" params="16" style="3" caption="${vortex.settings.ui.minimap_zoom}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="240" y="184" width="210" height="16" params="16" style="3" name="minimap_zoom">
+          <children>
+            <shape x="0" y="5" width="160" height="6" params="144" style="3" name="track" color="0xd8d8d0">
+              <variables>
+                <var key="shape" value="round_rectangle" type="String"/>
+                <var key="radius" value="3" type="Number"/>
+                <var key="stroke_color" value="0xffa0a098" type="hex"/>
+                <var key="stroke_thickness" value="1" type="Number"/>
+              </variables>
+            </shape>
+            <shape x="0" y="5" width="50" height="6" params="16" style="3" name="fill" color="0x2a8fd6">
+              <variables>
+                <var key="shape" value="round_rectangle" type="String"/>
+                <var key="radius" value="3" type="Number"/>
+              </variables>
+            </shape>
+            <border x="44" y="1" width="12" height="14" params="17" style="104" name="knob" dynamic_style="button">
+              <children>
+                
+              </children>
+            </border>
+            <text x="166" y="0" width="44" height="16" params="16" style="3" name="value_txt" caption="1.2x">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x1f2a33" type="hex"/>
+                <var key="auto_size" value="right" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </container>
+        <text x="8" y="214" width="180" height="16" params="16" style="3" caption="${vortex.settings.ui.chat_opacity}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="240" y="214" width="210" height="16" params="16" style="3" name="chat_opacity">
+          <children>
+            <shape x="0" y="5" width="160" height="6" params="144" style="3" name="track" color="0xd8d8d0">
+              <variables>
+                <var key="shape" value="round_rectangle" type="String"/>
+                <var key="radius" value="3" type="Number"/>
+                <var key="stroke_color" value="0xffa0a098" type="hex"/>
+                <var key="stroke_thickness" value="1" type="Number"/>
+              </variables>
+            </shape>
+            <shape x="0" y="5" width="108" height="6" params="16" style="3" name="fill" color="0x2a8fd6">
+              <variables>
+                <var key="shape" value="round_rectangle" type="String"/>
+                <var key="radius" value="3" type="Number"/>
+              </variables>
+            </shape>
+            <border x="102" y="1" width="12" height="14" params="17" style="104" name="knob" dynamic_style="button">
+              <children>
+                
+              </children>
+            </border>
+            <text x="166" y="0" width="44" height="16" params="16" style="3" name="value_txt" caption="80 %">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x1f2a33" type="hex"/>
+                <var key="auto_size" value="right" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </container>
+      </children>
+    </border>
+  </window>
+</layout>

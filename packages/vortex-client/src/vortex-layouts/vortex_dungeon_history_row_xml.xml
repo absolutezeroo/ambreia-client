@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_dungeon_history_row_xml" width="462" height="36" version="0.1">
   <window>
-    <border x="0" y="0" width="462" height="36" params="16" style="2" name="history_row" color="0xf2f2ec">
+    <border x="0" y="0" width="462" height="36" params="16" style="104" name="history_row">
       <children>
-        <border x="4" y="3" width="60" height="31" params="16" style="2" color="0x404040">
+        <border visible="false" x="0" y="0" width="462" height="36" params="16" style="104" name="selected" color="0xffd890"/>
+        <border x="4" y="3" width="60" height="31" params="16" style="104" color="0x404040">
           <children>
             <container x="1" y="1" width="58" height="29" params="16" style="3" clipping="true">
               <children>
@@ -38,7 +39,7 @@
         <container x="214" y="7" width="104" height="22" params="16" style="3" name="role_slot">
           <children/>
         </container>
-        <border x="324" y="8" width="68" height="20" params="16" style="2" name="difficulty" color="0xdcc8f4">
+        <border x="324" y="8" width="68" height="20" params="16" style="104" name="difficulty" color="0xdcc8f4">
           <children>
             <text x="0" y="2" width="68" height="16" params="16" style="3" name="difficulty_txt" caption="${vortex.ui.difficulty.hard}">
               <variables>

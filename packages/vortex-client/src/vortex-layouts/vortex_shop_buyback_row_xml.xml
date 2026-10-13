@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_shop_buyback_row_xml" width="312" height="44" version="0.1">
   <window>
-    <border x="0" y="0" width="312" height="44" params="17" style="2" name="buyback_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+    <border x="0" y="0" width="312" height="44" params="17" style="104" name="buyback_row" dynamic_style="lifted_hover">
       <children>
-        <border x="4" y="4" width="36" height="36" params="16" style="2" color="0xe4e4dc">
+        <border visible="false" x="0" y="0" width="312" height="44" params="16" style="104" name="selected" color="0xffd890"/>
+        <border x="4" y="4" width="36" height="36" params="16" style="104">
           <children>
             <static_bitmap x="2" y="2" width="32" height="32" params="16" style="3" name="item_icon" tags="%23icon">
               <variables>
@@ -14,7 +15,7 @@
             </static_bitmap>
           </children>
         </border>
-        <text x="48" y="14" width="102" height="16" params="16" style="3" name="item_name" caption="">
+        <text x="48" y="14" width="130" height="16" params="16" style="3" name="item_name" caption="">
           <variables>
             <var key="text_style" value="u_regular" type="String"/>
             <var key="font_size" value="11" type="uint"/>

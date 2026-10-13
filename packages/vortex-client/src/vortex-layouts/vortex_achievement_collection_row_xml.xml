@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_achievement_collection_row_xml" width="494" height="64" version="0.1">
   <window>
-    <border x="0" y="0" width="494" height="64" params="17" style="2" name="collection_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+    <border x="0" y="0" width="494" height="64" params="17" style="104" name="collection_row" dynamic_style="lifted_hover">
       <children>
-        <border x="6" y="8" width="48" height="48" params="16" style="2" color="0xe4e4dc">
+        <border visible="false" x="0" y="0" width="494" height="64" params="16" style="104" name="selected" color="0xffd890"/>
+        <border x="6" y="8" width="48" height="48" params="16" style="104">
           <children>
             <static_bitmap x="8" y="8" width="32" height="32" params="16" style="3" name="collection_icon" tags="%23icon">
               <variables>
@@ -60,7 +61,7 @@
             </text>
           </children>
         </container>
-        <border x="404" y="15" width="58" height="34" params="16" style="2" name="percent_badge" color="0x3a4652">
+        <border x="404" y="15" width="58" height="34" params="16" style="104" name="percent_badge" color="0x3a4652">
           <children>
             <text x="0" y="8" width="58" height="16" params="16" style="3" name="percent_txt" caption="">
               <variables>
@@ -73,7 +74,7 @@
             </text>
           </children>
         </border>
-        <border x="468" y="21" width="18" height="22" params="17" style="2" name="open_button" dynamic_style="button" color="0xe4e4dc">
+        <border x="468" y="21" width="18" height="22" params="17" style="104" name="open_button" dynamic_style="button">
           <children>
             <static_bitmap x="1" y="2" width="16" height="16" params="16" style="3" tags="%23icon">
               <variables>

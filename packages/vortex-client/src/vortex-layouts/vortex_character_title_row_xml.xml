@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_character_title_row_xml" width="252" height="48" version="0.1">
   <window>
-    <border x="0" y="0" width="252" height="48" params="17" style="2" name="title_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+    <border x="0" y="0" width="252" height="48" params="17" style="104" name="title_row" dynamic_style="lifted_hover">
       <children>
-        <border x="4" y="4" width="40" height="40" params="16" style="2" color="0xe4e4dc">
+        <border visible="false" x="0" y="0" width="252" height="48" params="16" style="104" name="selected" color="0xffd890"/>
+        <border x="4" y="4" width="40" height="40" params="16" style="104">
           <children>
             <static_bitmap x="10" y="10" width="20" height="20" params="16" style="3" name="icon" tags="%23icon">
               <variables>
                 <var key="asset_uri" value="variablefx_icon_star_power" type="String"/>
                 <var key="stretched_x" value="false" type="Boolean"/>
                 <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
               </variables>
             </static_bitmap>
           </children>
@@ -63,9 +65,10 @@
             <var key="asset_uri" value="rpg/ui-icons/tools_crafting_padlock_locked_icon" type="String"/>
             <var key="stretched_x" value="false" type="Boolean"/>
             <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="pivot_point" value="center" type="String"/>
           </variables>
         </static_bitmap>
-        <border visible="false" x="198" y="14" width="46" height="20" params="16" style="2" name="active_badge" color="0xb8e090">
+        <border visible="false" x="198" y="14" width="46" height="20" params="16" style="104" name="active_badge" color="0xb8e090">
           <children>
             <text x="0" y="2" width="46" height="16" params="16" style="3" caption="${vortex.ui.active}">
               <variables>
@@ -79,14 +82,6 @@
           </children>
         </border>
         <!-- Selected (focus) outline: four strips in a transparent container, toggled by the view. -->
-        <container visible="false" x="0" y="0" width="252" height="48" params="16" style="3" name="selected">
-          <children>
-            <container x="0" y="0" width="252" height="2" params="16" style="8" color="0xff2a8fd6" background="true"/>
-            <container x="0" y="46" width="252" height="2" params="16" style="8" color="0xff2a8fd6" background="true"/>
-            <container x="0" y="0" width="2" height="48" params="16" style="8" color="0xff2a8fd6" background="true"/>
-            <container x="250" y="0" width="2" height="48" params="16" style="8" color="0xff2a8fd6" background="true"/>
-          </children>
-        </container>
       </children>
     </border>
   </window>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_character_create_class_card_xml" width="170" height="244" version="0.1">
   <window>
-    <border x="0" y="0" width="170" height="244" params="17" style="2" name="class_card" dynamic_style="lifted_hover" color="0xf2f2ec">
+    <border x="0" y="0" width="170" height="244" params="17" style="104" name="class_card" dynamic_style="lifted_hover">
       <children>
         <widget x="53" y="4" width="64" height="110" params="16" style="3" name="avatar_image">
           <variables>
@@ -33,6 +33,7 @@
             <var key="asset_uri" value="rpg/ui-icons/rpg_stat_intelligence_intellect_brain_wisdom_thinking_iq_icon" type="String"/>
             <var key="stretched_x" value="false" type="Boolean"/>
             <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="pivot_point" value="center" type="String"/>
           </variables>
         </static_bitmap>
         <text x="30" y="175" width="134" height="16" params="16" style="3" name="class_stat_0" caption="${vortex.stat.intelligence}">
@@ -47,6 +48,7 @@
             <var key="asset_uri" value="rpg/ui-icons/rpg_stat_mp_mana_star_icon" type="String"/>
             <var key="stretched_x" value="false" type="Boolean"/>
             <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="pivot_point" value="center" type="String"/>
           </variables>
         </static_bitmap>
         <text x="30" y="195" width="134" height="16" params="16" style="3" name="class_stat_1" caption="${vortex.stat.mana}">
@@ -61,6 +63,7 @@
             <var key="asset_uri" value="rpg/ui-icons/rpg_spell_skill_magic_chain_lightning_link_icon" type="String"/>
             <var key="stretched_x" value="false" type="Boolean"/>
             <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="pivot_point" value="center" type="String"/>
           </variables>
         </static_bitmap>
         <text x="30" y="215" width="134" height="16" params="16" style="3" name="class_stat_2" caption="">

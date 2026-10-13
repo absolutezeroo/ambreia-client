@@ -3,7 +3,7 @@
   <window>
     <container x="0" y="0" width="330" height="96" params="1073741840" style="3" name="hud_player">
       <children>
-        <border x="0" y="0" width="330" height="96" params="16" style="9" name="player_frame" color="0x686661">
+        <border x="0" y="0" width="330" height="96" params="16" style="9" name="player_frame" color="0x4a4068">
           <children>
             <border x="6" y="6" width="64" height="64" params="16" style="3" color="0x201e19" blend="0.8">
               <children>
@@ -38,6 +38,7 @@
                 <var key="asset_uri" value="rpg/ui-icons/rpg_stat_hp_health_heart_icon" type="String"/>
                 <var key="stretched_x" value="false" type="Boolean"/>
                 <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
               </variables>
             </static_bitmap>
             <container x="98" y="25" width="224" height="16" params="0" style="3" name="hp_bar">
@@ -74,6 +75,7 @@
                 <var key="asset_uri" value="rpg/ui-icons/rpg_stat_mp_mana_star_icon" type="String"/>
                 <var key="stretched_x" value="false" type="Boolean"/>
                 <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
               </variables>
             </static_bitmap>
             <container x="98" y="45" width="224" height="16" params="0" style="3" name="mana_bar">

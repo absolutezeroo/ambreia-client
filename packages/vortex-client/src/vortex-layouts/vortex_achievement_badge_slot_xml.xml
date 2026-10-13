@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_achievement_badge_slot_xml" width="94" height="94" version="0.1">
   <window>
-    <border x="0" y="0" width="94" height="94" params="17" style="2" name="badge_slot" dynamic_style="reward_track_item" color="0xe4e4dc">
+    <border x="0" y="0" width="94" height="94" params="17" style="104" name="badge_slot" dynamic_style="reward_track_item">
       <children>
+        <border visible="false" x="0" y="0" width="94" height="94" params="16" style="104" name="selected" color="0xffd890"/>
         <widget x="21" y="21" width="52" height="52" params="16" style="3" name="badge_image">
           <variables>
             <var key="widget_type" value="badge_image" type="String"/>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_dungeon_xml" width="860" height="552" version="0.1">
   <window>
-    <frame x="0" y="0" width="860" height="552" params="32769" style="3" name="dungeon_window" caption="${vortex.dungeon.title}" color="0x418db0">
+    <frame x="0" y="0" width="860" height="552" params="32769" style="103" name="dungeon_window" caption="${vortex.dungeon.title}">
       <filters>
         <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
       </filters>

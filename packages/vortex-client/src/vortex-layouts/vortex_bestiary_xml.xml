@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_bestiary_xml" width="980" height="620" version="0.1">
   <window>
-    <frame x="0" y="0" width="980" height="620" params="32769" style="3" name="bestiary_window" caption="${vortex.bestiary.title}" color="0x418db0">
+    <frame x="0" y="0" width="980" height="620" params="32769" style="103" name="bestiary_window" caption="${vortex.bestiary.title}">
       <filters>
         <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
       </filters>
       <children>
         <container x="0" y="4" width="974" height="577" params="16" style="3" name="content">
           <children>
-            <border x="8" y="0" width="196" height="577" params="16" style="2" name="categories" color="0xe4eed8">
+            <border x="8" y="0" width="196" height="577" params="16" style="103" name="categories" color="0xe4eed8">
               <children>
                 <text x="8" y="6" width="200" height="16" params="16" style="3" caption="${vortex.achievement.categories}">
                   <variables>
@@ -26,7 +26,7 @@
                 </itemlist_vertical>
               </children>
             </border>
-            <border x="212" y="0" width="300" height="577" params="16" style="2" name="creatures">
+            <border x="212" y="0" width="300" height="577" params="16" style="103" name="creatures">
               <children>
                 <text x="8" y="6" width="200" height="16" params="16" style="3" caption="${vortex.bestiary.discovered}">
                   <variables>
@@ -52,9 +52,9 @@
                 </scrollable_itemlist_vertical>
               </children>
             </border>
-            <border x="520" y="0" width="446" height="577" params="16" style="2" name="creature_detail">
+            <border x="520" y="0" width="446" height="577" params="16" style="103" name="creature_detail">
               <children>
-                <border x="8" y="8" width="48" height="48" params="16" style="2" color="0xe4e4dc">
+                <border x="8" y="8" width="48" height="48" params="16" style="104">
                   <children>
                     <static_bitmap x="8" y="8" width="32" height="32" params="16" style="3" name="creature_icon" tags="%23icon">
                       <variables>
@@ -83,7 +83,7 @@
                 </text>
                 <itemlist_horizontal x="64" y="30" width="370" height="22" params="16" style="3" name="creature_tags">
                   <children>
-                    <border x="0" y="0" width="112" height="20" params="16" style="2" name="type_pill" color="0xe3d2f6">
+                    <border x="0" y="0" width="112" height="20" params="16" style="104" name="type_pill" color="0xe3d2f6">
                       <children>
                         <text x="0" y="2" width="112" height="16" params="16" style="3" name="type_pill_txt" caption="${vortex.bestiary.type}">
                           <variables>
@@ -96,7 +96,7 @@
                         </text>
                       </children>
                     </border>
-                    <border x="0" y="0" width="104" height="20" params="16" style="2" name="size_pill" color="0xe6e6de">
+                    <border x="0" y="0" width="104" height="20" params="16" style="104" name="size_pill">
                       <children>
                         <text x="0" y="2" width="104" height="16" params="16" style="3" name="size_pill_txt" caption="${vortex.bestiary.size}">
                           <variables>
@@ -115,7 +115,7 @@
                     <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
                   </variables>
                 </itemlist_horizontal>
-                <border x="8" y="62" width="211" height="170" params="16" style="2" name="stage" color="0xd8e6c8">
+                <border x="8" y="62" width="211" height="170" params="16" style="103" name="stage" color="0xd8e6c8">
                   <children>
                     <static_bitmap x="41" y="21" width="128" height="128" params="16" style="3" name="creature_illustration" tags="%23icon">
                       <variables>
@@ -145,9 +145,9 @@
                     <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
                   </variables>
                 </text>
-                <border x="227" y="170" width="211" height="62" params="17" style="2" name="zone_link" dynamic_style="lifted_hover" color="0xe4e4dc">
+                <border x="227" y="170" width="211" height="62" params="17" style="104" name="zone_link" dynamic_style="lifted_hover">
                   <children>
-                    <border x="0" y="0" width="183" height="62" params="16" style="2" color="0x404040">
+                    <border x="0" y="0" width="183" height="62" params="16" style="103" color="0x404040">
                       <children>
                         <container x="1" y="1" width="181" height="60" params="16" style="3" clipping="true">
                           <children>
@@ -199,7 +199,7 @@
                   </variables>
                 </itemlist_horizontal>
                 <container x="8" y="358" width="430" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
-                <border x="8" y="366" width="110" height="203" params="16" style="2" name="weaknesses" color="0xf2f2ec">
+                <border x="8" y="366" width="110" height="203" params="16" style="103" name="weaknesses">
                   <children>
                     <text x="8" y="6" width="200" height="16" params="16" style="3" caption="${vortex.bestiary.weaknesses}">
                       <variables>
@@ -217,7 +217,7 @@
                     </itemlist_vertical>
                   </children>
                 </border>
-                <border x="124" y="366" width="110" height="203" params="16" style="2" name="resistances" color="0xf2f2ec">
+                <border x="124" y="366" width="110" height="203" params="16" style="103" name="resistances">
                   <children>
                     <text x="8" y="6" width="200" height="16" params="16" style="3" caption="${vortex.bestiary.resistances}">
                       <variables>
@@ -235,7 +235,7 @@
                     </itemlist_vertical>
                   </children>
                 </border>
-                <border x="240" y="366" width="198" height="203" params="16" style="2" name="tips" color="0xf2f2ec">
+                <border x="240" y="366" width="198" height="203" params="16" style="103" name="tips">
                   <children>
                     <static_bitmap x="8" y="6" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf0c040">
                       <variables>

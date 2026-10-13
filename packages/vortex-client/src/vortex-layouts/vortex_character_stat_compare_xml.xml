@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_character_stat_compare_xml" width="300" height="196" version="0.1">
   <window>
-    <frame x="0" y="0" width="300" height="196" params="32769" style="3" name="stat_compare" caption="${vortex.stat.strength}" color="0x418db0">
+    <frame x="0" y="0" width="300" height="196" params="32769" style="103" name="stat_compare" caption="${vortex.stat.strength}">
       <filters>
         <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
       </filters>
       <children>
-        <border x="8" y="8" width="278" height="30" params="16" style="2" name="stat_header" color="0xdde8f1">
+        <border x="8" y="8" width="278" height="30" params="16" style="103" name="stat_header">
           <children>
             <static_bitmap x="8" y="7" width="16" height="16" params="16" style="3" name="stat_icon" tags="%23icon" color="0xe09a60">
               <variables>
                 <var key="asset_uri" value="rpg/ui-icons/rpg_stat_strength_fist_melee_attack_icon" type="String"/>
                 <var key="stretched_x" value="false" type="Boolean"/>
                 <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
               </variables>
             </static_bitmap>
             <text x="32" y="7" width="140" height="16" params="16" style="3" name="stat_name" caption="${vortex.stat.strength}">
@@ -44,7 +45,7 @@
           <variables>
             <var key="text_style" value="u_regular" type="String"/>
             <var key="font_size" value="11" type="uint"/>
-            <var key="text_color" value="0x666666" type="hex"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
@@ -52,6 +53,7 @@
           <variables>
             <var key="text_style" value="u_bold" type="String"/>
             <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
             <var key="auto_size" value="right" type="String"/>
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
@@ -60,7 +62,7 @@
           <variables>
             <var key="text_style" value="u_regular" type="String"/>
             <var key="font_size" value="11" type="uint"/>
-            <var key="text_color" value="0x666666" type="hex"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
@@ -68,7 +70,7 @@
           <variables>
             <var key="text_style" value="u_bold" type="String"/>
             <var key="font_size" value="11" type="uint"/>
-            <var key="text_color" value="0x2b9a00" type="hex"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
             <var key="auto_size" value="right" type="String"/>
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
@@ -77,7 +79,7 @@
           <variables>
             <var key="text_style" value="u_regular" type="String"/>
             <var key="font_size" value="11" type="uint"/>
-            <var key="text_color" value="0x666666" type="hex"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
@@ -85,7 +87,7 @@
           <variables>
             <var key="text_style" value="u_bold" type="String"/>
             <var key="font_size" value="11" type="uint"/>
-            <var key="text_color" value="0x666666" type="hex"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
             <var key="auto_size" value="right" type="String"/>
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
@@ -94,7 +96,7 @@
           <variables>
             <var key="text_style" value="u_regular" type="String"/>
             <var key="font_size" value="11" type="uint"/>
-            <var key="text_color" value="0x666666" type="hex"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
@@ -102,7 +104,7 @@
           <variables>
             <var key="text_style" value="u_bold" type="String"/>
             <var key="font_size" value="11" type="uint"/>
-            <var key="text_color" value="0x666666" type="hex"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
             <var key="auto_size" value="right" type="String"/>
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
@@ -112,6 +114,7 @@
           <variables>
             <var key="text_style" value="u_bold" type="String"/>
             <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
@@ -119,6 +122,7 @@
           <variables>
             <var key="text_style" value="u_bold" type="String"/>
             <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
             <var key="auto_size" value="right" type="String"/>
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
@@ -127,7 +131,7 @@
           <variables>
             <var key="text_style" value="u_bold" type="String"/>
             <var key="font_size" value="12" type="uint"/>
-            <var key="text_color" value="0x2b9a00" type="hex"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>

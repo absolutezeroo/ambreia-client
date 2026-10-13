@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_bestiary_loot_tile_xml" width="84" height="84" version="0.1">
   <window>
-    <border x="0" y="0" width="84" height="84" params="17" style="2" name="loot_tile" dynamic_style="reward_track_item" color="0xe4e4dc">
+    <border x="0" y="0" width="84" height="84" params="17" style="104" name="loot_tile" dynamic_style="reward_track_item">
       <children>
         <static_bitmap x="26" y="8" width="32" height="32" params="16" style="3" name="loot_icon" tags="%23icon">
           <variables>

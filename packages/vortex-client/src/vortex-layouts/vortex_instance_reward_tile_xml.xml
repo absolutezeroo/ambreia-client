@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_instance_reward_tile_xml" width="80" height="70" version="0.1">
+  <window>
+    <container x="0" y="0" width="80" height="70" params="16" style="3" name="reward_tile">
+      <children>
+        <border x="16" y="0" width="48" height="48" params="16" style="104" name="reward_box">
+          <children>
+            <static_bitmap x="8" y="8" width="32" height="32" params="16" style="3" name="reward_icon">
+              <variables>
+                <var key="asset_uri" value="" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+            <text visible="false" x="0" y="32" width="44" height="14" params="16" style="3" name="reward_count" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="9" type="uint"/>
+                <var key="text_color" value="0xffffff" type="hex"/>
+                <var key="auto_size" value="right" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+        <text x="0" y="52" width="80" height="14" params="16" style="3" name="reward_label" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="auto_size" value="center" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </container>
+  </window>
+</layout>

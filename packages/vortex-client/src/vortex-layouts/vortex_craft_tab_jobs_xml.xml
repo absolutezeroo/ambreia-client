@@ -3,7 +3,7 @@
   <window>
     <container x="0" y="0" width="924" height="506" params="16" style="3" name="tab_root">
       <children>
-        <border x="8" y="0" width="248" height="506" params="16" style="2" name="jobs" color="0xd9ead0">
+        <border x="8" y="0" width="248" height="506" params="16" style="103" name="jobs" color="0xd9ead0">
           <children>
             <text x="8" y="6" width="200" height="16" params="16" style="3" caption="${vortex.craft.your_jobs}">
               <variables>
@@ -21,7 +21,7 @@
             </itemlist_vertical>
           </children>
         </border>
-        <border x="264" y="0" width="360" height="172" params="16" style="2" name="job_detail" color="0xe3efdc">
+        <border x="264" y="0" width="360" height="172" params="16" style="103" name="job_detail" color="0xe3efdc">
           <children>
             <container x="8" y="8" width="344" height="84" params="16" style="3" name="item_header_slot">
               <children/>
@@ -90,7 +90,7 @@
             </text>
           </children>
         </border>
-        <border x="632" y="0" width="284" height="172" params="16" style="2" name="job_stats_panel">
+        <border x="632" y="0" width="284" height="172" params="16" style="103" name="job_stats_panel">
           <children>
             <text x="8" y="6" width="200" height="16" params="16" style="3" caption="${vortex.ui.statistics}">
               <variables>
@@ -108,7 +108,7 @@
             </itemlist_vertical>
           </children>
         </border>
-        <border x="264" y="180" width="652" height="128" params="16" style="2" name="milestones">
+        <border x="264" y="180" width="652" height="128" params="16" style="103" name="milestones">
           <children>
             <text x="8" y="6" width="200" height="16" params="16" style="3" caption="${vortex.craft.milestones}">
               <variables>
@@ -127,7 +127,7 @@
             </itemlist_horizontal>
           </children>
         </border>
-        <border x="264" y="316" width="360" height="98" params="16" style="2" name="unlocked">
+        <border x="264" y="316" width="360" height="98" params="16" style="103" name="unlocked">
           <children>
             <text x="8" y="6" width="200" height="16" params="16" style="3" name="recipes_title" caption="${vortex.craft.unlocked}">
               <variables>
@@ -156,7 +156,7 @@
             </itemlist_horizontal>
           </children>
         </border>
-        <border x="264" y="422" width="176" height="84" params="16" style="2" name="tool">
+        <border x="264" y="422" width="176" height="84" params="16" style="103" name="tool">
           <children>
             <text x="8" y="6" width="200" height="16" params="16" style="3" caption="${vortex.craft.tool}">
               <variables>
@@ -166,7 +166,7 @@
                 <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
               </variables>
             </text>
-            <border x="8" y="26" width="40" height="40" params="16" style="2" color="0xe4e4dc">
+            <border x="8" y="26" width="40" height="40" params="16" style="104">
               <children>
                 <static_bitmap x="4" y="4" width="32" height="32" params="16" style="3" name="tool_icon" tags="%23icon">
                   <variables>
@@ -192,10 +192,10 @@
                 <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
               </variables>
             </text>
-            <button x="54" y="56" width="64" height="24" params="131089" style="3" name="equip_button" caption="${vortex.ui.equip}" width_min="64" width_max="64"/>
+            <button x="54" y="56" width="64" height="24" params="131089" style="300" name="equip_button" caption="${vortex.ui.equip}" width_min="64" width_max="64"/>
           </children>
         </border>
-        <border x="448" y="422" width="176" height="84" params="16" style="2" name="main_resource">
+        <border x="448" y="422" width="176" height="84" params="16" style="103" name="main_resource">
           <children>
             <text x="8" y="6" width="200" height="16" params="16" style="3" caption="${vortex.craft.main_resource}">
               <variables>
@@ -205,7 +205,7 @@
                 <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
               </variables>
             </text>
-            <border x="8" y="26" width="40" height="40" params="16" style="2" color="0xe4e4dc">
+            <border x="8" y="26" width="40" height="40" params="16" style="104">
               <children>
                 <static_bitmap x="4" y="4" width="32" height="32" params="16" style="3" name="resource_icon" tags="%23icon">
                   <variables>

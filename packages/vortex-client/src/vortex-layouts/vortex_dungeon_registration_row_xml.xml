@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_dungeon_registration_row_xml" width="462" height="68" version="0.1">
   <window>
-    <border x="0" y="0" width="462" height="68" params="17" style="2" name="registration_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+    <border x="0" y="0" width="462" height="68" params="17" style="104" name="registration_row" dynamic_style="lifted_hover">
       <children>
-        <border x="5" y="9" width="98" height="50" params="16" style="2" color="0x404040">
+        <border visible="false" x="0" y="0" width="462" height="68" params="16" style="104" name="selected" color="0xffd890"/>
+        <border x="5" y="9" width="98" height="50" params="16" style="103" color="0x404040">
           <children>
             <container x="1" y="1" width="96" height="48" params="16" style="3" clipping="true">
               <children>
@@ -67,7 +68,7 @@
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
-        <border x="382" y="5" width="72" height="20" params="16" style="2" name="difficulty" color="0xb8e090">
+        <border x="382" y="5" width="72" height="20" params="16" style="104" name="difficulty" color="0xb8e090">
           <children>
             <text x="0" y="2" width="72" height="16" params="16" style="3" name="difficulty_txt" caption="${vortex.ui.difficulty.normal}">
               <variables>
@@ -107,9 +108,9 @@
             </text>
           </children>
         </container>
-        <button visible="false" x="322" y="37" width="64" height="24" params="131089" style="6" color="0x0aa00" name="accept_button" caption="${vortex.ui.accept}" width_min="64" width_max="64"/>
-        <button visible="false" x="390" y="37" width="64" height="24" params="131089" style="6" color="0x8c8c86" name="decline_button" caption="${vortex.ui.decline}" width_min="64" width_max="64"/>
-        <button visible="false" x="374" y="37" width="80" height="24" params="131089" style="6" color="0x0aa00" name="enter_button" caption="${vortex.dungeon.registrations.enter}" width_min="80" width_max="80"/>
+        <button visible="false" x="322" y="37" width="64" height="24" params="131089" style="301" color="0x0aa00" name="accept_button" caption="${vortex.ui.accept}" width_min="64" width_max="64"/>
+        <button visible="false" x="390" y="37" width="64" height="24" params="131089" style="301" color="0x8c8c86" name="decline_button" caption="${vortex.ui.decline}" width_min="64" width_max="64"/>
+        <button visible="false" x="374" y="37" width="80" height="24" params="131089" style="301" color="0x0aa00" name="enter_button" caption="${vortex.dungeon.registrations.enter}" width_min="80" width_max="80"/>
       </children>
     </border>
   </window>

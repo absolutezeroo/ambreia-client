@@ -3,12 +3,12 @@
   <window>
     <container x="0" y="0" width="1018" height="556" params="16" style="3" name="tab_root">
       <children>
-        <border x="8" y="0" width="694" height="556" params="16" style="2" name="history">
+        <border x="8" y="0" width="694" height="556" params="16" style="103" name="history">
           <children>
-            <button x="8" y="8" width="70" height="24" params="131089" style="6" color="0x8c8c86" name="type_filter_0" caption="${vortex.market.history.all}" width_min="70" width_max="70"/>
-            <button x="82" y="8" width="70" height="24" params="131089" style="6" color="0x8c8c86" name="type_filter_1" caption="${vortex.market.history.buys}" width_min="70" width_max="70"/>
-            <button x="156" y="8" width="70" height="24" params="131089" style="6" color="0x8c8c86" name="type_filter_2" caption="${vortex.market.history.sales}" width_min="70" width_max="70"/>
-            <border x="238" y="8" width="282" height="24" params="16" style="2" color="0xe4e4dc">
+            <button x="8" y="8" width="70" height="24" params="131089" style="301" color="0x8c8c86" name="type_filter_0" caption="${vortex.market.history.all}" width_min="70" width_max="70"/>
+            <button x="82" y="8" width="70" height="24" params="131089" style="301" color="0x8c8c86" name="type_filter_1" caption="${vortex.market.history.buys}" width_min="70" width_max="70"/>
+            <button x="156" y="8" width="70" height="24" params="131089" style="301" color="0x8c8c86" name="type_filter_2" caption="${vortex.market.history.sales}" width_min="70" width_max="70"/>
+            <border x="238" y="8" width="282" height="24" params="16" style="103">
               <children>
                 <static_bitmap x="4" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0x888880">
                   <variables>
@@ -21,7 +21,7 @@
               </children>
             </border>
             <dropmenu x="524" y="8" width="162" height="24" params="17" style="3" name="sort_menu" caption="${vortex.market.history.sort.recent}"/>
-            <border x="8" y="40" width="678" height="24" params="16" style="2" name="column_header" color="0xe6e6de">
+            <border x="8" y="40" width="678" height="24" params="16" style="103" name="column_header">
               <children>
                 <text x="42" y="4" width="128" height="16" params="16" style="3" caption="${vortex.market.column.item}">
                   <variables>
@@ -99,7 +99,7 @@
             </container>
           </children>
         </border>
-        <border x="710" y="0" width="300" height="556" params="16" style="2" name="transaction_detail">
+        <border x="710" y="0" width="300" height="556" params="16" style="103" name="transaction_detail">
           <children>
             <container x="8" y="8" width="284" height="84" params="16" style="3" name="item_header_slot">
               <children/>
@@ -119,7 +119,7 @@
                 <var key="spacing" value="3" type="int"/>
               </variables>
             </itemlist_vertical>
-            <border x="8" y="296" width="284" height="252" params="16" style="2" name="summary" color="0xe2f0e7">
+            <border x="8" y="296" width="284" height="252" params="16" style="103" name="summary" color="0xe2f0e7">
               <children>
                 <text x="8" y="6" width="200" height="16" params="16" style="3" caption="${vortex.market.history.summary}">
                   <variables>
@@ -129,9 +129,9 @@
                     <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
                   </variables>
                 </text>
-                <button x="8" y="28" width="86" height="24" params="131089" style="6" color="0x8c8c86" name="period_0" caption="${vortex.market.history.today}" width_min="86" width_max="86"/>
-                <button x="98" y="28" width="86" height="24" params="131089" style="6" color="0x8c8c86" name="period_1" caption="${vortex.market.history.days}" width_min="86" width_max="86"/>
-                <button x="188" y="28" width="86" height="24" params="131089" style="6" color="0x8c8c86" name="period_2" caption="${vortex.market.history.days}" width_min="86" width_max="86"/>
+                <button x="8" y="28" width="86" height="24" params="131089" style="301" color="0x8c8c86" name="period_0" caption="${vortex.market.history.today}" width_min="86" width_max="86"/>
+                <button x="98" y="28" width="86" height="24" params="131089" style="301" color="0x8c8c86" name="period_1" caption="${vortex.market.history.days}" width_min="86" width_max="86"/>
+                <button x="188" y="28" width="86" height="24" params="131089" style="301" color="0x8c8c86" name="period_2" caption="${vortex.market.history.days}" width_min="86" width_max="86"/>
                 <itemlist_vertical x="8" y="64" width="268" height="74" params="16" style="3" name="summary_list">
                   <children/>
                   <variables>

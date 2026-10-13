@@ -7,19 +7,20 @@
           <variables>
             <var key="text_style" value="u_bold" type="String"/>
             <var key="font_size" value="12" type="uint"/>
-            <var key="text_color" value="0x24607f" type="hex"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
-        <border x="8" y="22" width="340" height="150" params="16" style="2" name="main_reputation" color="0xf5ebc4">
+        <border x="8" y="22" width="340" height="150" params="16" style="102" name="main_reputation">
           <children>
-            <border x="10" y="10" width="48" height="48" params="16" style="2" name="main_emblem" color="0xe4e4dc">
+            <border x="10" y="10" width="48" height="48" params="16" style="104" name="main_emblem">
               <children>
                 <static_bitmap x="14" y="14" width="20" height="20" params="16" style="3" name="main_emblem_icon" tags="%23icon">
                   <variables>
                     <var key="asset_uri" value="variablefx_icon_star_power" type="String"/>
                     <var key="stretched_x" value="false" type="Boolean"/>
                     <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
                   </variables>
                 </static_bitmap>
               </children>
@@ -85,11 +86,11 @@
           <variables>
             <var key="text_style" value="u_bold" type="String"/>
             <var key="font_size" value="12" type="uint"/>
-            <var key="text_color" value="0x24607f" type="hex"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
-        <border x="356" y="22" width="230" height="150" params="16" style="2" name="global_status">
+        <border x="356" y="22" width="230" height="150" params="16" style="103" name="global_status">
           <children>
             <itemlist_vertical x="8" y="12" width="214" height="126" params="16" style="3" name="status_list">
               <children/>
@@ -103,11 +104,11 @@
           <variables>
             <var key="text_style" value="u_bold" type="String"/>
             <var key="font_size" value="12" type="uint"/>
-            <var key="text_color" value="0x24607f" type="hex"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
-        <border x="8" y="200" width="578" height="300" params="16" style="2" name="factions">
+        <border x="8" y="200" width="578" height="300" params="16" style="102" name="factions">
           <children>
             <scrollable_itemlist_vertical x="6" y="6" width="566" height="288" params="16" style="3" name="faction_list">
               <children/>

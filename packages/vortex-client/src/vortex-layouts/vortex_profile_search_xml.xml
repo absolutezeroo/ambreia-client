@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_profile_search_xml" width="560" height="360" version="0.1">
+  <window>
+    <frame x="0" y="0" width="560" height="360" params="32769" style="103" name="vortex_profile_search" caption="${vortex.profile.search_title}">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <container x="0" y="0" width="560" height="32" params="16" style="3">
+          <children>
+            <tab_context x="8" y="0" width="450" height="32" params="17" style="3" name="tab_context">
+              <children>
+                <tab_button x="0" y="0" width="150" height="32" params="17" style="3" name="tab_search" caption="${vortex.profile.tab.search}" id="1"/>
+                <tab_button x="150" y="0" width="150" height="32" params="17" style="3" name="tab_add" caption="${vortex.profile.tab.add}" id="2"/>
+                <tab_button x="300" y="0" width="150" height="32" params="17" style="3" name="tab_report" caption="${vortex.profile.tab.report}" id="3"/>
+              </children>
+            </tab_context>
+          </children>
+        </container>
+        <text x="8" y="40" width="300" height="16" params="16" style="3" caption="${vortex.profile.player_name}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="8" y="60" width="420" height="30" params="16" style="102" name="search_box">
+          <children>
+            <static_bitmap x="8" y="7" width="16" height="16" params="16" style="3" tags="%23icon" color="0x6a6a72">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_magnifier_zoom_looking_magnifying_glass_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+            <input x="30" y="7" width="352" height="16" params="1" style="0" name="search_input" caption="${vortex.profile.search_hint}"/>
+            <border x="388" y="3" width="26" height="24" params="17" style="3" name="clear_button" dynamic_style="button">
+              <children>
+                <static_bitmap x="5" y="4" width="16" height="16" params="16" style="3" name="clear_button_icon" tags="%23icon" color="0x6a6a72">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_signs_maths_multiplication_x_crossout_checkmark_cancel_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+          </children>
+        </border>
+        <button x="436" y="61" width="116" height="28" params="131089" style="301" color="0x2a6aa0" name="search_button" caption="${vortex.profile.search}" width_min="116" width_max="116" height_min="28" height_max="28"/>
+        <text x="8" y="100" width="300" height="16" params="16" style="3" caption="${vortex.profile.results}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="8" y="120" width="544" height="192" params="16" style="102" name="results">
+          <children>
+            <itemlist_vertical x="0" y="4" width="544" height="184" params="16" style="3" name="result_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="4" type="int"/>
+              </variables>
+            </itemlist_vertical>
+          </children>
+        </border>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

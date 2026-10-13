@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_npc_prompt_xml" width="120" height="28" version="0.1">
+  <window>
+    <container x="0" y="0" width="120" height="28" params="1073741840" style="3" name="npc_prompt">
+      <children>
+        <border x="0" y="0" width="120" height="28" params="16" style="9" name="prompt_frame" color="0x4a4068">
+          <children>
+            <border x="4" y="3" width="22" height="22" params="16" style="104" name="key_box">
+              <children>
+                <text x="0" y="4" width="22" height="16" params="16" style="3" name="key_txt" caption="E">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x1f2a33" type="hex"/>
+                    <var key="auto_size" value="center" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+            <text x="32" y="7" width="84" height="16" params="16" style="3" name="prompt_txt" caption="${vortex.npc.talk}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0xffffff" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

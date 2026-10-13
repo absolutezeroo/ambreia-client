@@ -1,0 +1,21 @@
+{
+  "vortex.npc.accept_quest": "Accepter la quête",
+  "vortex.npc.claim_rewards": "Récupérer les récompenses",
+  "vortex.npc.confirm.accept": "Êtes-vous sûr de vouloir accepter cette quête ?",
+  "vortex.npc.craft": "Fabriquer",
+  "vortex.npc.dialog": "Dialogue",
+  "vortex.npc.goodbye": "Au revoir.",
+  "vortex.npc.level_required": "Niveau %level% requis",
+  "vortex.npc.quests": "Quêtes",
+  "vortex.npc.receive_reward": "Recevoir la récompense",
+  "vortex.npc.repair": "Réparer",
+  "vortex.npc.role.services": "PNJ - Services",
+  "vortex.npc.shop": "Boutique",
+  "vortex.npc.status.available": "Quête disponible",
+  "vortex.npc.status.done": "Quête terminée",
+  "vortex.npc.status.in_progress": "Quête en cours",
+  "vortex.npc.status.reward": "Remise de récompense",
+  "vortex.npc.talk": "Parler",
+  "vortex.npc.teleport": "Téléportation",
+  "vortex.npc.warning.quest_first": "Vous devez terminer la quête précédente avant d’accéder à ce service."
+}

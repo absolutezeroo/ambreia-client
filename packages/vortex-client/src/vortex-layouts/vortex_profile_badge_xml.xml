@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_profile_badge_xml" width="52" height="52" version="0.1">
+  <window>
+    <border x="0" y="0" width="52" height="52" params="17" style="104" name="badge_box" dynamic_style="lifted_hover">
+      <children>
+        <static_bitmap x="10" y="10" width="32" height="32" params="16" style="3" name="badge_icon">
+          <variables>
+            <var key="asset_uri" value="" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="pivot_point" value="center" type="String"/>
+            <var key="zoom_x" value="2" type="Number"/>
+            <var key="zoom_y" value="2" type="Number"/>
+          </variables>
+        </static_bitmap>
+      </children>
+    </border>
+  </window>
+</layout>

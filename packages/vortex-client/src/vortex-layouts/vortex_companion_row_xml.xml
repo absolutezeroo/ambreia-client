@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_companion_row_xml" width="284" height="56" version="0.1">
+  <window>
+    <border x="0" y="0" width="284" height="56" params="17" style="104" name="companion_row" dynamic_style="lifted_hover">
+      <children>
+        <border visible="false" x="0" y="0" width="284" height="56" params="16" style="104" name="selected" color="0xffd890">
+          <children>
+            
+          </children>
+        </border>
+        <border x="6" y="6" width="44" height="44" params="16" style="104" name="head_image_box">
+          <children>
+            <widget x="4" y="4" width="36" height="36" params="16" style="3" name="head_image">
+              <variables>
+                <var key="widget_type" value="avatar_image" type="String"/>
+              </variables>
+            </widget>
+          </children>
+        </border>
+        <text x="58" y="8" width="150" height="16" params="16" style="3" name="companion_name" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <shape x="58" y="31" width="9" height="9" params="16" style="3" name="rarity_dot" color="0x4cc040">
+          <variables>
+            <var key="shape" value="round_rectangle" type="String"/>
+            <var key="radius" value="4" type="Number"/>
+            <var key="stroke_color" value="0xff444444" type="hex"/>
+            <var key="stroke_thickness" value="1" type="Number"/>
+          </variables>
+        </shape>
+        <text x="72" y="28" width="100" height="14" params="16" style="3" name="rarity_txt" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x666666" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="190" y="28" width="56" height="14" params="16" style="3" name="level_txt" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="auto_size" value="right" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="250" y="16" width="26" height="24" params="17" style="104" name="more_button" dynamic_style="button">
+          <children>
+            <static_bitmap x="5" y="4" width="16" height="16" params="16" style="3" name="more_button_icon" tags="%23icon" color="0x5a4a7a">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/controller_buttons_menu_options_settings_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <static_bitmap visible="false" x="200" y="8" width="16" height="16" params="16" style="3" name="lock_icon" tags="%23icon" color="0x8a94a0">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/map_markers_doorway_enterance_exit_locked_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="pivot_point" value="center" type="String"/>
+          </variables>
+        </static_bitmap>
+      </children>
+    </border>
+  </window>
+</layout>

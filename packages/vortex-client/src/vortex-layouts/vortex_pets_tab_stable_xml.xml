@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_pets_tab_stable_xml" width="874" height="500" version="0.1">
+  <window>
+    <container x="0" y="0" width="874" height="500" params="16" style="3" name="tab_root">
+      <children>
+        <text x="8" y="4" width="400" height="16" params="16" style="3" name="slots_title" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="690" y="0" width="180" height="26" params="17" style="6" name="upgrade_button" color="0x2a6aa0" dynamic_style="button">
+          <children>
+            <static_bitmap x="6" y="5" width="16" height="16" params="16" style="3" tags="%23icon" color="0xffffff">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/map_markers_building_home_house_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+            <text x="26" y="5" width="148" height="16" params="16" style="3" caption="${vortex.pets.enlarge}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0xffffff" type="hex"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+        <border x="0" y="32" width="870" height="300" params="16" style="102" name="slots">
+          <children>
+            <scrollable_itemgrid_vertical x="8" y="8" width="854" height="284" params="16" style="3" name="card_grid">
+              <children/>
+              <variables>
+                <var key="spacing" value="8" type="int"/>
+              </variables>
+            </scrollable_itemgrid_vertical>
+          </children>
+        </border>
+        <text x="8" y="342" width="860" height="14" params="16" style="3" name="slots_hint" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </container>
+  </window>
+</layout>

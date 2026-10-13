@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_character_create_preset_xml" width="50" height="50" version="0.1">
   <window>
-    <border x="0" y="0" width="50" height="50" params="17" style="2" name="preset_tile" dynamic_style="reward_track_item" color="0xf2f2ec">
+    <border x="0" y="0" width="50" height="50" params="17" style="104" name="preset_tile" dynamic_style="reward_track_item">
       <children>
-        <border x="1" y="1" width="48" height="48" params="16" style="2" color="0xe4e4dc">
+        <border x="1" y="1" width="48" height="48" params="16" style="104">
           <children>
             <widget x="7" y="6" width="34" height="36" params="16" style="3" name="preset_image">
               <variables>

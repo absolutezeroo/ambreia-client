@@ -25,6 +25,7 @@
   "vortex.market.column.unit_price": "Unit price",
   "vortex.market.column.unit_price_short": "Unit",
   "vortex.market.commission": "Fee (%percent%%)",
+  "vortex.market.commission_help": "A 5% commission applies when listing. It is deducted automatically on sale.",
   "vortex.market.current_offers": "Current offers",
   "vortex.market.duration": "Sale duration",
   "vortex.market.duration.hours": "%count% hours",
@@ -50,8 +51,10 @@
   "vortex.market.inventory": "My inventory",
   "vortex.market.listed_on": "Listed on",
   "vortex.market.listing_fee": "Listing fee (%percent%%)",
+  "vortex.market.lowest_help": "Lowest price currently on the market for this item.",
   "vortex.market.lowest_now": "Lowest price now",
   "vortex.market.lowest_price": "Lowest price",
+  "vortex.market.new_unit_price": "New unit price",
   "vortex.market.no_offer": "No offer yet.",
   "vortex.market.no_offer_hint": "Your item is listed in the auction house. It is withdrawn automatically when the sale expires.",
   "vortex.market.offers_available": "Offers available",
@@ -85,5 +88,6 @@
   "vortex.market.total_quantity": "Total quantity",
   "vortex.market.unstage_all": "Remove all",
   "vortex.market.withdraw": "Withdraw",
+  "vortex.market.withdraw_confirm": "Withdraw this item from the auction house? It goes back to your inventory.",
   "vortex.market.your_offer": "Your offer"
 }

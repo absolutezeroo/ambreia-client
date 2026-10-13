@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_zone_discovered_xml" width="600" height="240" version="0.1">
+  <window>
+    <container x="0" y="0" width="600" height="240" params="16" style="3" name="zone_discovered">
+      <children>
+        <border x="0" y="0" width="384" height="240" params="16" style="102" name="banner_box">
+          <children>
+            <static_bitmap x="0" y="0" width="384" height="240" params="16" style="3" name="zone_image">
+              <variables>
+                <var key="asset_uri" value="arena_10_preview" type="String"/>
+                <var key="stretched_x" value="true" type="Boolean"/>
+                <var key="stretched_y" value="true" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+            <text x="0" y="40" width="384" height="22" params="16" style="3" name="discovered_txt" caption="${vortex.map.discovered}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="16" type="uint"/>
+                <var key="text_color" value="0xffd040" type="hex"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container x="32" y="68" width="320" height="56" params="16" style="3" name="zone_banner">
+              <children>
+                <static_bitmap x="0" y="0" width="320" height="56" params="16" style="3">
+                  <variables>
+                    <var key="asset_uri" value="rpg/parchement" type="String"/>
+                    <var key="stretched_x" value="true" type="Boolean"/>
+                    <var key="stretched_y" value="true" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+                <text x="0" y="14" width="320" height="26" params="16" style="3" name="zone_name" caption="">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="20" type="uint"/>
+                    <var key="text_color" value="0x3a2a10" type="hex"/>
+                    <var key="auto_size" value="center" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </container>
+            <border x="92" y="132" width="200" height="26" params="16" style="9" name="level_box" color="0x2a2438">
+              <children>
+                <text x="0" y="4" width="200" height="18" params="16" style="3" name="level_txt" caption="">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="12" type="uint"/>
+                    <var key="text_color" value="0xffffff" type="hex"/>
+                    <var key="auto_size" value="center" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+            <border x="92" y="166" width="200" height="30" params="16" style="9" name="xp_box" color="0x2a2438">
+              <children>
+                <static_bitmap x="10" y="7" width="16" height="16" params="16" style="3" tags="%23icon" color="0xc080ff">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/boardgames_card_star_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
+                  </variables>
+                </static_bitmap>
+                <text x="32" y="6" width="160" height="18" params="16" style="3" name="xp_txt" caption="">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="12" type="uint"/>
+                    <var key="text_color" value="0xffd040" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+          </children>
+        </border>
+        <border x="392" y="0" width="208" height="240" params="16" style="9" name="poi_box" color="0x3a3254">
+          <children>
+            <text x="8" y="8" width="192" height="16" params="16" style="3" caption="${vortex.map.poi_found}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0xffd890" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <itemlist_vertical x="6" y="30" width="196" height="202" params="16" style="3" name="poi_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="2" type="int"/>
+              </variables>
+            </itemlist_vertical>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

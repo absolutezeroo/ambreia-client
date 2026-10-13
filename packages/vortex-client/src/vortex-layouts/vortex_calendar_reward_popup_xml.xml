@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_calendar_reward_popup_xml" width="360" height="300" version="0.1">
+  <window>
+    <frame x="0" y="0" width="360" height="300" params="32769" style="103" name="vortex_calendar_reward_popup" caption="${vortex.calendar.reward_obtained}">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <border x="8" y="4" width="344" height="150" params="16" style="102" name="reward_stage">
+          <children>
+            <static_bitmap x="140" y="14" width="64" height="64" params="16" style="3" tags="%23icon" color="0xb08050">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/tools_crafting_chest_locked_loot_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+                <var key="zoom_x" value="4" type="Number"/>
+                <var key="zoom_y" value="4" type="Number"/>
+              </variables>
+            </static_bitmap>
+            <text x="8" y="96" width="328" height="18" params="16" style="3" name="reward_title" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="13" type="uint"/>
+                <var key="text_color" value="0xb07a10" type="hex"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="8" y="118" width="328" height="16" params="16" style="3" caption="${vortex.calendar.reward_desc}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+        <itemlist_horizontal x="56" y="162" width="248" height="60" params="16" style="3" name="reward_list">
+          <children/>
+          <variables>
+            <var key="spacing" value="8" type="int"/>
+          </variables>
+        </itemlist_horizontal>
+        <button x="8" y="230" width="344" height="32" params="131089" style="301" color="0x2f9e2f" name="take_all_button" caption="${vortex.reward.take_all}" width_min="344" width_max="344" height_min="32" height_max="32"/>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

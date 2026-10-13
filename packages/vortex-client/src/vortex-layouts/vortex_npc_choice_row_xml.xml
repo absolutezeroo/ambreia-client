@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_npc_choice_row_xml" width="404" height="40" version="0.1">
+  <window>
+    <border x="0" y="0" width="404" height="40" params="17" style="104" name="npc_choice" dynamic_style="lifted_hover">
+      <children>
+        <border visible="false" x="0" y="0" width="404" height="40" params="16" style="104" name="selected" color="0xffd890">
+          <children>
+            
+          </children>
+        </border>
+        <border x="6" y="6" width="28" height="28" params="16" style="104" name="choice_icon_box">
+          <children>
+            <static_bitmap x="6" y="6" width="16" height="16" params="16" style="3" name="choice_icon" tags="%23icon" color="0x2a8fd6">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_speech_bubble_three_dots_dialogue_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <text x="44" y="11" width="330" height="18" params="16" style="3" name="choice_txt" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <static_bitmap x="380" y="12" width="16" height="16" params="16" style="3" name="chevron" tags="%23icon" color="0x5a4a7a">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_right_east_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="pivot_point" value="center" type="String"/>
+          </variables>
+        </static_bitmap>
+      </children>
+    </border>
+  </window>
+</layout>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_teleport_xml" width="420" height="380" version="0.1">
+  <window>
+    <frame x="0" y="0" width="420" height="380" params="32769" style="103" name="vortex_teleport" caption="${vortex.map.fast_travel}">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <border x="8" y="4" width="404" height="330" params="16" style="102" name="places">
+          <children>
+            <scrollable_itemlist_vertical x="0" y="4" width="404" height="322" params="16" style="3" name="place_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="4" type="int"/>
+              </variables>
+            </scrollable_itemlist_vertical>
+          </children>
+        </border>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

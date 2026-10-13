@@ -3,7 +3,7 @@
   <window>
     <container x="0" y="0" width="360" height="214" params="1073741840" style="3" name="hud_target">
       <children>
-        <border x="0" y="0" width="360" height="214" params="16" style="9" name="target_frame" color="0x686661">
+        <border x="0" y="0" width="360" height="214" params="16" style="9" name="target_frame" color="0x4a4068">
           <children>
             <static_bitmap x="8" y="8" width="16" height="16" params="16" style="3" tags="%23icon" color="0xe04848">
               <variables>

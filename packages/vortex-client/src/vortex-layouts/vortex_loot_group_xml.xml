@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_loot_group_xml" width="420" height="170" version="0.1">
+  <window>
+    <frame x="0" y="0" width="420" height="170" params="32769" style="103" name="vortex_loot_group" caption="${vortex.loot.group.title}">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <border x="8" y="4" width="56" height="56" params="16" style="104" name="item_frame">
+          <children>
+            <static_bitmap x="12" y="12" width="32" height="32" params="16" style="3" name="item_icon">
+              <variables>
+                <var key="asset_uri" value="" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <text x="72" y="6" width="320" height="18" params="16" style="3" name="item_name" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="13" type="uint"/>
+            <var key="text_color" value="0xd8a0ff" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="72" y="26" width="320" height="14" params="16" style="3" name="roll_status" caption="${vortex.loot.group.rolling}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="72" y="44" width="300" height="13" params="0" style="3" name="roll_bar">
+          <children>
+            <shape x="0" y="0" width="300" height="13" params="144" style="3" name="bg" color="0x2a2438">
+              <variables>
+                <var key="shape" value="round_rectangle" type="String"/>
+                <var key="radius" value="6" type="Number"/>
+                <var key="stroke_color" value="0xff6a6080" type="hex"/>
+                <var key="stroke_thickness" value="1" type="Number"/>
+              </variables>
+            </shape>
+            <shape x="0" y="0" width="120" height="13" params="16" style="3" name="fill" color="0x2a8fd6">
+              <variables>
+                <var key="shape" value="round_rectangle" type="String"/>
+                <var key="radius" value="6" type="Number"/>
+                <var key="stroke_color" value="0xff1a5a90" type="hex"/>
+                <var key="stroke_thickness" value="1" type="Number"/>
+              </variables>
+            </shape>
+          </children>
+        </container>
+        <text x="376" y="42" width="36" height="16" params="16" style="3" name="roll_timer" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
+            <var key="auto_size" value="right" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="8" y="74" width="404" height="44" params="16" style="3" name="roll_buttons">
+          <children>
+            <container x="0" y="0" width="128" height="44" params="16" style="3" name="need_button_box">
+              <children>
+                <button x="0" y="0" width="128" height="28" params="131089" style="301" color="0x2f9e2f" name="need_button" caption="${vortex.loot.group.need}" width_min="128" width_max="128" height_min="28" height_max="28"/>
+                <text x="0" y="30" width="128" height="14" params="16" style="3" name="need_button_hint" caption="${vortex.loot.group.need_hint}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="9" type="uint"/>
+                    <var key="text_color" value="0xd8d0e8" type="hex"/>
+                    <var key="auto_size" value="center" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </container>
+            <container x="138" y="0" width="128" height="44" params="16" style="3" name="greed_button_box">
+              <children>
+                <button x="0" y="0" width="128" height="28" params="131089" style="301" color="0x2a6aa0" name="greed_button" caption="${vortex.loot.group.greed}" width_min="128" width_max="128" height_min="28" height_max="28"/>
+                <text x="0" y="30" width="128" height="14" params="16" style="3" name="greed_button_hint" caption="${vortex.loot.group.greed_hint}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="9" type="uint"/>
+                    <var key="text_color" value="0xd8d0e8" type="hex"/>
+                    <var key="auto_size" value="center" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </container>
+            <container x="276" y="0" width="128" height="44" params="16" style="3" name="pass_button_box">
+              <children>
+                <button x="0" y="0" width="128" height="28" params="131089" style="301" color="0xd23a2a" name="pass_button" caption="${vortex.loot.group.pass}" width_min="128" width_max="128" height_min="28" height_max="28"/>
+                <text x="0" y="30" width="128" height="14" params="16" style="3" name="pass_button_hint" caption="${vortex.loot.group.pass_hint}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="9" type="uint"/>
+                    <var key="text_color" value="0xd8d0e8" type="hex"/>
+                    <var key="auto_size" value="center" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </container>
+          </children>
+        </container>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

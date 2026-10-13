@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_dungeon_reward_slot_xml" width="42" height="42" version="0.1">
   <window>
-    <border x="0" y="0" width="42" height="42" params="17" style="2" name="reward_slot" dynamic_style="lifted_hover" color="0xe4e4dc">
+    <border x="0" y="0" width="42" height="42" params="17" style="104" name="reward_slot" dynamic_style="lifted_hover">
       <children>
         <static_bitmap x="5" y="4" width="32" height="32" params="16" style="3" name="icon" tags="%23icon">
           <variables>

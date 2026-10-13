@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_dungeon_role_tag_xml" width="104" height="22" version="0.1">
   <window>
-    <border x="0" y="0" width="104" height="22" params="16" style="2" name="role_tag" color="0xd0ecbc">
+    <border x="0" y="0" width="104" height="22" params="16" style="103" name="role_tag" color="0xd0ecbc">
       <children>
         <static_bitmap x="6" y="3" width="16" height="16" params="16" style="3" name="icon" tags="%23icon" color="0xe03a3a">
           <variables>

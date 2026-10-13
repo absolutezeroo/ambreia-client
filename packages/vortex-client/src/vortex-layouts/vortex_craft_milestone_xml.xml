@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_craft_milestone_xml" width="122" height="92" version="0.1">
   <window>
-    <border x="0" y="0" width="122" height="92" params="16" style="2" name="milestone" color="0xe0f0d0">
+    <border x="0" y="0" width="122" height="92" params="16" style="103" name="milestone" color="0xe0f0d0">
       <children>
         <text x="0" y="4" width="122" height="16" params="16" style="3" name="milestone_level" caption="">
           <variables>

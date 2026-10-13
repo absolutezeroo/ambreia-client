@@ -8,6 +8,7 @@
             <var key="asset_uri" value="rpg/ui-icons/software_signs_checkmark_checkbox_ticked_todo_icon" type="String"/>
             <var key="stretched_x" value="false" type="Boolean"/>
             <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="pivot_point" value="center" type="String"/>
           </variables>
         </static_bitmap>
         <text x="20" y="1" width="210" height="16" params="16" style="3" name="rule_txt" caption="${vortex.charcreate.name.rule.length}">

@@ -42,6 +42,15 @@
             <var key="stretched_y" value="false" type="Boolean"/>
           </variables>
         </static_bitmap>
+        <!-- Selected quest, toggled by the view. -->
+        <container visible="false" x="0" y="0" width="330" height="44" params="16" style="3" name="selected">
+          <children>
+            <container x="0" y="0" width="330" height="2" params="16" style="8" color="0xff2a8fd6" background="true"/>
+            <container x="0" y="42" width="330" height="2" params="16" style="8" color="0xff2a8fd6" background="true"/>
+            <container x="0" y="0" width="2" height="44" params="16" style="8" color="0xff2a8fd6" background="true"/>
+            <container x="328" y="0" width="2" height="44" params="16" style="8" color="0xff2a8fd6" background="true"/>
+          </children>
+        </container>
       </children>
     </region>
   </window>

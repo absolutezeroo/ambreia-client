@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_zone_popup_xml" width="360" height="240" version="0.1">
+  <window>
+    <container x="0" y="0" width="360" height="240" params="1073741840" style="3" name="zone_popup">
+      <children>
+        <border x="0" y="0" width="360" height="240" params="16" style="9" name="zone_frame" color="0x4a4068">
+          <children>
+            <border x="330" y="8" width="22" height="22" params="17" style="6" name="close_button" color="0xc03028" dynamic_style="button">
+              <children>
+                <static_bitmap x="3" y="3" width="16" height="16" params="16" style="3" tags="%23icon" color="0xffffff">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_signs_maths_multiplication_x_crossout_checkmark_cancel_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <border x="10" y="10" width="56" height="56" params="16" style="3" name="zone_icon_box" color="0x201e19" blend="0.8">
+              <children>
+                <static_bitmap x="12" y="12" width="32" height="32" params="16" style="3" name="zone_icon" tags="%23icon" color="0xffffff">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/misc_peace_treaty_white_dove_bird_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
+                    <var key="zoom_x" value="2" type="Number"/>
+                    <var key="zoom_y" value="2" type="Number"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <text x="76" y="10" width="246" height="20" params="16" style="3" name="zone_title" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="14" type="uint"/>
+                <var key="text_color" value="0x6cdc5a" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <itemlist_vertical x="76" y="34" width="274" height="196" params="16" style="3" name="zone_body">
+              <children>
+                <text x="0" y="0" width="274" height="42" params="16" style="3" name="zone_desc" caption="">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0xe8e4f0" type="hex"/>
+                    <var key="multiline" value="true" type="Boolean"/>
+                    <var key="word_wrap" value="true" type="Boolean"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <itemlist_vertical x="0" y="0" width="274" height="76" params="16" style="3" name="info_list">
+                  <children></children>
+                  <variables>
+                    <var key="spacing" value="2" type="int"/>
+                  </variables>
+                </itemlist_vertical>
+                <border x="0" y="0" width="274" height="30" params="16" style="9" name="status_box" color="0x2f7a2f">
+                  <children>
+                    <static_bitmap x="6" y="7" width="16" height="16" params="16" style="3" name="status_icon" tags="%23icon" color="0x6cdc5a">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/software_signs_checkmark_checkbox_ticked_todo_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                        <var key="pivot_point" value="center" type="String"/>
+                      </variables>
+                    </static_bitmap>
+                    <text x="28" y="3" width="240" height="24" params="16" style="3" name="status_txt" caption="">
+                      <variables>
+                        <var key="text_style" value="u_bold" type="String"/>
+                        <var key="font_size" value="10" type="uint"/>
+                        <var key="text_color" value="0xffffff" type="hex"/>
+                        <var key="multiline" value="true" type="Boolean"/>
+                        <var key="word_wrap" value="true" type="Boolean"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </border>
+                <container visible="false" x="0" y="0" width="274" height="40" params="16" style="3" name="level_box">
+                  <children>
+                    <text x="0" y="0" width="140" height="14" params="16" style="3" name="advised_txt" caption="">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="10" type="uint"/>
+                        <var key="text_color" value="0xe8e4f0" type="hex"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <text x="140" y="0" width="134" height="14" params="16" style="3" name="own_level_txt" caption="">
+                      <variables>
+                        <var key="text_style" value="u_bold" type="String"/>
+                        <var key="font_size" value="10" type="uint"/>
+                        <var key="text_color" value="0xff8a6a" type="hex"/>
+                        <var key="auto_size" value="right" type="String"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <container x="0" y="18" width="274" height="13" params="0" style="3" name="level_bar">
+                      <children>
+                        <shape x="0" y="0" width="274" height="13" params="144" style="3" name="bg" color="0x2a2438">
+                          <variables>
+                            <var key="shape" value="round_rectangle" type="String"/>
+                            <var key="radius" value="6" type="Number"/>
+                            <var key="stroke_color" value="0xff6a6080" type="hex"/>
+                            <var key="stroke_thickness" value="1" type="Number"/>
+                          </variables>
+                        </shape>
+                        <shape x="0" y="0" width="216" height="13" params="16" style="3" name="fill" color="0xd8a030">
+                          <variables>
+                            <var key="shape" value="round_rectangle" type="String"/>
+                            <var key="radius" value="6" type="Number"/>
+                            <var key="stroke_color" value="0xff8a6a10" type="hex"/>
+                            <var key="stroke_thickness" value="1" type="Number"/>
+                          </variables>
+                        </shape>
+                        <text x="0" y="-1" width="274" height="14" params="16" style="3" name="points" caption="">
+                          <variables>
+                            <var key="text_style" value="u_bold" type="String"/>
+                            <var key="font_size" value="10" type="uint"/>
+                            <var key="text_color" value="0xffffff" type="hex"/>
+                            <var key="auto_size" value="center" type="String"/>
+                            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                          </variables>
+                        </text>
+                      </children>
+                    </container>
+                  </children>
+                </container>
+                <border visible="false" x="0" y="0" width="274" height="40" params="16" style="9" name="danger_box" color="0xb02818">
+                  <children>
+                    <static_bitmap x="6" y="12" width="16" height="16" params="16" style="3" name="danger_icon" tags="%23icon" color="0xffffff">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/rpg_skull_death_dead_small_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                        <var key="pivot_point" value="center" type="String"/>
+                      </variables>
+                    </static_bitmap>
+                    <text x="28" y="4" width="240" height="14" params="16" style="3" name="danger_title" caption="">
+                      <variables>
+                        <var key="text_style" value="u_bold" type="String"/>
+                        <var key="font_size" value="10" type="uint"/>
+                        <var key="text_color" value="0xffffff" type="hex"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                    <text x="28" y="18" width="240" height="20" params="16" style="3" name="danger_txt" caption="">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="9" type="uint"/>
+                        <var key="text_color" value="0xffe0e0" type="hex"/>
+                        <var key="multiline" value="true" type="Boolean"/>
+                        <var key="word_wrap" value="true" type="Boolean"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </border>
+                <container visible="false" x="0" y="0" width="274" height="28" params="16" style="3" name="buttons">
+                  <children>
+                    <button x="0" y="0" width="146" height="28" params="131089" style="301" color="0xd23a2a" name="primary_button" caption="${vortex.zone.continue}" width_min="146" width_max="146" height_min="28" height_max="28"/>
+                    <button x="152" y="0" width="122" height="28" params="131089" style="301" color="0x2a6aa0" name="secondary_button" caption="${vortex.zone.back}" width_min="122" width_max="122" height_min="28" height_max="28"/>
+                  </children>
+                </container>
+              </children>
+              <variables>
+                <var key="spacing" value="6" type="int"/>
+              </variables>
+            </itemlist_vertical>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

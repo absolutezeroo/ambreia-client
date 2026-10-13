@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_profile_tab_general_xml" width="364" height="200" version="0.1">
+  <window>
+    <border x="0" y="0" width="364" height="200" params="16" style="103" name="tab_root">
+      <children>
+        <itemlist_vertical x="8" y="8" width="168" height="184" params="16" style="3" name="left_list">
+          <children/>
+          <variables>
+            <var key="spacing" value="8" type="int"/>
+          </variables>
+        </itemlist_vertical>
+        <shape x="182" y="8" width="1" height="184" params="16" style="3" color="0xd0d0c8">
+          <variables>
+            <var key="shape" value="round_rectangle" type="String"/>
+            <var key="radius" value="0" type="Number"/>
+          </variables>
+        </shape>
+        <itemlist_vertical x="190" y="8" width="166" height="184" params="16" style="3" name="right_list">
+          <children/>
+          <variables>
+            <var key="spacing" value="8" type="int"/>
+          </variables>
+        </itemlist_vertical>
+      </children>
+    </border>
+  </window>
+</layout>

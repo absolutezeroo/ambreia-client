@@ -3,7 +3,7 @@
   <window>
     <container x="0" y="0" width="470" height="104" params="1073741840" style="3" name="hud_boss">
       <children>
-        <border x="0" y="0" width="470" height="104" params="16" style="9" name="boss_frame" color="0x686661">
+        <border x="0" y="0" width="470" height="104" params="16" style="9" name="boss_frame" color="0x4a4068">
           <children>
             <border x="6" y="6" width="64" height="64" params="16" style="3" color="0x201e19" blend="0.8">
               <children>
@@ -14,6 +14,7 @@
                     <var key="stretched_y" value="false" type="Boolean"/>
                     <var key="zoom_x" value="3" type="Number"/>
                     <var key="zoom_y" value="3" type="Number"/>
+                                      <var key="pivot_point" value="center" type="String"/>
                   </variables>
                 </static_bitmap>
               </children>
@@ -40,6 +41,7 @@
                 <var key="asset_uri" value="rpg/ui-icons/rpg_skull_death_dead_bones_pirates_icon" type="String"/>
                 <var key="stretched_x" value="false" type="Boolean"/>
                 <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
               </variables>
             </static_bitmap>
             <container x="78" y="28" width="384" height="20" params="0" style="3" name="boss_hp_bar">
@@ -85,6 +87,7 @@
                     <var key="asset_uri" value="rpg/skills/warrior_skill_icon_9" type="String"/>
                     <var key="stretched_x" value="false" type="Boolean"/>
                     <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
                   </variables>
                 </static_bitmap>
               </children>

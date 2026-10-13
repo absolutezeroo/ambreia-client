@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_settings_xml" width="680" height="500" version="0.1">
+  <window>
+    <frame x="0" y="0" width="680" height="500" params="32769" style="103" name="vortex_settings" caption="${vortex.settings.title}">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <border x="8" y="4" width="160" height="400" params="16" style="102" name="categories">
+          <children>
+            <itemlist_vertical x="5" y="5" width="150" height="390" params="16" style="3" name="category_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="4" type="int"/>
+              </variables>
+            </itemlist_vertical>
+          </children>
+        </border>
+        <container x="176" y="4" width="500" height="400" params="16" style="3" name="panel_slot">
+          <children>
+            
+          </children>
+        </container>
+        <button x="176" y="422" width="244" height="28" params="131089" style="301" color="0x8c8c86" name="cancel_button" caption="${vortex.ui.cancel}" width_min="244" width_max="244" height_min="28" height_max="28"/>
+        <button x="432" y="422" width="244" height="28" params="131089" style="301" color="0x2f9e2f" name="apply_button" caption="${vortex.settings.apply}" width_min="244" width_max="244" height_min="28" height_max="28"/>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

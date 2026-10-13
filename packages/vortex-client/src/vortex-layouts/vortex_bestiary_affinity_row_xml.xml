@@ -3,7 +3,7 @@
   <window>
     <container x="0" y="0" width="120" height="22" params="144" style="3" name="affinity_row">
       <children>
-        <static_bitmap x="2" y="3" width="16" height="16" params="16" style="3" tags="%23icon" color="0xd04a3a">
+        <static_bitmap x="2" y="3" width="16" height="16" params="16" style="3" name="affinity_icon" tags="%23icon" color="0xd04a3a">
           <variables>
             <var key="asset_uri" value="rpg/ui-icons/rpg_crossed_swords_duel_pvp_combat_battle_war_icon" type="String"/>
             <var key="stretched_x" value="false" type="Boolean"/>

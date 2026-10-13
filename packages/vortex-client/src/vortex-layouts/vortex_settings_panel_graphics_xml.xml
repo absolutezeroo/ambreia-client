@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_settings_panel_graphics_xml" width="500" height="400" version="0.1">
+  <window>
+    <border x="0" y="0" width="500" height="400" params="16" style="103" name="panel">
+      <children>
+        <static_bitmap x="8" y="8" width="16" height="16" params="16" style="3" tags="%23icon" color="0x5a4a7a">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/software_hardware_monitor_display_pc_computer_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="pivot_point" value="center" type="String"/>
+          </variables>
+        </static_bitmap>
+        <text x="30" y="8" width="300" height="16" params="16" style="3" caption="${vortex.settings.graphics_title}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="12" type="uint"/>
+            <var key="text_color" value="0x5a4a7a" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="8" y="40" width="180" height="16" params="16" style="3" caption="${vortex.settings.gfx.display_mode}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <dropmenu x="240" y="36" width="220" height="24" params="17" style="3" name="display_mode" caption="Plein écran"/>
+        <text x="8" y="70" width="180" height="16" params="16" style="3" caption="${vortex.settings.gfx.resolution}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <dropmenu x="240" y="66" width="220" height="24" params="17" style="3" name="resolution" caption="1920 × 1080 (16:9)"/>
+        <text x="8" y="100" width="180" height="16" params="16" style="3" caption="${vortex.settings.gfx.quality}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <dropmenu x="240" y="96" width="220" height="24" params="17" style="3" name="quality" caption="Élevée"/>
+        <text x="8" y="130" width="180" height="16" params="16" style="3" caption="${vortex.settings.gfx.shadows}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <dropmenu x="240" y="126" width="220" height="24" params="17" style="3" name="shadows" caption="Moyenne"/>
+        <text x="8" y="160" width="180" height="16" params="16" style="3" caption="${vortex.settings.gfx.effects}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <dropmenu x="240" y="156" width="220" height="24" params="17" style="3" name="effects" caption="Élevée"/>
+        <text x="8" y="190" width="180" height="16" params="16" style="3" caption="${vortex.settings.gfx.textures}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <dropmenu x="240" y="186" width="220" height="24" params="17" style="3" name="textures" caption="Élevée"/>
+        <text x="8" y="220" width="180" height="16" params="16" style="3" caption="${vortex.settings.gfx.distance}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <dropmenu x="240" y="216" width="220" height="24" params="17" style="3" name="distance" caption="Moyenne"/>
+        <checkbox x="8" y="252" width="18" height="18" params="17" style="3" name="vsync"/>
+        <text x="32" y="254" width="300" height="16" params="16" style="3" caption="${vortex.settings.gfx.vsync}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="400" y="254" width="60" height="16" params="16" style="3" name="vsync_txt" caption="${vortex.settings.enabled}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x666666" type="hex"/>
+            <var key="auto_size" value="right" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </border>
+  </window>
+</layout>

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_loot_settings_xml" width="580" height="150" version="0.1">
+  <window>
+    <frame x="0" y="0" width="580" height="150" params="32769" style="103" name="vortex_loot_settings" caption="${vortex.loot.settings.title}">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <border x="8" y="4" width="276" height="108" params="16" style="103" name="pickup_box">
+          <children>
+            <static_bitmap x="8" y="8" width="16" height="16" params="16" style="3" tags="%23icon" color="0x5a4a7a">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_options_settings_cogwheel_gear_mechanics_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+            <text x="30" y="8" width="230" height="16" params="16" style="3" caption="${vortex.loot.settings.pickup}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x5a4a7a" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container x="8" y="32" width="264" height="72" params="16" style="3">
+              <children>
+                <checkbox x="0" y="0" width="18" height="18" params="17" style="3" name="auto_standard"/>
+                <text x="24" y="1" width="220" height="16" params="16" style="3" caption="${vortex.loot.settings.auto_standard}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x1f2a33" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <border x="246" y="0" width="18" height="18" params="17" style="104" name="auto_standard_help" dynamic_style="button">
+                  <children>
+                    <static_bitmap x="1" y="1" width="16" height="16" params="16" style="3" tags="%23icon" color="0x5a4a7a">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/software_warning_sign_circle_question_mark_help_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                        <var key="pivot_point" value="center" type="String"/>
+                      </variables>
+                    </static_bitmap>
+                  </children>
+                </border>
+                <checkbox x="0" y="24" width="18" height="18" params="17" style="3" name="auto_gold"/>
+                <text x="24" y="25" width="220" height="16" params="16" style="3" caption="${vortex.loot.settings.auto_gold}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x1f2a33" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <border x="246" y="24" width="18" height="18" params="17" style="104" name="auto_gold_help" dynamic_style="button">
+                  <children>
+                    <static_bitmap x="1" y="1" width="16" height="16" params="16" style="3" tags="%23icon" color="0x5a4a7a">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/software_warning_sign_circle_question_mark_help_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                        <var key="pivot_point" value="center" type="String"/>
+                      </variables>
+                    </static_bitmap>
+                  </children>
+                </border>
+                <checkbox x="0" y="48" width="18" height="18" params="17" style="3" name="hide_common"/>
+                <text x="24" y="49" width="220" height="16" params="16" style="3" caption="${vortex.loot.settings.hide_common}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x1f2a33" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <border x="246" y="48" width="18" height="18" params="17" style="104" name="hide_common_help" dynamic_style="button">
+                  <children>
+                    <static_bitmap x="1" y="1" width="16" height="16" params="16" style="3" tags="%23icon" color="0x5a4a7a">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/software_warning_sign_circle_question_mark_help_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                        <var key="pivot_point" value="center" type="String"/>
+                      </variables>
+                    </static_bitmap>
+                  </children>
+                </border>
+              </children>
+            </container>
+          </children>
+        </border>
+        <border x="292" y="4" width="276" height="108" params="16" style="103" name="rules_box">
+          <children>
+            <static_bitmap x="8" y="8" width="16" height="16" params="16" style="3" tags="%23icon" color="0x5a4a7a">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/travel_person_people_three_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+            <text x="30" y="8" width="230" height="16" params="16" style="3" caption="${vortex.loot.settings.rules}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x5a4a7a" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container x="8" y="32" width="264" height="72" params="16" style="3">
+              <children>
+                <radiobutton x="0" y="0" width="18" height="18" params="17" style="3" name="rule_free"/>
+                <text x="24" y="1" width="220" height="16" params="16" style="3" caption="${vortex.loot.settings.rule_free}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x1f2a33" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <radiobutton x="0" y="24" width="18" height="18" params="17" style="3" name="rule_roll"/>
+                <text x="24" y="25" width="220" height="16" params="16" style="3" caption="${vortex.loot.settings.rule_roll}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x1f2a33" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <radiobutton x="0" y="48" width="18" height="18" params="17" style="3" name="rule_round"/>
+                <text x="24" y="49" width="220" height="16" params="16" style="3" caption="${vortex.loot.settings.rule_round}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x1f2a33" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </container>
+          </children>
+        </border>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

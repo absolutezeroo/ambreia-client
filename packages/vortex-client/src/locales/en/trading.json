@@ -1,0 +1,18 @@
+{
+  "vortex.trading.confirm": "Confirm the trade",
+  "vortex.trading.confirm_message": "Both players confirmed. The trade goes through in:",
+  "vortex.trading.confirm_title": "Confirm the trade",
+  "vortex.trading.gold": "Amber coins",
+  "vortex.trading.in_progress": "Trade in progress...",
+  "vortex.trading.locked": "Trade locked",
+  "vortex.trading.locked_sub": "Waiting for the final validation...",
+  "vortex.trading.notice": "Check the items and the offered sum. Once both players are ready the trade goes through.",
+  "vortex.trading.offer_quantity": "Quantity to offer:",
+  "vortex.trading.owned": "Owned: %count%",
+  "vortex.trading.ready": "Ready",
+  "vortex.trading.stackable": "Stackable: %count%",
+  "vortex.trading.title": "Player trade",
+  "vortex.trading.value": "Value:",
+  "vortex.trading.waiting": "Waiting for %name%...",
+  "vortex.trading.warning": "Check the items and the offered sum. Both players must confirm to validate the trade. Once confirmed, the trade cannot be cancelled."
+}

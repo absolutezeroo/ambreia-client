@@ -6,7 +6,7 @@
         <container x="0" y="0" width="152" height="26" params="16" style="3" name="quantity_slot">
           <children/>
         </container>
-        <button x="158" y="0" width="56" height="24" params="131089" style="3" name="max_button" caption="${vortex.shop.max}" width_min="56" width_max="56"/>
+        <button x="158" y="0" width="56" height="24" params="131089" style="300" name="max_button" caption="${vortex.shop.max}" width_min="56" width_max="56"/>
       </children>
     </container>
   </window>

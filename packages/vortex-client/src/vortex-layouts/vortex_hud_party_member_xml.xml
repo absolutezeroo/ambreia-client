@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_hud_party_member_xml" width="214" height="70" version="0.1">
   <window>
-    <border x="0" y="0" width="214" height="70" params="17" style="9" name="party_member" dynamic_style="lifted_hover" color="0x686661">
+    <border x="0" y="0" width="214" height="70" params="17" style="9" name="party_member" dynamic_style="lifted_hover" color="0x4a4068">
       <children>
         <border x="4" y="4" width="46" height="46" params="16" style="3" color="0x201e19" blend="0.8">
           <children>

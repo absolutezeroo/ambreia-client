@@ -3,7 +3,7 @@
   <window>
     <container x="0" y="0" width="300" height="96" params="144" style="3" name="empty_state">
       <children>
-        <border x="126" y="4" width="48" height="48" params="16" style="2" color="0xe8e8e2">
+        <border x="126" y="4" width="48" height="48" params="16" style="104">
           <children>
             <static_bitmap x="8" y="8" width="32" height="32" params="16" style="3" name="empty_icon" tags="%23icon">
               <variables>

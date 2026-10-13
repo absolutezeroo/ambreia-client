@@ -1,24 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_quest_objective_row_xml" width="394" height="22" version="0.1">
   <window>
-    <container x="0" y="0" width="394" height="22" params="144" style="3" name="objective_row">
+    <border x="0" y="0" width="394" height="22" params="17" style="104" dynamic_style="lifted_hover" name="objective_row">
       <children>
-        <border x="0" y="2" width="18" height="18" params="16" style="2" name="state_box" color="0xe4e4dc">
-          <children/>
+        <border x="6" y="2" width="18" height="18" params="16" style="104" name="state_box">
+          <children>
+            <static_bitmap visible="false" x="1" y="1" width="16" height="16" params="16" style="3" name="check_icon" tags="%23icon" color="0x40b030">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_signs_checkmark_checkbox_ticked_todo_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+          </children>
         </border>
-        <text x="26" y="3" width="304" height="16" params="16" style="3" name="label" caption="">
+        <text x="32" y="3" width="304" height="16" params="16" style="3" name="label" caption="">
           <variables>
             <var key="text_style" value="u_regular" type="String"/>
             <var key="font_size" value="11" type="uint"/>
-            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>            <var key="text_color" value="0x1f2a33" type="hex"/>
+
           </variables>
         </text>
-        <text x="334" y="3" width="60" height="16" params="80" style="3" name="count" caption="">
+        <text x="326" y="3" width="60" height="16" params="80" style="3" name="count" caption="">
           <variables>
             <var key="text_style" value="u_bold" type="String"/>
             <var key="font_size" value="11" type="uint"/>
             <var key="auto_size" value="right" type="String"/>
-            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>            <var key="text_color" value="0x1f2a33" type="hex"/>
+
           </variables>
         </text>
         <container x="26" y="24" width="368" height="13" params="16" style="3" name="progress_slot" visible="false">
@@ -37,7 +48,7 @@
                   <variables>
                     <var key="text_style" value="u_bold" type="String"/>
                     <var key="font_size" value="10" type="uint"/>
-                    <var key="text_color" value="0x222222" type="hex"/>
+                    <var key="text_color" value="0x1f2a33" type="hex"/>
                     <var key="auto_size" value="center" type="String"/>
                     <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
                   </variables>
@@ -47,6 +58,6 @@
           </children>
         </container>
       </children>
-    </container>
+    </border>
   </window>
 </layout>

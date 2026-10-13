@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_shop_row_xml" width="296" height="40" version="0.1">
   <window>
-    <border x="0" y="0" width="296" height="40" params="17" style="2" name="shop_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+    <border x="0" y="0" width="296" height="40" params="17" style="104" name="shop_row" dynamic_style="lifted_hover">
       <children>
-        <border x="3" y="3" width="34" height="34" params="16" style="2" color="0xe4e4dc">
+        <border visible="false" x="0" y="0" width="296" height="40" params="16" style="104" name="selected" color="0xffd890"/>
+        <border x="3" y="3" width="34" height="34" params="16" style="104">
           <children>
             <static_bitmap x="1" y="1" width="32" height="32" params="16" style="3" name="item_icon" tags="%23icon">
               <variables>

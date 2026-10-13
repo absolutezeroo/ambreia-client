@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_zone_info_row_xml" width="274" height="18" version="0.1">
+  <window>
+    <container x="0" y="0" width="274" height="18" params="144" style="3" name="zone_info_row">
+      <children>
+        <static_bitmap x="0" y="1" width="16" height="16" params="16" style="3" name="info_icon" tags="%23icon" color="0xffd890">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/boardgames_card_star_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="pivot_point" value="center" type="String"/>
+          </variables>
+        </static_bitmap>
+        <text x="22" y="1" width="252" height="16" params="16" style="3" name="info_txt" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0xe8e4f0" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </container>
+  </window>
+</layout>

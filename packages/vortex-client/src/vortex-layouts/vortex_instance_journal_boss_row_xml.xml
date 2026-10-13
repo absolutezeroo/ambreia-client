@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_instance_journal_boss_row_xml" width="110" height="96" version="0.1">
+  <window>
+    <border x="0" y="0" width="110" height="96" params="17" style="104" name="boss_row" dynamic_style="lifted_hover">
+      <children>
+        <border visible="false" x="0" y="0" width="110" height="96" params="16" style="104" name="selected" color="0xffd890">
+          <children>
+            
+          </children>
+        </border>
+        <border x="23" y="6" width="64" height="64" params="16" style="104" name="head_image_box">
+          <children>
+            <widget x="4" y="4" width="56" height="56" params="16" style="3" name="head_image">
+              <variables>
+                <var key="widget_type" value="avatar_image" type="String"/>
+              </variables>
+            </widget>
+          </children>
+        </border>
+        <text x="4" y="74" width="102" height="20" params="16" style="3" name="boss_name" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="auto_size" value="center" type="String"/>
+            <var key="multiline" value="true" type="Boolean"/>
+            <var key="word_wrap" value="true" type="Boolean"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </border>
+  </window>
+</layout>

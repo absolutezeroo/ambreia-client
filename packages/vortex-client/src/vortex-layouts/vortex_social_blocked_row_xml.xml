@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_social_blocked_row_xml" width="330" height="52" version="0.1">
   <window>
-    <border x="0" y="0" width="330" height="52" params="17" style="2" name="blocked_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+    <border x="0" y="0" width="330" height="52" params="17" style="104" name="blocked_row" dynamic_style="lifted_hover">
       <children>
-        <border x="4" y="6" width="40" height="40" params="16" style="2" color="0xe4e4dc">
+        <border visible="false" x="0" y="0" width="330" height="52" params="16" style="104" name="selected" color="0xffd890"/>
+        <border x="4" y="6" width="40" height="40" params="16" style="104">
           <children>
             <widget x="3" y="2" width="34" height="36" params="16" style="3" name="head_image">
               <variables>
@@ -37,7 +38,7 @@
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
-        <border x="268" y="14" width="24" height="24" params="17" style="2" name="unblock_button" dynamic_style="button" color="0xe4e4dc">
+        <border x="268" y="14" width="24" height="24" params="17" style="104" name="unblock_button" dynamic_style="button">
           <children>
             <static_bitmap x="5" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0xe0b040">
               <variables>
@@ -48,16 +49,16 @@
             </static_bitmap>
           </children>
         </border>
-        <border x="298" y="15" width="24" height="22" params="17" style="2" name="more_button" dynamic_style="button" color="0xe4e4dc">
+        <border x="298" y="15" width="24" height="22" params="17" style="104" name="more_button" dynamic_style="button">
           <children>
-            <text x="0" y="3" width="24" height="16" params="16" style="3" caption="">
+            <static_bitmap x="4" y="3" width="16" height="16" params="16" style="3" name="more_icon" tags="%23icon" color="0x5a4a7a">
               <variables>
-                <var key="text_style" value="u_bold" type="String"/>
-                <var key="font_size" value="11" type="uint"/>
-                <var key="auto_size" value="center" type="String"/>
-                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                <var key="asset_uri" value="rpg/ui-icons/controller_buttons_menu_options_settings_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
               </variables>
-            </text>
+            </static_bitmap>
           </children>
         </border>
       </children>

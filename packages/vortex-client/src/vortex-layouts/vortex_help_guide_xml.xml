@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_help_guide_xml" width="620" height="400" version="0.1">
+  <window>
+    <frame x="0" y="0" width="620" height="400" params="32769" style="103" name="vortex_help_guide" caption="${vortex.help.guide}">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <border x="8" y="4" width="160" height="302" params="16" style="102" name="steps">
+          <children>
+            <itemlist_vertical x="5" y="5" width="150" height="292" params="16" style="3" name="step_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="4" type="int"/>
+              </variables>
+            </itemlist_vertical>
+          </children>
+        </border>
+        <border x="176" y="4" width="436" height="302" params="16" style="102" name="page">
+          <children>
+            <static_bitmap x="0" y="0" width="436" height="302" params="16" style="3" name="page_image">
+              <variables>
+                <var key="asset_uri" value="arena_12_preview" type="String"/>
+                <var key="stretched_x" value="true" type="Boolean"/>
+                <var key="stretched_y" value="true" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+            <container x="0" y="0" width="436" height="302" params="16" style="3" name="callout_layer">
+              <children>
+                
+              </children>
+            </container>
+          </children>
+        </border>
+        <itemlist_horizontal x="330" y="322" width="130" height="12" params="16" style="3" name="page_dots">
+          <children/>
+          <variables>
+            <var key="spacing" value="10" type="int"/>
+          </variables>
+        </itemlist_horizontal>
+        <button x="492" y="314" width="120" height="28" params="131089" style="301" color="0x2a6aa0" name="next_button" caption="${vortex.help.next}" width_min="120" width_max="120" height_min="28" height_max="28"/>
+        <button x="176" y="314" width="120" height="28" params="131089" style="301" color="0x8c8c86" name="previous_button" caption="${vortex.help.previous}" width_min="120" width_max="120" height_min="28" height_max="28"/>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

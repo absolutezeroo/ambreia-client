@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_housing_preview_xml" width="400" height="440" version="0.1">
+  <window>
+    <frame x="0" y="0" width="400" height="440" params="32769" style="103" name="vortex_housing_preview" caption="${vortex.housing.preview}">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <border x="8" y="4" width="384" height="230" params="16" style="102" name="preview_box">
+          <children>
+            <static_bitmap x="0" y="0" width="384" height="230" params="16" style="3" name="room_image">
+              <variables>
+                <var key="asset_uri" value="arena_11_preview" type="String"/>
+                <var key="stretched_x" value="true" type="Boolean"/>
+                <var key="stretched_y" value="true" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+            <border x="8" y="8" width="170" height="28" params="16" style="9" name="room_chip" color="0x2a2438">
+              <children>
+                <static_bitmap x="8" y="6" width="16" height="16" params="16" style="3" tags="%23icon" color="0xffd890">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/map_markers_building_home_house_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
+                  </variables>
+                </static_bitmap>
+                <text x="30" y="6" width="110" height="16" params="16" style="3" name="room_name" caption="">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0xffffff" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <static_bitmap x="146" y="6" width="16" height="16" params="16" style="3" tags="%23icon" color="0xd8d0e8">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/tools_crafting_graphic_design_pencil_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+          </children>
+        </border>
+        <text x="10" y="242" width="300" height="14" params="16" style="3" caption="${vortex.housing.selected_object}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="8" y="260" width="184" height="104" params="16" style="103" name="object_panel">
+          <children>
+            <border x="6" y="6" width="56" height="56" params="16" style="104" name="object_box">
+              <children>
+                <static_bitmap x="12" y="12" width="32" height="32" params="16" style="3" name="object_icon">
+                  <variables>
+                    <var key="asset_uri" value="" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
+                    <var key="zoom_x" value="2" type="Number"/>
+                    <var key="zoom_y" value="2" type="Number"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <text x="70" y="8" width="108" height="16" params="16" style="3" name="object_name" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x1f2a33" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="70" y="28" width="108" height="14" params="16" style="3" name="object_category" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="9" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <static_bitmap x="70" y="46" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf0c030">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/rpg_coin_gold_currency_money_gp_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+            <text x="90" y="46" width="88" height="16" params="16" style="3" name="object_value" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x1f2a33" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+        <container x="200" y="260" width="192" height="104" params="16" style="3" name="variant_slot">
+          <children>
+            
+          </children>
+        </container>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_pets_tab_collection_xml" width="874" height="500" version="0.1">
+  <window>
+    <container x="0" y="0" width="874" height="500" params="16" style="3" name="tab_root">
+      <children>
+        <border x="0" y="0" width="292" height="500" params="16" style="102" name="collection">
+          <children>
+            <border x="6" y="6" width="280" height="24" params="16" style="103" name="search_box">
+              <children>
+                <static_bitmap x="4" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0x888880">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_magnifier_zoom_looking_magnifying_glass_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
+                  </variables>
+                </static_bitmap>
+                <input x="24" y="4" width="250" height="16" params="1" style="0" name="search_input" caption="${vortex.pets.search}"/>
+              </children>
+            </border>
+            <dropmenu x="6" y="36" width="136" height="24" params="17" style="3" name="type_menu" caption="${vortex.companion.all_types}"/>
+            <dropmenu x="150" y="36" width="136" height="24" params="17" style="3" name="rarity_menu" caption="${vortex.ui.all_rarities}"/>
+            <scrollable_itemlist_vertical x="4" y="66" width="284" height="400" params="16" style="3" name="companion_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="4" type="int"/>
+              </variables>
+            </scrollable_itemlist_vertical>
+            <container x="6" y="470" width="280" height="24" params="16" style="3" name="pager_slot">
+              <children>
+                
+              </children>
+            </container>
+          </children>
+        </border>
+        <border x="300" y="0" width="570" height="500" params="16" style="103" name="detail">
+          <children>
+            <border x="8" y="8" width="40" height="40" params="16" style="104" name="rarity_box">
+              <children>
+                <static_bitmap x="12" y="12" width="16" height="16" params="16" style="3" name="rarity_icon" tags="%23icon" color="0x4090e0">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/rpg_magic_sparkles_enchantment_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <text x="56" y="6" width="220" height="20" params="16" style="3" name="companion_name" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="14" type="uint"/>
+                <var key="text_color" value="0x1f2a33" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <border x="56" y="28" width="72" height="18" params="16" style="104" name="rarity_pill" color="0xc8dcf4">
+              <children>
+                <text x="0" y="2" width="72" height="14" params="16" style="3" name="rarity_pill_txt" caption="">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="9" type="uint"/>
+                    <var key="text_color" value="0x1a4a9a" type="hex"/>
+                    <var key="auto_size" value="center" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+            <static_bitmap x="300" y="8" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf0c030">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/boardgames_card_star_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+            <text x="322" y="8" width="240" height="14" params="16" style="3" name="required_level" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x1f2a33" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <static_bitmap x="300" y="28" width="16" height="16" params="16" style="3" tags="%23icon" color="0xb08050">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/rpg_stat_pet_paw_animal_handling_tame_beast_mastery_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+            <text x="322" y="28" width="240" height="14" params="16" style="3" name="kind_txt" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x1f2a33" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="8" y="52" width="284" height="46" params="16" style="3" name="companion_desc" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="multiline" value="true" type="Boolean"/>
+                <var key="word_wrap" value="true" type="Boolean"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <border x="8" y="102" width="284" height="190" params="16" style="102" name="stage">
+              <children>
+                <border x="70" y="10" width="140" height="140" params="16" style="104" name="stage_image_box">
+                  <children>
+                    <widget x="4" y="4" width="132" height="132" params="16" style="3" name="stage_image">
+                      <variables>
+                        <var key="widget_type" value="avatar_image" type="String"/>
+                      </variables>
+                    </widget>
+                  </children>
+                </border>
+                <border x="6" y="156" width="22" height="26" params="17" style="104" name="prev_button" dynamic_style="button">
+                  <children>
+                    <static_bitmap x="3" y="5" width="16" height="16" params="16" style="3" name="prev_button_icon" tags="%23icon" color="0x5a4a7a">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_left_west_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                        <var key="pivot_point" value="center" type="String"/>
+                      </variables>
+                    </static_bitmap>
+                  </children>
+                </border>
+                <itemlist_horizontal x="34" y="154" width="216" height="32" params="16" style="3" name="thumb_list">
+                  <children/>
+                  <variables>
+                    <var key="spacing" value="4" type="int"/>
+                  </variables>
+                </itemlist_horizontal>
+                <border x="256" y="156" width="22" height="26" params="17" style="104" name="next_button" dynamic_style="button">
+                  <children>
+                    <static_bitmap x="3" y="5" width="16" height="16" params="16" style="3" name="next_button_icon" tags="%23icon" color="0x5a4a7a">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_right_east_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                        <var key="pivot_point" value="center" type="String"/>
+                      </variables>
+                    </static_bitmap>
+                  </children>
+                </border>
+              </children>
+            </border>
+            <border x="300" y="52" width="262" height="132" params="16" style="103" name="stats_box">
+              <children>
+                <itemlist_vertical x="6" y="6" width="250" height="120" params="16" style="3" name="stat_list">
+                  <children/>
+                  <variables>
+                    <var key="spacing" value="2" type="int"/>
+                  </variables>
+                </itemlist_vertical>
+              </children>
+            </border>
+            <border x="300" y="190" width="262" height="58" params="16" style="103" name="affection_box">
+              <children>
+                <static_bitmap x="8" y="8" width="16" height="16" params="16" style="3" tags="%23icon" color="0xe03a3a">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/rpg_stat_hp_health_heart_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
+                  </variables>
+                </static_bitmap>
+                <text x="30" y="8" width="120" height="14" params="16" style="3" caption="${vortex.companion.affection}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x1f2a33" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="30" y="24" width="60" height="14" params="16" style="3" name="affection_level" caption="">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="9" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="150" y="24" width="104" height="14" params="16" style="3" name="affection_txt" caption="">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="9" type="uint"/>
+                    <var key="text_color" value="0x666666" type="hex"/>
+                    <var key="auto_size" value="right" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <container x="30" y="40" width="224" height="8" params="0" style="3" name="affection_bar">
+                  <children>
+                    <shape x="0" y="0" width="224" height="8" params="144" style="3" name="bg" color="0xd8d8d0">
+                      <variables>
+                        <var key="shape" value="round_rectangle" type="String"/>
+                        <var key="radius" value="4" type="Number"/>
+                        <var key="stroke_color" value="0xffa0a098" type="hex"/>
+                        <var key="stroke_thickness" value="1" type="Number"/>
+                      </variables>
+                    </shape>
+                    <shape x="0" y="0" width="90" height="8" params="16" style="3" name="fill" color="0x2a8fd6">
+                      <variables>
+                        <var key="shape" value="round_rectangle" type="String"/>
+                        <var key="radius" value="4" type="Number"/>
+                        <var key="stroke_color" value="0xff1a5a90" type="hex"/>
+                        <var key="stroke_thickness" value="1" type="Number"/>
+                      </variables>
+                    </shape>
+                  </children>
+                </container>
+              </children>
+            </border>
+            <border x="300" y="254" width="262" height="28" params="16" style="103" name="summon_box">
+              <children>
+                <static_bitmap x="8" y="6" width="16" height="16" params="16" style="3" tags="%23icon" color="0xd8a030">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_clock_time_wait_1_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
+                  </variables>
+                </static_bitmap>
+                <text x="30" y="7" width="140" height="14" params="16" style="3" caption="${vortex.companion.summon_time}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x1f2a33" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <text x="170" y="7" width="84" height="14" params="16" style="3" name="summon_time" caption="">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x1f2a33" type="hex"/>
+                    <var key="auto_size" value="right" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+            <border x="300" y="288" width="262" height="68" params="16" style="103" name="bonus_box">
+              <children>
+                <text x="8" y="6" width="240" height="14" params="16" style="3" caption="${vortex.companion.passive_bonuses}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x5a4a7a" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <itemlist_vertical x="8" y="24" width="246" height="40" params="16" style="3" name="bonus_list">
+                  <children/>
+                  <variables>
+                    <var key="spacing" value="2" type="int"/>
+                  </variables>
+                </itemlist_vertical>
+              </children>
+            </border>
+            <button x="8" y="364" width="276" height="34" params="131089" style="301" color="0x2f9e2f" name="primary_button" caption="${vortex.pets.summon}" width_min="276" width_max="276" height_min="34" height_max="34"/>
+            <button x="292" y="364" width="270" height="34" params="131089" style="301" color="0x2a6aa0" name="secondary_button" caption="${vortex.pets.follow}" width_min="270" width_max="270" height_min="34" height_max="34"/>
+            <button x="8" y="406" width="176" height="28" params="131089" style="301" color="0x6a4c9c" name="rename_button" caption="${vortex.companion.rename}" width_min="176" width_max="176" height_min="28" height_max="28"/>
+            <button x="192" y="406" width="176" height="28" params="131089" style="301" color="0xd89a20" name="feed_button" caption="${vortex.companion.feed}" width_min="176" width_max="176" height_min="28" height_max="28"/>
+            <button x="376" y="406" width="186" height="28" params="131089" style="301" color="0x8a3ad0" name="stable_button" caption="${vortex.pets.evolve}" width_min="186" width_max="186" height_min="28" height_max="28"/>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

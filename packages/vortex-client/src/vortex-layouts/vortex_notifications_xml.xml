@@ -1,27 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<layout name="vortex_notifications_xml" width="360" height="300" version="0.1">
+<layout name="vortex_notifications_xml" width="540" height="330" version="0.1">
   <window>
-    <frame x="0" y="0" width="360" height="300" params="32769" style="3" name="notifications_window" caption="${vortex.notifications.title}" color="0x418db0">
+    <frame x="0" y="0" width="540" height="330" params="32769" style="103" name="vortex_notifications" caption="${vortex.notifications.title}">
       <filters>
         <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
       </filters>
       <children>
-        <container x="0" y="4" width="354" height="257" params="16" style="3" name="tab_content">
+        <container x="8" y="4" width="524" height="24" params="16" style="3" name="filter_bar">
           <children>
-            <border x="8" y="4" width="338" height="215" params="16" style="2" name="notifications" color="0xf6efd8">
-              <children>
-                <scrollable_itemlist_vertical x="6" y="6" width="326" height="203" params="16" style="3" name="notification_list">
-                  <children/>
-                  <variables>
-                    <var key="spacing" value="3" type="int"/>
-                  </variables>
-                </scrollable_itemlist_vertical>
-              </children>
-            </border>
-            <button x="8" y="225" width="166" height="24" params="131089" style="6" color="0x8c8c86" name="mark_read_button" caption="${vortex.notifications.mark_read}" width_min="166" width_max="166"/>
-            <button x="180" y="225" width="166" height="24" params="131089" style="6" color="0xd23a2a" name="clear_button" caption="${vortex.skill.shortcuts.clear}" width_min="166" width_max="166"/>
+            
           </children>
         </container>
+        <border x="8" y="34" width="524" height="214" params="16" style="102" name="notifications">
+          <children>
+            <scrollable_itemlist_vertical x="4" y="4" width="516" height="206" params="16" style="3" name="notification_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="3" type="int"/>
+              </variables>
+            </scrollable_itemlist_vertical>
+          </children>
+        </border>
+        <button x="8" y="256" width="258" height="28" params="131089" style="301" color="0x8c8c86" name="mark_read_button" caption="${vortex.notifications.mark_read}" width_min="258" width_max="258" height_min="28" height_max="28"/>
+        <button x="274" y="256" width="258" height="28" params="131089" style="301" color="0xd23a2a" name="clear_button" caption="${vortex.notifications.clear}" width_min="258" width_max="258" height_min="28" height_max="28"/>
       </children>
       <variables>
         <var key="margin_left" value="3" type="int"/>

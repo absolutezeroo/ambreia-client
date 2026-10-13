@@ -3,7 +3,7 @@
   <window>
     <container x="0" y="0" width="350" height="180" params="1073741840" style="3" name="hud_quest_tracker">
       <children>
-        <border x="0" y="0" width="350" height="180" params="16" style="9" name="quest_tracker" color="0x686661">
+        <border x="0" y="0" width="350" height="180" params="16" style="9" name="quest_tracker" color="0x4a4068">
           <children>
             <static_bitmap x="8" y="8" width="16" height="16" params="16" style="3" tags="%23icon" color="0xe8d8a8">
               <variables>
@@ -20,7 +20,7 @@
                 <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
               </variables>
             </text>
-            <border x="294" y="4" width="24" height="24" params="17" style="6" name="minimize_button" color="0x55534e" dynamic_style="button">
+            <border x="294" y="4" width="24" height="24" params="17" style="6" name="minimize_button" color="0x3a3254" dynamic_style="button">
               <children>
                 <static_bitmap x="4" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0xffffff">
                   <variables>

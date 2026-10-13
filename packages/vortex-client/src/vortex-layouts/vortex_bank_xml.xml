@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_bank_xml" width="660" height="600" version="0.1">
+  <window>
+    <frame x="0" y="0" width="660" height="600" params="32769" style="103" name="vortex_bank" caption="${vortex.bank.title}">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <tab_context x="6" y="2" width="640" height="32" params="17" style="3" name="tab_context">
+          <children>
+            <tab_button x="0" y="0" width="150" height="32" params="17" style="3" name="tab_bag" caption="${vortex.bank.tab.bag}" id="1"/>
+            <tab_button x="150" y="0" width="170" height="32" params="17" style="3" name="tab_personal" caption="${vortex.bank.tab.personal}" id="2"/>
+            <tab_button x="320" y="0" width="170" height="32" params="17" style="3" name="tab_guild" caption="${vortex.bank.tab.guild}" id="3"/>
+          </children>
+        </tab_context>
+        <container x="0" y="40" width="654" height="520" params="16" style="3" name="tab_content">
+          <children>
+            
+          </children>
+        </container>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

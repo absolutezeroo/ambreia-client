@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_character_menu_row_xml" width="188" height="24" version="0.1">
   <window>
-    <border x="0" y="0" width="188" height="24" params="17" style="2" name="menu_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+    <border x="0" y="0" width="188" height="24" params="17" style="104" name="menu_row" dynamic_style="lifted_hover">
       <children>
         <static_bitmap x="5" y="4" width="16" height="16" params="16" style="3" name="row_icon" tags="%23icon">
           <variables>
             <var key="asset_uri" value="" type="String"/>
             <var key="stretched_x" value="false" type="Boolean"/>
             <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="pivot_point" value="center" type="String"/>
           </variables>
         </static_bitmap>
         <text x="27" y="4" width="136" height="16" params="16" style="3" name="row_label" caption="">
@@ -22,6 +23,7 @@
             <var key="asset_uri" value="rpg/ui-icons/software_signs_checkmark_checkbox_ticked_todo_icon" type="String"/>
             <var key="stretched_x" value="false" type="Boolean"/>
             <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="pivot_point" value="center" type="String"/>
           </variables>
         </static_bitmap>
       </children>

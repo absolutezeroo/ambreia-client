@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_calendar_tier_xml" width="128" height="44" version="0.1">
+  <window>
+    <border x="0" y="0" width="128" height="44" params="17" style="104" name="tier" dynamic_style="lifted_hover">
+      <children>
+        <border visible="false" x="0" y="0" width="128" height="44" params="16" style="104" name="selected" color="0xffd890">
+          <children>
+            
+          </children>
+        </border>
+        <text x="6" y="4" width="90" height="12" params="16" style="3" name="tier_txt" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <static_bitmap x="106" y="2" width="16" height="16" params="16" style="3" name="tier_state" tags="%23icon" color="0x40b030">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/software_signs_checkmark_checkbox_ticked_todo_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="pivot_point" value="center" type="String"/>
+          </variables>
+        </static_bitmap>
+        <static_bitmap x="6" y="20" width="16" height="16" params="16" style="3" name="tier_icon">
+          <variables>
+            <var key="asset_uri" value="" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="pivot_point" value="center" type="String"/>
+          </variables>
+        </static_bitmap>
+        <text x="26" y="22" width="96" height="14" params="16" style="3" name="tier_reward" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </border>
+  </window>
+</layout>

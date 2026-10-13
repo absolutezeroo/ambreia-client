@@ -3,7 +3,7 @@
   <window>
     <container x="0" y="0" width="684" height="381" params="16" style="3" name="step_confirm">
       <children>
-        <border x="0" y="0" width="444" height="377" params="16" style="2" name="final_stage" color="0x1e2228">
+        <border x="0" y="0" width="444" height="377" params="16" style="103" name="final_stage" color="0x1e2228">
           <children>
             <container x="1" y="1" width="442" height="375" params="16" style="3" name="stage_slot" clipping="true">
               <children/>
@@ -15,7 +15,7 @@
             </widget>
           </children>
         </border>
-        <border x="454" y="0" width="230" height="377" params="16" style="2" name="summary" color="0xe8eef4">
+        <border x="454" y="0" width="230" height="377" params="16" style="103" name="summary" color="0xe8eef4">
           <children>
             <itemlist_vertical x="12" y="10" width="206" height="44" params="16" style="3" name="summary_list">
               <children>

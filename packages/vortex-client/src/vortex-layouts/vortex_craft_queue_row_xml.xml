@@ -3,7 +3,7 @@
   <window>
     <container x="0" y="0" width="344" height="30" params="144" style="3" name="queue_row">
       <children>
-        <border x="0" y="0" width="30" height="30" params="16" style="2" color="0xe4e4dc">
+        <border x="0" y="0" width="30" height="30" params="16" style="104">
           <children>
             <static_bitmap x="7" y="7" width="16" height="16" params="16" style="3" name="item_icon" tags="%23icon">
               <variables>
@@ -23,16 +23,16 @@
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
-        <text x="92" y="7" width="32" height="16" params="16" style="3" name="item_qty" caption="">
+        <text x="128" y="7" width="32" height="16" params="16" style="3" name="item_qty" caption="">
           <variables>
             <var key="text_style" value="u_bold" type="String"/>
             <var key="font_size" value="11" type="uint"/>
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
-        <container x="128" y="9" width="114" height="13" params="0" style="3" name="progress">
+        <container x="164" y="9" width="78" height="13" params="0" style="3" name="progress">
           <children>
-            <shape x="0" y="0" width="114" height="13" params="144" style="3" name="bg" color="0xd8d8d0">
+            <shape x="0" y="0" width="78" height="13" params="144" style="3" name="bg" color="0xd8d8d0">
               <variables>
                 <var key="shape" value="round_rectangle" type="String"/>
                 <var key="radius" value="6" type="Number"/>
@@ -68,7 +68,7 @@
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
-        <border x="322" y="4" width="22" height="22" params="17" style="2" name="cancel_button" dynamic_style="button" color="0xf6c0b8">
+        <border x="322" y="4" width="22" height="22" params="17" style="104" name="cancel_button" dynamic_style="button" color="0xf6c0b8">
           <children>
             <text x="0" y="3" width="22" height="16" params="16" style="3" caption="X">
               <variables>
@@ -81,7 +81,7 @@
             </text>
           </children>
         </border>
-        <button visible="false" x="252" y="3" width="90" height="24" params="131089" style="6" color="0x0aa00" name="collect_button" caption="${vortex.craft.collect}" width_min="90" width_max="90"/>
+        <button visible="false" x="252" y="3" width="90" height="24" params="131089" style="301" color="0x0aa00" name="collect_button" caption="${vortex.craft.collect}" width_min="90" width_max="90"/>
       </children>
     </container>
   </window>

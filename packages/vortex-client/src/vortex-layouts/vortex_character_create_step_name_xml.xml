@@ -10,7 +10,7 @@
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
-        <border x="0" y="24" width="260" height="26" params="16" style="2" color="0xffffff">
+        <border x="0" y="24" width="260" height="26" params="16" style="103">
           <children>
             <input x="6" y="5" width="248" height="16" params="1" style="0" name="name_input" caption=""/>
           </children>
@@ -24,6 +24,7 @@
                     <var key="asset_uri" value="rpg/ui-icons/software_signs_checkmark_checkbox_ticked_todo_icon" type="String"/>
                     <var key="stretched_x" value="false" type="Boolean"/>
                     <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
                   </variables>
                 </static_bitmap>
                 <text x="22" y="2" width="98" height="16" params="16" style="3" name="status_txt" caption="${vortex.craft.orders.available}">
@@ -54,6 +55,7 @@
                     <var key="asset_uri" value="rpg/ui-icons/software_signs_checkmark_checkbox_ticked_todo_icon" type="String"/>
                     <var key="stretched_x" value="false" type="Boolean"/>
                     <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
                   </variables>
                 </static_bitmap>
                 <text x="20" y="1" width="280" height="16" params="16" style="3" name="rule_txt" caption="${vortex.charcreate.name.rule.length}">
@@ -72,6 +74,7 @@
                     <var key="asset_uri" value="rpg/ui-icons/software_signs_checkmark_checkbox_ticked_todo_icon" type="String"/>
                     <var key="stretched_x" value="false" type="Boolean"/>
                     <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
                   </variables>
                 </static_bitmap>
                 <text x="20" y="1" width="280" height="16" params="16" style="3" name="rule_txt" caption="${vortex.charcreate.name.rule.chars}">
@@ -90,6 +93,7 @@
                     <var key="asset_uri" value="rpg/ui-icons/software_signs_checkmark_checkbox_ticked_todo_icon" type="String"/>
                     <var key="stretched_x" value="false" type="Boolean"/>
                     <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
                   </variables>
                 </static_bitmap>
                 <text x="20" y="1" width="280" height="16" params="16" style="3" name="rule_txt" caption="${vortex.charcreate.name.rule.spaces}">
@@ -108,6 +112,7 @@
                     <var key="asset_uri" value="rpg/ui-icons/software_signs_checkmark_checkbox_ticked_todo_icon" type="String"/>
                     <var key="stretched_x" value="false" type="Boolean"/>
                     <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
                   </variables>
                 </static_bitmap>
                 <text x="20" y="1" width="280" height="16" params="16" style="3" name="rule_txt" caption="${vortex.charcreate.name.rule.unique}">

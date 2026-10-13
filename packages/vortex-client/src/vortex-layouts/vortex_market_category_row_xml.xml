@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_market_category_row_xml" width="188" height="42" version="0.1">
   <window>
-    <border x="0" y="0" width="188" height="42" params="17" style="2" name="category_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+    <border x="0" y="0" width="188" height="42" params="17" style="104" name="category_row" dynamic_style="lifted_hover">
       <children>
+        <border visible="false" x="0" y="0" width="188" height="42" params="16" style="104" name="selected" color="0xffd890"/>
         <static_bitmap x="6" y="4" width="32" height="32" params="16" style="3" name="category_icon" tags="%23icon">
           <variables>
             <var key="asset_uri" value="rpg/dungeon-objects/icon_24" type="String"/>

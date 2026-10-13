@@ -3,20 +3,22 @@
   <window>
     <container x="0" y="0" width="394" height="114" params="16" style="3" name="quest_progress">
       <children>
-        <border x="0" y="0" width="124" height="114" params="16" style="2" name="level_box" color="0xf3e8cf">
+        <border x="0" y="0" width="124" height="114" params="16" style="104" name="level_box">
           <children>
             <static_bitmap x="8" y="8" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf8d030">
               <variables>
                 <var key="asset_uri" value="rpg/ui-icons/rpg_magic_sparkles_enchantment_icon" type="String"/>
                 <var key="stretched_x" value="false" type="Boolean"/>
                 <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
               </variables>
             </static_bitmap>
             <text x="30" y="8" width="90" height="16" params="16" style="3" name="level_txt" caption="">
               <variables>
                 <var key="text_style" value="u_bold" type="String"/>
                 <var key="font_size" value="11" type="uint"/>
-                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>            <var key="text_color" value="0x1f2a33" type="hex"/>
+
               </variables>
             </text>
             <container x="8" y="34" width="108" height="13" params="0" style="3" name="xp_bar">
@@ -41,7 +43,7 @@
                   <variables>
                     <var key="text_style" value="u_bold" type="String"/>
                     <var key="font_size" value="10" type="uint"/>
-                    <var key="text_color" value="0x222222" type="hex"/>
+                    <var key="text_color" value="0x1f2a33" type="hex"/>
                     <var key="auto_size" value="center" type="String"/>
                     <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
                   </variables>

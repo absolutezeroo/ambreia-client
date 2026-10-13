@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_main_menu_xml" width="284" height="400" version="0.1">
+  <window>
+    <frame x="0" y="0" width="284" height="400" params="32769" style="103" name="vortex_main_menu" caption="${vortex.settings.menu}">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <border x="8" y="4" width="56" height="56" params="16" style="104" name="head_image_box">
+          <children>
+            <widget x="4" y="4" width="48" height="48" params="16" style="3" name="head_image">
+              <variables>
+                <var key="widget_type" value="avatar_image" type="String"/>
+              </variables>
+            </widget>
+          </children>
+        </border>
+        <text x="72" y="10" width="200" height="18" params="16" style="3" name="menu_title" caption="${vortex.settings.menu}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="13" type="uint"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="72" y="30" width="200" height="14" params="16" style="3" caption="${vortex.settings.universe}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <itemlist_vertical x="8" y="68" width="268" height="290" params="16" style="3" name="menu_list">
+          <children/>
+          <variables>
+            <var key="spacing" value="4" type="int"/>
+          </variables>
+        </itemlist_vertical>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

@@ -3,7 +3,7 @@
   <window>
     <container x="0" y="0" width="68" height="102" params="1073741840" style="3" name="hud_buffs">
       <children>
-        <border x="0" y="0" width="30" height="30" params="17" style="6" name="buff_add_button" color="0x55534e" dynamic_style="button">
+        <border x="0" y="0" width="30" height="30" params="17" style="6" name="buff_add_button" color="0x3a3254" dynamic_style="button">
           <children>
             <static_bitmap x="7" y="7" width="16" height="16" params="16" style="3" tags="%23icon" color="0xffffff">
               <variables>

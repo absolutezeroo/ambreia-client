@@ -10,6 +10,7 @@
                 <var key="asset_uri" value="rpg/skills/warrior_skill_icon_1" type="String"/>
                 <var key="stretched_x" value="false" type="Boolean"/>
                 <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
               </variables>
             </static_bitmap>
             <container visible="false" x="0" y="0" width="46" height="46" params="16" style="8" name="cooldown_veil" color="0xff000000" blend="0.55" background="true"/>

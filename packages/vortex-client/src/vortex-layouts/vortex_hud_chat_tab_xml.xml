@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_hud_chat_tab_xml" width="84" height="24" version="0.1">
   <window>
-    <border x="0" y="0" width="84" height="24" params="17" style="6" name="chat_tab" color="0x55534e" dynamic_style="button">
+    <border x="0" y="0" width="84" height="24" params="17" style="6" name="chat_tab" color="0x3a3254" dynamic_style="button">
       <children>
         <text x="4" y="4" width="76" height="16" params="16" style="3" name="tab_label" caption="">
             <variables>
@@ -19,6 +19,7 @@
               <var key="asset_uri" value="rpg/ui-icons/software_signs_maths_multiplication_x_crossout_checkmark_cancel_icon" type="String"/>
               <var key="stretched_x" value="false" type="Boolean"/>
               <var key="stretched_y" value="false" type="Boolean"/>
+              <var key="pivot_point" value="center" type="String"/>
             </variables>
           </static_bitmap>
           </children>

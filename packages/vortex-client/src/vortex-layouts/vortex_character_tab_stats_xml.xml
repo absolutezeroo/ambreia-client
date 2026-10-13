@@ -8,7 +8,7 @@
         </container>
         <scrollable_itemlist_vertical x="296" y="0" width="290" height="500" params="16" style="3" name="stat_sections">
           <children>
-            <border x="0" y="0" width="272" height="162" params="16" style="2" name="attributes" color="0xdde8f1">
+            <border x="0" y="0" width="272" height="162" params="16" style="103" name="attributes">
               <children>
                 <text x="8" y="5" width="200" height="16" params="16" style="3" caption="${vortex.character.stats.attributes}">
                   <variables>
@@ -18,7 +18,7 @@
                     <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
                   </variables>
                 </text>
-                <border x="248" y="5" width="16" height="16" params="17" style="2" name="attributes_help" dynamic_style="button" color="0xe4e4dc">
+                <border x="248" y="5" width="16" height="16" params="17" style="104" name="attributes_help" dynamic_style="button">
                   <children>
                     <text x="0" y="0" width="16" height="16" params="16" style="3" caption="?">
                       <variables>
@@ -40,7 +40,7 @@
                 </itemlist_vertical>
               </children>
             </border>
-            <border x="0" y="0" width="272" height="140" params="16" style="2" name="offense">
+            <border x="0" y="0" width="272" height="140" params="16" style="103" name="offense">
               <children>
                 <text x="8" y="5" width="200" height="16" params="16" style="3" caption="${vortex.character.stats.offense}">
                   <variables>
@@ -50,7 +50,7 @@
                     <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
                   </variables>
                 </text>
-                <border x="248" y="5" width="16" height="16" params="17" style="2" name="offense_help" dynamic_style="button" color="0xe4e4dc">
+                <border x="248" y="5" width="16" height="16" params="17" style="104" name="offense_help" dynamic_style="button">
                   <children>
                     <text x="0" y="0" width="16" height="16" params="16" style="3" caption="?">
                       <variables>
@@ -72,7 +72,7 @@
                 </itemlist_vertical>
               </children>
             </border>
-            <border x="0" y="0" width="272" height="140" params="16" style="2" name="defense">
+            <border x="0" y="0" width="272" height="140" params="16" style="103" name="defense">
               <children>
                 <text x="8" y="5" width="200" height="16" params="16" style="3" caption="${vortex.character.stats.defense}">
                   <variables>
@@ -82,7 +82,7 @@
                     <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
                   </variables>
                 </text>
-                <border x="248" y="5" width="16" height="16" params="17" style="2" name="defense_help" dynamic_style="button" color="0xe4e4dc">
+                <border x="248" y="5" width="16" height="16" params="17" style="104" name="defense_help" dynamic_style="button">
                   <children>
                     <text x="0" y="0" width="16" height="16" params="16" style="3" caption="?">
                       <variables>
@@ -104,7 +104,7 @@
                 </itemlist_vertical>
               </children>
             </border>
-            <border x="0" y="0" width="272" height="161" params="16" style="2" name="secondary">
+            <border x="0" y="0" width="272" height="161" params="16" style="103" name="secondary">
               <children>
                 <text x="8" y="5" width="200" height="16" params="16" style="3" caption="${vortex.character.stats.secondary}">
                   <variables>
@@ -114,7 +114,7 @@
                     <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
                   </variables>
                 </text>
-                <border x="248" y="5" width="16" height="16" params="17" style="2" name="secondary_help" dynamic_style="button" color="0xe4e4dc">
+                <border x="248" y="5" width="16" height="16" params="17" style="104" name="secondary_help" dynamic_style="button">
                   <children>
                     <text x="0" y="0" width="16" height="16" params="16" style="3" caption="?">
                       <variables>

@@ -3,7 +3,7 @@
   <window>
     <container x="0" y="0" width="54" height="64" params="16" style="3" name="recipe_tile">
       <children>
-        <border x="11" y="0" width="32" height="32" params="16" style="2" color="0xe4e4dc">
+        <border x="11" y="0" width="32" height="32" params="16" style="104">
           <children>
             <static_bitmap x="0" y="0" width="32" height="32" params="16" style="3" name="recipe_icon" tags="%23icon">
               <variables>

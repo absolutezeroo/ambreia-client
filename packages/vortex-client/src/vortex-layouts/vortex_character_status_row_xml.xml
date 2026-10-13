@@ -3,13 +3,14 @@
   <window>
     <container x="0" y="0" width="214" height="24" params="144" style="3" name="status_row">
       <children>
-        <border x="0" y="0" width="24" height="24" params="16" style="2" name="status_frame" color="0xe4e4dc">
+        <border x="0" y="0" width="24" height="24" params="16" style="104" name="status_frame">
           <children>
             <static_bitmap x="4" y="4" width="16" height="16" params="16" style="3" name="icon" tags="%23icon" color="0x40b030">
               <variables>
                 <var key="asset_uri" value="rpg/ui-icons/rpg_trade_handshake_deal_exchange_icon" type="String"/>
                 <var key="stretched_x" value="false" type="Boolean"/>
                 <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
               </variables>
             </static_bitmap>
           </children>

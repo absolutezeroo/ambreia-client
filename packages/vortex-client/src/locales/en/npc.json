@@ -1,0 +1,21 @@
+{
+  "vortex.npc.accept_quest": "Accept the quest",
+  "vortex.npc.claim_rewards": "Claim the rewards",
+  "vortex.npc.confirm.accept": "Are you sure you want to accept this quest?",
+  "vortex.npc.craft": "Craft",
+  "vortex.npc.dialog": "Dialogue",
+  "vortex.npc.goodbye": "Goodbye.",
+  "vortex.npc.level_required": "Level %level% required",
+  "vortex.npc.quests": "Quests",
+  "vortex.npc.receive_reward": "Receive the reward",
+  "vortex.npc.repair": "Repair",
+  "vortex.npc.role.services": "NPC - Services",
+  "vortex.npc.shop": "Shop",
+  "vortex.npc.status.available": "Quest available",
+  "vortex.npc.status.done": "Quest completed",
+  "vortex.npc.status.in_progress": "Quest in progress",
+  "vortex.npc.status.reward": "Reward delivery",
+  "vortex.npc.talk": "Talk",
+  "vortex.npc.teleport": "Teleport",
+  "vortex.npc.warning.quest_first": "You must finish the previous quest before using this service."
+}

@@ -7,11 +7,11 @@
           <variables>
             <var key="text_style" value="u_bold" type="String"/>
             <var key="font_size" value="12" type="uint"/>
-            <var key="text_color" value="0x553a8a" type="hex"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
-        <border x="8" y="26" width="490" height="296" params="16" style="2">
+        <border x="8" y="26" width="490" height="296" params="16" style="102">
           <children>
             <scrollable_itemlist_vertical x="6" y="6" width="478" height="284" params="16" style="3" name="active_list">
               <children/>
@@ -25,11 +25,11 @@
           <variables>
             <var key="text_style" value="u_bold" type="String"/>
             <var key="font_size" value="12" type="uint"/>
-            <var key="text_color" value="0x553a8a" type="hex"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
-        <border x="8" y="348" width="490" height="122" params="16" style="2">
+        <border x="8" y="348" width="490" height="122" params="16" style="102">
           <children>
             <scrollable_itemlist_vertical x="6" y="6" width="478" height="110" params="16" style="3" name="history_list">
               <children/>
@@ -39,7 +39,7 @@
             </scrollable_itemlist_vertical>
           </children>
         </border>
-        <border x="506" y="0" width="340" height="436" params="16" style="2" name="detail" color="0xece6f6">
+        <border x="506" y="0" width="340" height="436" params="16" style="103" name="detail" color="0xece6f6">
           <children>
             <container x="8" y="6" width="324" height="140" params="16" style="3" name="detail_header">
               <children/>
@@ -70,7 +70,7 @@
             <container x="140" y="172" width="104" height="22" params="16" style="3" name="role_slot">
               <children/>
             </container>
-            <button x="252" y="171" width="80" height="24" params="131089" style="3" name="change_role_button" caption="${vortex.ui.edit}" width_min="80" width_max="80"/>
+            <button x="252" y="171" width="80" height="24" params="131089" style="300" name="change_role_button" caption="${vortex.ui.edit}" width_min="80" width_max="80"/>
             <static_bitmap x="11" y="202" width="16" height="16" params="16" style="3" tags="%23icon" color="0xe0b860">
               <variables>
                 <var key="asset_uri" value="rpg/ui-icons/software_hourglass_sand_time_wait_icon" type="String"/>
@@ -85,7 +85,7 @@
                 <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
               </variables>
             </text>
-            <border x="140" y="199" width="104" height="20" params="16" style="2" name="my_difficulty" color="0xb8e090">
+            <border x="140" y="199" width="104" height="20" params="16" style="103" name="my_difficulty" color="0xb8e090">
               <children>
                 <text x="0" y="2" width="104" height="16" params="16" style="3" name="my_difficulty_txt" caption="${vortex.ui.difficulty.normal}">
                   <variables>
@@ -98,7 +98,7 @@
                 </text>
               </children>
             </border>
-            <button x="252" y="197" width="80" height="24" params="131089" style="3" name="change_difficulty_button" caption="${vortex.ui.edit}" width_min="80" width_max="80"/>
+            <button x="252" y="197" width="80" height="24" params="131089" style="300" name="change_difficulty_button" caption="${vortex.ui.edit}" width_min="80" width_max="80"/>
             <container x="8" y="228" width="324" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
             <text x="8" y="232" width="200" height="16" params="16" style="3" caption="${vortex.dungeon.registrations.group_info}">
               <variables>
@@ -188,8 +188,8 @@
             </itemlist_horizontal>
           </children>
         </border>
-        <button_thick x="506" y="442" width="167" height="28" params="131089" style="6" color="0xd23a2a" name="leave_queue_button" caption="${vortex.dungeon.registrations.leave}" width_min="167" width_max="167"/>
-        <button_thick x="679" y="442" width="167" height="28" params="131089" style="3" name="edit_role_button" caption="${vortex.dungeon.registrations.change_role}" width_min="167" width_max="167"/>
+        <button x="506" y="442" width="167" height="28" params="131089" style="301" color="0xd23a2a" name="leave_queue_button" caption="${vortex.dungeon.registrations.leave}" width_min="167" width_max="167" height_min="28" height_max="28"/>
+        <button x="679" y="442" width="167" height="28" params="131089" style="300" name="edit_role_button" caption="${vortex.dungeon.registrations.change_role}" width_min="167" width_max="167" height_min="28" height_max="28"/>
       </children>
     </container>
   </window>

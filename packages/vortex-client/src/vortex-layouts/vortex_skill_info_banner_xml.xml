@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_skill_info_banner_xml" width="848" height="58" version="0.1">
   <window>
-    <border x="0" y="0" width="848" height="58" params="16" style="2" name="info_banner" color="0xe2edf6">
+    <border x="0" y="0" width="848" height="58" params="16" style="103" name="info_banner">
       <children>
-        <border x="8" y="12" width="32" height="32" params="16" style="2" color="0x2a8fd6">
+        <border x="8" y="12" width="32" height="32" params="16" style="104" color="0x2a8fd6">
           <children>
             <text x="0" y="6" width="32" height="20" params="16" style="3" caption="i">
               <variables>

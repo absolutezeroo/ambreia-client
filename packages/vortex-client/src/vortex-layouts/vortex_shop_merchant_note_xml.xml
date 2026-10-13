@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_shop_merchant_note_xml" width="286" height="44" version="0.1">
   <window>
-    <border x="0" y="0" width="286" height="44" params="16" style="2" name="merchant_note_box" color="0xfbf3e2">
+    <border x="0" y="0" width="286" height="44" params="16" style="103" name="merchant_note_box" color="0xfbf3e2">
       <children>
-        <border x="4" y="4" width="36" height="36" params="16" style="2" color="0xe4e4dc">
+        <border x="4" y="4" width="36" height="36" params="16" style="104">
           <children>
             <widget x="2" y="1" width="32" height="34" params="16" style="3" name="merchant_image">
               <variables>

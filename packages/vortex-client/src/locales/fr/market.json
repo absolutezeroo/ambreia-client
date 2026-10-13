@@ -25,6 +25,7 @@
   "vortex.market.column.unit_price": "Prix unitaire",
   "vortex.market.column.unit_price_short": "Prix unit.",
   "vortex.market.commission": "Commission (%percent% %)",
+  "vortex.market.commission_help": "Une commission de 5 % est appliquée lors de la mise en vente. Elle est déduite automatiquement lors de la vente.",
   "vortex.market.current_offers": "Ventes actuelles",
   "vortex.market.duration": "Durée de la vente",
   "vortex.market.duration.hours": "%count% heures",
@@ -50,8 +51,10 @@
   "vortex.market.inventory": "Mon inventaire",
   "vortex.market.listed_on": "Mise en ligne le",
   "vortex.market.listing_fee": "Frais de mise en vente (%percent% %)",
+  "vortex.market.lowest_help": "Prix le plus bas actuellement sur le marché pour cet objet.",
   "vortex.market.lowest_now": "Prix le plus bas actuel",
   "vortex.market.lowest_price": "Prix le plus bas",
+  "vortex.market.new_unit_price": "Nouveau prix unitaire",
   "vortex.market.no_offer": "Aucune offre pour le moment.",
   "vortex.market.no_offer_hint": "Votre objet est visible dans l'Hôtel des ventes. Il sera automatiquement retiré à l'expiration de la durée de vente.",
   "vortex.market.offers_available": "Offres disponibles",
@@ -85,5 +88,6 @@
   "vortex.market.total_quantity": "Quantité totale",
   "vortex.market.unstage_all": "Tout retirer",
   "vortex.market.withdraw": "Retirer la vente",
+  "vortex.market.withdraw_confirm": "Êtes-vous sûr de vouloir retirer cet objet de l’hôtel des ventes ? Il sera rendu dans votre inventaire.",
   "vortex.market.your_offer": "Votre offre"
 }

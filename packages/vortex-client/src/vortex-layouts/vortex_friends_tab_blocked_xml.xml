@@ -3,7 +3,7 @@
   <window>
     <container x="0" y="0" width="374" height="521" params="16" style="3" name="tab_root">
       <children>
-        <border x="8" y="8" width="358" height="24" params="16" style="2" color="0xe4e4dc">
+        <border x="8" y="8" width="358" height="24" params="16" style="103">
           <children>
             <static_bitmap x="4" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0x888880">
               <variables>
@@ -15,7 +15,7 @@
             <input x="24" y="4" width="328" height="16" params="1" style="0" name="search_input" caption="${vortex.friends.search_blocked}"/>
           </children>
         </border>
-        <border x="8" y="40" width="358" height="473" params="16" style="2" name="blocked" color="0xf2e0dc">
+        <border x="8" y="40" width="358" height="473" params="16" style="103" name="blocked" color="0xf2e0dc">
           <children>
             <static_bitmap x="11" y="9" width="16" height="16" params="16" style="3" tags="%23icon" color="0xd84040">
               <variables>

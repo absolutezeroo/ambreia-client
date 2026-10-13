@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_character_create_step_row_xml" width="170" height="32" version="0.1">
   <window>
-    <border x="0" y="0" width="170" height="32" params="16" style="2" name="step_row" color="0xcfe3f4">
+    <border x="0" y="0" width="170" height="32" params="16" style="104" name="step_row" color="0xcfe3f4">
       <children>
-        <border x="4" y="4" width="24" height="24" params="16" style="2" name="step_badge" color="0x2a8fd6">
+        <border x="4" y="4" width="24" height="24" params="16" style="104" name="step_badge" color="0x2a8fd6">
           <children>
             <text x="0" y="4" width="24" height="16" params="16" style="3" name="step_number" caption="">
               <variables>

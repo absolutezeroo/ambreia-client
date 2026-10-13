@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_arena_xml" width="760" height="520" version="0.1">
+  <window>
+    <frame x="0" y="0" width="760" height="520" params="32769" style="103" name="vortex_arena" caption="${vortex.arena.title}">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <tab_context x="6" y="2" width="740" height="32" params="17" style="3" name="tab_context">
+          <children>
+            <tab_button x="0" y="0" width="130" height="32" params="17" style="3" name="tab_duel" caption="${vortex.arena.tab.duel}" id="1"/>
+            <tab_button x="130" y="0" width="130" height="32" params="17" style="3" name="tab_2v2" caption="${vortex.arena.tab.2v2}" id="2"/>
+            <tab_button x="260" y="0" width="130" height="32" params="17" style="3" name="tab_4v4" caption="${vortex.arena.tab.4v4}" id="3"/>
+            <tab_button x="390" y="0" width="130" height="32" params="17" style="3" name="tab_ranking" caption="${vortex.arena.tab.ranking}" id="4"/>
+          </children>
+        </tab_context>
+        <container x="0" y="40" width="754" height="440" params="16" style="3" name="tab_content">
+          <children>
+            
+          </children>
+        </container>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

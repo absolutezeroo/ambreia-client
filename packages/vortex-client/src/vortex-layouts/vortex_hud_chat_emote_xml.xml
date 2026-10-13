@@ -8,6 +8,7 @@
               <var key="asset_uri" value="" type="String"/>
               <var key="stretched_x" value="false" type="Boolean"/>
               <var key="stretched_y" value="false" type="Boolean"/>
+              <var key="pivot_point" value="center" type="String"/>
             </variables>
           </static_bitmap>
       </children>

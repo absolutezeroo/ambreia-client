@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_inventory_split_xml" width="300" height="182" version="0.1">
+  <window>
+    <frame x="0" y="0" width="300" height="182" params="32769" style="103" name="vortex_inventory_split" caption="${vortex.inventory.split.title}">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <border x="8" y="8" width="56" height="56" params="16" style="104" name="item_frame">
+          <children>
+            <static_bitmap x="12" y="12" width="32" height="32" params="16" style="3" name="item_icon">
+              <variables>
+                <var key="asset_uri" value="" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <text x="76" y="8" width="210" height="16" params="16" style="3" caption="${vortex.inventory.split.quantity}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="76" y="28" width="210" height="30" params="16" style="102" name="value_box">
+          <children>
+            <text x="0" y="7" width="210" height="16" params="16" style="3" name="split_value" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="12" type="uint"/>
+                <var key="text_color" value="0x1f2a33" type="hex"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+        <border x="8" y="72" width="28" height="24" params="17" style="104" name="minus_button" dynamic_style="button">
+          <children>
+            <static_bitmap x="6" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0x5a4a7a">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_signs_maths_minus_subtract_drawback_remove_delete_dash_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <container x="44" y="72" width="212" height="24" params="16" style="3" name="slider">
+          <children>
+            <shape x="0" y="9" width="212" height="6" params="144" style="3" name="track" color="0xd8d8d0">
+              <variables>
+                <var key="shape" value="round_rectangle" type="String"/>
+                <var key="radius" value="3" type="Number"/>
+                <var key="stroke_color" value="0xffa0a098" type="hex"/>
+                <var key="stroke_thickness" value="1" type="Number"/>
+              </variables>
+            </shape>
+            <shape x="0" y="9" width="106" height="6" params="16" style="3" name="fill" color="0x6a4c9c">
+              <variables>
+                <var key="shape" value="round_rectangle" type="String"/>
+                <var key="radius" value="3" type="Number"/>
+              </variables>
+            </shape>
+            <border x="100" y="3" width="12" height="18" params="17" style="104" name="handle" dynamic_style="button">
+              <children>
+                
+              </children>
+            </border>
+          </children>
+        </container>
+        <border x="264" y="72" width="28" height="24" params="17" style="104" name="plus_button" dynamic_style="button">
+          <children>
+            <static_bitmap x="6" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0x5a4a7a">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_signs_maths_plus_addition_bonus_add_new_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <button x="8" y="108" width="138" height="28" params="131089" style="300" name="confirm_button" caption="${vortex.ui.confirm}" width_min="138" width_max="138" height_min="28" height_max="28"/>
+        <button x="154" y="108" width="138" height="28" params="131089" style="301" color="0xd23a2a" name="cancel_button" caption="${vortex.ui.cancel}" width_min="138" width_max="138" height_min="28" height_max="28"/>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

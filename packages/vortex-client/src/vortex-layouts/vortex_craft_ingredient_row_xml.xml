@@ -3,7 +3,7 @@
   <window>
     <container x="0" y="0" width="344" height="30" params="144" style="3" name="ingredient_row">
       <children>
-        <border x="0" y="0" width="30" height="30" params="16" style="2" color="0xe4e4dc">
+        <border x="0" y="0" width="30" height="30" params="16" style="104">
           <children>
             <static_bitmap x="7" y="7" width="16" height="16" params="16" style="3" name="ingredient_icon" tags="%23icon">
               <variables>

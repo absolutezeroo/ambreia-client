@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<layout name="vortex_social_member_row_xml" width="560" height="32" version="0.1">
+<layout name="vortex_social_member_row_xml" width="560" height="40" version="0.1">
   <window>
-    <border x="0" y="0" width="560" height="32" params="17" style="2" name="member_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+    <border x="0" y="0" width="560" height="40" params="17" style="104" name="member_row" dynamic_style="lifted_hover">
       <children>
-        <border x="2" y="1" width="30" height="30" params="16" style="2" color="0xe4e4dc">
+        <border visible="false" x="0" y="0" width="560" height="40" params="16" style="104" name="selected" color="0xffd890"/>
+        <border x="2" y="4" width="32" height="32" params="16" style="104">
           <children>
             <widget x="5" y="5" width="20" height="20" params="16" style="3" name="head_image">
               <variables>
@@ -15,21 +16,21 @@
             </widget>
           </children>
         </border>
-        <text x="38" y="8" width="80" height="16" params="16" style="3" name="member_name" caption="">
+        <text x="38" y="12" width="80" height="16" params="16" style="3" name="member_name" caption="">
           <variables>
             <var key="text_style" value="u_bold" type="String"/>
             <var key="font_size" value="11" type="uint"/>
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
-        <static_bitmap x="121" y="8" width="16" height="16" params="16" style="3" tags="%23icon" color="0x6a9fd8">
+        <static_bitmap x="121" y="12" width="16" height="16" params="16" style="3" tags="%23icon" color="0x6a9fd8">
           <variables>
             <var key="asset_uri" value="rpg/ui-icons/rpg_item_stat_shield_defense_armor_icon" type="String"/>
             <var key="stretched_x" value="false" type="Boolean"/>
             <var key="stretched_y" value="false" type="Boolean"/>
           </variables>
         </static_bitmap>
-        <text x="140" y="8" width="70" height="16" params="16" style="3" name="member_role" caption="${vortex.guild.role.officer}">
+        <text x="140" y="12" width="70" height="16" params="16" style="3" name="member_role" caption="${vortex.guild.role.officer}">
           <variables>
             <var key="text_style" value="u_regular" type="String"/>
             <var key="font_size" value="11" type="uint"/>
@@ -37,7 +38,7 @@
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
-        <text x="212" y="8" width="30" height="16" params="16" style="3" name="member_level" caption="">
+        <text x="212" y="12" width="30" height="16" params="16" style="3" name="member_level" caption="">
           <variables>
             <var key="text_style" value="u_regular" type="String"/>
             <var key="font_size" value="11" type="uint"/>
@@ -45,7 +46,7 @@
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
-        <shape x="250" y="12" width="9" height="9" params="16" style="3" name="status_dot" color="0x4cc040">
+        <shape x="250" y="16" width="9" height="9" params="16" style="3" name="status_dot" color="0x4cc040">
           <variables>
             <var key="shape" value="round_rectangle" type="String"/>
             <var key="radius" value="4" type="Number"/>
@@ -53,7 +54,7 @@
             <var key="stroke_thickness" value="1" type="Number"/>
           </variables>
         </shape>
-        <text x="262" y="8" width="70" height="16" params="16" style="3" name="member_status" caption="${vortex.social.presence.online}">
+        <text x="262" y="12" width="70" height="16" params="16" style="3" name="member_status" caption="${vortex.social.presence.online}">
           <variables>
             <var key="text_style" value="u_regular" type="String"/>
             <var key="font_size" value="11" type="uint"/>
@@ -61,14 +62,14 @@
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
-        <text x="336" y="8" width="90" height="16" params="16" style="3" name="member_last" caption="${vortex.social.now}">
+        <text x="336" y="12" width="90" height="16" params="16" style="3" name="member_last" caption="${vortex.social.now}">
           <variables>
             <var key="text_style" value="u_regular" type="String"/>
             <var key="font_size" value="11" type="uint"/>
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
-        <container x="430" y="8" width="90" height="16" params="16" style="3" name="member_contribution">
+        <container x="430" y="12" width="90" height="16" params="16" style="3" name="member_contribution">
           <children>
             <static_bitmap x="0" y="0" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf0c030">
               <variables>
@@ -86,16 +87,16 @@
             </text>
           </children>
         </container>
-        <border x="530" y="4" width="24" height="22" params="17" style="2" name="more_button" dynamic_style="button" color="0xe4e4dc">
+        <border x="530" y="8" width="24" height="22" params="17" style="104" name="more_button" dynamic_style="button">
           <children>
-            <text x="0" y="3" width="24" height="16" params="16" style="3" caption="">
+            <static_bitmap x="4" y="3" width="16" height="16" params="16" style="3" name="more_icon" tags="%23icon" color="0x5a4a7a">
               <variables>
-                <var key="text_style" value="u_bold" type="String"/>
-                <var key="font_size" value="11" type="uint"/>
-                <var key="auto_size" value="center" type="String"/>
-                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                <var key="asset_uri" value="rpg/ui-icons/controller_buttons_menu_options_settings_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
               </variables>
-            </text>
+            </static_bitmap>
           </children>
         </border>
       </children>

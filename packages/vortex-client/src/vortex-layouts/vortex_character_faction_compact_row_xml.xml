@@ -3,13 +3,14 @@
   <window>
     <container x="0" y="0" width="274" height="34" params="144" style="3" name="faction_compact_row">
       <children>
-        <border x="0" y="1" width="32" height="32" params="16" style="2" color="0xe4e4dc">
+        <border x="0" y="1" width="32" height="32" params="16" style="104">
           <children>
             <static_bitmap x="6" y="6" width="20" height="20" params="16" style="3" name="icon" tags="%23icon">
               <variables>
                 <var key="asset_uri" value="variablefx_icon_star_power" type="String"/>
                 <var key="stretched_x" value="false" type="Boolean"/>
                 <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
               </variables>
             </static_bitmap>
           </children>
@@ -59,7 +60,7 @@
             </text>
           </children>
         </container>
-        <border x="184" y="7" width="64" height="20" params="16" style="2" name="standing" color="0xe4e4dc">
+        <border x="184" y="7" width="64" height="20" params="16" style="104" name="standing">
           <children>
             <text x="0" y="2" width="64" height="16" params="16" style="3" name="standing_txt" caption="${vortex.reputation.standing.neutral}">
               <variables>
@@ -72,7 +73,7 @@
             </text>
           </children>
         </border>
-        <border x="254" y="7" width="20" height="20" params="17" style="2" name="help_button" dynamic_style="button" color="0xe4e4dc">
+        <border x="254" y="7" width="20" height="20" params="17" style="104" name="help_button" dynamic_style="button">
           <children>
             <text x="0" y="2" width="20" height="16" params="16" style="3" tags="%23icon" caption="?">
               <variables>

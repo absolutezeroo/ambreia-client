@@ -3,18 +3,18 @@
   <window>
     <container x="0" y="0" width="864" height="516" params="16" style="3" name="tab_root">
       <children>
-        <border x="8" y="0" width="284" height="516" params="16" style="2" name="available">
+        <border x="8" y="0" width="284" height="516" params="16" style="103" name="available">
           <children>
             <text x="8" y="6" width="268" height="16" params="16" style="3" caption="${vortex.skill.shortcuts.available}">
               <variables>
                 <var key="text_style" value="u_bold" type="String"/>
                 <var key="font_size" value="11" type="uint"/>
-                <var key="text_color" value="0x9a3412" type="hex"/>
+                <var key="text_color" value="0x5a4a7a" type="hex"/>
                 <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
               </variables>
             </text>
             <dropmenu x="8" y="26" width="84" height="24" params="17" style="3" name="type_filter" caption="${vortex.ui.all}"/>
-            <border x="98" y="26" width="178" height="24" params="16" style="2" color="0xe4e4dc">
+            <border x="98" y="26" width="178" height="24" params="16" style="102">
               <children>
                 <input x="6" y="4" width="166" height="16" params="1" style="0" name="search_input" caption="${vortex.skill.search}"/>
               </children>
@@ -27,13 +27,13 @@
             </scrollable_itemlist_vertical>
           </children>
         </border>
-        <border x="300" y="0" width="556" height="120" params="16" style="2" name="main_bar" color="0xf6e2d8">
+        <border x="300" y="0" width="556" height="120" params="16" style="103" name="main_bar">
           <children>
             <text x="8" y="6" width="200" height="16" params="16" style="3" name="main_bar_title" caption="${vortex.skill.action_bar.main}">
               <variables>
                 <var key="text_style" value="u_bold" type="String"/>
                 <var key="font_size" value="11" type="uint"/>
-                <var key="text_color" value="0x9a3412" type="hex"/>
+                <var key="text_color" value="0x5a4a7a" type="hex"/>
                 <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
               </variables>
             </text>
@@ -46,13 +46,13 @@
             </itemlist_horizontal>
           </children>
         </border>
-        <border x="300" y="128" width="556" height="112" params="16" style="2" name="extra_bar" color="0xf6e2d8">
+        <border x="300" y="128" width="556" height="112" params="16" style="103" name="extra_bar">
           <children>
             <text x="8" y="6" width="200" height="16" params="16" style="3" caption="${vortex.skill.shortcuts.extra}">
               <variables>
                 <var key="text_style" value="u_bold" type="String"/>
                 <var key="font_size" value="11" type="uint"/>
-                <var key="text_color" value="0x9a3412" type="hex"/>
+                <var key="text_color" value="0x5a4a7a" type="hex"/>
                 <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
               </variables>
             </text>
@@ -68,7 +68,7 @@
               <variables>
                 <var key="text_style" value="u_bold" type="String"/>
                 <var key="font_size" value="11" type="uint"/>
-                <var key="text_color" value="0x9a3412" type="hex"/>
+                <var key="text_color" value="0x5a4a7a" type="hex"/>
                 <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
               </variables>
             </text>
@@ -84,17 +84,17 @@
             </text>
           </children>
         </border>
-        <border x="300" y="248" width="556" height="132" params="16" style="2" name="shortcut_detail">
+        <border x="300" y="248" width="556" height="132" params="16" style="103" name="shortcut_detail">
           <children>
             <text x="8" y="6" width="200" height="16" params="16" style="3" caption="${vortex.skill.shortcuts.selected}">
               <variables>
                 <var key="text_style" value="u_bold" type="String"/>
                 <var key="font_size" value="11" type="uint"/>
-                <var key="text_color" value="0x9a3412" type="hex"/>
+                <var key="text_color" value="0x5a4a7a" type="hex"/>
                 <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
               </variables>
             </text>
-            <border x="8" y="28" width="56" height="56" params="16" style="2" color="0xe4e4dc">
+            <border x="8" y="28" width="56" height="56" params="16" style="104">
               <children>
                 <static_bitmap x="12" y="12" width="32" height="32" params="16" style="3" name="shortcut_icon" tags="%23icon">
                   <variables>
@@ -129,7 +129,7 @@
                 <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
               </variables>
             </text>
-            <border x="400" y="40" width="148" height="24" params="16" style="2" name="key_box" color="0xe4e4dc">
+            <border x="400" y="40" width="148" height="24" params="16" style="103" name="key_box">
               <children>
                 <text x="0" y="4" width="148" height="16" params="16" style="3" name="assigned_key" caption="">
                   <variables>
@@ -141,7 +141,7 @@
                 </text>
               </children>
             </border>
-            <button x="400" y="68" width="148" height="24" params="131089" style="6" color="0xd23a2a" name="unassign_button" caption="${vortex.skill.shortcuts.unassign}" width_min="148" width_max="148"/>
+            <button x="400" y="68" width="148" height="24" params="131089" style="301" color="0xd23a2a" name="unassign_button" caption="${vortex.skill.shortcuts.unassign}" width_min="148" width_max="148"/>
             <text x="8" y="92" width="540" height="34" params="16" style="3" name="shortcut_desc" caption="">
               <variables>
                 <var key="text_style" value="u_regular" type="String"/>
@@ -154,13 +154,13 @@
             </text>
           </children>
         </border>
-        <border x="300" y="388" width="556" height="128" params="16" style="2" name="shortcut_settings">
+        <border x="300" y="388" width="556" height="128" params="16" style="103" name="shortcut_settings">
           <children>
             <text x="8" y="6" width="200" height="16" params="16" style="3" caption="${vortex.skill.shortcuts.settings}">
               <variables>
                 <var key="text_style" value="u_bold" type="String"/>
                 <var key="font_size" value="11" type="uint"/>
-                <var key="text_color" value="0x9a3412" type="hex"/>
+                <var key="text_color" value="0x5a4a7a" type="hex"/>
                 <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
               </variables>
             </text>
@@ -188,9 +188,9 @@
                 <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
               </variables>
             </text>
-            <button x="338" y="26" width="210" height="24" params="131089" style="6" color="0x8c8c86" name="reset_shortcuts_button" caption="${vortex.skill.shortcuts.reset}" width_min="210" width_max="210"/>
-            <button x="338" y="54" width="210" height="24" params="131089" style="6" color="0xd23a2a" name="clear_all_button" caption="${vortex.skill.shortcuts.clear}" width_min="210" width_max="210"/>
-            <button x="338" y="82" width="210" height="24" params="131089" style="6" color="0x2a8fd6" name="restore_defaults_button" caption="${vortex.skill.shortcuts.defaults}" width_min="210" width_max="210"/>
+            <button x="338" y="26" width="210" height="24" params="131089" style="301" color="0x8c8c86" name="reset_shortcuts_button" caption="${vortex.skill.shortcuts.reset}" width_min="210" width_max="210"/>
+            <button x="338" y="54" width="210" height="24" params="131089" style="301" color="0xd23a2a" name="clear_all_button" caption="${vortex.skill.shortcuts.clear}" width_min="210" width_max="210"/>
+            <button x="338" y="82" width="210" height="24" params="131089" style="301" color="0x2a8fd6" name="restore_defaults_button" caption="${vortex.skill.shortcuts.defaults}" width_min="210" width_max="210"/>
           </children>
         </border>
       </children>

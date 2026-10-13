@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_calendar_tab_rewards_xml" width="700" height="420" version="0.1">
+  <window>
+    <container x="0" y="0" width="700" height="420" params="16" style="3" name="tab_root">
+      <children>
+        <container x="8" y="0" width="684" height="24" params="16" style="3" name="period_tabs">
+          <children>
+            <border x="0" y="0" width="220" height="24" params="17" style="6" name="daily_tab" color="0x2a6aa0" dynamic_style="button">
+              <children>
+                <text x="0" y="4" width="220" height="16" params="16" style="3" name="daily_tab_txt" caption="${vortex.calendar.daily}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0xffffff" type="hex"/>
+                    <var key="auto_size" value="center" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+            <border x="228" y="0" width="220" height="24" params="17" style="6" name="weekly_tab" color="0x3a3254" dynamic_style="button">
+              <children>
+                <text x="0" y="4" width="220" height="16" params="16" style="3" name="weekly_tab_txt" caption="${vortex.calendar.weekly}">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0xffffff" type="hex"/>
+                    <var key="auto_size" value="center" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+          </children>
+        </container>
+        <border x="8" y="32" width="684" height="130" params="16" style="102" name="days">
+          <children>
+            <itemlist_horizontal x="8" y="8" width="668" height="114" params="16" style="3" name="day_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="8" type="int"/>
+              </variables>
+            </itemlist_horizontal>
+          </children>
+        </border>
+        <border x="8" y="170" width="684" height="80" params="16" style="103" name="detail">
+          <children>
+            <border x="8" y="8" width="64" height="64" params="16" style="104" name="detail_box">
+              <children>
+                <static_bitmap x="16" y="12" width="32" height="32" params="16" style="3" name="detail_icon">
+                  <variables>
+                    <var key="asset_uri" value="" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
+                    <var key="zoom_x" value="2" type="Number"/>
+                    <var key="zoom_y" value="2" type="Number"/>
+                  </variables>
+                </static_bitmap>
+                <text x="4" y="48" width="56" height="14" params="16" style="3" name="detail_count" caption="">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="9" type="uint"/>
+                    <var key="text_color" value="0x1f2a33" type="hex"/>
+                    <var key="auto_size" value="right" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+            <text x="80" y="10" width="300" height="16" params="16" style="3" name="detail_day" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x1f2a33" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="80" y="28" width="300" height="16" params="16" style="3" name="detail_name" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x1f2a33" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="80" y="46" width="300" height="28" params="16" style="3" name="detail_desc" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="multiline" value="true" type="Boolean"/>
+                <var key="word_wrap" value="true" type="Boolean"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <button x="420" y="24" width="256" height="32" params="131089" style="301" color="0x2f9e2f" name="claim_button" caption="${vortex.calendar.claim}" width_min="256" width_max="256" height_min="32" height_max="32"/>
+          </children>
+        </border>
+        <border x="8" y="258" width="684" height="150" params="16" style="103" name="boss_box">
+          <children>
+            <static_bitmap x="8" y="8" width="16" height="16" params="16" style="3" tags="%23icon" color="0xd23a2a">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/rpg_difficulty_5_brutal_monster_demon_boss_skull_shield_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+            <text x="30" y="6" width="400" height="16" params="16" style="3" name="boss_name" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x1f2a33" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="30" y="22" width="400" height="14" params="16" style="3" name="boss_sub" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="9" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <static_bitmap x="8" y="42" width="16" height="16" params="16" style="3" tags="%23icon" color="0xd8a030">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_clock_time_wait_1_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+            <text x="30" y="42" width="200" height="14" params="16" style="3" name="boss_timer" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0xc30000" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <static_bitmap x="260" y="42" width="16" height="16" params="16" style="3" tags="%23icon" color="0x6a6a72">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/travel_person_people_three_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+            <text x="282" y="42" width="200" height="14" params="16" style="3" name="boss_players" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x1f2a33" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="8" y="64" width="300" height="14" params="16" style="3" caption="${vortex.calendar.participation}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x5a4a7a" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="400" y="64" width="268" height="14" params="16" style="3" name="boss_rank" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x1f2a33" type="hex"/>
+                <var key="auto_size" value="right" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container x="8" y="82" width="660" height="13" params="0" style="3" name="boss_bar">
+              <children>
+                <shape x="0" y="0" width="660" height="13" params="144" style="3" name="bg" color="0xd8d8d0">
+                  <variables>
+                    <var key="shape" value="round_rectangle" type="String"/>
+                    <var key="radius" value="6" type="Number"/>
+                    <var key="stroke_color" value="0xffa0a098" type="hex"/>
+                    <var key="stroke_thickness" value="1" type="Number"/>
+                  </variables>
+                </shape>
+                <shape x="0" y="0" width="328" height="13" params="16" style="3" name="fill" color="0x2a8fd6">
+                  <variables>
+                    <var key="shape" value="round_rectangle" type="String"/>
+                    <var key="radius" value="6" type="Number"/>
+                    <var key="stroke_color" value="0xff1a5a90" type="hex"/>
+                    <var key="stroke_thickness" value="1" type="Number"/>
+                  </variables>
+                </shape>
+                <text x="0" y="-1" width="660" height="14" params="16" style="3" name="points" caption="">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x1f2a33" type="hex"/>
+                    <var key="auto_size" value="center" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </container>
+            <itemlist_horizontal x="8" y="102" width="668" height="44" params="16" style="3" name="tier_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="6" type="int"/>
+              </variables>
+            </itemlist_horizontal>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

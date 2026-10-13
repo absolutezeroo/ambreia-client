@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout name="vortex_market_listing_row_xml" width="470" height="38" version="0.1">
   <window>
-    <border x="0" y="0" width="470" height="38" params="17" style="2" name="listing_row" dynamic_style="lifted_hover" color="0xf2f2ec">
+    <border x="0" y="0" width="470" height="38" params="17" style="104" name="listing_row" dynamic_style="lifted_hover">
       <children>
-        <border x="3" y="3" width="32" height="32" params="16" style="2" color="0xe4e4dc">
+        <border visible="false" x="0" y="0" width="470" height="38" params="16" style="104" name="selected" color="0xffd890"/>
+        <border x="3" y="3" width="32" height="32" params="16" style="104">
           <children>
             <static_bitmap x="0" y="0" width="32" height="32" params="16" style="3" name="item_icon" tags="%23icon">
               <variables>
@@ -54,7 +55,7 @@
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
-        <border visible="false" x="332" y="9" width="82" height="18" params="16" style="2" name="own_pill" color="0xf5ebc4">
+        <border visible="false" x="332" y="9" width="82" height="18" params="16" style="104" name="own_pill">
           <children>
             <text x="0" y="1" width="82" height="16" params="16" style="3" name="own_pill_txt" caption="${vortex.market.your_offer}">
               <variables>
@@ -67,16 +68,16 @@
             </text>
           </children>
         </border>
-        <border x="440" y="8" width="24" height="22" params="17" style="2" name="more_button" dynamic_style="button" color="0xe4e4dc">
+        <border x="440" y="8" width="24" height="22" params="17" style="104" name="more_button" dynamic_style="button">
           <children>
-            <text x="0" y="3" width="24" height="16" params="16" style="3" caption="">
+            <static_bitmap x="4" y="3" width="16" height="16" params="16" style="3" name="more_icon" tags="%23icon" color="0x5a4a7a">
               <variables>
-                <var key="text_style" value="u_bold" type="String"/>
-                <var key="font_size" value="11" type="uint"/>
-                <var key="auto_size" value="center" type="String"/>
-                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                <var key="asset_uri" value="rpg/ui-icons/controller_buttons_menu_options_settings_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
               </variables>
-            </text>
+            </static_bitmap>
           </children>
         </border>
       </children>

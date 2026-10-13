@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_reconnect_xml" width="460" height="250" version="0.1">
+  <window>
+    <frame x="0" y="0" width="460" height="250" params="32769" style="103" name="vortex_reconnect" caption="${vortex.help.connection}">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <border x="8" y="4" width="120" height="196" params="16" style="102" name="avatar_box">
+          <children>
+            <widget x="10" y="20" width="100" height="160" params="16" style="3" name="avatar_image"><variables><var key="widget_type" value="avatar_image" type="String"/></variables></widget>
+            <static_bitmap x="52" y="6" width="16" height="16" params="16" style="3" tags="%23icon" color="0xd23a2a">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_warning_sign_triangle_exclaimation_mark_error_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <text x="140" y="4" width="312" height="20" params="16" style="3" caption="${vortex.help.connection_lost}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="14" type="uint"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="140" y="28" width="312" height="32" params="16" style="3" caption="${vortex.help.connection_desc}">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0xd8d0e8" type="hex"/>
+            <var key="multiline" value="true" type="Boolean"/>
+            <var key="word_wrap" value="true" type="Boolean"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <static_bitmap x="140" y="70" width="16" height="16" params="16" style="3" name="spinner_icon" tags="%23icon" color="0x8ab8ff">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/arrows_roundabout_rotation_circle_reload_refresh_loop_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="pivot_point" value="center" type="String"/>
+          </variables>
+        </static_bitmap>
+        <text x="162" y="70" width="290" height="16" params="16" style="3" name="retry_txt" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <container x="140" y="92" width="312" height="10" params="0" style="3" name="retry_bar">
+          <children>
+            <shape x="0" y="0" width="312" height="10" params="144" style="3" name="bg" color="0xd8d8d0">
+              <variables>
+                <var key="shape" value="round_rectangle" type="String"/>
+                <var key="radius" value="5" type="Number"/>
+                <var key="stroke_color" value="0xffa0a098" type="hex"/>
+                <var key="stroke_thickness" value="1" type="Number"/>
+              </variables>
+            </shape>
+            <shape x="0" y="0" width="60" height="10" params="16" style="3" name="fill" color="0x2a8fd6">
+              <variables>
+                <var key="shape" value="round_rectangle" type="String"/>
+                <var key="radius" value="5" type="Number"/>
+                <var key="stroke_color" value="0xff1a5a90" type="hex"/>
+                <var key="stroke_thickness" value="1" type="Number"/>
+              </variables>
+            </shape>
+          </children>
+        </container>
+        <button x="140" y="114" width="312" height="34" params="131089" style="301" color="0x2a6aa0" name="retry_button" caption="${vortex.help.retry}" width_min="312" width_max="312" height_min="34" height_max="34"/>
+        <button x="140" y="156" width="312" height="34" params="131089" style="301" color="0x3a3254" name="back_button" caption="${vortex.help.back_to_select}" width_min="312" width_max="312" height_min="34" height_max="34"/>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

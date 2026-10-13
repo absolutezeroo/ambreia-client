@@ -3,7 +3,7 @@
   <window>
     <container x="0" y="0" width="1114" height="576" params="16" style="3" name="tab_root">
       <children>
-        <border x="8" y="0" width="220" height="576" params="16" style="2" name="categories" color="0xf3ead0">
+        <border x="8" y="0" width="220" height="576" params="16" style="103" name="categories" color="0xf3ead0">
           <children>
             <text x="8" y="6" width="200" height="16" params="16" style="3" name="categories_title" caption="${vortex.achievement.categories}">
               <variables>
@@ -25,12 +25,12 @@
           <variables>
             <var key="text_style" value="u_bold" type="String"/>
             <var key="font_size" value="12" type="uint"/>
-            <var key="text_color" value="0x8a6510" type="hex"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
         <dropmenu x="608" y="0" width="150" height="24" params="17" style="3" name="rarity_filter" caption="${vortex.ui.all_rarities}"/>
-        <border x="236" y="30" width="522" height="546" params="16" style="2" name="title_list_panel">
+        <border x="236" y="30" width="522" height="546" params="16" style="102" name="title_list_panel">
           <children>
             <scrollable_itemlist_vertical x="6" y="6" width="510" height="534" params="16" style="3" name="title_list">
               <children/>
@@ -40,9 +40,9 @@
             </scrollable_itemlist_vertical>
           </children>
         </border>
-        <border x="766" y="0" width="340" height="576" params="16" style="2" name="title_detail">
+        <border x="766" y="0" width="340" height="576" params="16" style="103" name="title_detail">
           <children>
-            <border x="126" y="8" width="88" height="88" params="16" style="2" color="0xe4e4dc">
+            <border x="126" y="8" width="88" height="88" params="16" style="103">
               <children>
                 <static_bitmap x="28" y="28" width="32" height="32" params="16" style="3" name="title_emblem" tags="%23icon">
                   <variables>
@@ -61,7 +61,7 @@
                 <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
               </variables>
             </text>
-            <border x="131" y="124" width="78" height="18" params="16" style="2" name="rarity_pill" color="0xc8e8a8">
+            <border x="131" y="124" width="78" height="18" params="16" style="104" name="rarity_pill" color="0xc8e8a8">
               <children>
                 <text x="0" y="1" width="78" height="16" params="16" style="3" name="rarity_pill_txt" caption="${vortex.rarity.common}">
                   <variables>
@@ -139,7 +139,7 @@
                 </text>
               </children>
             </container>
-            <border x="306" y="252" width="26" height="26" params="16" style="2" name="condition_done" color="0xc8e8a8">
+            <border x="306" y="252" width="26" height="26" params="16" style="104" name="condition_done" color="0xc8e8a8">
               <children>
                 <static_bitmap x="5" y="5" width="16" height="16" params="16" style="3" tags="%23icon" color="0x40b030">
                   <variables>
@@ -173,9 +173,9 @@
             <container x="8" y="386" width="324" height="48" params="16" style="3" name="effect_slot">
               <children/>
             </container>
-            <button_thick x="8" y="536" width="324" height="28" params="131089" style="6" color="0xd23a2a" name="remove_title_button" caption="${vortex.character.titles.remove}" width_min="324" width_max="324"/>
-            <button_thick visible="false" x="8" y="536" width="324" height="28" params="131089" style="6" color="0x2a8fd6" name="equip_title_button" caption="${vortex.character.titles.equip}" width_min="324" width_max="324"/>
-            <button_thick visible="false" x="8" y="536" width="324" height="28" params="131089" style="3" name="locked_title_button" caption="${vortex.character.titles.locked}" width_min="324" width_max="324"/>
+            <button x="8" y="536" width="324" height="28" params="131089" style="301" color="0xd23a2a" name="remove_title_button" caption="${vortex.character.titles.remove}" width_min="324" width_max="324" height_min="28" height_max="28"/>
+            <button visible="false" x="8" y="536" width="324" height="28" params="131089" style="301" color="0x2a8fd6" name="equip_title_button" caption="${vortex.character.titles.equip}" width_min="324" width_max="324" height_min="28" height_max="28"/>
+            <button visible="false" x="8" y="536" width="324" height="28" params="131089" style="300" name="locked_title_button" caption="${vortex.character.titles.locked}" width_min="324" width_max="324" height_min="28" height_max="28"/>
           </children>
         </border>
       </children>

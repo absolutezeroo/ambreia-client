@@ -6,7 +6,7 @@
         <container x="8" y="8" width="598" height="112" params="16" style="3" name="guild_header_slot">
           <children/>
         </container>
-        <border x="572" y="8" width="30" height="28" params="17" style="2" name="guild_settings_button" dynamic_style="button" color="0xe4e4dc">
+        <border x="572" y="8" width="30" height="28" params="17" style="104" name="guild_settings_button" dynamic_style="button">
           <children>
             <static_bitmap x="7" y="6" width="16" height="16" params="16" style="3" tags="%23icon" color="0x8a8a94">
               <variables>
@@ -21,11 +21,11 @@
           <variables>
             <var key="text_style" value="u_bold" type="String"/>
             <var key="font_size" value="11" type="uint"/>
-            <var key="text_color" value="0x2a3c78" type="hex"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
-        <border x="8" y="146" width="598" height="44" params="16" style="2" name="motd" color="0xf2f2ec">
+        <border x="8" y="146" width="598" height="44" params="16" style="103" name="motd">
           <children>
             <text x="8" y="5" width="548" height="34" params="16" style="3" name="motd_txt" caption="">
               <variables>
@@ -36,7 +36,7 @@
                 <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
               </variables>
             </text>
-            <border x="566" y="10" width="24" height="24" params="17" style="2" name="edit_motd_button" dynamic_style="button" color="0xe4e4dc">
+            <border x="566" y="10" width="24" height="24" params="17" style="104" name="edit_motd_button" dynamic_style="button">
               <children>
                 <static_bitmap x="4" y="4" width="16" height="16" params="16" style="3" tags="%23icon" color="0xf0c040">
                   <variables>
@@ -53,7 +53,7 @@
           <variables>
             <var key="text_style" value="u_bold" type="String"/>
             <var key="font_size" value="11" type="uint"/>
-            <var key="text_color" value="0x2a3c78" type="hex"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </text>
@@ -61,13 +61,13 @@
           <variables>
             <var key="text_style" value="u_regular" type="String"/>
             <var key="font_size" value="11" type="uint"/>
-            <var key="text_color" value="0x1077ac" type="hex"/>
+            <var key="text_color" value="0xffd890" type="hex"/>
             <var key="auto_size" value="right" type="String"/>
             <var key="underline" value="true" type="Boolean"/>
             <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
           </variables>
         </link>
-        <border x="8" y="220" width="598" height="313" params="16" style="2" name="online_members" color="0xe2e6f2">
+        <border x="8" y="220" width="598" height="313" params="16" style="103" name="online_members" color="0xe2e6f2">
           <children>
             <itemlist_vertical x="8" y="6" width="582" height="301" params="16" style="3" name="member_lines">
               <children/>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_codex_entry_row_xml" width="420" height="40" version="0.1">
+  <window>
+    <container x="0" y="0" width="420" height="40" params="16" style="3" name="entry_row">
+      <children>
+        <static_bitmap x="4" y="10" width="16" height="16" params="16" style="3" name="entry_icon" tags="%23icon" color="0xd04040">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/boardgames_card_star_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="pivot_point" value="center" type="String"/>
+          </variables>
+        </static_bitmap>
+        <text x="28" y="3" width="380" height="16" params="16" style="3" name="entry_name" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="28" y="20" width="380" height="16" params="16" style="3" name="entry_desc" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0x666666" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </container>
+  </window>
+</layout>

@@ -3,7 +3,7 @@
   <window>
     <container x="0" y="0" width="854" height="520" params="16" style="3" name="tab_root">
       <children>
-        <border x="8" y="0" width="180" height="380" params="16" style="2" name="categories" color="0xf6e6cc">
+        <border x="8" y="0" width="180" height="380" params="16" style="103" name="categories" color="0xf6e6cc">
           <children>
             <itemlist_vertical x="6" y="8" width="168" height="364" params="16" style="3" name="category_list">
               <children/>
@@ -13,7 +13,7 @@
             </itemlist_vertical>
           </children>
         </border>
-        <border x="196" y="0" width="324" height="380" params="16" style="2" name="sell_inventory">
+        <border x="196" y="0" width="324" height="380" params="16" style="103" name="sell_inventory">
           <children>
             <text x="8" y="6" width="200" height="16" params="16" style="3" caption="${vortex.shop.inventory}">
               <variables>
@@ -26,13 +26,13 @@
             <scrollable_itemgrid_vertical x="8" y="28" width="308" height="344" params="16" style="3" name="sell_grid"/>
           </children>
         </border>
-        <border x="528" y="0" width="318" height="380" params="16" style="2" name="item_detail">
+        <border x="528" y="0" width="318" height="380" params="16" style="103" name="item_detail">
           <children>
             <container x="8" y="8" width="302" height="84" params="16" style="3" name="item_header_slot">
               <children/>
             </container>
             <container x="8" y="94" width="302" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
-            <border x="8" y="100" width="302" height="272" params="16" style="2" name="sale" color="0xf6eedd">
+            <border x="8" y="100" width="302" height="272" params="16" style="103" name="sale" color="0xf6eedd">
               <children>
                 <container x="8" y="8" width="286" height="20" params="16" style="3" name="owned_slot">
                   <children/>
@@ -56,12 +56,12 @@
                 <container x="8" y="134" width="286" height="44" params="16" style="3" name="merchant_note_slot">
                   <children/>
                 </container>
-                <button_thick x="8" y="232" width="286" height="28" params="131089" style="6" color="0x0aa00" name="sell_button" caption="${vortex.market.tab.sell}" width_min="286" width_max="286"/>
+                <button x="8" y="232" width="286" height="28" params="131089" style="301" color="0x0aa00" name="sell_button" caption="${vortex.market.tab.sell}" width_min="286" width_max="286" height_min="28" height_max="28"/>
               </children>
             </border>
           </children>
         </border>
-        <border x="8" y="388" width="838" height="132" params="16" style="2" name="inventory">
+        <border x="8" y="388" width="838" height="132" params="16" style="103" name="inventory">
           <children>
             <text x="8" y="6" width="200" height="16" params="16" style="3" caption="${vortex.shop.inventory}">
               <variables>

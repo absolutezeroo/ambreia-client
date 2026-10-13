@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_unlock_row_xml" width="300" height="36" version="0.1">
+  <window>
+    <container x="0" y="0" width="300" height="36" params="144" style="3" name="unlock_row">
+      <children>
+        <border x="0" y="0" width="36" height="36" params="16" style="104" name="unlock_box">
+          <children>
+            <static_bitmap x="10" y="10" width="16" height="16" params="16" style="3" name="unlock_icon" tags="%23icon" color="0x2a8fd6">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_signs_maths_plus_addition_bonus_add_new_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <text x="44" y="2" width="256" height="32" params="16" style="3" name="unlock_txt" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="multiline" value="true" type="Boolean"/>
+            <var key="word_wrap" value="true" type="Boolean"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </container>
+  </window>
+</layout>

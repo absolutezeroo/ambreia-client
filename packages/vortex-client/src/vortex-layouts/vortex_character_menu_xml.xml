@@ -3,7 +3,7 @@
   <window>
     <container x="0" y="0" width="200" height="40" params="1073741840" style="3" name="character_menu">
       <children>
-        <border x="0" y="0" width="200" height="40" params="16" style="2" name="menu_frame" color="0xffffff">
+        <border x="0" y="0" width="200" height="40" params="16" style="103" name="menu_frame">
           <filters>
             <DropShadowFilter distance="3" alpha="0.4" blurX="4" blurY="4"/>
           </filters>

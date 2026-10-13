@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_inbox_xml" width="700" height="520" version="0.1">
+  <window>
+    <frame x="0" y="0" width="700" height="520" params="32769" style="103" name="vortex_inbox" caption="${vortex.inbox.title}">
+      <filters>
+        <DropShadowFilter distance="4" alpha="0.349" blurX="4" blurY="4"/>
+      </filters>
+      <children>
+        <button x="8" y="2" width="160" height="28" params="131089" style="301" color="0x2a6aa0" name="new_message_button" caption="${vortex.inbox.new_message}" width_min="160" width_max="160" height_min="28" height_max="28"/>
+        <border x="8" y="38" width="160" height="440" params="16" style="103" name="categories">
+          <children>
+            <itemlist_vertical x="5" y="5" width="150" height="430" params="16" style="3" name="category_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="4" type="int"/>
+              </variables>
+            </itemlist_vertical>
+          </children>
+        </border>
+        <border x="176" y="2" width="310" height="476" params="16" style="102" name="messages">
+          <children>
+            <scrollable_itemlist_vertical x="5" y="5" width="300" height="466" params="16" style="3" name="message_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="4" type="int"/>
+              </variables>
+            </scrollable_itemlist_vertical>
+          </children>
+        </border>
+        <border x="494" y="2" width="200" height="476" params="16" style="103" name="reader">
+          <children>
+            <border x="8" y="8" width="38" height="38" params="16" style="104" name="read_icon_box">
+              <children>
+                <static_bitmap x="11" y="11" width="16" height="16" params="16" style="3" name="read_icon" tags="%23icon" color="0xd23a2a">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/rpg_gift_present_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <text x="54" y="10" width="138" height="16" params="16" style="3" name="read_sender" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0x1f2a33" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="54" y="28" width="138" height="14" params="16" style="3" name="read_time" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="9" type="uint"/>
+                <var key="text_color" value="0x666666" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container x="8" y="54" width="184" height="1" params="16" style="8" color="0xffd0d0c8" background="true"/>
+            <text x="8" y="62" width="184" height="18" params="16" style="3" name="read_subject" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="12" type="uint"/>
+                <var key="text_color" value="0x1f2a33" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="8" y="84" width="184" height="200" params="16" style="3" name="read_body" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x1f2a33" type="hex"/>
+                <var key="multiline" value="true" type="Boolean"/>
+                <var key="word_wrap" value="true" type="Boolean"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <border visible="false" x="8" y="292" width="184" height="120" params="16" style="102" name="attachments_box">
+              <children>
+                <static_bitmap x="6" y="6" width="16" height="16" params="16" style="3" tags="%23icon" color="0x6a6a72">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_paper_clip_attachment_file_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
+                  </variables>
+                </static_bitmap>
+                <text x="26" y="6" width="150" height="16" params="16" style="3" name="attachments_title" caption="">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x5a4a7a" type="hex"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+                <itemlist_horizontal x="6" y="28" width="172" height="60" params="16" style="3" name="attachment_list">
+                  <children/>
+                  <variables>
+                    <var key="spacing" value="4" type="int"/>
+                  </variables>
+                </itemlist_horizontal>
+                <button x="6" y="90" width="172" height="24" params="131089" style="301" color="0x2f9e2f" name="take_all_button" caption="${vortex.inbox.take_all}" width_min="172" width_max="172" height_min="24" height_max="24"/>
+              </children>
+            </border>
+            <button x="8" y="420" width="184" height="24" params="131089" style="301" color="0x2a6aa0" name="reply_button" caption="${vortex.inbox.reply}" width_min="184" width_max="184" height_min="24" height_max="24"/>
+            <button x="8" y="448" width="184" height="24" params="131089" style="301" color="0xd23a2a" name="delete_button" caption="${vortex.inbox.delete}" width_min="184" width_max="184" height_min="24" height_max="24"/>
+            <container visible="false" x="0" y="0" width="200" height="476" params="16" style="3" name="no_selection">
+              <children>
+                <border x="76" y="150" width="48" height="48" params="16" style="104">
+                  <children>
+                    <static_bitmap x="8" y="8" width="32" height="32" params="16" style="3" tags="%23icon" color="0x808078">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/software_email_message_read_opened_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                        <var key="pivot_point" value="center" type="String"/>
+                        <var key="zoom_x" value="2" type="Number"/>
+                        <var key="zoom_y" value="2" type="Number"/>
+                      </variables>
+                    </static_bitmap>
+                  </children>
+                </border>
+                <text x="8" y="206" width="184" height="32" params="16" style="3" name="empty_message" caption="${vortex.inbox.no_selection}">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="11" type="uint"/>
+                    <var key="text_color" value="0x888888" type="hex"/>
+                    <var key="auto_size" value="center" type="String"/>
+                    <var key="multiline" value="true" type="Boolean"/>
+                    <var key="word_wrap" value="true" type="Boolean"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </container>
+          </children>
+        </border>
+      </children>
+      <variables>
+        <var key="margin_left" value="3" type="int"/>
+        <var key="margin_top" value="36" type="int"/>
+        <var key="margin_right" value="3" type="int"/>
+        <var key="margin_bottom" value="3" type="int"/>
+      </variables>
+    </frame>
+  </window>
+</layout>

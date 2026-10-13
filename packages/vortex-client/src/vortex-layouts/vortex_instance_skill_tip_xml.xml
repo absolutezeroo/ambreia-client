@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_instance_skill_tip_xml" width="300" height="120" version="0.1">
+  <window>
+    <container x="0" y="0" width="300" height="120" params="1073741840" style="3" name="instance_skill_tip">
+      <children>
+        <border x="0" y="0" width="300" height="120" params="16" style="9" name="tip_frame" color="0x686661">
+          <children>
+            <border x="6" y="6" width="44" height="44" params="16" style="3" name="tip_icon_box" color="0x201e19" blend="0.8">
+              <children>
+                <static_bitmap x="14" y="14" width="16" height="16" params="16" style="3" name="tip_icon" tags="%23icon" color="0x8a3ad0">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/weather_wildfire_flame_element_hot_burn_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <text x="58" y="7" width="236" height="16" params="16" style="3" name="tip_title" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0xffffff" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="58" y="25" width="236" height="14" params="16" style="3" name="tip_kind" caption="${vortex.instance.boss_skill}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="9" type="uint"/>
+                <var key="text_color" value="0xd8d0e8" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="6" y="56" width="288" height="28" params="16" style="3" name="tip_txt" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="9" type="uint"/>
+                <var key="text_color" value="0xd8d0e8" type="hex"/>
+                <var key="multiline" value="true" type="Boolean"/>
+                <var key="word_wrap" value="true" type="Boolean"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <static_bitmap x="6" y="86" width="16" height="16" params="16" style="3" tags="%23icon" color="0xff6a6a">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_warning_sign_triangle_exclaimation_mark_error_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+            <text x="26" y="87" width="268" height="14" params="16" style="3" name="tip_warning" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="9" type="uint"/>
+                <var key="text_color" value="0xff8a6a" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="6" y="102" width="288" height="14" params="16" style="3" name="tip_cooldown" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="9" type="uint"/>
+                <var key="text_color" value="0xd8d0e8" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>
