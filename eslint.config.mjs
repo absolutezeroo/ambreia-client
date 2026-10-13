@@ -28,6 +28,8 @@ export default tseslint.config(
             // The dev server's esbuild output of the engine (vite-plugin-engine-bundle.mjs), gitignored.
             // It held 1,821 of the 1,828 errors `eslint .` reported on 2026-10-07.
             '**/.vortex-dev/**',
+            // dependency-cruiser only reads CommonJS config; `module` is not an ESM global.
+            '.dependency-cruiser.js',
             // The design-habbo-window skill's preview snippets run page-side through
             // Runtime.evaluate after compose.mjs injects their helpers (find, place, text…): they are
             // not modules, and linting them as such is 414 no-undef for nothing.

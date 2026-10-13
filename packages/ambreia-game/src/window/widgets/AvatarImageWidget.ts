@@ -7,13 +7,9 @@ import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 import type {IWindow} from '@ambreia/ui/IWindow';
 import type {IBitmapWrapperWindow} from '@ambreia/ui/components/IBitmapWrapperWindow';
 import type {IAssetReceiver} from '@ambreia/ui/IAssetReceiver';
-import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
 import {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
 import {AvatarRenderEvent} from '@ambreia/avatar/enum/AvatarRenderEvent';
 import {Logger} from '@ambreia/common/utils/Logger';
-import {
-    GetExtendedProfileMessageComposer
-} from '@ambreia/protocol/outgoing/users/GetExtendedProfileMessageComposer';
 import type {IIterator} from '@ambreia/ui/utils/IIterator';
 import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
 
@@ -91,11 +87,9 @@ export class AvatarImageWidget implements IAvatarImageWidget, IAvatarImageListen
     private _bitmap: IBitmapWrapperWindow | null = null;
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/window/widgets/AvatarImageWidget.as::_region
     private _region: IWindow | null = null;
-    // TS-only: bound event handler refs for removeEventListener - AS3's
+    // TS-only: bound event handler ref for removeEventListener - AS3's
     // addEventListener/removeEventListener take the listener function itself,
     // no separate bound reference needed.
-    private _onClickBound: (event: WindowMouseEvent) => void;
-    // TS-only: see _onClickBound above.
     private _onAvatarRendererReadyBound: () => void;
     private _avatarRendererReadyRegistered: boolean = false;
     private _placeholderRequestId: number = 0;
@@ -105,7 +99,6 @@ export class AvatarImageWidget implements IAvatarImageWidget, IAvatarImageListen
     {
         this._widgetWindow = window;
         this._windowManager = windowManager;
-        this._onClickBound = this.onClick.bind(this);
         this._onAvatarRendererReadyBound = this.onAvatarRendererReady.bind(this);
 
         // AS3 resolves "avatar_image_xml" against _windowManager.assets, i.e. the
@@ -118,11 +111,6 @@ export class AvatarImageWidget implements IAvatarImageWidget, IAvatarImageListen
             this._root = root;
             this._bitmap = root.findChildByName('bitmap') as IBitmapWrapperWindow | null;
             this._region = root.findChildByName('region');
-
-            if(this._region)
-            {
-                this._region.addEventListener(WindowMouseEvent.CLICK, this._onClickBound);
-            }
 
             this.refresh();
 
@@ -402,7 +390,6 @@ export class AvatarImageWidget implements IAvatarImageWidget, IAvatarImageListen
 
         if(this._region)
         {
-            this._region.removeEventListener(WindowMouseEvent.CLICK, this._onClickBound);
             this._region.dispose();
             this._region = null;
         }
@@ -673,19 +660,5 @@ export class AvatarImageWidget implements IAvatarImageWidget, IAvatarImageListen
         context.drawImage(bitmap, 0, 0);
 
         return canvas.transferToImageBitmap();
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/AvatarImageWidget.as::onClick()
-    private onClick(_event: WindowMouseEvent): void
-    {
-        if(this._userId > 0 && this._windowManager)
-        {
-            const communication = this._windowManager.communication;
-
-            if(communication?.connection)
-            {
-                communication.connection.send(new GetExtendedProfileMessageComposer(this._userId));
-            }
-        }
     }
 }

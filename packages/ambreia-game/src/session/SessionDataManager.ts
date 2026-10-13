@@ -6,7 +6,6 @@ import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
 import type {IMessageComposer} from '@ambreia/net/messages/IMessageComposer';
 import type {IHabboCommunicationManager} from '../communication/IHabboCommunicationManager';
 import type {ISessionDataManager} from './ISessionDataManager';
-import {UIFlagsEnum} from './enum';
 import {IID_HabboCommunicationManager} from '../iid/IIDHabboCommunicationManager';
 import {IID_HabboConfigurationManager} from '../iid/IIDHabboConfigurationManager';
 import {IID_HabboLocalizationManager} from '../iid/IIDHabboLocalizationManager';
@@ -50,10 +49,6 @@ import {
 } from '@ambreia/protocol/incoming/inventory/AchievementsScoreMessageEvent';
 import {FigureSetIdsMessageEvent} from '@ambreia/protocol/incoming/inventory/FigureSetIdsMessageEvent';
 
-// Events - Users
-import {InClientLinkMessageEvent} from '@ambreia/protocol/incoming/users/InClientLinkMessageEvent';
-import {EmailStatusResultEvent} from '@ambreia/protocol/incoming/users/EmailStatusResultEvent';
-
 // Events - Help (name change)
 import {
     ChangeUserNameResultMessageEvent
@@ -63,15 +58,6 @@ import {UserNameChangedMessageEvent} from '@ambreia/protocol/incoming/help/UserN
 // Events - Room
 import {RoomReadyMessageEvent} from '@ambreia/protocol/incoming/room/session/RoomReadyMessageEvent';
 import {UserChangeMessageEvent} from '@ambreia/protocol/incoming/room/action/UserChangeMessageEvent';
-
-// Events - Chat styles
-import {UserNftChatStylesMessageEvent} from '@ambreia/protocol/incoming/users/UserNftChatStylesMessageEvent';
-import {
-    UserPurchasableChatStyleChangedMessageEvent
-} from '@ambreia/protocol/incoming/users/UserPurchasableChatStyleChangedMessageEvent';
-import {
-    UserPurchasableChatStylesMessageEvent
-} from '@ambreia/protocol/incoming/users/UserPurchasableChatStylesMessageEvent';
 
 // Parsers
 import type {UserObjectMessageParser} from '@ambreia/protocol/parser/handshake/UserObjectMessageParser';
@@ -94,24 +80,14 @@ import type {
     AchievementsScoreMessageParser
 } from '@ambreia/protocol/parser/inventory/AchievementsScoreMessageParser';
 import type {FigureSetIdsMessageParser} from '@ambreia/protocol/parser/inventory/FigureSetIdsMessageParser';
-import type {InClientLinkMessageParser} from '@ambreia/protocol/parser/users/InClientLinkMessageParser';
-import type {EmailStatusResultParser} from '@ambreia/protocol/parser/users/EmailStatusResultParser';
 import type {
     ChangeUserNameResultMessageParser
 } from '@ambreia/protocol/parser/help/ChangeUserNameResultMessageParser';
 import type {UserNameChangedMessageParser} from '@ambreia/protocol/parser/help/UserNameChangedMessageParser';
 import type {RoomReadyMessageParser} from '@ambreia/protocol/parser/room/session/RoomReadyMessageParser';
-import type {UserNftChatStylesMessageParser} from '@ambreia/protocol/parser/users/UserNftChatStylesMessageParser';
-import type {
-    UserPurchasableChatStyleChangedMessageParser
-} from '@ambreia/protocol/parser/users/UserPurchasableChatStyleChangedMessageParser';
-import type {
-    UserPurchasableChatStylesMessageParser
-} from '@ambreia/protocol/parser/users/UserPurchasableChatStylesMessageParser';
 
 // Composers
 import {ChatMessageComposer} from '@ambreia/protocol/outgoing/room/chat/ChatMessageComposer';
-import {SetUIFlagsMessageComposer} from '@ambreia/protocol/outgoing/preferences/SetUIFlagsMessageComposer';
 import {
     CreditVaultStatusMessageComposer
 } from '@ambreia/protocol/outgoing/inventory/CreditVaultStatusMessageComposer';
@@ -124,25 +100,13 @@ import {
 import {
     IncomeRewardClaimMessageComposer
 } from '@ambreia/protocol/outgoing/inventory/IncomeRewardClaimMessageComposer';
-import {
-    GetUserNftChatStylesMessageComposer
-} from '@ambreia/protocol/outgoing/users/GetUserNftChatStylesMessageComposer';
-import {
-    GetDailyTasksComposer
-} from '@ambreia/protocol/outgoing/users/GetDailyTasksComposer';
 
 // Session events
 import {UserNameUpdateEvent} from './events/UserNameUpdateEvent';
-import {SessionDataToWidgetEvent} from './events/SessionDataToWidgetEvent';
 
 // Sub-managers
 import type {IUserDataManager} from './IUserDataManager';
-import type {IIgnoredUsersManager} from './IIgnoredUsersManager';
-import type {IHabboGroupInfoManager} from './IHabboGroupInfoManager';
 import {UserDataManager} from './UserDataManager';
-import {IgnoredUsersManager} from './IgnoredUsersManager';
-import {BlockedUsersManager} from './BlockedUsersManager';
-import {HabboGroupInfoManager} from './HabboGroupInfoManager';
 import {HabboWebTools} from '../utils/HabboWebTools';
 import {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import type {IDisposable} from '@ambreia/common/IDisposable';
@@ -161,8 +125,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
     private _messageEvents: IMessageEvent[] = [];
     private _customData: string = '';
     private _directMail: boolean = false;
-    private _nftChatStyleIds: Set<number> = new Set();
-    private _purchasableChatStyleIds: Set<number> = new Set();
     // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::_roomSessionManager
     private _roomSessionManager: IRoomSessionManager | null = null;
     // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::_windowManager
@@ -234,28 +196,11 @@ export class SessionDataManager extends Component implements ISessionDataManager
         return this._userDataManager!;
     }
 
-    // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/session/SessionDataManager.as::_ignoredUsersManager
-    private _ignoredUsersManager: IgnoredUsersManager | null = null;
-
-    get ignoredUsersManager(): IIgnoredUsersManager
-    {
-        return this._ignoredUsersManager!;
-    }
-
-    private _blockedUsersManager: BlockedUsersManager | null = null;
-
-    private _groupInfoManager: HabboGroupInfoManager | null = null;
-
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/session/SessionDataManager.as::_badgeImageManager
     private _badgeImageManager: BadgeImageManager | null = null;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/SessionDataManager.as::_SafeStr_7936
     private _furniIconImageManager: FurniIconImageManager | null = null;
-
-    get groupInfoManager(): IHabboGroupInfoManager
-    {
-        return this._groupInfoManager!;
-    }
 
     // System status
     // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::_systemOpen
@@ -363,14 +308,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
         return this._nameChangeAllowed;
     }
 
-    private _isEmailVerified: boolean = false;
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::get isEmailVerified()
-    get isEmailVerified(): boolean
-    {
-        return this._isEmailVerified;
-    }
-
     // Stream & Access
     private _streamPublishingAllowed: boolean = false;
 
@@ -406,15 +343,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
     get achievementScore(): number
     {
         return this._achievementScore;
-    }
-
-    // UI Preferences
-    private _uiFlags: number = 0;
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::get uiFlags()
-    get uiFlags(): number
-    {
-        return this._uiFlags;
     }
 
     private _isRoomCameraFollowDisabled: boolean = false;
@@ -570,8 +498,7 @@ export class SessionDataManager extends Component implements ISessionDataManager
     /**
 	 * Set room camera follow disabled preference.
 	 *
-	 * Only updates the local flag. The SetUIFlagsMessageComposer is
-	 * sent by setUIFlag() when the UI flags actually change.
+	 * Only updates the local flag.
 	 *
 	 * @see sources/win63_version/habbo/session/SessionDataManager.as setRoomCameraFollowDisabled()
 	 */
@@ -579,60 +506,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
     setRoomCameraFollowDisabled(disabled: boolean): void
     {
         this._isRoomCameraFollowDisabled = disabled;
-    }
-
-    /**
-	 * Set friend bar state UI flag
-	 */
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::setFriendBarState()
-    setFriendBarState(open: boolean): void
-    {
-        this.setUIFlag(UIFlagsEnum.FRIEND_BAR_OPEN, open);
-    }
-
-    /**
-	 * Set room tools state UI flag
-	 */
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::setRoomToolsState()
-    setRoomToolsState(open: boolean): void
-    {
-        this.setUIFlag(UIFlagsEnum.ROOM_TOOLS_OPEN, open);
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::isIgnored()
-    isIgnored(userId: number): boolean
-    {
-        return this._ignoredUsersManager?.isIgnored(userId) ?? false;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::ignoreUser()
-    ignoreUser(userId: number): void
-    {
-        this._ignoredUsersManager?.ignoreUser(userId);
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::unignoreUser()
-    unignoreUser(userId: number): void
-    {
-        this._ignoredUsersManager?.unignoreUser(userId);
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::isBlocked()
-    isBlocked(userId: number): boolean
-    {
-        return this._blockedUsersManager?.isBlocked(userId) ?? false;
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::blockUser()
-    blockUser(userId: number): void
-    {
-        this._blockedUsersManager?.blockUser(userId);
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::unblockUser()
-    unblockUser(userId: number): void
-    {
-        this._blockedUsersManager?.unblockUser(userId);
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/SessionDataManager.as::getFurniIconImage()
@@ -689,12 +562,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
     getBadgeImageWithInfo(badge: string): BadgeInfo
     {
         return this._badgeImageManager?.getBadgeImageWithInfo(badge) ?? new BadgeInfo(null, true);
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::getGroupBadgeId()
-    getGroupBadgeId(_groupId: number): string
-    {
-        return this._groupInfoManager?.getBadgeId(_groupId) ?? '';
     }
 
     /**
@@ -1034,18 +901,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
         this.send(new IncomeRewardClaimMessageComposer(rewardId));
     }
 
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::hasNftChatStyle()
-    hasNftChatStyle(styleId: number): boolean
-    {
-        return this._nftChatStyleIds.has(styleId);
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::hasPurchasableChatStyle()
-    hasPurchasableChatStyle(styleId: number): boolean
-    {
-        return this._purchasableChatStyleIds.has(styleId);
-    }
-
     // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::sendSpecialCommandMessage()
     sendSpecialCommandMessage(command: string): void
     {
@@ -1064,21 +919,13 @@ export class SessionDataManager extends Component implements ISessionDataManager
 
         // Dispose sub-managers
         this._userDataManager?.dispose();
-        this._ignoredUsersManager?.dispose();
-        this._blockedUsersManager?.dispose();
-        this._groupInfoManager?.dispose();
         this._badgeImageManager?.dispose();
 
         this._userDataManager = null;
-        this._ignoredUsersManager = null;
-        this._blockedUsersManager = null;
-        this._groupInfoManager = null;
         this._badgeImageManager = null;
         this._roomSessionManager = null;
         this._windowManager = null;
         this._localization = null;
-        this._nftChatStyleIds.clear();
-        this._purchasableChatStyleIds.clear();
 
         // Dispose parsers
         this._furnitureDataParser?.dispose();
@@ -1149,18 +996,8 @@ export class SessionDataManager extends Component implements ISessionDataManager
     protected override initComponent(): void
     {
         // Initialize sub-managers
-        const sendCallback = this.send.bind(this);
-
         this._userDataManager = new UserDataManager();
         this._userDataManager.connection = this._communicationManager?.connection ?? null;
-        this._ignoredUsersManager = new IgnoredUsersManager(this._communicationManager, sendCallback);
-        this._blockedUsersManager = new BlockedUsersManager(this._communicationManager, sendCallback);
-        this._groupInfoManager = new HabboGroupInfoManager(this._communicationManager, sendCallback);
-
-        this._ignoredUsersManager.initIgnoreList();
-        this._blockedUsersManager.initBlockList();
-        this.send(new GetUserNftChatStylesMessageComposer());
-        this.send(new GetDailyTasksComposer());
 
         this.registerMessageEvents();
 
@@ -1252,28 +1089,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
     }
 
     /**
-	 * Set a UI flag
-	 */
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::setUIFlag()
-    private setUIFlag(flag: number, enabled: boolean): void
-    {
-        if(enabled)
-        {
-            if(this._uiFlags & flag) return;
-
-            this._uiFlags |= flag;
-        }
-        else
-        {
-            if(!(this._uiFlags & flag)) return;
-
-            this._uiFlags &= ~flag;
-        }
-
-        this.send(new SetUIFlagsMessageComposer(this._uiFlags));
-    }
-
-    /**
 	 * Notify all pending furni data listeners
 	 * @see source_as_win63/habbo/session/SessionDataManager.as line 351
 	 */
@@ -1313,22 +1128,13 @@ export class SessionDataManager extends Component implements ISessionDataManager
         this.addMessageEvent(new AchievementsScoreMessageEvent(this.onAchievementsScore.bind(this)));
         this.addMessageEvent(new FigureSetIdsMessageEvent(this.onFigureSetIds.bind(this)));
 
-        // Users events
-        this.addMessageEvent(new InClientLinkMessageEvent(this.onInClientLink.bind(this)));
-
         // Name change events
         this.addMessageEvent(new ChangeUserNameResultMessageEvent(this.onChangeUserNameResult.bind(this)));
         this.addMessageEvent(new UserNameChangedMessageEvent(this.onUserNameChange.bind(this)));
-        this.addMessageEvent(new EmailStatusResultEvent(this.onEmailStatus.bind(this)));
 
         // Room events
         this.addMessageEvent(new RoomReadyMessageEvent(this.onRoomReady.bind(this)));
         this.addMessageEvent(new UserChangeMessageEvent(this.onUserChange.bind(this)));
-
-        // Chat-style events
-        this.addMessageEvent(new UserNftChatStylesMessageEvent(this.onNftChatStyles.bind(this)));
-        this.addMessageEvent(new UserPurchasableChatStylesMessageEvent(this.onPurchasableChatStyles.bind(this)));
-        this.addMessageEvent(new UserPurchasableChatStyleChangedMessageEvent(this.onPurchasableChatStyleChanged.bind(this)));
     }
 
     /**
@@ -1503,18 +1309,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
         log.debug(`Figure sets: ${this._figureSetIds.length}, Bound furniture: ${this._boundFurnitureNames.length}`);
     }
 
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::onInClientLink()
-    private onInClientLink(event: IMessageEvent): void
-    {
-        const parser = event.parser as InClientLinkMessageParser;
-
-        if(!parser) return;
-
-        this.context.createLinkEvent(parser.link);
-
-        log.debug('InClientLink: ' + parser.link);
-    }
-
     /**
 	 * Handle user name change result
 	 * @see source_as_win63/habbo/session/SessionDataManager.as line 456
@@ -1568,78 +1362,6 @@ export class SessionDataManager extends Component implements ISessionDataManager
                 new UserNameUpdateEvent(this._userName)
             );
         }
-    }
-
-    /**
-	 * Handle NFT chat styles
-	 * @see source_as_win63/habbo/session/SessionDataManager.as line 430
-	 */
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::onNftChatStyles()
-    private onNftChatStyles(event: IMessageEvent): void
-    {
-        if(!event) return;
-
-        const parser = event.parser as UserNftChatStylesMessageParser;
-
-        if(!parser) return;
-
-        this._nftChatStyleIds = new Set(parser.chatStyleIds);
-
-        log.debug(`NFT chat styles: ${this._nftChatStyleIds.size}`);
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::onPurchasableChatStyles()
-    private onPurchasableChatStyles(event: IMessageEvent): void
-    {
-        if(!event) return;
-
-        const parser = event.parser as UserPurchasableChatStylesMessageParser;
-
-        if(!parser) return;
-
-        this._purchasableChatStyleIds = new Set(parser.chatStyleIds);
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::onPurchasableChatStyleChanged()
-    private onPurchasableChatStyleChanged(event: IMessageEvent): void
-    {
-        if(!event) return;
-
-        const parser = event.parser as UserPurchasableChatStyleChangedMessageParser;
-
-        if(!parser) return;
-
-        if(parser.added)
-        {
-            this._purchasableChatStyleIds.add(parser.styleId);
-        }
-        else
-        {
-            this._purchasableChatStyleIds.delete(parser.styleId);
-        }
-
-        this.events.emit(
-            SessionDataToWidgetEvent.PURCHASABLE_STYLES_UPDATED,
-            new SessionDataToWidgetEvent(SessionDataToWidgetEvent.PURCHASABLE_STYLES_UPDATED)
-        );
-    }
-
-    /**
-	 * Handle email status result
-	 * @see source_as_win63/habbo/session/SessionDataManager.as line 501
-	 */
-    // AS3: .../src/com/sulake/habbo/session/SessionDataManager.as::onEmailStatus()
-    private onEmailStatus(event: IMessageEvent): void
-    {
-        if(!event) return;
-
-        const parser = event.parser as EmailStatusResultParser;
-
-        if(!parser) return;
-
-        this._isEmailVerified = parser.isVerified;
-
-        log.debug(`Email verified: ${this._isEmailVerified}`);
     }
 
     /**

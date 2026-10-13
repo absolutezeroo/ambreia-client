@@ -1,7 +1,6 @@
 import type {IDisposable} from '../core/runtime/index';
 import type {IConnection} from '@ambreia/net/connection/IConnection';
 import type {IUserData} from './IUserData';
-import type {ISelectedBadge} from '@ambreia/protocol/parser/users/HabboUserBadgesMessageParser';
 
 /**
  * Interface for user data manager
@@ -49,30 +48,10 @@ export interface IUserDataManager extends IDisposable
     getRentableBotUserData(webId: number): IUserData | null;
 
     /**
-	 * Request a user's selected badges from the server.
-	 */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/UserDataManager.as::requestUserSelectedBadges()
-    requestUserSelectedBadges(userId: number): void;
-
-    /**
 	 * Set user data
 	 */
     // AS3: .../src/com/sulake/habbo/session/UserDataManager.as::setUserData()
     setUserData(userData: IUserData): void;
-
-    /**
-	 * Set user badges
-	 */
-    setUserBadges(userId: number, badges: string[]): void;
-
-    /**
-	 * Pure cache read of a user's selected badges - no network request.
-	 */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/UserDataManager.as::getUserSelectedBadges()
-    getUserSelectedBadges(userId: number): ISelectedBadge[];
-
-    // TS-only: the setter behind `getUserSelectedBadges()` — AS3 writes the map inline.
-    setUserSelectedBadges(userId: number, badges: ISelectedBadge[]): void;
 
     /**
 	 * Remove user data by room index
@@ -112,12 +91,6 @@ export interface IUserDataManager extends IDisposable
 	 */
     // AS3: .../src/com/sulake/habbo/session/UserDataManager.as::updateNameByIndex()
     updateNameByIndex(roomIndex: number, name: string): void;
-
-    /**
-	 * Mark user data as blocked/unblocked by room index
-	 */
-    // AS3: .../src/com/sulake/habbo/session/UserDataManager.as::markAsBlocked()
-    markAsBlocked(roomIndex: number, blocked?: boolean): void;
 
     /**
 	 * Request pet info from server

@@ -2,8 +2,8 @@
  * RoomObjectAvatarBlockedUpdateMessage
  *
  * Carries an avatar's blocked state to `AvatarLogic`, which stores it on the model as the
- * `blocked` variable. Produced by `RoomEngine.updateObjectUserBlocked()`, itself driven by
- * the `onBlockUserUpdate` room message.
+ * `blocked` variable. Nothing produces it since the hotel block list was removed; the RPG
+ * social feature will.
  *
  * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/messages/RoomObjectAvatarBlockedUpdateMessage.as
  */

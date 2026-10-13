@@ -2,9 +2,7 @@ import type {IUserDataManager} from './IUserDataManager';
 import type {IUserData} from './IUserData';
 import {UserDataType} from './UserData';
 import type {IConnection} from '@ambreia/net/connection/IConnection';
-import {GetSelectedBadgesMessageComposer} from '@ambreia/protocol/outgoing/users/GetSelectedBadgesMessageComposer';
 import {GetPetInfoMessageComposer} from '@ambreia/protocol/outgoing/room/pet/GetPetInfoMessageComposer';
-import type {ISelectedBadge} from '@ambreia/protocol/parser/users/HabboUserBadgesMessageParser';
 
 /**
  * Room user data manager
@@ -17,7 +15,6 @@ export class UserDataManager implements IUserDataManager
 {
     private _usersByTypeAndWebId: Map<number, Map<number, IUserData>> = new Map();
     private _usersByRoomIndex: Map<number, IUserData> = new Map();
-    private _userBadges: Map<number, string[]> = new Map();
     private _connection: IConnection | null = null;
 
     constructor()
@@ -44,7 +41,6 @@ export class UserDataManager implements IUserDataManager
 
         this._usersByTypeAndWebId.clear();
         this._usersByRoomIndex.clear();
-        this._userBadges.clear();
         this._connection = null;
         this._disposed = true;
     }
@@ -100,38 +96,6 @@ export class UserDataManager implements IUserDataManager
         return this.getUserDataByType(webId, UserDataType.RENTABLE_BOT);
     }
 
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/UserDataManager.as::requestUserSelectedBadges()
-    requestUserSelectedBadges(userId: number): void
-    {
-        this._connection?.send(new GetSelectedBadgesMessageComposer(userId));
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/UserDataManager.as::_userSelectedBadges
-    private _userSelectedBadges: Map<number, ISelectedBadge[]> = new Map();
-
-    /**
-     * The badges a user wears, with their slots and rarities.
-     *
-     * A pure cache read, no side effect - AS3 keeps this strictly separate from
-     * requestUserSelectedBadges() above, which is the only one that sends the composer. The
-     * previous getUserBadges() fused both, so every read fired a fresh network request.
-     *
-     * Empty until the answer to that request lands, which is why the infostand also carries the
-     * plain code list: the first paint of a user's card happens before this can be populated.
-     */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/UserDataManager.as::getUserSelectedBadges()
-    getUserSelectedBadges(userId: number): ISelectedBadge[]
-    {
-        return this._userSelectedBadges.get(userId) ?? [];
-    }
-
-    // TS-only: AS3 writes `_userSelectedBadges` inline from its badges handler; this port routes
-    // every user-data write through a setter, as `setUserBadges()` below already does.
-    setUserSelectedBadges(userId: number, badges: ISelectedBadge[]): void
-    {
-        this._userSelectedBadges.set(userId, badges ?? []);
-    }
-
     // AS3: .../src/com/sulake/habbo/session/UserDataManager.as::setUserData()
     setUserData(userData: IUserData): void
     {
@@ -154,13 +118,6 @@ export class UserDataManager implements IUserDataManager
 
         // Add by room index
         this._usersByRoomIndex.set(userData.roomObjectId, userData);
-    }
-
-    // AS3: sources/win63_version/habbo/session/UserDataManager.as::setUserBadges()
-    setUserBadges(userId: number, badges: string[]): void
-    {
-        this._userBadges.delete(userId);
-        this._userBadges.set(userId, badges);
     }
 
     // TS-only: see IUserDataManager.getUserCount().
@@ -231,17 +188,6 @@ export class UserDataManager implements IUserDataManager
         if(userData)
         {
             userData.achievementScore = score;
-        }
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/UserDataManager.as::markAsBlocked()
-    markAsBlocked(roomIndex: number, blocked: boolean = true): void
-    {
-        const userData = this.getUserDataByIndex(roomIndex);
-
-        if(userData)
-        {
-            userData.isBlocked = blocked;
         }
     }
 

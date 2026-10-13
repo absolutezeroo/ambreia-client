@@ -5,24 +5,14 @@ import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 import type {IRegionWindow} from '@ambreia/ui/components/IRegionWindow';
 import type {IStaticBitmapWrapperWindow} from '@ambreia/ui/components/IStaticBitmapWrapperWindow';
 import type {IIterator} from '@ambreia/ui/utils/IIterator';
-import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
 import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
-import {WindowMouseEvent} from '@ambreia/ui/events/WindowMouseEvent';
 import {PropertyStruct} from '@ambreia/ui/utils/PropertyStruct';
 import {BadgeImageType} from '@ambreia/ui/kit/enum/BadgeImageType';
-import {
-    GroupDetailsChangedMessageEvent
-} from '@ambreia/protocol/incoming/users/GroupDetailsChangedMessageEvent';
-import {HabboGroupBadgesMessageEvent} from '@ambreia/protocol/incoming/users/HabboGroupBadgesMessageEvent';
-import {
-    GetHabboGroupDetailsMessageComposer
-} from '@ambreia/protocol/outgoing/users/GetHabboGroupDetailsMessageComposer';
 
 /**
  * Badge image rendering widget.
  *
- * Renders a badge image (normal, group, or perk) from a badge identifier, and keeps a
- * group badge current by listening for the two group message events.
+ * Renders a badge image (normal, group, or perk) from a badge identifier.
  *
  * Everything the layout writes under the `badge_image:` namespace other than `type` and
  * `badge_id` is forwarded, namespace stripped, to the bitmap inside the widget — that is
@@ -98,19 +88,12 @@ export class BadgeImageWidget implements IBadgeImageWidget
 
     // TS-only: see `_glowTicks`.
     private _glowTotalTicks: number = 1;
-    // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/window/widgets/BadgeImageWidget.as::_groupDetailsChangedMessageEvent
-    private _groupDetailsEvent: IMessageEvent | null = null;
-    // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/window/widgets/BadgeImageWidget.as::_habboGroupBadgesMessageEvent
-    private _groupBadgesEvent: IMessageEvent | null = null;
-    // TS-only: bound event handler ref for removeEventListener
-    private _onClickBound: (event: WindowMouseEvent) => void;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/BadgeImageWidget.as::BadgeImageWidget()
     constructor(window: IWidgetWindow, windowManager: IHabboWindowManager)
     {
         this._widgetWindow = window;
         this._windowManager = windowManager;
-        this._onClickBound = this.onClick.bind(this);
 
         const root = this._windowManager.buildWidgetLayout('badge_image_xml') as IWindowContainer | null;
 
@@ -119,8 +102,6 @@ export class BadgeImageWidget implements IBadgeImageWidget
             this._root = root;
             this._bitmap = root.findChildByName('bitmap') as IStaticBitmapWrapperWindow | null;
             this._region = root.findChildByName('region') as IRegionWindow | null;
-
-            if(this._region) this._region.addEventListener(WindowMouseEvent.CLICK, this._onClickBound);
 
             this._widgetWindow.rootWindow = root;
             root.width = this._widgetWindow.width;
@@ -230,27 +211,6 @@ export class BadgeImageWidget implements IBadgeImageWidget
     public set groupId(value: number)
     {
         this._groupId = value;
-
-        const shouldListen = this._type === BadgeImageType.GROUP && this._groupId > 0;
-        const comm = this._windowManager?.communication ?? null;
-
-        if(comm)
-        {
-            if(!shouldListen && this._groupBadgesEvent !== null)
-            {
-                comm.removeHabboConnectionMessageEvent(this._groupDetailsEvent!);
-                comm.removeHabboConnectionMessageEvent(this._groupBadgesEvent!);
-                this._groupDetailsEvent = null;
-                this._groupBadgesEvent = null;
-            }
-            else if(shouldListen && this._groupBadgesEvent === null)
-            {
-                this._groupDetailsEvent = new GroupDetailsChangedMessageEvent((e) => this.onGroupDetailsChanged(e as GroupDetailsChangedMessageEvent));
-                this._groupBadgesEvent = new HabboGroupBadgesMessageEvent((e) => this.onHabboGroupBadges(e as HabboGroupBadgesMessageEvent));
-                comm.addHabboConnectionMessageEvent(this._groupDetailsEvent);
-                comm.addHabboConnectionMessageEvent(this._groupBadgesEvent);
-            }
-        }
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/BadgeImageWidget.as::get glowColor()
@@ -450,39 +410,6 @@ export class BadgeImageWidget implements IBadgeImageWidget
             default:
                 return '';
         }
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/BadgeImageWidget.as::onClick()
-    private onClick(_event: WindowMouseEvent): void
-    {
-        if(this._groupId > 0 && this._windowManager?.communication?.connection)
-        {
-            this._windowManager.communication.connection.send(new GetHabboGroupDetailsMessageComposer(this._groupId, true));
-        }
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/BadgeImageWidget.as::onGroupDetailsChanged()
-    private onGroupDetailsChanged(event: GroupDetailsChangedMessageEvent): void
-    {
-        this.forceRefresh(event.groupId, this._badgeId);
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/BadgeImageWidget.as::onHabboGroupBadges()
-    private onHabboGroupBadges(event: HabboGroupBadgesMessageEvent): void
-    {
-        const badge = event.badges?.get(this._groupId);
-
-        if(badge !== undefined) this.forceRefresh(this._groupId, badge);
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/BadgeImageWidget.as::forceRefresh()
-    private forceRefresh(groupId: number, badgeId: string): void
-    {
-        if(groupId !== this._groupId) return;
-
-        this._badgeId = badgeId;
-        this._windowManager?.resourceManager?.removeAsset(this.assetUri);
-        this.refresh();
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/BadgeImageWidget.as::get bitmapData()
@@ -693,7 +620,6 @@ export class BadgeImageWidget implements IBadgeImageWidget
 
         if(this._region)
         {
-            this._region.removeEventListener(WindowMouseEvent.CLICK, this._onClickBound);
             this._region.dispose();
             this._region = null;
         }

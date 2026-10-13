@@ -10,13 +10,18 @@ import {fileURLToPath} from 'node:url';
 // cached layer. This test keeps both Dockerfiles equal to what the lockfile knows.
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 
-/** The workspace projects the lockfile was generated from: the keys of its `importers:` section. */
+/**
+ * The workspace projects the lockfile was generated from: the keys of its `importers:` section.
+ *
+ * pnpm 12 writes two YAML documents: a leading one whose `importers:` only holds the root's
+ * package-manager dependencies, then the workspace one. Every `importers:` section is read.
+ */
 export function lockfileImporters(lock)
 {
-    const importers = [];
+    const importers = new Set();
     let inImporters = false;
 
-    for(const line of lock.split('\n'))
+    for(const line of lock.split(/\r?\n/))
     {
         if(line === 'importers:')
         {
@@ -24,14 +29,14 @@ export function lockfileImporters(lock)
             continue;
         }
 
-        if(inImporters && /^\S/.test(line)) break;
+        if(inImporters && /^\S/.test(line)) inImporters = false;
 
         const match = inImporters ? /^ {2}(packages\/[^:\s]+):\s*$/.exec(line) : null;
 
-        if(match) importers.push(match[1]);
+        if(match) importers.add(match[1]);
     }
 
-    return importers.sort();
+    return [...importers].sort();
 }
 
 /** The package manifests a Dockerfile copies before installing. */

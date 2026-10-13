@@ -6,8 +6,6 @@ import type {IHabboCommunicationManager} from '../communication/IHabboCommunicat
 import type {IHabboLocalizationManager} from '../localization/IHabboLocalizationManager';
 import type {IWindowManager} from '@ambreia/ui/kit/IWindowManager';
 import type {IUserDataManager} from './IUserDataManager';
-import type {IIgnoredUsersManager} from './IIgnoredUsersManager';
-import type {IHabboGroupInfoManager} from './IHabboGroupInfoManager';
 import type {IRoomSessionManager} from './IRoomSessionManager';
 import type {IFurnitureData} from '@ambreia/iso/furniture/data/IFurnitureData';
 import type {IFurniDataListener} from '@ambreia/iso/furniture/data/IFurniDataListener';
@@ -24,8 +22,6 @@ export interface ISessionDataManager extends IDisposable
     readonly events: EventEmitter;
     readonly communication: IHabboCommunicationManager | null;
     readonly userDataManager: IUserDataManager;
-    readonly ignoredUsersManager: IIgnoredUsersManager;
-    readonly groupInfoManager: IHabboGroupInfoManager;
     readonly roomSessionManager: IRoomSessionManager | null;
     readonly windowManager: IWindowManager | null;
     readonly localization: IHabboLocalizationManager | null;
@@ -65,8 +61,6 @@ export interface ISessionDataManager extends IDisposable
     // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::get nameChangeAllowed()
     readonly nameChangeAllowed: boolean;
     readonly canChangeName: boolean;
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::get isEmailVerified()
-    readonly isEmailVerified: boolean;
 
     // Stream & access
     readonly streamPublishingAllowed: boolean;
@@ -78,8 +72,6 @@ export interface ISessionDataManager extends IDisposable
     readonly achievementScore: number;
 
     // UI preferences
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::get uiFlags()
-    readonly uiFlags: number;
     // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::get isRoomCameraFollowDisabled()
     readonly isRoomCameraFollowDisabled: boolean;
     readonly infoFeedEnabled: boolean;
@@ -98,31 +90,6 @@ export interface ISessionDataManager extends IDisposable
     // UI preferences
     // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::setRoomCameraFollowDisabled()
     setRoomCameraFollowDisabled(disabled: boolean): void;
-
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::setFriendBarState()
-    setFriendBarState(open: boolean): void;
-
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::setRoomToolsState()
-    setRoomToolsState(open: boolean): void;
-
-    // Ignored users
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::isIgnored()
-    isIgnored(userId: number): boolean;
-
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::ignoreUser()
-    ignoreUser(userId: number): void;
-
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::unignoreUser()
-    unignoreUser(userId: number): void;
-
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::isBlocked()
-    isBlocked(userId: number): boolean;
-
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::blockUser()
-    blockUser(userId: number): void;
-
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::unblockUser()
-    unblockUser(userId: number): void;
 
     // Badge images — every one of these delegates straight to BadgeImageManager in AS3.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/ISessionDataManager.as::getFurniIconImage()
@@ -150,9 +117,6 @@ export interface ISessionDataManager extends IDisposable
     getBadgeImageWithInfo(badge: string): BadgeInfo;
 
     // Group badge images
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/ISessionDataManager.as::getGroupBadgeId()
-    getGroupBadgeId(groupId: number): string;
-
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/ISessionDataManager.as::getGroupBadgeImage()
     getGroupBadgeImage(badge: string): HTMLImageElement | null;
 
@@ -229,13 +193,6 @@ export interface ISessionDataManager extends IDisposable
 
     // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::claimReward()
     claimReward(rewardId: number): void;
-
-    // NFT
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::hasNftChatStyle()
-    hasNftChatStyle(styleId: number): boolean;
-
-    // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::hasPurchasableChatStyle()
-    hasPurchasableChatStyle(styleId: number): boolean;
 
     // Special command
     // AS3: .../src/com/sulake/habbo/session/ISessionDataManager.as::sendSpecialCommandMessage()

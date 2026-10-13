@@ -4,7 +4,6 @@
 export {GenericErrorEnum} from './GenericErrorEnum';
 export {RoomControllerLevelEnum} from './RoomControllerLevelEnum';
 export {SecurityLevelEnum} from './SecurityLevelEnum';
-export {UIFlagsEnum} from './UIFlagsEnum';
 
 // Types
 export type {GenericError} from './GenericErrorEnum';

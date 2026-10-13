@@ -49,7 +49,6 @@ import {
     PongMessageComposer,
 } from '@ambreia/protocol/outgoing/handshake/index';
 
-import {EventLogMessageComposer} from '@ambreia/protocol/outgoing/tracking/index';
 import {GetFurnitureAliasesMessageComposer} from '@ambreia/protocol/outgoing/room/engine/index';
 
 const log = Logger.getLogger('habbo.communication.demo.IncomingMessages');
@@ -373,7 +372,6 @@ export class IncomingMessages
         this._demo.dispatchLoginStepEvent(HabboCommunicationEvent.AUTHENTICATED);
 
         connection.send(new InfoRetrieveMessageComposer());
-        connection.send(new EventLogMessageComposer('Login', 'socket', 'client.auth_ok'));
         connection.send(new GetFurnitureAliasesMessageComposer());
 
         log.info('Authenticated');

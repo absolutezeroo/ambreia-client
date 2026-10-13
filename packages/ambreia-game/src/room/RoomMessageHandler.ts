@@ -85,8 +85,6 @@ import {ItemRemoveMessageEvent} from '@ambreia/protocol/incoming/room/engine/Ite
 import {UsersMessageEvent} from '@ambreia/protocol/incoming/room/engine/UsersMessageEvent';
 import {UserUpdateMessageEvent} from '@ambreia/protocol/incoming/room/engine/UserUpdateMessageEvent';
 import {UserRemoveMessageEvent} from '@ambreia/protocol/incoming/room/engine/UserRemoveMessageEvent';
-import {BlockUserUpdateMessageEvent} from '@ambreia/protocol/incoming/users/BlockUserUpdateMessageEvent';
-import type {BlockUserUpdateMessageParser} from '@ambreia/protocol/parser/users/BlockUserUpdateMessageParser';
 import {UserObjectMessageEvent} from '@ambreia/protocol/incoming/handshake/UserObjectMessageEvent';
 import {
     SlideObjectBundleMessageEvent
@@ -104,8 +102,6 @@ import {WhisperMessageEvent} from '@ambreia/protocol/incoming/room/chat/WhisperM
 import type {
     ChatMessageEventParser
 } from '@ambreia/protocol/parser/room/chat/ChatMessageEventParser';
-import {IgnoreResultMessageEvent} from '@ambreia/protocol/incoming/users/IgnoreResultMessageEvent';
-import {IgnoreResult} from '../session/IIgnoredUsersManager';
 
 // Message Events - Room Action
 import {ExpressionMessageEvent} from '@ambreia/protocol/incoming/room/action/ExpressionMessageEvent';
@@ -288,7 +284,6 @@ export class RoomMessageHandler implements IRoomMessageHandler
             connection.addMessageEvent(new ChatMessageEvent(this.onChat.bind(this)));
             connection.addMessageEvent(new WhisperMessageEvent(this.onChat.bind(this)));
             connection.addMessageEvent(new ShoutMessageEvent(this.onChat.bind(this)));
-            connection.addMessageEvent(new IgnoreResultMessageEvent(this.onIgnoreResult.bind(this)));
             connection.addMessageEvent(new ObjectRemoveConfirmMessageEvent(this.onObjectRemoveConfirm.bind(this)));
             connection.addMessageEvent(new SpecialRoomEffectMessageEvent(this.onSpecialRoomEvent.bind(this)));
             connection.addMessageEvent(new PetExperienceEvent(this.onPetExperience.bind(this)));
@@ -316,9 +311,6 @@ export class RoomMessageHandler implements IRoomMessageHandler
             connection.addMessageEvent(new UsersMessageEvent(this.onUsers.bind(this)));
             connection.addMessageEvent(new UserUpdateMessageEvent(this.onUserUpdate.bind(this)));
             connection.addMessageEvent(new UserRemoveMessageEvent(this.onUserRemove.bind(this)));
-            // AS3 registers this here too, alongside BlockedUsersManager's own listener: the
-            // manager keeps the list, the room engine paints the avatar.
-            connection.addMessageEvent(new BlockUserUpdateMessageEvent(this.onBlockUserUpdate.bind(this)));
             connection.addMessageEvent(new SlideObjectBundleMessageEvent(this.onSlideUpdate.bind(this)));
             connection.addMessageEvent(new RoomPropertyMessageEvent(this.onRoomProperty.bind(this)));
             connection.addMessageEvent(new RoomVisualizationSettingsEvent(this.onRoomVisualizationSettings.bind(this)));
@@ -1714,32 +1706,6 @@ export class RoomMessageHandler implements IRoomMessageHandler
         );
     }
 
-    /**
-	 * The server's answer to a block/unblock. Resolves the account id to the avatar's room
-	 * object through the session's user data, then marks the object blocked.
-	 */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_1984.as::onBlockUserUpdate()
-    onBlockUserUpdate(event: IMessageEvent): void
-    {
-        const blockEvent = event as BlockUserUpdateMessageEvent;
-
-        if(blockEvent === null || this._roomCreator === null) return;
-
-        const parser = blockEvent.getParser() as BlockUserUpdateMessageParser;
-
-        if(parser === null) return;
-
-        const session = this._roomCreator.roomSessionManager?.getSession(this._currentRoomId) ?? null;
-
-        if(!session || !session.userDataManager) return;
-
-        const userData = session.userDataManager.getUserData(parser.userId);
-
-        if(userData === null) return;
-
-        this._roomCreator.updateObjectUserBlocked(this._currentRoomId, userData.roomObjectId, parser.result === 1);
-    }
-
     // AS3: .../src/com/sulake/habbo/room/_SafeCls_1984.as::onUsers()
     onUsers(event: IMessageEvent): void 
     {
@@ -2177,20 +2143,6 @@ export class RoomMessageHandler implements IRoomMessageHandler
         {
             this._roomCreator.updateObjectUserPosture(roomId, data.roomIndex, data.petPosture, '');
         }
-
-        // The muted marker on entry. `onIgnoreResult()` already handles ignoring someone WHILE in
-        // the room; this is the other half, and without it walking into a room showed everyone on
-        // your ignore list as though they were not. AS3 does it here, per user, behind the same
-        // flag.
-        if(this._roomCreator.configuration?.getBoolean('avatar.ignored.bubble.enabled'))
-        {
-            this._roomCreator.updateObjectUserAction(
-                roomId,
-                data.roomIndex,
-                RoomObjectVariableEnum.AVATAR_IS_MUTED,
-                this._roomCreator.sessionDataManager?.isIgnored(data.webID) === true ? 1 : 0
-            );
-        }
     }
 
     /**
@@ -2240,43 +2192,6 @@ export class RoomMessageHandler implements IRoomMessageHandler
             RoomObjectVariableEnum.AVATAR_TALK,
             Math.ceil(parser.text.length / 10)
         );
-    }
-
-    /**
-     * Ignoring someone puts the muted marker on their avatar; un-ignoring takes it off.
-     *
-     * `IgnoredUsersManager` keeps the list — that half was ported — but nothing told the room
-     * object, so the avatar looked exactly the same either way. Results 1 and 2 (`OK` and
-     * `ALREADY_IGNORED`, after AS3's `result - 1` rebase) mute, 3 unmutes, and anything else is
-     * left alone.
-     */
-    // AS3: .../src/com/sulake/habbo/room/_SafeCls_1984.as::onIgnoreResult()
-    onIgnoreResult(event: IMessageEvent): void
-    {
-        if(this._roomCreator === null) return;
-
-        if(!this._roomCreator.configuration?.getBoolean('avatar.ignored.bubble.enabled')) return;
-
-        const ignoreEvent = event as IgnoreResultMessageEvent;
-        const session = this._roomCreator.roomSessionManager?.getSession(this._currentRoomId) ?? null;
-        const userData = session?.userDataManager?.getUserData(ignoreEvent.userId) ?? null;
-
-        if(userData === null) return;
-
-        switch(ignoreEvent.result)
-        {
-            case IgnoreResult.IGNORED:
-            case IgnoreResult.IGNORED_LIST_FULL:
-                this._roomCreator.updateObjectUserAction(
-                    this._currentRoomId, userData.roomObjectId, RoomObjectVariableEnum.AVATAR_IS_MUTED, 1
-                );
-                break;
-            case IgnoreResult.UNIGNORED:
-                this._roomCreator.updateObjectUserAction(
-                    this._currentRoomId, userData.roomObjectId, RoomObjectVariableEnum.AVATAR_IS_MUTED, 0
-                );
-                break;
-        }
     }
 
     /**

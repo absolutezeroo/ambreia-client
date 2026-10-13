@@ -138,22 +138,9 @@ export interface IRoomSession
     // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::sendUpdateClothingChangeFurniture()
     sendUpdateClothingChangeFurniture(objectId: number, gender: string, figure: string): void;
 
-    // Tracking methods
-    // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::sendConversionPoint()
-    sendConversionPoint(category: string, pointType: string, action: string, extraString?: string | null, extraInt?: number): void;
-
-    // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::sendPeerUsersClassificationMessage()
-    sendPeerUsersClassificationMessage(data: string): void;
-
-    // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::sendRoomUsersClassificationMessage()
-    sendRoomUsersClassificationMessage(data: string): void;
-
     // Navigation methods
     // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::sendVisitFlatMessage()
     sendVisitFlatMessage(roomId: number): void;
-
-    // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::sendVisitUserMessage()
-    sendVisitUserMessage(userName: string): void;
 
     // Moderation methods
     // AS3: .../src/com/sulake/habbo/session/IRoomSession.as::ambassadorAlert()

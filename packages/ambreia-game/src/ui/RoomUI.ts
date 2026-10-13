@@ -96,12 +96,10 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
     private static readonly ROOM_SESSION_DESKTOP_EVENTS: readonly string[] = [
         'RSCE_CHAT_EVENT',
         'RSCE_FLOOD_EVENT',
-        'RSUBE_BADGES',
         'RSPE_PRESENT_OPENED',
         'RSOPPE_OPEN_PET_PACKAGE_REQUESTED',
         'RSOPPE_OPEN_PET_PACKAGE_RESULT',
         'RSDPE_PRESETS',
-        'RSFRE_FRIEND_REQUEST',
         'RSDE_DANCE',
     ];
 

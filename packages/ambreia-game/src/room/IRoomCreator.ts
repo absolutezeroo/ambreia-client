@@ -298,9 +298,7 @@ export interface IRoomCreator extends IRoomEngine
     readonly roomSessionManager: IRoomSessionManager | null;
 
     /**
-	 * The hotel's own switches, as the message handler reads them — `onIgnoreResult()` gates the
-	 * muted indicator on `avatar.ignored.bubble.enabled`. Declared on the AS3 interface; left out
-	 * of this one until something needed it.
+	 * The hotel's own switches, as the message handler reads them.
 	 */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_89.as::get configuration()
     readonly configuration: IHabboConfigurationManager | null;
@@ -422,12 +420,6 @@ export interface IRoomCreator extends IRoomEngine
 	 */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_86.as::updateObjectUserFlatControl()
     updateObjectUserFlatControl(roomId: number, objectId: number, flatControl: string | null): boolean;
-
-    /**
-	 * Whether an avatar is blocked for the local user.
-	 */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_86.as::updateObjectUserBlocked()
-    updateObjectUserBlocked(roomId: number, objectId: number, isBlocked: boolean): boolean;
 
     /**
 	 * A pet gesture. Pets live in the user object category.

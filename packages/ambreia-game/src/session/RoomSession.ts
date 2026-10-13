@@ -37,13 +37,7 @@ import {
     UseProductForPetComposer,
     WhisperMessageComposer,
 } from '@ambreia/protocol/outgoing/room/index';
-import {VisitUserMessageComposer,} from '@ambreia/protocol/outgoing/friendlist/index';
-import {EventLogMessageComposer,} from '@ambreia/protocol/outgoing/index';
 import {NewUserExperienceScriptProceedComposer,} from '@ambreia/protocol/outgoing/handshake/index';
-import {
-    PeerUsersClassificationMessageComposer,
-    RoomUsersClassificationMessageComposer,
-} from '@ambreia/protocol/outgoing/moderation/index';
 import type {IUserDataManager} from "./IUserDataManager";
 import {UserDataManager} from "./UserDataManager";
 
@@ -523,54 +517,12 @@ export class RoomSession implements IRoomSession
         this._connection.send(new UpdateClothingChangeFurnitureComposer(objectId, gender, figure));
     }
 
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::sendConversionPoint()
-    // The parameter names used to read (type, value, extra, category, action), which is the same
-    // five slots in the same order but describing the wrong fields. ConversionPointWidgetHandler
-    // is what names them: it passes category, pointType, action, extraString, extraInt — matching
-    // the composer's own field names. Positions, and therefore the wire, are unchanged.
-    sendConversionPoint(
-        category: string,
-        pointType: string,
-        action: string,
-        extraString: string | null = null,
-        extraInt: number = 0
-    ): void
-    {
-        if(this._connection === null) return;
-
-        this._connection.send(new EventLogMessageComposer(category, pointType, action, extraString ?? '', extraInt));
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::sendPeerUsersClassificationMessage()
-    sendPeerUsersClassificationMessage(data: string): void
-    {
-        if(this._connection === null) return;
-
-        this._connection.send(new PeerUsersClassificationMessageComposer(data));
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::sendRoomUsersClassificationMessage()
-    sendRoomUsersClassificationMessage(data: string): void
-    {
-        if(this._connection === null) return;
-
-        this._connection.send(new RoomUsersClassificationMessageComposer(data));
-    }
-
     // AS3: .../src/com/sulake/habbo/session/RoomSession.as::sendVisitFlatMessage()
     sendVisitFlatMessage(roomId: number): void
     {
         if(this._connection === null) return;
 
         this._connection.send(new OpenFlatConnectionMessageComposer(roomId, ''));
-    }
-
-    // AS3: .../src/com/sulake/habbo/session/RoomSession.as::sendVisitUserMessage()
-    sendVisitUserMessage(userName: string): void
-    {
-        if(this._connection === null) return;
-
-        this._connection.send(new VisitUserMessageComposer(userName));
     }
 
     // AS3: .../src/com/sulake/habbo/session/RoomSession.as::ambassadorAlert()

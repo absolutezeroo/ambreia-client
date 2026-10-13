@@ -8,4 +8,3 @@ export * from './error';
 export * from './handshake';
 export * from './notifications';
 export * from './room';
-export * from './users';

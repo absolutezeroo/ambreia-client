@@ -10,7 +10,6 @@ import type {IAvatarImageWidget} from '@ambreia/ui/kit/widgets/IAvatarImageWidge
 import type {UpdatingTimeStampWidget} from './UpdatingTimeStampWidget';
 import {ChatBubbleMessage} from '@ambreia/ui/kit/widgets/ChatBubbleMessage';
 import {Logger} from '@ambreia/common/utils/Logger';
-import {GetExtendedProfileMessageComposer} from '@ambreia/protocol/outgoing/users/GetExtendedProfileMessageComposer';
 import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import type {IIterator} from '@ambreia/ui/utils/IIterator';
 import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
@@ -723,7 +722,7 @@ export class IlluminaChatBubbleWidget implements IIlluminaChatBubbleWidget
      * and the bubble does not size itself without them.
      */
     // AS3: .../IlluminaChatBubbleWidget.as::rootProcedure()
-    private rootProcedure(event: WindowEvent, window: IWindow): void
+    private rootProcedure(event: WindowEvent, _window: IWindow): void
     {
         if(this._disposed)
         {
@@ -735,17 +734,6 @@ export class IlluminaChatBubbleWidget implements IIlluminaChatBubbleWidget
             case 'WE_RESIZED':
             case 'WE_CHILD_RESIZED':
                 this.refresh();
-                break;
-
-            case 'WME_CLICK':
-                // Clicking the name opens that user's profile. Guarded on a positive id
-                // because a group conversation carries a negative one, and on the region's
-                // name because the whole bubble shares this procedure.
-                if(this.userId > 0 && window.name === 'user_name_region')
-                {
-                    this._windowManager?.communication?.connection?.send(new GetExtendedProfileMessageComposer(this.userId));
-                }
-
                 break;
         }
     }

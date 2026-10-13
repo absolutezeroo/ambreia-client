@@ -18,12 +18,6 @@ import type {
     FloodControlMessageParser
 } from '@ambreia/protocol/parser/room/chat/FloodControlMessageParser';
 import {
-    HandItemReceivedMessageEvent
-} from '@ambreia/protocol/incoming/users/HandItemReceivedMessageEvent';
-import type {
-    HandItemReceivedMessageParser
-} from '@ambreia/protocol/parser/users/HandItemReceivedMessageParser';
-import {
     SpecialSystemChatMessageEvent
 } from '@ambreia/protocol/incoming/room/chat/SpecialSystemChatMessageEvent';
 import type {
@@ -66,8 +60,7 @@ export class RoomChatHandler extends BaseHandler
         this.addMessageEvent(connection, new FloodControlMessageEvent(this.onFloodControl.bind(this)));
         this.addMessageEvent(connection, new RemainingMutePeriodMessageEvent(this.onRemainingMutePeriod.bind(this)));
 
-        // Inherited hand-item/system chat messages remain until their RPG replacements land.
-        this.addMessageEvent(connection, new HandItemReceivedMessageEvent(this.onHandItemNotification.bind(this)));
+        // The inherited system chat message remains until its RPG replacement lands.
         this.addMessageEvent(connection, new SpecialSystemChatMessageEvent(this.onSpecialSystemChat.bind(this)));
     }
 
@@ -128,30 +121,6 @@ export class RoomChatHandler extends BaseHandler
                 )
             );
         }
-    }
-
-    /**
-	 * Someone handed this player an item — a drink, a camera. The bubble belongs over the *giver*,
-	 * and AS3 dispatches `giverUserId` straight through without a `userDataManager` lookup: it is
-	 * already a room object id here, unlike the respect message's web id one method up.
-	 *
-	 * `handItemType` rides in `extraParam`, which is how the chat layer knows which item to draw.
-	 */
-    // AS3: .../src/com/sulake/habbo/session/handler/RoomChatHandler.as::onHandItemNotification()
-    private onHandItemNotification(event: IMessageEvent): void
-    {
-        const parser = event.parser as HandItemReceivedMessageParser | null;
-
-        if(parser === null) return;
-
-        this.dispatchChatEvent(
-            parser.giverUserId,
-            '',
-            RoomSessionChatEvent.CHAT_TYPE_HAND_ITEM_RECEIVED,
-            1,
-            null,
-            parser.handItemType
-        );
     }
 
     /**

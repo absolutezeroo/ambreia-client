@@ -7,33 +7,22 @@ import {RoomShakingEffect} from '@ambreia/iso/utils/RoomShakingEffect';
 // Message events
 import {UsersMessageEvent} from '@ambreia/protocol/incoming/room/engine/UsersMessageEvent';
 import {UserRemoveMessageEvent} from '@ambreia/protocol/incoming/room/engine/UserRemoveMessageEvent';
-import {BlockUserUpdateMessageEvent} from '@ambreia/protocol/incoming/users/BlockUserUpdateMessageEvent';
-import {HabboUserBadgesMessageEvent} from '@ambreia/protocol/incoming/users/HabboUserBadgesMessageEvent';
 import {UserChangeMessageEvent} from '@ambreia/protocol/incoming/room/action/UserChangeMessageEvent';
 import {DanceMessageEvent} from '@ambreia/protocol/incoming/room/action/DanceMessageEvent';
 import type {
     DanceMessageEventParser
 } from '@ambreia/protocol/parser/room/action/DanceMessageEventParser';
-import {
-    NewFriendRequestMessageEvent
-} from '@ambreia/protocol/incoming/friendlist/NewFriendRequestMessageEvent';
-import type {
-    NewFriendRequestMessageParser
-} from '@ambreia/protocol/parser/friendlist/NewFriendRequestMessageParser';
 import {RoomSessionDanceEvent} from '../events/RoomSessionDanceEvent';
-import {RoomSessionFriendRequestEvent} from '../events/RoomSessionFriendRequestEvent';
 
 // Parsers
 import type {UsersMessageParser} from '@ambreia/protocol/parser/room/engine/UsersMessageParser';
 import type {UserRemoveMessageParser} from '@ambreia/protocol/parser/room/engine/UserRemoveMessageParser';
-import type {HabboUserBadgesMessageParser} from '@ambreia/protocol/parser/users/HabboUserBadgesMessageParser';
 import type {
     UserChangeMessageEventParser
 } from '@ambreia/protocol/parser/room/action/UserChangeMessageEventParser';
 
 // Events
 import {RoomSessionUserDataUpdateEvent} from '../events/RoomSessionUserDataUpdateEvent';
-import {RoomSessionUserBadgesEvent} from '../events/RoomSessionUserBadgesEvent';
 import {RoomSessionUserFigureUpdateEvent} from '../events/RoomSessionUserFigureUpdateEvent';
 import type {IUserData} from '../IUserData';
 import {UserData} from '../UserData';
@@ -69,8 +58,6 @@ export class RoomUsersHandler extends BaseHandler
         // Register core message events
         this.addMessageEvent(connection, new UsersMessageEvent(this.onUsers.bind(this)));
         this.addMessageEvent(connection, new UserRemoveMessageEvent(this.onUserRemove.bind(this)));
-        this.addMessageEvent(connection, new HabboUserBadgesMessageEvent(this.onUserBadges.bind(this)));
-        this.addMessageEvent(connection, new BlockUserUpdateMessageEvent(this.onBlockUserUpdate.bind(this)));
         // DEVIATION: AS3 also subscribes the pet messages (info, commands, placing error, figure,
         //   status, level, breeding), the favourite-group update and the bot error. The RPG server
         //   sends none of them; pets and bots come back as RPG companions and monsters.
@@ -82,10 +69,9 @@ export class RoomUsersHandler extends BaseHandler
         this.addMessageEvent(connection, new UserNameChangedMessageEvent(this.onUserNameChange.bind(this)));
 
         // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/session/handler/RoomUsersHandler.as::RoomUsersHandler()
-        // Both events were ported, registered and dispatched by nobody. `RoomSessionDanceEvent` and
-        // `RoomSessionFriendRequestEvent` each had a consumer already waiting — see the handlers.
+        // The event was ported, registered and dispatched by nobody; `RoomSessionDanceEvent` had a
+        // consumer already waiting — see the handler.
         this.addMessageEvent(connection, new DanceMessageEvent(this.onDance.bind(this)));
-        this.addMessageEvent(connection, new NewFriendRequestMessageEvent(this.onFriendRequest.bind(this)));
     }
 
     /**
@@ -247,7 +233,6 @@ export class RoomUsersHandler extends BaseHandler
         );
     }
 
-    // AS3: .../src/com/sulake/habbo/session/handler/RoomUsersHandler.as::onBlockUserUpdate()
     /**
 	 * The server's word on who is dancing and to what.
 	 *
@@ -274,71 +259,6 @@ export class RoomUsersHandler extends BaseHandler
             this.listener.sessionEvents.emit(
                 RoomSessionDanceEvent.RSDE_DANCE,
                 new RoomSessionDanceEvent(session, parser.userId, parser.danceStyle)
-            );
-        }
-    }
-
-    /**
-	 * A friend request that arrived while in a room, which is what raises the in-room request
-	 * bubble — `FriendRequestWidgetHandler` was listening for this event and nothing dispatched it.
-	 * The friend *list* subscribes the same message separately, for the list itself.
-	 *
-	 * AS3 passes `requestId` as both the request id and the user id. That is not a slip to correct:
-	 * `FriendRequestData` sets `requesterUserId = requestId` for the same reason — the payload
-	 * carries one id and a name, nothing else.
-	 */
-    // AS3: .../src/com/sulake/habbo/session/handler/RoomUsersHandler.as::onFriendRequest()
-    private onFriendRequest(event: IMessageEvent): void
-    {
-        const parser = event.parser as NewFriendRequestMessageParser | null;
-
-        if(!parser) return;
-
-        const session = this.listener.getSession(this.roomId);
-
-        if(session === null) return;
-
-        const request = parser.req;
-
-        if(!request) return;
-
-        if(this.listener.sessionEvents)
-        {
-            this.listener.sessionEvents.emit(
-                RoomSessionFriendRequestEvent.FRIEND_REQUEST,
-                new RoomSessionFriendRequestEvent(
-                    session,
-                    request.requestId,
-                    request.requestId,
-                    request.requesterName
-                )
-            );
-        }
-    }
-
-    private onBlockUserUpdate(event: IMessageEvent): void
-    {
-        const blockEvent = event as BlockUserUpdateMessageEvent;
-
-        if(blockEvent === null)
-        {
-            return;
-        }
-
-        const session = this.listener.getSession(this.roomId);
-
-        if(session === null)
-        {
-            return;
-        }
-
-        const userData = session.userDataManager.getUserData(blockEvent.userId);
-
-        if(userData !== null)
-        {
-            session.userDataManager.markAsBlocked(
-                userData.roomObjectId,
-                blockEvent.result === BlockUserUpdateMessageEvent.BLOCKED
             );
         }
     }
@@ -385,47 +305,6 @@ export class RoomUsersHandler extends BaseHandler
                     parser.customInfo,
                     parser.achievementScore
                 )
-            );
-        }
-    }
-
-    /**
-	 * Handle user badges update
-	 */
-    // AS3: .../src/com/sulake/habbo/session/handler/RoomUsersHandler.as::onUserBadges()
-    private onUserBadges(event: IMessageEvent): void
-    {
-        const badgesEvent = event as HabboUserBadgesMessageEvent;
-
-        if(badgesEvent === null)
-        {
-            return;
-        }
-
-        const parser = badgesEvent.parser as HabboUserBadgesMessageParser;
-
-        if(parser === null)
-        {
-            return;
-        }
-
-        const session = this.listener.getSession(this.roomId);
-
-        if(session === null)
-        {
-            return;
-        }
-
-        // Both shapes: the codes for anything that only wants to draw them, and the full entries
-        // for the infostand, which needs each badge's slot and rarity.
-        session.userDataManager.setUserBadges(parser.userId, parser.badges);
-        session.userDataManager.setUserSelectedBadges(parser.userId, parser.selectedBadges);
-
-        if(this.listener.sessionEvents)
-        {
-            this.listener.sessionEvents.emit(
-                RoomSessionUserBadgesEvent.RSUBE_BADGES,
-                new RoomSessionUserBadgesEvent(session, parser.userId, parser.badges)
             );
         }
     }

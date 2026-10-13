@@ -72,7 +72,6 @@ import {RoomObjectAvatarUpdateMessage} from '@ambreia/iso/scene/messages/RoomObj
 import {RoomObjectAvatarFigureUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectAvatarFigureUpdateMessage';
 import {RoomObjectAvatarPostureUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectAvatarPostureUpdateMessage';
 import {RoomObjectAvatarGestureUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectAvatarGestureUpdateMessage';
-import {RoomObjectAvatarBlockedUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectAvatarBlockedUpdateMessage';
 import {RoomObjectHeightUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectHeightUpdateMessage';
 import {RoomObjectAvatarFlatControlUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectAvatarFlatControlUpdateMessage';
 import {RoomObjectAvatarPetGestureUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectAvatarPetGestureUpdateMessage';
@@ -3356,18 +3355,6 @@ export class RoomEngine extends Component implements IRoomEngine,
         return true;
     }
 
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::updateObjectUserBlocked()
-    updateObjectUserBlocked(roomId: number, objectId: number, isBlocked: boolean): boolean
-    {
-        const object = this.getRoomObject(roomId, objectId, RoomObjectCategoryEnum.OBJECT_CATEGORY_USER) as IRoomObjectController | null;
-
-        if(!object || !object.getEventHandler()) return false;
-
-        object.getEventHandler()!.processUpdateMessage(new RoomObjectAvatarBlockedUpdateMessage(isBlocked));
-
-        return true;
-    }
-
     /**
 	 * Pets live in the user category, so this looks the object up exactly as the avatar
 	 * updates do — AS3 calls the same `getObjectUser()` here.
@@ -5060,31 +5047,13 @@ export class RoomEngine extends Component implements IRoomEngine,
     }
 
     /**
-	 * True while the user at this room index is on your blocked list.
-	 *
-	 * AS3 checks it before every user action, so a blocked user's dance, chat, sign and effects
-	 * never reach their room object at all — blocking hides what they do, not just what they say.
-	 */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::userIsBlocked()
-    private userIsBlocked(roomId: number, roomIndex: number): boolean
-    {
-        const session = this._roomSessionManager?.getSession(roomId) ?? null;
-        const userData = session?.userDataManager?.getUserDataByIndex(roomIndex) ?? null;
-
-        if(userData === null) return false;
-
-        return this._sessionDataManager?.isBlocked(userData.webID) ?? false;
-    }
-
-    /**
      * Update user action (expression, dance, sleep, typing, carry, use object).
      *
      * **This dispatches a typed update message through the object's logic; it does not write the
      * model.** It used to be one `model.setNumber(action, value)`, which reaches the same variable
      * for the simple cases and skips everything the logic does around it — so `figure_talk` was set
      * and `AvatarLogic._talkEndTime` never was, and the mouth would have flapped forever; the
-     * carry-object branch never armed its own timers; and `userIsBlocked()` was not consulted at
-     * all. The 13 messages below are all ported and all handled by `AvatarLogic.processUpdateMessage()`.
+     * carry-object branch never armed its own timers. The 13 messages below are all ported and all handled by `AvatarLogic.processUpdateMessage()`.
      */
     // DEVIATION: AS3 also maps `figure_habbicon` to the habbicon update message; the RPG fork removed
     //   Habbicons, so that action now takes the no-message warning.
@@ -5103,11 +5072,6 @@ export class RoomEngine extends Component implements IRoomEngine,
         ) as IRoomObjectController | null;
 
         if(roomObject === null || roomObject.getEventHandler() === null)
-        {
-            return false;
-        }
-
-        if(this.userIsBlocked(roomId, roomIndex))
         {
             return false;
         }
