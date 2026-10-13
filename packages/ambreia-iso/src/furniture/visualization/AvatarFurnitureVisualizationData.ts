@@ -11,7 +11,7 @@
 import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
 import type {IAvatarImage} from '@ambreia/avatar/IAvatarImage';
 import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
-import type {IAvatarEffectListener} from '@ambreia/avatar/IAvatarEffectListener';
+import type {IAvatarAnimationListener} from '@ambreia/avatar/IAvatarAnimationListener';
 import {AvatarVisualizationData} from '../../avatar/visualization/AvatarVisualizationData';
 import {FurnitureVisualizationData} from './FurnitureVisualizationData';
 
@@ -57,7 +57,7 @@ export class AvatarFurnitureVisualizationData extends FurnitureVisualizationData
         scale: number,
         gender: string | null = null,
         listener: IAvatarImageListener | null = null,
-        effectListener: IAvatarEffectListener | null = null
+        effectListener: IAvatarAnimationListener | null = null
     ): IAvatarImage | null
     {
         if(this._avatarData === null) return null;

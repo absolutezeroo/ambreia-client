@@ -31,7 +31,7 @@ export const AVATAR_DATA_FILES: Readonly<Record<AvatarDataFile, string>> = {
     figure: 'AmbreiaAvatarFigure.xml',
     figureData: 'AmbreiaFigureData.xml',
     figureMap: 'AmbreiaFigureMap.xml',
-    effectMap: 'AmbreiaEffectMap.xml'
+    effectMap: 'AmbreiaAnimationMap.xml'
 };
 
 export const AVATAR_ACTION_OFFSET_FILES: Readonly<Record<string, string>> = {

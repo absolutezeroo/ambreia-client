@@ -9,8 +9,6 @@ export interface IFigureData
 {
     readonly gender: string;
 
-    avatarEffectType: number;
-
     direction: number;
 
     loadAvatarData(figureString: string, gender: string): void;

@@ -1,9 +1,9 @@
 import EventEmitter from 'eventemitter3';
 import type {IAssetLibrary} from '@ambreia/common/assets/IAssetLibrary';
 import type {AmbreiaDirectory} from '@ambreia/common/assets/pack/AmbreiaDirectory';
-import type {IAvatarEffectListener} from './IAvatarEffectListener';
+import type {IAvatarAnimationListener} from './IAvatarAnimationListener';
 import type {AvatarStructure} from './AvatarStructure';
-import {EffectAssetDownloadLibrary} from './EffectAssetDownloadLibrary';
+import {AvatarAnimationLibrary} from './AvatarAnimationLibrary';
 import type {AssetAliasCollection} from './alias/AssetAliasCollection';
 import {getXmlAttribute, getXmlChildElements, getXmlRoot} from './structure/AvatarXmlUtils';
 
@@ -21,10 +21,10 @@ import {getXmlAttribute, getXmlChildElements, getXmlRoot} from './structure/Avat
  * In AS3, this extends EventDispatcherWrapper and uses Timer + URLRequest for
  * download scheduling. The effect map key is the string representation of the effect ID.
  *
- * @see sources/win63_version/habbo/avatar/EffectAssetDownloadManager.as
- * @see sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/EffectAssetDownloadManager.as
+ * @see sources/win63_version/habbo/avatar/AvatarAnimationAssets.as
+ * @see sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/AvatarAnimationAssets.as
  */
-export class EffectAssetDownloadManager extends EventEmitter 
+export class AvatarAnimationAssets extends EventEmitter 
 {
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/EffectAssetDownloadManager.as::LIBRARY_LOADED
     public static readonly LIBRARY_LOADED: string = 'LIBRARY_LOADED';
@@ -36,17 +36,17 @@ export class EffectAssetDownloadManager extends EventEmitter
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/EffectAssetDownloadManager.as::_structure
     private _structure: AvatarStructure;
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/EffectAssetDownloadManager.as::_incompleteEffects
-    private _incompleteEffects: Map<string, EffectAssetDownloadLibrary[]>;
+    private _incompleteEffects: Map<string, AvatarAnimationLibrary[]>;
     // AS3: .../src/com/sulake/habbo/avatar/EffectAssetDownloadManager.as::_listeners
-    private _listeners: Map<string, IAvatarEffectListener[]>;
+    private _listeners: Map<string, IAvatarAnimationListener[]>;
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/EffectAssetDownloadManager.as::_pendingDownloadQueue
-    private _pendingDownloadQueue: EffectAssetDownloadLibrary[];
-    private _pendingDownloadSet: Set<EffectAssetDownloadLibrary>;
+    private _pendingDownloadQueue: AvatarAnimationLibrary[];
+    private _pendingDownloadSet: Set<AvatarAnimationLibrary>;
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/EffectAssetDownloadManager.as::_currentDownloads
-    private _currentDownloads: EffectAssetDownloadLibrary[];
-    private _currentDownloadSet: Set<EffectAssetDownloadLibrary>;
+    private _currentDownloads: AvatarAnimationLibrary[];
+    private _currentDownloadSet: Set<AvatarAnimationLibrary>;
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/EffectAssetDownloadManager.as::_initDownloadBuffer
-    private _initDownloadBuffer: [number, IAvatarEffectListener | null][];
+    private _initDownloadBuffer: [number, IAvatarAnimationListener | null][];
     private _isReady: boolean;
     // DEVIATION: AS3 holds the libraries' URL template; the port holds the effects family's
     // .ambreia directory (spec 2026-10-09-ambreia-everything).
@@ -88,14 +88,14 @@ export class EffectAssetDownloadManager extends EventEmitter
         this._isReady = false;
     }
 
-    private _effectMap: Map<string, EffectAssetDownloadLibrary[]>;
+    private _effectMap: Map<string, AvatarAnimationLibrary[]>;
 
     /**
      * The underlying effect map for external access.
      *
      * In AS3, this is exposed as `get map()`.
      */
-    public get effectMap(): Map<string, EffectAssetDownloadLibrary[]> 
+    public get effectMap(): Map<string, AvatarAnimationLibrary[]> 
     {
         return this._effectMap;
     }
@@ -148,7 +148,7 @@ export class EffectAssetDownloadManager extends EventEmitter
      * @param listener - Optional listener to notify when effect assets are ready
      */
     // AS3: .../src/com/sulake/habbo/avatar/EffectAssetDownloadManager.as::loadEffectData()
-    public loadEffectData(effectId: number, listener: IAvatarEffectListener | null = null): void 
+    public loadEffectData(effectId: number, listener: IAvatarAnimationListener | null = null): void 
     {
         if(!this._isReady) 
         {
@@ -180,7 +180,7 @@ export class EffectAssetDownloadManager extends EventEmitter
         }
         else if(listener !== null && !listener.disposed) 
         {
-            listener.avatarEffectReady(effectId);
+            listener.avatarAnimationReady(effectId);
         }
     }
 
@@ -211,7 +211,7 @@ export class EffectAssetDownloadManager extends EventEmitter
     /**
      * Generates the effect-ID-to-library mapping from effect map data.
      *
-     * In AS3, iterates XML `<effect>` elements, creating EffectAssetDownloadLibrary
+     * In AS3, iterates XML `<effect>` elements, creating AvatarAnimationLibrary
      * instances keyed by effect ID string.
      */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/EffectAssetDownloadManager.as::generateMap()
@@ -249,14 +249,14 @@ export class EffectAssetDownloadManager extends EventEmitter
     {
         if(effectId === '' || libName === '') return;
 
-        const library = new EffectAssetDownloadLibrary(
+        const library = new AvatarAnimationLibrary(
             libName,
             revision,
             this._directory,
             this._assetLibrary
         );
 
-        library.on(EffectAssetDownloadLibrary.COMPLETE, () => this.libraryComplete(library));
+        library.on(AvatarAnimationLibrary.COMPLETE, () => this.libraryComplete(library));
 
         if(!this._effectMap.has(effectId)) 
         {
@@ -270,10 +270,10 @@ export class EffectAssetDownloadManager extends EventEmitter
      * Determines which libraries still need to be downloaded for a given effect.
      */
     // AS3: .../src/com/sulake/habbo/avatar/EffectAssetDownloadManager.as::getLibsToDownload()
-    private getLibsToDownload(effectId: number): EffectAssetDownloadLibrary[] 
+    private getLibsToDownload(effectId: number): AvatarAnimationLibrary[] 
     {
-        const result: EffectAssetDownloadLibrary[] = [];
-        const resultSet: Set<EffectAssetDownloadLibrary> = new Set();
+        const result: AvatarAnimationLibrary[] = [];
+        const resultSet: Set<AvatarAnimationLibrary> = new Set();
 
         if(!this._structure) return result;
 
@@ -324,7 +324,7 @@ export class EffectAssetDownloadManager extends EventEmitter
      * library from current downloads, and triggers the next batch of downloads.
      */
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/avatar/EffectAssetDownloadManager.as::libraryComplete()
-    private libraryComplete(library: EffectAssetDownloadLibrary): void
+    private libraryComplete(library: AvatarAnimationLibrary): void
     {
         // Register the library's assets and aliases so effect sprites resolve by name. See
         // _aliasCollection's declaration for why this has no AS3 counterpart.
@@ -344,7 +344,7 @@ export class EffectAssetDownloadManager extends EventEmitter
         // loudly: an animated action whose animation is missing renders its
         // `assetpartdefinition`, which for both Dance and AvatarEffect is `std` - so dances and
         // effects came out as a plain standing avatar. Register each entry under its own name.
-        for(const animation of EffectAssetDownloadManager.getAnimations(library.animation))
+        for(const animation of AvatarAnimationAssets.getAnimations(library.animation))
         {
             this._structure.registerAnimation(animation);
         }
@@ -368,7 +368,7 @@ export class EffectAssetDownloadManager extends EventEmitter
                     {
                         if(listener && !listener.disposed) 
                         {
-                            listener.avatarEffectReady(parseInt(effectKey));
+                            listener.avatarAnimationReady(parseInt(effectKey));
                         }
                     }
 
@@ -395,7 +395,7 @@ export class EffectAssetDownloadManager extends EventEmitter
 
         if(completedEffects.length > 0) 
         {
-            this.emit(EffectAssetDownloadManager.LIBRARY_LOADED, library.name);
+            this.emit(AvatarAnimationAssets.LIBRARY_LOADED, library.name);
         }
 
         this.processPending();
@@ -407,7 +407,7 @@ export class EffectAssetDownloadManager extends EventEmitter
      * In AS3, this also immediately calls processPending().
      */
     // AS3: .../src/com/sulake/habbo/avatar/EffectAssetDownloadManager.as::addToQueue()
-    private addToQueue(library: EffectAssetDownloadLibrary): void 
+    private addToQueue(library: AvatarAnimationLibrary): void 
     {
         if(!library.isReady && !this._pendingDownloadSet.has(library) && !this._currentDownloadSet.has(library)) 
         {
@@ -425,7 +425,7 @@ export class EffectAssetDownloadManager extends EventEmitter
     // AS3: .../src/com/sulake/habbo/avatar/EffectAssetDownloadManager.as::processPending()
     private processPending(): void 
     {
-        while(this._pendingDownloadQueue.length > 0 && this._currentDownloads.length < EffectAssetDownloadManager.MAX_SIMULTANEOUS_DOWNLOADS) 
+        while(this._pendingDownloadQueue.length > 0 && this._currentDownloads.length < AvatarAnimationAssets.MAX_SIMULTANEOUS_DOWNLOADS) 
         {
             const library = this._pendingDownloadQueue.shift()!;
             this._pendingDownloadSet.delete(library);
@@ -444,7 +444,7 @@ export class EffectAssetDownloadManager extends EventEmitter
     // AS3: .../src/com/sulake/habbo/avatar/EffectAssetDownloadManager.as::loadMandatoryLibs()
     private loadMandatoryLibs(): void 
     {
-        const mandatoryIds = EffectAssetDownloadManager.MANDATORY_EFFECT_IDS.slice();
+        const mandatoryIds = AvatarAnimationAssets.MANDATORY_EFFECT_IDS.slice();
 
         for(const effectId of mandatoryIds) 
         {

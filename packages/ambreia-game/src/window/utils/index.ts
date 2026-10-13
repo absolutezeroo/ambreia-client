@@ -6,7 +6,6 @@ export {AnimatedColor} from '@ambreia/ui/kit/utils/AnimatedColor';
 export {AnimatedScalar} from '@ambreia/ui/kit/utils/AnimatedScalar';
 export {ConfirmDialog} from '@ambreia/ui/kit/utils/ConfirmDialog';
 export {NumberPlaqueBitmap} from '@ambreia/ui/kit/utils/NumberPlaqueBitmap';
-export {EffectPreviewer} from './EffectPreviewer';
 export {ElementPointerHandler} from './ElementPointerHandler';
 export {ModalDialog} from '@ambreia/ui/kit/utils/ModalDialog';
 export {SimpleAlertDialog} from './SimpleAlertDialog';

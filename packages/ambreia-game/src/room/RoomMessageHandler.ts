@@ -106,7 +106,6 @@ import type {
 // Message Events - Room Action
 import {ExpressionMessageEvent} from '@ambreia/protocol/incoming/room/action/ExpressionMessageEvent';
 import {DanceMessageEvent} from '@ambreia/protocol/incoming/room/action/DanceMessageEvent';
-import {AvatarEffectMessageEvent} from '@ambreia/protocol/incoming/room/action/AvatarEffectMessageEvent';
 import {SleepMessageEvent} from '@ambreia/protocol/incoming/room/action/SleepMessageEvent';
 import {CarryObjectMessageEvent} from '@ambreia/protocol/incoming/room/action/CarryObjectMessageEvent';
 import {UseObjectMessageEvent} from '@ambreia/protocol/incoming/room/action/UseObjectMessageEvent';
@@ -164,9 +163,6 @@ import type {
     ExpressionMessageEventParser
 } from '@ambreia/protocol/parser/room/action/ExpressionMessageEventParser';
 import type {DanceMessageEventParser} from '@ambreia/protocol/parser/room/action/DanceMessageEventParser';
-import type {
-    AvatarEffectMessageEventParser
-} from '@ambreia/protocol/parser/room/action/AvatarEffectMessageEventParser';
 import type {SleepMessageEventParser} from '@ambreia/protocol/parser/room/action/SleepMessageEventParser';
 import type {
     CarryObjectMessageEventParser
@@ -322,7 +318,6 @@ export class RoomMessageHandler implements IRoomMessageHandler
             connection.addMessageEvent(new UserTypingMessageEvent(this.onTypingStatus.bind(this)));
             connection.addMessageEvent(new ExpressionMessageEvent(this.onExpression.bind(this)));
             connection.addMessageEvent(new DanceMessageEvent(this.onDance.bind(this)));
-            connection.addMessageEvent(new AvatarEffectMessageEvent(this.onAvatarEffect.bind(this)));
             connection.addMessageEvent(new SleepMessageEvent(this.onAvatarSleep.bind(this)));
             connection.addMessageEvent(new CarryObjectMessageEvent(this.onCarryObject.bind(this)));
             connection.addMessageEvent(new UseObjectMessageEvent(this.onUseObject.bind(this)));
@@ -2285,35 +2280,6 @@ export class RoomMessageHandler implements IRoomMessageHandler
             parser.userId,
             RoomObjectVariableEnum.AVATAR_DANCE,
             parser.danceStyle
-        );
-    }
-
-    /**
-     * Handle avatar effect update.
-     * Based on AS3: com.sulake.habbo.room.RoomMessageHandler.onAvatarEffect
-     */
-    // AS3: .../src/com/sulake/habbo/room/_SafeCls_1984.as::onAvatarEffect()
-    onAvatarEffect(event: IMessageEvent): void 
-    {
-        const effectEvent = event as AvatarEffectMessageEvent;
-
-        if(effectEvent === null || effectEvent.getParser() === null) 
-        {
-            return;
-        }
-
-        if(this._roomCreator === null) 
-        {
-            return;
-        }
-
-        const parser = effectEvent.getParser() as AvatarEffectMessageEventParser;
-
-        this._roomCreator.updateObjectUserEffect(
-            this._currentRoomId,
-            parser.userId,
-            parser.effectId,
-            parser.delayMilliSeconds
         );
     }
 

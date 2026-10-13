@@ -24,7 +24,7 @@ import type {IRoomObject} from '../../object/IRoomObject';
 import type {IRoomObjectVisualizationData} from '../../object/visualization/IRoomObjectVisualizationData';
 import type {IAvatarImage} from '@ambreia/avatar/IAvatarImage';
 import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
-import type {IAvatarEffectListener} from '@ambreia/avatar/IAvatarEffectListener';
+import type {IAvatarAnimationListener} from '@ambreia/avatar/IAvatarAnimationListener';
 import type {IAvatarPartSpriteSet} from '@ambreia/avatar/AvatarPartSprite';
 import type {IRoomObjectSprite} from '../../object/visualization/IRoomObjectSprite';
 import {RoomObjectSpriteData} from '@ambreia/common/graphics/RoomObjectSpriteData';
@@ -58,7 +58,7 @@ export interface IAvatarAdditionFactory
     expression(id: number, type: number, visualization: AvatarVisualization): IExpressionAddition | null;
 }
 
-export class AvatarVisualization extends RoomObjectSpriteVisualization implements IAvatarImageListener, IAvatarEffectListener 
+export class AvatarVisualization extends RoomObjectSpriteVisualization implements IAvatarImageListener, IAvatarAnimationListener 
 {
     /**
      * Builds the additions (bubbles, hearts, Zs). Set by the effects module (registerEffects); null
@@ -637,7 +637,7 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
      * @param effectId - The effect ID that is ready
      */
     // AS3: .../src/com/sulake/habbo/room/object/visualization/avatar/AvatarVisualization.as::avatarEffectReady()
-    avatarEffectReady(_effectId: number): void 
+    avatarAnimationReady(_effectId: number): void 
     {
         this._forceUpdate = true;
     }
@@ -984,15 +984,6 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
             if(numValue !== this._danceStyle) 
             {
                 this._danceStyle = numValue;
-                changed = true;
-            }
-
-            // Effect
-            numValue = model.getNumber(RoomObjectVariableEnum.AVATAR_EFFECT) | 0;
-
-            if(numValue !== this._effectType) 
-            {
-                this._effectType = numValue;
                 changed = true;
             }
 

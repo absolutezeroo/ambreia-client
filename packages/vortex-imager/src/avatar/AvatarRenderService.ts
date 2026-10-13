@@ -28,7 +28,7 @@ import {AvatarSetType} from '@ambreia/avatar/enum/AvatarSetType';
 import {AvatarAction} from '@ambreia/avatar/enum/AvatarAction';
 import type {IAvatarImage} from '@ambreia/avatar/IAvatarImage';
 import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
-import type {IAvatarEffectListener} from '@ambreia/avatar/IAvatarEffectListener';
+import type {IAvatarAnimationListener} from '@ambreia/avatar/IAvatarAnimationListener';
 import type {IImagerConfig} from '../config';
 import type {IAvatarRequest} from './AvatarRequest';
 import {AvatarRequestError} from './AvatarRequest';
@@ -109,9 +109,9 @@ export class AvatarRenderService
             effectResolve = resolve;
         });
 
-        const effectListener: IAvatarEffectListener = {
+        const effectListener: IAvatarAnimationListener = {
             disposed: false,
-            avatarEffectReady: (): void => effectResolve?.()
+            avatarAnimationReady: (): void => effectResolve?.()
         };
 
         const avatarImage = renderManager.createAvatarImage(

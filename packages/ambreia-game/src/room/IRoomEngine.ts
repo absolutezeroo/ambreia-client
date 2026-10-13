@@ -387,8 +387,6 @@ export interface IRoomEngine extends IDisposable {
 
     updateRoomObjectUserGesture(roomId: number, objectId: number, gesture: number): boolean;
 
-    updateRoomObjectUserEffect(roomId: number, objectId: number, effect: number, delay?: number): boolean;
-
     updateRoomObjectUserChat(roomId: number, objectId: number, numberOfWords: number): boolean;
 
     updateRoomObjectUserTyping(roomId: number, objectId: number, isTyping: boolean): boolean;

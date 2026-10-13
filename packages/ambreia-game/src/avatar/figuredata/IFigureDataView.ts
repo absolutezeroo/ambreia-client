@@ -1,8 +1,8 @@
 /**
  * The preview an editable figure pushes itself into.
  *
- * `FigureData` calls exactly one method on its view, with the figure string it has just serialised,
- * the effect to wear and the direction to face. Everything else about the preview — the room
+ * `FigureData` calls exactly one method on its view, with the figure string it has just serialised
+ * and the direction to face. Everything else about the preview — the room
  * previewer, the fallback to a flat rendered image — belongs to the implementation.
  *
  * TS-only: AS3's `FigureData` holds the concrete `FigureDataView`, which reaches back through
@@ -15,7 +15,8 @@
 export interface IFigureDataView
 {
     // AS3: .../avatar/figuredata/FigureDataView.as::update()
-    update(figureString: string, effectType?: number, direction?: number): void;
+    // DEVIATION: AS3 also passes the effect to wear; the RPG has no avatar effects (M1d §6.2).
+    update(figureString: string, direction?: number): void;
 
     // AS3: .../avatar/figuredata/FigureDataView.as::dispose()
     dispose(): void;

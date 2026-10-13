@@ -5,7 +5,6 @@ export {RoomObjectAvatarCarryObjectUpdateMessage} from '@ambreia/iso/scene/messa
 export {RoomObjectAvatarChatUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectAvatarChatUpdateMessage';
 export {RoomObjectAvatarDanceUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectAvatarDanceUpdateMessage';
 export {RoomObjectAvatarDirectionUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectAvatarDirectionUpdateMessage';
-export {RoomObjectAvatarEffectUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectAvatarEffectUpdateMessage';
 export {RoomObjectAvatarExperienceUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectAvatarExperienceUpdateMessage';
 export {RoomObjectAvatarExpressionUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectAvatarExpressionUpdateMessage';
 export {RoomObjectAvatarFigureUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectAvatarFigureUpdateMessage';

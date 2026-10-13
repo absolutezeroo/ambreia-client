@@ -5,7 +5,7 @@ import {AmbreiaDirectory} from '@ambreia/common/assets/pack/AmbreiaDirectory';
 import {setPlatform, BROWSER_PLATFORM} from '@ambreia/common/platform/Platform';
 import {AvatarRenderManager} from '../src/AvatarRenderManager';
 import {AvatarAssetDownloadLibrary} from '../src/AvatarAssetDownloadLibrary';
-import {EffectAssetDownloadLibrary} from '../src/EffectAssetDownloadLibrary';
+import {AvatarAnimationLibrary} from '../src/AvatarAnimationLibrary';
 import {readAvatarData, AVATAR_DATA_FILES, AVATAR_ACTION_OFFSET_FILES} from '../src/AvatarData';
 
 // No DOM here: the constructor's parse of the shipped data gets an empty document.
@@ -42,10 +42,10 @@ test('a figure library is asked of the clothing directory and an effect of the e
 {
     const asked: string[] = [];
     const library = new AvatarAssetDownloadLibrary('hh_human_body', '1', recording('clothing', asked), new AssetLibrary('clothing'));
-    const effect = new EffectAssetDownloadLibrary('Dance1', '1', recording('effects', asked), new AssetLibrary('effects'));
+    const effect = new AvatarAnimationLibrary('Dance1', '1', recording('effects', asked), new AssetLibrary('effects'));
     const done = Promise.all([
         new Promise(resolve => library.once(AvatarAssetDownloadLibrary.COMPLETE, resolve)),
-        new Promise(resolve => effect.once(EffectAssetDownloadLibrary.COMPLETE, resolve))
+        new Promise(resolve => effect.once(AvatarAnimationLibrary.COMPLETE, resolve))
     ]);
 
     library.startDownloading();

@@ -46,10 +46,6 @@ export class FigureData implements IFigureData, IAvatarImageListener
     // again, redundantly, as the first statement of the constructor.
     private static readonly DEFAULT_DIRECTION: number = 4;
 
-    // AS3: .../avatar/figuredata/FigureData.as::NO_EFFECT
-    // Name DERIVED: the −1 that means "no avatar effect".
-    private static readonly NO_EFFECT: number = -1;
-
     /**
      * Name DERIVED: AS3 writes these fifteen as bare `case` labels in two identical switches, one
      * in `savePartSetId()` and one in `savePartSetColourId()`. Hoisted to a set so the two cannot
@@ -91,10 +87,6 @@ export class FigureData implements IFigureData, IAvatarImageListener
     // Name DERIVED (`_SafeStr_4615`).
     private _direction: number = FigureData.DEFAULT_DIRECTION;
 
-    // AS3: .../avatar/figuredata/FigureData.as::_avatarEffectType
-    // Name DERIVED (`_SafeStr_8451`): −1 for none.
-    private _avatarEffectType: number = FigureData.NO_EFFECT;
-
     // AS3: .../avatar/figuredata/FigureData.as::FigureData()
     constructor(avatarEditor: IFigureDataOwner | null, view: IFigureDataView | null = null)
     {
@@ -130,19 +122,6 @@ export class FigureData implements IFigureData, IAvatarImageListener
     public get avatarEditor(): IFigureDataOwner | null
     {
         return this._avatarEditor;
-    }
-
-    // AS3: .../avatar/figuredata/FigureData.as::get avatarEffectType()
-    public get avatarEffectType(): number
-    {
-        return this._avatarEffectType;
-    }
-
-    // AS3: .../avatar/figuredata/FigureData.as::set avatarEffectType()
-    // Does **not** refresh the preview — every caller pairs it with an explicit `updateView()`.
-    public set avatarEffectType(value: number)
-    {
-        this._avatarEffectType = value;
     }
 
     // AS3: .../avatar/figuredata/FigureData.as::get direction()
@@ -284,7 +263,7 @@ export class FigureData implements IFigureData, IAvatarImageListener
     // AS3: .../avatar/figuredata/FigureData.as::updateView()
     public updateView(): void
     {
-        this._view?.update(this.getFigureString(), this._avatarEffectType, this._direction);
+        this._view?.update(this.getFigureString(), this._direction);
     }
 
     // AS3: .../avatar/figuredata/FigureData.as::avatarImageReady()

@@ -85,12 +85,6 @@ export interface IRoomMessageHandler extends IDisposable
     onDance(event: IMessageEvent): void;
 
     /**
-	 * Handle avatar effect update.
-	 * Based on AS3: com.sulake.habbo.room.RoomMessageHandler.onAvatarEffect
-	 */
-    onAvatarEffect(event: IMessageEvent): void;
-
-    /**
 	 * Handle avatar sleep status update.
 	 * Based on AS3: com.sulake.habbo.room.RoomMessageHandler.onAvatarSleep
 	 */

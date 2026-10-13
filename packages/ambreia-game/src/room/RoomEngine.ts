@@ -75,7 +75,6 @@ import {RoomObjectAvatarGestureUpdateMessage} from '@ambreia/iso/scene/messages/
 import {RoomObjectHeightUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectHeightUpdateMessage';
 import {RoomObjectAvatarFlatControlUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectAvatarFlatControlUpdateMessage';
 import {RoomObjectAvatarPetGestureUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectAvatarPetGestureUpdateMessage';
-import {RoomObjectAvatarEffectUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectAvatarEffectUpdateMessage';
 import {RoomObjectAvatarChatUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectAvatarChatUpdateMessage';
 import {RoomObjectAvatarTypingUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectAvatarTypingUpdateMessage';
 import {RoomObjectAvatarDanceUpdateMessage} from '@ambreia/iso/scene/messages/RoomObjectAvatarDanceUpdateMessage';
@@ -1104,24 +1103,6 @@ export class RoomEngine extends Component implements IRoomEngine,
         user.getEventHandler()?.processUpdateMessage(new RoomObjectAvatarGestureUpdateMessage(gesture));
 
         return true;
-    }
-
-    /**
-	 * Puts an effect on your own avatar, wherever it currently is
-	 *
-	 * The caller knows the effect id and nothing else — this resolves the room and the index from
-	 * the active session, which is why the me-menu can ask for an effect without tracking either.
-	 */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/_SafeCls_90.as::setAvatarEffect()
-    setAvatarEffect(effectId: number): void
-    {
-        if(this._sessionDataManager === null || this._roomSessionManager === null) return;
-
-        const session = this._roomSessionManager.getSession(this._activeRoomId);
-
-        if(session === null) return;
-
-        this.updateObjectUserEffect(this._activeRoomId, session.ownUserRoomId, effectId, 0);
     }
 
     /**
@@ -3371,29 +3352,6 @@ export class RoomEngine extends Component implements IRoomEngine,
         return true;
     }
 
-    updateRoomObjectUserEffect(roomId: number, objectId: number, effect: number, delay = 0): boolean 
-    {
-        const room = this.getRoomInstance(roomId);
-
-        if(!room) 
-        {
-            return false;
-        }
-
-        const object = room.getObject(objectId, RoomObjectCategoryEnum.OBJECT_CATEGORY_USER) as IRoomObjectController;
-
-        if(!object || !object.getEventHandler()) 
-        {
-            return false;
-        }
-
-        const message = new RoomObjectAvatarEffectUpdateMessage(effect, delay);
-
-        object.getEventHandler()!.processUpdateMessage(message);
-
-        return true;
-    }
-
     updateRoomObjectUserChat(roomId: number, objectId: number, numberOfWords: number): boolean 
     {
         const room = this.getRoomInstance(roomId);
@@ -5127,44 +5085,6 @@ export class RoomEngine extends Component implements IRoomEngine,
         // matched nothing — every `param1 is X` test in the logic then fails and it is a no-op.
         // Skipping the call is the same result without the null argument.
         if(message !== null) roomObject.getEventHandler()?.processUpdateMessage(message);
-
-        return true;
-    }
-
-    /**
-     * Update user effect.
-     * Based on AS3: RoomEngine.updateObjectUserEffect
-     */
-    updateObjectUserEffect(
-        roomId: number,
-        roomIndex: number,
-        effectId: number,
-        _delayMilliSeconds: number
-    ): boolean 
-    {
-        const roomInstance = this.getRoomInstance(roomId);
-
-        if(roomInstance === null) 
-        {
-            return false;
-        }
-
-        const roomObject = roomInstance.getObject(roomIndex, RoomObjectCategoryEnum.OBJECT_CATEGORY_USER);
-
-        if(roomObject === null) 
-        {
-            return false;
-        }
-
-        const model = (roomObject as IRoomObjectController).getModelController();
-
-        if(model === null) 
-        {
-            return false;
-        }
-
-        // Set the effect - delay handling would be done by visualization layer
-        model.setNumber(RoomObjectVariableEnum.AVATAR_EFFECT, effectId);
 
         return true;
     }

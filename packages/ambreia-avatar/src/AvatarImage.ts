@@ -8,7 +8,7 @@ import type {RoomObjectSpriteData} from '@ambreia/common/graphics/RoomObjectSpri
 import {AvatarFigureContainer} from './AvatarFigureContainer';
 import type {IAvatarImage} from './IAvatarImage';
 import type {IAvatarFigureContainer} from './IAvatarFigureContainer';
-import type {IAvatarEffectListener} from './IAvatarEffectListener';
+import type {IAvatarAnimationListener} from './IAvatarAnimationListener';
 import type {IAvatarPartSprite, IAvatarPartSpriteSet} from './AvatarPartSprite';
 import type {IActiveActionData} from './actions/IActiveActionData';
 import type {ISpriteDataContainer} from './animation/ISpriteDataContainer';
@@ -29,12 +29,12 @@ const log = Logger.getLogger('habbo.avatar.AvatarImage');
  * Main avatar image rendering class. Manages actions, directions,
  * animations, body part compositing, and full-image caching.
  *
- * Implements IAvatarImage and IAvatarEffectListener. The AS3 class also
+ * Implements IAvatarImage and IAvatarAnimationListener. The AS3 class also
  * implements IDisposable, which is handled via the dispose() method.
  *
  * @see sources/win63_version/habbo/avatar/AvatarImage.as
  */
-export class AvatarImage implements IAvatarImage, IAvatarEffectListener
+export class AvatarImage implements IAvatarImage, IAvatarAnimationListener
 {
     // AS3: .../src/com/sulake/habbo/avatar/AvatarImage.as::DEFAULT_ACTION
     private static readonly DEFAULT_ACTION: string = 'Default';
@@ -76,8 +76,8 @@ export class AvatarImage implements IAvatarImage, IAvatarEffectListener
     private _effectId: number = -1;
     private _animFrameCount: number = 0;
     private _actionsSorted: boolean = false;
-    private _effectManager: IEffectAssetDownloadManager | null;
-    private _effectListener: IAvatarEffectListener | null;
+    private _effectManager: IAvatarAnimationAssets | null;
+    private _effectListener: IAvatarAnimationListener | null;
     private _cachedBodyPartsDirection: number = -1;
     private _cachedBodyPartsGeometry: string | null = null;
     private _cachedBodyPartsSetType: string | null = null;
@@ -88,8 +88,8 @@ export class AvatarImage implements IAvatarImage, IAvatarEffectListener
         aliasCollection: AssetAliasCollection,
         figure: AvatarFigureContainer,
         scale: string,
-        effectManager: IEffectAssetDownloadManager | null = null,
-        effectListener: IAvatarEffectListener | null = null
+        effectManager: IAvatarAnimationAssets | null = null,
+        effectListener: IAvatarAnimationListener | null = null
     )
     {
         this._canvasOffsets = [];
@@ -632,7 +632,7 @@ export class AvatarImage implements IAvatarImage, IAvatarEffectListener
 	 * @param effectId - The effect identifier that is now ready
 	 */
     // AS3: .../src/com/sulake/habbo/avatar/AvatarImage.as::avatarEffectReady()
-    public avatarEffectReady(effectId: number): void
+    public avatarAnimationReady(effectId: number): void
     {
         if(effectId === this._effectId)
         {
@@ -643,7 +643,7 @@ export class AvatarImage implements IAvatarImage, IAvatarEffectListener
 
             if(this._effectListener)
             {
-                this._effectListener.avatarEffectReady(effectId);
+                this._effectListener.avatarAnimationReady(effectId);
             }
         }
     }
@@ -1622,11 +1622,11 @@ export class AvatarImage implements IAvatarImage, IAvatarEffectListener
 }
 
 /**
- * Temporary type placeholder for IEffectAssetDownloadManager until it is implemented.
+ * Temporary type placeholder for IAvatarAnimationAssets until it is implemented.
  */
-interface IEffectAssetDownloadManager
+interface IAvatarAnimationAssets
 {
     isReady(effectId: number): boolean;
 
-    loadEffectData(effectId: number, listener: IAvatarEffectListener): void;
+    loadEffectData(effectId: number, listener: IAvatarAnimationListener): void;
 }

@@ -17,7 +17,6 @@ import type {PetImageWidget} from './PetImageWidget';
 import type {AvatarImageWidget} from './AvatarImageWidget';
 import type {IIterator} from '@ambreia/ui/utils/IIterator';
 import {EmptyIterator} from '@ambreia/ui/iterators/EmptyIterator';
-import {EffectPreviewer} from '../utils/EffectPreviewer';
 
 const log = Logger.getLogger('habbo.window.widgets.ProductImageWidget');
 
@@ -59,10 +58,6 @@ export class ProductImageWidget implements IWidget, IGetImageListener
     private _lastEasterEggProductTypeId: number = -1;
     private _lastEasterEggItemTypeId: string = '';
     private _easterEggRepeatCount: number = 0;
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/ProductImageWidget.as::_effectPreviewer
-    // Name DERIVED (`_SafeStr_5597`): obfuscated in every tree, named after the class it holds.
-    private _effectPreviewer: EffectPreviewer | null = null;
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/ProductImageWidget.as::ProductImageWidget()
     constructor(window: IWidgetWindow, windowManager: IHabboWindowManager)
@@ -260,14 +255,10 @@ export class ProductImageWidget implements IWidget, IGetImageListener
                 this.setImageResult(windowManager.roomEngine?.getFurnitureImage(floorItemData.id, new Vector3d(90, 0, 0), 64, this) ?? null);
                 break;
             }
-            case 2: // pixel effect preview on an avatar
-                if(info.itemTypeId === '')
-                {
-                    this.clearPreviewer();
-                    break;
-                }
-
-                this.setEffectResult(windowManager.sessionDataManager?.figure ?? '', parseInt(info.itemTypeId, 10));
+            // DEVIATION: AS3 previewed a pixel effect on the player's avatar (EffectPreviewer); the RPG
+            //   has no avatar effects (M1d §6.2), so an effect product shows the unknown image.
+            case 2:
+                this.setUnknownImage();
                 break;
             case 4: // badge
                 this.setBadgeResult(info.itemTypeId);
@@ -390,10 +381,6 @@ export class ProductImageWidget implements IWidget, IGetImageListener
         if(pet) pet.visible = false;
         if(effect) effect.visible = false;
         if(unknown) unknown.visible = false;
-
-        // AS3 hides the previewer rather than the window it lives in — same effect, except that a
-        // previewer built lazily here would be pointless, so this only touches one that exists.
-        if(this._effectPreviewer !== null) this._effectPreviewer.visible = false;
     }
 
     private setImageResult(result: ImageResult | null): void
@@ -451,57 +438,6 @@ export class ProductImageWidget implements IWidget, IGetImageListener
 
         pet.visible = true;
         (pet.widget as PetImageWidget).figure = figure;
-    }
-
-    /**
-     * An avatar wearing the pixel effect being sold.
-     *
-     * The +50 is AS3's own: `centerWindow()` centres the *widget*, and the effect previewer draws
-     * the avatar in the upper half of it, so the box is pushed down to bring the figure back to
-     * the middle.
-     */
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/ProductImageWidget.as::setEffectResult()
-    private setEffectResult(figure: string, effectId: number): void
-    {
-        this.clearPreviewer();
-
-        const effect = this.effectImageWidget;
-
-        if(!effect) return;
-
-        this.centerWindow(effect);
-        effect.y += 50;
-
-        const previewer = this.effectPreviewer;
-
-        if(previewer === null) return;
-
-        previewer.visible = true;
-        previewer.update(figure, effectId);
-    }
-
-    /**
-     * Built on first use rather than in the constructor, which is where AS3 builds it.
-     *
-     * The widget's `product_image_xml` root is assigned in the constructor, but `widget.widget` —
-     * the room previewer the effect preview draws into — is attached later by the window system, so
-     * a previewer built in the constructor would capture a widget window that has no previewer
-     * behind it yet.
-     */
-    // TS-only: AS3 constructs `_SafeStr_5597` inline in its constructor; see above for why this
-    // port cannot.
-    private get effectPreviewer(): EffectPreviewer | null
-    {
-        if(this._effectPreviewer !== null) return this._effectPreviewer;
-
-        const effect = this.effectImageWidget;
-        const renderer = this._windowManager?.avatarRenderer ?? null;
-
-        if(effect === null || renderer === null) return null;
-
-        this._effectPreviewer = new EffectPreviewer(effect, renderer);
-
-        return this._effectPreviewer;
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/ProductImageWidget.as::setUnknownImage()
@@ -603,12 +539,6 @@ export class ProductImageWidget implements IWidget, IGetImageListener
 
         this._disposed = true;
         this._pendingImageId = -1;
-
-        if(this._effectPreviewer !== null)
-        {
-            this._effectPreviewer.dispose();
-            this._effectPreviewer = null;
-        }
 
         if(this._root)
         {

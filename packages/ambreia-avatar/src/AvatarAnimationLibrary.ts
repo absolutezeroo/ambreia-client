@@ -6,7 +6,7 @@ import type {NitroAsset} from '@ambreia/common/assets/NitroAsset';
 import {AssetLoaderEventType} from '@ambreia/common/assets/loaders/AssetLoaderEvent';
 import {Logger} from '@ambreia/common/utils/Logger';
 
-const log = Logger.getLogger('habbo.avatar.EffectAssetDownloadLibrary');
+const log = Logger.getLogger('habbo.avatar.AvatarAnimationLibrary');
 
 /**
  * Manages downloading a single avatar effect asset library.
@@ -17,10 +17,10 @@ const log = Logger.getLogger('habbo.avatar.EffectAssetDownloadLibrary');
  * In AS3, this extends EventDispatcherWrapper and implements INamed.
  * The animation data is extracted from the loaded SWF resource's animation property.
  *
- * @see sources/win63_version/habbo/avatar/EffectAssetDownloadLibrary.as
- * @see sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/EffectAssetDownloadLibrary.as
+ * @see sources/win63_version/habbo/avatar/AvatarAnimationLibrary.as
+ * @see sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/AvatarAnimationLibrary.as
  */
-export class EffectAssetDownloadLibrary extends EventEmitter 
+export class AvatarAnimationLibrary extends EventEmitter 
 {
     public static readonly COMPLETE: string = 'EADL_COMPLETE';
 
@@ -48,7 +48,7 @@ export class EffectAssetDownloadLibrary extends EventEmitter
         this._revision = revision;
         this._directory = directory;
         this._assetLibrary = assetLibrary;
-        this._state = EffectAssetDownloadLibrary.STATE_IDLE;
+        this._state = AvatarAnimationLibrary.STATE_IDLE;
         this._animation = null;
     }
 
@@ -85,7 +85,7 @@ export class EffectAssetDownloadLibrary extends EventEmitter
     // AS3: .../src/com/sulake/habbo/avatar/EffectAssetDownloadLibrary.as::get isReady()
     public get isReady(): boolean 
     {
-        return this._state === EffectAssetDownloadLibrary.STATE_READY;
+        return this._state === AvatarAnimationLibrary.STATE_READY;
     }
 
     /**
@@ -97,16 +97,16 @@ export class EffectAssetDownloadLibrary extends EventEmitter
     // AS3: .../src/com/sulake/habbo/avatar/EffectAssetDownloadLibrary.as::startDownloading()
     public startDownloading(): void 
     {
-        if(this._state !== EffectAssetDownloadLibrary.STATE_IDLE) return;
+        if(this._state !== AvatarAnimationLibrary.STATE_IDLE) return;
 
-        this._state = EffectAssetDownloadLibrary.STATE_DOWNLOADING;
+        this._state = AvatarAnimationLibrary.STATE_DOWNLOADING;
 
         // Check if already loaded in asset library
         if(this._assetLibrary.hasAsset(this._name)) 
         {
             this.extractAnimation();
-            this._state = EffectAssetDownloadLibrary.STATE_READY;
-            this.emit(EffectAssetDownloadLibrary.COMPLETE, this);
+            this._state = AvatarAnimationLibrary.STATE_READY;
+            this.emit(AvatarAnimationLibrary.COMPLETE, this);
 
             return;
         }
@@ -120,8 +120,8 @@ export class EffectAssetDownloadLibrary extends EventEmitter
             if(!loader) 
             {
                 log.warn(`Failed to start loading effect: ${this._name}`);
-                this._state = EffectAssetDownloadLibrary.STATE_READY;
-                this.emit(EffectAssetDownloadLibrary.COMPLETE, this);
+                this._state = AvatarAnimationLibrary.STATE_READY;
+                this.emit(AvatarAnimationLibrary.COMPLETE, this);
 
                 return;
             }
@@ -132,22 +132,22 @@ export class EffectAssetDownloadLibrary extends EventEmitter
                 {
                     log.debug(`Loaded effect: ${this._name}`);
                     this.extractAnimation();
-                    this._state = EffectAssetDownloadLibrary.STATE_READY;
-                    this.emit(EffectAssetDownloadLibrary.COMPLETE, this);
+                    this._state = AvatarAnimationLibrary.STATE_READY;
+                    this.emit(AvatarAnimationLibrary.COMPLETE, this);
                 }
                 else if(event.type === AssetLoaderEventType.ERROR) 
                 {
                     log.warn(`Failed to load effect: ${this._name}`);
-                    this._state = EffectAssetDownloadLibrary.STATE_READY;
-                    this.emit(EffectAssetDownloadLibrary.COMPLETE, this);
+                    this._state = AvatarAnimationLibrary.STATE_READY;
+                    this.emit(AvatarAnimationLibrary.COMPLETE, this);
                 }
             });
         }
         catch (error) 
         {
             log.warn(`Error loading effect ${this._name}: ${error}`);
-            this._state = EffectAssetDownloadLibrary.STATE_READY;
-            this.emit(EffectAssetDownloadLibrary.COMPLETE, this);
+            this._state = AvatarAnimationLibrary.STATE_READY;
+            this.emit(AvatarAnimationLibrary.COMPLETE, this);
         }
     }
 

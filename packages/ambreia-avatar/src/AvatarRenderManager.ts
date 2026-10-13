@@ -5,7 +5,7 @@ import type {IAvatarRenderManager} from './IAvatarRenderManager';
 import type {IAvatarImage} from './IAvatarImage';
 import type {IAvatarFigureContainer} from './IAvatarFigureContainer';
 import type {IAvatarImageListener} from './IAvatarImageListener';
-import type {IAvatarEffectListener} from './IAvatarEffectListener';
+import type {IAvatarAnimationListener} from './IAvatarAnimationListener';
 import type {IFigureData} from './structure/IFigureData';
 import {ErrorReportStorage} from '@ambreia/common/utils/ErrorReportStorage';
 import {AvatarStructure} from './AvatarStructure';
@@ -18,7 +18,7 @@ import {PlaceholderAvatarImage} from './PlaceholderAvatarImage';
 import {BlockedAvatarImage} from './BlockedAvatarImage';
 import {AvatarAssetDownloadManager} from './AvatarAssetDownloadManager';
 import type {AnimationManager} from './animation/AnimationManager';
-import {EffectAssetDownloadManager} from './EffectAssetDownloadManager';
+import {AvatarAnimationAssets} from './AvatarAnimationAssets';
 import {AvatarRenderEvent} from './enum/AvatarRenderEvent';
 import type {IStructureData} from './structure/IStructureData';
 import {parseXmlDocument} from './structure/AvatarXmlUtils';
@@ -51,7 +51,7 @@ export class AvatarRenderManager implements IAvatarRenderManager
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/AvatarRenderManager.as::_avatarAssetDownloadManager
     private _avatarAssetDownloadManager: AvatarAssetDownloadManager | null = null;
     // AS3: sources/PRODUCTION-201601012205-226667486/src/com/sulake/habbo/avatar/AvatarRenderManager.as::_effectAssetDownloadManager
-    private _effectAssetDownloadManager: EffectAssetDownloadManager | null = null;
+    private _animationAssets: AvatarAnimationAssets | null = null;
     private _placeholderFigure: AvatarFigureContainer | null = null;
     // AS3: .../src/com/sulake/habbo/avatar/_SafeCls_582.as::_blockedFigure
     private _blockedFigure: AvatarFigureContainer | null = null;
@@ -93,9 +93,9 @@ export class AvatarRenderManager implements IAvatarRenderManager
     // AS3: .../src/com/sulake/habbo/avatar/_SafeCls_582.as::get effectMap()
     public get effectMap(): Map<string, any> 
     {
-        if(!this._effectAssetDownloadManager) return new Map();
+        if(!this._animationAssets) return new Map();
 
-        return this._effectAssetDownloadManager.effectMap;
+        return this._animationAssets.effectMap;
     }
 
     // AS3: .../src/com/sulake/habbo/avatar/_SafeCls_582.as::_activeImages
@@ -109,7 +109,7 @@ export class AvatarRenderManager implements IAvatarRenderManager
         scale: string,
         gender: string | null = null,
         listener: IAvatarImageListener | null = null,
-        effectListener: IAvatarEffectListener | null = null
+        effectListener: IAvatarAnimationListener | null = null
     ): IAvatarImage | null
     {
         const figureContainer = new AvatarFigureContainer(figureString);
@@ -133,7 +133,7 @@ export class AvatarRenderManager implements IAvatarRenderManager
                 this._aliasCollection,
                 figureContainer,
                 scale,
-                this._effectAssetDownloadManager,
+                this._animationAssets,
                 effectListener
             );
 
@@ -154,7 +154,7 @@ export class AvatarRenderManager implements IAvatarRenderManager
             this._aliasCollection,
             this._placeholderFigure,
             scale,
-            this._effectAssetDownloadManager
+            this._animationAssets
         );
     }
 
@@ -257,7 +257,7 @@ export class AvatarRenderManager implements IAvatarRenderManager
             this._aliasCollection,
             this._blockedFigure,
             scale,
-            this._effectAssetDownloadManager
+            this._animationAssets
         );
     }
 
@@ -452,10 +452,10 @@ export class AvatarRenderManager implements IAvatarRenderManager
             this._avatarAssetDownloadManager = null;
         }
 
-        if(this._effectAssetDownloadManager) 
+        if(this._animationAssets) 
         {
-            this._effectAssetDownloadManager.dispose();
-            this._effectAssetDownloadManager = null;
+            this._animationAssets.dispose();
+            this._animationAssets = null;
         }
 
         this._pendingFigureDownloads.length = 0;
@@ -505,7 +505,7 @@ export class AvatarRenderManager implements IAvatarRenderManager
             () => this.onMandatoryLibrariesReady(),
             this._options.onLibraryLoaded ?? null
         );
-        this._effectAssetDownloadManager = new EffectAssetDownloadManager(
+        this._animationAssets = new AvatarAnimationAssets(
             effects,
             this._structure,
             this._options.assets,
@@ -517,7 +517,7 @@ export class AvatarRenderManager implements IAvatarRenderManager
         if(figureMap) this._avatarAssetDownloadManager.loadFigureMap(figureMap);
         else log.error('The figure map has no <lib>: no figure library will ever download.');
 
-        this._effectAssetDownloadManager.loadEffectMap(parseXmlDocument(data.effectMap));
+        this._animationAssets.loadEffectMap(parseXmlDocument(data.effectMap));
     }
 
     /**

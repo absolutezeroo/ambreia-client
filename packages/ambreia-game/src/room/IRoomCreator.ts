@@ -443,18 +443,6 @@ export interface IRoomCreator extends IRoomEngine
     updateObjectUserGesture(roomId: number, roomIndex: number, gesture: number): boolean;
 
     /**
-	 * Update user effect.
-	 * Based on AS3: updateObjectUserEffect
-	 */
-    // AS3: .../src/com/sulake/habbo/room/_SafeCls_86.as::updateObjectUserEffect()
-    updateObjectUserEffect(
-        roomId: number,
-        roomIndex: number,
-        effectId: number,
-        delayMilliSeconds: number
-    ): boolean;
-
-    /**
 	 * Dispose user.
 	 */
     // AS3: .../src/com/sulake/habbo/room/_SafeCls_86.as::disposeObjectUser()

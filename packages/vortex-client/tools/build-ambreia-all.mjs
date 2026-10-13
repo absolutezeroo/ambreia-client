@@ -71,7 +71,7 @@ function available(family)
 const configurations = path.resolve(CLIENT, 'src/assets/configurations');
 const result = coverage({
     figureLibs: figureMapLibs(fs.readFileSync(path.join(configurations, 'AmbreiaFigureMap.xml'), 'utf8')),
-    effectLibs: effectMapLibs(fs.readFileSync(path.join(configurations, 'AmbreiaEffectMap.xml'), 'utf8')),
+    effectLibs: effectMapLibs(fs.readFileSync(path.join(configurations, 'AmbreiaAnimationMap.xml'), 'utf8')),
     pets: petNames(JSON.parse(fs.readFileSync(path.resolve(CLIENT, '../ambreia-common/src/config/legacy.defaults.json'), 'utf8'))),
     available: Object.fromEntries(FAMILIES.map(family => [family, available(family)]))
 });

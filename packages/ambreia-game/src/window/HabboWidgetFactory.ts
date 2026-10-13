@@ -14,9 +14,7 @@ import {UpdatingTimeStampWidget} from './widgets/UpdatingTimeStampWidget';
  * The game's widgets, on top of the kit's (registerKitWidgets): the ones that read the avatar
  * renderer, the room engine, the session or the localisation off the game window manager.
  *
- * The wall/floor-item ones go through IRoomEngine.getWallItemImage()/getFurnitureImage(); the
- * pixel-effect one goes through `window/utils/EffectPreviewer`, which puts an avatar wearing the
- * effect into the widget's own room previewer.
+ * The wall/floor-item ones go through IRoomEngine.getWallItemImage()/getFurnitureImage().
  *
  * @see sources/WIN63-202607011411-782849652/src/com/sulake/habbo/window/widgets/WidgetClasses.as
  */

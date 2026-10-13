@@ -4,7 +4,7 @@ import type {AnimationManager} from './animation/AnimationManager';
 import type {IAvatarFigureContainer} from './IAvatarFigureContainer';
 import type {IAvatarImage} from './IAvatarImage';
 import type {IAvatarImageListener} from './IAvatarImageListener';
-import type {IAvatarEffectListener} from './IAvatarEffectListener';
+import type {IAvatarAnimationListener} from './IAvatarAnimationListener';
 import type {IFigureData} from './structure/IFigureData';
 import type {IGraphicAsset} from '@ambreia/common/graphics/IGraphicAsset';
 
@@ -27,7 +27,7 @@ export interface IAvatarRenderManager
         scale: string,
         gender: string | null,
         listener: IAvatarImageListener | null,
-        effectListener: IAvatarEffectListener | null
+        effectListener: IAvatarAnimationListener | null
     ): IAvatarImage | null;
 
     /**

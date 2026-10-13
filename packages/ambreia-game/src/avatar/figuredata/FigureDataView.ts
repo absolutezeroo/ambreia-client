@@ -95,7 +95,6 @@ export class FigureDataView implements IFigureDataView, IAvatarImageListener
     // AS3: .../avatar/figuredata/FigureDataView.as::update()
     public update(
         figureString: string,
-        effectType: number = 0,
         direction: number = FigureDataView.PREVIEW_AVATAR_DIRECTION
     ): void
     {
@@ -105,7 +104,7 @@ export class FigureDataView implements IFigureDataView, IAvatarImageListener
 
         if(previewer !== null && previewer.isRoomEngineReady)
         {
-            previewer.addAvatarIntoRoom(figureString, effectType);
+            previewer.addAvatarIntoRoom(figureString);
             previewer.updateAvatarDirectionAndLocation(direction, direction);
             previewer.updatePreviewRoomView(true);
             previewer.updateRoomEngine();

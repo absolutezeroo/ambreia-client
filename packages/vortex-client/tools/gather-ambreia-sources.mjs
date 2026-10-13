@@ -58,7 +58,7 @@ function copyTree(dir, family)
 const gordonNames = fs.readdirSync(GORDON).filter(name => name.endsWith('.nitro')).map(name => name.slice(0, -'.nitro'.length));
 const picked = gordonSelection({
     figureLibs: figureMapLibs(fs.readFileSync(path.join(CONFIGURATIONS, 'AmbreiaFigureMap.xml'), 'utf8')),
-    effectLibs: effectMapLibs(fs.readFileSync(path.join(CONFIGURATIONS, 'AmbreiaEffectMap.xml'), 'utf8')),
+    effectLibs: effectMapLibs(fs.readFileSync(path.join(CONFIGURATIONS, 'AmbreiaAnimationMap.xml'), 'utf8')),
     pets: petNames(JSON.parse(fs.readFileSync(LEGACY, 'utf8'))),
     gordonNames
 });

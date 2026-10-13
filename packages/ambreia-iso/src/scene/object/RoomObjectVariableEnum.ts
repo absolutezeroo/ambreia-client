@@ -25,7 +25,6 @@ export const RoomObjectVariableEnum = {
     AVATAR_DANCE: 'figure_dance',
     AVATAR_SLEEP: 'figure_sleep',
     AVATAR_BLINK: 'figure_blink',
-    AVATAR_EFFECT: 'figure_effect',
     AVATAR_CARRY_OBJECT: 'figure_carry_object',
     AVATAR_USE_OBJECT: 'figure_use_object',
     AVATAR_GESTURE: 'figure_gesture',

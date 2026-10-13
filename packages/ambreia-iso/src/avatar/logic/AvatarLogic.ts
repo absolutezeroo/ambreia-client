@@ -23,7 +23,6 @@ import {RoomObjectAvatarExpressionUpdateMessage} from '../../scene/messages/Room
 import {RoomObjectAvatarDanceUpdateMessage} from '../../scene/messages/RoomObjectAvatarDanceUpdateMessage';
 import {AvatarAction} from '@ambreia/avatar/enum/AvatarAction';
 import {RoomObjectAvatarSleepUpdateMessage} from '../../scene/messages/RoomObjectAvatarSleepUpdateMessage';
-import {RoomObjectAvatarEffectUpdateMessage} from '../../scene/messages/RoomObjectAvatarEffectUpdateMessage';
 import {RoomObjectAvatarCarryObjectUpdateMessage} from '../../scene/messages/RoomObjectAvatarCarryObjectUpdateMessage';
 import {RoomObjectAvatarUseObjectUpdateMessage} from '../../scene/messages/RoomObjectAvatarUseObjectUpdateMessage';
 import {RoomObjectAvatarSignUpdateMessage} from '../../scene/messages/RoomObjectAvatarSignUpdateMessage';
@@ -43,14 +42,6 @@ export class AvatarLogic extends MovingObjectLogic
 {
     // Constants
     private static readonly WARP_DISTANCE = 1.5;
-    // AS3: .../src/com/sulake/habbo/room/object/logic/AvatarLogic.as::EFFECT_TYPE_SPLASH
-    private static readonly EFFECT_TYPE_SPLASH = 28;
-    // AS3: .../src/com/sulake/habbo/room/object/logic/AvatarLogic.as::EFFECT_TYPE_SWIM
-    private static readonly EFFECT_TYPE_SWIM = 29;
-    private static readonly EFFECT_TYPE_SPLASH_DARK = 184;
-    private static readonly EFFECT_TYPE_SWIM_DARK = 185;
-    // AS3: .../src/com/sulake/habbo/room/object/logic/AvatarLogic.as::EFFECT_SPLASH_LENGTH
-    private static readonly EFFECT_SPLASH_LENGTH = 500;
 
     // AS3: .../src/com/sulake/habbo/room/object/logic/AvatarLogic.as::CARRY_ITEM_NULL
     private static readonly CARRY_ITEM_NULL = 0;
@@ -67,10 +58,6 @@ export class AvatarLogic extends MovingObjectLogic
     // AS3: .../src/com/sulake/habbo/room/object/logic/AvatarLogic.as::_selected
     private _selected = false;
     private _lastLocation: Vector3d | null = null;
-
-    // Effect state
-    private _effectChangeTime = 0;
-    private _nextEffect = 0;
 
     // Timed actions
     private _talkEndTime = 0;
@@ -243,13 +230,6 @@ export class AvatarLogic extends MovingObjectLogic
         {
             model.setNumber('figure_number_value', message.value);
             this._playerValueEndTime = Date.now() + 3000;
-            return;
-        }
-
-        // Effect
-        if(message instanceof RoomObjectAvatarEffectUpdateMessage)
-        {
-            this.updateEffect(message.effect, message.delayMilliSeconds, model);
             return;
         }
 
@@ -510,49 +490,6 @@ export class AvatarLogic extends MovingObjectLogic
         return super.getCurveStrength(message);
     }
 
-    // AS3: .../src/com/sulake/habbo/room/object/logic/AvatarLogic.as::updateEffect()
-    private updateEffect(effect: number, delay: number, model: IRoomObjectModelController): void
-    {
-        const currentEffect = model.getNumber('figure_effect');
-
-        // Handle splash/swim transitions
-        if(effect === AvatarLogic.EFFECT_TYPE_SPLASH)
-        {
-            this._effectChangeTime = Date.now() + AvatarLogic.EFFECT_SPLASH_LENGTH;
-            this._nextEffect = AvatarLogic.EFFECT_TYPE_SWIM;
-        }
-        else if(effect === AvatarLogic.EFFECT_TYPE_SPLASH_DARK)
-        {
-            this._effectChangeTime = Date.now() + AvatarLogic.EFFECT_SPLASH_LENGTH;
-            this._nextEffect = AvatarLogic.EFFECT_TYPE_SWIM_DARK;
-        }
-        else if(currentEffect === AvatarLogic.EFFECT_TYPE_SWIM)
-        {
-            // Exit water: show splash first
-            this._effectChangeTime = Date.now() + AvatarLogic.EFFECT_SPLASH_LENGTH;
-            this._nextEffect = effect;
-            effect = AvatarLogic.EFFECT_TYPE_SPLASH;
-        }
-        else if(currentEffect === AvatarLogic.EFFECT_TYPE_SWIM_DARK)
-        {
-            this._effectChangeTime = Date.now() + AvatarLogic.EFFECT_SPLASH_LENGTH;
-            this._nextEffect = effect;
-            effect = AvatarLogic.EFFECT_TYPE_SPLASH_DARK;
-        }
-        else if(delay !== 0)
-        {
-            this._effectChangeTime = Date.now() + delay;
-            this._nextEffect = effect;
-            return;
-        }
-        else
-        {
-            this._effectChangeTime = 0;
-        }
-
-        model.setNumber('figure_effect', effect);
-    }
-
     // DEVIATION: AS3 also times the habbicon out and advances its spin; the RPG fork removed
     //   Habbicons.
     // AS3: .../src/com/sulake/habbo/room/object/logic/AvatarLogic.as::updateActions()
@@ -651,13 +588,6 @@ export class AvatarLogic extends MovingObjectLogic
         {
             model.setNumber('figure_blink', 0);
             this._blinkEndTime = 0;
-        }
-
-        // Delayed effect
-        if(this._effectChangeTime > 0 && now > this._effectChangeTime)
-        {
-            model.setNumber('figure_effect', this._nextEffect);
-            this._effectChangeTime = 0;
         }
 
         // Player value timeout

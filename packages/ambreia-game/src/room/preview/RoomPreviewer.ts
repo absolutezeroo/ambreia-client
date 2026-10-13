@@ -560,7 +560,8 @@ export class RoomPreviewer
     }
 
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/preview/RoomPreviewer.as::addAvatarIntoRoom()
-    addAvatarIntoRoom(figure: string, effect: number = 0): number
+    // DEVIATION: AS3 also takes the effect to wear; the RPG has no avatar effects (M1d §6.2).
+    addAvatarIntoRoom(figure: string): number
     {
         if(this.isRoomEngineReady)
         {
@@ -590,7 +591,6 @@ export class RoomPreviewer
                 this._previousAutomaticStateChangeTime = RoomPreviewer.getTimer();
                 this._automaticStateChange = true;
                 this.updateUserGesture(1);
-                this.updateUserEffect(effect);
                 this.updateUserPosture('std');
             }
 
@@ -617,15 +617,6 @@ export class RoomPreviewer
         if(this.isRoomEngineReady)
         {
             this._roomEngine!.updateRoomObjectUserGesture(this._previewRoomId, RoomPreviewer.PREVIEW_OBJECT_ID, gesture);
-        }
-    }
-
-    // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/room/preview/RoomPreviewer.as::updateUserEffect()
-    updateUserEffect(effect: number): void
-    {
-        if(this.isRoomEngineReady)
-        {
-            this._roomEngine!.updateRoomObjectUserEffect(this._previewRoomId, RoomPreviewer.PREVIEW_OBJECT_ID, effect);
         }
     }
 

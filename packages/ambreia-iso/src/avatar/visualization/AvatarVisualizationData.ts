@@ -11,7 +11,7 @@ import type {IRoomObjectVisualizationData} from '../../object/visualization/IRoo
 import type {IAvatarRenderManager} from '@ambreia/avatar/IAvatarRenderManager';
 import type {IAvatarImage} from '@ambreia/avatar/IAvatarImage';
 import type {IAvatarImageListener} from '@ambreia/avatar/IAvatarImageListener';
-import type {IAvatarEffectListener} from '@ambreia/avatar/IAvatarEffectListener';
+import type {IAvatarAnimationListener} from '@ambreia/avatar/IAvatarAnimationListener';
 import {AvatarScaleType} from '@ambreia/avatar/enum/AvatarScaleType';
 
 export class AvatarVisualizationData implements IRoomObjectVisualizationData 
@@ -66,7 +66,7 @@ export class AvatarVisualizationData implements IRoomObjectVisualizationData
         scale: number,
         gender: string | null = null,
         listener: IAvatarImageListener | null = null,
-        effectListener: IAvatarEffectListener | null = null,
+        effectListener: IAvatarAnimationListener | null = null,
         blocked: boolean = false
     ): IAvatarImage | null
     {
