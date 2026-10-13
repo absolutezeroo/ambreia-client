@@ -14,7 +14,7 @@ import type {IClassDefinition} from './IClassDefinition';
 import type {ISkillDefinition} from './ISkillDefinition';
 import type {IStatusDefinition} from './IStatusDefinition';
 import type {IStatusEntry} from '../combat/IStatusEntry';
-import {SKILL_IMAGES, skillIcon, statusIcon} from './skillArt';
+import {CONTENT_ICON_IMAGES, FALLBACK_SKILL, FALLBACK_STATUS, iconOf} from './contentIcons';
 import {SKILL_WINDOW_IMAGES, SkillsWindow} from './SkillsWindow';
 
 const log = Logger.getLogger('habbo.features.skills');
@@ -38,12 +38,15 @@ const FRIENDLY_TELEGRAPH = 0xe8b830;
  */
 export const SkillsFeature: IGameFeature = {
     id: 'skills',
-    images: [...SKILL_IMAGES, ...SKILL_WINDOW_IMAGES],
+    images: [...CONTENT_ICON_IMAGES, ...SKILL_WINDOW_IMAGES],
     requires: ['roomEngine', 'interaction', 'hud', 'hudPlayer', 'roomSession', 'input', 'combat'],
     create: ({host, scope}) =>
     {
         const model = host.made.combat!.model;
         const session = new RpgSkillSession(model);
+        // The icons are the content's (M1d §6.1).
+        const skillIcon = (skillId: string): string => iconOf(session.definition(skillId), FALLBACK_SKILL);
+        const statusIcon = (statusId: string): string => iconOf(session.statusDefinition(statusId), FALLBACK_STATUS);
         const on = scope.bind(session.events);
         let room: IRoomSession | null = null;
         let window: SkillsWindow | null = null;

@@ -14,7 +14,7 @@ import {buildFrame} from '../../ui/kit/buildFrame';
 import {SKILL_SLOTS} from '../hud/IHud';
 import {barSkill, type RpgSkillSession} from './RpgSkillSession';
 import type {ISkillDefinition} from './ISkillDefinition';
-import {skillIcon} from './skillArt';
+import {FALLBACK_SKILL, iconOf} from './contentIcons';
 
 type SkillsTab = 'tab_active' | 'tab_passive' | 'tab_specs' | 'tab_shortcuts';
 
@@ -622,7 +622,7 @@ export class SkillsWindow
         if(!icon) return;
 
         icon.visible = skillId !== null;
-        if(skillId !== null) icon.assetUri = skillIcon(skillId);
+        if(skillId !== null) icon.assetUri = iconOf(this._session.definition(skillId), FALLBACK_SKILL);
     }
 
     /** The bar slot `window` is in, in the shown tab: its index, or -1. */
