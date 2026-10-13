@@ -187,6 +187,8 @@ export const CombatFeature: IGameFeature = {
         const sessionOn = scope.bind(host.made.roomSession?.sessionEvents);
 
         // The player's own object id comes with the room's users, sometimes after the combat burst.
+        // The room engine sets it from the same Users message as the session's update, and its
+        // handler may run after ours: read it again once the message is through.
         const knowOwn = (): void => session.model.setOwn(Math.max(0, room?.ownUserRoomId ?? 0));
 
         sessionOn(RoomSessionEvent.RSE_STARTED, (event: RoomSessionEvent) =>
@@ -199,6 +201,7 @@ export const CombatFeature: IGameFeature = {
         sessionOn(RoomSessionUserDataUpdateEvent.RSUDUE_USER_DATA_UPDATE, (event: RoomSessionUserDataUpdateEvent) =>
         {
             knowOwn();
+            queueMicrotask(knowOwn);
             if(event.addedUsers.length === 0) overlay.get()?.prune(objectId => event.session.userDataManager.getUserDataByIndex(objectId) !== null);
         });
         // A zone change and a reconnect both end the room session: the next zone's burst rebuilds
