@@ -62,7 +62,7 @@ i = int, s = string, b = bool; lists are `count × (...)`.
 | Message | Fields | When |
 |---|---|---|
 | `RpgTargets` | count × (objectId:i, targetObjectId:i; 0 = none) | full in the entry burst, then one entry per combatant whose target changed, each tick. Gives the target of target and every monster's target |
-| `RpgThreat` | monsterObjectId:i, percentOfTop:i | to the player only, for their current target: on target change, when the value moves by 5 points or more, and when the top of the table changes hands. 100 = the player holds aggro; above 100 only when the player is on top |
+| `RpgThreat` | monsterObjectId:i, percent:i, hasAggro:b | to the player only, for their current target: on target change, when `percent` moves by `ThreatReportStep` or more, and when `hasAggro` flips. `percent` = floor(playerThreat / topThreat × 100), in 0..100; `hasAggro` = the player is the top of the table (ties: the first in, as the server already resolves them). No value above 100 |
 | `RpgResurrectOffer` | casterObjectId:i, healthPercent:i, expiresMs:i | when a `resurrect` effect lands on a KO player. A newer offer replaces the pending one |
 | `RpgLevelUp` | level:i, statsBefore, statsAfter (the stat block of `RpgStatBlockWriter`), skillsLearned: count × skillId:s | to the player, right after `RpgCharacterProgress`, once per level gained |
 | `RpgAutoAttackState` | active:b | to the player on every change: start, stop, target died, target cleared, refusal |
@@ -87,12 +87,15 @@ Casting never sets or clears the flag. Monsters are unchanged. Every flag change
 `RpgAutoAttackState`.
 
 **KO replaces the ghost.** On death the player stays on the spot, posture `lay`, invulnerable,
-untargetable, removed from every threat table, casts and statuses cleared, 10% equipment wear
+removed from every threat table, out of reach of `RpgTargetSelect` and of every targeting mode
+except `dead_ally` (the only way to target a KO player is a skill declared for it), casts and statuses cleared, 10% equipment wear
 unchanged. `RpgDeath.respawnSeconds` becomes the auto-release delay (`AutoReleaseSeconds`, 60).
 `RpgDeathChoice`:
 
 - `release`: today's respawn — the zone's `respawn` entry, 50% health, mana untouched.
-- `wait`: cancels the auto-release; the player stays KO until an offer, a release or disconnect.
+- `wait`: cancels the auto-release; the player stays KO until an offer, a release, a disconnect,
+  or `MaxKoSeconds` (600) since death, which then releases. Leaving the zone or the instance while
+  KO (teleport, instance end) releases too: a player never changes zone KO.
 - `accept`: only with a pending offer; stands the player up on the spot with `healthPercent` of
   health and mana, leaves combat.
 - `decline`: drops the pending offer.
@@ -111,14 +114,19 @@ None at that tick, not when the corpse is removed. The same for a player who die
 memory like `persistent` statuses, so the GCD and cooldowns survive a zone change. `RpgCooldowns`
 joins the entry burst.
 
-**Level-up.** Health and mana are filled, so `RpgVitals` and `RpgSelfVitals` follow
-`RpgCharacterProgress`; then `RpgLevelUp`. `skillsLearned` is what the auto-placement on the action
-bar learned at that level.
+**Level-up.** Order on one XP gain, deterministic whatever the number of levels gained:
+`RpgCharacterProgress` (final level), `RpgCharacterStats` and `RpgSkills` as today, `RpgVitals` and
+`RpgSelfVitals` at the new maxima (health and mana filled), then one `RpgLevelUp` per level in
+ascending order, each with its own `statsBefore`/`statsAfter` and the skills learned at that level.
+The client coalesces consecutive `RpgLevelUp` received in the same tick into one panel (§4).
 
-**Entry burst**, in order: `RpgVitals` (full), `RpgSelfVitals`, `RpgStatuses`, `RpgTelegraphs`,
-`RpgTargets` (full), `RpgCooldowns`, `RpgThreat` of the current target if any, and if the player is
-KO: `RpgDeath` with the remaining delay (0 after `wait`) then the pending `RpgResurrectOffer` with
-its remaining time.
+**Entry burst**, in order: `RpgVitals` (full), `RpgStatuses` (full), `RpgTelegraphs`, `RpgTargets`
+(full), `RpgCooldowns` (full), `RpgThreat` of the current target if any, if the player is KO
+`RpgDeath` with the remaining delay (0 after `wait`) then the pending `RpgResurrectOffer` with its
+remaining time, and last `RpgSelfVitals`, which terminates the burst. The burst is flushed in one
+tick, before any delta of that tick, which the zone's single tick loop guarantees; every list in it
+is a full snapshot, so a delta that follows is always correct, and no message of the previous zone
+can follow `RSE_STARTED` because the session change travels on the same ordered connection.
 
 ### 2.4 Unchanged and sufficient
 
@@ -140,7 +148,7 @@ imports another only through its `I*.ts`). One writer per field; everything else
 | `self`: inCombat, autoAttacking, death state | 9014, `RpgAutoAttackState`, 9015, `RpgResurrectOffer`, 9013 of self | epoch, reconnect |
 | targets by objectId | `RpgTargets` | epoch |
 | `target`: objectId, kind, name, level, classId, rank | 9009 | 9009 None |
-| `threat`: percentOfTop of the current target | `RpgThreat` | target change |
+| `threat`: percent and hasAggro of the current target | `RpgThreat` | target change |
 | statuses by objectId | 9023 | epoch |
 | casts by objectId | 9020, 9021 | epoch, caster death |
 | cooldowns of the player | 9022 | epoch |
@@ -151,7 +159,9 @@ leaves `ko` only on the player's own `RpgVitals` with health above 0; the client
 server answer. A button sends; the model changes when the server replies.
 
 Timers (casts, cooldowns, status expiry, auto-release, offer expiry) are stored as absolute deadlines
-computed from `remainingMs` and the receive time, never accumulated.
+on the monotonic clock (`performance.now()`, through `platform()` so the Node tools and tests can
+substitute it), computed from `remainingMs` and the receive time, never accumulated and never on
+`Date.now()`, which a system clock change would shift.
 
 ### 3.2 Writers
 
@@ -171,9 +181,12 @@ view keeps no combat state of its own.
 
 ### 3.4 Resync
 
-`reset(epoch)` runs on RSE_ENDED and on the reconnect lifecycle reset. The entry burst rebuilds the
-model in full; §2.3 added `RpgTargets`, `RpgCooldowns`, `RpgThreat` and the KO replay for that reason.
-A `reset` followed by the burst must yield a model equal to one built live (§7).
+`reset(epoch)` runs on RSE_ENDED and on the reconnect lifecycle reset, and opens the `resyncing`
+phase; the first `RpgSelfVitals` of the new epoch closes it (§2.3 makes it the burst terminator).
+While `resyncing`, the model applies snapshots but emits no `log` entry and the feature plays no
+floating number or VFX: the burst restores state, it is not news. The burst rebuilds the model in
+full; §2.3 added `RpgTargets`, `RpgCooldowns`, `RpgThreat` and the KO replay for that reason. A
+`reset` followed by the burst must yield a model equal to one built live (§7).
 
 ### 3.5 Outside the model, on purpose
 
@@ -196,8 +209,9 @@ also sends `RpgAutoAttack(true)`.
 from `targets` and the model's vitals. It reuses the unused `vortex_hud_target_compact_xml`. Hidden
 when the target has no target.
 
-**Threat.** A thin gauge under the target's health bar, only for a monster target: green below 80,
-orange 80–99, red at 100 and above, with the number. Fed by `threat`, reset on target change.
+**Threat.** A thin gauge under the target's health bar, only for a monster target: red when
+`hasAggro`, otherwise green below 80 and orange from 80, with `percent` as text. Fed by `threat`,
+reset on target change.
 
 **KO panel** (mockup panel 1). Central, modal for the game, not for the chat: title, the player's
 avatar lying, level and class, "Réapparition possible dans …" counting the auto-release while
@@ -210,15 +224,29 @@ visible behind, greyed by a filter on the scene. The panel closes when the death
 name, level and class resolved from the room's user data by `casterObjectId`, the text with
 `healthPercent`, an expiry bar from `expiresMs`, Accept and Decline.
 
-**Level-up panel** (panel 4). Modal "Niveau N !": the avatar in its victory pose, the table of stats
-that rose (`statsAfter − statsBefore`, non-zero rows only), "Nouveaux éléments débloqués" with
-`skillsLearned` (icon and name from content), Continue. A gold flash on the player frame. No toast.
+**Level-up panel** (panel 4). Modal "Niveau N !" with N the last level reached: the avatar in its
+victory pose, the table of stats that rose (last `statsAfter` minus first `statsBefore`, non-zero rows
+only), "Nouveaux éléments débloqués" with every `skillsLearned` (icon and name from content),
+Continue. Several `RpgLevelUp` in one tick make one panel. A gold flash on the player frame. No toast.
 
 **Combat log.** A `combat` tab of the chat panel: a new channel in `ui/kit/chatModel.ts` next to
-`system`. Typed, coloured lines: damage dealt, damage taken, heals, dodge/miss/immune, status
-applied/expired, cast interrupted, death, level-up, refusals. Per-type filters in the tab header,
-200 lines kept, cleared on epoch. The refusal lines (`vortex.combat.error.*`, `vortex.skill.error`)
-move from `system` to `combat`.
+`system`. Typed, coloured lines, each derived from one producer:
+
+| Entry | Producer |
+|---|---|
+| damage dealt / taken, crit, absorbed | 9012 outcomes `hit`/`crit`; 9024 outcomes `hit`/`crit` with `absorbed`; dealt when `sourceObjectId` is self, taken when `targetObjectId` is self |
+| miss, dodge, immune | 9012 `miss`; 9024 `dodge`, `immune` |
+| heal | 9024 `heal` |
+| status applied, stacked, expired | the diff between two successive 9023 of the same objectId: a `statusId` that appears, whose `stacks` grows, or that disappears (9023 is a full list, so disappearance is the only expiry signal) |
+| cast interrupted / failed | 9021 `interrupted`, `failed` |
+| death | `killed` in 9012/9024 for others; 9015 for self |
+| resurrection offered, accepted, declined, released | `RpgResurrectOffer`; the death state leaving `ko` |
+| level-up | `RpgLevelUp` |
+| refusals | 9016 `RpgCombatResult`, 9019 `RpgSkillResult` |
+
+Per-type filters in the tab header, 200 lines kept, cleared on epoch, none emitted while
+`resyncing`. The refusal lines (`vortex.combat.error.*`, `vortex.skill.error`) move from `system`
+to `combat`.
 
 **Toasts** (panel 8). A generic info/error/success toast on `vortex_hud_toast_xml`, in `ui/kit/`,
 used for "Résurrection en cours", "Impossible de réapparaître ici" and later features. The tooltip
@@ -262,7 +290,8 @@ of the client is without visuals.
   chain.
 - `icon` field on skill and status definitions, served with them. `skillArt.ts` is deleted; the client
   maps nothing. Unknown icon: the generic one, as today.
-- Config: `AutoReleaseSeconds` 60, `ResurrectOfferSeconds` 30, `ThreatReportStep` 5.
+- Config: `AutoReleaseSeconds` 60, `MaxKoSeconds` 600, `ResurrectOfferSeconds` 30,
+  `ThreatReportStep` 5.
 
 ### 6.2 Texts
 
@@ -281,7 +310,8 @@ a buffer produced by the emulator's serializer, not an invented shape. `incoming
 (alive → ko → wait → offer → accept / decline / release / auto-release / offer replaced); health with
 one writer (9013 then 9004 does not lower it); rebuild from the entry burst after `reset(epoch)`
 equals the live model; timers computed from `remainingMs`; log bounded at 200 and typed; auto-attack
-follows `RpgAutoAttackState` only.
+follows `RpgAutoAttackState` only; nothing is logged while `resyncing`; two `RpgLevelUp` in one tick
+make one `levelUp` event.
 
 **Server** (emulator tests): `Swings` does nothing without `AutoAttacking`; `RpgTargetSelect` alone
 never swings; `resurrect` on a living target is `invalid_target`; `accept` stands up on the spot with
@@ -299,6 +329,9 @@ level-up panel, the combat tab, a status aura.
    and once with a release.
 2. `reset(epoch)` + entry burst rebuilds an identical model: proven by test, checked live by a zone
    change mid-fight.
-3. `grep AvatarEffect packages/*/src` is zero outside comments; the dance emote still plays.
+3. `grep -ri AvatarEffect packages/ --include=*.ts --include=*.xml --include=*.json` is zero
+   outside comments, the asset zip (`node install.mjs --pack`) carries no effect map or effect
+   library, and the emulator has no 2624 in `Headers.cs` nor an effect serializer; the dance emote
+   still plays.
 4. `skillArt.ts` no longer exists; icons come from content.
 5. `pnpm check` green on both repositories; the roadmap's §9.1 matrix and §11 register updated.
