@@ -15,6 +15,10 @@ import {vfxSheet, VFX_IMAGES, type IVfxPhase, type IVfxSet} from './vfxSheets';
 import {platform} from '@ambreia/common/platform/Platform';
 import {RoomEngineObjectEvent} from '@ambreia/iso/scene/events/RoomEngineObjectEvent';
 import {AttackBinding} from './views/AttackBinding';
+import {DeathScreens} from './views/DeathScreens';
+import {KoPanel} from './views/KoPanel';
+import {OnceChoice} from './views/OnceChoice';
+import {ResurrectOfferPanel} from './views/ResurrectOfferPanel';
 import {PlayerFrameBinding} from './views/PlayerFrameBinding';
 import {TargetHealthBinding} from './views/TargetHealthBinding';
 import {TargetOfTargetBinding} from './views/TargetOfTargetBinding';
@@ -100,6 +104,28 @@ export const CombatFeature: IGameFeature = {
         scope.bind(host.made.hudPlayer?.events)('attack', () => attack.toggle());
         scope.add(host.made.input!.bind('combat', 't', () => attack.toggle(), {when: () => room !== null}));
         scope.bind(host.made.roomEngine?.events)(RoomEngineObjectEvent.REOE_SELECTED, (event: RoomEngineObjectEvent) => attack.selected(event.objectId, isMonster(event.objectId), platform().now()));
+
+        // KO, wait, release, the resurrection offer (M1d §2.3, §4): the owner's two screens.
+        const choose = (choice: Parameters<typeof session.deathChoice>[0]): void => deaths.choose(choice);
+        const ko = new KoPanel(() => host.made.windowManager, bits(), choose);
+        const offer = new ResurrectOfferPanel(() => host.made.windowManager, bits(), choose);
+        const deaths = new DeathScreens(session.model, ko, offer, new OnceChoice(choice => session.deathChoice(choice)),
+            () =>
+            {
+                const player = host.made.hudPlayer?.value;
+                const classId = host.made.character?.state?.classId ?? '';
+
+                return {figure: player?.figure ?? '', level: player?.level ?? null, className: classId === '' ? '' : bits().contentName(`vortex.${classId}`, classId)};
+            },
+            objectId =>
+            {
+                const user = room?.userDataManager.getUserDataByIndex(objectId) ?? null;
+
+                return user ? {name: user.name, figure: user.figure, level: null} : null;
+            },
+            (run, ms) => scope.interval(run, ms));
+
+        scope.own(ko).own(offer).own(deaths);
 
         // A monster's own art (tools/build-monsters.mjs) plays these pet gestures; a pet without them
         // plays nothing.
