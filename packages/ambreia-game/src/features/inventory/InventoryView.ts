@@ -2,23 +2,21 @@ import type {WindowEvent} from '@ambreia/ui/events/WindowEvent';
 import type {IWindow} from '@ambreia/ui/IWindow';
 import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 import type {IItemGridWindow} from '@ambreia/ui/components/IItemGridWindow';
-import type {IStaticBitmapWrapperWindow} from '@ambreia/ui/components/IStaticBitmapWrapperWindow';
 import type {ITabContextWindow} from '@ambreia/ui/components/ITabContextWindow';
-import type {ITextFieldWindow} from '@ambreia/ui/components/ITextFieldWindow';
 import type {IRpgItemEntry} from '@ambreia/protocol/incoming/rpg/items/IRpgItemEntry';
 import type {IRpgStatBlock} from '@ambreia/protocol/incoming/rpg/characters/IRpgStatBlock';
-import {RpgItemEquipMessage} from '@ambreia/protocol/outgoing/rpg/items/RpgItemEquipMessage';
-import {RpgItemUnequipMessage} from '@ambreia/protocol/outgoing/rpg/items/RpgItemUnequipMessage';
-import {RpgItemDestroyMessage} from '@ambreia/protocol/outgoing/rpg/items/RpgItemDestroyMessage';
 import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
 import {WindowBits} from '../../ui/kit/WindowBits';
 import {buildFrame} from '../../ui/kit/buildFrame';
 import {CharacterSheet} from './CharacterSheet';
-import {bagView, isEquipment, itemIcon, itemKind, itemTab, type InventoryTab} from './items';
+import {bagView, type InventoryTab} from './items';
 import type {IRpgInventorySession} from './IRpgInventorySession';
+import {BagGrid} from './window/BagGrid';
+import {ItemActions} from './window/ItemActions';
+import {ItemDetailView} from './window/ItemDetailView';
+import {itemName, thousands} from './window/itemLines';
+import {SearchField} from './window/SearchField';
 
-const SELECTED = 0xffb8d8f0;
-const IDLE = 0xffe4e4dc;
 /** vortex_inventory_xml's item_grid `spacing`. */
 const GRID_SPACING = 4;
 const TABS = new Set<string>(['tab_equipment', 'tab_items', 'tab_resources', 'tab_quests'] satisfies InventoryTab[]);
@@ -27,7 +25,9 @@ const TABS = new Set<string>(['tab_equipment', 'tab_items', 'tab_resources', 'ta
  * The inventory window (I, vortex_inventory_xml, mockup/glaze/preview_inventory_*.png): the bag's
  * cases of the current tab on the right; on the left the character sheet (equipment tab, nothing
  * selected) or the selected item's details with Equip and Drop. Every action is a request: the
- * window changes when the server's RpgInventory comes back (Objets §17.3).
+ * window changes when the server's RpgInventory comes back (Objets §17.3). This one builds the
+ * window, keeps the tab, the selection and the query, and routes the events; the grid, the details,
+ * the search field and the actions are their own units (window/).
  */
 export class InventoryView
 {
@@ -37,8 +37,10 @@ export class InventoryView
     private _tab: InventoryTab = 'tab_equipment';
     private _selected = 0;
     private _search = '';
-    /** The grid's cases, to their item (null for a free case). */
-    private readonly _cases = new Map<IWindow, IRpgItemEntry | null>();
+    private readonly _grid: BagGrid;
+    private readonly _details: ItemDetailView;
+    private readonly _actions: ItemActions;
+    private readonly _searchField: SearchField;
     private _disposed = false;
 
     private readonly _onInventory = (): void => this.render();
@@ -52,6 +54,14 @@ export class InventoryView
         private readonly _currency: () => {gold: number | null; gems: number | null} = () => ({gold: null, gems: null})
     )
     {
+        this._grid = new BagGrid(_windows, _bits, this._onEvent);
+        this._details = new ItemDetailView(_bits);
+        this._actions = new ItemActions(_session, (title, text, onAnswer) => _windows.confirm(title, text, 0, onAnswer), _bits);
+        this._searchField = new SearchField(() => _bits.text('vortex.mapeditor.spawns.search'), query =>
+        {
+            this._search = query;
+            this.render();
+        });
         _session.events.on('inventory', this._onInventory);
     }
 
@@ -128,16 +138,16 @@ export class InventoryView
 
         const items = inventory?.items ?? [];
         const bagSize = inventory?.bagSize ?? 0;
-        const selected = items.find(item => item.itemId === this._selected && item.container === 0) ?? null;
+        const selected = this.selected();
 
         if(!selected) this._selected = 0;
 
         const currency = this._currency();
-        const thousands = (value: number | null): string => String(value ?? 0).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        const grid = window.findChildByName('item_grid') as IItemGridWindow | null;
 
         this._bits.setText(window, 'gold_amount', thousands(currency.gold));
         this._bits.setText(window, 'gems_amount', thousands(currency.gems));
-        this.renderGrid(window, items, bagSize);
+        if(grid) this._grid.render(grid, bagView(items, bagSize, this._tab, entry => this.matches(entry)), this._selected);
         this._bits.setText(window, 'bag_count', this._bits.text('vortex.inventory.bag_count',
             'count', String(items.filter(item => item.container === 0).length), 'max', String(bagSize)));
 
@@ -152,111 +162,18 @@ export class InventoryView
         if(this._detail)
         {
             this._detail.visible = !showSheet;
-            this.renderDetail(this._detail, selected);
+            this._details.render(this._detail, selected);
         }
-    }
-
-    private renderGrid(window: IWindowContainer, items: readonly IRpgItemEntry[], bagSize: number): void
-    {
-        const grid = window.findChildByName('item_grid') as IItemGridWindow | null;
-
-        if(!grid) return;
-
-        grid.destroyGridItems();
-        this._cases.clear();
-
-        for(const item of bagView(items, bagSize, this._tab, entry => this.matches(entry)))
-        {
-            const box = this._windows.buildWidgetLayout('vortex_inventory_item_slot_xml') as IWindowContainer | null;
-
-            if(!box) break;
-
-            const icon = box.findChildByName('item_icon') as IStaticBitmapWrapperWindow | null;
-
-            if(icon)
-            {
-                icon.visible = item !== null;
-                if(item) icon.assetUri = itemIcon(item.definitionId);
-            }
-
-            box.color = item && item.itemId === this._selected ? SELECTED : IDLE;
-            this._bits.setText(box, 'item_count', item && item.quantity > 1 ? String(item.quantity) : '');
-            this._bits.setVisible(box, false, 'new_dot', 'equipped_icon');
-            this._bits.setVisible(box, item !== null && itemKind(item.definitionId) === 'quest', 'quest_icon');
-            // A scrollable grid answers its items' events itself: the case carries the window's.
-            box.procedure = this._onEvent;
-            this._cases.set(box, item);
-            grid.addGridItem(box);
-        }
-    }
-
-    private renderDetail(detail: IWindowContainer, item: IRpgItemEntry | null): void
-    {
-        this._bits.setVisible(detail, item !== null, 'detail');
-        this._bits.setVisible(detail, item === null, 'no_selection');
-
-        if(!item) return;
-
-        const icon = detail.findChildByName('item_icon') as IStaticBitmapWrapperWindow | null;
-
-        if(icon) icon.assetUri = itemIcon(item.definitionId);
-        this._bits.setText(detail, 'item_name', this.name(item));
-        this._bits.setText(detail, 'item_kind', this.kindLine(item));
-        this._bits.setText(detail, 'item_desc', this._bits.textOr(`${item.definitionId}.description`, ''));
-        this._bits.setVisible(detail, itemTab(item.definitionId) === 'tab_quests', 'quest_note_box');
-
-        const primary = detail.findChildByName('primary_action');
-
-        if(primary)
-        {
-            primary.caption = this._bits.text(isEquipment(item.definitionId) ? 'vortex.inventory.action.equip' : 'vortex.inventory.action.use');
-            // No message uses an item yet (Objets §17.1 has none): only equipment has an action.
-            if(isEquipment(item.definitionId)) primary.enable();
-            else primary.disable();
-        }
-    }
-
-    /** `Arme · Lié · Durabilité 50`. */
-    private kindLine(item: IRpgItemEntry): string
-    {
-        const kind = itemKind(item.definitionId);
-        const parts = [this._bits.contentName(`vortex.inventory.kind.${kind}`, kind)];
-
-        if(item.bound) parts.push(this._bits.text('vortex.inventory.bound'));
-        if(item.durability >= 0) parts.push(this._bits.text('vortex.inventory.durability', 'value', String(item.durability)));
-
-        return parts.join(' · ');
-    }
-
-    private name(item: IRpgItemEntry): string
-    {
-        return this._bits.contentName(`${item.definitionId}.name`, item.definitionId);
     }
 
     private matches(item: IRpgItemEntry): boolean
     {
-        return this._search === '' || this.name(item).toLowerCase().includes(this._search);
+        return this._search === '' || itemName(this._bits, item).toLowerCase().includes(this._search);
     }
 
     private selected(): IRpgItemEntry | null
     {
         return this._session.inventory?.items.find(item => item.itemId === this._selected && item.container === 0) ?? null;
-    }
-
-    private equip(item: IRpgItemEntry): void
-    {
-        if(isEquipment(item.definitionId)) this._session.send(new RpgItemEquipMessage(item.slot));
-    }
-
-    private drop(item: IRpgItemEntry): void
-    {
-        const quantity = item.quantity > 1 ? ` x${item.quantity}` : '';
-
-        this._windows.confirm(this._bits.text('vortex.inventory.action.drop'), this._bits.text('vortex.inventory.drop.confirm', 'item', this.name(item) + quantity), 0, (dialog, event) =>
-        {
-            dialog.dispose();
-            if(event.type === 'WE_OK') this._session.send(new RpgItemDestroyMessage(item.slot, item.quantity));
-        });
     }
 
     private readonly _onEvent = (event: WindowEvent, window: IWindow): void =>
@@ -275,49 +192,22 @@ export class InventoryView
             return;
         }
 
-        // Left empty, the field shows its placeholder again (its caption, the layout's text).
-        if(event.type === 'WE_UNFOCUSED' && window.name === 'search_input')
+        if(this._searchField.handle(event, window)) return;
+
+        const cell = this._grid.caseOf(window);
+
+        if(event.type === 'WME_DOUBLE_CLICK' && cell?.item)
         {
-            const input = window as ITextFieldWindow;
-
-            if(input.text.trim() === '') input.text = this._bits.text('vortex.mapeditor.spawns.search');
-
-            return;
-        }
-
-        if(event.type === 'WKE_KEY_UP' && window.name === 'search_input')
-        {
-            this._search = (window as ITextFieldWindow).text.trim().toLowerCase();
-            this.render();
-
-            return;
-        }
-
-        const box = WindowBits.ancestor(window, 'item_slot');
-        const item = box ? this._cases.get(box) ?? null : null;
-
-        if(event.type === 'WME_DOUBLE_CLICK' && item)
-        {
-            this.equip(item);
+            this._actions.equip(cell.item);
 
             return;
         }
 
         if(event.type !== 'WME_CLICK') return;
 
-        // The field opens with its placeholder as its text: the first click clears it.
-        if(window.name === 'search_input')
+        if(cell)
         {
-            const input = window as ITextFieldWindow;
-
-            if(input.text === this._bits.text('vortex.mapeditor.spawns.search')) input.text = '';
-
-            return;
-        }
-
-        if(box)
-        {
-            this._selected = item && item.itemId !== this._selected ? item.itemId : 0;
+            this._selected = cell.item && cell.item.itemId !== this._selected ? cell.item.itemId : 0;
             this.render();
 
             return;
@@ -327,7 +217,7 @@ export class InventoryView
 
         if(equipped?.item)
         {
-            this._session.send(new RpgItemUnequipMessage(equipped.slot));
+            this._actions.unequip(equipped.slot);
 
             return;
         }
@@ -335,8 +225,8 @@ export class InventoryView
         const selected = this.selected();
 
         if(window.name === 'header_button_close') this.hide();
-        else if(window.name === 'primary_action' && selected) this.equip(selected);
-        else if((window.name === 'secondary_action' || WindowBits.ancestor(window, 'bin_button')) && selected) this.drop(selected);
+        else if(window.name === 'primary_action' && selected) this._actions.equip(selected);
+        else if((window.name === 'secondary_action' || WindowBits.ancestor(window, 'bin_button')) && selected) this._actions.drop(selected);
     };
 
     dispose(): void
@@ -349,6 +239,6 @@ export class InventoryView
         this._window = null;
         this._sheet = null;
         this._detail = null;
-        this._cases.clear();
+        this._grid.clear();
     }
 }
