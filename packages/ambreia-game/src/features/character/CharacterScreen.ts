@@ -10,6 +10,7 @@ import {RpgCharacterCreateMessage} from '@ambreia/protocol/outgoing/rpg/characte
 import {RpgCharacterChooseClassMessage} from '@ambreia/protocol/outgoing/rpg/characters/RpgCharacterChooseClassMessage';
 import {RpgEnterWorldMessage} from '@ambreia/protocol/outgoing/rpg/characters/RpgEnterWorldMessage';
 import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
+import {pinWindow} from '../../ui/kit/pinWindow';
 import type {IRpgCharacterSession} from './IRpgCharacterSession';
 import {CharacterCreateView} from './CharacterCreateView';
 import type {ICharacterDraft} from './create/ICharacterDraft';
@@ -90,6 +91,7 @@ export class CharacterScreen
         // Not in the F3a contract: no deletion, no zone, play time or dates yet.
         this._bits.setVisible(this._window, false, 'selected_zone', 'selected_details');
         desktop.addChild(this._window);
+        pinWindow(this._window);
         this._window.procedure = this._onEvent;
 
         // A frame hides on its header X (FrameController.close()); on a screen that is the only way

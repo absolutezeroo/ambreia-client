@@ -7,6 +7,7 @@ import type {ITextFieldWindow} from '@ambreia/ui/components/ITextFieldWindow';
 import type {IRpgClassEntry} from '@ambreia/protocol/incoming/rpg/characters/IRpgClassEntry';
 import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
 import type {WindowBits} from '../../ui/kit/WindowBits';
+import {pinWindow} from '../../ui/kit/pinWindow';
 import {AppearanceStepView} from './create/AppearanceStepView';
 import {ClassStepView} from './create/ClassStepView';
 import {ConfirmStepView} from './create/ConfirmStepView';
@@ -87,6 +88,7 @@ export class CharacterCreateView
         }
 
         parent.addChild(this._window);
+        pinWindow(this._window);
         this._window.x = Math.round((parent.width - this._window.width) / 2);
         this._window.y = Math.round((parent.height - this._window.height) / 2);
         this._window.procedure = this._onEvent;

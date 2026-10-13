@@ -6,6 +6,7 @@ import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 import type {ITextFieldWindow} from '@ambreia/ui/components/ITextFieldWindow';
 import type {IHabboLocalizationManager} from '../../localization/IHabboLocalizationManager';
 import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
+import {pinWindow} from '../../ui/kit/pinWindow';
 import {AuthApi} from './AuthApi';
 import {isEmail, registerProblem} from './AuthForm';
 import {authErrorKey} from './screen/authErrors';
@@ -132,6 +133,7 @@ export class LoginScreen
 
         // The slot is the login form's size; the registration form is larger, centred on it.
         slot.addChild(this._dialog);
+        pinWindow(this._dialog);
         this._dialog.x = Math.round((slot.width - this._dialog.width) / 2);
         this._dialog.y = Math.round((slot.height - this._dialog.height) / 2);
         this._dialog.procedure = this._onEvent;
