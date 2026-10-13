@@ -21,8 +21,13 @@ const COOLDOWN_TICK_MS = 250;
 /** vortex_hud_player_xml's frame colour, and its colour in combat (M1a §6.3). */
 const FRAME_COLOR = 0x686661;
 const IN_COMBAT_COLOR = 0x8a3a30;
-/** The bottom bar's shortcut slots (mock-up of 2026-10-10): keys only until the server assigns them. */
-const SHORTCUT_KEYS = ['Q', 'E', 'R'];
+/**
+ * The bottom bar's shortcut slots (mock-up of 2026-10-10): the first is the attack (M1d §2.3, key T),
+ * the others show their keys until the server assigns them.
+ */
+const SHORTCUT_KEYS = ['T', 'E', 'R'];
+/** The attack slot's icon. */
+export const ATTACK_ICON = 'rpg/ui-icons/rpg_item_weapon_sword_attack_melee_slashing_damage_icon';
 /** The bottom bar's menu buttons, in the layout's order. */
 const NAV_BUTTONS = ['nav_menu', 'nav_inventory', 'nav_shop', 'nav_quests', 'nav_map', 'nav_guild'];
 /** The player frame's bars and what their tooltips say (vortex_hud_tip_xml). */
@@ -54,6 +59,8 @@ export class HudView
     private _player: IWindowContainer | null = null;
     private _bar: IWindowContainer | null = null;
     private readonly _slots: {skills: IWindowContainer[]; items: IWindowContainer[]} = {skills: [], items: []};
+    /** The first shortcut slot: the auto-attack. */
+    private _attackSlot: IWindowContainer | null = null;
     private readonly _tips: HudTooltips;
     private _ticker: ReturnType<typeof setInterval> | null = null;
     private _disposed = false;
@@ -173,6 +180,15 @@ export class HudView
 
             this.renderSlot(slot, {icon: null, key});
             shortcuts.addListItem(slot);
+
+            if(this._attackSlot === null)
+            {
+                this._attackSlot = slot;
+                slot.procedure = (event: WindowEvent) =>
+                {
+                    if(event.type === 'WME_CLICK') this._state.events.emit('attack');
+                };
+            }
         }
 
         this._bar.procedure = this._onBarEvent;
@@ -230,6 +246,7 @@ export class HudView
             value[bar].forEach((slot, i) => this.renderSlot(this._slots[bar][i] ?? null, slot, value.mana));
         }
 
+        this.renderAttack(value.attack ?? 'disabled');
         this.syncTicker(value);
     }
 
@@ -258,6 +275,17 @@ export class HudView
         this._bits.setVisible(window, slot.icon !== null && unavailable(slot.cost ?? null, mana), 'unavailable_veil');
         this._bits.setVisible(window, slot.selected === true, 'selected');
         this.renderCooldown(window, slot, Date.now());
+    }
+
+    /** The attack slot: its sword and key always, outlined while attacking, veiled without a monster target. */
+    private renderAttack(state: 'idle' | 'active' | 'disabled'): void
+    {
+        const slot = this._attackSlot;
+
+        if(!slot) return;
+
+        this.renderSlot(slot, {icon: ATTACK_ICON, key: SHORTCUT_KEYS[0], selected: state === 'active'});
+        this._bits.setVisible(slot, state === 'disabled', 'unavailable_veil');
     }
 
     private renderCooldown(window: IWindowContainer, slot: IActionSlot, now: number): void

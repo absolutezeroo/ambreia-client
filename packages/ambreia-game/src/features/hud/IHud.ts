@@ -142,6 +142,8 @@ export interface IPlayerHud
     xpLabel?: string | null;
     /** In combat (M1a §6.3): the frame turns red. */
     inCombat?: boolean;
+    /** The attack slot (M1d §2.3): the server's auto-attack state; greyed without a monster target. */
+    attack?: 'idle' | 'active' | 'disabled';
     skills: IActionSlot[];
     items: IActionSlot[];
 }

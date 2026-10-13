@@ -42,3 +42,11 @@ export function placeTip(mouseX: number, mouseY: number, width: number, height: 
 
     return {x: Math.max(0, Math.min(desktopWidth - width, x)), y: Math.max(0, Math.min(desktopHeight - height, y))};
 }
+
+/** The attack slot (M1d §2.3): what the server says of the auto-attack, greyed without a monster to hit. */
+export function attackSlotState(input: {autoAttacking: boolean; hasMonsterTarget: boolean}): 'idle' | 'active' | 'disabled'
+{
+    if(input.autoAttacking) return 'active';
+
+    return input.hasMonsterTarget ? 'idle' : 'disabled';
+}

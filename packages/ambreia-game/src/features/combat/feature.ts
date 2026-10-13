@@ -12,6 +12,9 @@ import {CombatOverlay} from './CombatOverlay';
 import {CombatVfx} from './CombatVfx';
 import {RpgCombatSession} from './RpgCombatSession';
 import {vfxSheet, VFX_IMAGES, type IVfxPhase, type IVfxSet} from './vfxSheets';
+import {platform} from '@ambreia/common/platform/Platform';
+import {RoomEngineObjectEvent} from '@ambreia/iso/scene/events/RoomEngineObjectEvent';
+import {AttackBinding} from './views/AttackBinding';
 import {PlayerFrameBinding} from './views/PlayerFrameBinding';
 import {TargetHealthBinding} from './views/TargetHealthBinding';
 
@@ -34,7 +37,7 @@ const MISSED = new Set(['miss', 'dodge', 'immune']);
 export const CombatFeature: IGameFeature = {
     id: 'combat',
     images: VFX_IMAGES,
-    requires: ['roomEngine', 'hud', 'hudPlayer', 'roomSession'],
+    requires: ['roomEngine', 'hud', 'hudPlayer', 'roomSession', 'input'],
     create: ({host, scope}) =>
     {
         const session = new RpgCombatSession();
@@ -77,6 +80,14 @@ export const CombatFeature: IGameFeature = {
         modelOn('vitals', (objectId, vitals) => overlayOf()?.setHealth(objectId, vitals.health, vitals.maxHealth, isMonster(objectId)));
         scope.own(new PlayerFrameBinding(session.model, host.made.hudPlayer!));
         scope.own(new TargetHealthBinding(session.model, host.made.hud!));
+
+        // The auto-attack (M1d §2.3): the attack slot, the T key, a double click on a monster.
+        const attack = new AttackBinding(session.model, host.made.hudPlayer!, active => session.setAutoAttack(active));
+
+        scope.own(attack);
+        scope.bind(host.made.hudPlayer?.events)('attack', () => attack.toggle());
+        scope.add(host.made.input!.bind('combat', 't', () => attack.toggle(), {when: () => room !== null}));
+        scope.bind(host.made.roomEngine?.events)(RoomEngineObjectEvent.REOE_SELECTED, (event: RoomEngineObjectEvent) => attack.selected(event.objectId, isMonster(event.objectId), platform().now()));
 
         // A monster's own art (tools/build-monsters.mjs) plays these pet gestures; a pet without them
         // plays nothing.

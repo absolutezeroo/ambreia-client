@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {expiring, lowHp, placeTip, unavailable} from '../src/ui/kit/hudRules';
+import {attackSlotState, expiring, lowHp, placeTip, unavailable} from '../src/ui/kit/hudRules';
 
 test('a party member is in danger under a quarter of their health, never when dead or unknown', () =>
 {
@@ -32,4 +32,12 @@ test('a tooltip sits below-right of the pointer and flips to stay on the desktop
     assert.deepEqual(placeTip(1200, 100, 240, 80, 1280, 800), {x: 946, y: 114}, 'flipped left of the pointer');
     assert.deepEqual(placeTip(100, 780, 240, 80, 1280, 800), {x: 114, y: 686}, 'flipped above the pointer');
     assert.deepEqual(placeTip(5, 5, 240, 80, 200, 50), {x: 0, y: 0}, 'a desktop too small clamps to its corner');
+});
+
+test('the attack slot shows the server\'s auto-attack state, and greys without a monster target', () =>
+{
+    assert.equal(attackSlotState({autoAttacking: false, hasMonsterTarget: true}), 'idle');
+    assert.equal(attackSlotState({autoAttacking: true, hasMonsterTarget: true}), 'active');
+    assert.equal(attackSlotState({autoAttacking: true, hasMonsterTarget: false}), 'active', 'the server still says it attacks');
+    assert.equal(attackSlotState({autoAttacking: false, hasMonsterTarget: false}), 'disabled');
 });

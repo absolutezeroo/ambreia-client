@@ -27,8 +27,8 @@ const ITEM_SLOTS = 4;
 
 export class PlayerHudState
 {
-    /** `use`: a slot was clicked; the feature that fills the bar acts on it. */
-    readonly events = new EventEmitter<{changed: [Readonly<IPlayerHud>]; use: [ActionBar, number]}>();
+    /** `use`: a slot was clicked; the feature that fills the bar acts on it. `attack`: the attack slot was. */
+    readonly events = new EventEmitter<{changed: [Readonly<IPlayerHud>]; use: [ActionBar, number]; attack: []}>();
     private _value: IPlayerHud = {
         name: '', figure: '', level: null, hp: null, hpMax: null, mana: null, manaMax: null, xp: null, xpMax: null,
         skills: Array.from({length: SKILL_SLOTS}, (_, i) => ({icon: null, key: String(i + 1)})),

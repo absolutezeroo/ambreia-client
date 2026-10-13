@@ -2,7 +2,7 @@ import {RoomSessionEvent} from '../../session/events/RoomSessionEvent';
 import {RoomSessionUserDataUpdateEvent} from '../../session/events/RoomSessionUserDataUpdateEvent';
 import {UserDataType} from '../../session/UserData';
 import type {IGameFeature} from '../GameFeature';
-import {HudView} from './HudView';
+import {ATTACK_ICON, HudView} from './HudView';
 import {HudPanelsView} from './HudPanelsView';
 import {PlayerHudState} from './PlayerHudState';
 import {HudPanelsState, type IChatLine} from './HudPanelsState';
@@ -45,7 +45,7 @@ const clock = (date: Date): string => `${String(date.getHours()).padStart(2, '0'
  */
 export const HudFeature: IGameFeature = {
     id: 'hud',
-    images: [...CHAT_ICONS, ...DEMO_SKILLS, ...DEMO_ITEMS, ...DEMO_QUESTS, ...DEMO_BUFFS, ...DEMO_DEBUFFS, DEMO_BOSS],
+    images: [...CHAT_ICONS, ATTACK_ICON, ...DEMO_SKILLS, ...DEMO_ITEMS, ...DEMO_QUESTS, ...DEMO_BUFFS, ...DEMO_DEBUFFS, DEMO_BOSS],
     requires: ['character', 'roomSession', 'communication'],
     create: ({host, scope}) =>
     {
