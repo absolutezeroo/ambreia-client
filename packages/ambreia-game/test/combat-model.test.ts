@@ -176,3 +176,20 @@ test('a level-up is one event with what rose', () =>
     assert.deepEqual(seen, {fromLevel: 1, toLevel: 3, statsBefore: stats, statsAfter: {...stats, maxHealth: 130}, skillsLearned: ['skill.a']});
     assert.equal(model.log.at(-1)?.kind, 'levelup');
 });
+
+test('the own vitals are kept before the own object id is known, then keyed once it is', () =>
+{
+    const model = new CombatModel();
+    const seen: number[] = [];
+
+    model.events.on('ownVitals', vitals => seen.push(vitals.health));
+    model.reset(1);
+    model.setSelfVitals(70, 100, 20, 50, false);
+    assert.deepEqual(model.ownVitals, {health: 70, maxHealth: 100, mana: 20, maxMana: 50});
+    assert.equal(model.vitalsOf(0), null, 'no object id yet: nothing keyed');
+
+    model.setOwn(4);
+    model.setVitals(4, 60, 100);
+    assert.deepEqual(model.ownVitals, {health: 60, maxHealth: 100, mana: 20, maxMana: 50});
+    assert.deepEqual(seen, [70, 60]);
+});

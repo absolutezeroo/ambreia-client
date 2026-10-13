@@ -45,10 +45,10 @@ export function targetUnit(target: RpgTargetMessage, bits: WindowBits, figure: s
  */
 export const InteractionFeature: IGameFeature = {
     id: 'interaction',
-    requires: ['roomEngine', 'hud', 'roomSession', 'input'],
+    requires: ['roomEngine', 'hud', 'roomSession', 'input', 'combat'],
     create: ({host, scope}) =>
     {
-        const session = new RpgInteractionSession();
+        const session = new RpgInteractionSession(host.made.combat!.model);
         const on = scope.bind(session.events);
 
         host.made.interaction = session;
@@ -69,7 +69,7 @@ export const InteractionFeature: IGameFeature = {
             engine?.setRpgTarget(target.objectId);
             const figure = room?.userDataManager.getUserDataByIndex(target.objectId)?.figure ?? null;
 
-            hud?.update({target: targetUnit(target, new WindowBits(host.made.localization), figure, host.made.combat?.healthOf(target.objectId) ?? null)});
+            hud?.update({target: targetUnit(target, new WindowBits(host.made.localization), figure, host.made.combat?.model.vitalsOf(target.objectId) ?? null)});
         });
 
         // The HUD frame's close button clears the frame alone: ask the server to clear the target too.
@@ -105,7 +105,6 @@ export const InteractionFeature: IGameFeature = {
             room = null;
             engine?.setRpgInteractives(null);
             engine?.setRpgTarget(0);
-            session.forget();
             hud?.update({target: null});
         });
 

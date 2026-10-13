@@ -4,7 +4,7 @@ import type {IRpgCombatHit} from '@ambreia/protocol/incoming/rpg/combat/RpgComba
 import type {IRpgSkillOutcome} from '@ambreia/protocol/incoming/rpg/skills/RpgSkillEventsMessage';
 import type {IRpgTargetEntry} from '@ambreia/protocol/incoming/rpg/combat/RpgTargetsMessage';
 import type {ICastEntry} from './ICastEntry';
-import type {ICombatModel} from './ICombatModel';
+import type {ICombatModelWriter} from './ICombatModelWriter';
 import type {ICombatModelEvents} from './ICombatModelEvents';
 import type {ILevelUp} from './ILevelUp';
 import type {ILogEntry} from './ILogEntry';
@@ -30,7 +30,7 @@ import {VitalsBook} from './model/VitalsBook';
  * writer per field: the sessions. `reset(epoch)` opens `resyncing` and the first self vitals of the
  * new epoch closes it: the entry burst restores state, it is not news (the log is muted meanwhile).
  */
-export class CombatModel implements ICombatModel
+export class CombatModel implements ICombatModelWriter
 {
     readonly events = new EventEmitter<ICombatModelEvents>();
     private readonly _vitals = new VitalsBook();
@@ -41,6 +41,7 @@ export class CombatModel implements ICombatModel
     private readonly _cooldowns = new CooldownBook();
     private readonly _log = new CombatLog(() => this._own);
     private _own = 0;
+    private _ownVitals: IVitals | null = null;
     private _resyncing = false;
     private _inCombat = false;
     private _autoAttacking = false;
@@ -68,6 +69,11 @@ export class CombatModel implements ICombatModel
     get ownObjectId(): number
     {
         return this._own;
+    }
+
+    get ownVitals(): IVitals | null
+    {
+        return this._ownVitals;
     }
 
     get globalReadyAt(): number
@@ -119,6 +125,7 @@ export class CombatModel implements ICombatModel
         this._cooldowns.clear();
         this._log.clear();
         this._death.reset();
+        this._ownVitals = null;
         this._inCombat = false;
         this._autoAttacking = false;
         this.events.emit('self', this.self);
@@ -132,13 +139,20 @@ export class CombatModel implements ICombatModel
     setVitals(objectId: number, health: number, maxHealth: number): void
     {
         this.events.emit('vitals', objectId, this._vitals.setHealth(objectId, health, maxHealth));
-        if(objectId === this._own && health > 0) this.standUp();
+
+        if(objectId !== this._own || this._own === 0) return;
+
+        this._ownVitals = {health, maxHealth, mana: this._ownVitals?.mana ?? null, maxMana: this._ownVitals?.maxMana ?? null};
+        this.events.emit('ownVitals', this._ownVitals);
+        if(health > 0) this.standUp();
     }
 
     /** The burst's last message (spec §2.3): closes `resyncing`. */
     setSelfVitals(health: number, maxHealth: number, mana: number, maxMana: number, inCombat: boolean): void
     {
-        this.events.emit('vitals', this._own, this._vitals.setOwn(this._own, health, maxHealth, mana, maxMana));
+        this._ownVitals = {health, maxHealth, mana, maxMana};
+        if(this._own !== 0) this.events.emit('vitals', this._own, this._vitals.setOwn(this._own, health, maxHealth, mana, maxMana));
+        this.events.emit('ownVitals', this._ownVitals);
         if(health > 0) this.standUp();
 
         if(this._inCombat !== inCombat)

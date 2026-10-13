@@ -12,6 +12,8 @@ import {CombatOverlay} from './CombatOverlay';
 import {CombatVfx} from './CombatVfx';
 import {RpgCombatSession} from './RpgCombatSession';
 import {vfxSheet, VFX_IMAGES, type IVfxPhase, type IVfxSet} from './vfxSheets';
+import {PlayerFrameBinding} from './views/PlayerFrameBinding';
+import {TargetHealthBinding} from './views/TargetHealthBinding';
 
 const log = Logger.getLogger('habbo.features.combat');
 
@@ -21,9 +23,9 @@ const MISSED = new Set(['miss', 'dodge', 'immune']);
 /**
  * The fight in a zone (M1a §9.3): health bars over the monsters and the hurt players, the damage
  * numbers, the target frame's HP, the player frame's HP and mana and its « in combat » colour, the
- * death countdown, a monster's yell (M1c), and the refused attacks as system lines. A click on a
- * monster targets and attacks it through features/interaction (RpgTargetSelect); this feature only
- * shows the fight. The effects are the content's (a skill's `vfx`, a class's `basicAttack`: IVfxSet,
+ * death screens, a monster's yell (M1c). The fight's state is the model the session writes
+ * (CombatModel, spec §3); the frames and panels are its views (views/), this file only wires them.
+ * A click on a monster only selects it (features/interaction); the auto-attack is its own act. The effects are the content's (a skill's `vfx`, a class's `basicAttack`: IVfxSet,
  * read from the definitions features/skills loaded), drawn by CombatVfx from the sheets under
  * packages/vortex-client/spells/: a cast loops its `cast` on the caster; a blow or a skill plays
  * `release` on the caster, flies its `projectile`, then `area` where it landed and `hit` on each one
@@ -38,9 +40,9 @@ export const CombatFeature: IGameFeature = {
         const session = new RpgCombatSession();
         const vfx = new CombatVfx(host.assets, () => host.made.roomEngine);
         const on = scope.bind(session.events);
+        const modelOn = scope.bind(session.model.events);
         let overlay: CombatOverlay | null = null;
         let room: IRoomSession | null = null;
-        let countdown: IScopedTimer | null = null;
         // Every delayed effect belongs to the zone it was fired in: a flight or a hit that lands after
         // a zone change would play on whatever object holds the same id in the next room. The epoch
         // changes on RSE_ENDED and a pending timer whose epoch is gone does nothing.
@@ -72,15 +74,9 @@ export const CombatFeature: IGameFeature = {
         /** A monster is a pet of the room (M1a §9.1). */
         const isMonster = (objectId: number): boolean => room?.userDataManager.getUserDataByIndex(objectId)?.type === UserDataType.PET;
 
-        on('health', (objectId, health, maxHealth) =>
-        {
-            overlayOf()?.setHealth(objectId, health, maxHealth, isMonster(objectId));
-
-            // The target frame follows its target's HP.
-            const target = host.made.hud?.value.target ?? null;
-
-            if(target && host.made.interaction?.targetId === objectId) host.made.hud?.update({target: {...target, hp: health, hpMax: maxHealth}});
-        });
+        modelOn('vitals', (objectId, vitals) => overlayOf()?.setHealth(objectId, vitals.health, vitals.maxHealth, isMonster(objectId)));
+        scope.own(new PlayerFrameBinding(session.model, host.made.hudPlayer!));
+        scope.own(new TargetHealthBinding(session.model, host.made.hud!));
 
         // A monster's own art (tools/build-monsters.mjs) plays these pet gestures; a pet without them
         // plays nothing.
@@ -93,7 +89,7 @@ export const CombatFeature: IGameFeature = {
         // blow shows no visual until the hit says its attacker's class.
         const classOf = (objectId: number): string =>
             objectId === room?.ownUserRoomId ? host.made.character?.state?.classId ?? ''
-                : objectId === host.made.interaction?.targetId ? host.made.interaction?.target?.classId ?? '' : '';
+                : objectId === session.model.target?.objectId ? session.model.target.classId : '';
         /** What the content draws for a skill (its `vfx`) or a status (nothing here: its aura is its own). */
         const skillSet = (skillId: string): IVfxSet | null => host.made.skills?.definition(skillId)?.vfx ?? null;
         const basicAttackSet = (classId: string): IVfxSet | null => host.made.skills?.classDefinition(classId)?.basicAttack ?? null;
@@ -209,7 +205,7 @@ export const CombatFeature: IGameFeature = {
         // A skill's `cast` loops on its caster from its RpgCastStart to its RpgCastEnd.
         const incantations = new Map<number, () => void>();
 
-        on('cast', (objectId, cast) =>
+        modelOn('cast', (objectId, cast) =>
         {
             incantations.get(objectId)?.();
             incantations.delete(objectId);
@@ -243,49 +239,21 @@ export const CombatFeature: IGameFeature = {
             });
         });
 
-        on('self', vitals => host.made.hudPlayer?.update({
-            hp: vitals.health, hpMax: vitals.maxHealth, mana: vitals.mana, manaMax: vitals.maxMana, inCombat: vitals.inCombat
-        }));
-
-        // A ghost until the respawn (M1a §8.1): the HUD's warning counts down.
-        on('death', death =>
-        {
-            let left = death.respawnSeconds;
-            const show = (): void => host.made.hud?.update({alert: left > 0 ? bits().text('vortex.combat.dead', 'seconds', String(left)) : null});
-
-            countdown?.clear();
-            show();
-            countdown = scope.interval(() =>
-            {
-                left--;
-                show();
-
-                if(left <= 0)
-                {
-                    countdown?.clear();
-                    countdown = null;
-                }
-            }, 1000);
-        });
-
-        on('result', result =>
-        {
-            const text = bits();
-
-            log.debug(`attack refused: ${result.code}`);
-            host.made.hud?.addChatLine({
-                time: chatClock(Date.now() / 1000), channel: 'system', author: '',
-                message: text.textOr(`vortex.combat.error.${result.code}`, text.text('vortex.combat.error.refused'))
-            });
-        });
-
         const sessionOn = scope.bind(host.made.roomSession?.sessionEvents);
 
-        sessionOn(RoomSessionEvent.RSE_STARTED, (event: RoomSessionEvent) => room = event.session);
+        // The player's own object id comes with the room's users, sometimes after the combat burst.
+        const knowOwn = (): void => session.model.setOwn(Math.max(0, room?.ownUserRoomId ?? 0));
+
+        sessionOn(RoomSessionEvent.RSE_STARTED, (event: RoomSessionEvent) =>
+        {
+            room = event.session;
+            knowOwn();
+        });
         // A player who leaves hurt took their bar's object id with them; without this the overlay
         // kept an invisible bar per departed player for the whole visit (a monster's goes on kill).
         sessionOn(RoomSessionUserDataUpdateEvent.RSUDUE_USER_DATA_UPDATE, (event: RoomSessionUserDataUpdateEvent) =>
         {
+            knowOwn();
             if(event.addedUsers.length === 0) overlay?.prune(objectId => event.session.userDataManager.getUserDataByIndex(objectId) !== null);
         });
         sessionOn(RoomSessionEvent.RSE_ENDED, () =>
@@ -295,20 +263,13 @@ export const CombatFeature: IGameFeature = {
             for(const handle of pending) handle.clear();
             pending.clear();
 
-            // The death countdown belonged to that zone's ghost; the next zone starts clean.
-            if(countdown !== null)
-            {
-                countdown.clear();
-                countdown = null;
-                host.made.hud?.update({alert: null});
-            }
-
-            session.forget();
+            // A zone change and a reconnect both end the room session: the next zone's burst
+            // rebuilds the model (spec §3.4).
+            session.model.reset(epoch);
             overlay?.clear();
             // The canvas took the sprites with it; the loops' handles would only hold their closures.
             incantations.clear();
             flights.clear();
-            host.made.hudPlayer?.update({inCombat: false});
         });
 
         // Dev hook: `__ambreia.combat.simulate(objectId)` plays three blows of the player on an avatar
@@ -330,25 +291,29 @@ export const CombatFeature: IGameFeature = {
 
                 if(what === 'cast')
                 {
-                    session.cast(objectId, {durationMs: 2000, channel: false, skillId});
-                    later(() => session.cast(objectId, null), 2000);
+                    session.model.setCast(objectId, {durationMs: 2000, channel: false, skillId, targetObjectId: 0});
+                    later(() => session.model.endCast(objectId, 'done', skillId), 2000);
 
                     return;
                 }
 
                 if(what === 'skill')
                 {
-                    session.report(
-                        [{sourceObjectId: self, sourceId: skillId, targetObjectId: objectId, amount: 9, absorbed: 0, outcome: 'hit', health: 20, maxHealth: 40, killed: false}],
-                        [{casterObjectId: self, skillId, targetObjectId: objectId, x: 0, y: 0}]
-                    );
+                    const outcomes = [{sourceObjectId: self, sourceId: skillId, targetObjectId: objectId, amount: 9, absorbed: 0, outcome: 'hit', health: 20, maxHealth: 40, killed: false}];
+
+                    session.model.reportOutcomes(outcomes);
+                    session.report(outcomes, [{casterObjectId: self, skillId, targetObjectId: objectId, x: 0, y: 0}]);
 
                     return;
                 }
 
-                ['hit', 'crit', 'miss'].forEach((outcome, i) => later(() => session.events.emit('hits', new RpgCombatEventsMessage([
-                    {attackerId: self, targetId: objectId, amount: 7 * (i + 1), outcome, health: 28 - 7 * i, maxHealth: 40, killed: false}
-                ])), i * 700));
+                ['hit', 'crit', 'miss'].forEach((outcome, i) => later(() =>
+                {
+                    const blows = new RpgCombatEventsMessage([{attackerId: self, targetId: objectId, amount: 7 * (i + 1), outcome, health: 28 - 7 * i, maxHealth: 40, killed: false}]);
+
+                    session.model.reportHits(blows.hits);
+                    session.events.emit('hits', blows);
+                }, i * 700));
             }
         });
 

@@ -1,17 +1,19 @@
 import type {IScopedTimer} from '@ambreia/kernel/feature/FeatureScope';
 import {Logger} from '@ambreia/common/utils/Logger';
-import type {IRpgCastStart} from '@ambreia/protocol/incoming/rpg/skills/RpgCastStartMessage';
-import type {IRpgStatus} from '@ambreia/protocol/incoming/rpg/skills/RpgStatusesMessage';
+import {platform} from '@ambreia/common/platform/Platform';
 import type {IHudCast} from '../hud/IHud';
 import {RoomSessionEvent} from '../../session/events/RoomSessionEvent';
 import type {IRoomSession} from '../../session/IRoomSession';
 import {UserDataType} from '../../session/UserData';
 import type {IGameFeature} from '../GameFeature';
 import {WindowBits} from '../../ui/kit/WindowBits';
-import {chatClock} from '../../ui/kit/chatModel';
 import {SKILL_SLOTS, type ISlotTip} from '../hud/IHud';
 import {expiring, SELECTED_MS} from '../../ui/kit/hudRules';
-import {barSkill, holdBack, RpgSkillSession, statusTime, type IClassDefinition, type ISkillDefinition, type IStatusDefinition} from './RpgSkillSession';
+import {barSkill, holdBack, RpgSkillSession, statusTime} from './RpgSkillSession';
+import type {IClassDefinition} from './IClassDefinition';
+import type {ISkillDefinition} from './ISkillDefinition';
+import type {IStatusDefinition} from './IStatusDefinition';
+import type {IStatusEntry} from '../combat/IStatusEntry';
 import {SKILL_IMAGES, skillIcon, statusIcon} from './skillArt';
 import {SKILL_WINDOW_IMAGES, SkillsWindow} from './SkillsWindow';
 
@@ -22,14 +24,6 @@ const CAST_TICK_MS = 100;
 /** A telegraph's cells (M1c): red under a monster's cast, the cast bar's gold under a player's. */
 const HOSTILE_TELEGRAPH = 0xe03030;
 const FRIENDLY_TELEGRAPH = 0xe8b830;
-
-/** A cast running in the zone, by caster: the target frame shows its target's. */
-interface IRunningCast
-{
-    skillId: string;
-    start: number;
-    durationMs: number;
-}
 
 /** True when the key goes to a text field (the window system's fields are DOM inputs). */
 /**
@@ -45,17 +39,16 @@ interface IRunningCast
 export const SkillsFeature: IGameFeature = {
     id: 'skills',
     images: [...SKILL_IMAGES, ...SKILL_WINDOW_IMAGES],
-    requires: ['roomEngine', 'interaction', 'hud', 'hudPlayer', 'roomSession', 'input'],
+    requires: ['roomEngine', 'interaction', 'hud', 'hudPlayer', 'roomSession', 'input', 'combat'],
     create: ({host, scope}) =>
     {
-        const session = new RpgSkillSession();
+        const model = host.made.combat!.model;
+        const session = new RpgSkillSession(model);
         const on = scope.bind(session.events);
-        const casts = new Map<number, IRunningCast>();
         let room: IRoomSession | null = null;
         let window: SkillsWindow | null = null;
         let castTicker: IScopedTimer | null = null;
-        /** The player's own statuses with their end (Date.now() clock; null: none), and the HUD's second hand. */
-        let ownStatuses: {statusId: string; end: number | null}[] = [];
+        /** The HUD's second hand while one of the player's own statuses has an end. */
         let statusTicker: IScopedTimer | null = null;
         /** The combatants a slow or a stun holds back: marked over their head, slowed steps. */
         const heldBack = new Set<number>();
@@ -67,10 +60,16 @@ export const SkillsFeature: IGameFeature = {
 
         const bits = (): WindowBits => new WindowBits(host.made.localization);
         const skillName = (skillId: string): string => bits().contentName(`${skillId}.name`, skillId);
-        const system = (message: string): void => host.made.hud?.addChatLine({time: chatClock(Date.now() / 1000), channel: 'system', author: '', message});
         const self = (): number => room?.ownUserRoomId ?? -1;
         const targetId = (): number => host.made.interaction?.targetId ?? 0;
-        const icons = (statuses: readonly IRpgStatus[]): string[] => statuses.map(status => statusIcon(status.statusId));
+        const icons = (statuses: readonly IStatusEntry[]): string[] => statuses.map(status => statusIcon(status.statusId));
+        /** A deadline of the model's monotonic clock, as the HUD's slots count it (the wall clock); 0 when over. */
+        const wallClock = (deadline: number): number =>
+        {
+            const left = deadline - platform().now();
+
+            return left > 0 ? Date.now() + left : 0;
+        };
 
         // A slot's tooltip (vortex_hud_slot_tip_xml): name, rank, cost and cooldown, description, key.
         const slotTip = (skillId: string, key: number): ISlotTip =>
@@ -91,14 +90,14 @@ export const SkillsFeature: IGameFeature = {
 
             if(skillId === null) return {icon: null, cooldownEnd: undefined, cost: undefined, tip: undefined};
 
-            return {icon: skillIcon(skillId), cooldownEnd: session.readyAt(skillId), cost: session.definition(skillId)?.cost, tip: slotTip(skillId, i + 1)};
+            return {icon: skillIcon(skillId), cooldownEnd: wallClock(session.readyAt(skillId)), cost: session.definition(skillId)?.cost, tip: slotTip(skillId, i + 1)};
         }));
 
         /** What `objectId` casts right now for a frame's cast line, and whether it is still going. */
         const castOf = (objectId: number): {cast: IHudCast | null; casting: boolean} =>
         {
-            const cast = casts.get(objectId) ?? null;
-            const elapsed = cast ? Math.min(cast.durationMs, Date.now() - cast.start) / 1000 : 0;
+            const cast = model.castOf(objectId);
+            const elapsed = cast ? Math.min(cast.durationMs, platform().now() - cast.startedAt) / 1000 : 0;
 
             return {
                 cast: cast && {icon: skillIcon(cast.skillId), name: skillName(cast.skillId), elapsed, duration: cast.durationMs / 1000},
@@ -206,25 +205,9 @@ export const SkillsFeature: IGameFeature = {
         on('skills', renderBar);
         on('cooldowns', renderBar);
 
-        on('result', result =>
-        {
-            const text = bits();
-
-            log.debug(`skill ${result.skillId} refused: ${result.code}`);
-            system(text.text('vortex.skill.error', 'skill', skillName(result.skillId), 'reason',
-                text.textOr(`vortex.skill.error.${result.code}`, text.text('vortex.skill.error.refused'))));
-        });
-
-        on('castStart', message =>
-        {
-            for(const cast of message.casts as readonly IRpgCastStart[])
-            {
-                casts.set(cast.casterObjectId, {skillId: cast.skillId, start: Date.now(), durationMs: cast.durationMs});
-                host.made.combat?.cast(cast.casterObjectId, {durationMs: cast.durationMs, channel: cast.channel, skillId: cast.skillId});
-            }
-
-            renderTarget();
-        });
+        // A refusal is the model's (its log line, its toast): here only the trace.
+        on('result', result => log.debug(`skill ${result.skillId} refused: ${result.code}`));
+        on('castStart', renderTarget);
 
         // A telegraphed cast (M1c): its cells on the floor until its RpgCastEnd, also in a room's entry burst.
         on('telegraphs', message =>
@@ -239,17 +222,7 @@ export const SkillsFeature: IGameFeature = {
 
         on('castEnd', message =>
         {
-            for(const end of message.ends)
-            {
-                casts.delete(end.casterObjectId);
-                host.made.roomEngine?.clearRpgTelegraph(end.casterObjectId);
-                host.made.combat?.cast(end.casterObjectId, null);
-                // The player's own cast that did not go off says why (a walk cancels it on purpose: no line).
-                if(end.casterObjectId === self() && (end.reason === 'interrupted' || end.reason === 'failed'))
-                {
-                    system(bits().text(`vortex.skill.cast.${end.reason}`, 'skill', skillName(end.skillId)));
-                }
-            }
+            for(const end of message.ends) host.made.roomEngine?.clearRpgTelegraph(end.casterObjectId);
 
             renderTarget();
         });
@@ -257,20 +230,19 @@ export const SkillsFeature: IGameFeature = {
         // The player's effects panel: each icon with its time left, ticking while one has an end.
         const renderOwn = (): void =>
         {
-            const now = Date.now();
-
-            ownStatuses = ownStatuses.filter(status => status.end === null || status.end > now);
+            const now = platform().now();
+            const own = model.statusesOf(self()).filter(status => status.endsAt === null || status.endsAt > now);
             const text = bits();
 
             host.made.hud?.update({
-                buffs: ownStatuses.map(status => statusIcon(status.statusId)),
-                buffTimes: ownStatuses.map(status => status.end === null ? '' : statusTime(status.end - now)),
-                buffExpiring: ownStatuses.map(status => expiring(status.end === null ? null : status.end - now)),
-                buffTips: ownStatuses.map(status => text.contentName(`${status.statusId}.name`, status.statusId)
-                    + (status.end === null ? '' : `\n${text.text('vortex.hud.remaining', 'seconds', String(Math.ceil((status.end - now) / 1000)))}`))
+                buffs: own.map(status => statusIcon(status.statusId)),
+                buffTimes: own.map(status => status.endsAt === null ? '' : statusTime(status.endsAt - now)),
+                buffExpiring: own.map(status => expiring(status.endsAt === null ? null : status.endsAt - now)),
+                buffTips: own.map(status => text.contentName(`${status.statusId}.name`, status.statusId)
+                    + (status.endsAt === null ? '' : `\n${text.text('vortex.hud.remaining', 'seconds', String(Math.ceil((status.endsAt - now) / 1000)))}`))
             });
 
-            const ticking = ownStatuses.some(status => status.end !== null);
+            const ticking = own.some(status => status.endsAt !== null);
 
             if(ticking && statusTicker === null) statusTicker = scope.interval(renderOwn, 1000);
             else if(!ticking && statusTicker !== null)
@@ -282,15 +254,9 @@ export const SkillsFeature: IGameFeature = {
 
         on('statuses', message =>
         {
-            const now = Date.now();
-
             for(const combatant of message.combatants)
             {
-                if(combatant.objectId === self())
-                {
-                    ownStatuses = combatant.statuses.map(status => ({statusId: status.statusId, end: status.remainingMs < 0 ? null : now + status.remainingMs}));
-                    renderOwn();
-                }
+                if(combatant.objectId === self()) renderOwn();
 
                 // A slow or a stun (M1c): its icon over the combatant, and its steps as long as the server's.
                 const held = holdBack(combatant.statuses, id => session.statusDefinition(id));
@@ -327,7 +293,7 @@ export const SkillsFeature: IGameFeature = {
         scope.add(input.bind('skills', 'k', openWindow, {when: inWorld}));
         scope.add(input.onEscape('skills', () =>
         {
-            const casting = casts.has(self());
+            const casting = model.castOf(self()) !== null;
 
             if(!picking && !casting) return false;
 
@@ -353,12 +319,9 @@ export const SkillsFeature: IGameFeature = {
         sessionOn(RoomSessionEvent.RSE_ENDED, () =>
         {
             room = null;
-            casts.clear();
-            session.forget();
             host.made.roomEngine?.clearRpgTelegraph(null);
             for(const objectId of heldBack) host.made.roomEngine?.setRpgStepTime(objectId, null);
             heldBack.clear();
-            ownStatuses = [];
             statusTicker?.clear();
             statusTicker = null;
             window?.hide();

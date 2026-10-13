@@ -21,6 +21,8 @@ export interface ICombatModel
     readonly threat: IThreat | null;
     /** The player's own room object id; 0 before a room. */
     readonly ownObjectId: number;
+    /** The player's own health and mana (RpgSelfVitals): known without his object id, which may come later. */
+    readonly ownVitals: IVitals | null;
     /** The last cooldowns' global deadline. */
     readonly globalReadyAt: number;
     readonly log: readonly ILogEntry[];

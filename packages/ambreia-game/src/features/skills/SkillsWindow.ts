@@ -12,7 +12,8 @@ import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
 import {WindowBits} from '../../ui/kit/WindowBits';
 import {buildFrame} from '../../ui/kit/buildFrame';
 import {SKILL_SLOTS} from '../hud/IHud';
-import {barSkill, type ISkillDefinition, type RpgSkillSession} from './RpgSkillSession';
+import {barSkill, type RpgSkillSession} from './RpgSkillSession';
+import type {ISkillDefinition} from './ISkillDefinition';
 import {skillIcon} from './skillArt';
 
 type SkillsTab = 'tab_active' | 'tab_passive' | 'tab_specs' | 'tab_shortcuts';

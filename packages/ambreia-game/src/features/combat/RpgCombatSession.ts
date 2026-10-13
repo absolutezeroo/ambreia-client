@@ -1,100 +1,72 @@
 import {EventEmitter} from 'eventemitter3';
 import type {IConnection} from '@ambreia/net/connection/IConnection';
 import {MessageMap} from '@ambreia/net/style/MessageMap';
-import {Incoming} from '@ambreia/protocol/Headers.generated';
-import type {RpgCombatEventsMessage} from '@ambreia/protocol/incoming/rpg/combat/RpgCombatEventsMessage';
-import type {RpgVitalsMessage} from '@ambreia/protocol/incoming/rpg/combat/RpgVitalsMessage';
-import type {RpgSelfVitalsMessage} from '@ambreia/protocol/incoming/rpg/combat/RpgSelfVitalsMessage';
-import type {RpgDeathMessage} from '@ambreia/protocol/incoming/rpg/combat/RpgDeathMessage';
-import type {RpgCombatResultMessage} from '@ambreia/protocol/incoming/rpg/combat/RpgCombatResultMessage';
+import {Incoming, Outgoing} from '@ambreia/protocol/Headers.generated';
 import {RpgCombatEventsMessageParser} from '@ambreia/protocol/parser/rpg/combat/RpgCombatEventsMessageParser';
 import {RpgVitalsMessageParser} from '@ambreia/protocol/parser/rpg/combat/RpgVitalsMessageParser';
 import {RpgSelfVitalsMessageParser} from '@ambreia/protocol/parser/rpg/combat/RpgSelfVitalsMessageParser';
 import {RpgDeathMessageParser} from '@ambreia/protocol/parser/rpg/combat/RpgDeathMessageParser';
 import {RpgCombatResultMessageParser} from '@ambreia/protocol/parser/rpg/combat/RpgCombatResultMessageParser';
-import type {RpgMonsterYellMessage} from '@ambreia/protocol/incoming/rpg/combat/RpgMonsterYellMessage';
 import {RpgMonsterYellMessageParser} from '@ambreia/protocol/parser/rpg/combat/RpgMonsterYellMessageParser';
+import {RpgResurrectOfferMessageParser} from '@ambreia/protocol/parser/rpg/combat/RpgResurrectOfferMessageParser';
+import {RpgAutoAttackStateMessageParser} from '@ambreia/protocol/parser/rpg/combat/RpgAutoAttackStateMessageParser';
+import {RpgLevelUpMessageParser} from '@ambreia/protocol/parser/rpg/characters/RpgLevelUpMessageParser';
+import {RpgAutoAttackMessage} from '@ambreia/protocol/outgoing/rpg/combat/RpgAutoAttackMessage';
+import {RpgDeathChoiceMessage, type DeathChoice} from '@ambreia/protocol/outgoing/rpg/combat/RpgDeathChoiceMessage';
+import {RpgAutoAttackMessageSerializer} from '@ambreia/protocol/serializer/rpg/combat/RpgAutoAttackMessageSerializer';
+import {RpgDeathChoiceMessageSerializer} from '@ambreia/protocol/serializer/rpg/combat/RpgDeathChoiceMessageSerializer';
 import type {IRpgSkillImpact, IRpgSkillOutcome} from '@ambreia/protocol/incoming/rpg/skills/RpgSkillEventsMessage';
+import {CombatModel} from './CombatModel';
+import type {ICombatModelWriter} from './ICombatModelWriter';
+import type {IRpgCombatSessionEvents} from './IRpgCombatSessionEvents';
 
-/** A cast running over a combatant: its bar, and the skill whose `cast` visual loops meanwhile. */
-export interface IRpgCast
-{
-    readonly durationMs: number;
-    readonly channel: boolean;
-    readonly skillId: string;
-}
-
-export interface IRpgCombatSessionEvents
-{
-    hits: [RpgCombatEventsMessage];
-    vitals: [RpgVitalsMessage];
-    self: [RpgSelfVitalsMessage];
-    death: [RpgDeathMessage];
-    result: [RpgCombatResultMessage];
-    /** A monster yells (M1c: a boss's phase). */
-    yell: [RpgMonsterYellMessage];
-    /** A combatant's health as last known changed (a blow or a vitals line). */
-    health: [objectId: number, health: number, maxHealth: number];
-    /** Where skills landed (M1b RpgSkillEvents, reported by features/skills): announced before their outcomes. */
-    impacts: [readonly IRpgSkillImpact[]];
-    /** What skills and statuses did (M1b RpgSkillEvents, reported by features/skills). */
-    outcomes: [readonly IRpgSkillOutcome[]];
-    /** A cast began over this combatant (M1b RpgCastStart); null: it ended. */
-    cast: [objectId: number, cast: IRpgCast | null];
-    /** What holds this combatant back (a slow, a stun: its status icon), reported by features/skills; null: nothing. */
-    mark: [objectId: number, icon: string | null];
-}
-
-/** The combat's messages: the client's counterpart of the server's combat map (M1a §9.2). */
-export function rpgCombatMap(announce: <E extends keyof IRpgCombatSessionEvents>(event: E, ...args: IRpgCombatSessionEvents[E]) => void): MessageMap
+/**
+ * The combat's messages (M1a §9.2, M1d §2): each one written into the model, the blows and the
+ * yells also announced for the visuals. RpgLevelUp is served here rather than by the character
+ * session: the level-up panel is this feature's, and the character feature boots before it.
+ */
+export function rpgCombatMap(model: ICombatModelWriter, events: EventEmitter<IRpgCombatSessionEvents>): MessageMap
 {
     return new MessageMap()
-        .incoming(Incoming.RpgCombatEventsMessageComposer, new RpgCombatEventsMessageParser(), {handle: message => announce('hits', message)})
-        .incoming(Incoming.RpgVitalsMessageComposer, new RpgVitalsMessageParser(), {handle: message => announce('vitals', message)})
-        .incoming(Incoming.RpgSelfVitalsMessageComposer, new RpgSelfVitalsMessageParser(), {handle: message => announce('self', message)})
-        .incoming(Incoming.RpgDeathMessageComposer, new RpgDeathMessageParser(), {handle: message => announce('death', message)})
-        .incoming(Incoming.RpgCombatResultMessageComposer, new RpgCombatResultMessageParser(), {handle: message => announce('result', message)})
-        .incoming(Incoming.RpgMonsterYellMessageComposer, new RpgMonsterYellMessageParser(), {handle: message => announce('yell', message)});
+        .incoming(Incoming.RpgCombatEventsMessageComposer, new RpgCombatEventsMessageParser(), {handle: message =>
+        {
+            model.reportHits(message.hits);
+            events.emit('hits', message);
+        }})
+        .incoming(Incoming.RpgVitalsMessageComposer, new RpgVitalsMessageParser(), {handle: message =>
+        {
+            for(const line of message.combatants) model.setVitals(line.objectId, line.health, line.maxHealth);
+        }})
+        .incoming(Incoming.RpgSelfVitalsMessageComposer, new RpgSelfVitalsMessageParser(), {handle: vitals =>
+            model.setSelfVitals(vitals.health, vitals.maxHealth, vitals.mana, vitals.maxMana, vitals.inCombat)})
+        .incoming(Incoming.RpgDeathMessageComposer, new RpgDeathMessageParser(), {handle: death => model.setKo(death.respawnSeconds)})
+        .incoming(Incoming.RpgCombatResultMessageComposer, new RpgCombatResultMessageParser(), {handle: result => model.refused(result.code)})
+        .incoming(Incoming.RpgMonsterYellMessageComposer, new RpgMonsterYellMessageParser(), {handle: yell => events.emit('yell', yell)})
+        .incoming(Incoming.RpgResurrectOfferMessageComposer, new RpgResurrectOfferMessageParser(), {handle: offer =>
+            model.setOffer(offer.casterObjectId, offer.healthPercent, offer.expiresMs)})
+        .incoming(Incoming.RpgAutoAttackStateMessageComposer, new RpgAutoAttackStateMessageParser(), {handle: state => model.setAutoAttacking(state.active)})
+        .incoming(Incoming.RpgLevelUpMessageComposer, new RpgLevelUpMessageParser(), {handle: up => model.levelUp(up)})
+        .outgoing(RpgAutoAttackMessage, Outgoing.RpgAutoAttackMessageEvent, new RpgAutoAttackMessageSerializer())
+        .outgoing(RpgDeathChoiceMessage, Outgoing.RpgDeathChoiceMessageEvent, new RpgDeathChoiceMessageSerializer());
 }
 
 /**
- * The zone's fight as the client sees it (M1a): announces each message, and keeps every
- * combatant's last known health (by room object id) for the target frame and the bars. The skills
- * (M1b) report what they did through it, so the bars and numbers have one owner.
+ * The zone's fight on the wire (M1a, M1d): the model it writes (`model`, one per client), the two
+ * acts it sends (auto-attack, the KO player's choice), and the visuals' events.
  */
 export class RpgCombatSession
 {
     readonly events = new EventEmitter<IRpgCombatSessionEvents>();
-    private readonly _health = new Map<number, {health: number; maxHealth: number}>();
+    readonly model = new CombatModel();
     private _connection: IConnection | null = null;
     private _uninstall: (() => void) | null = null;
-    private readonly _map: MessageMap = rpgCombatMap((event, ...args) =>
-    {
-        // Typed at the map's side; eventemitter3 cannot tie a generic event to its payload here.
-        (this.events as unknown as EventEmitter).emit(event, ...args);
+    private readonly _map: MessageMap = rpgCombatMap(this.model, this.events);
 
-        if(event === 'hits') for(const hit of (args[0] as RpgCombatEventsMessage).hits) this.setHealth(hit.targetId, hit.health, hit.maxHealth);
-        else if(event === 'vitals') for(const line of (args[0] as RpgVitalsMessage).combatants) this.setHealth(line.objectId, line.health, line.maxHealth);
-    });
-
-    /** The last health known for this room object, or null. */
-    healthOf(objectId: number): {health: number; maxHealth: number} | null
-    {
-        return this._health.get(objectId) ?? null;
-    }
-
-    /** Skills and statuses hurt and healed too (M1b): their outcomes count as blows here, after where they landed. */
+    /** Skills and statuses hurt and healed too (M1b): their visuals, after where they landed. */
     report(outcomes: readonly IRpgSkillOutcome[], impacts: readonly IRpgSkillImpact[] = []): void
     {
         if(impacts.length > 0) this.events.emit('impacts', impacts);
         this.events.emit('outcomes', outcomes);
-        for(const outcome of outcomes) this.setHealth(outcome.targetObjectId, outcome.health, outcome.maxHealth);
-    }
-
-    /** A cast began (durationMs) or ended (null) over this combatant: the overlay shows its bar. */
-    cast(objectId: number, cast: IRpgCast | null): void
-    {
-        this.events.emit('cast', objectId, cast);
     }
 
     /** A slow or a stun holds this combatant back (its icon), or no longer (null): the overlay marks it. */
@@ -103,10 +75,19 @@ export class RpgCombatSession
         this.events.emit('mark', objectId, icon);
     }
 
-    /** The room was left: its combatants with it. */
-    forget(): void
+    /** Starts or stops the auto-attack; the model follows the server's answer, never this call. */
+    setAutoAttack(active: boolean): void
     {
-        this._health.clear();
+        this.send(new RpgAutoAttackMessage(active));
+    }
+
+    /** The KO player's choice; `wait` and `decline` change nothing the server must confirm. */
+    deathChoice(choice: DeathChoice): void
+    {
+        this.send(new RpgDeathChoiceMessage(choice));
+
+        if(choice === 'wait') this.model.setWaiting();
+        else if(choice === 'decline') this.model.declineOffer();
     }
 
     install(connection: IConnection): void
@@ -118,10 +99,9 @@ export class RpgCombatSession
         this._connection = connection;
     }
 
-    private setHealth(objectId: number, health: number, maxHealth: number): void
+    private send(message: object): void
     {
-        this._health.set(objectId, {health, maxHealth});
-        this.events.emit('health', objectId, health, maxHealth);
+        if(this._connection !== null) this._map.send(this._connection, message);
     }
 
     dispose(): void
@@ -129,7 +109,7 @@ export class RpgCombatSession
         this._uninstall?.();
         this._uninstall = null;
         this._connection = null;
-        this._health.clear();
+        this.model.dispose();
         this.events.removeAllListeners();
     }
 }

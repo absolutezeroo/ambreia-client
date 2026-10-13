@@ -1,7 +1,8 @@
 // M1c: what a slow or a stun does to a combatant on the client, and the effects panel's times.
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {holdBack, statusTime, type IStatusDefinition} from '../src/features/skills/RpgSkillSession';
+import {holdBack, statusTime} from '../src/features/skills/RpgSkillSession';
+import type {IStatusDefinition} from '../src/features/skills/IStatusDefinition';
 
 const DEFS: Record<string, IStatusDefinition> = {
     'status.frozen': {id: 'status.frozen', type: 'slow', durationMs: 5000, slowPercent: 60},

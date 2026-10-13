@@ -12,6 +12,8 @@ export interface ICombatModelEvents
 {
     vitals: [objectId: number, vitals: IVitals];
     self: [ISelf];
+    /** The player's own health and mana changed. */
+    ownVitals: [IVitals];
     target: [ITargetInfo | null];
     /** Who aims at whom changed (the target of target among others). */
     targets: [];

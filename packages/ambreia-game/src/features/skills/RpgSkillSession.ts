@@ -3,21 +3,13 @@ import type {IConnection} from '@ambreia/net/connection/IConnection';
 import {MessageMap} from '@ambreia/net/style/MessageMap';
 import {Incoming, Outgoing} from '@ambreia/protocol/Headers.generated';
 import type {RpgSkillsMessage} from '@ambreia/protocol/incoming/rpg/skills/RpgSkillsMessage';
-import type {RpgSkillResultMessage} from '@ambreia/protocol/incoming/rpg/skills/RpgSkillResultMessage';
-import type {RpgCastStartMessage} from '@ambreia/protocol/incoming/rpg/skills/RpgCastStartMessage';
-import type {RpgCastEndMessage} from '@ambreia/protocol/incoming/rpg/skills/RpgCastEndMessage';
-import type {RpgCooldownsMessage} from '@ambreia/protocol/incoming/rpg/skills/RpgCooldownsMessage';
-import type {IRpgStatus, RpgStatusesMessage} from '@ambreia/protocol/incoming/rpg/skills/RpgStatusesMessage';
-import type {RpgSkillEventsMessage} from '@ambreia/protocol/incoming/rpg/skills/RpgSkillEventsMessage';
 import {RpgSkillsMessageParser} from '@ambreia/protocol/parser/rpg/skills/RpgSkillsMessageParser';
 import {RpgSkillResultMessageParser} from '@ambreia/protocol/parser/rpg/skills/RpgSkillResultMessageParser';
-import type {IStatusVfx, IVfxSet} from '../combat/IVfx';
 import {RpgCastStartMessageParser} from '@ambreia/protocol/parser/rpg/skills/RpgCastStartMessageParser';
 import {RpgCastEndMessageParser} from '@ambreia/protocol/parser/rpg/skills/RpgCastEndMessageParser';
 import {RpgCooldownsMessageParser} from '@ambreia/protocol/parser/rpg/skills/RpgCooldownsMessageParser';
 import {RpgStatusesMessageParser} from '@ambreia/protocol/parser/rpg/skills/RpgStatusesMessageParser';
 import {RpgSkillEventsMessageParser} from '@ambreia/protocol/parser/rpg/skills/RpgSkillEventsMessageParser';
-import type {RpgTelegraphsMessage} from '@ambreia/protocol/incoming/rpg/skills/RpgTelegraphsMessage';
 import {RpgTelegraphsMessageParser} from '@ambreia/protocol/parser/rpg/skills/RpgTelegraphsMessageParser';
 import {RpgSkillCastMessage} from '@ambreia/protocol/outgoing/rpg/skills/RpgSkillCastMessage';
 import {RpgActionBarSetMessage} from '@ambreia/protocol/outgoing/rpg/skills/RpgActionBarSetMessage';
@@ -25,101 +17,56 @@ import {RpgCastCancelMessage} from '@ambreia/protocol/outgoing/rpg/skills/RpgCas
 import {RpgSkillCastMessageSerializer} from '@ambreia/protocol/serializer/rpg/skills/RpgSkillCastMessageSerializer';
 import {RpgActionBarSetMessageSerializer} from '@ambreia/protocol/serializer/rpg/skills/RpgActionBarSetMessageSerializer';
 import {RpgCastCancelMessageSerializer} from '@ambreia/protocol/serializer/rpg/skills/RpgCastCancelMessageSerializer';
+import type {ICombatModelWriter} from '../combat/ICombatModelWriter';
+import type {IStatusEntry} from '../combat/IStatusEntry';
+import type {IClassDefinition} from './IClassDefinition';
+import type {IRpgSkillSessionEvents} from './IRpgSkillSessionEvents';
+import type {ISkillDefinition} from './ISkillDefinition';
+import type {IStatusDefinition} from './IStatusDefinition';
 
-export interface IRpgSkillSessionEvents
-{
-    skills: [RpgSkillsMessage];
-    result: [RpgSkillResultMessage];
-    castStart: [RpgCastStartMessage];
-    castEnd: [RpgCastEndMessage];
-    cooldowns: [RpgCooldownsMessage];
-    statuses: [RpgStatusesMessage];
-    events: [RpgSkillEventsMessage];
-    /** Telegraphed casts began (M1c): the cells they will hit. */
-    telegraphs: [RpgTelegraphsMessage];
-}
-
-/** The skills' messages: the client's counterpart of the server's skills map (M1b §10). */
-export function rpgSkillMap(announce: <E extends keyof IRpgSkillSessionEvents>(event: E, ...args: IRpgSkillSessionEvents[E]) => void): MessageMap
+/**
+ * The skills' messages: the client's counterpart of the server's skills map (M1b §10). The state
+ * they carry goes to the combat model first (statuses, casts, cooldowns, outcomes, refusals), then
+ * each is announced for the views and visuals.
+ */
+export function rpgSkillMap(model: ICombatModelWriter, announce: <E extends keyof IRpgSkillSessionEvents>(event: E, ...args: IRpgSkillSessionEvents[E]) => void): MessageMap
 {
     return new MessageMap()
         .incoming(Incoming.RpgSkillsMessageComposer, new RpgSkillsMessageParser(), {handle: message => announce('skills', message)})
-        .incoming(Incoming.RpgSkillResultMessageComposer, new RpgSkillResultMessageParser(), {handle: message => announce('result', message)})
-        .incoming(Incoming.RpgCastStartMessageComposer, new RpgCastStartMessageParser(), {handle: message => announce('castStart', message)})
-        .incoming(Incoming.RpgCastEndMessageComposer, new RpgCastEndMessageParser(), {handle: message => announce('castEnd', message)})
-        .incoming(Incoming.RpgCooldownsMessageComposer, new RpgCooldownsMessageParser(), {handle: message => announce('cooldowns', message)})
-        .incoming(Incoming.RpgStatusesMessageComposer, new RpgStatusesMessageParser(), {handle: message => announce('statuses', message)})
-        .incoming(Incoming.RpgSkillEventsMessageComposer, new RpgSkillEventsMessageParser(), {handle: message => announce('events', message)})
+        .incoming(Incoming.RpgSkillResultMessageComposer, new RpgSkillResultMessageParser(), {handle: message =>
+        {
+            model.refused(message.code, message.skillId);
+            announce('result', message);
+        }})
+        .incoming(Incoming.RpgCastStartMessageComposer, new RpgCastStartMessageParser(), {handle: message =>
+        {
+            for(const cast of message.casts) model.setCast(cast.casterObjectId, {skillId: cast.skillId, durationMs: cast.durationMs, channel: cast.channel, targetObjectId: cast.targetObjectId});
+            announce('castStart', message);
+        }})
+        .incoming(Incoming.RpgCastEndMessageComposer, new RpgCastEndMessageParser(), {handle: message =>
+        {
+            for(const end of message.ends) model.endCast(end.casterObjectId, end.reason, end.skillId);
+            announce('castEnd', message);
+        }})
+        .incoming(Incoming.RpgCooldownsMessageComposer, new RpgCooldownsMessageParser(), {handle: message =>
+        {
+            model.setCooldowns(message.globalRemainingMs, message.skills);
+            announce('cooldowns');
+        }})
+        .incoming(Incoming.RpgStatusesMessageComposer, new RpgStatusesMessageParser(), {handle: message =>
+        {
+            for(const combatant of message.combatants) model.setStatuses(combatant.objectId, combatant.statuses);
+            announce('statuses', message);
+        }})
+        .incoming(Incoming.RpgSkillEventsMessageComposer, new RpgSkillEventsMessageParser(), {handle: message =>
+        {
+            model.reportOutcomes(message.outcomes);
+            announce('events', message);
+        }})
         .incoming(Incoming.RpgTelegraphsMessageComposer, new RpgTelegraphsMessageParser(), {handle: message => announce('telegraphs', message)})
         .outgoing(RpgSkillCastMessage, Outgoing.RpgSkillCastMessageEvent, new RpgSkillCastMessageSerializer())
         .outgoing(RpgActionBarSetMessage, Outgoing.RpgActionBarSetMessageEvent, new RpgActionBarSetMessageSerializer())
         .outgoing(RpgCastCancelMessage, Outgoing.RpgCastCancelMessageEvent, new RpgCastCancelMessageSerializer());
-}
-
-/** What the client reads of a skill's definition (GET /api/public/content/definitions/skill, M1b §5.1). */
-/** One effect of a skill (M1b §5.2): `damage`, `heal`, `apply_status`, `interrupt`, `dispel`, `threat`. */
-export interface ISkillEffect
-{
-    readonly kind: string;
-    readonly base: number;
-    readonly coefficient: number;
-    readonly status: string | null;
-}
-
-export interface ISkillDefinition
-{
-    readonly id: string;
-    /** Empty for a monster's skill (M1c): no class learns it. */
-    readonly classes: readonly string[];
-    /** Learned on reaching this level. */
-    readonly level: number;
-    readonly effects: readonly ISkillEffect[];
-    /** `self`, `ally`, `enemy`, `ground`, `around_caster`, `around_target`. */
-    readonly target: string;
-    readonly globalCooldown: boolean;
-    /** `instant`, `cast` or `channel`. */
-    readonly type: string;
-    readonly cost: number;
-    readonly castMs: number;
-    readonly channelMs: number;
-    /** Tiles; 0 for a skill on oneself or around oneself. */
-    readonly range: number;
-    readonly cooldownMs: number;
-    /** The area a monster's skill warns of before it lands (M1c); null for the others. */
-    readonly telegraph?: ISkillTelegraph | null;
-    /** What the client draws for it, by moment; null for nothing. */
-    readonly vfx: IVfxSet | null;
-}
-
-/** What the client reads of a class's definition (GET /api/public/content/definitions/class). */
-export interface IClassDefinition
-{
-    readonly id: string;
-    /** What the client draws for its basic attack; null for nothing. */
-    readonly basicAttack: IVfxSet | null;
-}
-
-/** A telegraphed skill's area (M1c): the server sends the cells, this only describes them. */
-export interface ISkillTelegraph
-{
-    /** `circle`, `line` or `cone`. */
-    readonly shape: string;
-    readonly size: number;
-    readonly width: number;
-    readonly angle: number;
-}
-
-/** What the client reads of a status's definition (GET /api/public/content/definitions/status, M1b §5.3). */
-export interface IStatusDefinition
-{
-    readonly id: string;
-    /** `buff`, `debuff`, `dot`, `hot`, `stun`, `slow`, `shield`. */
-    readonly type: string;
-    readonly durationMs: number;
-    /** A slow's grip on the walk and the attacks, 1–90 (M1c); absent for the others. */
-    readonly slowPercent?: number;
-    /** What the client draws while it lasts; null for nothing. */
-    readonly vfx: IStatusVfx | null;
 }
 
 /** Habbo's step, and so the server's walk tick when nothing slows it (AvatarTickMs). */
@@ -130,7 +77,7 @@ export const STEP_MS = 500;
  * long a step takes — the strongest slow, slows do not add up (500 × 100 / (100 − %)); null when
  * nothing slows it. A status whose definition is not loaded counts for nothing.
  */
-export function holdBack(statuses: readonly IRpgStatus[], definition: (statusId: string) => IStatusDefinition | null): {statusId: string | null; stepMs: number | null}
+export function holdBack(statuses: readonly {statusId: string}[], definition: (statusId: string) => IStatusDefinition | null): {statusId: string | null; stepMs: number | null}
 {
     let slow = 0;
     let slowId: string | null = null;
@@ -168,29 +115,36 @@ export function barSkill(action: string): string | null
 }
 
 /**
- * The player's skills as the server last said (M1b §9, §10): the known ones, the bar, the
- * cooldowns' ends (Date.now() clock) and the statuses on each combatant of the zone. The client
- * asks (cast(), setBar(), cancel()); the server decides and answers.
+ * The player's skills as the server last said (M1b §9, §10): the known ones, the bar and the
+ * content's definitions. The cooldowns and the statuses are the combat model's; this reads them
+ * there. The client asks (cast(), setBar(), cancel()); the server decides and answers.
  */
 export class RpgSkillSession
 {
     readonly events = new EventEmitter<IRpgSkillSessionEvents>();
     private _known: readonly string[] = [];
     private _bar: readonly string[] = [];
-    private _globalEnd = 0;
-    private readonly _cooldownEnds = new Map<string, number>();
-    private readonly _statuses = new Map<number, readonly IRpgStatus[]>();
     private readonly _definitions = new Map<string, ISkillDefinition>();
     private readonly _statusDefinitions = new Map<string, IStatusDefinition>();
     private readonly _classDefinitions = new Map<string, IClassDefinition>();
     private _connection: IConnection | null = null;
     private _uninstall: (() => void) | null = null;
-    private readonly _map: MessageMap = rpgSkillMap((event, ...args) =>
+    private readonly _map: MessageMap;
+
+    constructor(private readonly _model: ICombatModelWriter)
     {
-        this.remember(event, args[0]);
-        // Typed at the map's side; eventemitter3 cannot tie a generic event to its payload here.
-        (this.events as unknown as EventEmitter).emit(event, ...args);
-    });
+        this._map = rpgSkillMap(_model, (event, ...args) =>
+        {
+            if(event === 'skills')
+            {
+                this._known = (args[0] as RpgSkillsMessage).known;
+                this._bar = (args[0] as RpgSkillsMessage).bar;
+            }
+
+            // Typed at the map's side; eventemitter3 cannot tie a generic event to its payload here.
+            (this.events as unknown as EventEmitter).emit(event, ...args);
+        });
+    }
 
     get known(): readonly string[]
     {
@@ -203,12 +157,12 @@ export class RpgSkillSession
         return this._bar;
     }
 
-    /** When this skill can be cast again: its own cooldown or, unless it is free of it, the global one. */
+    /** When this skill can be cast again (monotonic clock): its own cooldown or, unless it is free of it, the global one. */
     readyAt(skillId: string): number
     {
-        const global = this._definitions.get(skillId)?.globalCooldown === false ? 0 : this._globalEnd;
+        const global = this._definitions.get(skillId)?.globalCooldown === false ? 0 : this._model.globalReadyAt;
 
-        return Math.max(global, this._cooldownEnds.get(skillId) ?? 0);
+        return Math.max(global, this._model.readyAt(skillId));
     }
 
     definition(skillId: string): ISkillDefinition | null
@@ -239,9 +193,9 @@ export class RpgSkillSession
         for(const definition of classes) this._classDefinitions.set(definition.id, definition);
     }
 
-    statusesOf(objectId: number): readonly IRpgStatus[]
+    statusesOf(objectId: number): readonly IStatusEntry[]
     {
-        return this._statuses.get(objectId) ?? [];
+        return this._model.statusesOf(objectId);
     }
 
     install(connection: IConnection): void
@@ -270,44 +224,9 @@ export class RpgSkillSession
         this.send(new RpgCastCancelMessage());
     }
 
-    /** The zone was left: its combatants' statuses with it (the player's own come back with the next zone's burst). */
-    forget(): void
-    {
-        this._statuses.clear();
-    }
-
     private send(message: object): void
     {
         if(this._connection !== null) this._map.send(this._connection, message);
-    }
-
-    private remember(event: keyof IRpgSkillSessionEvents, message: unknown): void
-    {
-        if(event === 'skills')
-        {
-            const skills = message as RpgSkillsMessage;
-
-            this._known = skills.known;
-            this._bar = skills.bar;
-        }
-        else if(event === 'cooldowns')
-        {
-            const cooldowns = message as RpgCooldownsMessage;
-            const now = Date.now();
-
-            this._globalEnd = now + cooldowns.globalRemainingMs;
-            // The list is every running cooldown: one missing has ended.
-            this._cooldownEnds.clear();
-            for(const skill of cooldowns.skills) this._cooldownEnds.set(skill.skillId, now + skill.remainingMs);
-        }
-        else if(event === 'statuses')
-        {
-            for(const combatant of (message as RpgStatusesMessage).combatants)
-            {
-                if(combatant.statuses.length === 0) this._statuses.delete(combatant.objectId);
-                else this._statuses.set(combatant.objectId, combatant.statuses);
-            }
-        }
     }
 
     dispose(): void
@@ -315,7 +234,6 @@ export class RpgSkillSession
         this._uninstall?.();
         this._uninstall = null;
         this._connection = null;
-        this._statuses.clear();
         this.events.removeAllListeners();
     }
 }

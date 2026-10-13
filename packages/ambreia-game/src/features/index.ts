@@ -271,8 +271,8 @@ export const GAME_FEATURES: readonly IGameFeature[] = [
     CharacterFeature,
     HudFeature,
     InventoryFeature,
+    CombatFeature,
     InteractionFeature,
     ChatFeature,
-    CombatFeature,
     SkillsFeature
 ];
