@@ -30,7 +30,7 @@ export class KoPanel implements IKoView
 
         window.visible = true;
         bits.setVisible(window, false, 'leave_button');
-        bits.avatar(window, 'head_image', player.figure, 2, true);
+        bits.avatar(window, 'head_image', player.figure, 2, true, true);
         bits.setText(window, 'level_txt', player.level === null ? '' : `${bits.text('vortex.ui.level')} ${player.level}`);
         bits.setText(window, 'class_txt', player.className);
         bits.setText(window, 'respawn_timer', timerMs === null ? '' : bits.text('vortex.death.timer', 'time', formatDuration(timerMs)));

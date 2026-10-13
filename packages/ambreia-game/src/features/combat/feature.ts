@@ -117,7 +117,7 @@ export const CombatFeature: IGameFeature = {
             if(name === null) return null;
 
             // The player's own level is known.
-            return {name, level: objectId === room?.ownUserRoomId ? host.made.hudPlayer?.value.level ?? null : null};
+            return {name, level: objectId === room?.ownUserRoomId ? host.made.hudPlayer?.value.level ?? null : null, monster: isMonster(objectId)};
         }));
 
         // The auto-attack (M1d §2.3): the attack slot, the T key, a double click on a monster.

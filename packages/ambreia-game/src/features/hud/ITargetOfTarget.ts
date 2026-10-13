@@ -9,4 +9,6 @@ export interface ITargetOfTarget
     readonly hpMax: number | null;
     /** It is the player: the target's aggro is on him. */
     readonly onPlayer: boolean;
+    /** A monster gets the frame's monster portrait; a player, a person's. */
+    readonly monster: boolean;
 }

@@ -8,6 +8,7 @@ import type {WindowBits} from '../../../ui/kit/WindowBits';
 import type {IHabboWindowManager} from '../../../window/IHabboWindowManager';
 import type {ILogEntry} from '../ILogEntry';
 import {LOG_FILTERS, logFilterOf, logLine} from './combatLogLines';
+import {FrozenLines} from './FrozenLines';
 import type {ILogFilter} from './ILogFilter';
 import type {ILogNames} from './ILogNames';
 
@@ -30,8 +31,12 @@ export class CombatLogPanel
     private readonly _chips = new Map<IWindow, ILogFilter>();
     private _chipColor = 0;
     private _entries: readonly ILogEntry[] = [];
+    private readonly _lines: FrozenLines;
 
-    constructor(private readonly _windows: () => IHabboWindowManager | null, private readonly _bits: WindowBits, private readonly _names: ILogNames, private readonly _clock: (at: number) => string) {}
+    constructor(private readonly _windows: () => IHabboWindowManager | null, private readonly _bits: WindowBits, names: ILogNames, private readonly _clock: (at: number) => string)
+    {
+        this._lines = new FrozenLines(entry => logLine(entry, (key, ...params) => this._bits.text(key, ...params), names));
+    }
 
     get visible(): boolean
     {
@@ -61,6 +66,8 @@ export class CombatLogPanel
     add(entry: ILogEntry, entries: readonly ILogEntry[]): void
     {
         this._entries = entries;
+        // Written now, while its names are still in the room.
+        this._lines.of(entry);
 
         if(!this.visible || !this.passes(entry)) return;
 
@@ -70,6 +77,7 @@ export class CombatLogPanel
 
         this.append(list, entry);
         while(list.numListItems > MAX_LINES) list.removeListItemAt(0)?.destroy();
+        list.scrollV = 1;
     }
 
     /** The zone was left: its lines with it. */
@@ -118,6 +126,8 @@ export class CombatLogPanel
 
         list.destroyListItems();
         for(const entry of this._entries) if(this.passes(entry)) this.append(list, entry);
+        // The newest line at the bottom, in view.
+        list.scrollV = 1;
     }
 
     private append(list: IItemListWindow, entry: ILogEntry): void
@@ -126,7 +136,7 @@ export class CombatLogPanel
 
         if(!row) return;
 
-        const line = logLine(entry, (key, ...params) => this._bits.text(key, ...params), this._names);
+        const line = this._lines.of(entry);
         const icon = row.findChildByName('line_icon') as IStaticBitmapWrapperWindow | null;
 
         this._bits.setText(row, 'time_txt', this._clock(entry.at));

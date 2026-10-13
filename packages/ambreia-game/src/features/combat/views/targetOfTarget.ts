@@ -1,8 +1,8 @@
 import type {ITargetOfTarget} from '../../hud/ITargetOfTarget';
 import type {ICombatModel} from '../ICombatModel';
 
-/** A room object's name and level, as the room knows it; null for one not named yet. */
-export type WhoIs = (objectId: number) => {name: string; level: number | null} | null;
+/** A room object's name and level, as the room knows it, and whether it is a monster; null for one not named yet. */
+export type WhoIs = (objectId: number) => {name: string; level: number | null; monster: boolean} | null;
 
 /**
  * Whom the player's target aims at (M1d §4), from the model: null without a target, when it aims
@@ -18,5 +18,5 @@ export function targetOfTarget(model: ICombatModel, who: WhoIs): ITargetOfTarget
 
     const vitals = model.vitalsOf(aimed);
 
-    return {objectId: aimed, name: known.name, level: known.level, hp: vitals?.health ?? null, hpMax: vitals?.maxHealth ?? null, onPlayer: aimed === model.ownObjectId};
+    return {objectId: aimed, name: known.name, level: known.level, hp: vitals?.health ?? null, hpMax: vitals?.maxHealth ?? null, onPlayer: aimed === model.ownObjectId, monster: known.monster};
 }

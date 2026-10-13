@@ -31,7 +31,7 @@ export class ResurrectOfferPanel implements IOfferView
         const bits = this._bits;
 
         window.visible = true;
-        bits.avatar(window, 'head_image', caster.figure, 2, true);
+        bits.avatar(window, 'head_image', caster.figure, 2, true, true);
         bits.setText(window, 'caster_name', caster.name);
         bits.setText(window, 'caster_level', caster.level === null ? '' : `${bits.text('vortex.ui.level')} ${caster.level}`);
         bits.setText(window, 'message', bits.text('vortex.resurrect.message', 'name', caster.name));

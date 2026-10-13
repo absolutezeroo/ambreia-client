@@ -27,6 +27,11 @@ type Panel = 'location' | 'quests' | 'party' | 'buffs' | 'target' | 'targetOfTar
 
 /** The target-of-target line when the target aims at the player (vortex_hud_target_compact_xml's mock-up). */
 const AGGRO_COLOR = 0xff6a6a;
+/** The compact target-of-target frame has no head widget: a portrait icon per kind of unit. */
+const TOT_MONSTER_PORTRAIT = 'rpg/ui-icons/rpg_creature_archetypes_giant_ogre_troll_cyclops_monster_icon';
+const TOT_PLAYER_PORTRAIT = 'rpg/ui-icons/rpg_character_humanoid_icon';
+/** Read by name, decoded at load (IGameFeature.images). */
+export const TOT_IMAGES: readonly string[] = [TOT_MONSTER_PORTRAIT, TOT_PLAYER_PORTRAIT];
 
 const LAYOUTS: Readonly<Record<Panel, string>> = {
     location: 'vortex_hud_location_xml',
@@ -315,6 +320,7 @@ export class HudPanelsView
         const percent = unit.hp !== null && unit.hpMax ? `${Math.round(100 * unit.hp / unit.hpMax)} %` : '';
 
         this._bits.setText(window, 'target_title', this._bits.text('vortex.combat.target_of_target'));
+        this.setIcon(window, 'target_portrait', unit.monster ? TOT_MONSTER_PORTRAIT : TOT_PLAYER_PORTRAIT);
         this._bits.setText(window, 'target_info', unit.onPlayer ? this._bits.text('vortex.combat.aggro') : `${unit.name}${level}`);
         this._bits.setTextColor(window, 'target_info', unit.onPlayer ? AGGRO_COLOR : 0xffffff);
         this._bits.setVisible(window, unit.hp !== null, 'target_hp_bar');

@@ -62,13 +62,15 @@ export class WindowBits
         if(window && window.textColor !== color) window.textColor = color;
     }
 
-    avatar(container: IWindowContainer, name: string, figure: string, direction = 2, onlyHead = false): void
+    avatar(container: IWindowContainer, name: string, figure: string, direction = 2, onlyHead = false, cropped = false): void
     {
         const widget = ((container.findChildByName(name) as IWidgetWindow | null)?.widget ?? null) as IAvatarImageWidget | null;
 
         if(!widget) return;
 
         widget.onlyHead = onlyHead;
+        // A layout may already ask for it (avatar_image:cropped): only ever turned on here.
+        if(cropped) widget.cropped = true;
         widget.direction = direction;
         if(widget.figure !== figure) widget.figure = figure;
     }
