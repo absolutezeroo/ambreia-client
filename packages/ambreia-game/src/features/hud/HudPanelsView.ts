@@ -13,6 +13,7 @@ import type {IHudCast, IHudPanels, IHudUnit, IPartyMember, HudPanelsState} from 
 import {ChatPanel, type IMenuItem} from './ChatPanel';
 import {HudTooltips, type ITooltip} from '../../ui/kit/HudTooltips';
 import {lowHp} from '../../ui/kit/hudRules';
+import type {ITargetOfTarget} from './ITargetOfTarget';
 
 const log = Logger.getLogger('habbo.features.hud.HudPanelsView');
 
@@ -22,7 +23,10 @@ const GAP = 8;
 /** The window context layer of the whole HUD (HudView's too). */
 export const LAYER = 1;
 
-type Panel = 'location' | 'quests' | 'party' | 'buffs' | 'target' | 'boss' | 'alert' | 'chat';
+type Panel = 'location' | 'quests' | 'party' | 'buffs' | 'target' | 'targetOfTarget' | 'boss' | 'alert' | 'chat';
+
+/** The target-of-target line when the target aims at the player (vortex_hud_target_compact_xml's mock-up). */
+const AGGRO_COLOR = 0xff6a6a;
 
 const LAYOUTS: Readonly<Record<Panel, string>> = {
     location: 'vortex_hud_location_xml',
@@ -30,6 +34,7 @@ const LAYOUTS: Readonly<Record<Panel, string>> = {
     party: 'vortex_hud_party_xml',
     buffs: 'vortex_hud_buffs_xml',
     target: 'vortex_hud_target_xml',
+    targetOfTarget: 'vortex_hud_target_compact_xml',
     boss: 'vortex_hud_boss_xml',
     alert: 'vortex_hud_alert_xml',
     chat: 'vortex_hud_chat_xml'
@@ -213,7 +218,9 @@ export class HudPanelsView
         const boss = at('boss', Math.max((w - width('boss')) / 2, buffs.visible ? buffs.x + buffs.width + GAP : 0), top);
 
         at('alert', boss.x + (boss.width - width('alert')) / 2, below(boss, top));
-        at('target', w - width('target') - MARGIN, bottom - height('target'));
+        const target = at('target', w - width('target') - MARGIN, bottom - height('target'));
+
+        at('targetOfTarget', target.x - width('targetOfTarget') - GAP, bottom - height('targetOfTarget'));
         at('chat', MARGIN, bottom - height('chat'));
 
         this._onPlaced();
@@ -238,6 +245,7 @@ export class HudPanelsView
         if(show('boss', value.boss !== null)) this.renderUnit(panel('boss'), 'boss', value.boss!);
         if(show('alert', value.alert !== null)) this._bits.setText(panel('alert'), 'alert_txt', value.alert!);
         if(show('target', value.target !== null)) this.renderUnit(panel('target'), 'target', value.target!);
+        if(show('targetOfTarget', value.target !== null && value.targetOfTarget !== null)) this.renderTargetOfTarget(panel('targetOfTarget'), value.targetOfTarget!);
 
         show('chat', true);
         this._chat.render(panel('chat'), value);
@@ -295,6 +303,22 @@ export class HudPanelsView
 
         // The selection is a mark on the frames, not a rebuild.
         for(const [frame, member] of this._members) this._bits.setVisible(frame as IWindowContainer, member.name === value.partySelected, 'selected');
+    }
+
+    /**
+     * The target's target (M1d §4): its name and level, its health; when it is the player, the line
+     * says the aggro is on him, in red (the owner's mock-up of the compact frame).
+     */
+    private renderTargetOfTarget(window: IWindowContainer, unit: ITargetOfTarget): void
+    {
+        const level = unit.level === null ? '' : ` · ${this._bits.text('vortex.ui.level.short', 'level', String(unit.level))}`;
+        const percent = unit.hp !== null && unit.hpMax ? `${Math.round(100 * unit.hp / unit.hpMax)} %` : '';
+
+        this._bits.setText(window, 'target_title', this._bits.text('vortex.combat.target_of_target'));
+        this._bits.setText(window, 'target_info', unit.onPlayer ? this._bits.text('vortex.combat.aggro') : `${unit.name}${level}`);
+        this._bits.setTextColor(window, 'target_info', unit.onPlayer ? AGGRO_COLOR : 0xffffff);
+        this._bits.setVisible(window, unit.hp !== null, 'target_hp_bar');
+        this.setBar(window, 'target_hp_bar', unit.hp, unit.hpMax, percent);
     }
 
     /** The boss or the target: portrait, name, level line, HP with its percentage, effects, cast. */

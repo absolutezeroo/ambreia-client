@@ -23,7 +23,7 @@ export class HudPanelsState
     readonly events = new EventEmitter<{changed: [Readonly<IHudPanels>]; nav: [string]; say: [string]; emote: [string]}>();
     private _value: IHudPanels = {
         gold: null, gems: null, tokens: null, questAlert: false, zoneName: '', zonePlayers: null,
-        quests: [], party: [], buffs: [], partySelected: null, navOpen: null, target: null, boss: null, alert: null, chat: [], chatTabs: [ALL_TAB], chatTab: ALL_TAB.id, sayChannel: 'world', chatSettings: DEFAULT_CHAT_SETTINGS
+        quests: [], party: [], buffs: [], partySelected: null, navOpen: null, target: null, targetOfTarget: null, boss: null, alert: null, chat: [], chatTabs: [ALL_TAB], chatTab: ALL_TAB.id, sayChannel: 'world', chatSettings: DEFAULT_CHAT_SETTINGS
     };
 
     get value(): Readonly<IHudPanels>

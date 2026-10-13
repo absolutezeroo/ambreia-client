@@ -1,6 +1,7 @@
 // What the HUD shows, as the other features describe it to it (host.made.hud / host.made.hudPlayer):
 // the one file of this feature another feature imports (spec §3 rule 4, the feature wall).
 import type {ChatChannel, IChatLine, IChatSettings, IChatTab} from '../../ui/kit/chatModel';
+import type {ITargetOfTarget} from './ITargetOfTarget';
 
 /** A quest the tracker follows: its icon, name, current objective and progress (`2 / 5`). */
 export interface IQuestLine
@@ -80,6 +81,8 @@ export interface IHudPanels
     /** The bottom bar's button whose window is open (`nav_inventory`), for its active mark. */
     navOpen: string | null;
     target: (IHudUnit & {cast: IHudCast | null}) | null;
+    /** Whom the target aims at (M1d §4); null for none. */
+    targetOfTarget: ITargetOfTarget | null;
     boss: IHudUnit | null;
     /** The warning under the boss (`Frappe sismique dans 3 seconde(s) !`). */
     alert: string | null;

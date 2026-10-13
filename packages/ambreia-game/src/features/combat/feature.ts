@@ -17,6 +17,7 @@ import {RoomEngineObjectEvent} from '@ambreia/iso/scene/events/RoomEngineObjectE
 import {AttackBinding} from './views/AttackBinding';
 import {PlayerFrameBinding} from './views/PlayerFrameBinding';
 import {TargetHealthBinding} from './views/TargetHealthBinding';
+import {TargetOfTargetBinding} from './views/TargetOfTargetBinding';
 
 const log = Logger.getLogger('habbo.features.combat');
 
@@ -80,6 +81,17 @@ export const CombatFeature: IGameFeature = {
         modelOn('vitals', (objectId, vitals) => overlayOf()?.setHealth(objectId, vitals.health, vitals.maxHealth, isMonster(objectId)));
         scope.own(new PlayerFrameBinding(session.model, host.made.hudPlayer!));
         scope.own(new TargetHealthBinding(session.model, host.made.hud!));
+        scope.own(new TargetOfTargetBinding(session.model, host.made.hud!, objectId =>
+        {
+            const user = room?.userDataManager.getUserDataByIndex(objectId) ?? null;
+
+            if(!user) return null;
+
+            // A monster is named by its content id (M1a §9.1); the player's own level is known.
+            const name = isMonster(objectId) ? bits().contentName(`${user.name}.name`, user.name) : user.name;
+
+            return {name, level: objectId === room?.ownUserRoomId ? host.made.hudPlayer?.value.level ?? null : null};
+        }));
 
         // The auto-attack (M1d §2.3): the attack slot, the T key, a double click on a monster.
         const attack = new AttackBinding(session.model, host.made.hudPlayer!, active => session.setAutoAttack(active));
