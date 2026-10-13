@@ -30,6 +30,11 @@ export class VitalsBook
         return vitals;
     }
 
+    forget(objectId: number): void
+    {
+        this._byObject.delete(objectId);
+    }
+
     clear(): void
     {
         this._byObject.clear();

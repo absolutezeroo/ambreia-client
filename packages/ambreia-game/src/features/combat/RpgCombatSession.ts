@@ -16,6 +16,8 @@ import {RpgDeathChoiceMessage, type DeathChoice} from '@ambreia/protocol/outgoin
 import {RpgAutoAttackMessageSerializer} from '@ambreia/protocol/serializer/rpg/combat/RpgAutoAttackMessageSerializer';
 import {RpgDeathChoiceMessageSerializer} from '@ambreia/protocol/serializer/rpg/combat/RpgDeathChoiceMessageSerializer';
 import type {IRpgSkillImpact, IRpgSkillOutcome} from '@ambreia/protocol/incoming/rpg/skills/RpgSkillEventsMessage';
+import {UserRemoveMessageEvent} from '@ambreia/protocol/incoming/room/engine/UserRemoveMessageEvent';
+import type {UserRemoveMessageParser} from '@ambreia/protocol/parser/room/engine/UserRemoveMessageParser';
 import {CombatModel} from './CombatModel';
 import type {ICombatModelWriter} from './ICombatModelWriter';
 import type {IRpgCombatSessionEvents} from './IRpgCombatSessionEvents';
@@ -61,6 +63,9 @@ export class RpgCombatSession
     private _connection: IConnection | null = null;
     private _uninstall: (() => void) | null = null;
     private readonly _map: MessageMap = rpgCombatMap(this.model, this.events);
+    // UserRemove is the room's (an inherited event, which takes several listeners): a monster
+    // despawned or a player gone leaves no health, cast or target behind (the server does not say).
+    private readonly _left = new UserRemoveMessageEvent(event => this.model.unitLeft((event.parser as UserRemoveMessageParser).roomIndex));
 
     /** Skills and statuses hurt and healed too (M1b): their visuals, after where they landed. */
     report(outcomes: readonly IRpgSkillOutcome[], impacts: readonly IRpgSkillImpact[] = []): void
@@ -95,7 +100,15 @@ export class RpgCombatSession
         if(this._connection === connection) return;
 
         this._uninstall?.();
-        this._uninstall = this._map.install(connection);
+
+        const uninstallMap = this._map.install(connection);
+
+        connection.addMessageEvent(this._left);
+        this._uninstall = () =>
+        {
+            uninstallMap();
+            connection.removeMessageEvent(this._left);
+        };
         this._connection = connection;
     }
 

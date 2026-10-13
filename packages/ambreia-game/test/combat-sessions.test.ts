@@ -5,6 +5,8 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import type {IConnection} from '@ambreia/net/connection/IConnection';
 import type {IMessageDataWrapper} from '@ambreia/net/messages/IMessageDataWrapper';
+import type {IMessageEvent} from '@ambreia/net/messages/IMessageEvent';
+import {UserRemoveMessageEvent} from '@ambreia/protocol/incoming/room/engine/UserRemoveMessageEvent';
 import {setPlatform, BROWSER_PLATFORM} from '@ambreia/common/platform/Platform';
 import {Incoming, Outgoing} from '@ambreia/protocol/Headers.generated';
 import {RpgCombatSession} from '../src/features/combat/RpgCombatSession';
@@ -31,9 +33,11 @@ function wire(...values: Array<number | string | boolean>): IMessageDataWrapper
 }
 
 /** The handlers a map installed, by header, and what was sent. */
-function connection(): {connection: IConnection; receive: (header: number, ...values: Array<number | string | boolean>) => void; sent: Array<[number, unknown[]]>}
+function connection(): {connection: IConnection; receive: (header: number, ...values: Array<number | string | boolean>) => void; deliver: (eventClass: abstract new (...args: never[]) => IMessageEvent, ...values: Array<number | string | boolean>) => void; sent: Array<[number, unknown[]]>}
 {
     const handlers = new Map<number, (wrapper: IMessageDataWrapper) => void>();
+    // The inherited events (several listeners per message), as SocketConnection keeps them.
+    const events = new Set<IMessageEvent>();
     const sent: Array<[number, unknown[]]> = [];
     const fake = {
         handleIncoming: (header: number, _name: string, read: (wrapper: IMessageDataWrapper) => void) =>
@@ -42,6 +46,8 @@ function connection(): {connection: IConnection; receive: (header: number, ...va
 
             return () => handlers.delete(header);
         },
+        addMessageEvent: (event: IMessageEvent) => events.add(event),
+        removeMessageEvent: (event: IMessageEvent) => events.delete(event),
         sendValues: (header: number, _name: string, values: unknown[]) =>
         {
             sent.push([header, values]);
@@ -58,6 +64,19 @@ function connection(): {connection: IConnection; receive: (header: number, ...va
 
             if(!read) throw new Error(`no handler for ${header}`);
             read(wire(...values));
+        },
+        deliver: (eventClass, ...values) =>
+        {
+            for(const event of events)
+            {
+                if(!(event instanceof eventClass)) continue;
+
+                const parser = new event.parserClass();
+
+                parser.parse(wire(...values));
+                event.parser = parser;
+                event.callback(event);
+            }
         },
         sent
     };
@@ -91,6 +110,22 @@ test('the combat session writes the vitals, the KO, the offer, the auto-attack a
     session.model.events.on('levelUp', up => level = up.toLevel);
     wire.receive(Incoming.RpgLevelUpMessageComposer, 1, 2, ...stats, ...stats, 0);
     assert.equal(level, 2);
+});
+
+test('a unit leaving the room (UserRemove) is forgotten by the combat model, and an uninstalled session hears nothing', () =>
+{
+    const session = new RpgCombatSession();
+    const wire = connection();
+
+    session.install(wire.connection);
+    session.model.setVitals(9, 30, 60);
+    wire.deliver(UserRemoveMessageEvent, '9');
+    assert.equal(session.model.vitalsOf(9), null);
+
+    session.model.setVitals(9, 30, 60);
+    session.dispose();
+    wire.deliver(UserRemoveMessageEvent, '9');
+    assert.notEqual(session.model.vitalsOf(9), null);
 });
 
 test('the combat session sends the auto-attack and the death choices, and wait and decline apply at once', () =>

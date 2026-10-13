@@ -51,6 +51,20 @@ export class TargetBook
         return true;
     }
 
+    /** A unit gone: no aim from or at it; true when it was the target, which goes too. */
+    forget(objectId: number): boolean
+    {
+        this._aims.delete(objectId);
+
+        for(const [aimer, aimed] of this._aims) if(aimed === objectId) this._aims.delete(aimer);
+
+        if(this._target?.objectId !== objectId) return false;
+
+        this.setTarget(null);
+
+        return true;
+    }
+
     clear(): void
     {
         this._target = null;

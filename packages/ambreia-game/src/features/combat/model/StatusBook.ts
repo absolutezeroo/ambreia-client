@@ -38,6 +38,12 @@ export class StatusBook
         return diff;
     }
 
+    /** True when it had any. */
+    forget(objectId: number): boolean
+    {
+        return this._byObject.delete(objectId);
+    }
+
     clear(): void
     {
         this._byObject.clear();

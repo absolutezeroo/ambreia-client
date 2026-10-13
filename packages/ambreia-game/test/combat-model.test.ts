@@ -193,3 +193,37 @@ test('the own vitals are kept before the own object id is known, then keyed once
     assert.deepEqual(model.ownVitals, {health: 60, maxHealth: 100, mana: 20, maxMana: 50});
     assert.deepEqual(seen, [70, 60]);
 });
+
+test('a unit leaving the room is forgotten: its health, statuses, cast, aim, and the target when it was', () =>
+{
+    const model = fresh();
+    const said: string[] = [];
+
+    model.setTarget(WOLF);
+    model.setVitals(9, 30, 60);
+    model.setStatuses(9, [{statusId: 'status.slow', remainingMs: 4000, stacks: 1}]);
+    model.setCast(9, {skillId: 'skill.wolf.howl', durationMs: 1500, channel: false, targetObjectId: 1});
+    model.setTargets([{objectId: 9, targetObjectId: 1}]);
+    model.events.on('target', info => said.push(`target ${info === null ? 'none' : info.objectId}`));
+    model.events.on('cast', (objectId, cast) => said.push(`cast ${objectId} ${cast === null ? 'none' : cast.skillId}`));
+    model.events.on('statuses', (objectId, statuses) => said.push(`statuses ${objectId} ${statuses.length}`));
+
+    model.unitLeft(9);
+
+    assert.equal(model.vitalsOf(9), null);
+    assert.deepEqual(model.statusesOf(9), []);
+    assert.equal(model.castOf(9), null);
+    assert.equal(model.targetOf(9), 0);
+    assert.equal(model.target, null);
+    assert.deepEqual(said, ['statuses 9 0', 'cast 9 none', 'target none']);
+});
+
+test('a unit leaving that is not the target leaves the target alone', () =>
+{
+    const model = fresh();
+
+    model.setTarget(WOLF);
+    model.unitLeft(12);
+
+    assert.equal(model.target?.objectId, 9);
+});

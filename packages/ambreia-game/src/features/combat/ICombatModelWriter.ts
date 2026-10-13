@@ -23,6 +23,7 @@ export interface ICombatModelWriter extends ICombatModel
     setStatuses(objectId: number, lines: readonly IStatusLine[]): void;
     setCast(objectId: number, cast: {skillId: string; durationMs: number; channel: boolean; targetObjectId: number}): void;
     endCast(objectId: number, reason: string, skillId: string): void;
+    unitLeft(objectId: number): void;
     setCooldowns(globalRemainingMs: number, skills: readonly {skillId: string; remainingMs: number}[]): void;
     setAutoAttacking(active: boolean): void;
     setKo(respawnSeconds: number): void;

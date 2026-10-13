@@ -212,6 +212,25 @@ export class CombatModel implements ICombatModelWriter
         this.events.emit('cast', objectId, null);
     }
 
+    /** A unit left the room (UserRemove): nothing of it stays, and it is no longer the target. */
+    unitLeft(objectId: number): void
+    {
+        this._vitals.forget(objectId);
+        if(this._statuses.forget(objectId)) this.events.emit('statuses', objectId, []);
+
+        if(this._casts.of(objectId))
+        {
+            this._casts.end(objectId);
+            this.events.emit('cast', objectId, null);
+        }
+
+        if(this._targets.forget(objectId))
+        {
+            this.events.emit('target', null);
+            this.events.emit('threat', null);
+        }
+    }
+
     setCooldowns(globalRemainingMs: number, skills: readonly {skillId: string; remainingMs: number}[]): void
     {
         this._cooldowns.set(globalRemainingMs, skills, platform().now());
