@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!-- The Ambreia dark theme's close button (style 300). Regions of ambreia_skin_dark.png (tools/build-ambreia-skin.mjs). -->
+<skin name="ambreia_skin_dark_close" version="0.1">
+	<states>
+		<state name="default" layout="close_300" template="close_default" />
+		<state name="hovering" layout="close_300" template="close_hovering" />
+		<state name="pressed" layout="close_300" template="close_pressed" />
+	</states>
+	<templates>
+		<template name="close_default" asset="ambreia_skin_dark">
+			<entities>
+				<entity name="button_close" type="bitmap"><region><Rectangle x="128" y="20" width="15" height="15" /></region></entity>
+			</entities>
+		</template>
+		<template name="close_hovering" asset="ambreia_skin_dark">
+			<entities>
+				<entity name="button_close" type="bitmap"><region><Rectangle x="128" y="36" width="15" height="15" /></region></entity>
+			</entities>
+		</template>
+		<template name="close_pressed" asset="ambreia_skin_dark">
+			<entities>
+				<entity name="button_close" type="bitmap"><region><Rectangle x="128" y="52" width="15" height="15" /></region></entity>
+			</entities>
+		</template>
+	</templates>
+	<layouts>
+		<layout name="close_300" transparent="true">
+			<entities>
+				<entity name="button_close" id="0"><region><Rectangle x="0" y="0" width="15" height="15" /></region><scale horizontal="fixed" vertical="fixed" /></entity>
+			</entities>
+		</layout>
+	</layouts>
+</skin>

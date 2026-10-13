@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!-- The Ambreia dark frame's title bar (style 300): nothing drawn, the frame's band is the bar. -->
+<skin name="ambreia_skin_dark_header" version="0.1">
+	<states>
+		<state name="default" layout="header_300" template="header_300" />
+	</states>
+	<templates>
+		<template name="header_300" asset="ambreia_skin_dark">
+			<entities>
+				<entity name="header_center" type="bitmap"><region><Rectangle x="144" y="0" width="6" height="5" /></region></entity>
+			</entities>
+		</template>
+	</templates>
+	<layouts>
+		<layout name="header_300" transparent="true">
+			<entities>
+				<entity name="header_center" id="1"><region><Rectangle x="0" y="0" width="6" height="20" /></region><scale horizontal="stretch" vertical="fixed" /></entity>
+			</entities>
+		</layout>
+	</layouts>
+</skin>

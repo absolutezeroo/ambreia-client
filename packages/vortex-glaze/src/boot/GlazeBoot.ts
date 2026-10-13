@@ -10,6 +10,7 @@ import {
     parseSkinXml,
     parseWindowLayoutXml
 } from '@ambreia/ui/assets/WindowXmlAssetParser';
+import {mergeElementDescription, mergeSkin} from '@ambreia/ui/assets/SkinMerge';
 import {GlazeConfigurationStub} from './GlazeConfigurationStub';
 import {registerGameWidgetPlaceholders} from './GameWidgetPlaceholder';
 import {GlazeLocalizationStub} from './GlazeLocalizationStub';
@@ -28,6 +29,9 @@ const ELEMENT_DESCRIPTION_ASSET = 'habbo_element_description_xml';
  * template references one of these by name, so this must cover every distinct
  * atlas any skin uses or that skin's pieces silently never render.
  */
+/** Vortex's own authored skins (vortex-client/src/vortex-skins), merged over the dump's as App.readVortexSkins() does. */
+const VORTEX_SKINS = import.meta.glob('../../../vortex-client/src/vortex-skins/*.xml', {query: '?raw', import: 'default', eager: true}) as Record<string, string>;
+
 const ATLAS_NAMES = [
     'habbo_blue_skin',
     'habbo_skin_ubuntu',
@@ -71,7 +75,9 @@ const ATLAS_NAMES = [
     'illumina_light_switch',
     'illumina_purple_border_frame',
     'illumina_purple_button_default',
-    'illumina_purple_button_frame_close'
+    'illumina_purple_button_frame_close',
+    // The Ambreia dark window theme (style 300), src/vortex-skins/ambreia_skin_dark_*.xml.
+    'ambreia_skin_dark'
 ];
 
 /**
@@ -258,9 +264,13 @@ export class GlazeBoot
                     elementDescriptionKey
                 );
 
-                if(elementDescription)
+                const authored = VORTEX_SKINS[Object.keys(VORTEX_SKINS).find((p) => p.endsWith(`/${ELEMENT_DESCRIPTION_ASSET}.xml`)) ?? ''];
+                const authoredDescription = authored ? parseElementDescriptionXml(authored, ELEMENT_DESCRIPTION_ASSET, 'vortex-skins') : null;
+                const merged = elementDescription && authoredDescription ? mergeElementDescription(elementDescription, authoredDescription) : elementDescription;
+
+                if(merged)
                 {
-                    windowManager.loadElementDescription(elementDescription);
+                    windowManager.loadElementDescription(merged);
                 }
             }
 
@@ -311,6 +321,18 @@ export class GlazeBoot
             const skin = parseSkinXml(skinXml, skinId, key);
 
             if(skin) skins.set(skin.id, skin);
+        }
+
+        // The authored skins: a file named after a dump skin merges into it, a new id is added.
+        for(const [path, xml] of Object.entries(VORTEX_SKINS))
+        {
+            const skinId = path.split('/').pop()!.replace(/.xml$/, '');
+
+            if(skinId === ELEMENT_DESCRIPTION_ASSET) continue;
+
+            const skin = parseSkinXml(xml, skinId, path);
+
+            if(skin) skins.set(skin.id, mergeSkin(skins.get(skin.id) ?? null, skin));
         }
 
         windowManager.loadSkinAssets(skins, atlases);

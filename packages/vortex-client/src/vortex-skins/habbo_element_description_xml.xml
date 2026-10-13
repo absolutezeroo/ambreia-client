@@ -20,4 +20,35 @@
 		<states><state name="default" layout="iconVortexCoinSmall" template="icon_85" /></states>
 	</window>
 
+
+	<!--
+		The Ambreia dark theme (style 300, the navy windows of the 2026-10 mock-ups), drawn by
+		tools/build-ambreia-skin.mjs into ambreia_skin_dark.png (ATLAS_NAMES in App.ts and GlazeBoot.ts).
+		300 is free of the dump's types below; 301 and 302 are its panel and button variants.
+	-->
+	<window type="frame" intent="ambreia dark" style="300" renderer="skin" asset="ambreia_skin_dark_frame" window_layout="habbo_window_layout_frame_3_xml" layout="frame_300" color="0xffffffff" />
+	<window type="header" intent="ambreia dark" style="300" renderer="skin" asset="ambreia_skin_dark_header" window_layout="habbo_window_layout_header_3_xml" layout="header_300" color="0xffffffff" treshold="0" />
+	<window type="border" intent="ambreia panel dark" style="300" renderer="skin" asset="ambreia_skin_dark_border" layout="panel_dark" />
+	<window type="border" intent="ambreia panel dark" style="301" renderer="skin" asset="ambreia_skin_dark_border" layout="panel_dark" />
+	<window type="border" intent="ambreia card dark" style="302" renderer="skin" asset="ambreia_skin_dark_border" layout="card_dark" />
+	<window type="border" intent="ambreia panel light" style="303" renderer="skin" asset="ambreia_skin_dark_border" layout="panel_light" />
+	<window type="border" intent="ambreia strip light" style="304" renderer="skin" asset="ambreia_skin_dark_border" layout="strip_light" />
+	<window type="border" intent="ambreia card light" style="305" renderer="skin" asset="ambreia_skin_dark_border" layout="card_light" />
+	<window type="border" intent="ambreia selected row" style="306" renderer="skin" asset="ambreia_skin_dark_border" layout="selected" />
+	<window type="button_thick" intent="ambreia dark blue" style="300" renderer="skin" asset="ambreia_skin_dark_button" window_layout="ambreia_window_layout_button_xml" layout="button_300" />
+	<window type="button_thick" intent="ambreia dark tintable" style="301" renderer="skin" asset="ambreia_skin_dark_button" window_layout="ambreia_window_layout_button_xml" layout="button_301" />
+	<window type="container_button" intent="ambreia dark blue" style="300" renderer="skin" asset="ambreia_skin_dark_button" layout="button_300" />
+	<window type="tab_button" intent="ambreia dark" style="300" renderer="skin" asset="ambreia_skin_dark_tab" window_layout="ambreia_window_layout_tab_button_xml" layout="tab_300" />
+	<window type="tab_container_button" intent="ambreia dark" style="300" renderer="skin" asset="ambreia_skin_dark_tab" layout="tab_300" />
+	<window type="tab_content" intent="ambreia dark" style="300" renderer="skin" asset="ambreia_skin_dark_tab" layout="tab_content_300" />
+	<window type="tab_context" intent="ambreia dark" style="300" renderer="null" asset="habbo_skin_tab_context_xml" window_layout="habbo_window_layout_tab_context_3_xml" layout="tab_context" />
+	<window type="closebutton" intent="ambreia dark" style="300" renderer="skin" asset="ambreia_skin_dark_close" layout="close_300" treshold="0" background="true" />
+
+	<!-- The purple theme's buttons with a white caption (ambreia_window_layout_button_xml): plain purple, and a tintable one. -->
+	<window type="button" intent="ambreia purple" style="300" renderer="skin" asset="illumina_purple_skin_button_plain_xml" window_layout="ambreia_window_layout_button_xml" layout="illumina_purple_button_plain" />
+	<window type="button" intent="ambreia tintable" style="301" renderer="skin" asset="illumina_light_skin_button_dark_recolorable_xml" window_layout="ambreia_window_layout_button_xml" layout="illumina_light_button_dark_recolorable" />
+
+	<!-- The purple frame, with the white title of ambreia_window_layout_frame_purple_xml (replaces the dump's style 103 entry). -->
+	<window type="frame" intent="purple" style="103" renderer="skin" asset="illumina_purple_skin_frame_xml" window_layout="ambreia_window_layout_frame_purple_xml" layout="illumina_purple_frame" />
+
 </skin>

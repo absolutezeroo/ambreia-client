@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<!-- The Ambreia dark theme's tabs (style 300) and the strip under them. Regions of ambreia_skin_dark.png (tools/build-ambreia-skin.mjs). -->
+<skin name="ambreia_skin_dark_tab" version="0.1">
+	<states>
+		<state name="default" layout="tab_300" template="tab_default" />
+		<state name="selected" layout="tab_300" template="tab_selected" />
+		<state name="pressed" layout="tab_300" template="tab_selected" />
+		<state name="hovering" layout="tab_300" template="tab_hovering" />
+		<state name="default" layout="tab_content_300" template="tab_content_300" />
+	</states>
+	<templates>
+		<template name="tab_default" asset="ambreia_skin_dark">
+			<entities>
+				<entity name="top_left" type="bitmap"><region><Rectangle x="0" y="80" width="5" height="5" /></region></entity>
+				<entity name="top_center" type="bitmap"><region><Rectangle x="5" y="80" width="1" height="5" /></region></entity>
+				<entity name="top_right" type="bitmap"><region><Rectangle x="25" y="80" width="5" height="5" /></region></entity>
+				<entity name="mid_left" type="bitmap"><region><Rectangle x="0" y="85" width="5" height="1" /></region></entity>
+				<entity name="mid_center" type="bitmap"><region><Rectangle x="5" y="85" width="1" height="1" /></region></entity>
+				<entity name="mid_right" type="bitmap"><region><Rectangle x="25" y="85" width="5" height="1" /></region></entity>
+				<entity name="btm_left" type="bitmap"><region><Rectangle x="0" y="96" width="5" height="5" /></region></entity>
+				<entity name="btm_center" type="bitmap"><region><Rectangle x="5" y="96" width="1" height="5" /></region></entity>
+				<entity name="btm_right" type="bitmap"><region><Rectangle x="25" y="96" width="5" height="5" /></region></entity>
+			</entities>
+		</template>
+		<template name="tab_selected" asset="ambreia_skin_dark">
+			<entities>
+				<entity name="top_left" type="bitmap"><region><Rectangle x="30" y="80" width="5" height="5" /></region></entity>
+				<entity name="top_center" type="bitmap"><region><Rectangle x="35" y="80" width="1" height="5" /></region></entity>
+				<entity name="top_right" type="bitmap"><region><Rectangle x="55" y="80" width="5" height="5" /></region></entity>
+				<entity name="mid_left" type="bitmap"><region><Rectangle x="30" y="85" width="5" height="1" /></region></entity>
+				<entity name="mid_center" type="bitmap"><region><Rectangle x="35" y="85" width="1" height="1" /></region></entity>
+				<entity name="mid_right" type="bitmap"><region><Rectangle x="55" y="85" width="5" height="1" /></region></entity>
+				<entity name="btm_left" type="bitmap"><region><Rectangle x="30" y="96" width="5" height="5" /></region></entity>
+				<entity name="btm_center" type="bitmap"><region><Rectangle x="35" y="96" width="1" height="5" /></region></entity>
+				<entity name="btm_right" type="bitmap"><region><Rectangle x="55" y="96" width="5" height="5" /></region></entity>
+			</entities>
+		</template>
+		<template name="tab_hovering" asset="ambreia_skin_dark">
+			<entities>
+				<entity name="top_left" type="bitmap"><region><Rectangle x="60" y="80" width="5" height="5" /></region></entity>
+				<entity name="top_center" type="bitmap"><region><Rectangle x="65" y="80" width="1" height="5" /></region></entity>
+				<entity name="top_right" type="bitmap"><region><Rectangle x="85" y="80" width="5" height="5" /></region></entity>
+				<entity name="mid_left" type="bitmap"><region><Rectangle x="60" y="85" width="5" height="1" /></region></entity>
+				<entity name="mid_center" type="bitmap"><region><Rectangle x="65" y="85" width="1" height="1" /></region></entity>
+				<entity name="mid_right" type="bitmap"><region><Rectangle x="85" y="85" width="5" height="1" /></region></entity>
+				<entity name="btm_left" type="bitmap"><region><Rectangle x="60" y="96" width="5" height="5" /></region></entity>
+				<entity name="btm_center" type="bitmap"><region><Rectangle x="65" y="96" width="1" height="5" /></region></entity>
+				<entity name="btm_right" type="bitmap"><region><Rectangle x="85" y="96" width="5" height="5" /></region></entity>
+			</entities>
+		</template>
+		<template name="tab_content_300" asset="ambreia_skin_dark">
+			<entities>
+				<entity name="top" type="bitmap"><region><Rectangle x="128" y="0" width="14" height="15" /></region></entity>
+				<entity name="btm" type="bitmap"><region><Rectangle x="128" y="15" width="14" height="4" /></region></entity>
+			</entities>
+		</template>
+	</templates>
+	<layouts>
+		<layout name="tab_300" transparent="true">
+			<entities>
+				<entity name="top_left" id="0"><region><Rectangle x="0" y="0" width="5" height="5" /></region><scale horizontal="fixed" vertical="fixed" /></entity>
+				<entity name="top_center" id="0"><region><Rectangle x="5" y="0" width="20" height="5" /></region><scale horizontal="strech" vertical="fixed" /></entity>
+				<entity name="top_right" id="0"><region><Rectangle x="25" y="0" width="5" height="5" /></region><scale horizontal="move" vertical="fixed" /></entity>
+				<entity name="mid_left" id="0"><region><Rectangle x="0" y="5" width="5" height="11" /></region><scale horizontal="fixed" vertical="strech" /></entity>
+				<entity name="mid_center" id="0"><region><Rectangle x="5" y="5" width="20" height="11" /></region><scale horizontal="strech" vertical="strech" /></entity>
+				<entity name="mid_right" id="0"><region><Rectangle x="25" y="5" width="5" height="11" /></region><scale horizontal="move" vertical="strech" /></entity>
+				<entity name="btm_left" id="0"><region><Rectangle x="0" y="16" width="5" height="5" /></region><scale horizontal="fixed" vertical="move" /></entity>
+				<entity name="btm_center" id="0"><region><Rectangle x="5" y="16" width="20" height="5" /></region><scale horizontal="strech" vertical="move" /></entity>
+				<entity name="btm_right" id="0"><region><Rectangle x="25" y="16" width="5" height="5" /></region><scale horizontal="move" vertical="move" /></entity>
+			</entities>
+		</layout>
+		<layout name="tab_content_300" transparent="true">
+			<entities>
+				<entity name="top" id="0"><region><Rectangle x="0" y="0" width="32" height="15" /></region><scale horizontal="strech" vertical="fixed" /></entity>
+				<entity name="btm" id="0"><region><Rectangle x="0" y="14" width="32" height="4" /></region><scale horizontal="strech" vertical="move" /></entity>
+			</entities>
+		</layout>
+	</layouts>
+</skin>

@@ -1,0 +1,172 @@
+<?xml version="1.0"?>
+<!-- The Ambreia theme panels (7 px corners): dark panel and card, light panel, strip and card, the selected row. Regions of ambreia_skin_dark.png (tools/build-ambreia-skin.mjs). -->
+<skin name="ambreia_skin_dark_border" version="0.1">
+	<states>
+		<state name="default" layout="panel_dark" template="panel_dark" />
+		<state name="default" layout="card_dark" template="card_dark" />
+		<state name="default" layout="panel_light" template="panel_light" />
+		<state name="default" layout="strip_light" template="strip_light" />
+		<state name="default" layout="card_light" template="card_light" />
+		<state name="default" layout="selected" template="selected" />
+	</states>
+	<templates>
+		<template name="panel_dark" asset="ambreia_skin_dark">
+			<entities>
+				<entity name="top_left" type="bitmap"><region><Rectangle x="32" y="0" width="7" height="7" /></region></entity>
+				<entity name="top_center" type="bitmap"><region><Rectangle x="39" y="0" width="1" height="7" /></region></entity>
+				<entity name="top_right" type="bitmap"><region><Rectangle x="41" y="0" width="7" height="7" /></region></entity>
+				<entity name="mid_left" type="bitmap"><region><Rectangle x="32" y="7" width="7" height="1" /></region></entity>
+				<entity name="mid_center" type="bitmap"><region><Rectangle x="39" y="7" width="1" height="1" /></region></entity>
+				<entity name="mid_right" type="bitmap"><region><Rectangle x="41" y="7" width="7" height="1" /></region></entity>
+				<entity name="btm_left" type="bitmap"><region><Rectangle x="32" y="9" width="7" height="7" /></region></entity>
+				<entity name="btm_center" type="bitmap"><region><Rectangle x="39" y="9" width="1" height="7" /></region></entity>
+				<entity name="btm_right" type="bitmap"><region><Rectangle x="41" y="9" width="7" height="7" /></region></entity>
+			</entities>
+		</template>
+		<template name="card_dark" asset="ambreia_skin_dark">
+			<entities>
+				<entity name="top_left" type="bitmap"><region><Rectangle x="48" y="0" width="7" height="7" /></region></entity>
+				<entity name="top_center" type="bitmap"><region><Rectangle x="55" y="0" width="1" height="7" /></region></entity>
+				<entity name="top_right" type="bitmap"><region><Rectangle x="57" y="0" width="7" height="7" /></region></entity>
+				<entity name="mid_left" type="bitmap"><region><Rectangle x="48" y="7" width="7" height="1" /></region></entity>
+				<entity name="mid_center" type="bitmap"><region><Rectangle x="55" y="7" width="1" height="1" /></region></entity>
+				<entity name="mid_right" type="bitmap"><region><Rectangle x="57" y="7" width="7" height="1" /></region></entity>
+				<entity name="btm_left" type="bitmap"><region><Rectangle x="48" y="9" width="7" height="7" /></region></entity>
+				<entity name="btm_center" type="bitmap"><region><Rectangle x="55" y="9" width="1" height="7" /></region></entity>
+				<entity name="btm_right" type="bitmap"><region><Rectangle x="57" y="9" width="7" height="7" /></region></entity>
+			</entities>
+		</template>
+		<template name="panel_light" asset="ambreia_skin_dark">
+			<entities>
+				<entity name="top_left" type="bitmap"><region><Rectangle x="64" y="0" width="7" height="7" /></region></entity>
+				<entity name="top_center" type="bitmap"><region><Rectangle x="71" y="0" width="1" height="7" /></region></entity>
+				<entity name="top_right" type="bitmap"><region><Rectangle x="73" y="0" width="7" height="7" /></region></entity>
+				<entity name="mid_left" type="bitmap"><region><Rectangle x="64" y="7" width="7" height="1" /></region></entity>
+				<entity name="mid_center" type="bitmap"><region><Rectangle x="71" y="7" width="1" height="1" /></region></entity>
+				<entity name="mid_right" type="bitmap"><region><Rectangle x="73" y="7" width="7" height="1" /></region></entity>
+				<entity name="btm_left" type="bitmap"><region><Rectangle x="64" y="9" width="7" height="7" /></region></entity>
+				<entity name="btm_center" type="bitmap"><region><Rectangle x="71" y="9" width="1" height="7" /></region></entity>
+				<entity name="btm_right" type="bitmap"><region><Rectangle x="73" y="9" width="7" height="7" /></region></entity>
+			</entities>
+		</template>
+		<template name="strip_light" asset="ambreia_skin_dark">
+			<entities>
+				<entity name="top_left" type="bitmap"><region><Rectangle x="80" y="0" width="7" height="7" /></region></entity>
+				<entity name="top_center" type="bitmap"><region><Rectangle x="87" y="0" width="1" height="7" /></region></entity>
+				<entity name="top_right" type="bitmap"><region><Rectangle x="89" y="0" width="7" height="7" /></region></entity>
+				<entity name="mid_left" type="bitmap"><region><Rectangle x="80" y="7" width="7" height="1" /></region></entity>
+				<entity name="mid_center" type="bitmap"><region><Rectangle x="87" y="7" width="1" height="1" /></region></entity>
+				<entity name="mid_right" type="bitmap"><region><Rectangle x="89" y="7" width="7" height="1" /></region></entity>
+				<entity name="btm_left" type="bitmap"><region><Rectangle x="80" y="9" width="7" height="7" /></region></entity>
+				<entity name="btm_center" type="bitmap"><region><Rectangle x="87" y="9" width="1" height="7" /></region></entity>
+				<entity name="btm_right" type="bitmap"><region><Rectangle x="89" y="9" width="7" height="7" /></region></entity>
+			</entities>
+		</template>
+		<template name="card_light" asset="ambreia_skin_dark">
+			<entities>
+				<entity name="top_left" type="bitmap"><region><Rectangle x="96" y="0" width="7" height="7" /></region></entity>
+				<entity name="top_center" type="bitmap"><region><Rectangle x="103" y="0" width="1" height="7" /></region></entity>
+				<entity name="top_right" type="bitmap"><region><Rectangle x="105" y="0" width="7" height="7" /></region></entity>
+				<entity name="mid_left" type="bitmap"><region><Rectangle x="96" y="7" width="7" height="1" /></region></entity>
+				<entity name="mid_center" type="bitmap"><region><Rectangle x="103" y="7" width="1" height="1" /></region></entity>
+				<entity name="mid_right" type="bitmap"><region><Rectangle x="105" y="7" width="7" height="1" /></region></entity>
+				<entity name="btm_left" type="bitmap"><region><Rectangle x="96" y="9" width="7" height="7" /></region></entity>
+				<entity name="btm_center" type="bitmap"><region><Rectangle x="103" y="9" width="1" height="7" /></region></entity>
+				<entity name="btm_right" type="bitmap"><region><Rectangle x="105" y="9" width="7" height="7" /></region></entity>
+			</entities>
+		</template>
+		<template name="selected" asset="ambreia_skin_dark">
+			<entities>
+				<entity name="top_left" type="bitmap"><region><Rectangle x="112" y="0" width="7" height="7" /></region></entity>
+				<entity name="top_center" type="bitmap"><region><Rectangle x="119" y="0" width="1" height="7" /></region></entity>
+				<entity name="top_right" type="bitmap"><region><Rectangle x="121" y="0" width="7" height="7" /></region></entity>
+				<entity name="mid_left" type="bitmap"><region><Rectangle x="112" y="7" width="7" height="1" /></region></entity>
+				<entity name="mid_center" type="bitmap"><region><Rectangle x="119" y="7" width="1" height="1" /></region></entity>
+				<entity name="mid_right" type="bitmap"><region><Rectangle x="121" y="7" width="7" height="1" /></region></entity>
+				<entity name="btm_left" type="bitmap"><region><Rectangle x="112" y="9" width="7" height="7" /></region></entity>
+				<entity name="btm_center" type="bitmap"><region><Rectangle x="119" y="9" width="1" height="7" /></region></entity>
+				<entity name="btm_right" type="bitmap"><region><Rectangle x="121" y="9" width="7" height="7" /></region></entity>
+			</entities>
+		</template>
+	</templates>
+	<layouts>
+		<layout name="panel_dark" transparent="true">
+			<entities>
+				<entity name="top_left" id="0"><region><Rectangle x="0" y="0" width="7" height="7" /></region><scale horizontal="fixed" vertical="fixed" /></entity>
+				<entity name="top_center" id="0"><region><Rectangle x="7" y="0" width="1" height="7" /></region><scale horizontal="strech" vertical="fixed" /></entity>
+				<entity name="top_right" id="0"><region><Rectangle x="8" y="0" width="7" height="7" /></region><scale horizontal="move" vertical="fixed" /></entity>
+				<entity name="mid_left" id="0"><region><Rectangle x="0" y="7" width="7" height="1" /></region><scale horizontal="fixed" vertical="strech" /></entity>
+				<entity name="mid_center" id="0"><region><Rectangle x="7" y="7" width="1" height="1" /></region><scale horizontal="strech" vertical="strech" /></entity>
+				<entity name="mid_right" id="0"><region><Rectangle x="8" y="7" width="7" height="1" /></region><scale horizontal="move" vertical="strech" /></entity>
+				<entity name="btm_left" id="0"><region><Rectangle x="0" y="8" width="7" height="7" /></region><scale horizontal="fixed" vertical="move" /></entity>
+				<entity name="btm_center" id="0"><region><Rectangle x="7" y="8" width="1" height="7" /></region><scale horizontal="strech" vertical="move" /></entity>
+				<entity name="btm_right" id="0"><region><Rectangle x="8" y="8" width="7" height="7" /></region><scale horizontal="move" vertical="move" /></entity>
+			</entities>
+		</layout>
+		<layout name="card_dark" transparent="true">
+			<entities>
+				<entity name="top_left" id="0"><region><Rectangle x="0" y="0" width="7" height="7" /></region><scale horizontal="fixed" vertical="fixed" /></entity>
+				<entity name="top_center" id="0"><region><Rectangle x="7" y="0" width="1" height="7" /></region><scale horizontal="strech" vertical="fixed" /></entity>
+				<entity name="top_right" id="0"><region><Rectangle x="8" y="0" width="7" height="7" /></region><scale horizontal="move" vertical="fixed" /></entity>
+				<entity name="mid_left" id="0"><region><Rectangle x="0" y="7" width="7" height="1" /></region><scale horizontal="fixed" vertical="strech" /></entity>
+				<entity name="mid_center" id="0"><region><Rectangle x="7" y="7" width="1" height="1" /></region><scale horizontal="strech" vertical="strech" /></entity>
+				<entity name="mid_right" id="0"><region><Rectangle x="8" y="7" width="7" height="1" /></region><scale horizontal="move" vertical="strech" /></entity>
+				<entity name="btm_left" id="0"><region><Rectangle x="0" y="8" width="7" height="7" /></region><scale horizontal="fixed" vertical="move" /></entity>
+				<entity name="btm_center" id="0"><region><Rectangle x="7" y="8" width="1" height="7" /></region><scale horizontal="strech" vertical="move" /></entity>
+				<entity name="btm_right" id="0"><region><Rectangle x="8" y="8" width="7" height="7" /></region><scale horizontal="move" vertical="move" /></entity>
+			</entities>
+		</layout>
+		<layout name="panel_light" transparent="true">
+			<entities>
+				<entity name="top_left" id="0"><region><Rectangle x="0" y="0" width="7" height="7" /></region><scale horizontal="fixed" vertical="fixed" /></entity>
+				<entity name="top_center" id="0"><region><Rectangle x="7" y="0" width="1" height="7" /></region><scale horizontal="strech" vertical="fixed" /></entity>
+				<entity name="top_right" id="0"><region><Rectangle x="8" y="0" width="7" height="7" /></region><scale horizontal="move" vertical="fixed" /></entity>
+				<entity name="mid_left" id="0"><region><Rectangle x="0" y="7" width="7" height="1" /></region><scale horizontal="fixed" vertical="strech" /></entity>
+				<entity name="mid_center" id="0"><region><Rectangle x="7" y="7" width="1" height="1" /></region><scale horizontal="strech" vertical="strech" /></entity>
+				<entity name="mid_right" id="0"><region><Rectangle x="8" y="7" width="7" height="1" /></region><scale horizontal="move" vertical="strech" /></entity>
+				<entity name="btm_left" id="0"><region><Rectangle x="0" y="8" width="7" height="7" /></region><scale horizontal="fixed" vertical="move" /></entity>
+				<entity name="btm_center" id="0"><region><Rectangle x="7" y="8" width="1" height="7" /></region><scale horizontal="strech" vertical="move" /></entity>
+				<entity name="btm_right" id="0"><region><Rectangle x="8" y="8" width="7" height="7" /></region><scale horizontal="move" vertical="move" /></entity>
+			</entities>
+		</layout>
+		<layout name="strip_light" transparent="true">
+			<entities>
+				<entity name="top_left" id="0"><region><Rectangle x="0" y="0" width="7" height="7" /></region><scale horizontal="fixed" vertical="fixed" /></entity>
+				<entity name="top_center" id="0"><region><Rectangle x="7" y="0" width="1" height="7" /></region><scale horizontal="strech" vertical="fixed" /></entity>
+				<entity name="top_right" id="0"><region><Rectangle x="8" y="0" width="7" height="7" /></region><scale horizontal="move" vertical="fixed" /></entity>
+				<entity name="mid_left" id="0"><region><Rectangle x="0" y="7" width="7" height="1" /></region><scale horizontal="fixed" vertical="strech" /></entity>
+				<entity name="mid_center" id="0"><region><Rectangle x="7" y="7" width="1" height="1" /></region><scale horizontal="strech" vertical="strech" /></entity>
+				<entity name="mid_right" id="0"><region><Rectangle x="8" y="7" width="7" height="1" /></region><scale horizontal="move" vertical="strech" /></entity>
+				<entity name="btm_left" id="0"><region><Rectangle x="0" y="8" width="7" height="7" /></region><scale horizontal="fixed" vertical="move" /></entity>
+				<entity name="btm_center" id="0"><region><Rectangle x="7" y="8" width="1" height="7" /></region><scale horizontal="strech" vertical="move" /></entity>
+				<entity name="btm_right" id="0"><region><Rectangle x="8" y="8" width="7" height="7" /></region><scale horizontal="move" vertical="move" /></entity>
+			</entities>
+		</layout>
+		<layout name="card_light" transparent="true">
+			<entities>
+				<entity name="top_left" id="0"><region><Rectangle x="0" y="0" width="7" height="7" /></region><scale horizontal="fixed" vertical="fixed" /></entity>
+				<entity name="top_center" id="0"><region><Rectangle x="7" y="0" width="1" height="7" /></region><scale horizontal="strech" vertical="fixed" /></entity>
+				<entity name="top_right" id="0"><region><Rectangle x="8" y="0" width="7" height="7" /></region><scale horizontal="move" vertical="fixed" /></entity>
+				<entity name="mid_left" id="0"><region><Rectangle x="0" y="7" width="7" height="1" /></region><scale horizontal="fixed" vertical="strech" /></entity>
+				<entity name="mid_center" id="0"><region><Rectangle x="7" y="7" width="1" height="1" /></region><scale horizontal="strech" vertical="strech" /></entity>
+				<entity name="mid_right" id="0"><region><Rectangle x="8" y="7" width="7" height="1" /></region><scale horizontal="move" vertical="strech" /></entity>
+				<entity name="btm_left" id="0"><region><Rectangle x="0" y="8" width="7" height="7" /></region><scale horizontal="fixed" vertical="move" /></entity>
+				<entity name="btm_center" id="0"><region><Rectangle x="7" y="8" width="1" height="7" /></region><scale horizontal="strech" vertical="move" /></entity>
+				<entity name="btm_right" id="0"><region><Rectangle x="8" y="8" width="7" height="7" /></region><scale horizontal="move" vertical="move" /></entity>
+			</entities>
+		</layout>
+		<layout name="selected" transparent="true">
+			<entities>
+				<entity name="top_left" id="0"><region><Rectangle x="0" y="0" width="7" height="7" /></region><scale horizontal="fixed" vertical="fixed" /></entity>
+				<entity name="top_center" id="0"><region><Rectangle x="7" y="0" width="1" height="7" /></region><scale horizontal="strech" vertical="fixed" /></entity>
+				<entity name="top_right" id="0"><region><Rectangle x="8" y="0" width="7" height="7" /></region><scale horizontal="move" vertical="fixed" /></entity>
+				<entity name="mid_left" id="0"><region><Rectangle x="0" y="7" width="7" height="1" /></region><scale horizontal="fixed" vertical="strech" /></entity>
+				<entity name="mid_center" id="0"><region><Rectangle x="7" y="7" width="1" height="1" /></region><scale horizontal="strech" vertical="strech" /></entity>
+				<entity name="mid_right" id="0"><region><Rectangle x="8" y="7" width="7" height="1" /></region><scale horizontal="move" vertical="strech" /></entity>
+				<entity name="btm_left" id="0"><region><Rectangle x="0" y="8" width="7" height="7" /></region><scale horizontal="fixed" vertical="move" /></entity>
+				<entity name="btm_center" id="0"><region><Rectangle x="7" y="8" width="1" height="7" /></region><scale horizontal="strech" vertical="move" /></entity>
+				<entity name="btm_right" id="0"><region><Rectangle x="8" y="8" width="7" height="7" /></region><scale horizontal="move" vertical="move" /></entity>
+			</entities>
+		</layout>
+	</layouts>
+</skin>

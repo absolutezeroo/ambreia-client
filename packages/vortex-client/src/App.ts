@@ -486,6 +486,8 @@ export class VortexApp
         // Vortex's own sheet, not from the dump: the art src/vortex-skins/ cuts its regions out of.
         // Built by tools/build-vortexcoin-icon.mjs, which is also what documents its layout.
         'vortex_icons',
+        // The Ambreia dark window theme (style 300): tools/build-ambreia-skin.mjs draws it.
+        'ambreia_skin_dark',
     ];
 
     /**

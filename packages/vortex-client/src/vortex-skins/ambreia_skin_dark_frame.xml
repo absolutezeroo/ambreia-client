@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!--
+	The Ambreia dark theme's frame (style 300): the navy window of the 2026-10 mock-ups, its
+	title band drawn by the frame itself (the header skin is transparent). Regions are cut out of
+	ambreia_skin_dark.png, drawn by tools/build-ambreia-skin.mjs, which documents them.
+-->
+<skin name="ambreia_skin_dark_frame" version="0.1">
+	<states>
+		<state name="default" layout="frame_300" template="frame_300" />
+	</states>
+	<templates>
+		<template name="frame_300" asset="ambreia_skin_dark">
+			<entities>
+				<entity name="top_left" type="bitmap"><region><Rectangle x="0" y="0" width="10" height="33" /></region></entity>
+				<entity name="top_center" type="bitmap"><region><Rectangle x="10" y="0" width="6" height="33" /></region></entity>
+				<entity name="top_right" type="bitmap"><region><Rectangle x="16" y="0" width="10" height="33" /></region></entity>
+				<entity name="center_left" type="bitmap"><region><Rectangle x="0" y="33" width="10" height="12" /></region></entity>
+				<entity name="center_center" type="bitmap"><region><Rectangle x="10" y="33" width="6" height="12" /></region></entity>
+				<entity name="center_right" type="bitmap"><region><Rectangle x="16" y="33" width="10" height="12" /></region></entity>
+				<entity name="bottom_left" type="bitmap"><region><Rectangle x="0" y="45" width="10" height="10" /></region></entity>
+				<entity name="bottom_center" type="bitmap"><region><Rectangle x="10" y="45" width="6" height="10" /></region></entity>
+				<entity name="bottom_right" type="bitmap"><region><Rectangle x="16" y="45" width="10" height="10" /></region></entity>
+			</entities>
+		</template>
+	</templates>
+	<layouts>
+		<layout name="frame_300" transparent="true">
+			<entities>
+				<entity name="top_left" id="0"><region><Rectangle x="0" y="0" width="10" height="33" /></region><scale horizontal="fixed" vertical="fixed" /></entity>
+				<entity name="top_center" id="0"><region><Rectangle x="10" y="0" width="44" height="33" /></region><scale horizontal="strech" vertical="fixed" /></entity>
+				<entity name="top_right" id="0"><region><Rectangle x="54" y="0" width="10" height="33" /></region><scale horizontal="move" vertical="fixed" /></entity>
+				<entity name="center_left" id="0" colorize="false"><region><Rectangle x="0" y="33" width="10" height="21" /></region><scale horizontal="fixed" vertical="strech" /></entity>
+				<entity name="center_center" id="0" colorize="false"><region><Rectangle x="10" y="33" width="44" height="21" /></region><scale horizontal="strech" vertical="strech" /></entity>
+				<entity name="center_right" id="0" colorize="false"><region><Rectangle x="54" y="33" width="10" height="21" /></region><scale horizontal="move" vertical="strech" /></entity>
+				<entity name="bottom_left" id="0" colorize="false"><region><Rectangle x="0" y="54" width="10" height="10" /></region><scale horizontal="fixed" vertical="move" /></entity>
+				<entity name="bottom_center" id="0" colorize="false"><region><Rectangle x="10" y="54" width="44" height="10" /></region><scale horizontal="strech" vertical="move" /></entity>
+				<entity name="bottom_right" id="0" colorize="false"><region><Rectangle x="54" y="54" width="10" height="10" /></region><scale horizontal="move" vertical="move" /></entity>
+			</entities>
+		</layout>
+	</layouts>
+</skin>
