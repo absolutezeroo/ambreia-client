@@ -40,7 +40,7 @@ from a list and checked before the zone is published.
 | A character's quest log, saved | server (character grain, database) |
 | NPCs in the room, clickable | server room + client |
 | Dialogue: the server walks it, the client shows one node at a time | wire + server + client window |
-| Objectives progress: kill, talk, reach | server event handlers |
+| A modular quest engine: objective, reward and requirement kinds as plug-ins; objectives `kill`, `talk`, `reach`, `interact`, `collect`; rewards `xp`, `items` | server |
 | Hand-in: rewards once | server |
 | `StartQuest` executor, `QuestState` evaluator | server rules |
 | NPC markers « ! » and « ? » | wire + client overlay |
@@ -68,30 +68,77 @@ Two new content kinds in the emulator, each a JSON file under `content/<kind>/` 
 
 ### 2.1 Quest (`content/quest/*.json`, public)
 
+A quest is three lists of pieces, each piece a `kind` and its own fields: what the player must do
+(`objectives`), what the quest needs before it is offered (`requires`), what it gives (`rewards`).
+The quest system never names a kind: each kind is its own unit (§3.4), so « find X items », « click
+X objects », « finish X dungeons », « kill X monsters of a zone » are each one class and one schema
+fragment, added without touching the rest.
+
 ```json
 {
   "$schema": "../../schemas/content/quest.schema.json",
   "id": "quest.camp.wolves",
   "kind": "quest",
   "level": 1,
-  "requires": [],
+  "requires": [
+    {"kind": "PlayerLevel", "min": 1, "max": 200}
+  ],
   "objectives": [
     {"kind": "kill", "monster": "monster.forest.wolf", "count": 3},
-    {"kind": "talk", "zone": "camp", "npc": "elder"},
-    {"kind": "reach", "zone": "forest", "area": "clearing"}
+    {"kind": "kill", "zone": "camp", "rank": "elite", "count": 1},
+    {"kind": "collect", "item": "item.material.amber_shard", "count": 5, "consume": true},
+    {"kind": "interact", "zone": "camp", "object": "old_well", "count": 1},
+    {"kind": "talk", "zone": "camp", "npc": "scout"},
+    {"kind": "reach", "zone": "camp", "area": "clearing"}
   ],
-  "rewards": {"xp": 120, "items": [{"item": "item.weapon.rusted_sword", "quantity": 1}]}
+  "rewards": [
+    {"kind": "xp", "amount": 120},
+    {"kind": "items", "items": [{"item": "item.weapon.rusted_sword", "quantity": 1}]}
+  ]
 }
 ```
 
-- `level`: the advised level, shown in the journal; it does not block. `requires`: quest ids that
-  must be done before this one is offered.
-- An objective `kill` counts the `MonsterKilledEvent`s naming that monster in which the player is a
-  participant. `talk` is met when the player opens the dialogue of that NPC (`zone` key + `ZoneNpc.Id`).
-  `reach` is met when the player enters that area (`ZoneAreaEnteredEvent`). Objectives progress in
-  any order; the quest is `ready` when all are met.
-- Texts: `quest.camp.wolves.name`, `.description`, `.objective.0` … (with `%current%`/`%required%`).
+- `level`: the advised level, shown in the journal; it does not block.
+- `requires` reuses the zone rules' condition vocabulary and evaluators (`PlayerLevel`, `HasItem`,
+  `QuestState`, later `Faction`…): a new requirement is a new zone condition, usable by the editor's
+  triggers too. All must hold for the quest to be offered.
+- Objectives progress in any order; the quest is `ready` when every one is met. An objective has a
+  `count` (1 when left out) and an optional `text` key (default `quest.<id>.objective.<n>`, with
+  `%current%`/`%required%`).
+- Texts: `quest.camp.wolves.name`, `.description`, the objective lines.
 - Public (`/api/public/content/quest`): the journal and the tracker read names and counts from it.
+
+#### Objective kinds
+
+Two families, so that both « do X times » and « have X » fit:
+
+- **Counted**: an event adds to the counter, which never goes back. The kind names the event it
+  listens to and says, for one event and one objective, how much it adds for which players.
+- **Held**: the counter is read from what the player has now (their zone facts: items, level…), on
+  every change of those facts; it can go down (an item sold) and the quest can fall back from
+  `ready` to `active`.
+
+| Kind | Family | Fields | Source | When |
+|---|---|---|---|---|
+| `kill` | counted | `monster`?, `zone`?, `rank`? (at least one) | `MonsterKilledEvent` (participants) | M2a |
+| `talk` | counted | `zone`, `npc` | dialogue opened (`NpcTalkedEvent`, new) | M2a |
+| `reach` | counted | `zone`, `area` | `ZoneAreaEnteredEvent` | M2a |
+| `interact` | counted | `zone`, `object` (a decor id with an interaction or an Interact trigger) | `ZoneObjectInteractedEvent` (new, raised where the Interact trigger fires) | M2a |
+| `collect` | held | `item`, `consume`? (taken from the bag on hand-in) | `CharacterZoneFacts.Items` | M2a |
+| `level` | held | `min` | `CharacterZoneFacts.Level` | when wanted |
+| `dungeon` | counted | `dungeon`, `difficulty`? | dungeon completed event | M4 |
+| `craft`, `gather`, `use_item`, `deliver`, `escort`… | either | their own | their system's event | with their system |
+
+`kill` needs the monster's rank in `MonsterKilledEvent`: it gains a `Rank` field (the zone is
+already there).
+
+#### Reward kinds
+
+| Kind | Fields | Grants through | When |
+|---|---|---|---|
+| `xp` | `amount` | `GrantXpAsync` | M2a |
+| `items` | `items: [{item, quantity}]` | `GrantItemsAsync` (overflow to parcels, as today) | M2a |
+| `gold`, `reputation`, `skill`, `title`, `choice` (one of N) | their own | their system | with their system |
 
 ### 2.2 Dialogue (`content/dialogue/*.json`, server only)
 
@@ -132,9 +179,11 @@ Two new content kinds in the emulator, each a JSON file under `content/<kind>/` 
 
 ### 2.3 Validation
 
-The content loader refuses a dialogue whose `next` names no node, a choice with two actions, an
-`accept`/`complete`/`entries` quest that is not in the content, and a quest whose `kill` monster is
-not in the content or whose `count` is below 1.
+The content loader refuses a dialogue whose `next` names no node, a choice with two actions, and an
+`accept`/`complete`/`entries` quest that is not in the content. For a quest it refuses an unknown
+`kind` in any of its three lists, a `count` below 1, and whatever the piece's own kind refuses: each
+kind validates its fields against the content (`kill` an unknown monster, `collect` an unknown item,
+a reward an unknown item…). The schema is assembled from each kind's fragment (`oneOf` on `kind`).
 
 ## 3. Server contract
 
@@ -157,7 +206,7 @@ lists are `count × (...)`.
 | `RpgNpcs` | count × (objectId:i, marker:s) | in the zone's entry burst, then to a player whenever one of their quests changes state. Lists every NPC of the zone. `marker`: `available` (« ! »: a quest it offers is offerable), `ready` (« ? »: a quest it completes is `ready`), `active` (grey « ? »), or `` |
 | `RpgDialogue` | npcObjectId:i, speaker:s, text:s, choices: count × (text:s, kind:s) | the node to show. `speaker` and `text` are content text keys; `kind` is `next`, `accept`, `complete` or `close` (for the button's look) |
 | `RpgDialogueClose` | — | the server ended the dialogue: a quest accepted or completed, the player walked away (more than 2 tiles), left the zone, or died |
-| `RpgQuestLog` | count × (questId:s, state:s, objectives: count × (current:i, required:i)) | the whole log, active, ready and done: after sign-in (with the character's state push) and after every change. Small by construction (§4.1 caps the active quests) |
+| `RpgQuestLog` | count × (questId:s, state:s, objectives: count × (kind:s, current:i, required:i)) | the whole log, active, ready and done: after sign-in (with the character's state push) and after every change. Small by construction (§4.1 caps the active quests) |
 | `RpgQuestResult` | action:s, code:s, questId:s | `accepted`, `completed`, `abandoned` with `ok`; or a refusal: `quest.log_full`, `quest.not_offerable`, `quest.not_ready`, `npc.too_far`, `npc.unknown` |
 
 ### 3.3 Rules
@@ -170,11 +219,12 @@ lists are `count × (...)`.
   against that node; any other choice is ignored. Talking to another NPC replaces it.
 - **Accept**: offerable (§2.2) and fewer than 20 active quests, else a refusal. The quest enters the
   log as `active` with zero progress (or straight `ready` when it has no objectives left to meet).
-- **Progress**: a handler per event updates every concerned player's log, in the character grain;
-  over-kill does not count past `required`. A quest whose objectives are all met becomes `ready`.
-- **Complete**: the quest must be `ready`. The XP and items are granted with the grant key
-  `quest:<questId>:<playerId>`, so a retry or a double click grants nothing more; then the quest is
-  `done`. Items that do not fit go where `GrantItemsAsync` already puts overflow (its parcel rule).
+- **Progress**: see §3.4. A counter never passes `required`. A quest whose objectives are all met
+  becomes `ready`; a held objective that drops sends it back to `active`.
+- **Complete**: the quest must be `ready` (held objectives are read again at that moment). Items a
+  `collect` objective consumes are taken first; then each reward kind grants with the grant key
+  `quest:<questId>:<playerId>:<n>`, so a retry or a double click grants nothing more; then the quest
+  is `done`.
 - **Rules engine**: a `StartQuestExecutor` (the same path as a dialogue accept) and a
   `QuestStateEvaluator` reading a new `CharacterQuestFacts` part of the zone facts (quest id → state),
   pushed by the character on every change, as `CharacterZoneFacts` is today. Both drop their `rpg`
@@ -182,6 +232,27 @@ lists are `count × (...)`.
 - **Persistence**: a table `rpg_character_quests` (player id, quest id, state, progress per
   objective, accepted at, completed at; one row per quest taken), read with the character and
   written on each change, like the items. An EF migration adds it.
+
+### 3.4 The quest engine and its kinds
+
+The engine (`Vortex.Rpg.Quests`, a new module) knows quests, states and counters, never a kind:
+
+- `IQuestObjectiveKind`: `Key`, `Validate(objective, content)`, and one of
+  - `ICountedObjective<TEvent>`: `Progress(TEvent, objective)`, the players and amounts that event
+    adds;
+  - `IHeldObjective`: `Current(objective, facts)`, the count the player holds now.
+- `IQuestRewardKind`: `Key`, `Validate(reward, content)`, `GrantAsync(player, reward, grantKey)`.
+- Requirements are zone conditions (§2.1): the existing `IZoneConditionEvaluator`s.
+- Kinds are declared by DI by the module that owns their source (`kill` by combat, `collect` by
+  characters…). At start the engine subscribes once to every event type a counted kind names, and
+  on each event asks only the kinds of that type; the character grain applies the amounts to its
+  active quests that have such an objective. A held objective is recomputed when the character
+  pushes new facts.
+- A kind is unit-tested alone (an event and an objective in, amounts out); the engine is tested with
+  a test kind it has never heard of, to prove a new kind needs no change to it.
+
+The client stays generic too: it shows objective lines from their text keys and counts, and picks an
+icon from the objective's `kind`, with a default for a kind it does not know.
 
 ## 4. Client
 
@@ -235,20 +306,24 @@ feature). `available` « ! » gold, `ready` « ? » gold, `active` « ? » grey.
 No published zone has monsters or NPCs today (measured: `test`, `proof_a`, `proof_b`,
 `proof_zone`). M2a ships a demo zone `camp`, a zone document seeded by a dev script beside
 `scripts/sql/dev_zone.sql` (re-runnable, published as version 1): a safe area `camp`, an area
-`clearing`, three `monster.forest.wolf` spawns outside the camp, the NPCs `elder` (« Ancien du
-camp ») and `scout`, a respawn entry in the camp. In it, two chained quests, the second requiring
-the first:
+`clearing`, three `monster.forest.wolf` spawns outside the camp, an old well (`old_well`, a decor
+object with an Interact trigger) in the clearing, the NPCs `elder` (« Ancien du camp ») and `scout`,
+a respawn entry in the camp. In it, two chained quests, the second requiring the first (a
+`QuestState` requirement):
 
-1. `quest.camp.wolves`: kill 3 `monster.forest.wolf`; reward 120 XP and `item.weapon.rusted_sword`.
-2. `quest.camp.report`: talk to the camp's scout NPC, then reach the area `clearing`; reward 80 XP
-   and `item.consumable.minor_potion` × 3.
+1. `quest.camp.wolves`: kill 3 `monster.forest.wolf`; rewards 120 XP and `item.weapon.rusted_sword`.
+2. `quest.camp.report`: talk to the scout, reach the area `clearing`, look into the old well
+   (`interact`); rewards 80 XP and `item.consumable.minor_potion` × 3.
 
-French and English texts for both.
+French and English texts for both. `collect` has no live quest in M2a (no loot drops items yet): its
+tests cover it, and the first quest that uses it comes with loot.
 
 ## 7. Tests and exit criteria
 
-- Emulator: content loading and validation (§2.3); offerable rules; accept, progress per objective
-  kind, ready, complete with grants once (a second complete grants nothing); abandon; the dialogue
+- Emulator: content loading and validation (§2.3); offerable rules; accept; each objective kind and
+  each reward kind alone; the engine with a test kind it does not know; a held objective falling
+  back; ready; complete with grants once (a second complete grants nothing) and consumed items;
+  abandon; the dialogue
   walk (entry by state, hidden choices, a stale choice index ignored, close on distance); NPC units
   serialized as bots and ignored by combat; the two rule pieces; the quest log round-trips the
   database; `UnknownDialogue` and `UnknownQuest`.
