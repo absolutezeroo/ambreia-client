@@ -10,6 +10,7 @@ import {RpgCharacterResultMessageParser} from '../src/parser/rpg/characters/RpgC
 import {RpgCharacterStateMessageParser} from '../src/parser/rpg/characters/RpgCharacterStateMessageParser';
 import {RpgCharacterProgressMessageParser} from '../src/parser/rpg/characters/RpgCharacterProgressMessageParser';
 import {RpgCharacterStatsMessageParser} from '../src/parser/rpg/characters/RpgCharacterStatsMessageParser';
+import {RpgLevelUpMessageParser} from '../src/parser/rpg/characters/RpgLevelUpMessageParser';
 import {RpgCharacterListRequestMessage} from '../src/outgoing/rpg/characters/RpgCharacterListRequestMessage';
 import {RpgCharacterCreateMessage} from '../src/outgoing/rpg/characters/RpgCharacterCreateMessage';
 import {RpgCharacterChooseClassMessage} from '../src/outgoing/rpg/characters/RpgCharacterChooseClassMessage';
@@ -82,4 +83,19 @@ test('the four client messages serialize in the order the server parses them', (
     assert.deepEqual(new RpgCharacterCreateMessageSerializer().serialize(new RpgCharacterCreateMessage('Arwen', 'hd-180-1', 'F')), ['Arwen', 'hd-180-1', 'F']);
     assert.deepEqual(new RpgCharacterChooseClassMessageSerializer().serialize(new RpgCharacterChooseClassMessage(7, 'class.mage')), [7, 'class.mage']);
     assert.deepEqual(new RpgEnterWorldMessageSerializer().serialize(new RpgEnterWorldMessage(7)), [7]);
+});
+
+// M1d §2.1: both stat blocks, then the skills learned over the whole gain.
+test('RpgLevelUp reads both stat blocks then the skills learned', () =>
+{
+    const after = [...STATS];
+
+    after[3] = 172;
+    const message = new RpgLevelUpMessageParser().parse(wire(3, 4, ...STATS, ...after, 1, 'skill.mage.frost_nova'));
+
+    assert.equal(message.fromLevel, 3);
+    assert.equal(message.toLevel, 4);
+    assert.deepEqual(message.statsBefore, STAT_BLOCK);
+    assert.equal(message.statsAfter.maxHealth, 172);
+    assert.deepEqual(message.skillsLearned, ['skill.mage.frost_nova']);
 });

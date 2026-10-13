@@ -42,7 +42,14 @@ export const NewStyleHeaders = {
         Incoming.RpgStatusesMessageComposer,
         Incoming.RpgSkillEventsMessageComposer,
         // M1c: the telegraphed casts' cells (features/skills).
-        Incoming.RpgTelegraphsMessageComposer
+        Incoming.RpgTelegraphsMessageComposer,
+        // M1d Combat vertical slice: aims, threat, the resurrection offer, the auto-attack state
+        // (features/combat, interaction) and the level-up (features/character).
+        Incoming.RpgTargetsMessageComposer,
+        Incoming.RpgThreatMessageComposer,
+        Incoming.RpgResurrectOfferMessageComposer,
+        Incoming.RpgAutoAttackStateMessageComposer,
+        Incoming.RpgLevelUpMessageComposer
     ]),
     outgoing: new Set<number>([
         Outgoing.RpgCharacterListRequestMessageEvent,
@@ -60,7 +67,9 @@ export const NewStyleHeaders = {
         Outgoing.RpgEmoteMessageEvent,
         Outgoing.RpgSkillCastMessageEvent,
         Outgoing.RpgActionBarSetMessageEvent,
-        Outgoing.RpgCastCancelMessageEvent
+        Outgoing.RpgCastCancelMessageEvent,
+        Outgoing.RpgAutoAttackMessageEvent,
+        Outgoing.RpgDeathChoiceMessageEvent
     ])
 };
 

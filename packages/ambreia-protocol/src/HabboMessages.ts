@@ -82,7 +82,6 @@ import {
 
 // Incoming Events - Room Action
 import {
-    AvatarEffectMessageEvent,
     CarryObjectMessageEvent,
     UserChangeMessageEvent,
 } from './incoming/room/action/index';
@@ -251,7 +250,6 @@ export class HabboMessages implements IMessageConfiguration
         this._events.set(Incoming.RoomVisualizationSettingsComposer, RoomVisualizationSettingsEvent);
 
         // === ROOM ACTION ===
-        this._events.set(Incoming.AvatarEffectMessageComposer, AvatarEffectMessageEvent);
         this._events.set(Incoming.CarryObjectMessageComposer, CarryObjectMessageEvent);
         this._events.set(Incoming.UserChangeMessageComposer, UserChangeMessageEvent);
 
