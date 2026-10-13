@@ -15,6 +15,7 @@ import {vfxSheet, VFX_IMAGES, type IVfxPhase, type IVfxSet} from './vfxSheets';
 import {platform} from '@ambreia/common/platform/Platform';
 import {RoomEngineObjectEvent} from '@ambreia/iso/scene/events/RoomEngineObjectEvent';
 import {AttackBinding} from './views/AttackBinding';
+import {AuraLayer} from './views/AuraLayer';
 import {CombatLogPanel} from './views/CombatLogPanel';
 import {LOG_IMAGES, logClock, logLine} from './views/combatLogLines';
 import type {ILogNames} from './views/ILogNames';
@@ -52,6 +53,15 @@ export const CombatFeature: IGameFeature = {
     {
         const session = new RpgCombatSession();
         const vfx = new CombatVfx(host.assets, () => host.made.roomEngine);
+        // The status auras (M1d §3): the content's aura of each status, looped while it lasts.
+        const auras = new AuraLayer((phase, objectId) =>
+        {
+            const sheet = vfxSheet(phase.sheet);
+
+            return sheet ? vfx.loop(sheet, objectId, phase.attach) : null;
+        }, statusId => host.made.skills?.statusDefinition(statusId)?.vfx?.aura ?? null);
+
+        scope.own(auras);
         const on = scope.bind(session.events);
         const modelOn = scope.bind(session.model.events);
         let overlay: CombatOverlay | null = null;
@@ -154,6 +164,7 @@ export const CombatFeature: IGameFeature = {
 
         scope.own(levelUp);
         modelOn('levelUp', up => levelUp.show(up, host.made.hudPlayer?.value.figure ?? ''));
+        modelOn('statuses', (objectId, statuses) => auras.update(objectId, statuses));
 
         // The combat log (M1d §4): the model's lines, opened with L; the time each line was written.
         const logNames: ILogNames = {
@@ -254,6 +265,7 @@ export const CombatFeature: IGameFeature = {
 
                 overlayOf()?.hit(hit.targetId, hit.amount, hit.outcome, 0, wait);
                 // A dead monster leaves the room (UserRemove); a dead player stays, as a ghost.
+                if(hit.killed) auras.forget(hit.targetId);
                 if(hit.killed && isMonster(hit.targetId)) overlay?.remove(hit.targetId);
             }
         });
@@ -289,6 +301,7 @@ export const CombatFeature: IGameFeature = {
 
                 if(hit) later(() => play({...hit, delayMs: 0}, outcome.targetObjectId), delay);
                 overlayOf()?.hit(outcome.targetObjectId, outcome.amount, outcome.outcome, outcome.absorbed, delay);
+                if(outcome.killed) auras.forget(outcome.targetObjectId);
                 if(outcome.killed && isMonster(outcome.targetObjectId)) overlay?.remove(outcome.targetObjectId);
             }
 
@@ -365,6 +378,7 @@ export const CombatFeature: IGameFeature = {
             // rebuilds the model (spec §3.4).
             session.model.reset(epoch);
             combatLog.clear();
+            auras.clear();
             overlay?.clear();
             // The canvas took the sprites with it; the loops' handles would only hold their closures.
             incantations.clear();
