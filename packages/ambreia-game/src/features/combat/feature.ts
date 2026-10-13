@@ -15,6 +15,8 @@ import {vfxSheet, VFX_IMAGES, type IVfxPhase, type IVfxSet} from './vfxSheets';
 import {platform} from '@ambreia/common/platform/Platform';
 import {RoomEngineObjectEvent} from '@ambreia/iso/scene/events/RoomEngineObjectEvent';
 import {AttackBinding} from './views/AttackBinding';
+import {CombatLogPanel} from './views/CombatLogPanel';
+import {LOG_IMAGES, logClock} from './views/combatLogLines';
 import {DeathScreens} from './views/DeathScreens';
 import {KoPanel} from './views/KoPanel';
 import {LevelUpPanel} from './views/LevelUpPanel';
@@ -43,7 +45,7 @@ const MISSED = new Set(['miss', 'dodge', 'immune']);
  */
 export const CombatFeature: IGameFeature = {
     id: 'combat',
-    images: [...VFX_IMAGES, ...LEVEL_UP_IMAGES],
+    images: [...VFX_IMAGES, ...LEVEL_UP_IMAGES, ...LOG_IMAGES],
     requires: ['roomEngine', 'hud', 'hudPlayer', 'roomSession', 'input'],
     create: ({host, scope}) =>
     {
@@ -87,15 +89,23 @@ export const CombatFeature: IGameFeature = {
         modelOn('vitals', (objectId, vitals) => overlayOf()?.setHealth(objectId, vitals.health, vitals.maxHealth, isMonster(objectId)));
         scope.own(new PlayerFrameBinding(session.model, host.made.hudPlayer!));
         scope.own(new TargetHealthBinding(session.model, host.made.hud!));
-        scope.own(new TargetOfTargetBinding(session.model, host.made.hud!, objectId =>
+        // A monster is named by its content id (M1a §9.1), anyone else by its user name.
+        const nameOf = (objectId: number): string | null =>
         {
             const user = room?.userDataManager.getUserDataByIndex(objectId) ?? null;
 
             if(!user) return null;
 
-            // A monster is named by its content id (M1a §9.1); the player's own level is known.
-            const name = isMonster(objectId) ? bits().contentName(`${user.name}.name`, user.name) : user.name;
+            return isMonster(objectId) ? bits().contentName(`${user.name}.name`, user.name) : user.name;
+        };
 
+        scope.own(new TargetOfTargetBinding(session.model, host.made.hud!, objectId =>
+        {
+            const name = nameOf(objectId);
+
+            if(name === null) return null;
+
+            // The player's own level is known.
             return {name, level: objectId === room?.ownUserRoomId ? host.made.hudPlayer?.value.level ?? null : null};
         }));
 
@@ -137,6 +147,16 @@ export const CombatFeature: IGameFeature = {
 
         scope.own(levelUp);
         modelOn('levelUp', up => levelUp.show(up, host.made.hudPlayer?.value.figure ?? ''));
+
+        // The combat log (M1d §4): the model's lines, opened with L; the time each line was written.
+        const combatLog = new CombatLogPanel(() => host.made.windowManager, bits(), {
+            name: objectId => objectId === session.model.ownObjectId ? bits().text('vortex.combat.log.you') : nameOf(objectId) ?? '',
+            content: id => bits().contentName(`${id}.name`, id)
+        }, at => logClock(Date.now() - (platform().now() - at)));
+
+        scope.own(combatLog);
+        modelOn('log', entry => combatLog.add(entry, session.model.log));
+        scope.add(host.made.input!.bind('combat', 'l', () => combatLog.toggle(session.model.log), {when: () => room !== null}));
 
         // A monster's own art (tools/build-monsters.mjs) plays these pet gestures; a pet without them
         // plays nothing.
@@ -326,6 +346,7 @@ export const CombatFeature: IGameFeature = {
             // A zone change and a reconnect both end the room session: the next zone's burst
             // rebuilds the model (spec §3.4).
             session.model.reset(epoch);
+            combatLog.clear();
             overlay?.clear();
             // The canvas took the sprites with it; the loops' handles would only hold their closures.
             incantations.clear();
