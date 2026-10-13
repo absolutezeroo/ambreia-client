@@ -994,7 +994,6 @@ All items below are sourced directly from the emulator's own status docs (`ROADM
 | Achievements | 100% stub, `AchievementScore` hardcoded 0 (§20) |
 | Bots | **Built 2026-08-08** — entity, inventory, purchase, placement, pickup, chatter/wander (§18). Only `MoveBot` (1295) is unhandled |
 | Games (SnowStorm/Freeze/BattleBall-style) | 100% stub, no `Turbo.Games` project exists (§19) |
-| Avatar effects | Deferred alongside Achievements — needs a full subsystem from zero |
 
 ### Real, Precise Gaps in Otherwise-Implemented Systems
 
@@ -1227,3 +1226,20 @@ All values below are read directly from `Turbo.Revisions/Revision20260112/Header
 | S→C | 118 | `MessageComposer.CreditBalanceComposer` | Credit balance |
 
 Extend this table by grepping `Headers.cs` directly for anything you need that isn't listed — the full set is ~525 incoming + ~538 outgoing constants, far too many to usefully enumerate here.
+
+---
+
+## 26. RPG combat
+
+The Habbo avatar effects are gone (2624 and its chain, M1d §6.2): combat speaks through the new-style
+`Rpg*` messages, aligned on the emulator's serializers. What each one carries and why is in the specs,
+not repeated here:
+
+- server combat model, damage, death and resurrection: `../vortex-rpg-emulator/docs/superpowers/specs/2026-10-09-rpg-combat-m1a-design.md`;
+- skills, casts, cooldowns, statuses: `../vortex-rpg-emulator/docs/superpowers/specs/2026-10-09-rpg-skills-m1b-design.md`;
+- monsters, threat, telegraphs, yells: `../vortex-rpg-emulator/docs/superpowers/specs/2026-10-10-rpg-monsters-m1c-design.md`;
+- the vertical slice (targets of target, auto-attack, KO and offer, level-up, combat log, auras, icons from content) and the client's single-writer combat model: `docs/superpowers/specs/2026-10-13-m1-combat-vertical-slice-design.md`.
+
+On the client the network sessions alone write `features/combat/CombatModel`; every view reads it.
+A zone change (`RSE_ENDED`) resets it under a new epoch, and the entry burst that follows ends with
+`RpgSelfVitals`, which closes the resync: the log stays silent until then.

@@ -780,7 +780,7 @@ La suppression suit une règle stricte : **on ne conserve ni ne réimplémente a
 | Perks HC/Habbo | **DELETE** | future progression RPG explicite | fait |
 | Navigator public/guest | **DELETE** | World Map / Zones | fait (coupe noyau) |
 | Navigator private rooms | **REPLACE** | Housing browser | M10 |
-| AvatarEffect lifecycle | **REPLACE** | StatusEffects/VFX/Cosmetics | M1 |
+| AvatarEffect lifecycle | **REPLACE** | StatusEffects/VFX/Cosmetics | fait (M1) |
 | Wardrobe Habbo | **REPLACE** | supprimé ; Appearance/Equipment/Transmog à construire | M5 |
 | Pets Habbo | **REPLACE** | Mounts + Companions | M8 |
 | Pet Respect | **DELETE** | Affection RPG si besoin | M8 |
@@ -866,16 +866,18 @@ HotLooks, Perks, HC / HabboClub, Respect, Wardrobe, Navigator, Catalog, Messenge
 Groups, Quests Habbo, et les dossiers protocole `users`, `friendlist`, `moderation`, `preferences`,
 `tracking` avec leurs consommateurs (ignore/block list, group badges, selected badges, hand-item
 reçu, chat styles NFT, daily tasks, UI flags, event log, visit user, classification, extended
-profile). Il ne reste que des commentaires qui documentent le retrait.
+profile). Les AvatarEffects aussi (M1) : le message 2624, sa chaîne moteur et logique, la
+prévisualisation d'effet et neuf layouts ; la danse garde ses quatre bibliothèques sous
+`AvatarAnimationAssets` / `AmbreiaAnimationMap.xml`, et les statuts, auras et VFX de combat viennent
+du contenu. Il ne reste que des commentaires qui documentent le retrait.
 
 ## Restant
 
 | Domaine | Où | Décision | Milestone |
 |---|---|---|---|
 | Pets Habbo | `protocol/{incoming,outgoing,parser}/room/pet` (16 fichiers), `iso/avatar/pet`, `game/room/object/visualization/pet` | REPLACE | M8 |
-| AvatarEffect lifecycle | ~23 fichiers : `iso/effects`, `game/avatar`, protocole `avatar` | REPLACE | M1 |
 | Achievements score / badges | `AchievementsScoreMessageEvent`, `BadgeImageManager`, `BadgeImageWidget` | REPLACE | M7 |
-| Chat bubbles Habbo | `IlluminaChatBubbleWidget`, `RoomChatHandler` | DELETE si chat RPG sans bulles | M3 |
+| Chat bubbles Habbo | `IlluminaChatBubbleWidget`, `RoomChatHandler` ; le journal de combat existe (M1, touche L) | DELETE si chat RPG sans bulles | M3 |
 | Hand-items / carry | `HanditemConfigurationMessageEvent`, carry dans `AvatarLogic` | DELETE/REPLACE | M5 |
 | Moderation primitives | `RoomSession.ambassadorAlert`, mute/kick/ban composers | KEEP / REBUILD UI | M11 |
 
@@ -1141,10 +1143,10 @@ Ordre immédiat recommandé :
 2. ~~créer `LEGACY_REGISTER.md`~~ — le registre est le §11, tenu à jour à chaque retrait ;
 3. ~~supprimer M0~~ — fait le 2026-10-13 ;
 4. ~~figer les imports legacy~~ — `wall()` et les tests de registre le font déjà ;
-5. spécifier M1 Combat Support en détail ;
-6. implémenter M1 en vertical slice ;
-7. supprimer AvatarEffects au cutover ;
-8. passer ensuite à M2 World/NPC.
+5. ~~spécifier M1 Combat Support en détail~~ — `docs/superpowers/specs/2026-10-13-m1-combat-vertical-slice-design.md` ;
+6. ~~implémenter M1 en vertical slice~~ — livré le 2026-10-13, serveur et client ; le parcours live à deux comptes reste à faire ;
+7. ~~supprimer AvatarEffects au cutover~~ — fait ;
+8. **prochain : M2 World/NPC**, avec les quêtes qui portent les récompenses de combat.
 
 Cela donne un développement lisible, mesurable et réversible, au lieu d'un grand rewrite et d'une suppression massive risquée.
 

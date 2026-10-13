@@ -131,7 +131,7 @@ export class FigureData implements IFigureData, IAvatarImageListener
     }
 
     // AS3: .../avatar/figuredata/FigureData.as::set direction()
-    // Unlike the effect setter, this one *does* refresh — turning the avatar is a visible act.
+    // This one *does* refresh: turning the avatar is a visible act.
     public set direction(value: number)
     {
         this._direction = value;

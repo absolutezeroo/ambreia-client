@@ -61,7 +61,7 @@ test('a client request leaves under its own header, serialized in the server ord
     assert.deepEqual(sent, [[Outgoing.RpgEnterWorldMessageEvent, [7]]]);
 });
 
-test('the HUD shows the state, then follows progress and stats; current HP and mana stay within the maxima', () =>
+test('the HUD shows the state, then follows progress and stats; the current HP and mana belong to the combat model', () =>
 {
     const session = new RpgCharacterSession();
     const hud = new PlayerHudState();
@@ -71,18 +71,20 @@ test('the HUD shows the state, then follows progress and stats; current HP and m
     bindCharacterToHud(session, hud);
     deliver(Incoming.RpgCharacterStateMessageComposer, 7, 'class.warrior', '', 6, 20, 380, 400, ...STATS);
 
-    assert.deepEqual([hud.value.level, hud.value.xp, hud.value.xpMax, hud.value.hp, hud.value.hpMax, hud.value.mana, hud.value.manaMax], [6, 380, 400, 160, 160, 90, 90]);
+    // The maxima are the stats'; the current values wait for the combat's own vitals (RpgSelfVitals).
+    assert.deepEqual([hud.value.level, hud.value.xp, hud.value.xpMax, hud.value.hp, hud.value.hpMax, hud.value.mana, hud.value.manaMax], [6, 380, 400, null, 160, null, 90]);
 
+    // What PlayerFrameBinding writes from the combat model.
+    hud.update({hp: 150, mana: 80});
     deliver(Incoming.RpgCharacterProgressMessageComposer, 7, 15, 450);
     deliver(Incoming.RpgCharacterStatsMessageComposer, 13, 8, 10, 170, 90, 4, 620, 130, 100, 13);
 
-    // The current HP are the combat's (RpgSelfVitals, M1a): a higher maximum leaves them as they were.
-    assert.deepEqual([hud.value.level, hud.value.xp, hud.value.xpMax, hud.value.hpMax, hud.value.hp], [7, 15, 450, 170, 160]);
+    assert.deepEqual([hud.value.level, hud.value.xp, hud.value.xpMax, hud.value.hpMax, hud.value.hp], [7, 15, 450, 170, 150]);
 
-    // A lower maximum caps them.
+    // A lower maximum does not write the current values either: the server's next vitals do.
     deliver(Incoming.RpgCharacterStatsMessageComposer, 13, 8, 10, 120, 60, 4, 620, 130, 100, 13);
 
-    assert.deepEqual([hud.value.hp, hud.value.hpMax, hud.value.mana, hud.value.manaMax], [120, 120, 60, 60]);
+    assert.deepEqual([hud.value.hp, hud.value.hpMax, hud.value.mana, hud.value.manaMax], [150, 120, 80, 60]);
 });
 
 test('at the maximum level the XP bar is full and reads MAX', () =>
