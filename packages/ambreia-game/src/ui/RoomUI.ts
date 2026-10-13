@@ -773,13 +773,16 @@ export class RoomUI extends Component implements IRoomUI, IUpdateReceiver
 
     // DEVIATION: AS3 hands the dialog to the notifications component, which picks a bubble, a window or
     //   nothing per type from external_variables; that component left with the core cut (2026-10-07),
-    //   so every dialog becomes a plain alert of its `message` parameter.
+    //   so every dialog becomes a plain alert of its `message` parameter, but the zone's (`zone.*`),
+    //   which the HUD shows as toasts.
     // AS3: sources/WIN63-202607011411-782849652/src/com/sulake/habbo/notifications/_SafeCls_1951.as::onNotificationDialogMessageEvent()
     private onNotificationDialog(event: IMessageEvent): void
     {
-        const message = (event?.parser as NotificationDialogMessageEventParser | null)?.parameters.get('message');
+        const parser = event?.parser as NotificationDialogMessageEventParser | null;
+        const message = parser?.parameters.get('message');
 
-        if(!message) return;
+        // The zone's own notices (`zone.*`) are the HUD's toasts (features/hud/zoneNotice).
+        if(!message || parser?.type.startsWith('zone.')) return;
 
         this._windowManager?.alert('${generic.alert.title}', message, 0, (dialog) => dialog.dispose());
     }

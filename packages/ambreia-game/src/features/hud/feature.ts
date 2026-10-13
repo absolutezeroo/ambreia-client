@@ -14,6 +14,9 @@ import {CHAT_ICONS, loadChatSettings} from '../../ui/kit/chatModel';
 import {WindowBits} from '../../ui/kit/WindowBits';
 import {platform} from '@ambreia/common/platform/Platform';
 import {TOAST_IMAGES, ToastStack} from './ToastStack';
+import {zoneNotice} from './zoneNotice';
+import {NotificationDialogMessageEvent} from '@ambreia/protocol/incoming/notifications/NotificationDialogMessageEvent';
+import type {NotificationDialogMessageEventParser} from '@ambreia/protocol/parser/notifications/NotificationDialogMessageEventParser';
 
 // The demo's icons: read by name (static_bitmap asset_uri set at run time), so declared to be
 // decoded at load (IGameFeature.images). The server's skills, quests and effects will come with
@@ -67,6 +70,20 @@ export const HudFeature: IGameFeature = {
 
         scope.own(toasts);
         scope.bind(panels.events)('toast', toast => toasts.push(toast));
+
+        // The zone's notices (an area entered, a level advice) as toasts; RoomUI keeps its alert for the rest.
+        const communication = host.made.communication;
+        const zoneNotices = new NotificationDialogMessageEvent(event =>
+        {
+            const parser = event.parser as NotificationDialogMessageEventParser | null;
+            const message = parser?.parameters.get('message');
+            const toast = parser && message ? zoneNotice(parser.type, message) : null;
+
+            if(toast) toasts.push(toast);
+        });
+
+        communication?.addHabboConnectionMessageEvent(zoneNotices);
+        scope.add(() => communication?.removeHabboConnectionMessageEvent(zoneNotices));
         let panelsView: HudPanelsView | null = null;
 
         // What is typed goes to the chat feature (F3c), which sends it; the server's copy comes back as a line.
