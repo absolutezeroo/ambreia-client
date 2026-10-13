@@ -3,7 +3,7 @@ import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 import type {Ticker} from '../../ui/kit/Ticker';
 import type {WindowBits} from '../../ui/kit/WindowBits';
 import type {IHabboWindowManager} from '../../window/IHabboWindowManager';
-import {LAYER} from './HudPanelsView';
+import {LAYER} from './hudLayout';
 import type {IToast} from './IToast';
 import {ToastQueue} from './ToastQueue';
 

@@ -3,7 +3,8 @@ import {RoomSessionUserDataUpdateEvent} from '../../session/events/RoomSessionUs
 import {UserDataType} from '../../session/UserData';
 import type {IGameFeature} from '../GameFeature';
 import {ATTACK_ICON, HudView} from './HudView';
-import {HudPanelsView, TOT_IMAGES} from './HudPanelsView';
+import {HudPanelsView} from './HudPanelsView';
+import {TOT_IMAGES} from './panels/TargetOfTargetView';
 import {PlayerHudState} from './PlayerHudState';
 import {HudPanelsState, type IChatLine} from './HudPanelsState';
 import {bindCharacterToHud} from './CharacterHudBridge';

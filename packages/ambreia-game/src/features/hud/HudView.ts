@@ -12,7 +12,7 @@ import {barFill, cooldownLabel} from './PlayerHudState';
 import type {IActionSlot, IPlayerHud, PlayerHudState} from './PlayerHudState';
 import {unavailable} from '../../ui/kit/hudRules';
 import {HudTooltips, type ITooltip} from '../../ui/kit/HudTooltips';
-import {LAYER, MARGIN} from './HudPanelsView';
+import {LAYER, MARGIN} from './hudLayout';
 
 const log = Logger.getLogger('habbo.features.hud.HudView');
 /** How often a running cooldown's seconds are redrawn; nothing ticks when none runs. */
