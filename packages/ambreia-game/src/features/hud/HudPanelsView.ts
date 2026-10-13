@@ -10,7 +10,10 @@ import type {IHabboLocalizationManager} from '../../localization/IHabboLocalizat
 import {WindowBits} from '../../ui/kit/WindowBits';
 import {barFill} from './PlayerHudState';
 import type {IHudCast, IHudPanels, IHudUnit, IPartyMember, HudPanelsState} from './HudPanelsState';
-import {ChatPanel, type IMenuItem} from './ChatPanel';
+import {ChatPanel} from './chat/ChatPanel';
+import {HudMenu} from './HudMenu';
+import type {IMenuItem} from './IMenuItem';
+import {PopupSlot} from './PopupSlot';
 import {HudTooltips, type ITooltip} from '../../ui/kit/HudTooltips';
 import {lowHp} from '../../ui/kit/hudRules';
 import type {ITargetOfTarget} from './ITargetOfTarget';
@@ -66,6 +69,9 @@ export class HudPanelsView
     private readonly _built = new Map<string, unknown>();
     /** The chat window's tabs, log, menus and settings. */
     private readonly _chat: ChatPanel;
+    /** The HUD's popups (its menus, the chat's emoticons and settings): one open at a time. */
+    private readonly _popups = new PopupSlot();
+    private readonly _menu: HudMenu;
     private readonly _tips: HudTooltips;
     /** Each party frame to its member, for a click (selection) and a hover (tooltip). */
     private readonly _members = new Map<IWindow, IPartyMember>();
@@ -92,7 +98,8 @@ export class HudPanelsView
     )
     {
         this._bits = new WindowBits(localization);
-        this._chat = new ChatPanel(_windows, this._bits, _state, onChat);
+        this._menu = new HudMenu(_windows, this._bits, this._popups, LAYER);
+        this._chat = new ChatPanel(_windows, this._bits, _state, this._menu, this._popups, LAYER, onChat);
         this._tips = new HudTooltips(_windows, LAYER);
     }
 
@@ -107,7 +114,7 @@ export class HudPanelsView
     hide(): void
     {
         this._state.events.off('changed', this._onChange);
-        this._chat.closePopups();
+        this._popups.close();
         this._tips.out();
 
         for(const panel of this._panels.values()) panel.visible = false;
@@ -119,7 +126,7 @@ export class HudPanelsView
         const text = (key: string): string => this._bits.text(key);
         const soon = (label: string): IMenuItem => ({label: `${label} (${text('vortex.chat.soon')})`, icon: null, color: 0xffffff, checked: false, enabled: false, pick: () => undefined});
 
-        this._chat.toggleMenu('more', anchor, [
+        this._menu.toggle('more', anchor, [
             {label: text('vortex.hud.menu.profile'), icon: 'rpg/ui-icons/travel_person_people_three_icon', color: 0x6aa0e0, checked: false, enabled: true, pick: () => this._onNav('nav_character')},
             soon(text('vortex.hud.menu.settings')),
             soon(text('vortex.hud.menu.help')),
@@ -134,7 +141,7 @@ export class HudPanelsView
         const text = (key: string): string => this._bits.text(key);
         const entry = (label: string, icon: string, color: number, nav: string): IMenuItem => ({label, icon, color, checked: false, enabled: true, pick: () => this._onNav(nav)});
 
-        this._chat.toggleMenu('plus', anchor, [
+        this._menu.toggle('plus', anchor, [
             entry(text('vortex.character.stats.attributes'), 'rpg/ui-icons/rpg_stat_strength_fist_melee_attack_icon', 0xe09a60, 'nav_character'),
             entry(text('vortex.skill.title'), 'rpg/ui-icons/misc_religion_christianity_bible_book_cross_tome_libram_icon', 0xd0a040, 'nav_skills'),
             entry(text('vortex.hud.nav.inventory'), 'rpg/ui-icons/rpg_loot_bag_money_coins_purse_icon', 0xd8a060, 'nav_inventory')

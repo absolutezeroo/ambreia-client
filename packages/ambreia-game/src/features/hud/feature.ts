@@ -7,7 +7,7 @@ import {HudPanelsView, TOT_IMAGES} from './HudPanelsView';
 import {PlayerHudState} from './PlayerHudState';
 import {HudPanelsState, type IChatLine} from './HudPanelsState';
 import {bindCharacterToHud} from './CharacterHudBridge';
-import {ChatPanel} from './ChatPanel';
+import {browserStorage} from '../../ui/kit/browserStorage';
 import {CHAT_ICONS, loadChatSettings} from '../../ui/kit/chatModel';
 import {WindowBits} from '../../ui/kit/WindowBits';
 import {platform} from '@ambreia/common/platform/Platform';
@@ -57,7 +57,7 @@ export const HudFeature: IGameFeature = {
         host.made.hud = panels;
         host.made.hudPlayer = state;
         // The chat settings the player chose on this browser (the cog).
-        panels.update({chatSettings: loadChatSettings(ChatPanel.storage())});
+        panels.update({chatSettings: loadChatSettings(browserStorage())});
         let view: HudView | null = null;
 
         // The toasts (M1d §4): any feature's notices, stacked at the top of the screen.
