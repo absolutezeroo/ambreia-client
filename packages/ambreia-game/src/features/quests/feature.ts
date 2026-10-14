@@ -6,7 +6,9 @@ import type {IRoomSession} from '../../session/IRoomSession';
 import {WindowBits} from '../../ui/kit/WindowBits';
 import type {IEngineHost} from '../EngineHost';
 import type {IGameFeature} from '../GameFeature';
+import {QuestDefinitions} from './definitions/QuestDefinitions';
 import {DialogueWindow} from './dialogue/DialogueWindow';
+import {QuestJournal} from './journal/QuestJournal';
 import {LazySlot} from './LazySlot';
 import {NpcMarkerLayer} from './markers/NpcMarkerLayer';
 import {NpcMarkers} from './model/NpcMarkers';
@@ -31,13 +33,22 @@ const sessions = new WeakMap<IEngineHost, RpgQuestSession>();
  */
 export const QuestsFeature: IGameFeature = {
     id: 'quests',
-    requires: ['roomEngine', 'roomSession', 'input'],
+    requires: ['roomEngine', 'hud', 'roomSession', 'input'],
     create: ({host, scope}) =>
     {
         const session = new RpgQuestSession();
         const questLog = new QuestLogModel();
         const markers = new NpcMarkers();
         const bits = (): WindowBits => new WindowBits(host.made.localization);
+        // Level and rewards are the same for everyone: public content, loaded when the journal first opens.
+        const definitions = new QuestDefinitions(async () =>
+        {
+            const response = await fetch('/webapi/api/public/content/definitions/quest');
+
+            if(!response.ok) throw new Error(`HTTP ${response.status}`);
+
+            return await response.json() as unknown[];
+        });
         /** The room the player is in: its Users give an NPC's figure. */
         let room: IRoomSession | null = null;
 
@@ -53,6 +64,27 @@ export const QuestsFeature: IGameFeature = {
             : null);
 
         scope.own(dialogue);
+
+        const journal = new LazySlot(() => host.made.windowManager
+            ? new QuestJournal(host.made.windowManager, bits(), questLog, questId => definitions.of(questId), questId => session.abandon(questId))
+            : null);
+
+        scope.own(journal);
+
+        const openJournal = (): void =>
+        {
+            journal.get()?.toggle();
+            void definitions.load().then(() => journal.peek()?.render());
+            // The bottom bar's button of the journal shows it is open.
+            host.made.hud?.update({navOpen: journal.peek()?.visible ? 'nav_quests' : null});
+        };
+
+        // The bottom bar's « Quêtes » and J, in a zone only.
+        scope.bind(host.made.hud?.events)('nav', name =>
+        {
+            if(name === 'nav_quests') openJournal();
+        });
+        scope.add(host.made.input!.bind('quests', 'j', openJournal, {when: () => room !== null}));
 
         const layer = new NpcMarkerLayer(() =>
         {
@@ -89,10 +121,14 @@ export const QuestsFeature: IGameFeature = {
         });
 
         scope.bind(markers.events)('changed', () => layer.set(markers.all));
-        scope.bind(questLog.events)('changed', () => host.made.hud?.update({
-            quests: trackerLines(questLog.entries, bits()),
-            questAlert: questLog.active().some(entry => entry.state === 'ready')
-        }));
+        scope.bind(questLog.events)('changed', () =>
+        {
+            host.made.hud?.update({
+                quests: trackerLines(questLog.entries, bits()),
+                questAlert: questLog.active().some(entry => entry.state === 'ready')
+            });
+            journal.peek()?.render();
+        });
 
         const clicks = new NpcClicks(objectId => markers.isNpc(objectId), objectId => session.talk(objectId));
 
@@ -114,6 +150,7 @@ export const QuestsFeature: IGameFeature = {
         {
             room = null;
             dialogue.peek()?.hide();
+            journal.peek()?.hide();
             markers.clear();
         });
 

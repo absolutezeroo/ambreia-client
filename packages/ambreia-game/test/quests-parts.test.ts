@@ -15,6 +15,7 @@ import {markerLook} from '../src/features/quests/markers/markerLook';
 import {RoomObjectCategoryEnum} from '@ambreia/iso/scene/object/RoomObjectCategoryEnum';
 import {NpcClicks} from '../src/features/quests/npc/NpcClicks';
 import {LazySlot} from '../src/features/quests/LazySlot';
+import {rewardLines} from '../src/features/quests/journal/rewardLines';
 
 const known: Record<string, string> = {
     'quest.camp.wolves.name': 'Les loups du bosquet',
@@ -163,4 +164,14 @@ test('a lazy slot builds once, on first use, and only when it can', () =>
     assert.equal(slot.get()?.n, 1);
     assert.equal(slot.get()?.n, 1);
     assert.equal(built, 1);
+});
+
+test('the rewards read as lines: experience, then each item with its quantity', () =>
+{
+    assert.deepEqual(rewardLines({...texts, text: (key: string) => key === 'vortex.quest.reward.xp' ? 'Expérience' : key, contentName: (_key: string, id: string) => id === 'item.weapon.rusted_sword' ? 'Épée rouillée' : id}, {
+        id: 'quest.camp.wolves',
+        level: 1,
+        objectives: [],
+        rewards: [{kind: 'xp', amount: 120}, {kind: 'items', items: [{item: 'item.weapon.rusted_sword', quantity: 1}]}, {kind: 'gold', amount: 5}]
+    }), [{name: 'Expérience', value: '120'}, {name: 'Épée rouillée', value: '×1'}]);
 });
