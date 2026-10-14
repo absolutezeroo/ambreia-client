@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_answer_row_xml" width="198" height="24" version="0.1">
+  <window>
+    <border x="0" y="0" width="198" height="24" params="17" style="2" name="answer_row" color="0xffffff" dynamic_style="lifted_hover">
+      <children>
+        <border visible="false" x="0" y="0" width="198" height="24" params="16" style="2" name="selected" color="0x9cc9f5">
+          <children>
+            
+          </children>
+        </border>
+        <border x="3" y="3" width="18" height="18" params="16" style="2" color="0x2a6ad0">
+          <children>
+            <text x="0" y="0" width="18" height="16" params="16" style="3" name="answer_index" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="9" type="uint"/>
+                <var key="text_color" value="0xffffff" type="hex"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+        <text x="26" y="4" width="170" height="16" params="16" style="3" name="answer_txt" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </border>
+  </window>
+</layout>

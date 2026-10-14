@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_socket_xml" width="30" height="30" version="0.1">
+  <window>
+    <container x="0" y="0" width="30" height="30" params="16" style="3" name="socket">
+      <children>
+        <shape x="0" y="0" width="30" height="30" params="16" style="3" name="socket_shape" color="0xffc8ccd2">
+          <variables>
+            <var key="shape" value="round_rectangle" type="String"/>
+            <var key="radius" value="15" type="Number"/>
+            <var key="stroke_color" value="0xff6a7280" type="hex"/>
+            <var key="stroke_thickness" value="1" type="Number"/>
+          </variables>
+        </shape>
+        <static_bitmap visible="false" x="3" y="3" width="24" height="24" params="16" style="3" name="socket_gem" tags="%23icon">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/rpg_gem_jewelcrafting_diamond_points_currency_icon" type="String"/>
+            <var key="stretched_x" value="true" type="Boolean"/>
+            <var key="stretched_y" value="true" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+      </children>
+    </container>
+  </window>
+</layout>

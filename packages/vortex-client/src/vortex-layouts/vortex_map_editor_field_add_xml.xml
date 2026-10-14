@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_field_add_xml" width="316" height="24" version="0.1">
+  <window>
+    <container x="0" y="0" width="316" height="24" params="16" style="3" name="field_add">
+      <children>
+        <border x="0" y="2" width="20" height="20" params="17" style="2" name="add_button" color="0x2f9e2f" dynamic_style="button">
+          <children>
+            <static_bitmap x="2" y="2" width="16" height="16" params="16" style="3" tags="%23icon" color="0xffffff">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_signs_maths_plus_addition_bonus_add_new_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <text x="26" y="4" width="290" height="16" params="16" style="3" name="field_label" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x1f5f9a" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </container>
+  </window>
+</layout>

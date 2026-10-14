@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_vfx_track_row_xml" width="912" height="22" version="0.1">
+  <window>
+    <container x="0" y="0" width="912" height="22" params="16" style="3" name="vfx_track_row">
+      <children>
+        <shape x="0" y="0" width="912" height="22" params="16" style="3" name="bg" color="0xdce8f6">
+          <variables>
+            <var key="shape" value="round_rectangle" type="String"/>
+            <var key="radius" value="0" type="Number"/>
+          </variables>
+        </shape>
+        <shape x="0" y="0" width="200" height="22" params="16" style="3" name="head_bg" color="0xc8dcf2">
+          <variables>
+            <var key="shape" value="round_rectangle" type="String"/>
+            <var key="radius" value="0" type="Number"/>
+          </variables>
+        </shape>
+        <checkbox x="4" y="2" width="18" height="18" params="17" style="3" name="track_check"/>
+        <static_bitmap x="26" y="3" width="16" height="16" params="16" style="3" name="track_icon" tags="%23icon">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/boardgames_card_star_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="pivot_point" value="center" type="String"/>
+          </variables>
+        </static_bitmap>
+        <text x="46" y="3" width="104" height="16" params="16" style="3" name="track_name" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="154" y="1" width="20" height="20" params="17" style="2" name="track_eye" color="0xffffff" dynamic_style="button">
+          <children>
+            <static_bitmap x="2" y="2" width="16" height="16" params="16" style="3" name="track_eye_icon" tags="%23icon" color="0x4a5a6a">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/media_eyeball_vision_shown_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <border x="176" y="1" width="20" height="20" params="17" style="2" name="track_remove" color="0xffffff" dynamic_style="button">
+          <children>
+            <static_bitmap x="2" y="2" width="16" height="16" params="16" style="3" name="track_remove_icon" tags="%23icon" color="0x4a5a6a">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_signs_maths_multiplication_x_crossout_checkmark_cancel_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <shape x="210" y="5" width="400" height="12" params="16" style="3" name="bar" color="0xff8ab8e8">
+          <variables>
+            <var key="shape" value="round_rectangle" type="String"/>
+            <var key="radius" value="3" type="Number"/>
+          </variables>
+        </shape>
+        <container x="0" y="0" width="912" height="22" params="16" style="3" name="lane">
+          <children>
+            
+          </children>
+        </container>
+      </children>
+    </container>
+  </window>
+</layout>

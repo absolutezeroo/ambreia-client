@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_key_xml" width="9" height="9" version="0.1">
+  <window>
+    <container x="0" y="0" width="9" height="9" params="16" style="3" name="key">
+      <children>
+        <shape x="0" y="0" width="9" height="9" params="16" style="3" name="key_shape" color="0xff4a90e0">
+          <variables>
+            <var key="shape" value="round_rectangle" type="String"/>
+            <var key="radius" value="2" type="Number"/>
+            <var key="stroke_color" value="0xff1f3a5a" type="hex"/>
+            <var key="stroke_thickness" value="1" type="Number"/>
+          </variables>
+        </shape>
+      </children>
+    </container>
+  </window>
+</layout>

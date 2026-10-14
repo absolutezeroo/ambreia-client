@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_affix_row_xml" width="292" height="20" version="0.1">
+  <window>
+    <border x="0" y="0" width="292" height="20" params="17" style="2" name="affix_row" color="0xffffff">
+      <children>
+        <text x="6" y="2" width="40" height="16" params="16" style="3" name="affix_value" caption="">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <text x="50" y="2" width="140" height="16" params="16" style="3" name="affix_name" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="196" y="1" width="64" height="18" params="16" style="2" name="kind_box" color="0xdce8f6">
+          <children>
+            <text x="0" y="0" width="64" height="16" params="16" style="3" name="affix_kind" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="9" type="uint"/>
+                <var key="text_color" value="0x1f5f9a" type="hex"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+        <border x="268" y="0" width="20" height="20" params="17" style="2" name="remove_button" color="0xffffff" dynamic_style="button">
+          <children>
+            <static_bitmap x="2" y="2" width="16" height="16" params="16" style="3" name="remove_button_icon" tags="%23icon" color="0xd23a2a">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_signs_maths_multiplication_x_crossout_checkmark_cancel_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+      </children>
+    </border>
+  </window>
+</layout>

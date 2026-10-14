@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_icon_slot_xml" width="40" height="40" version="0.1">
+  <window>
+    <border x="0" y="0" width="40" height="40" params="17" style="2" name="icon_slot" color="0x2a3a50" dynamic_style="button">
+      <children>
+        <border visible="false" x="0" y="0" width="40" height="40" params="16" style="2" name="selected" color="0x9cc9f5">
+          <children>
+            
+          </children>
+        </border>
+        <static_bitmap x="4" y="4" width="32" height="32" params="16" style="3" name="slot_icon" tags="%23icon">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/rpg_item_weapon_sword_attack_melee_slashing_damage_icon" type="String"/>
+            <var key="stretched_x" value="true" type="Boolean"/>
+            <var key="stretched_y" value="true" type="Boolean"/>
+          </variables>
+        </static_bitmap>
+      </children>
+    </border>
+  </window>
+</layout>

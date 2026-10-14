@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_graph_palette_xml" width="330" height="250" version="0.1">
+  <window>
+    <border x="0" y="0" width="330" height="250" params="16" style="2" name="palette" color="0xe8eef4">
+      <children>
+        <container x="1" y="1" width="328" height="22" params="16" style="8" color="0xff3d7aa8" background="true"/>
+        <text x="8" y="4" width="266" height="16" params="16" style="3" name="palette_title" caption="${vortex.mapeditor.content.graph.add_node}">
+          <variables>
+            <var key="text_style" value="u_bold" type="String"/>
+            <var key="font_size" value="11" type="uint"/>
+            <var key="text_color" value="0xffffff" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="8" y="28" width="314" height="22" params="16" style="2" color="0xe4e4dc">
+          <children>
+            <static_bitmap x="3" y="3" width="16" height="16" params="16" style="3" tags="%23icon" color="0x888880">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_magnifier_zoom_looking_magnifying_glass_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+            <input x="22" y="3" width="286" height="16" params="1" style="0" name="palette_search" caption="${vortex.mapeditor.content.graph.search_node}"/>
+          </children>
+        </border>
+        <scrollable_itemlist_vertical x="8" y="56" width="112" height="188" params="16" style="3" name="kind_list">
+          <children/>
+          <variables>
+            <var key="spacing" value="1" type="int"/>
+          </variables>
+        </scrollable_itemlist_vertical>
+        <scrollable_itemlist_vertical x="126" y="56" width="196" height="188" params="16" style="3" name="template_list">
+          <children/>
+          <variables>
+            <var key="spacing" value="3" type="int"/>
+          </variables>
+        </scrollable_itemlist_vertical>
+      </children>
+    </border>
+  </window>
+</layout>

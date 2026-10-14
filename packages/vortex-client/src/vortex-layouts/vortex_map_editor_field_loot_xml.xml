@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_field_loot_xml" width="316" height="34" version="0.1">
+  <window>
+    <container x="0" y="0" width="316" height="34" params="16" style="3" name="field_loot">
+      <children>
+        <border x="0" y="2" width="30" height="30" params="16" style="2" name="icon_box" color="0xe4e4dc">
+          <children>
+            <static_bitmap x="-1" y="-1" width="32" height="32" params="16" style="3" name="loot_icon" tags="%23icon">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/rpg_item_weapon_sword_attack_melee_slashing_damage_icon" type="String"/>
+                <var key="stretched_x" value="true" type="Boolean"/>
+                <var key="stretched_y" value="true" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <text x="36" y="9" width="122" height="16" params="16" style="3" name="loot_name" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="160" y="5" width="46" height="24" params="16" style="2" color="0xffffff">
+          <children>
+            <text x="0" y="4" width="46" height="16" params="16" style="3" name="loot_pct" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x1f2a33" type="hex"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+        <border x="210" y="5" width="50" height="24" params="16" style="2" color="0xffffff">
+          <children>
+            <text x="0" y="4" width="50" height="16" params="16" style="3" name="loot_qty" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x1f2a33" type="hex"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+        <border x="264" y="5" width="12" height="12" params="17" style="2" name="loot_order_up" color="0xe4e4dc" dynamic_style="button">
+          <children>
+            <static_bitmap x="-2" y="-2" width="16" height="16" params="16" style="3" name="loot_order_up_icon" tags="%23icon" color="0x4a5a6a">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_up_north_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <border x="264" y="17" width="12" height="12" params="17" style="2" name="loot_order_down" color="0xe4e4dc" dynamic_style="button">
+          <children>
+            <static_bitmap x="-2" y="-2" width="16" height="16" params="16" style="3" name="loot_order_down_icon" tags="%23icon" color="0x4a5a6a">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_down_south_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <border x="284" y="6" width="22" height="22" params="17" style="2" name="remove_button" color="0xffffff" dynamic_style="button">
+          <children>
+            <static_bitmap x="3" y="3" width="16" height="16" params="16" style="3" name="remove_button_icon" tags="%23icon" color="0xd23a2a">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/software_signs_maths_multiplication_x_crossout_checkmark_cancel_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

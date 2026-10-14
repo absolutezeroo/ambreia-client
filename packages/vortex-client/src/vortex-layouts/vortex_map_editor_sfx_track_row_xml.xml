@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_sfx_track_row_xml" width="926" height="28" version="0.1">
+  <window>
+    <container x="0" y="0" width="926" height="28" params="16" style="3" name="sfx_track_row">
+      <children>
+        <border x="0" y="0" width="146" height="28" params="16" style="2" name="track_head" color="0x4a90d9">
+          <children>
+            <static_bitmap x="6" y="6" width="16" height="16" params="16" style="3" name="track_icon" tags="%23icon" color="0xffffff">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/media_audio_sound_volume_3_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+            <text x="26" y="5" width="66" height="16" params="16" style="3" name="track_name" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0xffffff" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <border x="94" y="4" width="22" height="20" params="17" style="2" name="mute" color="0xffffff" dynamic_style="button">
+              <children>
+                <text x="0" y="1" width="22" height="16" params="16" style="3" caption="M">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x1f2a33" type="hex"/>
+                    <var key="auto_size" value="center" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+            <border x="120" y="4" width="22" height="20" params="17" style="2" name="solo" color="0xffffff" dynamic_style="button">
+              <children>
+                <text x="0" y="1" width="22" height="16" params="16" style="3" caption="S">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x1f2a33" type="hex"/>
+                    <var key="auto_size" value="center" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+          </children>
+        </border>
+        <border x="150" y="0" width="776" height="28" params="16" style="2" name="lane_bg" color="0xdde3ea">
+          <children>
+            
+          </children>
+        </border>
+        <container x="150" y="0" width="776" height="28" params="16" style="3" name="lane">
+          <children>
+            
+          </children>
+        </container>
+      </children>
+    </container>
+  </window>
+</layout>

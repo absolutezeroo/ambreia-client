@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_wave_bar_xml" width="2" height="22" version="0.1">
+  <window>
+    <container x="0" y="0" width="2" height="22" params="16" style="3" name="wave_bar">
+      <children>
+        <shape x="0" y="0" width="2" height="22" params="16" style="3" name="bar_shape" color="0xff2a5a9a">
+          <variables>
+            <var key="shape" value="round_rectangle" type="String"/>
+            <var key="radius" value="0" type="Number"/>
+          </variables>
+        </shape>
+      </children>
+    </container>
+  </window>
+</layout>

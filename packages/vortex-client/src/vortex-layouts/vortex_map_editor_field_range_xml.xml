@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_field_range_xml" width="316" height="26" version="0.1">
+  <window>
+    <container x="0" y="0" width="316" height="26" params="16" style="3" name="field_range">
+      <children>
+        <text x="0" y="4" width="112" height="16" params="16" style="3" name="field_label" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="118" y="0" width="60" height="24" params="16" style="2" name="field_min_box" color="0xffffff">
+          <children>
+            <input x="6" y="4" width="48" height="16" params="1" style="0" name="field_min" caption=""/>
+          </children>
+        </border>
+        <border x="178" y="0" width="12" height="12" params="17" style="2" name="field_min_up" color="0xe4e4dc" dynamic_style="button">
+          <children>
+            <static_bitmap x="-2" y="-2" width="16" height="16" params="16" style="3" name="field_min_up_icon" tags="%23icon" color="0x4a5a6a">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_up_north_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <border x="178" y="12" width="12" height="12" params="17" style="2" name="field_min_down" color="0xe4e4dc" dynamic_style="button">
+          <children>
+            <static_bitmap x="-2" y="-2" width="16" height="16" params="16" style="3" name="field_min_down_icon" tags="%23icon" color="0x4a5a6a">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_down_south_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <text x="192" y="4" width="40" height="16" params="16" style="3" name="field_sep" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x6b7682" type="hex"/>
+            <var key="auto_size" value="center" type="String"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="236" y="0" width="64" height="24" params="16" style="2" name="field_max_box" color="0xffffff">
+          <children>
+            <input x="6" y="4" width="52" height="16" params="1" style="0" name="field_max" caption=""/>
+          </children>
+        </border>
+        <border x="300" y="0" width="12" height="12" params="17" style="2" name="field_max_up" color="0xe4e4dc" dynamic_style="button">
+          <children>
+            <static_bitmap x="-2" y="-2" width="16" height="16" params="16" style="3" name="field_max_up_icon" tags="%23icon" color="0x4a5a6a">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_up_north_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+        <border x="300" y="12" width="12" height="12" params="17" style="2" name="field_max_down" color="0xe4e4dc" dynamic_style="button">
+          <children>
+            <static_bitmap x="-2" y="-2" width="16" height="16" params="16" style="3" name="field_max_down_icon" tags="%23icon" color="0x4a5a6a">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_down_south_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

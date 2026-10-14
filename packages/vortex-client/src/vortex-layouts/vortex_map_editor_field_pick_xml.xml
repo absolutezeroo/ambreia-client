@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_field_pick_xml" width="316" height="26" version="0.1">
+  <window>
+    <container x="0" y="0" width="316" height="26" params="16" style="3" name="field_pick">
+      <children>
+        <text x="0" y="4" width="112" height="16" params="16" style="3" name="field_label" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="118" y="0" width="170" height="24" params="16" style="2" name="field_box" color="0xffffff">
+          <children>
+            <input x="6" y="4" width="158" height="16" params="1" style="0" name="field" caption=""/>
+          </children>
+        </border>
+        <border x="292" y="1" width="22" height="22" params="17" style="2" name="field_button" color="0xffffff" dynamic_style="button">
+          <children>
+            <static_bitmap x="3" y="3" width="16" height="16" params="16" style="3" name="field_button_icon" tags="%23icon" color="0x4a5a6a">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/controller_buttons_menu_options_settings_icon" type="String"/>
+                <var key="stretched_x" value="false" type="Boolean"/>
+                <var key="stretched_y" value="false" type="Boolean"/>
+                <var key="pivot_point" value="center" type="String"/>
+              </variables>
+            </static_bitmap>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

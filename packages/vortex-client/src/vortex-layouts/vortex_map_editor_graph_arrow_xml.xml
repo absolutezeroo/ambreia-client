@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_graph_arrow_xml" width="16" height="16" version="0.1">
+  <window>
+    <container x="0" y="0" width="16" height="16" params="16" style="3" name="graph_arrow">
+      <children>
+        <static_bitmap x="0" y="0" width="16" height="16" params="16" style="3" name="arrow_icon" tags="%23icon" color="0x2a9a50">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/arrows_pointer_right_east_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="pivot_point" value="center" type="String"/>
+          </variables>
+        </static_bitmap>
+      </children>
+    </container>
+  </window>
+</layout>

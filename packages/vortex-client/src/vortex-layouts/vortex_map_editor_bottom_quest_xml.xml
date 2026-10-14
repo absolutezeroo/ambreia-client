@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_bottom_quest_xml" width="942" height="217" version="0.1">
+  <window>
+    <container x="0" y="0" width="942" height="217" params="16" style="3" name="bottom_quest">
+      <children>
+        <border x="0" y="0" width="530" height="217" params="16" style="2" name="console" color="0xe8eef4">
+          <children>
+            <container x="1" y="1" width="528" height="22" params="16" style="8" color="0xff3d7aa8" background="true"/>
+            <text x="8" y="4" width="466" height="16" params="16" style="3" name="console_title" caption="${vortex.mapeditor.content.quest.console}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0xffffff" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <container x="8" y="28" width="500" height="22" params="16" style="3" name="console_filters">
+              <children>
+                <border x="0" y="0" width="120" height="22" params="17" style="2" name="filter_all" color="0x9cc9f5" dynamic_style="button">
+                  <children>
+                    <static_bitmap x="4" y="3" width="16" height="16" params="16" style="3" tags="%23icon" color="0x2a6ad0">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/software_warning_sign_circle_information_help_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                        <var key="pivot_point" value="center" type="String"/>
+                      </variables>
+                    </static_bitmap>
+                    <text x="24" y="3" width="94" height="16" params="16" style="3" name="all_txt" caption="">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="9" type="uint"/>
+                        <var key="text_color" value="0x1f2a33" type="hex"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </border>
+                <border x="124" y="0" width="120" height="22" params="17" style="2" name="filter_errors" color="0xffffff" dynamic_style="button">
+                  <children>
+                    <static_bitmap x="4" y="3" width="16" height="16" params="16" style="3" tags="%23icon" color="0xd23a2a">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/software_signs_maths_multiplication_x_crossout_checkmark_cancel_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                        <var key="pivot_point" value="center" type="String"/>
+                      </variables>
+                    </static_bitmap>
+                    <text x="24" y="3" width="94" height="16" params="16" style="3" name="errors_txt" caption="">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="9" type="uint"/>
+                        <var key="text_color" value="0x1f2a33" type="hex"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </border>
+                <border x="248" y="0" width="120" height="22" params="17" style="2" name="filter_warnings" color="0xffffff" dynamic_style="button">
+                  <children>
+                    <static_bitmap x="4" y="3" width="16" height="16" params="16" style="3" tags="%23icon" color="0xe0a020">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/software_warning_sign_triangle_exclaimation_mark_error_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                        <var key="pivot_point" value="center" type="String"/>
+                      </variables>
+                    </static_bitmap>
+                    <text x="24" y="3" width="94" height="16" params="16" style="3" name="warnings_txt" caption="">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="9" type="uint"/>
+                        <var key="text_color" value="0x1f2a33" type="hex"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </border>
+                <border x="372" y="0" width="120" height="22" params="17" style="2" name="filter_infos" color="0xffffff" dynamic_style="button">
+                  <children>
+                    <static_bitmap x="4" y="3" width="16" height="16" params="16" style="3" tags="%23icon" color="0x2a8fd6">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/software_warning_sign_circle_information_help_icon" type="String"/>
+                        <var key="stretched_x" value="false" type="Boolean"/>
+                        <var key="stretched_y" value="false" type="Boolean"/>
+                        <var key="pivot_point" value="center" type="String"/>
+                      </variables>
+                    </static_bitmap>
+                    <text x="24" y="3" width="94" height="16" params="16" style="3" name="infos_txt" caption="">
+                      <variables>
+                        <var key="text_style" value="u_regular" type="String"/>
+                        <var key="font_size" value="9" type="uint"/>
+                        <var key="text_color" value="0x1f2a33" type="hex"/>
+                        <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                      </variables>
+                    </text>
+                  </children>
+                </border>
+              </children>
+            </container>
+            <border x="8" y="56" width="514" height="155" params="16" style="2" color="0xffffff">
+              <children>
+                <scrollable_itemlist_vertical x="4" y="4" width="506" height="147" params="16" style="3" name="console_list">
+                  <children/>
+                  <variables>
+                    <var key="spacing" value="1" type="int"/>
+                  </variables>
+                </scrollable_itemlist_vertical>
+              </children>
+            </border>
+          </children>
+        </border>
+        <border x="536" y="0" width="230" height="217" params="16" style="2" name="rewards" color="0xe8eef4">
+          <children>
+            <container x="1" y="1" width="228" height="22" params="16" style="8" color="0xff3d7aa8" background="true"/>
+            <text x="8" y="4" width="166" height="16" params="16" style="3" name="rewards_title" caption="${vortex.mapeditor.content.quest.rewards}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0xffffff" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <scrollable_itemgrid_vertical x="8" y="30" width="214" height="140" params="16" style="3" name="reward_grid">
+              <children/>
+              <variables>
+                <var key="spacing" value="4" type="int"/>
+              </variables>
+            </scrollable_itemgrid_vertical>
+            <button x="8" y="182" width="214" height="24" params="131089" style="6" color="0x8c8c86" name="rewards_edit" caption="${vortex.mapeditor.content.quest.rewards_edit}" width_min="214" width_max="214"/>
+          </children>
+        </border>
+        <border x="772" y="0" width="170" height="217" params="16" style="2" name="flow_map" color="0xe8eef4">
+          <children>
+            <container x="1" y="1" width="168" height="22" params="16" style="8" color="0xff3d7aa8" background="true"/>
+            <text x="8" y="4" width="106" height="16" params="16" style="3" name="flow_map_title" caption="${vortex.mapeditor.content.quest.flow_map}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0xffffff" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <border x="6" y="28" width="130" height="183" params="16" style="2" name="flow_box" color="0xffffff">
+              <children>
+                <container x="0" y="0" width="130" height="183" params="16" style="3" name="flow_layer">
+                  <children>
+                    
+                  </children>
+                </container>
+              </children>
+            </border>
+            <border x="142" y="28" width="22" height="22" params="17" style="2" name="flow_fit" color="0xffffff" dynamic_style="button">
+              <children>
+                <static_bitmap x="3" y="3" width="16" height="16" params="16" style="3" name="flow_fit_icon" tags="%23icon" color="0x4a5a6a">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_qr_code_scan_small_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <border x="142" y="54" width="22" height="22" params="17" style="2" name="flow_in" color="0xffffff" dynamic_style="button">
+              <children>
+                <static_bitmap x="3" y="3" width="16" height="16" params="16" style="3" name="flow_in_icon" tags="%23icon" color="0x4a5a6a">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_signs_maths_plus_addition_bonus_add_new_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <border x="142" y="80" width="22" height="22" params="17" style="2" name="flow_out" color="0xffffff" dynamic_style="button">
+              <children>
+                <static_bitmap x="3" y="3" width="16" height="16" params="16" style="3" name="flow_out_icon" tags="%23icon" color="0x4a5a6a">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_signs_maths_minus_subtract_drawback_remove_delete_dash_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

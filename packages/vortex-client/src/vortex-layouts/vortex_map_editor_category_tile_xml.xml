@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_category_tile_xml" width="132" height="26" version="0.1">
+  <window>
+    <border x="0" y="0" width="132" height="26" params="17" style="2" name="category_tile" color="0xf2f2ec" dynamic_style="lifted_hover">
+      <children>
+        <border visible="false" x="0" y="0" width="132" height="26" params="16" style="2" name="selected" color="0x9cc9f5">
+          <children>
+            
+          </children>
+        </border>
+        <static_bitmap x="5" y="5" width="16" height="16" params="16" style="3" name="category_icon" tags="%23icon">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/boardgames_card_star_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="pivot_point" value="center" type="String"/>
+          </variables>
+        </static_bitmap>
+        <text x="26" y="4" width="104" height="16" params="16" style="3" name="category_txt" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </border>
+  </window>
+</layout>

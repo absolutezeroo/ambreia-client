@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_graph_kind_row_xml" width="100" height="20" version="0.1">
+  <window>
+    <border x="0" y="0" width="100" height="20" params="17" style="2" name="graph_kind_row" color="0xffffff" dynamic_style="lifted_hover">
+      <children>
+        <border visible="false" x="0" y="0" width="100" height="20" params="16" style="2" name="selected" color="0x9cc9f5">
+          <children>
+            
+          </children>
+        </border>
+        <static_bitmap x="3" y="2" width="16" height="16" params="16" style="3" name="kind_icon" tags="%23icon">
+          <variables>
+            <var key="asset_uri" value="rpg/ui-icons/boardgames_card_star_icon" type="String"/>
+            <var key="stretched_x" value="false" type="Boolean"/>
+            <var key="stretched_y" value="false" type="Boolean"/>
+            <var key="pivot_point" value="center" type="String"/>
+          </variables>
+        </static_bitmap>
+        <text x="24" y="2" width="76" height="16" params="16" style="3" name="kind_txt" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="9" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </border>
+  </window>
+</layout>

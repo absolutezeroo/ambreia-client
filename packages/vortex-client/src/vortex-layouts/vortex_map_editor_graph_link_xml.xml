@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_graph_link_xml" width="2" height="2" version="0.1">
+  <window>
+    <container x="0" y="0" width="2" height="2" params="16" style="3" name="graph_link">
+      <children>
+        <shape x="0" y="0" width="2" height="2" params="16" style="3" name="link_shape" color="0xff2a9a50">
+          <variables>
+            <var key="shape" value="round_rectangle" type="String"/>
+            <var key="radius" value="0" type="Number"/>
+          </variables>
+        </shape>
+      </children>
+    </container>
+  </window>
+</layout>

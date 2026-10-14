@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_item_sheet_xml" width="632" height="582" version="0.1">
+  <window>
+    <border x="0" y="0" width="632" height="582" params="16" style="2" name="item_sheet" color="0xd6dee8">
+      <children>
+        <border x="8" y="8" width="200" height="220" params="16" style="2" name="art_box" color="0x1c3048">
+          <children>
+            <shape x="8" y="8" width="10" height="10" params="16" style="3" name="art_rarity" color="0x4cc040">
+              <variables>
+                <var key="shape" value="round_rectangle" type="String"/>
+                <var key="radius" value="5" type="Number"/>
+              </variables>
+            </shape>
+            <static_bitmap x="36" y="18" width="128" height="128" params="16" style="3" name="item_art" tags="%23icon">
+              <variables>
+                <var key="asset_uri" value="rpg/ui-icons/rpg_item_weapon_sword_attack_melee_slashing_damage_icon" type="String"/>
+                <var key="stretched_x" value="true" type="Boolean"/>
+                <var key="stretched_y" value="true" type="Boolean"/>
+              </variables>
+            </static_bitmap>
+            <itemlist_horizontal x="10" y="170" width="180" height="40" params="16" style="3" name="variant_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="4" type="int"/>
+              </variables>
+            </itemlist_horizontal>
+          </children>
+        </border>
+        <border x="216" y="8" width="200" height="220" params="16" style="2" name="identity_box" color="0xe8eef4">
+          <children>
+            <text x="8" y="6" width="186" height="22" params="16" style="3" name="item_name" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="15" type="uint"/>
+                <var key="text_color" value="0x1f2a33" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <border x="8" y="32" width="96" height="20" params="16" style="2" name="rarity_badge" color="0x40a040">
+              <children>
+                <text x="0" y="1" width="96" height="16" params="16" style="3" name="rarity_txt" caption="">
+                  <variables>
+                    <var key="text_style" value="u_bold" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0xffffff" type="hex"/>
+                    <var key="auto_size" value="center" type="String"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+            <text x="110" y="34" width="84" height="16" params="16" style="3" name="level_txt" caption="">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x1f2a33" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <border x="8" y="60" width="184" height="152" params="16" style="2" name="desc_box" color="0xffffff">
+              <children>
+                <text x="6" y="4" width="172" height="144" params="16" style="3" name="item_desc" caption="">
+                  <variables>
+                    <var key="text_style" value="u_regular" type="String"/>
+                    <var key="font_size" value="10" type="uint"/>
+                    <var key="text_color" value="0x3a4650" type="hex"/>
+                    <var key="multiline" value="true" type="Boolean"/>
+                    <var key="word_wrap" value="true" type="Boolean"/>
+                    <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+                  </variables>
+                </text>
+              </children>
+            </border>
+          </children>
+        </border>
+        <border x="424" y="8" width="200" height="220" params="16" style="2" name="equip" color="0xe8eef4">
+          <children>
+            <container x="1" y="1" width="198" height="22" params="16" style="8" color="0xff3d7aa8" background="true"/>
+            <text x="8" y="4" width="136" height="16" params="16" style="3" name="equip_title" caption="${vortex.mapeditor.content.item.equip}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0xffffff" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <border x="4" y="24" width="192" height="192" params="16" style="2" name="equip_body" color="0x22344a">
+              <children>
+                <widget x="56" y="22" width="80" height="150" params="16" style="3" name="avatar_image">
+                  <variables>
+                    <var key="widget_type" value="avatar_image" type="String"/>
+                  </variables>
+                </widget>
+                <border x="82" y="4" width="30" height="30" params="17" style="2" name="slot_head" color="0x3a4a60" dynamic_style="button">
+                  <children>
+                    <static_bitmap visible="false" x="2" y="2" width="26" height="26" params="16" style="3" name="slot_head_icon" tags="%23icon">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/rpg_item_weapon_sword_attack_melee_slashing_damage_icon" type="String"/>
+                        <var key="stretched_x" value="true" type="Boolean"/>
+                        <var key="stretched_y" value="true" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                  </children>
+                </border>
+                <border x="132" y="20" width="30" height="30" params="17" style="2" name="slot_amulet" color="0x3a4a60" dynamic_style="button">
+                  <children>
+                    <static_bitmap visible="false" x="2" y="2" width="26" height="26" params="16" style="3" name="slot_amulet_icon" tags="%23icon">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/rpg_item_weapon_sword_attack_melee_slashing_damage_icon" type="String"/>
+                        <var key="stretched_x" value="true" type="Boolean"/>
+                        <var key="stretched_y" value="true" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                  </children>
+                </border>
+                <border x="32" y="20" width="30" height="30" params="17" style="2" name="slot_cape" color="0x3a4a60" dynamic_style="button">
+                  <children>
+                    <static_bitmap visible="false" x="2" y="2" width="26" height="26" params="16" style="3" name="slot_cape_icon" tags="%23icon">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/rpg_item_weapon_sword_attack_melee_slashing_damage_icon" type="String"/>
+                        <var key="stretched_x" value="true" type="Boolean"/>
+                        <var key="stretched_y" value="true" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                  </children>
+                </border>
+                <border x="4" y="66" width="30" height="30" params="17" style="2" name="slot_weapon" color="0x3a4a60" dynamic_style="button">
+                  <children>
+                    <static_bitmap visible="false" x="2" y="2" width="26" height="26" params="16" style="3" name="slot_weapon_icon" tags="%23icon">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/rpg_item_weapon_sword_attack_melee_slashing_damage_icon" type="String"/>
+                        <var key="stretched_x" value="true" type="Boolean"/>
+                        <var key="stretched_y" value="true" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                  </children>
+                </border>
+                <border x="160" y="66" width="30" height="30" params="17" style="2" name="slot_shield" color="0x3a4a60" dynamic_style="button">
+                  <children>
+                    <static_bitmap visible="false" x="2" y="2" width="26" height="26" params="16" style="3" name="slot_shield_icon" tags="%23icon">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/rpg_item_weapon_sword_attack_melee_slashing_damage_icon" type="String"/>
+                        <var key="stretched_x" value="true" type="Boolean"/>
+                        <var key="stretched_y" value="true" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                  </children>
+                </border>
+                <border x="4" y="108" width="30" height="30" params="17" style="2" name="slot_ring1" color="0x3a4a60" dynamic_style="button">
+                  <children>
+                    <static_bitmap visible="false" x="2" y="2" width="26" height="26" params="16" style="3" name="slot_ring1_icon" tags="%23icon">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/rpg_item_weapon_sword_attack_melee_slashing_damage_icon" type="String"/>
+                        <var key="stretched_x" value="true" type="Boolean"/>
+                        <var key="stretched_y" value="true" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                  </children>
+                </border>
+                <border x="160" y="108" width="30" height="30" params="17" style="2" name="slot_ring2" color="0x3a4a60" dynamic_style="button">
+                  <children>
+                    <static_bitmap visible="false" x="2" y="2" width="26" height="26" params="16" style="3" name="slot_ring2_icon" tags="%23icon">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/rpg_item_weapon_sword_attack_melee_slashing_damage_icon" type="String"/>
+                        <var key="stretched_x" value="true" type="Boolean"/>
+                        <var key="stretched_y" value="true" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                  </children>
+                </border>
+                <border x="32" y="150" width="30" height="30" params="17" style="2" name="slot_chest" color="0x3a4a60" dynamic_style="button">
+                  <children>
+                    <static_bitmap visible="false" x="2" y="2" width="26" height="26" params="16" style="3" name="slot_chest_icon" tags="%23icon">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/rpg_item_weapon_sword_attack_melee_slashing_damage_icon" type="String"/>
+                        <var key="stretched_x" value="true" type="Boolean"/>
+                        <var key="stretched_y" value="true" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                  </children>
+                </border>
+                <border x="82" y="158" width="30" height="30" params="17" style="2" name="slot_feet" color="0x3a4a60" dynamic_style="button">
+                  <children>
+                    <static_bitmap visible="false" x="2" y="2" width="26" height="26" params="16" style="3" name="slot_feet_icon" tags="%23icon">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/rpg_item_weapon_sword_attack_melee_slashing_damage_icon" type="String"/>
+                        <var key="stretched_x" value="true" type="Boolean"/>
+                        <var key="stretched_y" value="true" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                  </children>
+                </border>
+                <border x="132" y="150" width="30" height="30" params="17" style="2" name="slot_gloves" color="0x3a4a60" dynamic_style="button">
+                  <children>
+                    <static_bitmap visible="false" x="2" y="2" width="26" height="26" params="16" style="3" name="slot_gloves_icon" tags="%23icon">
+                      <variables>
+                        <var key="asset_uri" value="rpg/ui-icons/rpg_item_weapon_sword_attack_melee_slashing_damage_icon" type="String"/>
+                        <var key="stretched_x" value="true" type="Boolean"/>
+                        <var key="stretched_y" value="true" type="Boolean"/>
+                      </variables>
+                    </static_bitmap>
+                  </children>
+                </border>
+              </children>
+            </border>
+          </children>
+        </border>
+        <border x="8" y="236" width="300" height="228" params="16" style="2" name="stats" color="0xe8eef4">
+          <children>
+            <container x="1" y="1" width="298" height="22" params="16" style="8" color="0xff3d7aa8" background="true"/>
+            <text x="8" y="4" width="236" height="16" params="16" style="3" name="stats_title" caption="${vortex.mapeditor.content.item.stats}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0xffffff" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <itemlist_vertical x="8" y="28" width="284" height="194" params="16" style="3" name="stat_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="0" type="int"/>
+              </variables>
+            </itemlist_vertical>
+          </children>
+        </border>
+        <border x="316" y="236" width="308" height="92" params="16" style="2" name="affixes" color="0xe8eef4">
+          <children>
+            <container x="1" y="1" width="306" height="22" params="16" style="8" color="0xff3d7aa8" background="true"/>
+            <text x="8" y="4" width="244" height="16" params="16" style="3" name="affixes_title" caption="${vortex.mapeditor.content.item.affixes}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0xffffff" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <itemlist_vertical x="8" y="28" width="292" height="42" params="16" style="3" name="affix_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="2" type="int"/>
+              </variables>
+            </itemlist_vertical>
+            <border x="8" y="70" width="18" height="18" params="17" style="2" name="affix_add" color="0x2f9e2f" dynamic_style="button">
+              <children>
+                <static_bitmap x="1" y="1" width="16" height="16" params="16" style="3" tags="%23icon" color="0xffffff">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_signs_maths_plus_addition_bonus_add_new_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <text x="32" y="71" width="200" height="16" params="16" style="3" caption="${vortex.mapeditor.content.item.affix_add}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x1f5f9a" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+        <border x="316" y="334" width="308" height="60" params="16" style="2" name="sockets" color="0xe8eef4">
+          <children>
+            <container x="1" y="1" width="306" height="22" params="16" style="8" color="0xff3d7aa8" background="true"/>
+            <text x="8" y="4" width="244" height="16" params="16" style="3" name="sockets_title" caption="${vortex.mapeditor.content.item.sockets}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0xffffff" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <itemlist_horizontal x="8" y="26" width="160" height="30" params="16" style="3" name="socket_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="6" type="int"/>
+              </variables>
+            </itemlist_horizontal>
+            <button x="146" y="30" width="154" height="24" params="131089" style="6" color="0x8c8c86" name="socket_unlock" caption="${vortex.mapeditor.content.item.socket_unlock}" width_min="154" width_max="154"/>
+          </children>
+        </border>
+        <border x="316" y="400" width="308" height="64" params="16" style="2" name="set_bonus" color="0xe8eef4">
+          <children>
+            <container x="1" y="1" width="306" height="22" params="16" style="8" color="0xff3d7aa8" background="true"/>
+            <text x="8" y="4" width="244" height="16" params="16" style="3" name="set_bonus_title" caption="${vortex.mapeditor.content.item.set}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0xffffff" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <text x="0" y="26" width="308" height="16" params="16" style="3" caption="${vortex.mapeditor.content.item.set_none}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="9" type="uint"/>
+                <var key="text_color" value="0x6b7682" type="hex"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <border x="8" y="42" width="18" height="18" params="17" style="2" name="set_add" color="0x2f9e2f" dynamic_style="button">
+              <children>
+                <static_bitmap x="1" y="1" width="16" height="16" params="16" style="3" tags="%23icon" color="0xffffff">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/software_signs_maths_plus_addition_bonus_add_new_icon" type="String"/>
+                    <var key="stretched_x" value="false" type="Boolean"/>
+                    <var key="stretched_y" value="false" type="Boolean"/>
+                    <var key="pivot_point" value="center" type="String"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+            <text x="32" y="43" width="200" height="16" params="16" style="3" caption="${vortex.mapeditor.content.item.set_link}">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="10" type="uint"/>
+                <var key="text_color" value="0x1f5f9a" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+        <border x="8" y="472" width="200" height="102" params="16" style="2" name="icons" color="0xe8eef4">
+          <children>
+            <container x="1" y="1" width="198" height="22" params="16" style="8" color="0xff3d7aa8" background="true"/>
+            <text x="8" y="4" width="136" height="16" params="16" style="3" name="icons_title" caption="${vortex.mapeditor.content.item.icons}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0xffffff" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <itemlist_horizontal x="8" y="28" width="136" height="40" params="16" style="3" name="icon_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="4" type="int"/>
+              </variables>
+            </itemlist_horizontal>
+            <button x="8" y="72" width="90" height="24" params="131089" style="6" color="0x8c8c86" name="icons_import" caption="${vortex.mapeditor.content.item.import}" width_min="90" width_max="90"/>
+            <text x="104" y="76" width="90" height="16" params="16" style="3" caption="32 × 32 px">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="9" type="uint"/>
+                <var key="text_color" value="0x6b7682" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+        <border x="216" y="472" width="200" height="102" params="16" style="2" name="variants" color="0xe8eef4">
+          <children>
+            <container x="1" y="1" width="198" height="22" params="16" style="8" color="0xff3d7aa8" background="true"/>
+            <text x="8" y="4" width="136" height="16" params="16" style="3" name="variants_title" caption="${vortex.mapeditor.content.item.variants}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0xffffff" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <itemlist_horizontal x="8" y="32" width="184" height="32" params="16" style="3" name="look_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="4" type="int"/>
+              </variables>
+            </itemlist_horizontal>
+          </children>
+        </border>
+        <border x="424" y="472" width="200" height="102" params="16" style="2" name="borders" color="0xe8eef4">
+          <children>
+            <container x="1" y="1" width="198" height="22" params="16" style="8" color="0xff3d7aa8" background="true"/>
+            <text x="8" y="4" width="136" height="16" params="16" style="3" name="borders_title" caption="${vortex.mapeditor.content.item.borders}">
+              <variables>
+                <var key="text_style" value="u_bold" type="String"/>
+                <var key="font_size" value="11" type="uint"/>
+                <var key="text_color" value="0xffffff" type="hex"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+            <itemlist_horizontal x="6" y="28" width="190" height="70" params="16" style="3" name="border_list">
+              <children/>
+              <variables>
+                <var key="spacing" value="2" type="int"/>
+              </variables>
+            </itemlist_horizontal>
+          </children>
+        </border>
+      </children>
+    </border>
+  </window>
+</layout>

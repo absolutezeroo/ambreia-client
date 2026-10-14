@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_rarity_slot_xml" width="36" height="68" version="0.1">
+  <window>
+    <container x="0" y="0" width="36" height="68" params="16" style="3" name="rarity_slot">
+      <children>
+        <border x="0" y="0" width="36" height="36" params="16" style="2" name="slot_box" color="0x9a9a9a">
+          <children>
+            <border x="3" y="3" width="30" height="30" params="16" style="2" color="0x2a3a50">
+              <children>
+                <static_bitmap x="-1" y="-1" width="32" height="32" params="16" style="3" name="slot_icon" tags="%23icon">
+                  <variables>
+                    <var key="asset_uri" value="rpg/ui-icons/rpg_item_weapon_sword_attack_melee_slashing_damage_icon" type="String"/>
+                    <var key="stretched_x" value="true" type="Boolean"/>
+                    <var key="stretched_y" value="true" type="Boolean"/>
+                  </variables>
+                </static_bitmap>
+              </children>
+            </border>
+          </children>
+        </border>
+        <text x="-4" y="36" width="44" height="30" params="16" style="3" name="slot_txt" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="8" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="auto_size" value="center" type="String"/>
+            <var key="multiline" value="true" type="Boolean"/>
+            <var key="word_wrap" value="true" type="Boolean"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+      </children>
+    </container>
+  </window>
+</layout>

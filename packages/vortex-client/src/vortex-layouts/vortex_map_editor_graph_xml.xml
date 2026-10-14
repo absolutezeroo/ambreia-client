@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_graph_xml" width="632" height="582" version="0.1">
+  <window>
+    <border x="0" y="0" width="632" height="582" params="16" style="2" name="graph" color="0xc4ced8">
+      <children>
+        <container x="0" y="0" width="632" height="582" params="16" style="3" name="link_layer">
+          <children>
+            
+          </children>
+        </container>
+        <container x="0" y="0" width="632" height="582" params="16" style="3" name="node_layer">
+          <children>
+            
+          </children>
+        </container>
+        <dropmenu x="512" y="10" width="112" height="24" params="17" style="3" name="zoom_menu" caption="${vortex.mapeditor.content.graph.zoom}"/>
+      </children>
+    </border>
+  </window>
+</layout>

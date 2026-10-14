@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_tag_chip_xml" width="50" height="20" version="0.1">
+  <window>
+    <container x="0" y="0" width="50" height="20" params="16" style="3" name="tag_chip">
+      <children>
+        <border x="0" y="0" width="50" height="20" params="16" style="2" name="chip_box" color="0xb8d4f4">
+          <children>
+            <text x="0" y="1" width="50" height="16" params="16" style="3" name="tag_txt" caption="">
+              <variables>
+                <var key="text_style" value="u_regular" type="String"/>
+                <var key="font_size" value="9" type="uint"/>
+                <var key="text_color" value="0x1f5f9a" type="hex"/>
+                <var key="auto_size" value="center" type="String"/>
+                <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+              </variables>
+            </text>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>

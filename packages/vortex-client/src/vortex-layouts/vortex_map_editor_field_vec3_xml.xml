@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout name="vortex_map_editor_field_vec3_xml" width="316" height="26" version="0.1">
+  <window>
+    <container x="0" y="0" width="316" height="26" params="16" style="3" name="field_vec3">
+      <children>
+        <text x="0" y="4" width="112" height="16" params="16" style="3" name="field_label" caption="">
+          <variables>
+            <var key="text_style" value="u_regular" type="String"/>
+            <var key="font_size" value="10" type="uint"/>
+            <var key="text_color" value="0x1f2a33" type="hex"/>
+            <var key="mouse_wheel_enabled" value="false" type="Boolean"/>
+          </variables>
+        </text>
+        <border x="118" y="0" width="62" height="24" params="16" style="2" name="field_x_box" color="0xffffff">
+          <children>
+            <input x="6" y="4" width="50" height="16" params="1" style="0" name="field_x" caption=""/>
+          </children>
+        </border>
+        <border x="186" y="0" width="62" height="24" params="16" style="2" name="field_y_box" color="0xffffff">
+          <children>
+            <input x="6" y="4" width="50" height="16" params="1" style="0" name="field_y" caption=""/>
+          </children>
+        </border>
+        <border x="254" y="0" width="62" height="24" params="16" style="2" name="field_z_box" color="0xffffff">
+          <children>
+            <input x="6" y="4" width="50" height="16" params="1" style="0" name="field_z" caption=""/>
+          </children>
+        </border>
+      </children>
+    </container>
+  </window>
+</layout>
