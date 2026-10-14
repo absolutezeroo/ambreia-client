@@ -49,7 +49,13 @@ export const NewStyleHeaders = {
         Incoming.RpgThreatMessageComposer,
         Incoming.RpgResurrectOfferMessageComposer,
         Incoming.RpgAutoAttackStateMessageComposer,
-        Incoming.RpgLevelUpMessageComposer
+        Incoming.RpgLevelUpMessageComposer,
+        // M2a NPCs, dialogue, quests (features/quests).
+        Incoming.RpgNpcsMessageComposer,
+        Incoming.RpgDialogueMessageComposer,
+        Incoming.RpgDialogueCloseMessageComposer,
+        Incoming.RpgQuestLogMessageComposer,
+        Incoming.RpgQuestResultMessageComposer
     ]),
     outgoing: new Set<number>([
         Outgoing.RpgCharacterListRequestMessageEvent,
@@ -69,7 +75,11 @@ export const NewStyleHeaders = {
         Outgoing.RpgActionBarSetMessageEvent,
         Outgoing.RpgCastCancelMessageEvent,
         Outgoing.RpgAutoAttackMessageEvent,
-        Outgoing.RpgDeathChoiceMessageEvent
+        Outgoing.RpgDeathChoiceMessageEvent,
+        // M2a NPCs, dialogue, quests (features/quests).
+        Outgoing.RpgNpcTalkMessageEvent,
+        Outgoing.RpgDialogueChooseMessageEvent,
+        Outgoing.RpgQuestAbandonMessageEvent
     ])
 };
 

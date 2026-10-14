@@ -26,6 +26,7 @@ import {ChatFeature} from './chat/feature';
 import {CombatFeature} from './combat/feature';
 import {SkillsFeature} from './skills/feature';
 import {InputFeature} from './input/feature';
+import {QuestsFeature} from './quests/feature';
 import {IID_HabboConfigurationManager} from '../iid/IIDHabboConfigurationManager';
 import {IID_HabboCommunicationManager} from '../iid/IIDHabboCommunicationManager';
 import {IID_HabboLocalizationManager} from '../iid/IIDHabboLocalizationManager';
@@ -51,7 +52,7 @@ export function emptyManagers(): IEngineManagers
     return {
         configuration: null, assetDirectories: null, communication: null, demo: null, localization: null, roomManager: null, roomSession: null,
         sessionData: null, roomEngine: null, avatarRenderer: null, windowManager: null, roomUI: null, character: null,
-        hud: null, inventory: null, interaction: null, chat: null, hudPlayer: null, combat: null, skills: null, input: null
+        hud: null, inventory: null, interaction: null, chat: null, hudPlayer: null, combat: null, skills: null, input: null, quests: null
     };
 }
 
@@ -274,5 +275,6 @@ export const GAME_FEATURES: readonly IGameFeature[] = [
     CombatFeature,
     InteractionFeature,
     ChatFeature,
-    SkillsFeature
+    SkillsFeature,
+    QuestsFeature
 ];

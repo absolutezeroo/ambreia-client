@@ -20,6 +20,7 @@ import type {HudPanelsState} from './hud/HudPanelsState';
 import type {RpgInteractionSession} from './interaction/RpgInteractionSession';
 import type {RpgChatSession} from './chat/RpgChatSession';
 import type {RpgCombatSession} from './combat/RpgCombatSession';
+import type {IQuests} from './quests/IQuests';
 import type {RpgSkillSession} from './skills/RpgSkillSession';
 import type {PlayerHudState} from './hud/PlayerHudState';
 import type {IInputBindings} from './input/IInputBindings';
@@ -75,6 +76,9 @@ export interface IEngineManagers
 
     /** The player's skills, the bar, cooldowns and statuses (features/skills, M1b). */
     skills: RpgSkillSession | null;
+
+    /** Which room objects are NPCs (features/quests, M2a): the interaction feature does not target them. */
+    quests: IQuests | null;
 
     /** The keyboard: the bindings of the features (features/input). */
     input: IInputBindings | null;
