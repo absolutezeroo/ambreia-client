@@ -19,6 +19,8 @@
   "vortex.quest.done.sort.region_desc": "Région (Z → A)",
   "vortex.quest.done.title": "Quêtes terminées (%count%)",
   "vortex.quest.empty": "Aucune quête disponible pour le moment.",
+  "vortex.quest.empty.active": "Aucune quête en cours.",
+  "vortex.quest.empty.done": "Aucune quête terminée.",
   "vortex.quest.error.failed": "Impossible pour le moment.",
   "vortex.quest.error.npc.too_far": "Ce personnage est trop loin.",
   "vortex.quest.error.npc.unknown": "Ce personnage ne répond pas.",

@@ -20,6 +20,7 @@ export class QuestRowsView
     renderActive(list: IItemListWindow, entries: readonly IRpgQuestLogEntry[], selectedId: string | null, procedure: (event: WindowEvent, window: IWindow) => void): void
     {
         list.destroyListItems();
+        if(entries.length === 0) this.empty(list, 'vortex.quest.empty.active');
 
         entries.forEach((entry, index) =>
         {
@@ -45,6 +46,7 @@ export class QuestRowsView
     renderDone(list: IItemListWindow, entries: readonly IRpgQuestLogEntry[], selectedId: string | null, procedure: (event: WindowEvent, window: IWindow) => void): void
     {
         list.destroyListItems();
+        if(entries.length === 0) this.empty(list, 'vortex.quest.empty.done');
 
         entries.forEach((entry, index) =>
         {
@@ -62,5 +64,21 @@ export class QuestRowsView
             row.procedure = procedure;
             list.addListItem(row);
         });
+    }
+
+    /** An empty tab says so (vortex_ui_empty_state_xml) rather than showing a blank list. */
+    private empty(list: IItemListWindow, key: string): void
+    {
+        const message = this._windows.buildWidgetLayout('vortex_ui_empty_state_xml') as IWindowContainer | null;
+
+        if(!message) return;
+
+        const icon = message.findChildByName('empty_icon') as IStaticBitmapWrapperWindow | null;
+
+        message.width = list.width;
+        // The quest scroll the tracker shows, not the layout's eye.
+        if(icon) icon.assetUri = 'rpg/ui-icons/tools_crafting_writing_parchment_scroll_document_icon';
+        this._bits.setText(message, 'empty_message', this._bits.text(key));
+        list.addListItem(message);
     }
 }

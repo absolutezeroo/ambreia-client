@@ -19,6 +19,8 @@
   "vortex.quest.done.sort.region_desc": "Region (Z → A)",
   "vortex.quest.done.title": "Completed quests (%count%)",
   "vortex.quest.empty": "No quest available right now.",
+  "vortex.quest.empty.active": "No quest under way.",
+  "vortex.quest.empty.done": "No quest completed yet.",
   "vortex.quest.error.failed": "Not possible right now.",
   "vortex.quest.error.npc.too_far": "This character is too far away.",
   "vortex.quest.error.npc.unknown": "This character does not answer.",
