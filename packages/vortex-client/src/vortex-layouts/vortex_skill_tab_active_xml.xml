@@ -11,7 +11,11 @@
                 <input x="6" y="4" width="218" height="16" params="1" style="0" name="search_input" caption="${vortex.skill.search}"/>
               </children>
             </border>
-            <scrollable_itemgrid_vertical x="8" y="40" width="356" height="340" params="16" style="3" name="skill_grid"/>
+            <scrollable_itemgrid_vertical x="8" y="40" width="356" height="340" params="16" style="3" name="skill_grid">
+              <variables>
+                <var key="spacing" value="6" type="int"/>
+              </variables>
+            </scrollable_itemgrid_vertical>
           </children>
         </border>
         <border x="388" y="0" width="468" height="388" params="16" style="103" name="skill_detail">

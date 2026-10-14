@@ -17,8 +17,6 @@ import {ItemDetailView} from './window/ItemDetailView';
 import {itemName, thousands} from './window/itemLines';
 import {SearchField} from './window/SearchField';
 
-/** vortex_inventory_xml's item_grid `spacing`. */
-const GRID_SPACING = 4;
 const TABS = new Set<string>(['tab_equipment', 'tab_items', 'tab_resources', 'tab_quests'] satisfies InventoryTab[]);
 
 /**
@@ -114,12 +112,6 @@ export class InventoryView
         // Not on the wire yet (Objets §17): rarity, item effects and value, the filter.
         this._bits.setVisible(window, false, 'filter_menu');
         if(this._detail) this._bits.setVisible(this._detail, false, 'item_rarity', 'effects_title', 'effects_list', 'value_icon', 'value_label', 'item_value');
-
-        // The layout's `spacing` var does not reach a scrollable grid's inner grid (ScrollableItemGridWindow
-        // has no properties setter): set it, or the cases touch.
-        const grid = window.findChildByName('item_grid') as IItemGridWindow | null;
-
-        if(grid) grid.spacing = GRID_SPACING;
 
         const tabs = window.findChildByName('tab_context') as ITabContextWindow | null;
         const first = tabs?.getTabItemByName(this._tab);

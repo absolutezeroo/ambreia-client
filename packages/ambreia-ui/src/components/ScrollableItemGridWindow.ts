@@ -5,6 +5,7 @@ import type {IItemGridWindow} from './IItemGridWindow';
 import type {IScrollbarWindow} from './IScrollbarWindow';
 import type {IScrollableWindow} from './IScrollableWindow';
 import type {IIterator} from '../utils/IIterator';
+import type {PropertyStruct} from '../utils/PropertyStruct';
 import {ContainerController} from './ContainerController';
 import {WindowEvent} from '../events/WindowEvent';
 
@@ -59,6 +60,47 @@ export class ScrollableItemGridWindow extends ContainerController implements ISc
         {
             this.hideScrollBar();
         }
+    }
+
+    // AS3: .../src/com/sulake/core/window/components/ScrollableItemGridWindow.as::get properties()
+    public override get properties(): unknown[]
+    {
+        const props = super.properties;
+
+        props.push(this.createProperty('spacing', this.spacing));
+        props.push(this.createProperty('auto_arrange_items', this.autoArrangeItems));
+        props.push(this.createProperty('scale_to_fit_items', this.scaleToFitItems));
+        props.push(this.createProperty('resize_on_item_update', this.resizeOnItemUpdate));
+
+        return props;
+    }
+
+    // AS3: .../src/com/sulake/core/window/components/ScrollableItemGridWindow.as::set properties()
+    // Runs after buildLayoutChildren() (completeConstruction), so the inner grid is there to take them.
+    public override set properties(value: unknown[])
+    {
+        for(const item of value)
+        {
+            const prop = item as PropertyStruct;
+
+            switch(prop.key)
+            {
+                case 'spacing':
+                    this.spacing = prop.value as number;
+                    break;
+                case 'scale_to_fit_items':
+                    this.scaleToFitItems = !!prop.value;
+                    break;
+                case 'resize_on_item_update':
+                    this.resizeOnItemUpdate = !!prop.value;
+                    break;
+                case 'auto_arrange_items':
+                    this.autoArrangeItems = !!prop.value;
+                    break;
+            }
+        }
+
+        super.properties = value;
     }
 
     private _autoHideScrollBar: boolean = true;

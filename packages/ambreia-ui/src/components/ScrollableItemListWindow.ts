@@ -4,6 +4,7 @@ import type {IScrollableListWindow} from './IScrollableListWindow';
 import type {IItemListWindow} from './IItemListWindow';
 import type {IScrollbarWindow} from './IScrollbarWindow';
 import type {IIterator} from '../utils/IIterator';
+import type {PropertyStruct} from '../utils/PropertyStruct';
 import {ContainerController} from './ContainerController';
 import {WindowEvent} from '../events/WindowEvent';
 
@@ -48,6 +49,51 @@ export class ScrollableItemListWindow extends ContainerController implements ISc
         super(name, type, style, param, context, rect, parent, procedure, tags, properties, id);
 
         this._scrollBarEventProcBound = this.scrollBarEventProc.bind(this);
+    }
+
+    // AS3: .../src/com/sulake/core/window/components/ScrollableItemListWindow.as::get properties()
+    public override get properties(): unknown[]
+    {
+        const props = super.properties;
+
+        props.push(this.createProperty('spacing', this.spacing));
+        props.push(this.createProperty('auto_arrange_items', this.autoArrangeItems));
+        props.push(this.createProperty('scale_to_fit_items', this.scaleToFitItems));
+        props.push(this.createProperty('resize_on_item_update', this.resizeOnItemUpdate));
+        props.push(this.createProperty('inverse_resize_on_item_update', this.inverseResizeOnItemUpdate));
+
+        return props;
+    }
+
+    // AS3: .../src/com/sulake/core/window/components/ScrollableItemListWindow.as::set properties()
+    // Runs after buildLayoutChildren() (completeConstruction), so the inner list is there to take them.
+    public override set properties(value: unknown[])
+    {
+        for(const item of value)
+        {
+            const prop = item as PropertyStruct;
+
+            switch(prop.key)
+            {
+                case 'spacing':
+                    this.spacing = prop.value as number;
+                    break;
+                case 'scale_to_fit_items':
+                    this.scaleToFitItems = !!prop.value;
+                    break;
+                case 'resize_on_item_update':
+                    this.resizeOnItemUpdate = !!prop.value;
+                    break;
+                case 'inverse_resize_on_item_update':
+                    this.inverseResizeOnItemUpdate = !!prop.value;
+                    break;
+                case 'auto_arrange_items':
+                    this.autoArrangeItems = !!prop.value;
+                    break;
+            }
+        }
+
+        super.properties = value;
     }
 
     private _autoHideScrollBar: boolean = true;

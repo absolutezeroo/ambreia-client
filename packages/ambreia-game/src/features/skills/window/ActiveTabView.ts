@@ -38,11 +38,6 @@ export class ActiveTabView
     /** The tab's own state, set once: one rank per skill in M1b, the upgrade off. */
     build(tab: IWindowContainer): void
     {
-        const grid = tab.findChildByName('skill_grid') as IItemGridWindow | null;
-
-        // The layout's `spacing` does not reach a scrollable grid's inner grid (InventoryView).
-        if(grid) grid.spacing = 6;
-
         // One rank per skill in M1b: the next level's title says so without a number.
         this._bits.setText(tab, 'next_level_title', this._bits.text('vortex.skill.next_level.title'));
         tab.findChildByName('upgrade_button')?.disable();
