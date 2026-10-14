@@ -82,7 +82,8 @@ export const InteractionFeature: IGameFeature = {
 
         engineOn(RoomEngineObjectEvent.REOE_SELECTED, (event: RoomEngineObjectEvent) =>
         {
-            if(event.category === RoomObjectCategoryEnum.OBJECT_CATEGORY_USER) session.select(event.objectId);
+            // An NPC is talked to (features/quests), not targeted.
+            if(event.category === RoomObjectCategoryEnum.OBJECT_CATEGORY_USER && !host.made.quests?.isNpc(event.objectId)) session.select(event.objectId);
         });
         engineOn(RoomEngineObjectEvent.REOE_DESELECTED, () => session.select(0));
 

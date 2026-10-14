@@ -12,6 +12,9 @@ import {resultToast} from '../src/features/quests/results/resultToast';
 import {QuestDefinitions} from '../src/features/quests/definitions/QuestDefinitions';
 import {choiceIcon} from '../src/features/quests/dialogue/choiceIcons';
 import {markerLook} from '../src/features/quests/markers/markerLook';
+import {RoomObjectCategoryEnum} from '@ambreia/iso/scene/object/RoomObjectCategoryEnum';
+import {NpcClicks} from '../src/features/quests/npc/NpcClicks';
+import {LazySlot} from '../src/features/quests/LazySlot';
 
 const known: Record<string, string> = {
     'quest.camp.wolves.name': 'Les loups du bosquet',
@@ -136,4 +139,28 @@ test('a marker\'s look: « ! » for a quest offered, « ? » to hand in, a dim �
     assert.equal(markerLook('ready')?.icon, markerLook('active')?.icon);
     assert.notEqual(markerLook('available')?.icon, markerLook('ready')?.icon);
     assert.equal(markerLook(''), null);
+});
+
+test('a click on an NPC talks to it; on anyone else it does nothing', () =>
+{
+    const talked: number[] = [];
+    const clicks = new NpcClicks(id => id === 5, id => talked.push(id));
+
+    assert.equal(clicks.selected(5, RoomObjectCategoryEnum.OBJECT_CATEGORY_USER), true);
+    assert.equal(clicks.selected(6, RoomObjectCategoryEnum.OBJECT_CATEGORY_USER), false);
+    assert.equal(clicks.selected(5, RoomObjectCategoryEnum.OBJECT_CATEGORY_FURNITURE), false);
+    assert.deepEqual(talked, [5]);
+});
+
+test('a lazy slot builds once, on first use, and only when it can', () =>
+{
+    let ready = false;
+    let built = 0;
+    const slot = new LazySlot(() => ready ? {n: ++built, dispose: () => undefined} : null);
+
+    assert.equal(slot.get(), null);
+    ready = true;
+    assert.equal(slot.get()?.n, 1);
+    assert.equal(slot.get()?.n, 1);
+    assert.equal(built, 1);
 });
