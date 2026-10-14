@@ -11,6 +11,7 @@ import {trackerLines} from '../src/features/quests/tracker/trackerLines';
 import {resultToast} from '../src/features/quests/results/resultToast';
 import {QuestDefinitions} from '../src/features/quests/definitions/QuestDefinitions';
 import {choiceIcon} from '../src/features/quests/dialogue/choiceIcons';
+import {markerLook} from '../src/features/quests/markers/markerLook';
 
 const known: Record<string, string> = {
     'quest.camp.wolves.name': 'Les loups du bosquet',
@@ -125,4 +126,14 @@ test('a choice\'s icon says what it does', () =>
     assert.notEqual(choiceIcon('accept'), choiceIcon('next'));
     assert.notEqual(choiceIcon('complete'), choiceIcon('accept'));
     assert.equal(choiceIcon('close'), choiceIcon('next'));
+});
+
+test('a marker\'s look: « ! » for a quest offered, « ? » to hand in, a dim « ? » under way, nothing otherwise', () =>
+{
+    assert.equal(markerLook('available')?.dim, false);
+    assert.equal(markerLook('ready')?.dim, false);
+    assert.equal(markerLook('active')?.dim, true);
+    assert.equal(markerLook('ready')?.icon, markerLook('active')?.icon);
+    assert.notEqual(markerLook('available')?.icon, markerLook('ready')?.icon);
+    assert.equal(markerLook(''), null);
 });
