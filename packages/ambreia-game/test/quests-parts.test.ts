@@ -10,6 +10,7 @@ import {objectiveIcon, QUEST_READY_ICON} from '../src/features/quests/objectiveI
 import {trackerLines} from '../src/features/quests/tracker/trackerLines';
 import {resultToast} from '../src/features/quests/results/resultToast';
 import {QuestDefinitions} from '../src/features/quests/definitions/QuestDefinitions';
+import {choiceIcon} from '../src/features/quests/dialogue/choiceIcons';
 
 const known: Record<string, string> = {
     'quest.camp.wolves.name': 'Les loups du bosquet',
@@ -117,4 +118,11 @@ test('the definitions load once, and a failed load is tried again', async () =>
 
     assert.equal(definitions.of('quest.camp.wolves')?.level, 2);
     assert.equal(calls, 2);
+});
+
+test('a choice\'s icon says what it does', () =>
+{
+    assert.notEqual(choiceIcon('accept'), choiceIcon('next'));
+    assert.notEqual(choiceIcon('complete'), choiceIcon('accept'));
+    assert.equal(choiceIcon('close'), choiceIcon('next'));
 });
