@@ -16,8 +16,8 @@ import type {WindowCanvasHost} from './WindowCanvasHost';
 
 /**
  * The owner's main window (vortex_map_editor_xml) bound to the editor: menus, rail, view tools,
- * view info, the isometric view inside `viewport_slot`, and the three slots (left, inspector,
- * bottom) whose content follows the chosen category.
+ * view info, the isometric view inside `viewport_slot`, and the slots (left, inspector, bottom, and
+ * the view for content without a zone) whose content follows the chosen category.
  */
 export class EditorShell
 {
@@ -28,7 +28,7 @@ export class EditorShell
         readonly texts: EditorTexts,
         readonly app: EditorApp,
         host: WindowCanvasHost,
-        slots: (category: Category) => {left: string; inspector: string; bottom: string},
+        slots: (category: Category) => {left: string; inspector: string; bottom: string; view: string},
         panels: (layout: string, window: IWindow) => IPanelUi | null
     )
     {

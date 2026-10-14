@@ -17,5 +17,9 @@ export const CATEGORY_LABEL_KEYS: Readonly<Record<Category, string>> = {
     events: 'vortex.guild.channel.events',
     triggers: 'vortex.mapeditor.layer.triggers',
     ambience: 'vortex.mapeditor.layer.ambience',
-    settings: 'vortex.guild.tab.settings'
+    settings: 'vortex.guild.tab.settings',
+    items: 'vortex.mapeditor.content.rail.items',
+    vfx: 'vortex.mapeditor.content.rail.vfx',
+    sfx: 'vortex.mapeditor.content.rail.sfx',
+    quests: 'vortex.mapeditor.content.rail.quests'
 };

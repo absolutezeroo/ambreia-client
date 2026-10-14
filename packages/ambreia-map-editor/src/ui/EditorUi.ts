@@ -13,6 +13,7 @@ import {elementForm} from './forms/elementForm';
 import type {IPanelUi} from './IPanelUi';
 import {BottomEditUi} from './panels/BottomEditUi';
 import {CATEGORY_LABEL_KEYS} from './panels/CATEGORY_LABEL_KEYS';
+import {ContentLibraryUi} from './panels/ContentLibraryUi';
 import {DecorInspectorUi} from './panels/DecorInspectorUi';
 import {DecorPanelUi} from './panels/DecorPanelUi';
 import {FloorPanelUi} from './panels/FloorPanelUi';
@@ -53,12 +54,22 @@ export class EditorUi
         this._shell.window.destroy();
     }
 
-    private static slots(category: Category): {left: string; inspector: string; bottom: string}
+    private static slots(category: Category): {left: string; inspector: string; bottom: string; view: string}
+    {
+        return {view: '', ...EditorUi.layouts(category)};
+    }
+
+    private static layouts(category: Category): {left: string; inspector: string; bottom: string; view?: string}
     {
         const bottom = L('bottom_edit');
 
         switch(category)
         {
+            // Content without a zone (the « Contenu » rail): its library, its form, its own view and bottom.
+            case 'items': return {left: `${L('left_library')}#items`, inspector: `${L('inspect_form')}#items`, bottom: L('bottom_item'), view: L('item_sheet')};
+            case 'vfx': return {left: `${L('left_library')}#vfx`, inspector: `${L('inspect_form')}#vfx`, bottom: L('bottom_vfx')};
+            case 'sfx': return {left: `${L('left_library')}#sfx`, inspector: `${L('inspect_form')}#sfx`, bottom: L('bottom_sfx')};
+            case 'quests': return {left: `${L('left_library')}#quests`, inspector: `${L('inspect_form')}#quests`, bottom: L('bottom_quest'), view: L('graph')};
             case 'decor': return {left: L('left_decor'), inspector: L('inspect_decor'), bottom};
             case 'walls':
             case 'ambience': return {left: `${L('left_form')}#${category}`, inspector: L('inspect_tile'), bottom};
@@ -100,6 +111,8 @@ export class EditorUi
                 return layer ? new LayerListPanelUi(window, app, layer, texts.get(CATEGORY_LABEL_KEYS[suffix!]), build) : null;
             case L('inspect_form'):
                 return layer ? new FormPanelUi(window, build, () => elementForm(app, layer as LayerKey)) : null;
+            case L('left_library'):
+                return suffix ? new ContentLibraryUi(window, app, suffix, texts, build) : null;
             case L('left_form'):
                 return new FormPanelUi(window, build, () => suffix === 'walls' ? wallsForm(app) : ambienceForm(app));
             default: return null;

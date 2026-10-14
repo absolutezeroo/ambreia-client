@@ -3,18 +3,20 @@ import type {IWindowContainer} from '@ambreia/ui/IWindowContainer';
 import type {WindowManager} from '@ambreia/ui/kit/WindowManager';
 import type {Category} from '../app/Category';
 import type {EditorApp} from '../app/EditorApp';
-import {child} from './bind';
+import {child, setVisible} from './bind';
 import type {IPanelUi} from './IPanelUi';
 
-type SlotName = 'left' | 'inspector' | 'bottom';
+type SlotName = 'left' | 'inspector' | 'bottom' | 'view';
 
-const SLOT_WINDOWS: Record<SlotName, string> = {left: 'left_slot', inspector: 'inspector_slot', bottom: 'bottom_slot'};
+const SLOT_WINDOWS: Record<SlotName, string> = {left: 'left_slot', inspector: 'inspector_slot', bottom: 'bottom_slot', view: 'viewport_slot'};
 
 /**
- * Fills the main window's three slots with the layouts the current category asks for. A slot is
+ * Fills the main window's slots with the layouts the current category asks for. A slot is
  * named by its layout, or `layout#key` when one layout serves several categories with different
  * content (left_npcs for the NPCs, the entries, the passages…): each key gets its own window.
- * A window is built once and kept: switching back finds its panel as it was left.
+ * A window is built once and kept: switching back finds its panel as it was left. The view slot is
+ * empty ('') for the zone's own categories: the iso view shows; a content view (an item's sheet, a
+ * quest's graph) goes over it and over its toolbars, which act on the zone.
  */
 export class SlotSwitcher implements IPanelUi
 {
@@ -72,6 +74,16 @@ export class SlotSwitcher implements IPanelUi
             const old = this._built.get(previous);
 
             if(old) container.removeChild(old.window);
+        }
+
+        // The iso view repaints itself every frame over whatever lies on it: a content view hides it.
+        if(slot === 'view') setVisible(container, 'iso_view', !layout);
+
+        if(!layout)
+        {
+            this._shown[slot] = layout;
+
+            return;
         }
 
         let entry = this._built.get(layout);

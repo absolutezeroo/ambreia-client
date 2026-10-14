@@ -17,3 +17,14 @@ export function contentOptions(ids: readonly string[], used: readonly string[], 
 
     return options;
 }
+
+/** A library's lines (id, French name, id as the sub-line), by name, kept when the query is in the name or the id. */
+export function libraryRows(ids: readonly string[], names: ReadonlyMap<string, string>, query: string): {id: string; title: string; sub: string}[]
+{
+    const q = query.toLowerCase();
+
+    return ids
+        .map(id => ({id, title: contentName(id, names), sub: id}))
+        .filter(r => !q || r.title.toLowerCase().includes(q) || r.id.toLowerCase().includes(q))
+        .sort((a, b) => a.title.localeCompare(b.title, 'fr'));
+}
