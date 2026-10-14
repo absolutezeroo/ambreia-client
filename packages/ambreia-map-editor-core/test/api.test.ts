@@ -87,3 +87,20 @@ test('the monsters come from the editor route, the names from the content texts'
     assert.deepEqual([...await api.texts()], [['monster.grove.guardian.name', 'Gardien du bosquet']]);
     assert.deepEqual(seen, ['/api/editor/monsters', '/api/public/content/texts/fr']);
 });
+
+test('the dialogues come from the editor route, the quests from the public definitions', async () =>
+{
+    const seen: string[] = [];
+    const api = new EditorApiClient('', async url =>
+    {
+        seen.push(url);
+
+        return url.endsWith('/dialogues')
+            ? new Response(JSON.stringify(['dialogue.camp.elder']))
+            : new Response(JSON.stringify([{id: 'quest.camp.wolves', level: 1, objectives: [], rewards: []}]));
+    });
+
+    assert.deepEqual(await api.dialogues(), ['dialogue.camp.elder']);
+    assert.deepEqual(await api.quests(), ['quest.camp.wolves']);
+    assert.deepEqual(seen, ['/api/editor/dialogues', '/api/public/content/definitions/quest']);
+});

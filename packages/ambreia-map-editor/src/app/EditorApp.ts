@@ -69,6 +69,9 @@ export class EditorApp
     /** The monsters a spawn can name (GET /api/editor/monsters), and the content's texts for their names. */
     monsters: readonly IEditorMonster[] = [];
     texts: ReadonlyMap<string, string> = new Map();
+    /** The dialogues an NPC can name (GET /api/editor/dialogues) and the quests a rule can name (M2a §5). */
+    dialogues: readonly string[] = [];
+    quests: readonly string[] = [];
     savedVersion: number | null;
     publishedVersion: number | null;
     status = '';

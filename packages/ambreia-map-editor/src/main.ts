@@ -5,6 +5,7 @@ import type {IFurniturePaletteEntry} from '@ambreia/map-editor-core/api/IFurnitu
 import type {IZoneSummary} from '@ambreia/map-editor-core/api/IZoneSummary';
 import {blankZone} from '@ambreia/map-editor-core/zone/blankZone';
 import {EditorApp} from './app/EditorApp';
+import type {IEditorContent} from './app/IEditorContent';
 import {HomeScreen} from './home/HomeScreen';
 import {LoginDialog} from './home/LoginDialog';
 import {MapBrowser} from './home/MapBrowser';
@@ -45,7 +46,7 @@ async function boot(): Promise<void>
 
     const browser = new MapBrowser(manager, home, api, texts);
     let palette: IFurniturePaletteEntry[] | null = null;
-    let bestiary: Promise<[IEditorMonster[], Map<string, string>]> | null = null;
+    let content: Promise<IEditorContent> | null = null;
     let notice = '';
 
     for(;;)
@@ -63,7 +64,12 @@ async function boot(): Promise<void>
             const app = new EditorApp(api, zone, doc, palette);
 
             app.zones = await api.listZones();
-            [app.monsters, app.texts] = await (bestiary ??= loadBestiary());
+            const loaded = await (content ??= loadContent());
+
+            app.monsters = loaded.monsters;
+            app.texts = loaded.texts;
+            app.dialogues = loaded.dialogues;
+            app.quests = loaded.quests;
             home.hide();
 
             const ui = new EditorUi(manager, texts, app, host);
@@ -84,27 +90,31 @@ async function boot(): Promise<void>
 }
 
 /**
- * The monsters a spawn can name and their names, once per run. A server without the route (or
- * without texts) leaves the menu to the ids the zone already has, and the ids as names.
+ * The monsters, dialogues and quests a zone can name, and their names, once per run. A server
+ * without a route (or without texts) leaves its menu to the ids the zone already has, and the ids
+ * as names.
  */
-async function loadBestiary(): Promise<[IEditorMonster[], Map<string, string>]>
+async function loadContent(): Promise<IEditorContent>
 {
-    const [monsters, texts] = await Promise.all([
-        api.monsters().catch((error: unknown) =>
-        {
-            log.warn('no monster list from the server — the spawn menu offers only the ids the zone has', error);
+    const missing = <T>(what: string) => (error: unknown): T[] =>
+    {
+        log.warn(`no ${what} list from the server — its menu offers only the ids the zone has`, error);
 
-            return [];
-        }),
+        return [];
+    };
+    const [monsters, texts, dialogues, quests] = await Promise.all([
+        api.monsters().catch(missing<IEditorMonster>('monster')),
         api.texts().catch((error: unknown) =>
         {
-            log.warn('no content texts — monsters show their ids', error);
+            log.warn('no content texts — monsters, dialogues and quests show their ids', error);
 
             return new Map<string, string>();
-        })
+        }),
+        api.dialogues().catch(missing<string>('dialogue')),
+        api.quests().catch(missing<string>('quest'))
     ]);
 
-    return [monsters, texts];
+    return {monsters, texts, dialogues, quests};
 }
 
 /** Null when the session cookie is good; otherwise what to tell on the login ('' for no session). */

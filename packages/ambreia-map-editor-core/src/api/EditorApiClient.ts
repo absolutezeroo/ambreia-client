@@ -103,6 +103,18 @@ export class EditorApiClient
         return this.json('GET', '/api/editor/monsters');
     }
 
+    /** The dialogues an NPC can name, by id (M2a §5); a dialogue's name is the content text `<id>.name`. */
+    dialogues(): Promise<string[]>
+    {
+        return this.json('GET', '/api/editor/dialogues');
+    }
+
+    /** The quests a quest rule can name: the ids of the public quest definitions (M2a §5). */
+    async quests(): Promise<string[]>
+    {
+        return (await this.json<{id: string}[]>('GET', '/api/public/content/definitions/quest')).map(quest => quest.id);
+    }
+
     /** The content's texts (`key=value` lines): the monsters' names, `<id>.name`. */
     async texts(language = 'fr'): Promise<Map<string, string>>
     {

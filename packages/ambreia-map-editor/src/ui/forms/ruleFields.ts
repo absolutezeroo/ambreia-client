@@ -1,6 +1,8 @@
 import type {ZoneAction, ZoneCondition} from '@ambreia/map-editor-core/zone/Zone.generated';
 import type {EditorApp} from '../../app/EditorApp';
 import type {IFieldSpec} from './IFieldSpec';
+import {contentOptions} from '../panels/contentLabels';
+import {QUEST_STATES} from './QUEST_STATES';
 import {RULE_KINDS} from './RULE_KINDS';
 
 type Rule = ZoneCondition | ZoneAction;
@@ -24,20 +26,21 @@ export function ruleFields(app: EditorApp, family: 'conditions' | 'actions', rul
     const decor = (app.doc.decor ?? []).map(d => [d.id, `${d.id} (${d.class})`] as const);
     const zones = app.zones.map(z => [z.key, z.name] as const);
     const spawns = (app.doc.spawns ?? []).map(s => [s.id, s.id] as const);
+    const quests = contentOptions(app.quests, [String(r.quest ?? '')], app.texts);
 
     const params: IFieldSpec[] = (() =>
     {
         switch(kind)
         {
             case 'PlayerLevel': return [number('min', 'Niveau min', 1, 200), number('max', 'Niveau max', 1, 200)];
-            case 'QuestState': return [text('quest', 'Quête'), text('state', 'État')];
+            case 'QuestState': return [choice('quest', 'Quête', quests), choice('state', 'État', QUEST_STATES)];
             case 'TimeOfDay': return [number('from', 'De (heure)', 0, 23), number('to', 'À (heure)', 0, 23)];
             case 'HasItem': return [text('item', 'Objet'), number('count', 'Nombre', 1, 9999)];
             case 'Faction': return [text('faction', 'Faction')];
             case 'ZoneActive':
             case 'ActivateZone':
             case 'DeactivateZone': return [choice('zone', 'Aire', areas)];
-            case 'StartQuest': return [text('quest', 'Quête')];
+            case 'StartQuest': return [choice('quest', 'Quête', quests)];
             case 'ShowDialogue': return [{kind: 'area', label: 'Texte ou clé', get: () => String(r.dialogue ?? ''), set: set('dialogue')}];
             case 'Teleport': return [choice('zone', 'Zone', zones), text('entry', 'Entrée')];
             case 'SpawnGroup': return [choice('spawn', 'Spawn', spawns)];

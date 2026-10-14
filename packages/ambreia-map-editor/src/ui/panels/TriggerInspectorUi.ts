@@ -6,6 +6,7 @@ import {CheckBinding, child, ChoiceBinding, NumberBinding, setEnabled, TextBindi
 import type {EditorTexts} from '../EditorTexts';
 import {RuleListUi} from '../forms/RuleListUi';
 import type {IPanelUi} from '../IPanelUi';
+import {contentOptions} from './contentLabels';
 
 const TYPES: readonly ZoneTriggerType[] = ['EnterZone', 'LeaveZone', 'Interact', 'Timer', 'MonsterKilled', 'QuestState', 'PlayerLevel', 'ItemOwned'];
 /** Triggers the server runs now (plan D11); the others wait for the RPG. */
@@ -72,6 +73,7 @@ export class TriggerInspectorUi implements IPanelUi
             case 'LeaveZone': return [['', 'Aire ?'], ...(doc.zones ?? []).map(z => [z.id, z.name || z.id] as const)];
             case 'Interact': return [['', 'Mobi ?'], ...(doc.decor ?? []).map(d => [d.id, `${d.id} (${d.class})`] as const)];
             case 'Timer': return [['', 'Période ?'], ...PERIODS];
+            case 'QuestState': return [['', 'Quête ?'], ...contentOptions(this._app.quests, [this._app.world.current('triggers')?.target ?? ''], this._app.texts)];
             default: return [['', '(système RPG)']];
         }
     }
