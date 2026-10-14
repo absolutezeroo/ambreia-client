@@ -66,7 +66,9 @@ export const QuestsFeature: IGameFeature = {
         scope.own(dialogue);
 
         const journal = new LazySlot(() => host.made.windowManager
-            ? new QuestJournal(host.made.windowManager, bits(), questLog, questId => definitions.of(questId), questId => session.abandon(questId))
+            ? new QuestJournal(host.made.windowManager, bits(), questLog, questId => definitions.of(questId), questId => session.abandon(questId),
+                // The bottom bar's button of the journal shows it is open.
+                visible => host.made.hud?.update({navOpen: visible ? 'nav_quests' : null}))
             : null);
 
         scope.own(journal);
@@ -75,8 +77,6 @@ export const QuestsFeature: IGameFeature = {
         {
             journal.get()?.toggle();
             void definitions.load().then(() => journal.peek()?.render());
-            // The bottom bar's button of the journal shows it is open.
-            host.made.hud?.update({navOpen: journal.peek()?.visible ? 'nav_quests' : null});
         };
 
         // The bottom bar's « Quêtes » and J, in a zone only.

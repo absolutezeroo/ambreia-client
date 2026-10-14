@@ -39,7 +39,9 @@ export class QuestJournal
         private readonly _bits: WindowBits,
         private readonly _log: {active(): readonly IRpgQuestLogEntry[]; done(): readonly IRpgQuestLogEntry[]},
         private readonly _definition: (questId: string) => IQuestDefinition | null,
-        private readonly _abandon: (questId: string) => void
+        private readonly _abandon: (questId: string) => void,
+        /** Opened or closed, by J, the bottom bar or its close button. */
+        private readonly _visibility: (visible: boolean) => void
     )
     {
         this._rows = new QuestRowsView(_windows, _bits);
@@ -64,11 +66,15 @@ export class QuestJournal
         this._window!.visible = true;
         this._window!.activate();
         this.render();
+        this._visibility(true);
     }
 
     hide(): void
     {
-        if(this._window) this._window.visible = false;
+        if(!this._window?.visible) return;
+
+        this._window.visible = false;
+        this._visibility(false);
     }
 
     /** The log changed (or the definitions arrived): what is shown follows. */
@@ -90,7 +96,7 @@ export class QuestJournal
             else this._rows.renderActive(list, this._shown, this._selected, this._onEvent);
         }
 
-        if(done) this._bits.setText(tab, 'done_count', String(this._shown.length));
+        if(done) this._bits.setText(tab, 'done_count', this._bits.text('vortex.quest.done.title', 'count', String(this._shown.length)));
 
         const selected = this._shown.find(entry => entry.questId === this._selected) ?? null;
 

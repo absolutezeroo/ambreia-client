@@ -27,9 +27,19 @@ export class QuestDetailView
 
     render(tab: IWindowContainer, entry: IRpgQuestLogEntry | null, definition: IQuestDefinition | null, canAbandon: boolean): void
     {
-        this._bits.setVisible(tab, entry !== null, 'detail');
-        this._bits.setVisible(tab, false, 'track_button', 'turn_in_button', 'progression_slot', 'region_filter', 'sort_menu', 'done_date');
-        this._bits.setVisible(tab, entry !== null && canAbandon, 'abandon_button');
+        const detail = tab.findChildByName('detail') as IWindowContainer | null;
+        // The panel around the progression slot, its title included.
+        const progression = detail?.findChildByName('progression_slot')?.parent;
+
+        if(detail) detail.visible = entry !== null;
+        if(progression) progression.visible = false;
+        this._bits.setVisible(tab, false, 'region_filter', 'sort_menu');
+
+        if(!detail) return;
+
+        // In the detail: the list's rows have a track_button too, and they come first.
+        this._bits.setVisible(detail, false, 'track_button', 'turn_in_button', 'done_date');
+        this._bits.setVisible(detail, entry !== null && canAbandon, 'abandon_button');
 
         if(!entry) return;
 
@@ -43,6 +53,9 @@ export class QuestDetailView
             this._bits.setVisible(header, false, 'repeatable_pill', 'giver');
         }
 
+        // The done tab's objectives title counts them.
+        this._bits.setText(detail, 'objective_title', this._bits.text('vortex.ui.objectives.count',
+            'done', String(entry.objectives.filter(line => line.current >= line.required).length), 'total', String(entry.objectives.length)));
         this._bits.setText(tab, 'summary_txt', questDescription(this._bits, entry.questId));
         this._bits.setText(tab, 'done_title', this._bits.text('vortex.quest.done.banner'));
 
