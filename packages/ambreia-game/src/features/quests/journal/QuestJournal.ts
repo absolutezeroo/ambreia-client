@@ -129,10 +129,19 @@ export class QuestJournal
         }
 
         this._window = window;
-        // No side or daily quests yet (M2a): their tabs are hidden.
-        this._bits.setVisible(window, false, 'tab_side', 'tab_daily');
-
         const tabs = window.findChildByName('tab_context') as ITabContextWindow | null;
+
+        // No side or daily quests yet (M2a): their tabs leave the bar rather than hide, so the
+        // selector packs the done tab next to the main one instead of leaving their gap.
+        for(const name of ['tab_side', 'tab_daily'])
+        {
+            const tab = tabs?.getTabItemByName(name);
+
+            if(!tab) continue;
+
+            tabs!.removeTabItem(tab);
+            tab.destroy();
+        }
         const first = tabs?.getTabItemByName(this._tab);
 
         if(tabs?.selector && first) tabs.selector.setSelected(first);

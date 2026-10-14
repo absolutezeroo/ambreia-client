@@ -121,14 +121,23 @@ export const QuestsFeature: IGameFeature = {
         });
 
         scope.bind(markers.events)('changed', () => layer.set(markers.all));
-        scope.bind(questLog.events)('changed', () =>
+        // The tracker and the journal name quests from the content texts: drawn on each log change,
+        // and again when the texts arrive — the log comes with the sign-in, often before them.
+        const showLog = (): void =>
         {
             host.made.hud?.update({
                 quests: trackerLines(questLog.entries, bits()),
                 questAlert: questLog.active().some(entry => entry.state === 'ready')
             });
             journal.peek()?.render();
-        });
+        };
+        const textsArrived = {set localization(_value: string) { showLog(); }};
+        const localization = host.made.localization;
+
+        scope.bind(questLog.events)('changed', showLog);
+        // Any loadTexts() tells every listener: one key of the quest texts is enough.
+        localization?.registerLocalizationListener('vortex.quest.title', textsArrived);
+        scope.add(() => localization?.removeLocalizationListener('vortex.quest.title', textsArrived));
 
         const clicks = new NpcClicks(objectId => markers.isNpc(objectId), objectId => session.talk(objectId));
 

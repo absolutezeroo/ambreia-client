@@ -212,6 +212,14 @@ export class HudPanelsView
             return;
         }
 
+        if(WindowBits.ancestor(window, 'minimize_button') && WindowBits.ancestor(window, 'hud_quest_tracker'))
+        {
+            this._quests.toggleFold();
+            this.render(this._state.value);
+
+            return;
+        }
+
         const plus = WindowBits.ancestor(window, 'buff_add_button');
 
         if(plus)

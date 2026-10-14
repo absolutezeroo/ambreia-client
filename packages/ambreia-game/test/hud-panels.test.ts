@@ -11,6 +11,7 @@ import {ListCache} from '../src/features/hud/panels/ListCache';
 import {PartyFramesView} from '../src/features/hud/panels/PartyFramesView';
 import type {WindowBits} from '../src/ui/kit/WindowBits';
 import type {IHabboWindowManager} from '../src/window/IHabboWindowManager';
+import {trackerHeight} from '../src/features/hud/panels/trackerHeight';
 
 test('a list is rebuilt only when its array changed', () =>
 {
@@ -64,4 +65,13 @@ test('the chat sits bottom left and the target bottom right, both above the bar;
     assert.deepEqual([chat.x, chat.y], [MARGIN, bottom - 220]);
     assert.deepEqual([target.x, target.y], [1280 - 360 - MARGIN, bottom - 210]);
     assert.deepEqual([targetOfTarget.x, targetOfTarget.y], [target.x - 100 - GAP, bottom - 50]);
+});
+
+test('the quest tracker fits its rows, and folds down to its title bar', () =>
+{
+    // Header to the list's top (34), the rows and their spacing, the bottom padding (8).
+    assert.equal(trackerHeight([40, 40, 40], 2, false), 34 + 124 + 8);
+    assert.equal(trackerHeight([40], 2, false), 34 + 40 + 8);
+    assert.equal(trackerHeight([], 2, false), 34 + 8);
+    assert.equal(trackerHeight([40, 40], 2, true), 32);
 });
